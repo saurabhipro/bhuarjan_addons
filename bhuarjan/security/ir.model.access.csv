@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bhu_state,bhu.state,model_bhu_state,base.group_user,1,1,1,1
+access_bhu_district,bhu.district.model_access,model_bhu_district,base.group_user,1,1,1,1
+access_bhu_village_user,bhu.village.model_access,model_bhu_village,base.group_user,1,1,1,1
+access_bhu_project_user,bhu.project.model_access,model_bhu_project,base.group_user,1,1,1,1
+

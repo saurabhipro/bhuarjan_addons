@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- list View -->
+    <record id="view_bhu_project_list" model="ir.ui.view">
+        <field name="name">bhu.project.list</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="budget"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_bhu_project_form" model="ir.ui.view">
+        <field name="name">bhu.project.form</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="budget"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_bhu_project" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">bhu.project</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

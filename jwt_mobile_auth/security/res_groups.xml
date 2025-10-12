@@ -1,0 +1,7 @@
+<odoo>
+    <!-- Define a new group -->
+    <record id="surveyor_group_ddn" model="res.groups">
+        <field name="name">Surveyor</field>
+        <field name="category_id" ref="base.module_category_administration_administration"/>
+    </record>
+</odoo>

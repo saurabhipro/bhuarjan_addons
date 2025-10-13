@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record id="inherit_res_users_form_menu_rights_skjfkjsdf" model="ir.ui.view">
+          <field name="name">inherit.res.users.form.menu.rightssdfsdf</field>
+          <field name="model">res.users</field>
+          <field name="inherit_id" ref="base.view_users_form"/>
+          <field name="arch" type="xml">
+              
+              <xpath expr="//notebook" position="inside">
+                <page string="Bhuarjan Details">
+                    <group>
+                        <group>
+                            <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="district_id" invsible="user_has_group != bhuarjan.group_bhuarjan_collector" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="village_ids" domain="[('district_id','=',district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                        </group>
+                    </group>
+                </page>
+                  <page string="Child Ids">
+                      <field name="child_ids" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                  </page>
+              </xpath>
+          </field>
+      </record>
+    </data>
+</odoo>

@@ -3,9 +3,8 @@
     <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1">
         <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" sequence="1"/>
         <menuitem id="menu_bhu_master" name="Master" sequence="2">
-            <menuitem id="menu_bhu_state" name="States" action="action_bhu_state" sequence="1"/>
             <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" sequence="2"/>
-            <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" sequence="3"/>
+            <!-- <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" sequence="3"/> -->
         </menuitem>
     </menuitem>
 </odoo>

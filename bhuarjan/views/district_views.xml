@@ -20,9 +20,18 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="name"/>
                         <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                        <field name="name"/>
                     </group>
+                    <notebook>
+                        <page string="Villages">
+                            <field name="village_line_ids" mode="list">
+                                <list editable="bottom">
+                                    <field name="village_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                  <chatter/>
             </form>

@@ -10,10 +10,10 @@
     'depends':['mail'],
     'data':[
         'security/ir.model.access.csv',
-        'views/state_views.xml',
+        'security/secrurity.xml',
         'views/district_views.xml',
-        'views/village_views.xml',
         'views/project_views.xml',
+        'views/res_users.xml',
         'views/menuitem.xml',
     ],
     'installable': True,

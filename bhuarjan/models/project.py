@@ -7,3 +7,4 @@ class BhuProject(models.Model):
 
     name = fields.Char(string='Project Name', required=True)
     budget = fields.Float(string='Budget')
+    village_ids = fields.Many2many('bhu.village.line', string="Villages")

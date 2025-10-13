@@ -20,8 +20,13 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="budget"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="village_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="budget"/>
+                        </group>
                     </group>
                 </sheet>
                 <chatter/>

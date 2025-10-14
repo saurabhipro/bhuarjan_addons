@@ -12,7 +12,6 @@ import random
 _logger = logging.getLogger(__name__)
 
 import jwt
-print(jwt.__file__)
 
 from odoo.exceptions import AccessError, UserError
 
@@ -26,9 +25,7 @@ def check_permission(token):
             token = token[7:]
 
         decoded_token = jwt.decode(token, options={"verify_signature": False})
-        print("decoded token - ", decoded_token)
         user_id = decoded_token['user_id']
-        print("user_id - ", user_id)
         
         user_id = request.env['res.users'].sudo().search([('id', '=', user_id)])
         if user_id :

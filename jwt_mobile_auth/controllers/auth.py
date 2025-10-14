@@ -23,7 +23,6 @@ class JWTAuthController(http.Controller):
         otp_code = str(random.randint(100000, 999999))
         expire_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
 
-        print("user.id - ", user.id)
         request.env['mobile.otp'].sudo().create({
             'mobile': mobile,
             'user_id': user.id,
@@ -98,7 +97,6 @@ class JWTAuthController(http.Controller):
 
             # Create the user
             user = request.env['res.users'].sudo().create(user_vals)
-            print("lkfjsdlfjdfgsfg - ", user)
             # Return a success response with user details
             return Response(
                 json.dumps({
@@ -133,12 +131,10 @@ class JWTAuthController(http.Controller):
             ('mobile', '=', mobile),
             ('otp', '=', otp_input)
         ], limit=1)
-        print("otp_record - ", otp_record)
         if not otp_record:
             return Response( json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json' )
 
         expire_date = otp_record.expire_date
-        print("expire_date - ", expire_date)
         if datetime.datetime.utcnow() > expire_date:
             otp_record.unlink()
             return Response(json.dumps({'error': 'OTP expired'}),status=400, content_type='application/json')
@@ -158,13 +154,10 @@ class JWTAuthController(http.Controller):
 
     @http.route('/api/get_contacts', type='json', auth='none', methods=['POST'], csrf=False)
     def get_contacts(self, **kwargs):
-        print("\n self - ", self)
         try:
             user_id = check_permission(request.httprequest.headers.get('Authorization'))
-            print("user_id - ", user_id)
             if user_id :
                 contacts = request.env['res.partner'].sudo().search([])
-                print("contacts - ", contacts)
                 contact_data = []
                 for contact in contacts:
                     contact_data.append({

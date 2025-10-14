@@ -64,7 +64,6 @@ class Smkc(http.Controller):
 
     @http.route(['/api/ward', '/api/ward/<int:ward_id>'], type='http', auth='none', methods=['GET', 'POST', 'PUT', 'DELETE'], csrf=False)
     def get_wards(self, ward_id=None, **kwargs):
-        print("self -- , ", self)
         try:
             # Parsing the incoming JSON body if present
             data = json.loads(request.httprequest.data or "{}")
@@ -80,7 +79,6 @@ class Smkc(http.Controller):
                 
                 # Fetch all wards
                 wards = request.env['smkc.ward'].sudo().search([])
-                print("asldkfjs")
                 return Response(json.dumps([{'id': ward.id, 'name': ward.name, 'zone_id': ward.zone.id if ward.zone else None, 'zone_name': ward.zone.name if ward.zone else None} for ward in wards]), 
                                 status=200, content_type='application/json')
             

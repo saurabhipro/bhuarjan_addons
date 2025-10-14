@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form-10 Survey List View -->
+    <record id="view_form_10_survey_list" model="ir.ui.view">
+        <field name="name">form.10.survey.list</field>
+        <field name="model">form.10.survey</field>
+        <field name="arch" type="xml">
+            <list string="Form-10 Surveys / भू-अर्जन फार्म-10" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="department_id"/>
+                <field name="village_id"/>
+                <field name="tehsil_id"/>
+                <field name="khasra_number"/>
+                <field name="total_area"/>
+                <field name="acquired_area"/>
+                <field name="survey_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form-10 Survey Form View -->
+    <record id="view_form_10_survey_form" model="ir.ui.view">
+        <field name="name">form.10.survey.form</field>
+        <field name="model">form.10.survey</field>
+        <field name="arch" type="xml">
+            <form string="Form-10 Survey / भू-अर्जन फार्म-10">
+                <header>
+                    <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
+                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Survey Number / सर्वे नंबर"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Project Information / परियोजना की जानकारी">
+                            <field name="project_id"/>
+                            <field name="department_id"/>
+                            <field name="survey_date"/>
+                        </group>
+                        <group string="Location Information / स्थान की जानकारी">
+                            <field name="village_id"/>
+                            <field name="tehsil_id"/>
+                            <field name="district_name"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <field name="survey_uuid" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Landowners / भूमिस्वामी">
+                        <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Khasra Details / खसरा विवरण" name="khasra_details">
+                            <group>
+                                <group string="Land Information / भूमि की जानकारी">
+                                    <field name="khasra_number"/>
+                                    <field name="total_area"/>
+                                    <field name="acquired_area"/>
+                                </group>
+                                <group string="Crop Information / फसल की जानकारी">
+                                    <field name="is_single_crop"/>
+                                    <field name="is_double_crop"/>
+                                    <field name="is_irrigated"/>
+                                    <field name="is_unirrigated"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Tree Information / वृक्ष की जानकारी">
+                                    <field name="tree_development_stage"/>
+                                    <field name="tree_count"/>
+                                </group>
+                                <group string="House Information / घर की जानकारी">
+                                    <field name="house_type"/>
+                                    <field name="house_area"/>
+                                    <field name="shed_area"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Infrastructure / बुनियादी सुविधाएं">
+                                    <field name="has_well"/>
+                                    <field name="well_type" invisible="not has_well"/>
+                                    <field name="has_electricity"/>
+                                    <field name="has_road_access"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Attachments / संलग्नक" name="attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Form-10 Survey Search View -->
+    <record id="view_form_10_survey_search" model="ir.ui.view">
+        <field name="name">form.10.survey.search</field>
+        <field name="model">form.10.survey</field>
+        <field name="arch" type="xml">
+            <search string="Search Form-10 Surveys / फार्म-10 सर्वे खोजें">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="department_id"/>
+                <field name="village_id"/>
+                <field name="tehsil_id"/>
+                <field name="khasra_number"/>
+                <field name="survey_date"/>
+                <field name="survey_uuid"/>
+                
+                <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Submitted / प्रस्तुत" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="Approved / अनुमोदित" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Rejected / अस्वीकृत" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                
+                <separator/>
+                <filter string="This Month / इस महीने" name="this_month" domain="[('survey_date', '>=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01')), ('survey_date', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="This Year / इस साल" name="this_year" domain="[('survey_date', '>=', context_today().strftime('%Y-01-01')), ('survey_date', '&lt;', (context_today() + relativedelta(years=1)).strftime('%Y-01-01'))]"/>
+                
+                <group expand="0" string="Group By / समूह बनाएं">
+                    <filter string="State / स्थिति" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Village / ग्राम" name="group_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="Tehsil / तहसील" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                    <filter string="Khasra Number / खसरा नंबर" name="group_khasra" context="{'group_by': 'khasra_number'}"/>
+                    <filter string="Project / परियोजना" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Department / विभाग" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Survey Date / सर्वे दिनाँक" name="group_survey_date" context="{'group_by': 'survey_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Form-10 Survey Action -->
+    <record id="action_form_10_survey" model="ir.actions.act_window">
+        <field name="name">Form-10 Surveys / भू-अर्जन फार्म-10</field>
+        <field name="res_model">form.10.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_form_10_survey_search"/>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Form-10 Survey!
+            </p>
+            <p>
+                Form-10 Survey is used for preliminary land acquisition surveys.
+                You can add multiple citizens/landowners in one survey.
+            </p>
+        </field>
+    </record>
+
+    <!-- Form-10 Survey Kanban View -->
+    <record id="view_form_10_survey_kanban" model="ir.ui.view">
+        <field name="name">form.10.survey.kanban</field>
+        <field name="model">form.10.survey</field>
+        <field name="arch" type="xml">
+            <kanban string="Form-10 Surveys / भू-अर्जन फार्म-10" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="state"/>
+                <field name="survey_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <br/>
+                                        <span class="o_kanban_record_subtitle">
+                                            <field name="project_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_dropdown_kanban dropdown">
+                                        <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                            <span class="fa fa-ellipsis-v"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                            <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div>
+                                        <strong>Village / ग्राम:</strong> <field name="village_id"/>
+                                    </div>
+                                    <div>
+                                        <strong>Date / दिनाँक:</strong> <field name="survey_date"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge badge-pill" t-attf-class="badge-#{record.state.raw_value == 'draft' and 'info' or record.state.raw_value == 'approved' and 'success' or 'danger'}">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+</odoo>

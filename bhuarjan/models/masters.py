@@ -36,6 +36,42 @@ class BhuVillage(models.Model):
     _name = 'bhu.village'
     _description = 'Village'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    
+    name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
+    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True)
+    pincode = fields.Char(string='Pincode / पिनकोड')
+    population = fields.Integer(string='Population / जनसंख्या')
+    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
+    is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र')
+    is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र')
 
-    name = fields.Char(string='Name', required=True)
+
+class BhuTehsil(models.Model):
+    _name = 'bhu.tehsil'
+    _description = 'Tehsil'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    
+    name = fields.Char(string='Tehsil Name / तहसील का नाम', required=True)
+    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
+    code = fields.Char(string='Tehsil Code / तहसील कोड')
+    headquarters = fields.Char(string='Headquarters / मुख्यालय')
+    population = fields.Integer(string='Population / जनसंख्या')
+    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
+    is_tribal_tehsil = fields.Boolean(string='Tribal Tehsil / आदिवासी तहसील')
+    is_forest_tehsil = fields.Boolean(string='Forest Tehsil / वन तहसील')
+
+
+class BhuDepartment(models.Model):
+    _name = 'bhu.department'
+    _description = 'Department'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    
+    name = fields.Char(string='Department Name', required=True)
+    code = fields.Char(string='Department Code')
+    description = fields.Text(string='Description')
+    head_of_department = fields.Char(string='Head of Department')
+    contact_number = fields.Char(string='Contact Number')
+    email = fields.Char(string='Email')
+    address = fields.Text(string='Address')
 

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Chhattisgarh State reference will be handled in districts -->
+
+        <!-- Chhattisgarh Districts -->
+        <record id="district_balod" model="bhu.district">
+            <field name="name">Balod / बालोद</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_baloda_bazar" model="bhu.district">
+            <field name="name">Baloda Bazar / बालोदा बाजार</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_balrampur" model="bhu.district">
+            <field name="name">Balrampur / बलरामपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_bastar" model="bhu.district">
+            <field name="name">Bastar / बस्तर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_bemetara" model="bhu.district">
+            <field name="name">Bemetara / बेमेतरा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_bijapur" model="bhu.district">
+            <field name="name">Bijapur / बीजापुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_bilaspur" model="bhu.district">
+            <field name="name">Bilaspur / बिलासपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_dantewada" model="bhu.district">
+            <field name="name">Dantewada / दंतेवाड़ा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_dhamtari" model="bhu.district">
+            <field name="name">Dhamtari / धमतरी</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_durg" model="bhu.district">
+            <field name="name">Durg / दुर्ग</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_gariaband" model="bhu.district">
+            <field name="name">Gariaband / गरियाबंद</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_janjgir_champa" model="bhu.district">
+            <field name="name">Janjgir-Champa / जांजगीर-चंपा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_jashpur" model="bhu.district">
+            <field name="name">Jashpur / जशपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_kabirdham" model="bhu.district">
+            <field name="name">Kabirdham / कबीरधाम</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_kanker" model="bhu.district">
+            <field name="name">Kanker / कांकेर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_kawardha" model="bhu.district">
+            <field name="name">Kawardha / कवर्धा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_kondagaon" model="bhu.district">
+            <field name="name">Kondagaon / कोंडागांव</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_korba" model="bhu.district">
+            <field name="name">Korba / कोरबा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_koriya" model="bhu.district">
+            <field name="name">Koriya / कोरिया</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_mahasamund" model="bhu.district">
+            <field name="name">Mahasamund / महासमुंद</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_mungeli" model="bhu.district">
+            <field name="name">Mungeli / मुंगेली</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_narayanpur" model="bhu.district">
+            <field name="name">Narayanpur / नारायणपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_raigarh" model="bhu.district">
+            <field name="name">Raigarh / रायगढ़</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_raipur" model="bhu.district">
+            <field name="name">Raipur / रायपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_rajnandgaon" model="bhu.district">
+            <field name="name">Rajnandgaon / राजनांदगांव</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_sukma" model="bhu.district">
+            <field name="name">Sukma / सुकमा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_surajpur" model="bhu.district">
+            <field name="name">Surajpur / सूरजपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_surguja" model="bhu.district">
+            <field name="name">Surguja / सरगुजा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_balodabazar_bhatapara" model="bhu.district">
+            <field name="name">Balodabazar-Bhatapara / बालोदाबाजार-भाटापारा</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_bhanupratappur" model="bhu.district">
+            <field name="name">Bhanupratappur / भानुप्रतापपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_gaurela_pendra_marwahi" model="bhu.district">
+            <field name="name">Gaurela-Pendra-Marwahi / गौरेला-पेंड्रा-मरवाही</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_manendragarh_chirmiri_bharatpur" model="bhu.district">
+            <field name="name">Manendragarh-Chirmiri-Bharatpur / मनेन्द्रगढ़-चिरमिरी-भरतपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_mohla_manpur_ambagarh_chouki" model="bhu.district">
+            <field name="name">Mohla-Manpur-Ambagarh Chouki / मोहला-मानपुर-अम्बागढ़ चौकी</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_sakti" model="bhu.district">
+            <field name="name">Sakti / सक्ती</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_sarangarh_bilaigarh" model="bhu.district">
+            <field name="name">Sarangarh-Bilaigarh / सारंगढ़-बिलाईगढ़</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+    </data>
+</odoo>

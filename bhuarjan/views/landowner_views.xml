@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Landowner List View -->
+    <record id="view_bhu_landowner_list" model="ir.ui.view">
+        <field name="name">bhu.landowner.list</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <list string="Landowners / भूमिस्वामी" multi_edit="1">
+                <field name="name"/>
+                <field name="father_name"/>
+                <field name="mobile"/>
+                <field name="village_id"/>
+                <field name="tehsil_id"/>
+                <field name="district_id"/>
+                <field name="aadhar_number"/>
+                <field name="pan_number"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="is_minor"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Landowner Form View -->
+    <record id="view_bhu_landowner_form" model="ir.ui.view">
+        <field name="name">bhu.landowner.form</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <form string="Landowner / भूमिस्वामी">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_surveys" type="object" class="oe_stat_button" icon="fa-search">
+                            <field name="survey_ids" widget="statinfo" string="Surveys"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Enter full name..."/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Personal Information / व्यक्तिगत जानकारी">
+                            <field name="father_name"/>
+                            <field name="mother_name"/>
+                            <field name="spouse_name"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                            <field name="occupation"/>
+                            <field name="annual_income"/>
+                        </group>
+                        <group string="Contact Information / संपर्क जानकारी">
+                            <field name="mobile"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Address Information / पता जानकारी">
+                            <field name="address_line1"/>
+                            <field name="address_line2"/>
+                            <field name="village_id"/>
+                            <field name="tehsil_id"/>
+                            <field name="district_id"/>
+                            <field name="pincode"/>
+                            <field name="state"/>
+                        </group>
+                        <group string="Identity Documents / पहचान दस्तावेज">
+                            <field name="aadhar_number"/>
+                            <field name="pan_number"/>
+                            <field name="voter_id"/>
+                            <field name="ration_card_number"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Bank Details / बैंक विवरण">
+                            <field name="bank_name"/>
+                            <field name="bank_branch"/>
+                            <field name="account_number"/>
+                            <field name="ifsc_code"/>
+                            <field name="account_holder_name"/>
+                        </group>
+                        <group string="Minor Information / नाबालिग जानकारी">
+                            <field name="is_minor"/>
+                            <field name="guardian_name" invisible="not is_minor"/>
+                            <field name="guardian_relation" invisible="not is_minor"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Documents &amp; Photos / दस्तावेज और फोटो" name="documents">
+                            <group>
+                                <group>
+                                    <field name="photo" widget="image" class="oe_avatar"/>
+                                </group>
+                                <group>
+                                    <field name="aadhar_card" widget="binary"/>
+                                    <field name="pan_card" widget="binary"/>
+                                    <field name="voter_id_card" widget="binary"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="ration_card" widget="binary"/>
+                                    <field name="bank_passbook" widget="binary"/>
+                                </group>
+                                <group>
+                                    <field name="other_documents" widget="binary"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Related Surveys / संबंधित सर्वे" name="surveys">
+                            <field name="survey_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="project_id"/>
+                                    <field name="village_id"/>
+                                    <field name="survey_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        
+                        <page string="Complete Address / पूरा पता" name="address">
+                            <field name="full_address" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Landowner Search View -->
+    <record id="view_bhu_landowner_search" model="ir.ui.view">
+        <field name="name">bhu.landowner.search</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <search string="Search Landowners / भूमिस्वामी खोजें">
+                <field name="name"/>
+                <field name="father_name"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="aadhar_number"/>
+                <field name="pan_number"/>
+                <field name="village_id"/>
+                <field name="tehsil_id"/>
+                <field name="district_id"/>
+                
+                <filter string="Minors / नाबालिग" name="minors" domain="[('is_minor', '=', True)]"/>
+                <filter string="Male / पुरुष" name="male" domain="[('gender', '=', 'male')]"/>
+                <filter string="Female / महिला" name="female" domain="[('gender', '=', 'female')]"/>
+                <filter string="With Bank Details / बैंक विवरण के साथ" name="with_bank" domain="[('bank_name', '!=', False)]"/>
+                <filter string="With Aadhar / आधार के साथ" name="with_aadhar" domain="[('aadhar_number', '!=', False)]"/>
+                <filter string="With PAN / पैन के साथ" name="with_pan" domain="[('pan_number', '!=', False)]"/>
+                
+                <group expand="0" string="Group By / समूह बनाएं">
+                    <filter string="Gender / लिंग" name="group_gender" context="{'group_by': 'gender'}"/>
+                    <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil / तहसील" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                    <filter string="Village / ग्राम" name="group_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="Minor Status / नाबालिग स्थिति" name="group_minor" context="{'group_by': 'is_minor'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Landowner Kanban View -->
+    <record id="view_bhu_landowner_kanban" model="ir.ui.view">
+        <field name="name">bhu.landowner.kanban</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="mobile"/>
+                <field name="village_id"/>
+                <field name="district_id"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <field name="is_minor"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="o_kanban_record_subtitle">
+                                            <field name="father_name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <div>
+                                            <i class="fa fa-phone"/> <field name="mobile"/>
+                                        </div>
+                                        <div>
+                                            <i class="fa fa-map-marker"/> <field name="village_id"/> - <field name="district_id"/>
+                                        </div>
+                                        <div>
+                                            <i class="fa fa-user"/> <field name="age"/> years, <field name="gender"/>
+                                        </div>
+                                        <div t-if="record.is_minor.raw_value">
+                                            <i class="fa fa-child"/> Minor
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Landowner Action -->
+    <record id="action_bhu_landowner" model="ir.actions.act_window">
+        <field name="name">Landowners / भूमिस्वामी</field>
+        <field name="res_model">bhu.landowner</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="search_view_id" ref="view_bhu_landowner_search"/>
+        <field name="context">{'search_default_group_district': 1}</field>
+    </record>
+
+    <!-- Landowner Menu -->
+    <menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner" parent="menu_bhu_master" sequence="6"/>
+
+</odoo>

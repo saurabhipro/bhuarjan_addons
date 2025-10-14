@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Project Views -->
+    <record id="view_bhu_project_list" model="ir.ui.view">
+        <field name="name">bhu.project.list</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <list string="Projects">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="budget"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhu_project_form" model="ir.ui.view">
+        <field name="name">bhu.project.form</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <form string="Project">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="budget"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                    <group>
+                        <field name="village_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bhu_project" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">bhu.project</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Department Views -->
+    <record id="view_bhu_department_list" model="ir.ui.view">
+        <field name="name">bhu.department.list</field>
+        <field name="model">bhu.department</field>
+        <field name="arch" type="xml">
+            <list string="Departments">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="head_of_department"/>
+                <field name="contact_number"/>
+                <field name="email"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhu_department_form" model="ir.ui.view">
+        <field name="name">bhu.department.form</field>
+        <field name="model">bhu.department</field>
+        <field name="arch" type="xml">
+            <form string="Department">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="head_of_department"/>
+                        </group>
+                        <group>
+                            <field name="contact_number"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                        <field name="address"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bhu_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">bhu.department</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Tehsil Views -->
+    <record id="view_bhu_tehsil_list" model="ir.ui.view">
+        <field name="name">bhu.tehsil.list</field>
+        <field name="model">bhu.tehsil</field>
+        <field name="arch" type="xml">
+            <list string="Tehsils / तहसील">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="code"/>
+                <field name="headquarters"/>
+                <field name="population"/>
+                <field name="is_tribal_tehsil"/>
+                <field name="is_forest_tehsil"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhu_tehsil_form" model="ir.ui.view">
+        <field name="name">bhu.tehsil.form</field>
+        <field name="model">bhu.tehsil</field>
+        <field name="arch" type="xml">
+            <form string="Tehsil / तहसील">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="district_id"/>
+                            <field name="code"/>
+                            <field name="headquarters"/>
+                        </group>
+                        <group>
+                            <field name="population"/>
+                            <field name="area_hectares"/>
+                            <field name="is_tribal_tehsil"/>
+                            <field name="is_forest_tehsil"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bhu_tehsil_search" model="ir.ui.view">
+        <field name="name">bhu.tehsil.search</field>
+        <field name="model">bhu.tehsil</field>
+        <field name="arch" type="xml">
+            <search string="Search Tehsils / तहसील खोजें">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="code"/>
+                <field name="headquarters"/>
+                
+                <filter string="Tribal Tehsils / आदिवासी तहसील" name="tribal" domain="[('is_tribal_tehsil', '=', True)]"/>
+                <filter string="Forest Tehsils / वन तहसील" name="forest" domain="[('is_forest_tehsil', '=', True)]"/>
+                
+                <group expand="0" string="Group By / समूह बनाएं">
+                    <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bhu_tehsil" model="ir.actions.act_window">
+        <field name="name">Tehsils / तहसील</field>
+        <field name="res_model">bhu.tehsil</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_tehsil_search"/>
+    </record>
+
+    <!-- Village Views -->
+    <record id="view_bhu_village_list" model="ir.ui.view">
+        <field name="name">bhu.village.list</field>
+        <field name="model">bhu.village</field>
+        <field name="arch" type="xml">
+            <list string="Villages / ग्राम">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="pincode"/>
+                <field name="population"/>
+                <field name="is_tribal_area"/>
+                <field name="is_forest_area"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhu_village_form" model="ir.ui.view">
+        <field name="name">bhu.village.form</field>
+        <field name="model">bhu.village</field>
+        <field name="arch" type="xml">
+            <form string="Village / ग्राम">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="district_id"/>
+                            <field name="tehsil_id"/>
+                            <field name="pincode"/>
+                        </group>
+                        <group>
+                            <field name="population"/>
+                            <field name="area_hectares"/>
+                            <field name="is_tribal_area"/>
+                            <field name="is_forest_area"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bhu_village_search" model="ir.ui.view">
+        <field name="name">bhu.village.search</field>
+        <field name="model">bhu.village</field>
+        <field name="arch" type="xml">
+            <search string="Search Villages / ग्राम खोजें">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="pincode"/>
+                
+                <filter string="Tribal Areas / आदिवासी क्षेत्र" name="tribal" domain="[('is_tribal_area', '=', True)]"/>
+                <filter string="Forest Areas / वन क्षेत्र" name="forest" domain="[('is_forest_area', '=', True)]"/>
+                
+                <group expand="0" string="Group By / समूह बनाएं">
+                    <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil / तहसील" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bhu_village" model="ir.actions.act_window">
+        <field name="name">Villages / ग्राम</field>
+        <field name="res_model">bhu.village</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_village_search"/>
+    </record>
+
+</odoo>

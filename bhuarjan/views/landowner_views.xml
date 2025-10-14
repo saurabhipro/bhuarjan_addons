@@ -42,51 +42,51 @@
                     
                     <group>
                         <group string="Personal Information / व्यक्तिगत जानकारी">
-                            <field name="father_name"/>
-                            <field name="mother_name"/>
-                            <field name="spouse_name"/>
-                            <field name="age"/>
-                            <field name="gender"/>
-                            <field name="occupation"/>
-                            <field name="annual_income"/>
+                            <field name="father_name" widget="char"/>
+                            <field name="mother_name" widget="char"/>
+                            <field name="spouse_name" widget="char"/>
+                            <field name="age" widget="integer"/>
+                            <field name="gender" widget="selection"/>
+                            <field name="occupation" widget="char"/>
+                            <field name="annual_income" widget="monetary"/>
                         </group>
                         <group string="Contact Information / संपर्क जानकारी">
-                            <field name="mobile"/>
-                            <field name="phone"/>
-                            <field name="email"/>
+                            <field name="mobile" widget="phone"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
                         </group>
                     </group>
                     
                     <group>
                         <group string="Address Information / पता जानकारी">
-                            <field name="address_line1"/>
-                            <field name="address_line2"/>
-                            <field name="village_id"/>
-                            <field name="tehsil_id"/>
-                            <field name="district_id"/>
-                            <field name="pincode"/>
-                            <field name="state"/>
+                            <field name="address_line1" widget="char"/>
+                            <field name="address_line2" widget="char"/>
+                            <field name="village_id" widget="selection"/>
+                            <field name="tehsil_id" widget="selection"/>
+                            <field name="district_id" widget="selection"/>
+                            <field name="pincode" widget="char"/>
+                            <field name="state" widget="char"/>
                         </group>
                         <group string="Identity Documents / पहचान दस्तावेज">
-                            <field name="aadhar_number"/>
-                            <field name="pan_number"/>
-                            <field name="voter_id"/>
-                            <field name="ration_card_number"/>
+                            <field name="aadhar_number" widget="char"/>
+                            <field name="pan_number" widget="char"/>
+                            <field name="voter_id" widget="char"/>
+                            <field name="ration_card_number" widget="char"/>
                         </group>
                     </group>
                     
                     <group>
                         <group string="Bank Details / बैंक विवरण">
-                            <field name="bank_name"/>
-                            <field name="bank_branch"/>
-                            <field name="account_number"/>
-                            <field name="ifsc_code"/>
-                            <field name="account_holder_name"/>
+                            <field name="bank_name" widget="char"/>
+                            <field name="bank_branch" widget="char"/>
+                            <field name="account_number" widget="char"/>
+                            <field name="ifsc_code" widget="char"/>
+                            <field name="account_holder_name" widget="char"/>
                         </group>
                         <group string="Minor Information / नाबालिग जानकारी">
-                            <field name="is_minor"/>
-                            <field name="guardian_name" invisible="not is_minor"/>
-                            <field name="guardian_relation" invisible="not is_minor"/>
+                            <field name="is_minor" widget="boolean_toggle"/>
+                            <field name="guardian_name" widget="char" invisible="not is_minor"/>
+                            <field name="guardian_relation" widget="char" invisible="not is_minor"/>
                         </group>
                     </group>
                     

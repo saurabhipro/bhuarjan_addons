@@ -34,11 +34,14 @@ class JWTAuthController(http.Controller):
             msg = f"Your SELECTIAL OPT {otp_code}"
             api_url = f"https://webmsg.smsbharti.com/app/smsapi/index.php?key=5640415B1D6730&campaign=0&routeid=9&type=text&contacts={mobile}&senderid=SPTSMS&msg=Your%20otp%20is%20{otp_code}%20SELECTIAL&template_id=1707166619134631839"
             response = requests.get(api_url)
+            print("\n\n response.status_code - ", response.status_code)
             if response.status_code == 200:
-                return Response(json.dumps({'message': 'OTP sent successfully','details': response.text}), status=400, content_type='application/json')
+                # return Response(json.dumps({'message': 'OTP sent successfully','details': response.text}), content_type='application/json')
+                return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), content_type='application/json')
+
             else:
-                return Response(
-                    json.dumps({'error': 'Failed to send OTP via SMS API', 'details': response.text}), status=400, content_type='application/json')
+                return Response(json.dumps({'error': 'Failed to send OTP via SMS API', 'details': response.text}), status=400, content_type='application/json')
+
         except Exception as e:
             return Response( json.dumps({'error': 'Error sending SMS', 'details': str(e)}), status=400, content_type='application/json' )
         # return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), status=400, content_type='application/json')

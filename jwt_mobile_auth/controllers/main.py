@@ -16,22 +16,32 @@ import jwt
 from odoo.exceptions import AccessError, UserError
 
 
-def check_permission(token):
-    if not token:
-        raise AccessError('Authorization header is missing or invalid')
+from functools import wraps
 
-    try:
-        if token.startswith("Bearer "):
-            token = token[7:]
+def check_permission(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth_header = request.httprequest.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise AccessError('Authorization header is missing or invalid')
 
-        decoded_token = jwt.decode(token, options={"verify_signature": False})
-        user_id = decoded_token['user_id']
-        
-        user_id = request.env['res.users'].sudo().search([('id', '=', user_id)])
-        if user_id :
-            return user_id
+        token = auth_header[7:]
 
-    except jwt.ExpiredSignatureError:
+        try:
+            decoded_token = jwt.decode(token, options={"verify_signature": False})
+            user_id = decoded_token['user_id']
+            user = request.env['res.users'].sudo().search([('id', '=', user_id)])
+            if not user:
+                raise AccessError('User not found')
+            request.user = user  # Optionally store for later use
+        except jwt.ExpiredSignatureError:
             raise AccessError('JWT token has expired')
-    except jwt.InvalidTokenError:
-        raise AccessError('Invalid JWT token')
+        except jwt.InvalidTokenError:
+            raise AccessError('Invalid JWT token')
+        except Exception as e:
+            raise AccessError(str(e))
+
+        return func(*args, **kwargs)
+    return wrapper
+
+

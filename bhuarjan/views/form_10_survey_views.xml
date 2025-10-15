@@ -42,13 +42,13 @@
                     
                     <group>
                         <group string="Project Information / परियोजना की जानकारी">
-                            <field name="project_id"/>
-                            <field name="department_id"/>
-                            <field name="survey_date"/>
+                            <field name="project_id" widget="selection"/>
+                            <field name="department_id" widget="selection"/>
+                            <field name="survey_date" widget="date"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी">
-                            <field name="village_id"/>
-                            <field name="tehsil_id"/>
+                            <field name="village_id" widget="selection"/>
+                            <field name="tehsil_id" widget="selection"/>
                             <field name="district_name"/>
                         </group>
                     </group>
@@ -64,39 +64,60 @@
                     </group>
                     
                     <notebook>
+                        <page string="Landowners / भूमिस्वामी" name="landowners_details">
+                            <field name="landowner_ids" readonly="1">
+                                <list string="Landowner Details / भूमिस्वामी विवरण" decoration-info="is_minor">
+                                    <field name="name" string="Name / नाम"/>
+                                    <field name="father_name" string="Father's Name / पिता का नाम"/>
+                                    <field name="age" string="Age / आयु"/>
+                                    <field name="gender" string="Gender / लिंग"/>
+                                    <field name="mobile" string="Mobile / मोबाइल"/>
+                                    <field name="email" string="Email / ईमेल"/>
+                                    <field name="village_id" string="Village / ग्राम"/>
+                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
+                                    <field name="district_id" string="District / जिला"/>
+                                    <field name="aadhar_number" string="Aadhar / आधार"/>
+                                    <field name="pan_number" string="PAN / पैन"/>
+                                    <field name="bank_name" string="Bank / बैंक"/>
+                                    <field name="account_number" string="Account / खाता"/>
+                                    <field name="is_minor" string="Minor / नाबालिग"/>
+                                </list>
+                            </field>
+                        </page>
+                        
                         <page string="Khasra Details / खसरा विवरण" name="khasra_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी">
-                                    <field name="khasra_number"/>
-                                    <field name="total_area"/>
-                                    <field name="acquired_area"/>
+                                    <field name="khasra_number" widget="char"/>
+                                    <field name="total_area" widget="float"/>
+                                    <field name="acquired_area" widget="float"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी">
-                                    <field name="is_single_crop"/>
-                                    <field name="is_double_crop"/>
-                                    <field name="is_irrigated"/>
-                                    <field name="is_unirrigated"/>
+                                    <field name="is_single_crop" widget="boolean_toggle"/>
+                                    <field name="is_double_crop" widget="boolean_toggle"/>
+                                    <field name="is_irrigated" widget="boolean_toggle"/>
+                                    <field name="is_unirrigated" widget="boolean_toggle"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Tree Information / वृक्ष की जानकारी">
-                                    <field name="tree_development_stage"/>
-                                    <field name="tree_count"/>
+                                    <field name="tree_development_stage" widget="selection"/>
+                                    <field name="tree_count" widget="integer"/>
                                 </group>
                                 <group string="House Information / घर की जानकारी">
-                                    <field name="house_type"/>
-                                    <field name="house_area"/>
-                                    <field name="shed_area"/>
+                                    <field name="house_type" widget="selection"/>
+                                    <field name="house_area" widget="float"/>
+                                    <field name="shed_area" widget="float"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं">
-                                    <field name="has_well"/>
-                                    <field name="well_type" invisible="not has_well"/>
-                                    <field name="has_electricity"/>
-                                    <field name="has_road_access"/>
+                                    <field name="has_well" widget="boolean_toggle"/>
+                                    <field name="well_type" widget="selection" invisible="not has_well"/>
+                                    <field name="has_electricity" widget="boolean_toggle"/>
+                                    <field name="has_road_access" widget="boolean_toggle"/>
                                 </group>
                             </group>
                         </page>

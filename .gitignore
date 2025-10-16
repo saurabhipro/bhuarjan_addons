@@ -1,4 +1,50 @@
-*.pyc
+# Ignore Python cache and compiled files
 __pycache__/
-spiffy_theme_backend/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore compressed or temporary files
+*.zip
+*.7z
+*.tar
+*.gz
+*.bak
+
+# Ignore VS Code and workspace settings
+.vscode/
+.idea/
+
+# Ignore Odoo addons (folders)
+api_auth_apikey/
+api_auth_apiuser/
+api_auth_basic/
+api_auth_jwt/
+api_auth_oauth2/
+api_auth_public/
+api_cors_config/
+api_framework/
+api_framework_base/
+api_log/
+api_resource_access/
+bhuarjan/
+easy_graphql/
+easy_jsonapi/
+easy_jsonapi_apikey_signup/
+easy_jsonapi_basic_signup/
+easy_restjson/
+ekika_utils/
+ekika_widgets/
+graphql_studio/
+jsonapi_studio/
+jwt_mobile_auth/
+restjson_studio/
+
+# Ignore custom or heavy folders
 rmt_bpmn/
+spiffy_theme_backend/

@@ -226,7 +226,4 @@
         <field name="context">{'search_default_group_district': 1}</field>
     </record>
 
-    <!-- Landowner Menu -->
-    <menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner" parent="menu_bhu_master" sequence="6"/>
-
 </odoo>

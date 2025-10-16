@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1">
-        <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" sequence="1"/>
         <menuitem id="menu_bhu_surveys" name="Surveys / सर्वे" sequence="2">
             <menuitem id="menu_form_10_survey" name="Form-10 Survey / भू-अर्जन फार्म-10" action="action_form_10_survey" sequence="1"/>
         </menuitem>
-        <menuitem id="menu_bhu_master" name="Master" sequence="3">
+        <menuitem id="menu_bhu_master" name="Master Data / मास्टर डेटा" sequence="3">
             <menuitem id="menu_bhu_district" name="Districts / जिला" action="action_bhu_district" sequence="1"/>
             <menuitem id="menu_bhu_tehsil" name="Tehsils / तहसील" action="action_bhu_tehsil" sequence="2"/>
             <menuitem id="menu_bhu_village" name="Villages / ग्राम" action="action_bhu_village" sequence="3"/>

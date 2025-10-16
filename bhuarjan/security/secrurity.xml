@@ -8,14 +8,14 @@
     </record>
 
     <record id="group_bhuarjan_patwari" model="res.groups">
-        <field name="name">Patwari</field>
+        <field name="name">Patwari</field>                     
         <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
         <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
         <field name="comment">The user will be able to approve document created by employees.</field>
     </record>
 
     <record id="group_bhuarjan_ri" model="res.groups">
-        <field name="name">RI</field>
+        <field name="name">Revenue Inspector</field>
         <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
         <field name="implied_ids" eval="[(4, ref('group_bhuarjan_patwari'))]"/>
         <field name="comment">The user will be able to approve document created by employees.</field>
@@ -42,10 +42,17 @@
         <field name="comment">The user will be able to approve document created by employees.</field>
     </record>
 
+    <record id="group_bhuarjan_additional_collector" model="res.groups">
+        <field name="name">Additional Collector</field>
+        <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
+        <field name="implied_ids" eval="[(4, ref('group_bhuarjan_sdm'))]"/>
+        <field name="comment">The user will be able to approve document created by employees.</field>
+    </record>
+
     <record id="group_bhuarjan_collector" model="res.groups">
         <field name="name">Collector</field>
         <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
-        <field name="implied_ids" eval="[(4, ref('group_bhuarjan_sdm'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_bhuarjan_additional_collector'))]"/>
         <field name="comment">The user will be able to approve document created by employees.</field>
     </record>
 

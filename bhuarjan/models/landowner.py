@@ -69,7 +69,7 @@ class BhuLandowner(models.Model):
     other_documents = fields.Binary(string='Other Documents / अन्य दस्तावेज', tracking=True)
     
     # Survey Relations
-    survey_ids = fields.Many2many('form.10.survey', 'form_10_survey_landowner_rel', 
+    survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 
                                  'landowner_id', 'survey_id', string='Related Surveys / संबंधित सर्वे')
     
     # Computed Fields
@@ -166,7 +166,7 @@ class BhuLandowner(models.Model):
     
     def action_view_surveys(self):
         """Action to view related surveys"""
-        action = self.env.ref('bhuarjan.action_form_10_survey').read()[0]
+        action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('landowner_ids', 'in', self.ids)]
         action['context'] = {'default_landowner_ids': [(6, 0, self.ids)]}
         return action

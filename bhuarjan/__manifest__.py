@@ -21,7 +21,7 @@
         'views/res_users.xml',
         'views/master_views.xml',
         'views/landowner_views.xml',
-        'views/form_10_survey_views.xml',
+        'views/survey_views.xml',
         'views/menuitem.xml',
     ],
     'installable': True,

@@ -16,6 +16,7 @@
         'data/chhattisgarh_villages_data.xml',
         'security/ir.model.access.csv',
         'security/secrurity.xml',
+        'reports/form10_survey_report.xml',
         'views/district_views.xml',
         'views/project_views.xml',
         'views/res_users.xml',

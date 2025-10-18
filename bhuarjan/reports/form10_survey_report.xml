@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form-10 Survey Report -->
+        <record id="action_report_form10_survey" model="ir.actions.report">
+            <field name="name">Form-10 Survey Report</field>
+            <field name="model">bhu.survey</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bhuarjan.form10_survey_report</field>
+            <field name="report_file">bhuarjan.form10_survey_report</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+        </record>
+
+        <!-- Form-10 Survey Report Template -->
+        <template id="form10_survey_report">
+            <t t-call="web.html_container">
+                <meta charset="utf-8"/>
+                <style>
+                    @page {
+                        margin: 1cm;
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                    }
+                    body {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        direction: ltr;
+                        font-size: 12px;
+                        line-height: 1.4;
+                    }
+                    .hindi-text {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        font-size: 12px;
+                        line-height: 1.4;
+                        unicode-bidi: embed;
+                        direction: ltr;
+                    }
+                    .table th, .table td {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        font-size: 11px;
+                        padding: 4px;
+                        unicode-bidi: embed;
+                        direction: ltr;
+                    }
+                    .table {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        unicode-bidi: embed;
+                        direction: ltr;
+                    }
+                    h1, h2, h3, h4, h5, h6 {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        unicode-bidi: embed;
+                        direction: ltr;
+                    }
+                    p, div, span {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                        unicode-bidi: embed;
+                        direction: ltr;
+                    }
+                </style>
+                <t t-foreach="docs" t-as="survey">
+                    <div class="page" style="padding: 20px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;">
+                            <!-- Header -->
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <h2 class="hindi-text" style="text-decoration: underline; margin-bottom: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
+                                </div>
+                            </div>
+                            
+                            <!-- Project Information -->
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="hindi-text"><strong>परियोजना का नाम :</strong> ................................................................................................................................................ <span t-field="survey.project_id.name"/></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="hindi-text"><strong>विभाग का नाम</strong> ................................................................................................................................................ <span t-field="survey.department_id.name"/></p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="hindi-text"><strong>ग्राम का नाम</strong> ................................................................................................................................................ <span t-field="survey.village_id.name"/></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="hindi-text"><strong>तहसील का नाम</strong> ................................................................................................................................................ <span t-field="survey.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong></p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <p class="hindi-text"><strong>सर्वे दिनाँक</strong> ................................................................................................................................................ <span t-field="survey.survey_date"/></p>
+                                </div>
+                            </div>
+
+                            <!-- Main Data Table -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <table class="table table-bordered hindi-text" style="width: 100%; border-collapse: collapse;">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">क्र.</th>
+                                                <th rowspan="2" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">प्रभावित खसरा क्रमांक</th>
+                                                <th rowspan="2" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">कुल रकबा (हे.में.)</th>
+                                                <th rowspan="2" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">कुल अर्जित रकबा (हे.में.)</th>
+                                                <th rowspan="2" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">भूमिस्वामी का नाम</th>
+                                                <th colspan="4" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">भूमि का प्रकार</th>
+                                                <th colspan="3" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</th>
+                                                <th colspan="6" class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">भूमि पर स्थित परिसंपत्तियों का विवरण</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">एक फसली</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">दो फसली</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">सिंचित</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">असिंचित</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">अविकसित</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">अर्द्ध विकसित</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">पूर्ण विकसित</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">शेड (क्षेत्रफल वर्गफुट में)</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">कुँआ (कच्चा/पक्का) (हाँ/नहीं)</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">तालाब (हाँ/नहीं)</th>
+                                                <th class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">रिमार्क</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">1</td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;"><span t-field="survey.khasra_number"/></td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;"><span t-field="survey.total_area"/></td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;"><span t-field="survey.acquired_area"/></td>
+                                                <td style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <t t-foreach="survey.landowner_ids" t-as="landowner">
+                                                        <span t-field="landowner.name"/><br/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.is_single_crop">✓</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.is_double_crop">✓</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.is_irrigated">✓</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.is_unirrigated">✓</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.tree_development_stage == 'undeveloped'"><span t-field="survey.tree_count"/></span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.tree_development_stage == 'semi_developed'"><span t-field="survey.tree_count"/></span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.tree_development_stage == 'fully_developed'"><span t-field="survey.tree_count"/></span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.house_type">
+                                                        <span t-field="survey.house_type"/> - <span t-field="survey.house_area"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.shed_area"><span t-field="survey.shed_area"/></span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.has_well">हाँ</span><span t-if="not survey.has_well">नहीं</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.has_tubewell">हाँ</span><span t-if="not survey.has_tubewell">नहीं</span>
+                                                </td>
+                                                <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 10px;">
+                                                    <span t-if="survey.has_pond">हाँ</span><span t-if="not survey.has_pond">नहीं</span>
+                                                </td>
+                                                <td style="border: 1px solid #000; padding: 8px; font-size: 10px;"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p class="hindi-text"><strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong></p>
+                                </div>
+                            </div>
+
+                            <!-- Signature Blocks -->
+                            <div class="row mt-5">
+                                <div class="col-12">
+                                    <div class="row" style="display: flex; flex-wrap: nowrap;">
+                                        <div class="col-2" style="flex: 1; min-width: 0;">
+                                            <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
+                                            <p class="hindi-text"><strong>अपेक्षक निकाय के</strong></p>
+                                            <p class="hindi-text"><strong>अधिकृत प्रतिनिधि</strong></p>
+                                            <p class="hindi-text"><strong>नाम -</strong></p>
+                                            <p class="hindi-text"><strong>पदनाम</strong></p>
+                                            <p>_________________________________</p>
+                                        </div>
+                                        <div class="col-2" style="flex: 1; min-width: 0;">
+                                            <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
+                                            <p class="hindi-text"><strong>तहसीलदार</strong></p>
+                                            <p class="hindi-text"><strong>नाम -</strong></p>
+                                            <p>_________________________________</p>
+                                        </div>
+                                        <div class="col-2" style="flex: 1; min-width: 0;">
+                                            <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
+                                            <p class="hindi-text"><strong>नायब तहसीलदार</strong></p>
+                                            <p class="hindi-text"><strong>नाम -</strong></p>
+                                            <p>_________________________________</p>
+                                        </div>
+                                        <div class="col-3" style="flex: 1; min-width: 0;">
+                                            <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
+                                            <p class="hindi-text"><strong>राजस्व निरीक्षक</strong></p>
+                                            <p class="hindi-text"><strong>नाम-</strong></p>
+                                            <p class="hindi-text"><strong>रा.नि.मं.</strong></p>
+                                            <p>_________________________________</p>
+                                        </div>
+                                        <div class="col-3" style="flex: 1; min-width: 0;">
+                                            <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
+                                            <p class="hindi-text"><strong>पटवारी</strong></p>
+                                            <p class="hindi-text"><strong>नाम-</strong></p>
+                                            <p class="hindi-text"><strong>हल्का नम्बर</strong></p>
+                                            <p>_________________________________</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

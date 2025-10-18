@@ -126,6 +126,15 @@ class Survey(models.Model):
             report_action = self.env.ref('bhuarjan.action_report_form10_survey')
             return report_action.report_action(record)
 
+    def action_bulk_download_form10(self):
+        """Download Form-10 PDFs for all selected surveys"""
+        if not self:
+            raise ValidationError(_('Please select at least one survey to download.'))
+        
+        # Generate PDF report for all selected surveys
+        report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        return report_action.report_action(self)
+
 
 class SurveyLine(models.Model):
     _name = 'bhu.survey.line'

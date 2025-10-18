@@ -17,7 +17,7 @@
                 <meta charset="utf-8"/>
                 <style>
                     @page {
-                        
+                        margin: 1cm;
                         font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
                     }
                     body {
@@ -58,9 +58,17 @@
                         unicode-bidi: embed;
                         direction: ltr;
                     }
+                    .page-break {
+                        page-break-before: always;
+                        break-before: page;
+                    }
+                    .page-break-after {
+                        page-break-after: always;
+                        break-after: page;
+                    }
                 </style>
                 <t t-foreach="docs" t-as="survey">
-                    <div class="page" style="padding: 0px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;">
+                    <div class="page" style="padding: 0px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; page-break-inside: avoid;" t-att-style="'page-break-before: always;' if survey_index > 0 else ''">
                             <!-- Header -->
                             <div style="margin: 0; padding: 0;">
                                 <h2 class="hindi-text" style="text-decoration: underline; margin: 0; padding: 0; text-align: center; font-size: 25px; line-height: 1.2;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
@@ -227,6 +235,10 @@
                                 </div>
                             </div>
                     </div>
+                    <!-- Page Break (only if not last survey) -->
+                    <t t-if="not survey_last">
+                        <div class="page-break-after"></div>
+                    </t>
                 </t>
             </t>
         </template>

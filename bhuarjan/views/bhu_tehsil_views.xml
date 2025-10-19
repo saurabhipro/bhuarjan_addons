@@ -1,0 +1,76 @@
+<odoo>
+    <data>
+                <!-- Tehsil Views -->
+        <record id="bhu_tehsil_view_list" model="ir.ui.view">
+            <field name="name">bhu.tehsil.view.list</field>
+            <field name="model">bhu.tehsil</field>
+            <field name="arch" type="xml">
+                <list string="Tehsils / तहसील">
+                    <field name="name"/>
+                    <field name="sub_division_id"/>
+                    <field name="district_id"/>
+                    <field name="state_id"/>
+                    <field name="code"/>
+                    <field name="headquarters"/>
+                    <field name="population"/>
+                    <field name="is_tribal_tehsil"/>
+                    <field name="is_forest_tehsil"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="bhu_tehsil_view_form" model="ir.ui.view">
+            <field name="name">bhu.tehsil.view.form</field>
+            <field name="model">bhu.tehsil</field>
+            <field name="arch" type="xml">
+                <form string="Tehsil / तहसील">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="district_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}" domain="[('state_id', '=', state_id)]"/>
+                                <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}" domain="[('district_id', '=', district_id)]"/>
+                                <field name="name"/>
+                                <field name="code"/>
+                                <field name="headquarters"/>
+                            </group>
+                            <group>
+                                <field name="population"/>
+                                <field name="area_hectares"/>
+                                <field name="is_tribal_tehsil"/>
+                                <field name="is_forest_tehsil"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="bhu_tehsil_view_search" model="ir.ui.view">
+            <field name="name">bhu.tehsil.view.search</field>
+            <field name="model">bhu.tehsil</field>
+            <field name="arch" type="xml">
+                <search string="Search Tehsils / तहसील खोजें">
+                    <field name="name"/>
+                    <field name="district_id"/>
+                    <field name="code"/>
+                    <field name="headquarters"/>
+                    
+                    <filter string="Tribal Tehsils / आदिवासी तहसील" name="tribal" domain="[('is_tribal_tehsil', '=', True)]"/>
+                    <filter string="Forest Tehsils / वन तहसील" name="forest" domain="[('is_forest_tehsil', '=', True)]"/>
+                    
+                    <group expand="0" string="Group By / समूह बनाएं">
+                        <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_bhu_tehsil" model="ir.actions.act_window">
+            <field name="name">Tehsils / तहसील</field>
+            <field name="res_model">bhu.tehsil</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="bhu_tehsil_view_search"/>
+        </record>
+    </data>
+</odoo>

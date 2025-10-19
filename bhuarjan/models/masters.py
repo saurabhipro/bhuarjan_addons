@@ -1,15 +1,6 @@
 from odoo import models, fields, api, _
 import json
 
-class BhuDistrict(models.Model):
-    _name = 'bhu.district'
-    _description = 'District'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-
-    name = fields.Char(string='District', required=True)
-    state_id = fields.Many2one('res.country.state', string='State', required=True, domain="[('country_id.name','=','India')]")
-    village_line_ids = fields.One2many('bhu.village.line', 'district_id', string="Village Line")
-
 class BhuVillageLine(models.Model):
     _name = 'bhu.village.line'
     _description = 'Village Line'
@@ -45,21 +36,6 @@ class BhuVillage(models.Model):
     area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
     is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र')
     is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र')
-
-
-class BhuTehsil(models.Model):
-    _name = 'bhu.tehsil'
-    _description = 'Tehsil'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-    
-    name = fields.Char(string='Tehsil Name / तहसील का नाम', required=True)
-    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
-    code = fields.Char(string='Tehsil Code / तहसील कोड')
-    headquarters = fields.Char(string='Headquarters / मुख्यालय')
-    population = fields.Integer(string='Population / जनसंख्या')
-    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
-    is_tribal_tehsil = fields.Boolean(string='Tribal Tehsil / आदिवासी तहसील')
-    is_forest_tehsil = fields.Boolean(string='Forest Tehsil / वन तहसील')
 
 
 class BhuDepartment(models.Model):

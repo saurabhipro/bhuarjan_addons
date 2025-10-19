@@ -6,11 +6,16 @@
         </menuitem>
         <menuitem id="menu_bhu_master" name="Master Data / मास्टर डेटा" sequence="3">
             <menuitem id="menu_bhu_district" name="Districts / जिला" action="action_bhu_district" sequence="1"/>
-            <menuitem id="menu_bhu_tehsil" name="Tehsils / तहसील" action="action_bhu_tehsil" sequence="2"/>
-            <menuitem id="menu_bhu_village" name="Villages / ग्राम" action="action_bhu_village" sequence="3"/>
-            <menuitem id="menu_bhu_project" name="Projects / परियोजना" action="action_bhu_project" sequence="4"/>
-            <menuitem id="menu_bhu_department" name="Departments / विभाग" action="action_bhu_department" sequence="5"/>
-            <menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner" sequence="6"/>
+            <menuitem id="menu_bhu_sub_division" name="Sub Division / उपभाग" action="action_bhu_sub_division" sequence="2"/>
+
+            <menuitem id="menu_bhu_tehsil" name="Tehsils / तहसील" action="action_bhu_tehsil" sequence="3"/>
+            <menuitem id="menu_bhu_circle" name="Circles / Circles" action="action_bhu_circle" sequence="4"/>
+
+            
+            <menuitem id="menu_bhu_village" name="Villages / ग्राम" action="action_bhu_village" sequence="5"/>
+            <menuitem id="menu_bhu_project" name="Projects / परियोजना" action="action_bhu_project" sequence="6"/>
+            <menuitem id="menu_bhu_department" name="Departments / विभाग" action="action_bhu_department" sequence="7"/>
+            <menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner" sequence="8"/>
         </menuitem>
     </menuitem>
 </odoo>

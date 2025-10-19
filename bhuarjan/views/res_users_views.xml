@@ -1,0 +1,96 @@
+<odoo>
+    <data>
+        <record id="res_users_view_form_inherit" model="ir.ui.view">
+          <field name="name">res.users.view.form.inherit.bhuarjan</field>
+          <field name="model">res.users</field>
+          <field name="inherit_id" ref="base.view_users_form"/>
+          <field name="arch" type="xml">
+
+              <xpath expr="//notebook" position="before">
+                    <group string="Bhuarjan">
+                        <group>
+                            <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="circle_ids" domain="[('tehsil_id', 'in', tehsil_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="village_ids" domain="[('circle_id', 'in', circle_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                        </group>
+                    </group>
+                    <group string="Subordinates" invisible="1">
+                        <field name="child_ids" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                    </group>
+              </xpath>
+          </field>
+      </record>
+
+      <!-- Res user own custom view -->
+
+      <record id="res_users_bhuarjan_view_form_inherit" model="ir.ui.view">
+            <field name="name">res.users.view.form</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <form string="Users">
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                        <div class="alert alert-info text-center o_form_header" invisible="active and active_partner or not active and not active_partner or active and not active_partner" role="alert">
+                          <a class="close" data-bs-dismiss="alert" href="#">x</a>
+                          <div>
+                            <strong>The contact linked to this user is still active</strong>
+                          </div>
+                          <div>You can archive the contact
+                            <field name="partner_id" required="0" readonly="1"/>
+                          </div>
+                        </div>
+                        <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"/>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name" placeholder="e.g. John Doe" required="1"/></h1>
+                            <field name="email" invisible="1"/><!-- needed to update partner's email from on_change_login() -->
+                            <label for="login" string="Email Address"/>
+                            <h2><field name="login" placeholder="e.g. email@yourcompany.com"/></h2>
+                            <group>
+                                <field name="partner_id" groups="base.group_no_one" readonly="1" required="0" invisible="not id"/>
+                            </group>
+                        </div>
+                        <group string="Bhuarjan">
+                            <group>
+                                <field name="bhuarjan_role"/>
+                                <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="circle_ids" domain="[('tehsil_id', 'in', tehsil_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="village_ids" domain="[('circle_id', 'in', circle_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            </group>
+                        </group>
+                        <group string="Subordinates" invisible="1">
+                            <field name="child_ids" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                        </group>
+
+                        <group string="User Group">
+                            <field name="groups_id" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                        </group>
+                        
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
+            <field name="name">Users</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('base.view_users_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>
+        </record>
+
+
+
+
+    </data>
+</odoo>

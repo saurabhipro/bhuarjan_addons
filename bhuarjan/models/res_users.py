@@ -10,12 +10,12 @@ class ResUsers(models.Model):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
 
-    state_id = fields.Many2one('res.country.state', string='State', required=True, domain=lambda self: self._get_state_domain())
-    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
-    sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग', required=True)
-    tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', required=True)
-    circle_ids = fields.Many2many('bhu.circle', string='Circle / circle', required=True)
-    village_ids = fields.Many2many('bhu.village', string="Villages", required=True)
+    state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain())
+    district_id = fields.Many2one('bhu.district', string='District / जिला')
+    sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
+    tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
+    circle_ids = fields.Many2many('bhu.circle', string='Circle / circle')
+    village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),
         ('revenue_inspector', 'Revenue Inspector'),

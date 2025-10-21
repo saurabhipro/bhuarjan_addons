@@ -11,9 +11,9 @@ class BhuTehsil(models.Model):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
             
-    state_id = fields.Many2one('res.country.state', string='State', required=True, domain=lambda self: self._get_state_domain())
-    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
-    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=True)
+    state_id = fields.Many2one('res.country.state', string='State')
+    district_id = fields.Many2one('bhu.district', string='District / जिला')
+    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग')
     code = fields.Char(string='Tehsil Code / तहसील कोड')
     headquarters = fields.Char(string='Headquarters / मुख्यालय')
     population = fields.Integer(string='Population / जनसंख्या')

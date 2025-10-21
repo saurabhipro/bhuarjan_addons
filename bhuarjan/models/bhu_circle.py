@@ -9,7 +9,7 @@ class BhuCircle(models.Model):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
 
-    state_id = fields.Many2one('res.country.state', string='State', required=True, domain=lambda self: self._get_state_domain())
+    state_id = fields.Many2one('res.country.state', string='State', required=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
     sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True)

@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1">
-        <menuitem id="menu_bhu_surveys" name="Surveys / सर्वे">
-            <menuitem id="menu_bhu_survey" name="Survey / सर्वे" action="action_bhu_survey"/>
-        </menuitem>
-        <menuitem id="menu_bhu_master" name="Master Data / मास्टर डेटा">
-            <menuitem id="menu_bhu_district" name="Districts / जिला" action="action_bhu_district"/>
-            <menuitem id="menu_bhu_sub_division" name="Sub Division / उपभाग" action="action_bhu_sub_division"/>
-            <menuitem id="menu_bhu_tehsil" name="Tehsils / तहसील" action="action_bhu_tehsil"/>
-            <menuitem id="menu_bhu_circle" name="Circles / Circles" action="action_bhu_circle"/>            
-            <menuitem id="menu_bhu_village" name="Villages / ग्राम" action="action_bhu_village"/>
-            <menuitem id="menu_bhu_project" name="Projects / परियोजना" action="action_bhu_project"/>
-            <menuitem id="menu_bhu_department" name="Departments / विभाग" action="action_bhu_department"/>
-        </menuitem>
-        <menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner"/>
-        <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action"/>
-    </menuitem>
+    <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1" />
+
+<menuitem id="menu_bhu_surveys" name="Surveys / सर्वे" parent="menu_bhu_root" sequence="1" />
+<menuitem id="menu_bhu_survey" name="Survey / सर्वे" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
+
+<menuitem id="menu_bhu_master" name="Master Data / मास्टर डेटा" parent="menu_bhu_root" sequence="2" />
+
+<menuitem id="menu_bhu_district" name="Districts / जिला" action="action_bhu_district" parent="menu_bhu_master" sequence="1" />
+<menuitem id="menu_bhu_sub_division" name="Sub Division / उपभाग" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="2" />
+<menuitem id="menu_bhu_tehsil" name="Tehsils / तहसील" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="3" />
+<menuitem id="menu_bhu_circle" name="Circles / सर्कल" action="action_bhu_circle" parent="menu_bhu_master" sequence="4" />
+<menuitem id="menu_bhu_village" name="Villages / ग्राम" action="action_bhu_village" parent="menu_bhu_master" sequence="5" />
+<menuitem id="menu_bhu_project" name="Projects / परियोजना" action="action_bhu_project" parent="menu_bhu_master" sequence="6" />
+<menuitem id="menu_bhu_department" name="Departments / विभाग" action="action_bhu_department" parent="menu_bhu_master" sequence="7" />
+
+<menuitem id="menu_bhu_landowner" name="Landowners / भूमिस्वामी" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3" />
+<menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="4" />
+
 </odoo>

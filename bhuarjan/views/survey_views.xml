@@ -149,15 +149,7 @@
                         </page>
                     </notebook>
                     
-                    <!-- Chatter -->
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers"/>
-                        <field name="activity_ids" widget="mail_activity" 
-                               context="{'mail_activity_view': 'bhuarjan.view_mail_activity_survey'}"/>
-                        <field name="message_ids" widget="mail_thread" 
-                               context="{'mail_message_view': 'bhuarjan.view_mail_message_survey', 'hide_related_document': True}"
-                               options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
-                    </div>
+                    <!-- Chatter removed -->
                 </sheet>
             </form>
         </field>
@@ -289,32 +281,5 @@ if records:
     </record>
 
     <!-- Custom Mail Message View to Hide Related Document Fields -->
-    <record id="view_mail_message_survey" model="ir.ui.view">
-        <field name="name">mail.message.survey</field>
-        <field name="model">mail.message</field>
-        <field name="arch" type="xml">
-            <list string="Messages" create="false" edit="false" delete="false" decoration-info="message_type == 'notification'">
-                <field name="date"/>
-                <field name="subject"/>
-                <field name="author_id"/>
-                <field name="body" widget="html"/>
-            </list>
-        </field>
-    </record>
-
-    <!-- Custom Mail Activity View to Hide Related Document Fields -->
-    <record id="view_mail_activity_survey" model="ir.ui.view">
-        <field name="name">mail.activity.survey</field>
-        <field name="model">mail.activity</field>
-        <field name="arch" type="xml">
-            <list string="Activities" create="false" edit="false" delete="false">
-                <field name="date_deadline"/>
-                <field name="activity_type_id"/>
-                <field name="summary"/>
-                <field name="user_id"/>
-                <field name="state"/>
-            </list>
-        </field>
-    </record>
 
 </odoo>

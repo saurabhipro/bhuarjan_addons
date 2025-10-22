@@ -106,15 +106,8 @@ $(document).ready(function() {
         }
     }
     
-    // Auto-capture for mobile devices
-    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    var isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    if (isMobile || isPWA || isTouchDevice) {
-        console.log('Auto-capturing location on form load');
-        setTimeout(captureLocation, 1000); // Small delay to ensure form is loaded
-    }
+    // No auto-capture - only manual capture via button
+    console.log('GPS capture available - click "Capture Location" button to capture coordinates');
     
     // Manual capture button
     $('button[name="action_capture_location"]').click(function(e) {
@@ -138,17 +131,338 @@ $(document).ready(function() {
         captureLocation();
     });
     
-    // Capture when survey evidence tab is opened
-    $('a[href*="survey_evidence"]').on('click', function() {
-        setTimeout(function() {
-            var $latField = $('input[name="latitude"]');
-            var $lonField = $('input[name="longitude"]');
+    // No auto-capture on tab change - only manual capture via button
+    
+    // Camera capture functionality
+    function captureImage() {
+        console.log('Starting camera capture...');
+        console.log('Browser info:', {
+            userAgent: navigator.userAgent,
+            hasMediaDevices: !!navigator.mediaDevices,
+            hasGetUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+            isSecureContext: window.isSecureContext
+        });
+        
+        // Check if camera is supported
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Create a video element for camera preview
+            var video = document.createElement('video');
+            video.style.width = '100%';
+            video.style.maxWidth = '400px';
+            video.style.height = 'auto';
+            video.setAttribute('autoplay', '');
+            video.setAttribute('muted', '');
             
-            if ($latField.length && $lonField.length && (!$latField.val() || !$lonField.val())) {
-                console.log('Survey evidence tab opened - checking for empty location fields');
-                captureLocation();
+            // Create a canvas element for capturing the image
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            
+            // Create modal for camera preview
+            var modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            var modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 90%;
+                text-align: center;
+            `;
+            
+            var title = document.createElement('h3');
+            title.textContent = 'Camera Capture';
+            title.style.marginBottom = '20px';
+            
+            var buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                margin-top: 20px;
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+            `;
+            
+            var captureBtn = document.createElement('button');
+            captureBtn.textContent = 'Capture Photo';
+            captureBtn.style.cssText = `
+                background: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            `;
+            
+            var cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.cssText = `
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            `;
+            
+            // Assemble modal
+            modalContent.appendChild(title);
+            modalContent.appendChild(video);
+            buttonContainer.appendChild(captureBtn);
+            buttonContainer.appendChild(cancelBtn);
+            modalContent.appendChild(buttonContainer);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Start camera - optimized for both mobile and desktop
+            var constraints = {
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            // Try to use back camera on mobile, front camera on desktop
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                constraints.video.facingMode = 'environment'; // Back camera on mobile
+            } else {
+                constraints.video.facingMode = 'user'; // Front camera on desktop
             }
-        }, 500);
+            
+            console.log('Camera constraints:', constraints);
+            
+            navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                video.srcObject = stream;
+                console.log('Camera started successfully');
+                
+                // Capture photo when button is clicked
+                captureBtn.onclick = function() {
+                    // Set canvas dimensions to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // Draw video frame to canvas
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert canvas to blob
+                    canvas.toBlob(function(blob) {
+                        // Create file input and set the captured image
+                        var fileInput = $('input[name="survey_image"]');
+                        if (fileInput.length > 0) {
+                            // Create a File object from the blob
+                            var file = new File([blob], 'survey_image_' + Date.now() + '.jpg', {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            
+                            // Create a FileList-like object
+                            var dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            
+                            // Set the file to the input
+                            fileInput[0].files = dataTransfer.files;
+                            fileInput.trigger('change');
+                            
+                            console.log('Image captured and set to survey_image field');
+                            alert('Photo captured successfully!');
+                        } else {
+                            console.log('Survey image field not found');
+                            alert('Photo captured but could not save to form');
+                        }
+                        
+                        // Stop camera and close modal
+                        stream.getTracks().forEach(function(track) {
+                            track.stop();
+                        });
+                        document.body.removeChild(modal);
+                    }, 'image/jpeg', 0.8);
+                };
+                
+                // Cancel button
+                cancelBtn.onclick = function() {
+                    stream.getTracks().forEach(function(track) {
+                        track.stop();
+                    });
+                    document.body.removeChild(modal);
+                };
+                
+            }).catch(function(error) {
+                console.log('Camera error:', error);
+                console.log('Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    constraint: error.constraint
+                });
+                
+                var errorMessage = 'Camera access failed: ';
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Camera access denied. Please allow camera access and try again.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No camera found. Please connect a camera and try again.';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage += 'Camera is being used by another application. Please close other camera apps and try again.';
+                } else if (error.name === 'OverconstrainedError') {
+                    errorMessage += 'Camera constraints cannot be satisfied. Trying with basic settings...';
+                    // Try with basic constraints
+                    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                        video.srcObject = stream;
+                        console.log('Camera started with basic constraints');
+                    }).catch(function(basicError) {
+                        console.log('Basic camera also failed:', basicError);
+                        alert('Camera not available: ' + basicError.message);
+                        document.body.removeChild(modal);
+                    });
+                    return;
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                alert(errorMessage);
+                document.body.removeChild(modal);
+            });
+            
+        } else {
+            alert('Camera not supported on this device');
+        }
+    }
+    
+    // Add camera capture to image field click - multiple selectors
+    $(document).on('click', function(e) {
+        var target = $(e.target);
+        var isImageField = false;
+        
+        // Check if clicked on survey image field or related elements
+        if (target.is('input[name="survey_image"]') || 
+            target.closest('input[name="survey_image"]').length > 0 ||
+            target.is('.oe_avatar') || 
+            target.closest('.oe_avatar').length > 0 ||
+            target.is('.o_field_image') ||
+            target.closest('.o_field_image').length > 0 ||
+            target.is('[data-field-name="survey_image"]') ||
+            target.closest('[data-field-name="survey_image"]').length > 0) {
+            
+            isImageField = true;
+            console.log('Survey image area clicked - opening camera');
+            e.preventDefault();
+            e.stopPropagation();
+            captureImage();
+        }
+    });
+    
+    // Also try to add click handler directly to the image field
+    setTimeout(function() {
+        var $imageField = $('input[name="survey_image"]');
+        var $avatar = $('.oe_avatar');
+        var $fieldImage = $('.o_field_image');
+        
+        console.log('Image field elements found:', {
+            input: $imageField.length,
+            avatar: $avatar.length,
+            fieldImage: $fieldImage.length
+        });
+        
+        // Add click handlers to all possible elements
+        $imageField.on('click', function(e) {
+            console.log('Direct input click - opening camera');
+            e.preventDefault();
+            captureImage();
+        });
+        
+        $avatar.on('click', function(e) {
+            console.log('Avatar click - opening camera');
+            e.preventDefault();
+            captureImage();
+        });
+        
+        $fieldImage.on('click', function(e) {
+            console.log('Field image click - opening camera');
+            e.preventDefault();
+            captureImage();
+        });
+    }, 1000);
+    
+    // Add a manual camera button for testing - more aggressive approach
+    function addCameraButton() {
+        console.log('Attempting to add camera button...');
+        
+        // Try multiple selectors to find the image section
+        var $imageSection = null;
+        var selectors = [
+            '.oe_avatar',
+            '[name="survey_image"]',
+            '.o_field_image',
+            '.oe_avatar + div'
+        ];
+        
+        for (var i = 0; i < selectors.length; i++) {
+            var $test = $(selectors[i]);
+            if ($test.length > 0) {
+                $imageSection = $test.closest('div, td, tr');
+                console.log('Found image section with selector:', selectors[i], $imageSection.length);
+                break;
+            }
+        }
+        
+        if ($imageSection && $imageSection.length > 0) {
+            // Remove existing button if any
+            $imageSection.find('.camera-capture-btn').remove();
+            
+            // Create camera button with better styling
+            var cameraBtn = $('<button type="button" class="camera-capture-btn btn btn-primary" style="margin: 10px 0; padding: 10px; width: 100%; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">📷 Capture Photo with Camera</button>');
+            
+            cameraBtn.on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Manual camera button clicked');
+                captureImage();
+            });
+            
+            $imageSection.append(cameraBtn);
+            console.log('Camera button added successfully');
+            return true;
+        } else {
+            console.log('Could not find image section, trying alternative approach...');
+            
+            // Try to add button to the page body as a floating button
+            if ($('.floating-camera-btn').length === 0) {
+                var floatingBtn = $('<button type="button" class="floating-camera-btn" style="position: fixed; top: 20px; right: 20px; z-index: 9999; background: #007bff; color: white; border: none; padding: 15px; border-radius: 50px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">📷</button>');
+                
+                floatingBtn.on('click', function(e) {
+                    e.preventDefault();
+                    console.log('Floating camera button clicked');
+                    captureImage();
+                });
+                
+                $('body').append(floatingBtn);
+                console.log('Floating camera button added');
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Try to add camera button multiple times with different delays
+    setTimeout(addCameraButton, 1000);
+    setTimeout(addCameraButton, 3000);
+    setTimeout(addCameraButton, 5000);
+    
+    // Also try when tab is clicked
+    $('a[href*="survey_evidence"]').on('click', function() {
+        setTimeout(addCameraButton, 1000);
     });
     
     console.log('GPS Location Capture Script Initialized');

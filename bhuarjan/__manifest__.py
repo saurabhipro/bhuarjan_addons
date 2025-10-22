@@ -21,6 +21,7 @@
         'data/chhattisgarh_villages_data.xml',
         'security/ir.model.access.csv',
         'security/secrurity.xml',
+        'security/notification4_security.xml',
         'reports/form10_survey_report.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',

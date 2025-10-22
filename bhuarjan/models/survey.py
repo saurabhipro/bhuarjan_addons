@@ -16,7 +16,7 @@ class Survey(models.Model):
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)
-    district_name = fields.Char(string='District / जिला', default='Raigarh (Chhattisgarh)', readonly=True)
+    district_name = fields.Char(string='District / जिला', default='Raigarh (Chhattisgarh)', readonly=True, tracking=True)
     survey_date = fields.Date(string='Survey Date / सर्वे दिनाँक', required=True, tracking=True, default=fields.Date.today)
     
     
@@ -60,7 +60,7 @@ class Survey(models.Model):
     
     # Multiple Landowners
     landowner_ids = fields.Many2many('bhu.landowner', 'bhu_survey_landowner_rel', 
-                                   'survey_id', 'landowner_id', string='Landowners / भूमिस्वामी')
+                                   'survey_id', 'landowner_id', string='Landowners / भूमिस्वामी', tracking=True)
     
     # Status
     state = fields.Selection([
@@ -69,9 +69,19 @@ class Survey(models.Model):
         ('approved', 'Approved / अनुमोदित'),
         ('rejected', 'Rejected / अस्वीकृत')
     ], string='Status / स्थिति', default='draft', tracking=True)
+   
+
+
+    # Survey Images and Location
+    survey_image = fields.Binary(string='Survey Image / सर्वे छवि', help='Photo taken during survey', tracking=True)
+    survey_image_filename = fields.Char(string='Image Filename / छवि फ़ाइल नाम', tracking=True)
+    latitude = fields.Float(string='Latitude / अक्षांश', digits=(10, 8), help='GPS Latitude coordinate', tracking=True)
+    longitude = fields.Float(string='Longitude / देशांतर', digits=(11, 8), help='GPS Longitude coordinate', tracking=True)
+    location_accuracy = fields.Float(string='Location Accuracy (meters) / स्थान सटीकता (मीटर)', digits=(8, 2), help='GPS accuracy in meters', tracking=True)
+    location_timestamp = fields.Datetime(string='Location Timestamp / स्थान समय', help='When the GPS coordinates were captured', tracking=True)
     
     # Attachments
-    attachment_ids = fields.Many2many('ir.attachment', string='Attachments / संलग्नक')
+    attachment_ids = fields.Many2many('ir.attachment', string='Attachments / संलग्नक', tracking=True)
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -81,7 +91,14 @@ class Survey(models.Model):
                 # Get the next sequence number
                 sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
                 vals['name'] = f'SUR_{sequence.zfill(3)}'
-        return super(Survey, self).create(vals_list)
+        records = super(Survey, self).create(vals_list)
+        # Log creation
+        for record in records:
+            record.message_post(
+                body=_('Survey created by %s') % self.env.user.name,
+                message_type='notification'
+            )
+        return records
     
     @api.constrains('khasra_number', 'village_id')
     def _check_unique_khasra_per_village(self):
@@ -103,21 +120,41 @@ class Survey(models.Model):
             if not record.khasra_number:
                 raise ValidationError(_('Please enter khasra number before submitting.'))
             record.state = 'submitted'
+            # Log the submission
+            record.message_post(
+                body=_('Survey submitted for approval by %s') % self.env.user.name,
+                message_type='notification'
+            )
 
     def action_approve(self):
         """Approve the survey"""
         for record in self:
             record.state = 'approved'
+            # Log the approval
+            record.message_post(
+                body=_('Survey approved by %s') % self.env.user.name,
+                message_type='notification'
+            )
 
     def action_reject(self):
         """Reject the survey"""
         for record in self:
             record.state = 'rejected'
+            # Log the rejection
+            record.message_post(
+                body=_('Survey rejected by %s') % self.env.user.name,
+                message_type='notification'
+            )
 
     def action_reset_to_draft(self):
         """Reset survey to draft"""
         for record in self:
             record.state = 'draft'
+            # Log the reset
+            record.message_post(
+                body=_('Survey reset to draft by %s') % self.env.user.name,
+                message_type='notification'
+            )
 
     def action_download_form10(self):
         """Download Form-10 as PDF"""
@@ -134,6 +171,56 @@ class Survey(models.Model):
         # Generate PDF report for all selected surveys
         report_action = self.env.ref('bhuarjan.action_report_form10_survey')
         return report_action.report_action(self)
+
+    def action_capture_location(self):
+        """Capture current GPS location using browser geolocation"""
+        for record in self:
+            # For now, just show a notification that location capture is not yet implemented
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Location Capture'),
+                    'message': _('GPS location capture feature will be implemented soon. You can manually enter coordinates in the location fields.'),
+                    'type': 'info',
+                }
+            }
+
+    def update_location(self, latitude, longitude, accuracy=None):
+        """Update GPS coordinates from JavaScript"""
+        for record in self:
+            record.write({
+                'latitude': latitude,
+                'longitude': longitude,
+                'location_accuracy': accuracy,
+                'location_timestamp': fields.Datetime.now()
+            })
+            # Log location capture
+            record.message_post(
+                body=_('GPS location captured: Lat: %s, Lon: %s, Accuracy: %s meters') % 
+                     (latitude, longitude, accuracy or 'Unknown'),
+                message_type='notification'
+            )
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Location Updated'),
+                    'message': _('GPS coordinates have been captured successfully.'),
+                    'type': 'success',
+                }
+            }
+
+    def log_survey_activity(self, activity_type, details=None):
+        """Log custom survey activities"""
+        for record in self:
+            message = _('Survey activity: %s') % activity_type
+            if details:
+                message += _(' - %s') % details
+            record.message_post(
+                body=message,
+                message_type='notification'
+            )
 
 
 class SurveyLine(models.Model):

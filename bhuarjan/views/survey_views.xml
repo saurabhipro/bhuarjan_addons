@@ -32,6 +32,7 @@
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
+                    <button name="action_capture_location" string="Capture Location / स्थान कैप्चर करें" type="object" class="btn-secondary" icon="fa-map-marker"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
                 </header>
                 <sheet>
@@ -125,10 +126,35 @@
                             </group>
                         </page>
                         
+                        <page string="Survey Evidence / सर्वे साक्ष्य" name="survey_evidence">
+                            <group>
+                                <group string="Survey Image / सर्वे छवि">
+                                    <field name="survey_image" widget="image" class="oe_avatar"/>
+                                    <field name="survey_image_filename" invisible="1"/>
+                                </group>
+                                <group string="Location Information / स्थान की जानकारी">
+                                    <field name="latitude" widget="float"/>
+                                    <field name="longitude" widget="float"/>
+                                    <field name="location_accuracy" widget="float"/>
+                                    <field name="location_timestamp" widget="datetime"/>
+                                </group>
+                            </group>
+                        </page>
+                        
                         <page string="Attachments / संलग्नक" name="attachments">
                             <field name="attachment_ids" widget="many2many_binary"/>
                         </page>
                     </notebook>
+                    
+                    <!-- Chatter -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity" 
+                               context="{'mail_activity_view': 'bhuarjan.view_mail_activity_survey'}"/>
+                        <field name="message_ids" widget="mail_thread" 
+                               context="{'mail_message_view': 'bhuarjan.view_mail_message_survey', 'hide_related_document': True}"
+                               options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                    </div>
                 </sheet>
             </form>
         </field>
@@ -256,6 +282,35 @@ if records:
                     </t>
                 </templates>
             </kanban>
+        </field>
+    </record>
+
+    <!-- Custom Mail Message View to Hide Related Document Fields -->
+    <record id="view_mail_message_survey" model="ir.ui.view">
+        <field name="name">mail.message.survey</field>
+        <field name="model">mail.message</field>
+        <field name="arch" type="xml">
+            <list string="Messages" create="false" edit="false" delete="false" decoration-info="message_type == 'notification'">
+                <field name="date"/>
+                <field name="subject"/>
+                <field name="author_id"/>
+                <field name="body" widget="html"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Custom Mail Activity View to Hide Related Document Fields -->
+    <record id="view_mail_activity_survey" model="ir.ui.view">
+        <field name="name">mail.activity.survey</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <list string="Activities" create="false" edit="false" delete="false">
+                <field name="date_deadline"/>
+                <field name="activity_type_id"/>
+                <field name="summary"/>
+                <field name="user_id"/>
+                <field name="state"/>
+            </list>
         </field>
     </record>
 

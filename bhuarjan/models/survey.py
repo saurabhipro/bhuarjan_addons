@@ -175,13 +175,13 @@ class Survey(models.Model):
     def action_capture_location(self):
         """Capture current GPS location using browser geolocation"""
         for record in self:
-            # For now, just show a notification that location capture is not yet implemented
+            # Trigger JavaScript-based location capture
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': _('Location Capture'),
-                    'message': _('GPS location capture feature will be implemented soon. You can manually enter coordinates in the location fields.'),
+                    'message': _('Please allow location access to capture GPS coordinates. The location will be automatically filled in the form fields.'),
                     'type': 'info',
                 }
             }
@@ -208,6 +208,20 @@ class Survey(models.Model):
                     'title': _('Location Updated'),
                     'message': _('GPS coordinates have been captured successfully.'),
                     'type': 'success',
+                }
+            }
+
+    def action_auto_capture_location(self):
+        """Auto-capture GPS location when form loads"""
+        for record in self:
+            # This method is called by JavaScript when auto-capture is triggered
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Auto Location Capture'),
+                    'message': _('GPS location will be automatically captured when you open this form on a mobile device or PWA.'),
+                    'type': 'info',
                 }
             }
 

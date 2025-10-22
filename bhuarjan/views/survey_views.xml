@@ -139,6 +139,9 @@
                                     <field name="location_timestamp" widget="datetime"/>
                                 </group>
                             </group>
+                            
+                            <!-- GPS Capture Script - External File -->
+                            <script type="text/javascript" src="/bhuarjan/static/src/js/survey_gps_capture.js"></script>
                         </page>
                         
                         <page string="Attachments / संलग्नक" name="attachments">

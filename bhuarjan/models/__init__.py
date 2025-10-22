@@ -8,6 +8,8 @@ from . import bhu_sub_division
 from . import bhu_tehsil
 from . import bhu_circle
 from . import bhu_village
+from . import notification4
+from . import notification4_wizard
 
 
 

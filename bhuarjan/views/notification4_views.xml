@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Notification 4 List View -->
+    <record id="view_bhu_notification4_list" model="ir.ui.view">
+        <field name="name">bhu.notification4.list</field>
+        <field name="model">bhu.notification4</field>
+        <field name="arch" type="xml">
+            <list string="Notification 4 / अधिसूचना 4" decoration-info="state == 'draft'" decoration-success="state == 'published'" decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="notification_date"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="village_id"/>
+                <field name="total_area"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Server Action for Generate Notification 4 -->
+    <record id="action_generate_notification4_server" model="ir.actions.server">
+        <field name="name">Generate Notification 4 / अधिसूचना 4 जेनरेट करें</field>
+        <field name="model_id" ref="model_bhu_notification4"/>
+        <field name="binding_model_id" ref="model_bhu_notification4"/>
+        <field name="state">code</field>
+        <field name="code">action = env.ref('bhuarjan.action_bhu_notification4_wizard')</field>
+    </record>
+
+    <!-- Notification 4 Form View -->
+    <record id="view_bhu_notification4_form" model="ir.ui.view">
+        <field name="name">bhu.notification4.form</field>
+        <field name="model">bhu.notification4</field>
+        <field name="arch" type="xml">
+            <form string="Notification 4 / अधिसूचना 4">
+                <header>
+                    <button name="action_publish" string="Publish / प्रकाशित करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancel / रद्द करें" type="object" class="btn-danger" invisible="state == 'cancelled'"/>
+                    <button name="action_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'cancelled'"/>
+                    <button name="action_populate_surveys" string="Populate Surveys / सर्वे भरें" type="object" class="btn-warning" invisible="state != 'draft'"/>
+                    <button name="action_generate_land_details" string="Generate Land Details / भूमि विवरण जेनरेट करें" type="object" class="btn-info" invisible="state != 'draft'"/>
+                    <button name="action_download_notification" string="Download PDF / PDF डाउनलोड करें" type="object" class="btn-success" icon="fa-download"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Notification Number / अधिसूचना नंबर"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Basic Information / मूल जानकारी">
+                            <field name="notification_date" widget="date"/>
+                            <field name="public_purpose" widget="text"/>
+                        </group>
+                        <group string="Location Information / स्थान की जानकारी">
+                            <field name="district_id" widget="selection"/>
+                            <field name="tehsil_id" widget="selection"/>
+                            <field name="village_id" widget="selection"/>
+                            <field name="total_area" widget="float" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Related Surveys / संबंधित सर्वे">
+                        <field name="survey_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Land Details Table / भूमि विवरण तालिका" name="land_details">
+                            <field name="land_details_ids" readonly="1">
+                                <list string="Land Details / भूमि विवरण" create="false" edit="false" delete="false">
+                                    <field name="district_name"/>
+                                    <field name="tehsil_name"/>
+                                    <field name="village_name"/>
+                                    <field name="khasra_number"/>
+                                    <field name="area"/>
+                                    <field name="landowner_count"/>
+                                    <field name="survey_count"/>
+                                    <field name="public_purpose"/>
+                                </list>
+                            </field>
+                        </page>
+                        
+                        <page string="Public Hearing / सार्वजनिक सुनवाई" name="hearing">
+                            <group>
+                                <group string="Hearing Details / सुनवाई विवरण">
+                                    <field name="hearing_date" widget="date"/>
+                                    <field name="hearing_time" widget="char"/>
+                                    <field name="hearing_location" widget="char"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="SIA Details / SIA विवरण" name="sia_details">
+                            <group>
+                                <field name="brief_public_purpose" widget="text"/>
+                                <field name="direct_affected_families" widget="integer"/>
+                                <field name="indirect_affected_families" widget="integer"/>
+                                <field name="private_assets_count" widget="integer"/>
+                                <field name="govt_assets_count" widget="integer"/>
+                                <field name="is_acquisition_minimum" widget="boolean_toggle"/>
+                                <field name="alternative_site_feasibility" widget="text"/>
+                                <field name="project_total_cost" widget="monetary"/>
+                                <field name="project_benefits" widget="text"/>
+                                <field name="compensation_framework" widget="text"/>
+                                <field name="other_affected_factors" widget="text"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Signature Details / हस्ताक्षर विवरण" name="signature">
+                            <group>
+                                <group string="Signature Information / हस्ताक्षर जानकारी">
+                                    <field name="signature_place" widget="char"/>
+                                    <field name="signature_date" widget="date"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Notification 4 Search View -->
+    <record id="view_bhu_notification4_search" model="ir.ui.view">
+        <field name="name">bhu.notification4.search</field>
+        <field name="model">bhu.notification4</field>
+        <field name="arch" type="xml">
+            <search string="Search Notifications / अधिसूचना खोजें">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="village_id"/>
+                <field name="notification_date"/>
+                
+                <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Published / प्रकाशित" name="published" domain="[('state', '=', 'published')]"/>
+                <filter string="Cancelled / रद्द" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                
+                <separator/>
+                <filter string="This Month / इस महीने" name="this_month" domain="[('notification_date', '>=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01')), ('notification_date', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="This Year / इस साल" name="this_year" domain="[('notification_date', '>=', context_today().strftime('%Y-01-01')), ('notification_date', '&lt;', (context_today() + relativedelta(years=1)).strftime('%Y-01-01'))]"/>
+                
+                <group expand="0" string="Group By / समूह बनाएं">
+                    <filter string="State / स्थिति" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil / तहसील" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                    <filter string="Village / ग्राम" name="group_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="Notification Date / अधिसूचना दिनाँक" name="group_notification_date" context="{'group_by': 'notification_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Notification 4 Action -->
+    <record id="action_bhu_notification4" model="ir.actions.act_window">
+        <field name="name">Notification 4 / अधिसूचना 4</field>
+        <field name="res_model">bhu.notification4</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_notification4_search"/>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Generate your first Notification 4!
+            </p>
+            <p>
+                Use the "Generate Notification 4" button to create notifications for specific villages.
+                This will automatically create notifications for all khasras in the selected village.
+            </p>
+        </field>
+    </record>
+
+</odoo>

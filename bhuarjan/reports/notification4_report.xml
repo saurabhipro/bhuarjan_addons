@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_notification4" model="ir.actions.report">
+        <field name="name">Notification 4 Report</field>
+        <field name="model">bhu.notification4</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.notification4_report</field>
+        <field name="report_file">bhuarjan.notification4_report</field>
+        <field name="binding_model_id" ref="model_bhu_notification4"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="notification4_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="notification">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        
+                        <!-- Header -->
+                        <div class="text-center" style="margin-bottom: 30px;">
+                            <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                                प्रपत्र – 4  (नियम 4 देखें)
+                            </h2>
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">
+                                कलेक्टर एवं सह सचिव, राजस्व एवं आपदा प्रबंधन विभाग का कार्यालय
+                            </h3>
+                            <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 20px;">
+                                अधिसूचना
+                            </h4>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div style="text-align: justify; line-height: 1.6; margin-bottom: 20px;">
+                            <p>
+                                भूमि अधिग्रहण, पुनर्वास एवं पुनर्स्थापन में उचित प्रतिकर का अधिकार एवं पारदर्शिता अधिनियम, 2013 की धारा 4 तथा नियम 4 के साथ पठित के अंतर्गत, राज्य शासन निम्न तालिका में वर्णित भूमि को लोक प्रयोजन हेतु अधिग्रहित करने का आशय व्यक्त करता है—
+                            </p>
+                        </div>
+
+                        <!-- Land Details Table -->
+                        <table class="table table-bordered" style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold;">जिला</th>
+                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold;">तहसील</th>
+                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold;">ग्राम/नगर</th>
+                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold;">क्षेत्रफल</th>
+                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold;">लोक प्रयोजन का विवरण</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="notification.land_details_ids" t-as="land_detail">
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="land_detail.district_name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="land_detail.tehsil_name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="land_detail.village_name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="land_detail.area or 0"/> हेक्टेयर
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="land_detail.public_purpose or ''"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- SIA and Public Hearing Information -->
+                        <div style="text-align: justify; line-height: 1.6; margin-bottom: 20px;">
+                            <p>
+                                उक्त भूमि के अधिग्रहण हेतु सामाजिक प्रभाव आकलन (SIA) कराया जाएगा तथा दिनांक <t t-esc="notification.hearing_date or '________'"/> को समय <t t-esc="notification.hearing_time or '________'"/> बजे, स्थान <t t-esc="notification.hearing_location or '________'"/> पर एक सार्वजनिक सुनवाई आयोजित की जाएगी। प्रस्तावित भूमि अधिग्रहण से संबंधित अन्य विवरण निम्नानुसार हैं—
+                            </p>
+                        </div>
+
+                        <!-- Detailed Information Section -->
+                        <div style="text-align: justify; line-height: 1.6; margin-bottom: 20px;">
+                            <p><strong>(1) लोक प्रयोजन का संक्षिप्त विवरण:</strong> <t t-esc="notification.brief_public_purpose or ''"/></p>
+                            <p><strong>(2) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या:</strong> <t t-esc="notification.direct_affected_families or ''"/></p>
+                            <p><strong>(3) परोक्ष रूप से प्रभावित परिवारों की संख्या:</strong> <t t-esc="notification.indirect_affected_families or ''"/></p>
+                            <p><strong>(4) प्रभावित क्षेत्र में निजी भवनों एवं अन्य परिसंपत्तियों की अनुमानित संख्या:</strong> <t t-esc="notification.private_assets_count or ''"/></p>
+                            <p><strong>(5) प्रभावित क्षेत्र में शासकीय भवनों एवं अन्य परिसंपत्तियों की अनुमानित संख्या:</strong> <t t-esc="notification.govt_assets_count or ''"/></p>
+                            <p><strong>(6) क्या प्रस्तावित अधिग्रहण न्यूनतम है?</strong> <t t-esc="'हाँ' if notification.is_acquisition_minimum else 'नहीं'"/></p>
+                            <p><strong>(7) संभावित वैकल्पिक स्थल तथा उसकी व्यवहार्यता पर विचार:</strong> <t t-esc="notification.alternative_site_feasibility or ''"/></p>
+                            <p><strong>(8) परियोजना की कुल लागत:</strong> <t t-esc="notification.project_total_cost or ''"/></p>
+                            <p><strong>(9) परियोजना से होने वाले लाभ:</strong> <t t-esc="notification.project_benefits or ''"/></p>
+                            <p><strong>(10) प्रस्तावित सामाजिक प्रभाव के प्रतिकर की रूपरेखा एवं अनुमानित व्यय:</strong> <t t-esc="notification.compensation_framework or ''"/></p>
+                            <p><strong>(11) परियोजना से प्रभावित अन्य कारक:</strong> <t t-esc="notification.other_affected_factors or ''"/></p>
+                        </div>
+
+                        <!-- Footer Information -->
+                        <div style="text-align: justify; line-height: 1.6; margin-bottom: 30px;">
+                            <p>
+                                उपर्युक्त भूमि-अधिग्रहण के संबंध में किसी भी व्यक्ति/संस्था द्वारा सूचना/आपत्तियाँ/सुझाव निर्धारित तिथि, समय एवं स्थान पर प्रस्तुत किए जा सकते हैं।
+                            </p>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div style="margin-top: 50px;">
+                            <div style="float: right; text-align: center;">
+                                <p><strong>स्थान: <t t-esc="notification.signature_place or '_____________'"/></strong></p>
+                                <p><strong>दिनांक: <t t-esc="notification.signature_date or '_____________'"/></strong></p>
+                                <br/>
+                                <p><strong>जिला कलेक्टर एवं सह सचिव</strong></p>
+                                <p><strong>राजस्व एवं आपदा प्रबंधन विभाग</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

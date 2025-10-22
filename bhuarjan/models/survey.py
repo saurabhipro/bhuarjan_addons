@@ -67,8 +67,12 @@ class Survey(models.Model):
         ('draft', 'Draft / प्रारूप'),
         ('submitted', 'Submitted / प्रस्तुत'),
         ('approved', 'Approved / अनुमोदित'),
-        ('rejected', 'Rejected / अस्वीकृत')
+        ('rejected', 'Rejected / अस्वीकृत'),
+        ('locked', 'Locked / लॉक')
     ], string='Status / स्थिति', default='draft', tracking=True)
+    
+    # Notification 4 Generation
+    notification4_generated = fields.Boolean(string='Notification 4 Generated / अधिसूचना 4 जेनरेट', default=False, tracking=True)
    
 
 

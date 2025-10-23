@@ -10,6 +10,7 @@
     'depends':['mail'],
     'data':[
         'data/ir_sequence_data.xml',
+        'templates/website.xml',
         'data/chhattisgarh_districts_data.xml',
         'data/raigarh_sub_division_data.xml',
         'data/raipur_sub_division_data.xml',

@@ -1,0 +1,9 @@
+<odoo>
+    <data>
+        <template id="brand_promotion_custom" inherit_id="web.brand_promotion" name="Custom Brand Promotion">
+            <xpath expr="//t[@t-call='web.brand_promotion_message']" position="replace">
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

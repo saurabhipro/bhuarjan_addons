@@ -12,16 +12,6 @@
             <field name="perm_unlink" eval="True"/>
         </record>
 
-        <!-- Notification 4 Land Detail Security -->
-        <record id="access_bhu_notification4_land_detail_user" model="ir.model.access">
-            <field name="name">bhu.notification4.land.detail.user</field>
-            <field name="model_id" ref="model_bhu_notification4_land_detail"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
 
         <!-- Notification 4 Wizard Security -->
         <record id="access_bhu_notification4_wizard_user" model="ir.model.access">

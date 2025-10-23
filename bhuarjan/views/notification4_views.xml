@@ -57,20 +57,6 @@
                     </group>
                     
                     <notebook>
-                        <page string="Land Details Table / भूमि विवरण तालिका" name="land_details">
-                            <field name="land_details_ids" readonly="1">
-                                <list string="Land Details / भूमि विवरण" create="false" edit="false" delete="false">
-                                    <field name="district_name"/>
-                                    <field name="tehsil_name"/>
-                                    <field name="village_name"/>
-                                    <field name="khasra_number"/>
-                                    <field name="area"/>
-                                    <field name="landowner_count"/>
-                                    <field name="survey_count"/>
-                                    <field name="public_purpose"/>
-                                </list>
-                            </field>
-                        </page>
                         
                         <page string="Public Hearing / सार्वजनिक सुनवाई" name="hearing">
                             <group>
@@ -84,18 +70,30 @@
                         
                         <page string="SIA Details / SIA विवरण" name="sia_details">
                             <group>
-                                <field name="brief_public_purpose" widget="text"/>
-                                <field name="direct_affected_families" widget="integer"/>
-                                <field name="indirect_affected_families" widget="integer"/>
-                                <field name="private_assets_count" widget="integer"/>
-                                <field name="govt_assets_count" widget="integer"/>
-                                <field name="is_acquisition_minimum" widget="boolean_toggle"/>
-                                <field name="alternative_site_feasibility" widget="text"/>
-                                <field name="project_total_cost" widget="monetary"/>
-                                <field name="project_benefits" widget="text"/>
-                                <field name="compensation_framework" widget="text"/>
-                                <field name="other_affected_factors" widget="text"/>
+                                <group string="Basic Information / मूल जानकारी" col="2">
+                                    <field name="brief_public_purpose" widget="text" nolabel="1"/>
+                                    <field name="direct_affected_families" widget="integer"/>
+                                    <field name="indirect_affected_families" widget="integer"/>
+                                    <field name="is_acquisition_minimum" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Assets Information / परिसंपत्ति जानकारी" col="2">
+                                    <field name="private_assets_count" widget="integer"/>
+                                    <field name="govt_assets_count" widget="integer"/>
+                                    <field name="alternative_site_feasibility" widget="text"/>
+                                </group>
+                                <group string="Project Details / परियोजना विवरण" col="2">
+                                    <field name="project_total_cost" widget="monetary"/>
+                                    <field name="project_benefits" widget="text"/>
+                                </group>
+                                <group string="Compensation &amp; Impact / प्रतिकर और प्रभाव" col="2">
+                                    <field name="compensation_framework" widget="text"/>
+                                    <field name="other_affected_factors" widget="text"/>
+                                </group>
                             </group>
+                        </page>
+                        
+                        <page string="Survey Details / सर्वे विवरण" name="survey_details">
+                            <field name="survey_ids" readonly="1" widget="one2many" context="{'tree_view_ref': 'bhuarjan.view_survey_details_tree'}"/>
                         </page>
                         
                         <page string="Signature Details / हस्ताक्षर विवरण" name="signature">
@@ -159,6 +157,43 @@
                 Use the "Generate Notification 4" button to create notifications for specific villages.
                 This will automatically create notifications for all khasras in the selected village.
             </p>
+        </field>
+    </record>
+
+    <!-- Survey Details Tree View for Notification 4 -->
+    <record id="view_survey_details_tree" model="ir.ui.view">
+        <field name="name">survey.details.tree</field>
+        <field name="model">bhu.survey</field>
+        <field name="arch" type="xml">
+            <list string="Survey Details / सर्वे विवरण" create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="department_id"/>
+                <field name="village_id"/>
+                <field name="tehsil_id"/>
+                <field name="district_name"/>
+                <field name="khasra_number"/>
+                <field name="total_area"/>
+                <field name="acquired_area"/>
+                <field name="survey_date"/>
+                <field name="state" widget="badge"/>
+                <field name="is_single_crop"/>
+                <field name="is_double_crop"/>
+                <field name="is_irrigated"/>
+                <field name="is_unirrigated"/>
+                <field name="tree_development_stage"/>
+                <field name="tree_count"/>
+                <field name="house_type"/>
+                <field name="house_area"/>
+                <field name="shed_area"/>
+                <field name="has_well"/>
+                <field name="well_type"/>
+                <field name="has_electricity"/>
+                <field name="has_road_access"/>
+                <field name="has_tubewell"/>
+                <field name="has_pond"/>
+                <field name="landowner_ids" widget="many2many_tags"/>
+            </list>
         </field>
     </record>
 

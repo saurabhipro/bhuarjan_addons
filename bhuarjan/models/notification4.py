@@ -25,8 +25,6 @@ class Notification4(models.Model):
                                  domain="[('village_id', '=', village_id)]")
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)', compute='_compute_total_area', store=True)
     
-    # Land Details Table (Auto-generated from surveys)
-    land_details_ids = fields.One2many('bhu.notification4.land.detail', 'notification_id', string='Land Details / भूमि विवरण')
     
     # Public Hearing Details
     hearing_date = fields.Date(string='Hearing Date / सुनवाई दिनाँक', tracking=True)
@@ -88,43 +86,29 @@ class Notification4(models.Model):
             self.survey_ids = surveys
             self.district_id = self.village_id.district_id
             self.tehsil_id = self.village_id.tehsil_id
-            # Note: Land details will be generated manually via the "Fetch Survey Details" button
-    
-    def _generate_land_details(self):
-        """Generate land details table from surveys"""
-        for record in self:
-            # Clear existing records
-            record.land_details_ids.unlink()
             
-            if not record.survey_ids:
-                return
-            
-            # Group surveys by khasra number
-            khasra_groups = {}
-            for survey in record.survey_ids:
-                khasra = survey.khasra_number or 'Unknown'
-                if khasra not in khasra_groups:
-                    khasra_groups[khasra] = {
-                        'area': 0,
-                        'landowners': set(),
-                        'surveys': []
+            # Show notification about surveys found
+            if surveys:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Surveys Found'),
+                        'message': _('Found %d surveys for village %s. Check the "Survey Details" tab to view all survey information.') % (len(surveys), self.village_id.name),
+                        'type': 'success',
                     }
-                khasra_groups[khasra]['area'] += survey.total_area or 0
-                khasra_groups[khasra]['landowners'].update(survey.landowner_ids)
-                khasra_groups[khasra]['surveys'].append(survey)
-            
-            # Create land detail records
-            for khasra, data in khasra_groups.items():
-                try:
-                    self.env['bhu.notification4.land.detail'].create({
-                        'notification_id': record.id,
-                        'khasra_number': khasra,
-                        'area': data['area'],
-                        'landowner_count': len(data['landowners']),
-                        'survey_count': len(data['surveys'])
-                    })
-                except Exception as e:
-                    raise ValidationError(_('Error creating land details: %s') % str(e))
+                }
+            else:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('No Surveys Found'),
+                        'message': _('No approved surveys found for village %s.') % self.village_id.name,
+                        'type': 'warning',
+                    }
+                }
+    
     
     def action_publish(self):
         """Publish the notification"""
@@ -246,32 +230,50 @@ class Notification4(models.Model):
             record.district_id = record.village_id.district_id
             record.tehsil_id = record.village_id.tehsil_id
             
-            # Generate land details
-            record._generate_land_details()
+            # Populate survey details directly into notification fields
+            self._populate_survey_details()
             
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': _('Success'),
-                    'message': _('Survey details fetched and land details generated for %d surveys.') % len(surveys),
+                    'message': _('Survey details fetched and populated for %d surveys.') % len(surveys),
                     'type': 'success',
                 }
             }
+    
+    def _populate_survey_details(self):
+        """Populate notification form with survey details directly"""
+        for record in self:
+            if not record.survey_ids:
+                return
+            
+            # Calculate totals from surveys
+            total_landowners = 0
+            total_private_assets = 0
+            total_govt_assets = 0
+            khasra_numbers = []
+            
+            for survey in record.survey_ids:
+                total_landowners += len(survey.landowner_ids)
+                if survey.house_type and survey.house_type != 'none':
+                    total_private_assets += 1
+                if survey.has_well or survey.has_electricity or survey.has_road_access:
+                    total_private_assets += 1
+                if survey.khasra_number:
+                    khasra_numbers.append(survey.khasra_number)
+            
+            # Populate SIA fields with calculated data
+            record.direct_affected_families = total_landowners
+            record.private_assets_count = total_private_assets
+            record.govt_assets_count = total_govt_assets
+            
+            # Set default values for other fields
+            if not record.brief_public_purpose:
+                record.brief_public_purpose = record.public_purpose
+            
+            if not record.is_acquisition_minimum:
+                record.is_acquisition_minimum = True  # Default to minimum acquisition
 
 
-class Notification4LandDetail(models.Model):
-    _name = 'bhu.notification4.land.detail'
-    _description = 'Notification 4 Land Details'
-    
-    notification_id = fields.Many2one('bhu.notification4', string='Notification', required=True, ondelete='cascade')
-    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True)
-    area = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', required=True)
-    landowner_count = fields.Integer(string='Number of Landowners / भूमिस्वामियों की संख्या')
-    survey_count = fields.Integer(string='Number of Surveys / सर्वे की संख्या')
-    
-    # Display fields
-    district_name = fields.Char(string='District / जिला', related='notification_id.district_id.name', store=True)
-    tehsil_name = fields.Char(string='Tehsil / तहसील', related='notification_id.tehsil_id.name', store=True)
-    village_name = fields.Char(string='Village / ग्राम', related='notification_id.village_id.name', store=True)
-    public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन', related='notification_id.public_purpose', store=True)

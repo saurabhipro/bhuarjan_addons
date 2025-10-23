@@ -162,9 +162,4 @@
         </field>
     </record>
 
-    <!-- Update menu item to include action -->
-    <record id="menu_bhu_notification4" model="ir.ui.menu">
-        <field name="action" ref="action_bhu_notification4"/>
-    </record>
-
 </odoo>

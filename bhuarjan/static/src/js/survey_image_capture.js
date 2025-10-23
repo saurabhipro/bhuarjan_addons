@@ -209,26 +209,10 @@ $(document).ready(function() {
                                 console.log('Direct assignment failed:', directError);
                             }
                             
-                // Method 3: Try setting value as data URL
-                try {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            if (e.target && e.target.result) {
-                                fileInput.val(e.target.result);
-                                console.log('Data URL method applied');
-                            }
-                        } catch (valError) {
-                            console.log('Error setting data URL value:', valError);
-                        }
-                    };
-                    reader.onerror = function(e) {
-                        console.log('FileReader error:', e);
-                    };
-                    reader.readAsDataURL(file);
-                } catch (urlError) {
-                    console.log('Data URL method failed:', urlError);
-                }
+                // Method 3: Try setting value as data URL (DISABLED - causes InvalidStateError)
+                // This method is disabled because it causes InvalidStateError when DOM elements become invalid
+                // The file assignment methods above should be sufficient for most cases
+                console.log('Data URL method skipped to prevent InvalidStateError');
                             
                             // Trigger events
                             fileInput.trigger('change');
@@ -408,11 +392,23 @@ $(document).ready(function() {
         console.log('Assigning file to survey field:', file.name);
         
         // Find the survey image field using multiple selectors
-        var fileInput = $('input[name="survey_image"], input[data-field-name="survey_image"], .o_field_binary input, .o_field_image input').filter(function() {
-            return $(this).attr('name') === 'survey_image' || 
-                   $(this).attr('data-field-name') === 'survey_image' ||
-                   $(this).closest('.o_field_binary, .o_field_image').length > 0;
+        var fileInput = $('input[name="survey_image"], input[data-field-name="survey_image"], .o_field_binary input, .o_field_image input, input[type="file"]').filter(function() {
+            var $this = $(this);
+            return $this.attr('name') === 'survey_image' || 
+                   $this.attr('data-field-name') === 'survey_image' ||
+                   $this.closest('.o_field_binary, .o_field_image').length > 0 ||
+                   ($this.attr('type') === 'file' && $this.closest('form').length > 0);
         });
+        
+        console.log('Found file inputs:', fileInput.length);
+        console.log('File input details:', fileInput.map(function() { 
+            return {
+                name: $(this).attr('name'),
+                type: $(this).attr('type'),
+                id: $(this).attr('id'),
+                class: $(this).attr('class')
+            };
+        }).get());
         
         if (fileInput && fileInput.length > 0) {
             try {
@@ -422,10 +418,14 @@ $(document).ready(function() {
                 
                 // Method 1: Try DataTransfer approach
                 try {
-                    var dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput[0].files = dataTransfer.files;
-                    console.log('DataTransfer method applied');
+                    if (typeof DataTransfer !== 'undefined') {
+                        var dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput[0].files = dataTransfer.files;
+                        console.log('DataTransfer method applied');
+                    } else {
+                        console.log('DataTransfer not supported, trying direct assignment');
+                    }
                 } catch (dtError) {
                     console.log('DataTransfer failed:', dtError);
                 }
@@ -438,64 +438,140 @@ $(document).ready(function() {
                     console.log('Direct assignment failed:', directError);
                 }
                 
-                // Method 3: Try setting value as data URL
+                // Method 2.5: Try setting files property with FileList
                 try {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            if (e.target && e.target.result) {
-                                fileInput.val(e.target.result);
-                                console.log('Data URL method applied');
-                            }
-                        } catch (valError) {
-                            console.log('Error setting data URL value:', valError);
-                        }
+                    var fileList = {
+                        0: file,
+                        length: 1,
+                        item: function(index) { return index === 0 ? file : null; }
                     };
-                    reader.onerror = function(e) {
-                        console.log('FileReader error:', e);
-                    };
-                    reader.readAsDataURL(file);
-                } catch (urlError) {
-                    console.log('Data URL method failed:', urlError);
+                    fileInput[0].files = fileList;
+                    console.log('FileList assignment applied');
+                } catch (fileListError) {
+                    console.log('FileList assignment failed:', fileListError);
                 }
                 
-                // Trigger events
-                fileInput.trigger('change');
-                fileInput.trigger('input');
-                fileInput.trigger('blur');
+                // Method 3: Try setting value as data URL (DISABLED - causes InvalidStateError)
+                // This method is disabled because it causes InvalidStateError when DOM elements become invalid
+                // The file assignment methods above should be sufficient for most cases
+                console.log('Data URL method skipped to prevent InvalidStateError');
                 
-                // Force form update
+                // Trigger events with error handling and multiple approaches
+                try {
+                    // Native DOM events
+                    var changeEvent = new Event('change', { bubbles: true, cancelable: true });
+                    fileInput[0].dispatchEvent(changeEvent);
+                    console.log('Native change event dispatched');
+                } catch (e) {
+                    console.log('Error dispatching native change event:', e);
+                }
+                
+                try {
+                    // jQuery events
+                    fileInput.trigger('change');
+                    console.log('jQuery change event triggered');
+                } catch (e) {
+                    console.log('Error triggering jQuery change event:', e);
+                }
+                
+                try {
+                    // Input event
+                    var inputEvent = new Event('input', { bubbles: true, cancelable: true });
+                    fileInput[0].dispatchEvent(inputEvent);
+                    fileInput.trigger('input');
+                    console.log('Input events triggered');
+                } catch (e) {
+                    console.log('Error triggering input events:', e);
+                }
+                
+                try {
+                    // Blur event
+                    fileInput.trigger('blur');
+                    console.log('Blur event triggered');
+                } catch (e) {
+                    console.log('Error triggering blur event:', e);
+                }
+                
+                // Additional events for Odoo
+                try {
+                    fileInput.trigger('focus');
+                    fileInput.trigger('keyup');
+                    fileInput.trigger('keydown');
+                    console.log('Additional Odoo events triggered');
+                } catch (e) {
+                    console.log('Error triggering additional events:', e);
+                }
+                
+                // Force form update with error handling
                 if (window.odoo && window.odoo.__WOWL_DEBUG__) {
                     console.log('Triggering Odoo field update');
-                    fileInput.trigger('odoo_field_changed');
+                    try {
+                        fileInput.trigger('odoo_field_changed');
+                    } catch (e) {
+                        console.log('Error triggering Odoo field update:', e);
+                    }
                 }
                 
                 // Method 4: Try Odoo-specific approach
                 try {
                     // Find the Odoo field widget and update it directly
-                    var $fieldWidget = fileInput.closest('.o_field_binary, .o_field_image');
+                    var $fieldWidget = fileInput.closest('.o_field_binary, .o_field_image, .o_field_widget');
                     if ($fieldWidget.length > 0) {
                         console.log('Found Odoo field widget');
                         // Try to trigger the field's change event
                         $fieldWidget.trigger('change');
                         $fieldWidget.find('input').trigger('change');
+                        
+                        // Try to find and update the field value directly
+                        var $hiddenInput = $fieldWidget.find('input[type="hidden"]');
+                        if ($hiddenInput.length > 0) {
+                            console.log('Found hidden input, updating value');
+                            $hiddenInput.val('uploaded');
+                        }
+                        
+                        // Try to find and update any display elements
+                        var $displayElement = $fieldWidget.find('.o_field_binary_file, .o_field_image_file');
+                        if ($displayElement.length > 0) {
+                            console.log('Found display element, updating');
+                            $displayElement.text('File uploaded: ' + file.name);
+                        }
+                    }
+                    
+                    // Try to find the parent form and trigger its change event
+                    var $form = fileInput.closest('form');
+                    if ($form.length > 0) {
+                        console.log('Found parent form, triggering change');
+                        $form.trigger('change');
                     }
                 } catch (odooError) {
                     console.log('Odoo field update failed:', odooError);
+                }
+                
+                // Method 5: Try replacing the input element entirely
+                try {
+                    console.log('Attempting input replacement method');
+                    var newInput = fileInput[0].cloneNode(true);
+                    newInput.files = [file];
+                    fileInput[0].parentNode.replaceChild(newInput, fileInput[0]);
+                    console.log('Input replacement method applied');
+                } catch (replaceError) {
+                    console.log('Input replacement failed:', replaceError);
                 }
                 
                 console.log('File assigned to survey_image field');
                 
                 // Verify the assignment worked
                 setTimeout(function() {
-                    if (fileInput[0].files && fileInput[0].files.length > 0) {
-                        console.log('File assignment verified:', fileInput[0].files[0].name);
+                    var currentInput = $('input[name="survey_image"], input[data-field-name="survey_image"]').first();
+                    if (currentInput.length > 0 && currentInput[0].files && currentInput[0].files.length > 0) {
+                        console.log('File assignment verified:', currentInput[0].files[0].name);
                         alert('Photo uploaded and saved successfully!');
                     } else {
                         console.log('File assignment verification failed');
+                        console.log('Current input files:', currentInput[0] ? currentInput[0].files : 'No input found');
                         alert('Photo uploaded but may not be saved properly. Please try again.');
                     }
-                }, 500);
+                }, 1000);
                 
             } catch (error) {
                 console.log('Error setting file to input:', error);
@@ -505,17 +581,38 @@ $(document).ready(function() {
             console.log('Survey image field not found with any selector');
             console.log('Available inputs:', $('input').map(function() { return $(this).attr('name'); }).get());
             
-            // Try to save the image as a data URL to localStorage as fallback
+            // Try to save the image as a data URL to localStorage as fallback (without FileReader)
             try {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var dataURL = e.target.result;
+                // Use canvas to convert blob to data URL without FileReader
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                var img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    var dataURL = canvas.toDataURL('image/jpeg', 0.8);
                     localStorage.setItem('captured_survey_image', dataURL);
                     localStorage.setItem('captured_survey_image_timestamp', Date.now());
                     console.log('Image saved to localStorage as fallback');
                     alert('Photo uploaded! Please refresh the page to see the image.');
                 };
-                reader.readAsDataURL(file);
+                
+                img.onerror = function() {
+                    console.log('Failed to load image for localStorage fallback');
+                    alert('Photo uploaded but could not save to form - field not found');
+                };
+                
+                // Create object URL for the image
+                var objectURL = URL.createObjectURL(file);
+                img.src = objectURL;
+                
+                // Clean up object URL after use
+                setTimeout(function() {
+                    URL.revokeObjectURL(objectURL);
+                }, 1000);
+                
             } catch (fallbackError) {
                 console.log('Fallback save also failed:', fallbackError);
                 alert('Photo uploaded but could not save to form - field not found');

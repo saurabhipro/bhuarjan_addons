@@ -32,6 +32,7 @@
             <field name="inherit_id" ref="base.view_users_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='login']" position="after">
+
                     <field name="parent_id"/>
                     <field name="state_id"/>
                     <field name="district_id"/>
@@ -72,6 +73,9 @@
                             <group>
                                 <field name="partner_id" groups="base.group_no_one" readonly="1" required="0" invisible="not id"/>
                             </group>
+                            <group>
+                                <field name="mobile"/>
+                            </group>
                         </div>
                         <group string="Bhuarjan">
                             <group>
@@ -107,6 +111,7 @@
         <kanban class="o_kanban_mobile">
             <!-- Include any fields you plan to display -->
             <field name="active"/>
+            <field name="mobile"/>
             <field name="login_date"/>
             <field name="parent_id"/>
             <field name="state_id"/>
@@ -192,12 +197,12 @@
 
     
     <record id="department_details_view_hierarchy_jhg" model="ir.ui.view">
-       <field name="name">res.users</field>
-       <field name="model">res.users</field>
-       <field name="arch" type="xml">
-           <hierarchy child_field="child_ids"
-                       draggable="1">
-               <field name="district_id"/>
+    <field name="name">res.users.hierarchy.view.bhuarjan</field>
+    <field name="model">res.users</field>
+    <field name="arch" type="xml">
+        <hierarchy child_field="child_ids"
+                       draggable="1" js_class="hr_employee_hierarchy" icon="fa-users">
+               <field name="parent_id"/>
                <templates>
                    <t t-name="hierarchy-box">
                        <div t-attf-class="o_hierarchy_node_header d-flex justify-content-center pb-4"
@@ -205,14 +210,15 @@
                        </div>
                        <div class="o_hierarchy_node_body d-flex flex-column text-center">
                            <div class="w-100 position-relative">
-                               <field class="fw-bold" name="district_id"/><br/>
+                               <field class="fw-bold" name="parent_id"/><br/>
                            </div>
                        </div>
                    </t>
                </templates>
            </hierarchy>
-       </field>
-   </record>
+    </field>
+</record>
+
 
     <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
             <field name="name">Users</field>

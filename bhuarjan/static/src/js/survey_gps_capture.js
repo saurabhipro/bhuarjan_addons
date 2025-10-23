@@ -260,28 +260,66 @@ $(document).ready(function() {
                     
                     // Convert canvas to blob
                     canvas.toBlob(function(blob) {
-                        // Create file input and set the captured image
-                        var fileInput = $('input[name="survey_image"]');
-                        if (fileInput.length > 0) {
-                            // Create a File object from the blob
-                            var file = new File([blob], 'survey_image_' + Date.now() + '.jpg', {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            });
-                            
-                            // Create a FileList-like object
-                            var dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
-                            
-                            // Set the file to the input
-                            fileInput[0].files = dataTransfer.files;
-                            fileInput.trigger('change');
-                            
-                            console.log('Image captured and set to survey_image field');
-                            alert('Photo captured successfully!');
+                        console.log('Image blob created, size:', blob.size);
+                        
+                        // Try multiple ways to find the survey_image field
+                        var fileInput = null;
+                        var selectors = [
+                            'input[name="survey_image"]',
+                            'input[data-field-name="survey_image"]',
+                            '.o_field_image input',
+                            'input[type="file"]'
+                        ];
+                        
+                        for (var i = 0; i < selectors.length; i++) {
+                            var $test = $(selectors[i]);
+                            if ($test.length > 0) {
+                                fileInput = $test;
+                                console.log('Found survey_image field with selector:', selectors[i]);
+                                break;
+                            }
+                        }
+                        
+                        if (fileInput && fileInput.length > 0) {
+                            try {
+                                // Create a File object from the blob
+                                var file = new File([blob], 'survey_image_' + Date.now() + '.jpg', {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                
+                                console.log('File created:', file.name, file.size, file.type);
+                                
+                                // Create a FileList-like object
+                                var dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                
+                                // Set the file to the input
+                                fileInput[0].files = dataTransfer.files;
+                                fileInput.trigger('change');
+                                fileInput.trigger('input');
+                                
+                                console.log('Image captured and set to survey_image field');
+                                alert('Photo captured successfully!');
+                            } catch (error) {
+                                console.log('Error setting file to input:', error);
+                                alert('Photo captured but could not save to form: ' + error.message);
+                            }
                         } else {
-                            console.log('Survey image field not found');
-                            alert('Photo captured but could not save to form');
+                            console.log('Survey image field not found with any selector');
+                            console.log('Available inputs:', $('input').map(function() { return $(this).attr('name'); }).get());
+                            
+                            // Try to save the image as a data URL to localStorage as fallback
+                            try {
+                                var dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                                localStorage.setItem('captured_survey_image', dataURL);
+                                localStorage.setItem('captured_survey_image_timestamp', Date.now());
+                                console.log('Image saved to localStorage as fallback');
+                                alert('Photo captured! Please refresh the page to see the image.');
+                            } catch (fallbackError) {
+                                console.log('Fallback save also failed:', fallbackError);
+                                alert('Photo captured but could not save to form - field not found');
+                            }
                         }
                         
                         // Stop camera and close modal

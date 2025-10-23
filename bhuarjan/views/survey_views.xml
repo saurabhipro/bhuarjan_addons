@@ -73,28 +73,7 @@
                     </group>
                     
                     <notebook>
-                        <page string="Landowners / भूमिस्वामी" name="landowners_details">
-                            <field name="landowner_ids" readonly="1">
-                                <list string="Landowner Details / भूमिस्वामी विवरण" decoration-info="is_minor">
-                                    <field name="name" string="Name / नाम"/>
-                                    <field name="father_name" string="Father's Name / पिता का नाम"/>
-                                    <field name="age" string="Age / आयु"/>
-                                    <field name="gender" string="Gender / लिंग"/>
-                                    <field name="mobile" string="Mobile / मोबाइल"/>
-                                    <field name="email" string="Email / ईमेल"/>
-                                    <field name="village_id" string="Village / ग्राम"/>
-                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                    <field name="district_id" string="District / जिला"/>
-                                    <field name="aadhar_number" string="Aadhar / आधार"/>
-                                    <field name="pan_number" string="PAN / पैन"/>
-                                    <field name="bank_name" string="Bank / बैंक"/>
-                                    <field name="account_number" string="Account / खाता"/>
-                                    <field name="is_minor" string="Minor / नाबालिग"/>
-                                </list>
-                            </field>
-                        </page>
-                        
-                        <page string="Khasra Details / खसरा विवरण" name="khasra_details">
+                        <page string="Survey / सर्वे" name="survey_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी">
                                     <field name="khasra_number" widget="char" readonly="state == 'locked'"/>
@@ -130,20 +109,21 @@
                                     <field name="has_tubewell" widget="boolean_toggle" readonly="state == 'locked'"/>
                                     <field name="has_pond" widget="boolean_toggle" readonly="state == 'locked'"/>
                                 </group>
-                            </group>
-                        </page>
-                        
-                        <page string="Survey Evidence / सर्वे साक्ष्य" name="survey_evidence">
-                            <group>
                                 <group string="Survey Image / सर्वे छवि">
                                     <field name="survey_image" widget="image" class="oe_avatar"/>
                                     <field name="survey_image_filename" invisible="1"/>
                                 </group>
+                            </group>
+                            
+                            <group>
                                 <group string="Location Information / स्थान की जानकारी">
                                     <field name="latitude" widget="float"/>
                                     <field name="longitude" widget="float"/>
                                     <field name="location_accuracy" widget="float"/>
                                     <field name="location_timestamp" widget="datetime"/>
+                                </group>
+                                <group string="Attachments / संलग्नक">
+                                    <field name="attachment_ids" widget="many2many_binary"/>
                                 </group>
                             </group>
                             
@@ -151,8 +131,25 @@
                             <script type="text/javascript" src="/bhuarjan/static/src/js/survey_gps_capture.js"></script>
                         </page>
                         
-                        <page string="Attachments / संलग्नक" name="attachments">
-                            <field name="attachment_ids" widget="many2many_binary"/>
+                        <page string="Landowner / भूमिस्वामी" name="landowners_details">
+                            <field name="landowner_ids" readonly="1">
+                                <list string="Landowner Details / भूमिस्वामी विवरण" decoration-info="is_minor">
+                                    <field name="name" string="Name / नाम"/>
+                                    <field name="father_name" string="Father's Name / पिता का नाम"/>
+                                    <field name="age" string="Age / आयु"/>
+                                    <field name="gender" string="Gender / लिंग"/>
+                                    <field name="mobile" string="Mobile / मोबाइल"/>
+                                    <field name="email" string="Email / ईमेल"/>
+                                    <field name="village_id" string="Village / ग्राम"/>
+                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
+                                    <field name="district_id" string="District / जिला"/>
+                                    <field name="aadhar_number" string="Aadhar / आधार"/>
+                                    <field name="pan_number" string="PAN / पैन"/>
+                                    <field name="bank_name" string="Bank / बैंक"/>
+                                    <field name="account_number" string="Account / खाता"/>
+                                    <field name="is_minor" string="Minor / नाबालिग"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                     

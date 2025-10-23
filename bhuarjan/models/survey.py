@@ -77,7 +77,7 @@ class Survey(models.Model):
 
 
     # Survey Images and Location
-    survey_image = fields.Binary(string='Survey Image / सर्वे छवि', help='Photo taken during survey', tracking=True)
+    survey_image = fields.Binary(string='Survey Image / सर्वे छवि', help='Photo taken during survey')
     survey_image_filename = fields.Char(string='Image Filename / छवि फ़ाइल नाम', tracking=True)
     latitude = fields.Float(string='Latitude / अक्षांश', digits=(10, 8), help='GPS Latitude coordinate', tracking=True)
     longitude = fields.Float(string='Longitude / देशांतर', digits=(11, 8), help='GPS Longitude coordinate', tracking=True)

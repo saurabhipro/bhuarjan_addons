@@ -127,8 +127,9 @@
                                 </group>
                             </group>
                             
-                            <!-- GPS Capture Script - External File -->
-                            <script type="text/javascript" src="/bhuarjan/static/src/js/survey_gps_capture.js"></script>
+                <!-- GPS and Image Capture Scripts - External Files -->
+                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_gps_capture.js"></script>
+                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_image_capture.js"></script>
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">

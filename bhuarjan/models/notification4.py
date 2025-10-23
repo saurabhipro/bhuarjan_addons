@@ -1,11 +1,12 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import datetime
 
 
 class Notification4(models.Model):
     _name = 'bhu.notification4'
     _description = 'Notification 4 (Rule 4)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'notification_date desc, name'
     
     name = fields.Char(string='Notification Number', required=True, readonly=True, copy=False, default='New')
@@ -87,7 +88,7 @@ class Notification4(models.Model):
             self.survey_ids = surveys
             self.district_id = self.village_id.district_id
             self.tehsil_id = self.village_id.tehsil_id
-            self._generate_land_details()
+            # Note: Land details will be generated manually via the "Fetch Survey Details" button
     
     def _generate_land_details(self):
         """Generate land details table from surveys"""
@@ -212,6 +213,51 @@ class Notification4(models.Model):
         for record in self:
             report_action = self.env.ref('bhuarjan.action_report_notification4')
             return report_action.report_action(record)
+    
+    def action_generate_and_download_wizard(self):
+        """Open wizard to generate new notification and download PDF"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Generate & Download Notification 4'),
+            'res_model': 'bhu.notification4.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {},
+        }
+    
+    def action_fetch_survey_details(self):
+        """Fetch survey details based on district and village selection"""
+        for record in self:
+            if not record.village_id:
+                raise UserError(_('Please select a village first.'))
+            
+            # Get all surveys for the village
+            surveys = self.env['bhu.survey'].search([
+                ('village_id', '=', record.village_id.id),
+                ('state', 'in', ['submitted', 'approved']),
+                ('notification4_generated', '=', False)
+            ])
+            
+            if not surveys:
+                raise UserError(_('No available surveys found for this village.'))
+            
+            # Set the surveys
+            record.survey_ids = surveys
+            record.district_id = record.village_id.district_id
+            record.tehsil_id = record.village_id.tehsil_id
+            
+            # Generate land details
+            record._generate_land_details()
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('Survey details fetched and land details generated for %d surveys.') % len(surveys),
+                    'type': 'success',
+                }
+            }
 
 
 class Notification4LandDetail(models.Model):

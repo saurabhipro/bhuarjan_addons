@@ -196,16 +196,16 @@
                                     </div>
                                     <div class="o_kanban_record_body">
                                         <div>
-                                            <i class="fa fa-phone"/> <field name="mobile"/>
+                                            <i class="fa fa-phone" title="Phone"/> <field name="mobile"/>
                                         </div>
                                         <div>
-                                            <i class="fa fa-map-marker"/> <field name="village_id"/> - <field name="district_id"/>
+                                            <i class="fa fa-map-marker" title="Location"/> <field name="village_id"/> - <field name="district_id"/>
                                         </div>
                                         <div>
-                                            <i class="fa fa-user"/> <field name="age"/> years, <field name="gender"/>
+                                            <i class="fa fa-user" title="Landowner"/> <field name="age"/> years, <field name="gender"/>
                                         </div>
                                         <div t-if="record.is_minor.raw_value">
-                                            <i class="fa fa-child"/> Minor
+                                            <i class="fa fa-child" title="Minor"/> Minor
                                         </div>
                                     </div>
                                 </div>

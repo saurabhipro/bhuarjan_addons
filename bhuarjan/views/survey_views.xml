@@ -5,7 +5,7 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+            <list string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'">
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="department_id"/>
@@ -33,7 +33,7 @@
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
                     <button name="action_capture_location" string="Capture Location / स्थान कैप्चर करें" type="object" class="btn-secondary" icon="fa-map-marker"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -42,16 +42,23 @@
                         </h1>
                     </div>
                     
+                    <!-- Locked Survey Warning -->
+                    <div class="alert alert-warning" role="alert" invisible="state != 'locked'">
+                        <strong>Survey Locked / सर्वे लॉक:</strong> This survey has been used to generate Notification 4 and is now locked. No further modifications are allowed.
+                        <br/>
+                        <strong>सर्वे लॉक:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है और अब यह लॉक है। कोई और संशोधन की अनुमति नहीं है।
+                    </div>
+                    
                     <group>
                         <group string="Project Information / परियोजना की जानकारी">
-                            <field name="project_id" widget="selection"/>
-                            <field name="department_id" widget="selection"/>
-                            <field name="survey_date" widget="date"/>
+                            <field name="project_id" widget="selection" readonly="state == 'locked'"/>
+                            <field name="department_id" widget="selection" readonly="state == 'locked'"/>
+                            <field name="survey_date" widget="date" readonly="state == 'locked'"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी">
-                            <field name="village_id" widget="selection"/>
-                            <field name="tehsil_id" widget="selection"/>
-                            <field name="district_name"/>
+                            <field name="village_id" widget="selection" readonly="state == 'locked'"/>
+                            <field name="tehsil_id" widget="selection" readonly="state == 'locked'"/>
+                            <field name="district_name" readonly="state == 'locked'"/>
                         </group>
                     </group>
                     
@@ -90,38 +97,38 @@
                         <page string="Khasra Details / खसरा विवरण" name="khasra_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी">
-                                    <field name="khasra_number" widget="char"/>
-                                    <field name="total_area" widget="float"/>
-                                    <field name="acquired_area" widget="float"/>
+                                    <field name="khasra_number" widget="char" readonly="state == 'locked'"/>
+                                    <field name="total_area" widget="float" readonly="state == 'locked'"/>
+                                    <field name="acquired_area" widget="float" readonly="state == 'locked'"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी">
-                                    <field name="is_single_crop" widget="boolean_toggle"/>
-                                    <field name="is_double_crop" widget="boolean_toggle"/>
-                                    <field name="is_irrigated" widget="boolean_toggle"/>
-                                    <field name="is_unirrigated" widget="boolean_toggle"/>
+                                    <field name="is_single_crop" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="is_double_crop" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="is_irrigated" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="is_unirrigated" widget="boolean_toggle" readonly="state == 'locked'"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Tree Information / वृक्ष की जानकारी">
-                                    <field name="tree_development_stage" widget="selection"/>
-                                    <field name="tree_count" widget="integer"/>
+                                    <field name="tree_development_stage" widget="selection" readonly="state == 'locked'"/>
+                                    <field name="tree_count" widget="integer" readonly="state == 'locked'"/>
                                 </group>
                                 <group string="House Information / घर की जानकारी">
-                                    <field name="house_type" widget="selection"/>
-                                    <field name="house_area" widget="float"/>
-                                    <field name="shed_area" widget="float"/>
+                                    <field name="house_type" widget="selection" readonly="state == 'locked'"/>
+                                    <field name="house_area" widget="float" readonly="state == 'locked'"/>
+                                    <field name="shed_area" widget="float" readonly="state == 'locked'"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं">
-                                    <field name="has_well" widget="boolean_toggle"/>
-                                    <field name="well_type" widget="selection" invisible="not has_well"/>
-                                    <field name="has_electricity" widget="boolean_toggle"/>
-                                    <field name="has_road_access" widget="boolean_toggle"/>
-                                    <field name="has_tubewell" widget="boolean_toggle"/>
-                                    <field name="has_pond" widget="boolean_toggle"/>
+                                    <field name="has_well" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="well_type" widget="selection" invisible="not has_well" readonly="state == 'locked'"/>
+                                    <field name="has_electricity" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="has_road_access" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="has_tubewell" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="has_pond" widget="boolean_toggle" readonly="state == 'locked'"/>
                                 </group>
                             </group>
                         </page>

@@ -17,14 +17,6 @@
         </field>
     </record>
 
-    <!-- Server Action for Generate Notification 4 -->
-    <record id="action_generate_notification4_server" model="ir.actions.server">
-        <field name="name">Generate Notification 4 / अधिसूचना 4 जेनरेट करें</field>
-        <field name="model_id" ref="model_bhu_notification4"/>
-        <field name="binding_model_id" ref="model_bhu_notification4"/>
-        <field name="state">code</field>
-        <field name="code">action = env.ref('bhuarjan.action_bhu_notification4_wizard')</field>
-    </record>
 
     <!-- Notification 4 Form View -->
     <record id="view_bhu_notification4_form" model="ir.ui.view">
@@ -36,8 +28,7 @@
                     <button name="action_publish" string="Publish / प्रकाशित करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_cancel" string="Cancel / रद्द करें" type="object" class="btn-danger" invisible="state == 'cancelled'"/>
                     <button name="action_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'cancelled'"/>
-                    <button name="action_populate_surveys" string="Populate Surveys / सर्वे भरें" type="object" class="btn-warning" invisible="state != 'draft'"/>
-                    <button name="action_generate_land_details" string="Generate Land Details / भूमि विवरण जेनरेट करें" type="object" class="btn-info" invisible="state != 'draft'"/>
+                    <button name="action_fetch_survey_details" string="Fetch Survey Details / सर्वे विवरण प्राप्त करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_download_notification" string="Download PDF / PDF डाउनलोड करें" type="object" class="btn-success" icon="fa-download"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
                 </header>
@@ -163,6 +154,7 @@
             <p class="o_view_nocontent_smiling_face">
                 Generate your first Notification 4!
             </p>
+            
             <p>
                 Use the "Generate Notification 4" button to create notifications for specific villages.
                 This will automatically create notifications for all khasras in the selected village.

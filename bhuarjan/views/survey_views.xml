@@ -202,7 +202,7 @@
     <record id="action_bhu_survey" model="ir.actions.act_window">
         <field name="name">Surveys / सर्वे</field>
         <field name="res_model">bhu.survey</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_bhu_survey_search"/>
         <field name="context">{'search_default_this_year': 1}</field>
         <field name="help" type="html">
@@ -230,61 +230,81 @@ if records:
 
     <!-- Survey Kanban View -->
     <record id="view_bhu_survey_kanban" model="ir.ui.view">
-        <field name="name">bhu.survey.kanban</field>
-        <field name="model">bhu.survey</field>
-        <field name="arch" type="xml">
-            <kanban string="Surveys / सर्वे" class="o_kanban_small_column">
-                <field name="name"/>
-                <field name="project_id"/>
-                <field name="village_id"/>
-                <field name="state"/>
-                <field name="survey_date"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong class="o_kanban_record_title">
-                                            <field name="name"/>
-                                        </strong>
-                                        <br/>
-                                        <span class="o_kanban_record_subtitle">
-                                            <field name="project_id"/>
-                                        </span>
-                                    </div>
-                                    <div class="o_dropdown_kanban dropdown">
-                                        <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
-                                            <span class="fa fa-ellipsis-v"/>
+    <field name="name">bhu.survey.kanban</field>
+    <field name="model">bhu.survey</field>
+    <field name="arch" type="xml">
+        <kanban string="Surveys / सर्वे" class="o_kanban_large_column o_kanban_mobile">
+            <field name="name"/>
+            <field name="project_id"/>
+            <field name="village_id"/>
+            <field name="state"/>
+            <field name="survey_date"/>
+
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_card shadow-sm rounded-lg o_kanban_record">
+                        <div class="oe_kanban_content p-3 bg-white border">
+                            
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h4 class="mb-1 text-primary">
+                                        <field name="name"/>
+                                    </h4>
+                                    <small class="text-muted">
+                                        <i class="fa fa-folder-open mr-1"/> <field name="project_id"/>
+                                    </small>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#">
+                                        <i class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <a role="menuitem" type="edit" class="dropdown-item">
+                                            <i class="fa fa-pencil-alt mr-1"/> Edit
                                         </a>
-                                        <div class="dropdown-menu" role="menu">
-                                            <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
-                                            <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="o_kanban_record_body">
-                                    <div>
-                                        <strong>Village / ग्राम:</strong> <field name="village_id"/>
-                                    </div>
-                                    <div>
-                                        <strong>Date / दिनाँक:</strong> <field name="survey_date"/>
-                                    </div>
-                                </div>
-                                <div class="o_kanban_record_bottom">
-                                    <div class="oe_kanban_bottom_left">
-                                        <span class="badge badge-pill" t-attf-class="badge-#{record.state.raw_value == 'draft' and 'info' or record.state.raw_value == 'approved' and 'success' or 'danger'}">
-                                            <field name="state"/>
-                                        </span>
+                                        <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                            <i class="fa fa-trash mr-1"/> Delete
+                                        </a>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Body -->
+                            <div class="mb-3">
+                                <p class="mb-1">
+                                    <strong>🏘️ Village / ग्राम:</strong> <field name="village_id"/>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>📅 Date / दिनाँक:</strong> <field name="survey_date"/>
+                                </p>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                                <span t-attf-class="badge badge-pill px-3 py-2 text-uppercase 
+                                    #{record.state.raw_value == 'approved' and 'badge-info' 
+                                    or record.state.raw_value == 'locked' and 'badge-success' 
+                                    or record.state.raw_value == 'submitted' and 'badge-warning' 
+                                    or record.state.raw_value == 'draft' and 'badge-primary' 
+
+
+                                    or 'badge-danger'}">
+                                    <field name="state"/>
+                                </span>
+                                <span class="text-muted small">
+                                    <i class="fa fa-camera"/> Survey
+                                </span>
+                            </div>
+
                         </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+
 
     <!-- Custom Mail Message View to Hide Related Document Fields -->
 

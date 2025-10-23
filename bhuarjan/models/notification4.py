@@ -22,7 +22,7 @@ class Notification4(models.Model):
     
     # Survey Information
     survey_ids = fields.Many2many('bhu.survey', string='Related Surveys / संबंधित सर्वे', 
-                                 domain="[('village_id', '=', village_id)]")
+                                 domain="[('village_id', '=', village_id)]", readonly=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)', compute='_compute_total_area', store=True)
     
     
@@ -111,12 +111,15 @@ class Notification4(models.Model):
     
     
     def action_publish(self):
-        """Publish the notification"""
+        self.ensure_one()
         for record in self:
             if not record.survey_ids:
                 raise ValidationError(_('Please add at least one survey before publishing.'))
-            if not record.land_details_ids:
-                raise ValidationError(_('Please generate land details before publishing.'))
+
+            survey = self.env['bhu.survey'].search([('id','in',record.survey_ids.ids)])
+            for sr in survey:
+                sr.state = 'locked'
+
             record.state = 'published'
     
     def action_cancel(self):

@@ -282,6 +282,10 @@ $(document).ready(function() {
                         
                         if (fileInput && fileInput.length > 0) {
                             try {
+                                console.log('Found input field:', fileInput[0]);
+                                console.log('Input field type:', fileInput[0].type);
+                                console.log('Input field name:', fileInput[0].name);
+                                
                                 // Create a File object from the blob
                                 var file = new File([blob], 'survey_image_' + Date.now() + '.jpg', {
                                     type: 'image/jpeg',
@@ -290,17 +294,74 @@ $(document).ready(function() {
                                 
                                 console.log('File created:', file.name, file.size, file.type);
                                 
-                                // Create a FileList-like object
-                                var dataTransfer = new DataTransfer();
-                                dataTransfer.items.add(file);
+                                // Method 1: Try DataTransfer approach
+                                try {
+                                    var dataTransfer = new DataTransfer();
+                                    dataTransfer.items.add(file);
+                                    fileInput[0].files = dataTransfer.files;
+                                    console.log('DataTransfer method applied');
+                                } catch (dtError) {
+                                    console.log('DataTransfer failed:', dtError);
+                                }
                                 
-                                // Set the file to the input
-                                fileInput[0].files = dataTransfer.files;
+                                // Method 2: Try direct file assignment
+                                try {
+                                    fileInput[0].files = [file];
+                                    console.log('Direct file assignment applied');
+                                } catch (directError) {
+                                    console.log('Direct assignment failed:', directError);
+                                }
+                                
+                                // Method 3: Try setting value as data URL
+                                try {
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        fileInput.val(e.target.result);
+                                        console.log('Data URL method applied');
+                                    };
+                                    reader.readAsDataURL(file);
+                                } catch (urlError) {
+                                    console.log('Data URL method failed:', urlError);
+                                }
+                                
+                                // Trigger events
                                 fileInput.trigger('change');
                                 fileInput.trigger('input');
+                                fileInput.trigger('blur');
+                                
+                                // Force form update
+                                if (window.odoo && window.odoo.__WOWL_DEBUG__) {
+                                    console.log('Triggering Odoo field update');
+                                    fileInput.trigger('odoo_field_changed');
+                                }
+                                
+                                // Method 4: Try Odoo-specific approach
+                                try {
+                                    // Find the Odoo field widget and update it directly
+                                    var $fieldWidget = fileInput.closest('.o_field_binary, .o_field_image');
+                                    if ($fieldWidget.length > 0) {
+                                        console.log('Found Odoo field widget');
+                                        // Try to trigger the field's change event
+                                        $fieldWidget.trigger('change');
+                                        $fieldWidget.find('input').trigger('change');
+                                    }
+                                } catch (odooError) {
+                                    console.log('Odoo field update failed:', odooError);
+                                }
                                 
                                 console.log('Image captured and set to survey_image field');
-                                alert('Photo captured successfully!');
+                                
+                                // Verify the assignment worked
+                                setTimeout(function() {
+                                    if (fileInput[0].files && fileInput[0].files.length > 0) {
+                                        console.log('File assignment verified:', fileInput[0].files[0].name);
+                                        alert('Photo captured and saved successfully!');
+                                    } else {
+                                        console.log('File assignment verification failed');
+                                        alert('Photo captured but may not be saved properly. Please try again.');
+                                    }
+                                }, 500);
+                                
                             } catch (error) {
                                 console.log('Error setting file to input:', error);
                                 alert('Photo captured but could not save to form: ' + error.message);

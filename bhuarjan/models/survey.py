@@ -10,6 +10,7 @@ class Survey(models.Model):
     _order = 'survey_date desc, name'
 
     # Basic Information
+    user_id = fields.Many2one('res.users', string="User", default=lambda self : self.env.user.id, readonly=True)
     name = fields.Char(string='Survey Number', required=True, tracking=True, readonly=True, copy=False, default='New')
     survey_uuid = fields.Char(string='Survey UUID', readonly=True, copy=False, default=lambda self: str(uuid.uuid4()))
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)

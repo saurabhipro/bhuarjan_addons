@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'">
                 <field name="name"/>
+                <field name="user_id"/>
                 <field name="project_id"/>
                 <field name="department_id"/>
                 <field name="village_id"/>
@@ -59,6 +60,8 @@
                             <field name="village_id" widget="selection" readonly="state == 'locked'"/>
                             <field name="tehsil_id" widget="selection" readonly="state == 'locked'"/>
                             <field name="district_name" readonly="state == 'locked'"/>
+                            <field name="user_id"/>
+
                         </group>
                     </group>
                     
@@ -282,14 +285,23 @@ if records:
 
                             <!-- Footer -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-2">
-                                <span t-attf-class="badge badge-pill px-3 py-2 text-uppercase 
-                                    #{record.state.raw_value == 'approved' and 'badge-info' 
-                                    or record.state.raw_value == 'locked' and 'badge-success' 
-                                    or record.state.raw_value == 'submitted' and 'badge-warning' 
-                                    or record.state.raw_value == 'draft' and 'badge-primary' 
-
-
-                                    or 'badge-danger'}">
+                                <span t-attf-style="
+                                    border: 1px solid #{record.state.raw_value == 'approved' and '#0dcaf0'
+                                        or record.state.raw_value == 'locked' and '#198754'
+                                        or record.state.raw_value == 'submitted' and '#ffc107'
+                                        or record.state.raw_value == 'draft' and '#0d6efd'
+                                        or '#dc3545'};
+                                    color: #{record.state.raw_value == 'approved' and '#0dcaf0'
+                                        or record.state.raw_value == 'locked' and '#198754'
+                                        or record.state.raw_value == 'submitted' and '#856404'
+                                        or record.state.raw_value == 'draft' and '#0d6efd'
+                                        or '#dc3545'};
+                                    padding: 4px 10px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    text-transform: uppercase;
+                                    background-color: #fff;">
                                     <field name="state"/>
                                 </span>
                                 <span class="text-muted small">

@@ -25,6 +25,25 @@
           </field>
       </record>
 
+
+        <record id="inherit_res_users_tree_views_bhuarjan" model="ir.ui.view">
+            <field name="name">res.users.inherit.list</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='login']" position="after">
+                    <field name="parent_id"/>
+                    <field name="state_id"/>
+                    <field name="district_id"/>
+                    <field name="sub_division_ids" widget="many2many_tags"/>
+                    <field name="tehsil_ids" widget="many2many_tags"/>
+                    <field name="circle_ids" widget="many2many_tags"/>
+                    <field name="village_ids" widget="many2many_tags"/>
+                    <field name="child_ids" widget="many2many_tags"/>
+                </xpath>
+            </field>
+        </record>
+
       <!-- Res user own custom view -->
 
       <record id="res_users_bhuarjan_view_form_inherit" model="ir.ui.view">

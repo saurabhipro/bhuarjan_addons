@@ -60,13 +60,13 @@ class BhuLandowner(models.Model):
     guardian_relation = fields.Char(string='Guardian Relation / अभिभावक का संबंध', tracking=True)
     
     # Documents and Photos
-    photo = fields.Binary(string='Photo / फोटो', tracking=True)
-    aadhar_card = fields.Binary(string='Aadhar Card / आधार कार्ड', tracking=True)
-    pan_card = fields.Binary(string='PAN Card / पैन कार्ड', tracking=True)
-    voter_id_card = fields.Binary(string='Voter ID Card / मतदाता पहचान पत्र', tracking=True)
-    ration_card = fields.Binary(string='Ration Card / राशन कार्ड', tracking=True)
-    bank_passbook = fields.Binary(string='Bank Passbook / बैंक पासबुक', tracking=True)
-    other_documents = fields.Binary(string='Other Documents / अन्य दस्तावेज', tracking=True)
+    photo = fields.Binary(string='Photo / फोटो')
+    aadhar_card = fields.Binary(string='Aadhar Card / आधार कार्ड')
+    pan_card = fields.Binary(string='PAN Card / पैन कार्ड')
+    voter_id_card = fields.Binary(string='Voter ID Card / मतदाता पहचान पत्र')
+    ration_card = fields.Binary(string='Ration Card / राशन कार्ड')
+    bank_passbook = fields.Binary(string='Bank Passbook / बैंक पासबुक')
+    other_documents = fields.Binary(string='Other Documents / अन्य दस्तावेज')
     
     # Survey Relations
     survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 

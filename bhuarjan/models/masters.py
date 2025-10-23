@@ -28,14 +28,14 @@ class BhuVillage(models.Model):
     _description = 'Village'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
-    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True)
-    pincode = fields.Char(string='Pincode / पिनकोड')
-    population = fields.Integer(string='Population / जनसंख्या')
-    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
-    is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र')
-    is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र')
+    name = fields.Char(string='Village Name / ग्राम का नाम', required=True, tracking=True)
+    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True, tracking=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)
+    pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
+    population = fields.Integer(string='Population / जनसंख्या', tracking=True)
+    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
+    is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र', tracking=True)
+    is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र', tracking=True)
 
 
 class BhuDepartment(models.Model):
@@ -43,11 +43,11 @@ class BhuDepartment(models.Model):
     _description = 'Department'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    name = fields.Char(string='Department Name', required=True)
-    code = fields.Char(string='Department Code')
-    description = fields.Text(string='Description')
-    head_of_department = fields.Char(string='Head of Department')
-    contact_number = fields.Char(string='Contact Number')
-    email = fields.Char(string='Email')
-    address = fields.Text(string='Address')
+    name = fields.Char(string='Department Name', required=True, tracking=True)
+    code = fields.Char(string='Department Code', tracking=True)
+    description = fields.Text(string='Description', tracking=True)
+    head_of_department = fields.Char(string='Head of Department', tracking=True)
+    contact_number = fields.Char(string='Contact Number', tracking=True)
+    email = fields.Char(string='Email', tracking=True)
+    address = fields.Text(string='Address', tracking=True)
 

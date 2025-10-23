@@ -9,16 +9,16 @@ class Notification4(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'notification_date desc, name'
     
-    name = fields.Char(string='Notification Number', required=True, readonly=True, copy=False, default='New')
-    notification_date = fields.Date(string='Notification Date / अधिसूचना दिनाँक', required=True, default=fields.Date.today)
+    name = fields.Char(string='Notification Number', required=True, readonly=True, copy=False, default='New', tracking=True)
+    notification_date = fields.Date(string='Notification Date / अधिसूचना दिनाँक', required=True, default=fields.Date.today, tracking=True)
     
     # Location Information
-    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True)
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
+    district_id = fields.Many2one('bhu.district', string='District / जिला', required=True, tracking=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
     # Public Purpose
-    public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', required=True)
+    public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', required=True, tracking=True)
     
     # Survey Information
     survey_ids = fields.Many2many('bhu.survey', string='Related Surveys / संबंधित सर्वे', 
@@ -52,12 +52,12 @@ class Notification4(models.Model):
     ], string='Status / स्थिति', default='draft', tracking=True)
     
     # Location for signature
-    signature_place = fields.Char(string='Signature Place / हस्ताक्षर स्थान', required=True)
-    signature_date = fields.Date(string='Signature Date / हस्ताक्षर दिनाँक', required=True, default=fields.Date.today)
+    signature_place = fields.Char(string='Signature Place / हस्ताक्षर स्थान', required=True, tracking=True)
+    signature_date = fields.Date(string='Signature Date / हस्ताक्षर दिनाँक', required=True, default=fields.Date.today, tracking=True)
     
     # Company currency
-    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string="Company Currency", readonly=True)
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
+    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string="Company Currency", readonly=True, tracking=True)
+    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company, tracking=True)
     
     @api.model_create_multi
     def create(self, vals_list):

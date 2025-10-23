@@ -158,6 +158,7 @@
                     
                     <!-- Chatter removed -->
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

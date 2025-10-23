@@ -190,18 +190,8 @@
 </record>
 
 
-        <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
-            <field name="name">Users</field>
-            <field name="res_model">res.users</field>
-            <field name="view_mode">list,form,hierarchy,kanban</field>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('bhuarjan.view_bhu_res_users_kanban')}),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('base.view_users_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>
-        </record>
-
-
-        <record id="department_details_view_hierarchy_jhg" model="ir.ui.view">
+    
+    <record id="department_details_view_hierarchy_jhg" model="ir.ui.view">
        <field name="name">res.users</field>
        <field name="model">res.users</field>
        <field name="arch" type="xml">
@@ -224,7 +214,15 @@
        </field>
    </record>
 
-
+    <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
+            <field name="name">Users</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">list,form,hierarchy,kanban</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('bhuarjan.view_bhu_res_users_kanban')}),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('base.view_users_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>
+        </record>
 
 
     </data>

@@ -251,12 +251,33 @@ $(document).ready(function() {
                 
                 // Capture photo when button is clicked
                 captureBtn.onclick = function() {
+                    console.log('Capture button clicked');
+                    
+                    // Disable button to prevent multiple clicks
+                    captureBtn.disabled = true;
+                    captureBtn.textContent = 'Processing...';
+                    
                     // Set canvas dimensions to match video
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     
                     // Draw video frame to canvas
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Add timeout to force close modal if it gets stuck
+                    var forceCloseTimeout = setTimeout(function() {
+                        console.log('Force closing modal due to timeout');
+                        try {
+                            stream.getTracks().forEach(function(track) {
+                                track.stop();
+                            });
+                            if (document.body.contains(modal)) {
+                                document.body.removeChild(modal);
+                            }
+                        } catch (e) {
+                            console.log('Error in force close:', e);
+                        }
+                    }, 10000); // 10 second timeout
                     
                     // Convert canvas to blob
                     canvas.toBlob(function(blob) {
@@ -351,7 +372,19 @@ $(document).ready(function() {
                                 
                                 console.log('Image captured and set to survey_image field');
                                 
-                                // Verify the assignment worked
+                                // Close modal immediately
+                                try {
+                                    clearTimeout(forceCloseTimeout);
+                                    stream.getTracks().forEach(function(track) {
+                                        track.stop();
+                                    });
+                                    document.body.removeChild(modal);
+                                    console.log('Modal closed successfully');
+                                } catch (closeError) {
+                                    console.log('Error closing modal:', closeError);
+                                }
+                                
+                                // Verify the assignment worked (without blocking modal close)
                                 setTimeout(function() {
                                     if (fileInput[0].files && fileInput[0].files.length > 0) {
                                         console.log('File assignment verified:', fileInput[0].files[0].name);
@@ -360,10 +393,22 @@ $(document).ready(function() {
                                         console.log('File assignment verification failed');
                                         alert('Photo captured but may not be saved properly. Please try again.');
                                     }
-                                }, 500);
+                                }, 100);
                                 
                             } catch (error) {
                                 console.log('Error setting file to input:', error);
+                                
+                                // Close modal even on error
+                                try {
+                                    clearTimeout(forceCloseTimeout);
+                                    stream.getTracks().forEach(function(track) {
+                                        track.stop();
+                                    });
+                                    document.body.removeChild(modal);
+                                } catch (closeError) {
+                                    console.log('Error closing modal on error:', closeError);
+                                }
+                                
                                 alert('Photo captured but could not save to form: ' + error.message);
                             }
                         } else {
@@ -381,13 +426,19 @@ $(document).ready(function() {
                                 console.log('Fallback save also failed:', fallbackError);
                                 alert('Photo captured but could not save to form - field not found');
                             }
+                            
+                            // Close modal immediately
+                            try {
+                                clearTimeout(forceCloseTimeout);
+                                stream.getTracks().forEach(function(track) {
+                                    track.stop();
+                                });
+                                document.body.removeChild(modal);
+                                console.log('Modal closed in fallback case');
+                            } catch (closeError) {
+                                console.log('Error closing modal in fallback:', closeError);
+                            }
                         }
-                        
-                        // Stop camera and close modal
-                        stream.getTracks().forEach(function(track) {
-                            track.stop();
-                        });
-                        document.body.removeChild(modal);
                     }, 'image/jpeg', 0.8);
                 };
                 

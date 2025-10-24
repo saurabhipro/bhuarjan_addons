@@ -185,59 +185,8 @@ class Survey(models.Model):
         report_action = self.env.ref('bhuarjan.action_report_form10_survey')
         return report_action.report_action(self)
 
-    def action_capture_location(self):
-        """Manual GPS location capture button - works without form validation"""
-        for record in self:
-            # This method is called by the button but the actual GPS capture
-            # is handled by JavaScript to avoid form validation issues
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Location Capture'),
-                    'message': _('GPS capture is handled by JavaScript. Please check the browser console for details.'),
-                    'type': 'info',
-                }
-            }
 
-    def update_location(self, latitude, longitude, accuracy=None):
-        """Update GPS coordinates from JavaScript"""
-        for record in self:
-            record.write({
-                'latitude': latitude,
-                'longitude': longitude,
-                'location_accuracy': accuracy,
-                'location_timestamp': fields.Datetime.now()
-            })
-            # Log location capture
-            record.message_post(
-                body=_('GPS location captured: Lat: %s, Lon: %s, Accuracy: %s meters') % 
-                     (latitude, longitude, accuracy or 'Unknown'),
-                message_type='notification'
-            )
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Location Updated'),
-                    'message': _('GPS coordinates have been captured successfully.'),
-                    'type': 'success',
-                }
-            }
 
-    def action_auto_capture_location(self):
-        """Auto-capture GPS location when form loads"""
-        for record in self:
-            # This method is called by JavaScript when auto-capture is triggered
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Auto Location Capture'),
-                    'message': _('GPS location will be automatically captured when you open this form on a mobile device or PWA.'),
-                    'type': 'info',
-                }
-            }
 
     def log_survey_activity(self, activity_type, details=None):
         """Log custom survey activities"""

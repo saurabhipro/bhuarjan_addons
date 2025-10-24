@@ -34,7 +34,6 @@
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     
                     <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
-                    <button name="action_capture_location" string="Capture Location / स्थान कैप्चर करें" type="object" class="btn-secondary" icon="fa-map-marker" context="{'no_reload': True, 'no_validation': True}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -120,19 +119,11 @@
                             </group>
                             
                             <group>
-                                <group string="Location Information / स्थान की जानकारी">
-                                    <field name="latitude" widget="float"/>
-                                    <field name="longitude" widget="float"/>
-                                    <field name="location_accuracy" widget="float"/>
-                                    <field name="location_timestamp" widget="datetime"/>
-                                </group>
                                 <group string="Attachments / संलग्नक">
                                     <field name="attachment_ids" widget="many2many_binary"/>
                                 </group>
                             </group>
                             
-                <!-- Auto GPS Capture Script -->
-                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_auto_gps.js?v=7"></script>
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">

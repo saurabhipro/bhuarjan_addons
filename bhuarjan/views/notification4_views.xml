@@ -39,69 +39,97 @@
                         </h1>
                     </div>
                     
-                    <group>
-                        <group string="Basic Information / मूल जानकारी">
-                            <field name="notification_date" widget="date"/>
-                            <field name="public_purpose" widget="text"/>
-                        </group>
-                        <group string="Location Information / स्थान की जानकारी">
-                            <field name="district_id" widget="selection"/>
-                            <field name="tehsil_id" widget="selection"/>
-                            <field name="village_id" widget="selection"/>
-                            <field name="total_area" widget="float" readonly="1"/>
-                        </group>
-                    </group>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <group string="Basic Information / मूल जानकारी">
+                                <field name="notification_date" widget="date"/>
+                                <field name="public_purpose" widget="text"/>
+                            </group>
+                        </div>
+                        <div class="col-md-6">
+                            <group string="Location Information / स्थान की जानकारी">
+                                <field name="district_id" widget="selection"/>
+                                <field name="tehsil_id" widget="selection"/>
+                                <field name="village_id" widget="selection"/>
+                                <field name="total_area" widget="float" readonly="1"/>
+                            </group>
+                        </div>
+                    </div>
                     
-                    <group string="Related Surveys / संबंधित सर्वे">
-                        <field name="survey_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}"/>
-                    </group>
                     
                     <notebook>
-                        
-                        <page string="Public Hearing / सार्वजनिक सुनवाई" name="hearing">
+                        <!-- Survey Tab -->
+                        <page string="Survey Details / सर्वे विवरण" name="survey_details" icon="fa fa-map-marker">
                             <group>
-                                <group string="Hearing Details / सुनवाई विवरण">
+                                <group string="Public Hearing Details / सार्वजनिक सुनवाई विवरण">
                                     <field name="hearing_date" widget="date"/>
-                                    <field name="hearing_time" widget="char"/>
-                                    <field name="hearing_location" widget="char"/>
+                                    <field name="hearing_time" widget="char" placeholder="e.g., 10:00 AM"/>
+                                    <field name="hearing_location" widget="char" placeholder="Enter hearing location"/>
                                 </group>
-                            </group>
-                        </page>
-                        
-                        <page string="SIA Details / SIA विवरण" name="sia_details">
-                            <group>
-                                <group string="Basic Information / मूल जानकारी" col="2">
-                                    <field name="brief_public_purpose" widget="text" nolabel="1"/>
-                                    <field name="direct_affected_families" widget="integer"/>
-                                    <field name="indirect_affected_families" widget="integer"/>
-                                    <field name="is_acquisition_minimum" widget="boolean_toggle"/>
-                                </group>
-                                <group string="Assets Information / परिसंपत्ति जानकारी" col="2">
-                                    <field name="private_assets_count" widget="integer"/>
-                                    <field name="govt_assets_count" widget="integer"/>
-                                    <field name="alternative_site_feasibility" widget="text"/>
-                                </group>
-                                <group string="Project Details / परियोजना विवरण" col="2">
-                                    <field name="project_total_cost" widget="monetary"/>
-                                    <field name="project_benefits" widget="text"/>
-                                </group>
-                                <group string="Compensation &amp; Impact / प्रतिकर और प्रभाव" col="2">
-                                    <field name="compensation_framework" widget="text"/>
-                                    <field name="other_affected_factors" widget="text"/>
-                                </group>
-                            </group>
-                        </page>
-                        
-                        <page string="Survey Details / सर्वे विवरण" name="survey_details">
-                            <field name="survey_ids" readonly="1" widget="one2many" context="{'tree_view_ref': 'bhuarjan.view_survey_details_tree'}"/>
-                        </page>
-                        
-                        <page string="Signature Details / हस्ताक्षर विवरण" name="signature">
-                            <group>
                                 <group string="Signature Information / हस्ताक्षर जानकारी">
-                                    <field name="signature_place" widget="char"/>
+                                    <field name="signature_place" widget="char" placeholder="Enter signature place"/>
                                     <field name="signature_date" widget="date"/>
                                 </group>
+                            </group>
+                        </page>
+                        
+                        <!-- SIA Tab -->
+                        <page string="SIA Details / SIA विवरण" name="sia_details" icon="fa fa-users">
+                            <group>
+                                <group string="Basic Information / मूल जानकारी">
+                                    <field name="brief_public_purpose" widget="text" nolabel="1" placeholder="(1) लोक प्रयोजन का संक्षिप्त विवरण।"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Affected Families / प्रभावित परिवार">
+                                    <field name="direct_affected_families" widget="integer"/>
+                                    <field name="indirect_affected_families" widget="integer"/>
+                                </group>
+                                <group string="Assets Information / परिसंपत्ति जानकारी">
+                                    <field name="private_assets_count" widget="integer"/>
+                                    <field name="govt_assets_count" widget="integer"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Acquisition Details / अधिग्रहण विवरण">
+                                    <field name="is_acquisition_minimum" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Project Cost / परियोजना लागत">
+                                    <field name="project_total_cost" widget="monetary"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Alternative Site / वैकल्पिक स्थल">
+                                    <field name="alternative_site_feasibility" widget="text" nolabel="1" placeholder="(7) संभावित वैकल्पिक स्थल तथा उसकी व्यवहार्यता पर विचार।"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Project Benefits / परियोजना लाभ">
+                                    <field name="project_benefits" widget="text" nolabel="1" placeholder="(9) परियोजना से होने वाले लाभ।"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Compensation Framework / प्रतिकर ढांचा">
+                                    <field name="compensation_framework" widget="text" nolabel="1" placeholder="Enter compensation framework details"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Other Affected Factors / अन्य प्रभावित कारक">
+                                    <field name="other_affected_factors" widget="text" nolabel="1" placeholder="Enter other factors that may be affected"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Related Surveys Tab -->
+                        <page  name="related_surveys" icon="fa fa-list-alt">
+                            <group>
+                                <field name="survey_ids" readonly="1" widget="one2many" context="{'tree_view_ref': 'bhuarjan.view_survey_details_tree'}"/>
                             </group>
                         </page>
                     </notebook>

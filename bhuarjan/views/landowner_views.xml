@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list string="Landowners / भूमिस्वामी" multi_edit="1">
                 <field name="name"/>
+                <field name="company_id"/>
                 <field name="father_name"/>
                 <field name="mobile"/>
                 <field name="village_id"/>
@@ -51,6 +52,7 @@
                             <field name="annual_income" widget="monetary"/>
                         </group>
                         <group string="Contact Information / संपर्क जानकारी">
+                            <field name="company_id"/>
                             <field name="mobile" widget="phone"/>
                             <field name="phone" widget="phone"/>
                             <field name="email" widget="email"/>

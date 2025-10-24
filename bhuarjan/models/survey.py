@@ -20,6 +20,9 @@ class Survey(models.Model):
     district_name = fields.Char(string='District / जिला', default='Raigarh (Chhattisgarh)', readonly=True, tracking=True)
     survey_date = fields.Date(string='Survey Date / सर्वे दिनाँक', required=True, tracking=True, default=fields.Date.today)
     
+    # Company/Organization Information
+    company_id = fields.Many2one('res.company', string='Company / कंपनी', required=True, 
+                                 default=lambda self: self.env.company, tracking=True)
     
     # Single Khasra Details - One survey per khasra
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, tracking=True)
@@ -198,6 +201,7 @@ class Survey(models.Model):
                 body=message,
                 message_type='notification'
             )
+    
 
 
 class SurveyLine(models.Model):

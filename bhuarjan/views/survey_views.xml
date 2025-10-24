@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'">
                 <field name="name"/>
+                <field name="company_id"/>
                 <field name="user_id"/>
                 <field name="project_id"/>
                 <field name="department_id"/>
@@ -57,6 +58,7 @@
                             <field name="survey_date" widget="date" readonly="state == 'locked'"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी">
+                            <field name="company_id" readonly="state == 'locked'"/>
                             <field name="village_id" widget="selection" readonly="state == 'locked'"/>
                             <field name="tehsil_id" widget="selection" readonly="state == 'locked'"/>
                             <field name="district_name" readonly="state == 'locked'"/>
@@ -250,10 +252,10 @@ if records:
                                     </small>
                                     </div>
                                 <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#">
+                                    <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#" title="More Actions">
                                         <i class="fa fa-ellipsis-v"/>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                    <div class="dropdown-menu dropdown-menu-right shadow" role="menu">
                                         <a role="menuitem" type="edit" class="dropdown-item">
                                             <i class="fa fa-pencil-alt mr-1"/> Edit
                                         </a>

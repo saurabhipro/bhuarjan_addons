@@ -28,6 +28,10 @@ class BhuLandowner(models.Model):
     # Contact Information
     mobile = fields.Char(string='Mobile Number / मोबाइल नंबर', tracking=True)
     phone = fields.Char(string='Phone Number / फोन नंबर', tracking=True)
+    
+    # Company/Organization Information
+    company_id = fields.Many2one('res.company', string='Company / कंपनी', required=True, 
+                                 default=lambda self: self.env.company, tracking=True)
     email = fields.Char(string='Email / ईमेल', tracking=True)
     
     # Address Information
@@ -170,3 +174,4 @@ class BhuLandowner(models.Model):
         action['domain'] = [('landowner_ids', 'in', self.ids)]
         action['context'] = {'default_landowner_ids': [(6, 0, self.ids)]}
         return action
+    

@@ -116,6 +116,12 @@
             <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
+
+        <record id="record_bhu_district_rule" model="ir.rule">
+            <field name="name">Company: User can see own company data</field>
+            <field name="model_id" ref="model_bhu_district"/>
+            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+        </record>
         
         
     </data>

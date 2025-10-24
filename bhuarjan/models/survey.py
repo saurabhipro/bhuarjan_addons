@@ -93,9 +93,17 @@ class Survey(models.Model):
         """Generate automatic survey numbers for multiple records"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
+                # Get project code if available
+                project_code = ''
+                if vals.get('project_id'):
+                    project = self.env['bhu.project'].browse(vals['project_id'])
+                    project_code = project.code or project.name or 'PROJ'
+                else:
+                    project_code = 'PROJ'
+                
                 # Get the next sequence number
                 sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
-                vals['name'] = f'SUR_{sequence.zfill(3)}'
+                vals['name'] = f'{project_code}_SUR_{sequence.zfill(3)}'
         records = super(Survey, self).create(vals_list)
         # Log creation
         for record in records:
@@ -178,15 +186,16 @@ class Survey(models.Model):
         return report_action.report_action(self)
 
     def action_capture_location(self):
-        """Capture current GPS location using browser geolocation"""
+        """Manual GPS location capture button - works without form validation"""
         for record in self:
-            # Trigger JavaScript-based location capture
+            # This method is called by the button but the actual GPS capture
+            # is handled by JavaScript to avoid form validation issues
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': _('Location Capture'),
-                    'message': _('Please allow location access to capture GPS coordinates. The location will be automatically filled in the form fields.'),
+                    'message': _('GPS capture is handled by JavaScript. Please check the browser console for details.'),
                     'type': 'info',
                 }
             }

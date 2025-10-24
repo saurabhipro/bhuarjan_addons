@@ -63,17 +63,58 @@
         <field name="comment">The user will be able to approve document created by employees.</field>
     </record>
 
-    <!-- hide  -->
-        <record id="base.menu_management" model="ir.ui.menu">
-            <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    <!-- Hide Apps menu from non-admin users -->
+    <record id="base.menu_management" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <!-- Hide Apps menu (alternative name) from non-admin users -->
+    <record id="base.menu_apps" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <!-- Hide Master Data menu from non-admin users -->
+    <record id="menu_bhu_master" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <!-- Hide Master Data sub-menus from non-admin users -->
+    <record id="menu_bhu_department" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_project" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_district" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_sub_division" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_tehsil" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_circle" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    <record id="menu_bhu_village" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('bhuarjan.group_bhuarjan_admin')), (4, ref('base.group_system'))]"/>
+    </record>
+    
+    
+    <!-- Survey access rule for Patwari -->
+    <data noupdate="0">
+        <record id="record_bhu_survey_rule" model="ir.rule">
+            <field name="name">Patwari can see own survey only</field>
+            <field name="model_id" ref="model_bhu_survey"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
-
-        <data noupdate="0">
-            <record id="record_bhu_survey_rule" model="ir.rule">
-                <field name="name">Patwari can see own survey only</field>
-                <field name="model_id" ref="model_bhu_survey"/>
-                <field name="domain_force">[('user_id', '=', user.id)]</field>
-                <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
-            </record>
-        </data>
+    </data>
 </odoo>

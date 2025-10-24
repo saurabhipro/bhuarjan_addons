@@ -32,8 +32,9 @@
                     <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
+                    
                     <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
-                    <button name="action_capture_location" string="Capture Location / स्थान कैप्चर करें" type="object" class="btn-secondary" icon="fa-map-marker"/>
+                    <button name="action_capture_location" string="Capture Location / स्थान कैप्चर करें" type="object" class="btn-secondary" icon="fa-map-marker" context="{'no_reload': True, 'no_validation': True}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -130,9 +131,8 @@
                                 </group>
                             </group>
                             
-                <!-- GPS and Image Capture Scripts - External Files -->
-                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_gps_capture.js?v=2"></script>
-                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_image_capture.js?v=2"></script>
+                <!-- Auto GPS Capture Script -->
+                <script type="text/javascript" src="/bhuarjan/static/src/js/survey_auto_gps.js?v=7"></script>
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
@@ -233,18 +233,18 @@ if records:
 
     <!-- Survey Kanban View -->
     <record id="view_bhu_survey_kanban" model="ir.ui.view">
-    <field name="name">bhu.survey.kanban</field>
-    <field name="model">bhu.survey</field>
-    <field name="arch" type="xml">
+        <field name="name">bhu.survey.kanban</field>
+        <field name="model">bhu.survey</field>
+        <field name="arch" type="xml">
         <kanban string="Surveys / सर्वे" class="o_kanban_large_column o_kanban_mobile">
-            <field name="name"/>
-            <field name="project_id"/>
-            <field name="village_id"/>
-            <field name="state"/>
-            <field name="survey_date"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="state"/>
+                <field name="survey_date"/>
 
-            <templates>
-                <t t-name="kanban-box">
+                <templates>
+                    <t t-name="kanban-box">
                     <div class="oe_kanban_card shadow-sm rounded-lg o_kanban_record">
                         <div class="oe_kanban_content p-3 bg-white border">
                             
@@ -252,12 +252,12 @@ if records:
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <h4 class="mb-1 text-primary">
-                                        <field name="name"/>
+                                            <field name="name"/>
                                     </h4>
                                     <small class="text-muted">
                                         <i class="fa fa-folder-open mr-1"/> <field name="project_id"/>
                                     </small>
-                                </div>
+                                    </div>
                                 <div class="dropdown">
                                     <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#">
                                         <i class="fa fa-ellipsis-v"/>
@@ -271,7 +271,7 @@ if records:
                                         </a>
                                     </div>
                                 </div>
-                            </div>
+                                    </div>
 
                             <!-- Body -->
                             <div class="mb-3">
@@ -281,27 +281,16 @@ if records:
                                 <p class="mb-0">
                                     <strong>📅 Date / दिनाँक:</strong> <field name="survey_date"/>
                                 </p>
-                            </div>
+                                    </div>
 
                             <!-- Footer -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-2">
-                                <span t-attf-style="
-                                    border: 1px solid #{record.state.raw_value == 'approved' and '#0dcaf0'
-                                        or record.state.raw_value == 'locked' and '#198754'
-                                        or record.state.raw_value == 'submitted' and '#ffc107'
-                                        or record.state.raw_value == 'draft' and '#0d6efd'
-                                        or '#dc3545'};
-                                    color: #{record.state.raw_value == 'approved' and '#0dcaf0'
-                                        or record.state.raw_value == 'locked' and '#198754'
-                                        or record.state.raw_value == 'submitted' and '#856404'
-                                        or record.state.raw_value == 'draft' and '#0d6efd'
-                                        or '#dc3545'};
-                                    padding: 4px 10px;
-                                    border-radius: 20px;
-                                    font-size: 12px;
-                                    font-weight: 600;
-                                    text-transform: uppercase;
-                                    background-color: #fff;">
+                                <span t-attf-class="badge badge-pill px-3 py-2 text-uppercase 
+                                    #{record.state.raw_value == 'approved' and 'badge-info' 
+                                    or record.state.raw_value == 'locked' and 'badge-success' 
+                                    or record.state.raw_value == 'submitted' and 'badge-warning' 
+                                    or record.state.raw_value == 'draft' and 'badge-primary' 
+                                    or 'badge-danger'}">
                                     <field name="state"/>
                                 </span>
                                 <span class="text-muted small">
@@ -309,13 +298,13 @@ if records:
                                 </span>
                             </div>
 
+                            </div>
                         </div>
-                    </div>
-                </t>
-            </templates>
-        </kanban>
-    </field>
-</record>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 
 
     <!-- Custom Mail Message View to Hide Related Document Fields -->

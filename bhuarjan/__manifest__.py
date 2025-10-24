@@ -10,6 +10,7 @@
     'depends':['mail', 'jwt_mobile_auth'],
     'data':[
         'data/ir_sequence_data.xml',
+        'data/ir_model_access_data.xml',
         'templates/website.xml',
         'data/chhattisgarh_districts_data.xml',
         'data/raigarh_sub_division_data.xml',

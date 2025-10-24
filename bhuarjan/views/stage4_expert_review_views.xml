@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stage 4 Expert Review List View -->
+    <record id="view_bhu_stage4_expert_review_list" model="ir.ui.view">
+        <field name="name">bhu.stage4.expert.review.list</field>
+        <field name="model">bhu.stage4.expert.review</field>
+        <field name="arch" type="xml">
+            <list string="Stage 4: Expert Group Review" decoration-info="state=='draft'" decoration-warning="state=='under_review'" decoration-success="state=='approved'" decoration-danger="state=='rejected'" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="review_date"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="village_id"/>
+                <field name="expert_group_chairman"/>
+                <field name="technical_feasibility"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Stage 4 Expert Review Form View -->
+    <record id="view_bhu_stage4_expert_review_form" model="ir.ui.view">
+        <field name="name">bhu.stage4.expert.review.form</field>
+        <field name="model">bhu.stage4.expert.review</field>
+        <field name="arch" type="xml">
+            <form string="Stage 4: Expert Group Review (Section 7)">
+                <header>
+                    <button name="action_start_review" string="Start Review" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success" invisible="state != 'under_review'"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger" invisible="state != 'under_review'"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary" invisible="state not in ['draft', 'under_review']"/>
+                    <button name="action_reset" string="Reset" type="object" class="btn-warning" invisible="state not in ['approved', 'rejected', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,under_review,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Basic Information">
+                            <field name="review_date"/>
+                            <field name="review_purpose"/>
+                        </group>
+                        <group string="Location Information">
+                            <field name="district_id"/>
+                            <field name="tehsil_id"/>
+                            <field name="village_id"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Expert Group Details">
+                            <field name="expert_group_formed"/>
+                            <field name="expert_group_date"/>
+                            <field name="expert_group_chairman"/>
+                            <field name="expert_group_members"/>
+                        </group>
+                        <group string="Review Details">
+                            <field name="review_scope"/>
+                            <field name="review_methodology"/>
+                            <field name="review_findings"/>
+                            <field name="review_recommendations"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Technical Assessment">
+                            <field name="technical_feasibility"/>
+                            <field name="environmental_impact"/>
+                            <field name="social_impact"/>
+                        </group>
+                        <group string="Financial Assessment">
+                            <field name="estimated_cost"/>
+                            <field name="cost_benefit_ratio"/>
+                            <field name="economic_viability"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Review Documents">
+                            <field name="review_report" filename="review_report_filename"/>
+                            <field name="supporting_documents" filename="supporting_documents_filename"/>
+                        </group>
+                        <group string="Company Information">
+                            <field name="company_id"/>
+                            <field name="company_name"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Related Records">
+                            <field name="stage3_ids" widget="many2many_tags"/>
+                            <field name="survey_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Approval Details">
+                            <field name="approval_date"/>
+                            <field name="approved_by"/>
+                            <field name="approval_remarks"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Signature Details">
+                            <field name="signature_place"/>
+                            <field name="signature_date"/>
+                            <field name="signed_by"/>
+                            <field name="designation"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Stage 4 Expert Review Search View -->
+    <record id="view_bhu_stage4_expert_review_search" model="ir.ui.view">
+        <field name="name">bhu.stage4.expert.review.search</field>
+        <field name="model">bhu.stage4.expert.review</field>
+        <field name="arch" type="xml">
+            <search string="Search Stage 4 Expert Review">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <field name="village_id"/>
+                <field name="expert_group_chairman"/>
+                <field name="technical_feasibility"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Under Review" name="under_review" domain="[('state', '=', 'under_review')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Rejected" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter string="This Year" name="this_year" domain="[('review_date', '>=', datetime.datetime.now().strftime('%Y-01-01'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                    <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Stage 4 Expert Review Action -->
+    <record id="action_bhu_stage4_expert_review" model="ir.actions.act_window">
+        <field name="name">Stage 4: Expert Group Review (Section 7)</field>
+        <field name="res_model">bhu.stage4.expert.review</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_stage4_expert_review_search"/>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Stage 4 Expert Review record!
+            </p>
+            <p>
+                This stage involves expert group review and assessment as per Section 7 of the RFCTLARR Act, 2013.
+            </p>
+        </field>
+    </record>
+</odoo>

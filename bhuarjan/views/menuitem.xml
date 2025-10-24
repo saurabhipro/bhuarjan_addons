@@ -30,13 +30,13 @@
 <menuitem id="menu_bhu_stage2" name="Stage 2: Social Impact Assessment" parent="menu_bhu_process" sequence="3" />
 
 <!-- Stage 3: Section 4(1) Jansunwai & Social Impact Assessment -->
-<menuitem id="menu_bhu_stage3" name="Stage 3: Section 4(1) Jansunwai &amp; Social Impact Assessment" parent="menu_bhu_process" sequence="4" />
+<menuitem id="menu_bhu_stage3" name="Stage 3: Section 4(1) Jansunwai &amp; Social Impact Assessment" action="action_bhu_stage3_jansunwai" parent="menu_bhu_process" sequence="4" />
 
 <!-- Stage 4: Expert Group Review (Section 7) -->
-<menuitem id="menu_bhu_stage4" name="Stage 4: Expert Group Review (Section 7)" parent="menu_bhu_process" sequence="5" />
+<menuitem id="menu_bhu_stage4" name="Stage 4: Expert Group Review (Section 7)" action="action_bhu_stage4_expert_review" parent="menu_bhu_process" sequence="5" />
 
 <!-- Stage 5: Collector Approval (Section 8) -->
-<menuitem id="menu_bhu_stage5" name="Stage 5: Collector Approval (Section 8)" parent="menu_bhu_process" sequence="6" />
+<menuitem id="menu_bhu_stage5" name="Stage 5: Collector Approval (Section 8)" action="action_bhu_stage5_collector_approval" parent="menu_bhu_process" sequence="6" />
 
 <!-- Stage 6: Section 11 Notifications -->
 <menuitem id="menu_bhu_section11_notification" name="Stage 6: Section 11 Notifications" action="action_section11_notification" parent="menu_bhu_process" sequence="7" />

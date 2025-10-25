@@ -254,73 +254,140 @@ if records:
                 <field name="state"/>
                 <field name="survey_date"/>
                 <field name="user_id"/>
-
+                <field name="user_id" widget="image"/>
+                <field name="khasra_number"/>
 
                 <templates>
                     <t t-name="kanban-box">
-                    <div class="oe_kanban_card shadow-sm rounded-lg o_kanban_record">
-                        <div class="oe_kanban_content p-3 bg-white border">
+                    <div class="oe_kanban_card o_kanban_record" style="background: #ffffff; border: 2px solid #d1d5db; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                        <div class="oe_kanban_content p-3">
                             
-                            <!-- Header -->
+                            <!-- Compact Header -->
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h4 class="mb-1 text-primary">
-                                            <field name="name"/>
-                                    </h4>
-                                    <small class="text-muted">
-                                        <i class="fa fa-folder-open mr-1"/> <field name="project_id"/>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1 text-dark font-weight-bold" style="font-size: 1rem; font-weight: 700;">
+                                        <field name="name"/>
+                                    </h5>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fa fa-folder mr-1 text-muted" style="font-size: 0.8rem;" title="Project"></i>
+                                        <span class="text-muted small">
+                                            <field name="project_id"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-map-marker mr-1 text-muted" style="font-size: 0.8rem;" title="Khasra"></i>
+                                        <span class="text-muted small">
+                                            Khasra: <field name="khasra_number"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- User Image/Avatar -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="position-relative">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #d1d5db;">
+                                            <span t-if="record.user_id.raw_value" t-esc="record.user_id.raw_value[0]" style="font-size: 0.9rem; font-weight: bold;"></span>
+                                            <i t-else="" class="fa fa-user" style="font-size: 1rem;" title="User"></i>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-1 text-center" style="font-size: 0.7rem; max-width: 60px;">
+                                        <field name="user_id"/>
                                     </small>
                                 </div>
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#" title="More Actions">
-                                        <i class="fa fa-ellipsis-v"/>
+                                
+                                <!-- Actions Dropdown -->
+                                <div class="dropdown ml-1">
+                                    <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.9rem;">
+                                        <i class="fa fa-ellipsis-v" title="More Actions"></i>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-right shadow" role="menu">
+                                    <div class="dropdown-menu dropdown-menu-right" role="menu" style="border: 1px solid #e5e7eb; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                                         <a role="menuitem" type="edit" class="dropdown-item">
-                                            <i class="fa fa-pencil-alt mr-1"/> Edit
+                                            <i class="fa fa-pencil-alt mr-2 text-primary" title="Edit"></i> Edit
+                                        </a>
+                                        <a role="menuitem" class="dropdown-item" onclick="shareOnWhatsApp()">
+                                            <i class="fab fa-whatsapp mr-2 text-success" title="Share on WhatsApp"></i> Share on WhatsApp
                                         </a>
                                         <a role="menuitem" type="delete" class="dropdown-item text-danger">
-                                            <i class="fa fa-trash mr-1"/> Delete
+                                            <i class="fa fa-trash mr-2" title="Delete"></i> Delete
                                         </a>
                                     </div>
                                 </div>
-                                    </div>
-
-                            <!-- Body -->
-                            <div class="mb-3">
-                                <p class="mb-1">
-                                    <strong>🏘️ Village / ग्राम:</strong> <field name="village_id"/>
-                                </p>
-                                <p class="mb-0">
-                                    <strong>📅 Date / दिनाँक:</strong> <field name="survey_date"/>
-                                </p>
-                                <p class="mb-1">
-                                    <strong>Surveyor:</strong> <field name="user_id"/>
-                                </p>
                             </div>
 
-                            <!-- Footer -->
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2">
-                                <span t-attf-class="badge badge-pill px-3 py-2 text-uppercase 
-                                    #{record.state.raw_value == 'approved' and 'badge-info' 
-                                    or record.state.raw_value == 'locked' and 'badge-success' 
-                                    or record.state.raw_value == 'submitted' and 'badge-warning' 
-                                    or record.state.raw_value == 'draft' and 'badge-primary' 
-                                    or 'badge-danger'}">
+                            <!-- Compact Body -->
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="fa fa-home mr-3 text-muted" style="font-size: 0.8rem;" title="Village"></i>
+                                    <span class="text-muted small mr-3">Village:</span>
+                                    <span class="text-dark small">
+                                        <field name="village_id"/>
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="fa fa-calendar mr-3 text-muted" style="font-size: 0.8rem;" title="Date"></i>
+                                    <span class="text-muted small mr-3">Date:</span>
+                                    <span class="text-dark small">
+                                        <field name="survey_date"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Compact Footer -->
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
+                                <span t-attf-class="badge px-2 py-1 text-uppercase small" 
+                                      t-attf-style="#{record.state.raw_value == 'approved' and 'background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;' 
+                                      or record.state.raw_value == 'locked' and 'background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;' 
+                                      or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
+                                      or record.state.raw_value == 'draft' and 'background: #f3f4f6; color: #374151; border: 1px solid #d1d5db;' 
+                                      or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
                                     <field name="state"/>
                                 </span>
-                                <span class="text-muted small">
-                                    <i class="fa fa-camera"/> Survey
-                                </span>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="fa fa-camera mr-1" style="font-size: 0.8rem;" title="Survey"></i>
+                                    <span class="small">Survey</span>
+                                </div>
                             </div>
 
-                            </div>
                         </div>
+                    </div>
                     </t>
                 </templates>
             </kanban>
         </field>
     </record>
+
+    <!-- WhatsApp Share JavaScript -->
+    <template id="whatsapp_share_script" name="WhatsApp Share Script">
+        <script type="text/javascript">
+            function shareOnWhatsApp() {
+                // Get current survey data
+                var surveyName = document.querySelector('.oe_kanban_card h5').textContent;
+                var projectName = document.querySelector('.oe_kanban_card .fa-folder').nextSibling.textContent.trim();
+                var villageName = document.querySelector('.oe_kanban_card .fa-home').parentElement.querySelector('div').textContent.trim();
+                var surveyDate = document.querySelector('.oe_kanban_card .fa-calendar').parentElement.querySelector('div').textContent.trim();
+                
+                // Create survey URL
+                var surveyUrl = window.location.origin + '/web#model=bhu.survey&amp;view_type=form';
+                
+                // Create WhatsApp message
+                var message = '🏗️ *Survey Update*\n\n' +
+                             '📋 *Survey:* ' + surveyName + '\n' +
+                             '🏢 *Project:* ' + projectName + '\n' +
+                             '🏘️ *Village:* ' + villageName + '\n' +
+                             '📅 *Date:* ' + surveyDate + '\n\n' +
+                             '🔗 *View Details:* ' + surveyUrl;
+                
+                // Encode message for URL
+                var encodedMessage = encodeURIComponent(message);
+                
+                // Open WhatsApp
+                var whatsappUrl = 'https://wa.me/?text=' + encodedMessage;
+                window.open(whatsappUrl, '_blank');
+            }
+        </script>
+    </template>
 
 
     <!-- Custom Mail Message View to Hide Related Document Fields -->

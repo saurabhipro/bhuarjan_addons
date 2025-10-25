@@ -285,13 +285,10 @@ if records:
                                 <!-- User Image/Avatar -->
                                 <div class="d-flex flex-column align-items-center">
                                     <div class="position-relative">
-                                        <img t-if="record.user_id.raw_value and record.user_id.raw_value[1]" 
-                                             t-att-src="record.user_id.raw_value[1]" 
-                                             class="rounded-circle" 
-                                             style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #d1d5db;"/>
-                                        <div t-else="" class="rounded-circle d-flex align-items-center justify-content-center" 
-                                             style="width: 40px; height: 40px; background: #f3f4f6; color: #6b7280; border: 2px solid #d1d5db;">
-                                            <i class="fa fa-user" style="font-size: 1rem;" title="User"></i>
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #d1d5db;">
+                                            <span t-if="record.user_id.raw_value" t-esc="record.user_id.raw_value[0]" style="font-size: 0.9rem; font-weight: bold;"></span>
+                                            <i t-else="" class="fa fa-user" style="font-size: 1rem;" title="User"></i>
                                         </div>
                                     </div>
                                     <small class="text-muted mt-1 text-center" style="font-size: 0.7rem; max-width: 60px;">
@@ -321,23 +318,19 @@ if records:
                             <!-- Compact Body -->
                             <div class="mb-2">
                                 <div class="d-flex align-items-center mb-1">
-                                    <i class="fa fa-home mr-2 text-muted" style="font-size: 0.8rem;" title="Village"></i>
-                                    <div>
-                                        <span class="text-muted small">Village:</span>
-                                        <div class="text-dark small">
-                                            <field name="village_id"/>
-                                        </div>
-                                    </div>
+                                    <i class="fa fa-home mr-3 text-muted" style="font-size: 0.8rem;" title="Village"></i>
+                                    <span class="text-muted small mr-3">Village:</span>
+                                    <span class="text-dark small">
+                                        <field name="village_id"/>
+                                    </span>
                                 </div>
                                 
                                 <div class="d-flex align-items-center mb-1">
-                                    <i class="fa fa-calendar mr-2 text-muted" style="font-size: 0.8rem;" title="Date"></i>
-                                    <div>
-                                        <span class="text-muted small">Date:</span>
-                                        <div class="text-dark small">
-                                            <field name="survey_date"/>
-                                        </div>
-                                    </div>
+                                    <i class="fa fa-calendar mr-3 text-muted" style="font-size: 0.8rem;" title="Date"></i>
+                                    <span class="text-muted small mr-3">Date:</span>
+                                    <span class="text-dark small">
+                                        <field name="survey_date"/>
+                                    </span>
                                 </div>
                             </div>
 

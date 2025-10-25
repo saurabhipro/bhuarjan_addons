@@ -49,6 +49,7 @@
         'reports/notification4_report.xml',
         'views/bhu_menu.xml',
         'views/menuitem.xml',
+        'static/src/xml/project_switcher.xml',
     ],
     'installable': True,
     'application': True,

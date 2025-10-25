@@ -8,12 +8,19 @@
                                 <span class="fa fa-folder-open" title="All Projects"></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" role="menu">
-                                <div class="dropdown-header">Select Project</div>
                                 <div class="o_project_list">
-                                    <a href="#" class="dropdown-item o_project_item active" data-project-id="0">
-                                        <span class="fa fa-folder-o"></span>
-                                        All Projects
-                                    </a>
+                                    <div class="dropdown-item o_project_item active" data-project-id="0">
+                                        <input type="checkbox" class="project-checkbox" checked="checked"/>
+                                        <span class="project-name">All Projects</span>
+                                    </div>
+                                    <div class="dropdown-item o_project_item" data-project-id="1">
+                                        <input type="checkbox" class="project-checkbox"/>
+                                        <span class="project-name">Sample Project 1</span>
+                                    </div>
+                                    <div class="dropdown-item o_project_item" data-project-id="2">
+                                        <input type="checkbox" class="project-checkbox"/>
+                                        <span class="project-name">Sample Project 2</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -57,20 +64,30 @@
                     color: #000000 !important;
                 }
                 .o_project_switcher .fa {
-                    margin: 0; /* Remove all margins */
+                    margin: 0 !important; /* Remove all margins */
                     font-size: 18px; /* Adjust icon size */
                     line-height: 1; /* Reset line height */
+                    display: inline-block !important;
+                    text-align: center;
+                    width: auto !important;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                 }
                         .o_project_switcher .dropdown-menu {
-                            min-width: 200px;
-                            max-height: 300px;
+                            min-width: 150px;
+                            max-width: 200px;
+                            max-height: 150px;
                             overflow-y: auto;
                             background: white;
-                            border: 1px solid #ccc;
-                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                             position: absolute;
                             z-index: 9999;
                             display: none;
+                            padding: 2px 0;
                         }
                 .o_project_switcher .dropdown-header {
                     padding: 8px 16px;
@@ -79,23 +96,165 @@
                     border-bottom: 1px solid #dee2e6;
                 }
                 .o_project_switcher .o_project_item {
-                    padding: 8px 16px;
-                    color: #495057;
+                    padding: 4px 8px;
+                    color: #333 !important;
                     text-decoration: none;
-                    display: block;
-                    transition: background-color 0.2s;
+                    display: flex;
+                    align-items: center;
+                    font-size: 12px;
+                    line-height: 1.2;
+                    background-color: transparent !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    cursor: pointer;
+                    border-bottom: 1px solid #f0f0f0;
+                }
+                
+                .o_project_switcher .project-checkbox {
+                    margin-right: 8px;
+                    width: 14px;
+                    height: 14px;
+                    cursor: pointer;
+                    display: inline-block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .o_project_switcher .project-name {
+                    flex: 1;
+                    color: #333 !important;
                 }
                 .o_project_switcher .o_project_item:hover {
-                    background-color: #f8f9fa;
-                    color: #495057;
+                    color: #333 !important;
+                    background-color: transparent !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+                .o_project_switcher .o_project_item:focus {
+                    color: #333 !important;
+                    background-color: transparent !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
                 }
                 .o_project_switcher .o_project_item.active {
-                    background-color: #007bff;
-                    color: white;
+                    background-color: #f8f9fa !important;
+                    color: #333 !important;
+                    font-weight: bold;
+                    opacity: 1 !important;
+                    visibility: visible !important;
                 }
-                .o_project_switcher .o_project_item .fa {
+                .o_project_switcher .o_project_item.active:hover {
+                    background-color: #f8f9fa !important;
+                    color: #333 !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+                /* Hide ALL icons in dropdown - no exceptions */
+                .o_project_switcher .dropdown-menu .fa,
+                .o_project_switcher .dropdown-menu .fa-*,
+                .o_project_switcher .dropdown-menu i,
+                .o_project_switcher .dropdown-menu .icon,
+                .o_project_switcher .dropdown-menu .glyphicon,
+                .o_project_switcher .dropdown-menu .material-icons,
+                .o_project_switcher .dropdown-menu .oi,
+                .o_project_switcher .dropdown-menu .icon-*,
+                .o_project_switcher .dropdown-menu [class*="icon-"],
+                .o_project_switcher .dropdown-menu [class*="fa-"],
+                .o_project_switcher .dropdown-menu svg,
+                .o_project_switcher .dropdown-menu img {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                
+                /* Remove ALL pseudo-elements that might inject icons */
+                .o_project_switcher .dropdown-menu *::before,
+                .o_project_switcher .dropdown-menu *::after,
+                .o_project_switcher .dropdown-menu *:before,
+                .o_project_switcher .dropdown-menu *:after {
+                    display: none !important;
+                    content: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                }
+                
+                /* Remove pseudo-elements that inject icons */
+                .o_project_switcher .dropdown-menu .dropdown-item::before,
+                .o_project_switcher .dropdown-menu .dropdown-item::after {
+                    display: none !important;
+                    content: none !important;
+                }
+                
+                /* Remove any theme-injected icons */
+                .o_project_switcher .dropdown-menu .dropdown-item:before,
+                .o_project_switcher .dropdown-menu .dropdown-item:after {
+                    display: none !important;
+                    content: none !important;
+                }
+                
+                /* Clean up dropdown items */
+                
+                /* Ensure checkboxes are visible - override any hiding rules */
+                .o_project_switcher .dropdown-menu input[type="checkbox"] {
+                    display: inline-block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    width: 14px !important;
+                    height: 14px !important;
+                    margin-right: 8px !important;
+                    padding: 0 !important;
+                }
+                
+                /* Clean dropdown menu styles - no wildcards */
+                .o_project_switcher .dropdown-menu {
+                    min-width: 180px;
+                    max-width: 250px;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    position: absolute;
+                    z-index: 9999;
+                    display: none;
+                    padding: 4px 0;
+                }
+                
+                .o_project_switcher .dropdown-menu .dropdown-item {
+                    display: flex !important;
+                    align-items: center;
+                    padding: 6px 12px;
+                    color: #333;
+                    text-decoration: none;
+                    border: none;
+                    background: none;
+                    width: 100%;
+                    cursor: pointer;
+                }
+                
+                .o_project_switcher .dropdown-menu .dropdown-item:hover {
+                    background-color: #f8f9fa;
+                    color: #333;
+                }
+                
+                .o_project_switcher .dropdown-menu .project-name {
+                    color: #333;
+                    flex: 1;
+                }
+                
+                .o_project_switcher .dropdown-menu input[type="checkbox"] {
                     margin-right: 8px;
-                    width: 16px;
+                    width: 14px;
+                    height: 14px;
                 }
                 
                         /* Project Info Display Styles */
@@ -103,6 +262,7 @@
                             display: flex;
                             flex-direction: column;
                             align-items: center;
+                            justify-content: center;
                             font-size: 12px;
                             font-weight: bold;
                             color: #ffd700;
@@ -111,17 +271,22 @@
                             border-radius: 4px;
                             margin: 0 10px;
                             line-height: 1.2;
+                            text-align: center;
+                            width: 100%;
                         }
                         
                         .o_project_name, .o_district_name {
                             color: #ffd700 !important;
                             font-weight: bold;
                             font-size: 12px;
-                            text-align: center;
+                            text-align: center !important;
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
                             max-width: 150px;
+                            display: block;
+                            width: 100%;
+                            margin: 0 auto;
                         }
                         
                         .o_district_name {

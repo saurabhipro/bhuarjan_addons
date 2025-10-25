@@ -188,6 +188,22 @@ class Survey(models.Model):
         report_action = self.env.ref('bhuarjan.action_report_form10_survey')
         return report_action.report_action(self)
 
+    def action_download_award_letter(self):
+        """Download Award Letter as PDF"""
+        for record in self:
+            # Generate PDF report
+            report_action = self.env.ref('bhuarjan.action_report_award_letter')
+            return report_action.report_action(record)
+
+    def action_bulk_download_award_letter(self):
+        """Download Award Letter PDFs for all selected surveys"""
+        if not self:
+            raise ValidationError(_('Please select at least one survey to download.'))
+        
+        # Generate PDF report for all selected surveys
+        report_action = self.env.ref('bhuarjan.action_report_award_letter')
+        return report_action.report_action(self)
+
 
 
 

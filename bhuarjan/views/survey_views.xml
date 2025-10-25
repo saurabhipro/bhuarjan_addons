@@ -35,6 +35,7 @@
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     
                     <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
+                    <button name="action_download_award_letter" string="Download Award Letter" type="object" class="btn-success" icon="fa-file-text"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -226,6 +227,18 @@
         <field name="code">
 if records:
     action = records.action_bulk_download_form10()
+</field>
+    </record>
+
+    <!-- Bulk Download Award Letter Action -->
+    <record id="action_bulk_download_award_letter" model="ir.actions.server">
+        <field name="name">Download Award Letter PDFs</field>
+        <field name="model_id" ref="model_bhu_survey"/>
+        <field name="binding_model_id" ref="model_bhu_survey"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_download_award_letter()
 </field>
     </record>
 

@@ -71,11 +71,12 @@ class Stage3Jansunwai(models.Model):
     signed_by = fields.Char(string='Signed By')
     designation = fields.Char(string='Designation')
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('bhu.stage3.jansunwai') or _('New')
-        return super(Stage3Jansunwai, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.stage3.jansunwai') or _('New')
+        return super(Stage3Jansunwai, self).create(vals_list)
 
     def action_confirm(self):
         self.write({'state': 'in_progress'})

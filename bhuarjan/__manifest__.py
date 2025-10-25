@@ -25,6 +25,7 @@
         'security/secrurity.xml',
         'security/notification4_security.xml',
         'reports/form10_survey_report.xml',
+        'reports/award_letter_report.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',

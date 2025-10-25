@@ -19,9 +19,6 @@ class BhuProject(models.Model):
     ], string='Status', default='draft', tracking=True)
     village_ids = fields.Many2many('bhu.village.line', string="Villages", tracking=True)
     
-    # District field for project location
-    district_id = fields.Many2one('bhu.district', string='District', required=True, tracking=True)
-    
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 
                                 default=lambda self: self.env.company, tracking=True)

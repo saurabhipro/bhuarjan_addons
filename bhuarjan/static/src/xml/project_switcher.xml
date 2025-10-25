@@ -207,7 +207,7 @@
                                     method: 'search_read',
                                     args: [[]],
                                     kwargs: {
-                                        fields: ['id', 'name', 'district_id', 'company_id'],
+                                        fields: ['id', 'name', 'company_id'],
                                         order: 'name asc'
                                     }
                                 },
@@ -365,10 +365,8 @@
                             var projectName = $('.o_project_item[data-project-id="' + projectId + '"]').text().trim();
                             $('.o_project_name').text(projectName);
                             
-                            // Try to get district info from the project data
-                            var projectItem = $('.o_project_item[data-project-id="' + projectId + '"]');
-                            var districtName = projectItem.data('district-name') || 'Unknown District';
-                            $('.o_district_name').text(districtName);
+                            // For now, show "District" as placeholder until database is updated
+                            $('.o_district_name').text('District');
                         }
                     }
                     

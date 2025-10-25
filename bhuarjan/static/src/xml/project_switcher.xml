@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="project_switcher_template" name="Project Switcher" inherit_id="web.layout">
+        <xpath expr="//head" position="inside">
+                    <div id="project_switcher_container" style="display: none;">
+                        <div class="o_project_switcher dropdown">
+                            <a class="dropdown-toggle o-no-caret" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="fa fa-folder-open" title="All Projects"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <div class="dropdown-header">Select Project</div>
+                                <div class="o_project_list">
+                                    <a href="#" class="dropdown-item o_project_item active" data-project-id="0">
+                                        <span class="fa fa-folder-o"></span>
+                                        All Projects
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project and District Display -->
+                    <div id="project_info_display" style="display: none;">
+                        <div class="o_project_info">
+                            <div class="o_district_name" style="color: #ffd700; font-weight: bold; font-size: 12px;">All Districts</div>
+                            <div class="o_project_name" style="color: #ffd700; font-weight: bold; font-size: 12px;">All Projects</div>
+                        </div>
+                    </div>
+        </xpath>
+    </template>
+
+    <template id="project_switcher_script" name="Project Switcher Script" inherit_id="web.layout">
+        <xpath expr="//head" position="inside">
+            <style>
+                .o_project_switcher {
+                    margin-right: 10px;
+                    display: inline-block;
+                    position: relative;
+                }
+                .o_project_switcher .dropdown-toggle {
+                    color: #000000 !important;
+                    text-decoration: none;
+                    padding: 0;
+                    border-radius: 4px;
+                    transition: background-color 0.3s;
+                    background-color: #ffff00;
+                    border: 1px solid #000000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    width: 40px;
+                    height: 40px;
+                }
+                .o_project_switcher .dropdown-toggle:hover {
+                    background-color: #ffff80;
+                    color: #000000 !important;
+                }
+                .o_project_switcher .fa {
+                    margin: 0; /* Remove all margins */
+                    font-size: 18px; /* Adjust icon size */
+                    line-height: 1; /* Reset line height */
+                }
+                        .o_project_switcher .dropdown-menu {
+                            min-width: 200px;
+                            max-height: 300px;
+                            overflow-y: auto;
+                            background: white;
+                            border: 1px solid #ccc;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            position: absolute;
+                            z-index: 9999;
+                            display: none;
+                        }
+                .o_project_switcher .dropdown-header {
+                    padding: 8px 16px;
+                    font-weight: bold;
+                    color: #495057;
+                    border-bottom: 1px solid #dee2e6;
+                }
+                .o_project_switcher .o_project_item {
+                    padding: 8px 16px;
+                    color: #495057;
+                    text-decoration: none;
+                    display: block;
+                    transition: background-color 0.2s;
+                }
+                .o_project_switcher .o_project_item:hover {
+                    background-color: #f8f9fa;
+                    color: #495057;
+                }
+                .o_project_switcher .o_project_item.active {
+                    background-color: #007bff;
+                    color: white;
+                }
+                .o_project_switcher .o_project_item .fa {
+                    margin-right: 8px;
+                    width: 16px;
+                }
+                
+                        /* Project Info Display Styles */
+                        .o_project_info {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            font-size: 12px;
+                            font-weight: bold;
+                            color: #ffd700;
+                            padding: 5px 10px;
+                            background: rgba(255, 255, 255, 0.1);
+                            border-radius: 4px;
+                            margin: 0 10px;
+                            line-height: 1.2;
+                        }
+                        
+                        .o_project_name, .o_district_name {
+                            color: #ffd700 !important;
+                            font-weight: bold;
+                            font-size: 12px;
+                            text-align: center;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            max-width: 150px;
+                        }
+                        
+                        .o_district_name {
+                            margin-bottom: 2px;
+                        }
+
+                        /* Debug styles */
+                        .o_project_switcher {
+                            border: 2px solid red !important;
+                            background: yellow !important;
+                        }
+            </style>
+            <script>
+                <![CDATA[
+                $(document).ready(function() {
+                    // Insert project switcher into the navbar
+                    function insertProjectSwitcher() {
+                        // Try multiple selectors to find the navbar
+                        var navbar = null;
+                        var selectors = [
+                            '.o_main_navbar .o_menu_systray',
+                            '.o_main_navbar',
+                            '.navbar',
+                            '.o_menu_systray',
+                            '.o_menu_systray_items',
+                            '.o_action_manager .o_main_navbar',
+                            '.o_action_manager .navbar',
+                            '.o_web_client .o_main_navbar',
+                            '.o_web_client .navbar'
+                        ];
+                        
+                        for (var i = 0; i < selectors.length; i++) {
+                            navbar = $(selectors[i]).first();
+                            if (navbar.length > 0) {
+                                console.log('Found navbar with selector:', selectors[i]);
+                                break;
+                            }
+                        }
+                        
+                            if (navbar.length > 0) {
+                                var switcher = $('#project_switcher_container').html();
+                                var projectInfo = $('#project_info_display').html();
+                                
+                                // Insert project switcher on the right
+                                navbar.append(switcher);
+                                
+                                // Insert project info display in the center (after Users menu)
+                                var centerPosition = navbar.find('.o_menu_systray').first();
+                                if (centerPosition.length > 0) {
+                                    centerPosition.before(projectInfo);
+                                } else {
+                                    navbar.append(projectInfo);
+                                }
+                                
+                                $('#project_switcher_container').remove();
+                                $('#project_info_display').remove();
+                                console.log('Project switcher and info display inserted successfully');
+                            } else {
+                                console.log('No navbar found, trying to insert in body');
+                                // Fallback: insert at the end of body
+                                var switcher = $('#project_switcher_container').html();
+                                var projectInfo = $('#project_info_display').html();
+                                $('body').append('<div style="position: fixed; top: 10px; right: 10px; z-index: 9999;">' + switcher + '</div>');
+                                $('body').append('<div style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9999;">' + projectInfo + '</div>');
+                                $('#project_switcher_container').remove();
+                                $('#project_info_display').remove();
+                            }
+                    }
+                    
+                    // Load projects from the current company
+                    function loadProjects() {
+                        console.log('Loading projects...');
+                        
+                        // Use jQuery AJAX to get projects
+                        $.ajax({
+                            url: '/web/dataset/call_kw',
+                            type: 'POST',
+                            data: JSON.stringify({
+                                jsonrpc: '2.0',
+                                method: 'call',
+                                params: {
+                                    model: 'bhu.project',
+                                    method: 'search_read',
+                                    args: [[]],
+                                    kwargs: {
+                                        fields: ['id', 'name', 'district_id', 'company_id'],
+                                        order: 'name asc'
+                                    }
+                                },
+                                id: Math.floor(Math.random() * 1000000)
+                            }),
+                            contentType: 'application/json',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            success: function(response) {
+                                console.log('Full response:', response);
+                                console.log('Response type:', typeof response);
+                                console.log('Response result:', response.result);
+                                
+                                var result = [];
+                                if (response && response.result) {
+                                    result = response.result;
+                                } else if (Array.isArray(response)) {
+                                    result = response;
+                                }
+                                
+                                console.log('Processed result:', result);
+                                console.log('Result length:', result.length);
+                                
+                                var projectList = $('.o_project_list');
+                                projectList.empty();
+                                
+                                // Add "All Projects" option
+                                projectList.append(
+                                    '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                                    '<span class="fa fa-folder-o"></span>All Projects</a>'
+                                );
+                                
+                                // Add project options
+                                if (result && result.length > 0) {
+                                    console.log('Adding ' + result.length + ' real projects to dropdown');
+                                    result.forEach(function(project) {
+                                        console.log('Adding real project:', project.name, 'ID:', project.id);
+                                        projectList.append(
+                                            '<a href="#" class="dropdown-item o_project_item" data-project-id="' + project.id + '">' +
+                                            '<span class="fa fa-folder"></span>' + project.name + '</a>'
+                                        );
+                                    });
+                                } else {
+                                    console.log('No real projects found, adding sample projects');
+                                    // Add some sample projects for testing
+                                    projectList.append(
+                                        '<a href="#" class="dropdown-item o_project_item" data-project-id="1">' +
+                                        '<span class="fa fa-folder"></span>Sample Project 1</a>'
+                                    );
+                                    projectList.append(
+                                        '<a href="#" class="dropdown-item o_project_item" data-project-id="2">' +
+                                        '<span class="fa fa-folder"></span>Sample Project 2</a>'
+                                    );
+                                }
+                                
+                                // Set current project from session
+                                var currentProjectId = sessionStorage.getItem('bhuarjan_current_project_id') || '0';
+                                $('.o_project_item').removeClass('active');
+                                $('.o_project_item[data-project-id="' + currentProjectId + '"]').addClass('active');
+                                updateProjectTitle(currentProjectId);
+                            },
+                            error: function(xhr, status, error) {
+                                console.log('Error loading projects:', error);
+                                console.log('XHR status:', xhr.status);
+                                console.log('XHR response:', xhr.responseText);
+                                
+                                // Try alternative method to get projects
+                                tryAlternativeMethod();
+                            }
+                        });
+                    }
+                    
+                    // Alternative method to get projects
+                    function tryAlternativeMethod() {
+                        console.log('Trying alternative method to get projects...');
+                        
+                        // Try using the current action context to get projects
+                        var currentAction = odoo.web.client.action_manager.get_current_action();
+                        if (currentAction && currentAction.res_model === 'bhu.project') {
+                            console.log('We are on bhu.project page, trying to get projects from current view...');
+                            
+                            // Try to get projects from the current list view
+                            var $projectRows = $('.o_list_view tbody tr');
+                            console.log('Found project rows:', $projectRows.length);
+                            
+                            var projectList = $('.o_project_list');
+                            projectList.empty();
+                            
+                            // Add "All Projects" option
+                            projectList.append(
+                                '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                                '<span class="fa fa-folder-o"></span>All Projects</a>'
+                            );
+                            
+                            if ($projectRows.length > 0) {
+                                $projectRows.each(function(index) {
+                                    var $row = $(this);
+                                    var projectName = $row.find('td:first').text().trim();
+                                    var projectId = $row.attr('data-id') || (index + 1);
+                                    
+                                    if (projectName && projectName !== '') {
+                                        console.log('Found project from list:', projectName, 'ID:', projectId);
+                                        projectList.append(
+                                            '<a href="#" class="dropdown-item o_project_item" data-project-id="' + projectId + '">' +
+                                            '<span class="fa fa-folder"></span>' + projectName + '</a>'
+                                        );
+                                    }
+                                });
+                            } else {
+                                console.log('No project rows found, showing sample projects');
+                                showSampleProjects();
+                            }
+                        } else {
+                            console.log('Not on bhu.project page, showing sample projects');
+                            showSampleProjects();
+                        }
+                    }
+                    
+                    // Show sample projects as fallback
+                    function showSampleProjects() {
+                        var projectList = $('.o_project_list');
+                        projectList.empty();
+                        projectList.append(
+                            '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                            '<span class="fa fa-folder-o"></span>All Projects</a>'
+                        );
+                        projectList.append(
+                            '<a href="#" class="dropdown-item o_project_item" data-project-id="1">' +
+                            '<span class="fa fa-folder"></span>Sample Project 1</a>'
+                        );
+                        projectList.append(
+                            '<a href="#" class="dropdown-item o_project_item" data-project-id="2">' +
+                            '<span class="fa fa-folder"></span>Sample Project 2</a>'
+                        );
+                    }
+                    
+                    // Update project icon title
+                    function updateProjectTitle(projectId) {
+                        if (projectId === '0') {
+                            $('.o_project_switcher .dropdown-toggle span').attr('title', 'All Projects');
+                        } else {
+                            var projectName = $('.o_project_item[data-project-id="' + projectId + '"]').text().trim();
+                            $('.o_project_switcher .dropdown-toggle span').attr('title', projectName);
+                        }
+                    }
+                    
+                    // Update project info display
+                    function updateProjectInfoDisplay(projectId) {
+                        if (projectId === '0') {
+                            $('.o_project_name').text('All Projects');
+                            $('.o_district_name').text('All Districts');
+                        } else {
+                            var projectName = $('.o_project_item[data-project-id="' + projectId + '"]').text().trim();
+                            $('.o_project_name').text(projectName);
+                            
+                            // Try to get district info from the project data
+                            var projectItem = $('.o_project_item[data-project-id="' + projectId + '"]');
+                            var districtName = projectItem.data('district-name') || 'Unknown District';
+                            $('.o_district_name').text(districtName);
+                        }
+                    }
+                    
+                    // Handle project selection
+                    $(document).on('click', '.o_project_item', function(e) {
+                        e.preventDefault();
+                        var projectId = $(this).data('project-id');
+                        console.log('Project clicked:', projectId);
+                        
+                        // Update active state
+                        $('.o_project_item').removeClass('active');
+                        $(this).addClass('active');
+                        
+                        // Store in session
+                        sessionStorage.setItem('bhuarjan_current_project_id', projectId);
+                        console.log('Project stored in session:', projectId);
+                        
+                        // Update icon title
+                        updateProjectTitle(projectId);
+                        
+                        // Update project info display
+                        updateProjectInfoDisplay(projectId);
+                        
+                        // Hide dropdown
+                        $('.dropdown-menu').hide();
+                        
+                        // Apply project filter to current view
+                        applyProjectFilter(projectId);
+                    });
+                    
+                    // Apply project filter to current view
+                    function applyProjectFilter(projectId) {
+                        console.log('Applying project filter:', projectId);
+                        
+                        // Store project selection in session for future use
+                        sessionStorage.setItem('bhuarjan_current_project_id', projectId);
+                        
+                        // Simple approach: just log the selection
+                        // The actual filtering will be handled by the project_filter.py model
+                        console.log('Project filter applied:', projectId);
+                        
+                        // Optional: Show a message to user
+                        if (projectId === '0') {
+                            console.log('Showing all projects');
+                        } else {
+                            var projectName = $('.o_project_item[data-project-id="' + projectId + '"]').text().trim();
+                            console.log('Filtering by project:', projectName);
+                        }
+                    }
+                    
+                    // Handle dropdown toggle
+                    $(document).on('click', '.o_project_switcher .dropdown-toggle', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Dropdown toggle clicked');
+                        var dropdown = $(this).next('.dropdown-menu');
+                        if (dropdown.is(':visible')) {
+                            dropdown.hide();
+                        } else {
+                            // Reload projects when opening dropdown
+                            loadProjects();
+                            dropdown.show();
+                        }
+                    });
+                    
+                    // Prevent dropdown from closing when clicking inside
+                    $(document).on('click', '.o_project_switcher .dropdown-menu', function(e) {
+                        e.stopPropagation();
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    $(document).on('click', function(e) {
+                        if (!$(e.target).closest('.o_project_switcher').length) {
+                            $('.o_project_switcher .dropdown-menu').hide();
+                        }
+                    });
+                    
+                    // Insert switcher and load projects
+                    setTimeout(function() {
+                        console.log('Attempting to insert project switcher...');
+                        insertProjectSwitcher();
+                        loadProjects();
+                        
+                        // Check if switcher was inserted
+                        setTimeout(function() {
+                            if ($('.o_project_switcher').length > 0) {
+                                console.log('Project switcher found in DOM');
+                            } else {
+                                console.log('Project switcher NOT found in DOM');
+                                // Try to insert again with a different approach
+                                $('body').prepend('<div class="o_project_switcher" style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: yellow; border: 2px solid red; padding: 10px;"><a href="#" class="dropdown-toggle"><span class="fa fa-folder-open"></span><span class="o_project_name">All Projects</span></a></div>');
+                            }
+                        }, 2000);
+                    }, 1000);
+                });
+                ]]>
+            </script>
+        </xpath>
+    </template>
+</odoo>

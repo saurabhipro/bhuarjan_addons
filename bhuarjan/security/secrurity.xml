@@ -117,73 +117,82 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 
-        <record id="record_bhu_district_rule" model="ir.rule">
-            <field name="name">Company: User can see own company data</field>
+        <record id="record_bhu_district_rule_admin" model="ir.rule">
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_district"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
-        <!-- Survey Models Company Rules -->
         <record id="record_bhu_survey_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company survey data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_survey"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
-        <!-- Landowner Model Company Rule -->
         <record id="record_bhu_landowner_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company landowner data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_landowner"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
-        <!-- Process Models Company Rules -->
         <record id="record_bhu_notification4_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company notification4 data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_notification4"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_section11_notification_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company section11 notification data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_section11_notification"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
+
         <record id="record_bhu_section15_objection_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company section15 objection data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_section15_objection"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_stage3_jansunwai_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company stage3 jansunwai data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_stage3_jansunwai"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_stage4_expert_review_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company stage4 expert review data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_stage4_expert_review"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_stage5_collector_approval_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company stage5 collector approval data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_stage5_collector_approval"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_post_award_payment_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company post award payment data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_post_award_payment"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
 
         <record id="record_bhu_payment_reconciliation_company_rule" model="ir.rule">
-            <field name="name">Company: User can see own company payment reconciliation data</field>
+            <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_payment_reconciliation"/>
-            <field name="domain_force">['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
         
         

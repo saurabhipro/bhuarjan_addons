@@ -31,6 +31,8 @@
         </field>
     </record>
 
+    
+
     <!-- Action -->
     <record id="action_bhu_sub_division" model="ir.actions.act_window">
         <field name="name">Sub Divisions</field>

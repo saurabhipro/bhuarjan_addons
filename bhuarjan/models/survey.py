@@ -202,6 +202,40 @@ class Survey(models.Model):
                 message_type='notification'
             )
     
+    landowner_pan_numbers = fields.Char(
+        string="PAN Numbers",
+        compute="_compute_landowner_pan_numbers",
+        store=True,
+        search="_search_landowner_pan_numbers"
+    )
+
+    def _compute_landowner_pan_numbers(self):
+        for rec in self:
+            if rec.landowner_ids:
+                pan_numbers = [
+                    str(pan or '') for pan in rec.landowner_ids.mapped('pan_number') if pan
+                ]
+                rec.landowner_pan_numbers = ', '.join(pan_numbers)
+            else:
+                rec.landowner_pan_numbers = ''
+
+
+    landowner_aadhar_numbers = fields.Char(
+        string="Aadhaar Numbers",
+        compute="_compute_landowner_aadhar_numbers",
+        store=True,
+        search="_search_landowner_aadhar_numbers"
+    )
+
+    def _compute_landowner_aadhar_numbers(self):
+        for rec in self:
+            if rec.landowner_ids:
+                aadhar_numbers = [
+                    str(aadhar).strip() for aadhar in rec.landowner_ids.mapped('aadhar_number') if aadhar
+                ]
+                rec.landowner_aadhar_numbers = ', '.join(aadhar_numbers)
+            else:
+                rec.landowner_aadhar_numbers = ''
 
 
 class SurveyLine(models.Model):

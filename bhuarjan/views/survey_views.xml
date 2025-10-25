@@ -164,6 +164,7 @@
         <field name="arch" type="xml">
             <search string="Search Surveys / सर्वे खोजें">
                 <field name="name"/>
+                <field name="landowner_ids"/>
                 <field name="project_id"/>
                 <field name="department_id"/>
                 <field name="village_id"/>
@@ -172,7 +173,11 @@
                 <field name="survey_date"/>
                 <field name="survey_uuid"/>
                 
+                <field name="landowner_pan_numbers" string="Pan Number"/>
+                <field name="landowner_aadhar_numbers" string="Aadhar Number"/>
+            
                 <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
+
                 <filter string="Submitted / प्रस्तुत" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved / अनुमोदित" name="approved" domain="[('state', '=', 'approved')]"/>
                 <filter string="Rejected / अस्वीकृत" name="rejected" domain="[('state', '=', 'rejected')]"/>
@@ -235,6 +240,8 @@ if records:
                 <field name="village_id"/>
                 <field name="state"/>
                 <field name="survey_date"/>
+                <field name="user_id"/>
+
 
                 <templates>
                     <t t-name="kanban-box">
@@ -250,7 +257,7 @@ if records:
                                     <small class="text-muted">
                                         <i class="fa fa-folder-open mr-1"/> <field name="project_id"/>
                                     </small>
-                                    </div>
+                                </div>
                                 <div class="dropdown">
                                     <a class="dropdown-toggle text-secondary" data-toggle="dropdown" href="#" title="More Actions">
                                         <i class="fa fa-ellipsis-v"/>
@@ -274,7 +281,10 @@ if records:
                                 <p class="mb-0">
                                     <strong>📅 Date / दिनाँक:</strong> <field name="survey_date"/>
                                 </p>
-                                    </div>
+                                <p class="mb-1">
+                                    <strong>Surveyor:</strong> <field name="user_id"/>
+                                </p>
+                            </div>
 
                             <!-- Footer -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-2">

@@ -49,22 +49,42 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="notification.land_details_ids" t-as="land_detail">
+                                <t t-foreach="notification.survey_ids" t-as="survey">
                                     <tr>
                                         <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-                                            <t t-esc="land_detail.district_name or ''"/>
+                                            <t t-esc="survey.district_name or notification.district_id.name or ''"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-                                            <t t-esc="land_detail.tehsil_name or ''"/>
+                                            <t t-esc="survey.tehsil_id.name or notification.tehsil_id.name or ''"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-                                            <t t-esc="land_detail.village_name or ''"/>
+                                            <t t-esc="survey.village_id.name or notification.village_id.name or ''"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-                                            <t t-esc="land_detail.area or 0"/> हेक्टेयर
+                                            <t t-esc="survey.total_area or 0"/> हेक्टेयर
                                         </td>
                                         <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-                                            <t t-esc="land_detail.public_purpose or ''"/>
+                                            <t t-esc="notification.public_purpose or ''"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <!-- If no surveys, show single row with notification data -->
+                                <t t-if="not notification.survey_ids">
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="notification.district_id.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="notification.tehsil_id.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="notification.village_id.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="notification.total_area or 0"/> हेक्टेयर
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+                                            <t t-esc="notification.public_purpose or ''"/>
                                         </td>
                                     </tr>
                                 </t>

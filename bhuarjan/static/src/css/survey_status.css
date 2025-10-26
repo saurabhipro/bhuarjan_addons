@@ -1,0 +1,112 @@
+/* Survey Status Styling - Enhanced Green for Approved */
+
+/* Survey Form Spacing Optimization */
+.o_form_view .o_form_sheet {
+    padding: 10px 15px !important;
+}
+
+.o_form_view .oe_title {
+    margin-bottom: 10px !important;
+}
+
+.o_form_view .oe_title h1 {
+    margin-bottom: 5px !important;
+    margin-top: 5px !important;
+}
+
+.o_form_view .alert {
+    margin-bottom: 15px !important;
+    margin-top: 5px !important;
+}
+
+.o_form_view .o_group {
+    margin-bottom: 10px !important;
+}
+
+.o_form_view .o_group .o_group {
+    margin-bottom: 5px !important;
+}
+
+.o_form_view .o_notebook {
+    margin-top: 10px !important;
+}
+
+.o_form_view .o_notebook .tab-content {
+    padding: 10px 0 !important;
+}
+
+/* Kanban Card Approved Status */
+.o_kanban_record .badge[style*="background: linear-gradient(135deg, #10b981"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #047857 !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* List View Approved Status */
+.o_list_view .o_field_badge[title*="Approved"],
+.o_list_view .o_field_badge[title*="अनुमोदित"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #047857 !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+    font-weight: bold !important;
+}
+
+/* Form View Approved Status */
+.o_form_view .o_field_badge[title*="Approved"],
+.o_form_view .o_field_badge[title*="अनुमोदित"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #047857 !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+    font-weight: bold !important;
+}
+
+/* General Approved Status Badge */
+.badge-success,
+.o_field_badge.badge-success,
+.o_field_badge[style*="background: #d1fae5"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #047857 !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+    font-weight: bold !important;
+}
+
+/* Hover Effect for Approved Status */
+.o_kanban_record .badge:hover,
+.o_list_view .o_field_badge:hover,
+.o_form_view .o_field_badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4) !important;
+    transition: all 0.3s ease;
+}
+
+/* Animation for Approved Status */
+@keyframes approvedPulse {
+    0% { box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
+    50% { box-shadow: 0 4px 8px rgba(16, 185, 129, 0.5); }
+    100% { box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
+}
+
+.o_kanban_record .badge[style*="background: linear-gradient(135deg, #10b981"] {
+    animation: approvedPulse 2s ease-in-out infinite;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .o_kanban_record .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .o_list_view .o_field_badge,
+    .o_form_view .o_field_badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+

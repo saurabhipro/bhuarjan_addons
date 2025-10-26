@@ -39,14 +39,14 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>
+                    <div class="oe_title" style="margin-bottom: 10px;">
+                        <h1 style="margin-bottom: 5px;">
                             <field name="name" placeholder="Survey Number / सर्वे नंबर"/>
                         </h1>
                     </div>
                     
                     <!-- Locked Survey Warning -->
-                    <div class="alert alert-warning" role="alert" invisible="state != 'locked'">
+                    <div class="alert alert-warning" role="alert" invisible="state != 'locked'" style="margin-bottom: 15px;">
                         <strong>Survey Locked / सर्वे लॉक:</strong> This survey has been used to generate Notification 4 and is now locked. No further modifications are allowed.
                         <br/>
                         <strong>सर्वे लॉक:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है और अब यह लॉक है। कोई और संशोधन की अनुमति नहीं है।
@@ -64,19 +64,14 @@
                             <field name="tehsil_id" widget="selection" readonly="state == 'locked'"/>
                             <field name="district_name" readonly="state == 'locked'"/>
                             <field name="user_id"/>
-
                         </group>
                     </group>
                     
-                    <group>
-                        <group>
-                            <field name="survey_uuid" readonly="1"/>
-                        </group>
-                    </group>
-                    
-                    <group string="Landowners / भूमिस्वामी">
+                    <group string="Landowners / भूमिस्वामी" style="margin-top: 10px;">
                         <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}"/>
                     </group>
+                    
+                    <field name="survey_uuid" readonly="1" invisible="1"/>
                     
                     <notebook>
                         <page string="Survey / सर्वे" name="survey_details">
@@ -336,12 +331,13 @@ if records:
 
                             <!-- Compact Footer -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                <span t-attf-class="badge px-2 py-1 text-uppercase small" 
-                                      t-attf-style="#{record.state.raw_value == 'approved' and 'background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;' 
-                                      or record.state.raw_value == 'locked' and 'background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;' 
+                                <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                      t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
+                                      or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
                                       or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
-                                      or record.state.raw_value == 'draft' and 'background: #f3f4f6; color: #374151; border: 1px solid #d1d5db;' 
+                                      or record.state.raw_value == 'draft' and 'background: #fbbf24; color: #92400e; border: 1px solid #f59e0b; box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);' 
                                       or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
+                                    <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;"></i>
                                     <field name="state"/>
                                 </span>
                                 <div class="d-flex align-items-center text-muted">

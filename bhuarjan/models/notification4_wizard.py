@@ -140,8 +140,7 @@ class Notification4Wizard(models.TransientModel):
             # Refresh the record to get the ID
             notification.refresh()
             
-            # Generate land details for this notification
-            notification._generate_land_details()
+            # Land details are automatically computed from survey_ids
             
             # Mark surveys as notification4_generated
             for survey in khasra_surveys:

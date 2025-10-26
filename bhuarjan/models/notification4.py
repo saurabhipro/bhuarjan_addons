@@ -143,11 +143,8 @@ class Notification4(models.Model):
             for survey in record.survey_ids:
                 survey_info.append(f"Survey: {survey.name}, Khasra: {survey.khasra_number}, Area: {survey.total_area}")
             
-            # Generate land details
-            record._generate_land_details()
-            
             # Show success message with details
-            message = _('Land details generated successfully for %d khasras.') % len(record.land_details_ids)
+            message = _('Land details generated successfully for %d surveys.') % len(record.survey_ids)
             if survey_info:
                 message += '\n\nSurveys processed:\n' + '\n'.join(survey_info)
             
@@ -181,9 +178,6 @@ class Notification4(models.Model):
             record.survey_ids = surveys
             record.district_id = record.village_id.district_id
             record.tehsil_id = record.village_id.tehsil_id
-            
-            # Generate land details
-            record._generate_land_details()
             
             return {
                 'type': 'ir.actions.client',

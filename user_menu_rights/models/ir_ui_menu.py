@@ -10,7 +10,7 @@ class Menu(models.Model):
     @tools.ormcache("frozenset(self.env.user.show_menu_access_ids.ids)", "debug")
     def _visible_menu_ids(self, debug=False):
         """Return the ids of the menu items visible to the user."""
-        self.clear_caches()
+        self.env.registry.clear_cache()
         visible = super()._visible_menu_ids(debug=debug)
         if not self.env.user.has_group('base.group_system') and self.env.user.user_menu_access_ids:
             context = {'ir.ui.menu.full_list': True}

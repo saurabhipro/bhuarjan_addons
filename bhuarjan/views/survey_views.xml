@@ -260,6 +260,7 @@ if records:
                             <!-- Compact Header -->
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div class="flex-grow-1">
+                                    
                                     <h5 class="mb-1 text-dark font-weight-bold" style="font-size: 1rem; font-weight: 700;">
                                         <field name="name"/>
                                     </h5>
@@ -279,16 +280,8 @@ if records:
                                 
                                 <!-- User Image/Avatar -->
                                 <div class="d-flex flex-column align-items-center">
-                                    <div class="position-relative">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                             style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #d1d5db;">
-                                            <span t-if="record.user_id.raw_value" t-esc="record.user_id.raw_value[0]" style="font-size: 0.9rem; font-weight: bold;"></span>
-                                            <i t-else="" class="fa fa-user" style="font-size: 1rem;" title="User"></i>
-                                        </div>
-                                    </div>
-                                    <small class="text-muted mt-1 text-center" style="font-size: 0.7rem; max-width: 60px;">
-                                        <field name="user_id"/>
-                                    </small>
+                                    
+                                        <field name="user_id" widget="many2one_avatar_user"/>
                                 </div>
                                 
                                 <!-- Actions Dropdown -->

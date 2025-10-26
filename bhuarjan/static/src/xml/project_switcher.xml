@@ -9,15 +9,15 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" role="menu">
                                 <div class="o_project_list">
-                                    <div class="dropdown-item o_project_item active" data-project-id="0">
+                                    <div class=" o_project_item active" data-project-id="0">
                                         <input type="checkbox" class="project-checkbox" checked="checked"/>
                                         <span class="project-name">All Projects</span>
                                     </div>
-                                    <div class="dropdown-item o_project_item" data-project-id="1">
+                                    <div class=" o_project_item" data-project-id="1">
                                         <input type="checkbox" class="project-checkbox"/>
                                         <span class="project-name">Sample Project 1</span>
                                     </div>
-                                    <div class="dropdown-item o_project_item" data-project-id="2">
+                                    <div class=" o_project_item" data-project-id="2">
                                         <input type="checkbox" class="project-checkbox"/>
                                         <span class="project-name">Sample Project 2</span>
                                     </div>
@@ -60,8 +60,8 @@
                     height: 40px;
                 }
                 .o_project_switcher .dropdown-toggle:hover {
-                    background-color: #ffff80;
-                    color: #000000 !important;
+                    <!-- background-color: #ffff80;
+                    color: #000000 !important; -->
                 }
                 .o_project_switcher .fa {
                     margin: 0 !important; /* Remove all margins */
@@ -127,10 +127,10 @@
                     color: #333 !important;
                 }
                 .o_project_switcher .o_project_item:hover {
-                    color: #333 !important;
-                    background-color: transparent !important;
+                    <!-- color: #333 !important; -->
+                    <!-- background-color: transparent !important;
                     opacity: 1 !important;
-                    visibility: visible !important;
+                    visibility: visible !important; -->
                 }
                 .o_project_switcher .o_project_item:focus {
                     color: #333 !important;
@@ -146,10 +146,10 @@
                     visibility: visible !important;
                 }
                 .o_project_switcher .o_project_item.active:hover {
-                    background-color: #f8f9fa !important;
+                    <!-- background-color: #f8f9fa !important;
                     color: #333 !important;
                     opacity: 1 !important;
-                    visibility: visible !important;
+                    visibility: visible !important; -->
                 }
                 /* Hide ALL icons in dropdown - no exceptions */
                 .o_project_switcher .dropdown-menu .fa,
@@ -187,18 +187,18 @@
                 }
                 
                 /* Remove pseudo-elements that inject icons */
-                .o_project_switcher .dropdown-menu .dropdown-item::before,
+                <!-- .o_project_switcher .dropdown-menu .dropdown-item::before,
                 .o_project_switcher .dropdown-menu .dropdown-item::after {
                     display: none !important;
                     content: none !important;
-                }
+                } -->
                 
                 /* Remove any theme-injected icons */
-                .o_project_switcher .dropdown-menu .dropdown-item:before,
+                <!-- .o_project_switcher .dropdown-menu .dropdown-item:before,
                 .o_project_switcher .dropdown-menu .dropdown-item:after {
                     display: none !important;
                     content: none !important;
-                }
+                } -->
                 
                 /* Clean up dropdown items */
                 
@@ -236,16 +236,17 @@
                     color: #333;
                     text-decoration: none;
                     border: none;
-                    background: none;
+                    <!-- background: none; -->
                     width: 100%;
                     cursor: pointer;
                     gap: 16px;
                     min-height: 40px;
+                    color: transparent;
                 }
                 
                 .o_project_switcher .dropdown-menu .dropdown-item:hover {
-                    background-color: #f8f9fa;
-                    color: #333;
+                    <!-- background-color: #f8f9fa; -->
+                    <!-- color: #333; -->
                 }
                 
                 .o_project_switcher .dropdown-menu .project-name {
@@ -412,7 +413,7 @@
                                 
                                 // Add "All Projects" option
                                 projectList.append(
-                                    '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                                    '<a href="#" class=" o_project_item active" data-project-id="0">' +
                                     '<span class="fa fa-folder-o"></span>All Projects</a>'
                                 );
                                 
@@ -422,7 +423,7 @@
                                     result.forEach(function(project) {
                                         console.log('Adding real project:', project.name, 'ID:', project.id);
                                         projectList.append(
-                                            '<a href="#" class="dropdown-item o_project_item" data-project-id="' + project.id + '">' +
+                                            '<a href="#" class=" o_project_item" data-project-id="' + project.id + '">' +
                                             '<span class="fa fa-folder"></span>' + project.name + '</a>'
                                         );
                                     });
@@ -430,11 +431,11 @@
                                     console.log('No real projects found, adding sample projects');
                                     // Add some sample projects for testing
                                     projectList.append(
-                                        '<a href="#" class="dropdown-item o_project_item" data-project-id="1">' +
+                                        '<a href="#" class=" o_project_item" data-project-id="1">' +
                                         '<span class="fa fa-folder"></span>Sample Project 1</a>'
                                     );
                                     projectList.append(
-                                        '<a href="#" class="dropdown-item o_project_item" data-project-id="2">' +
+                                        '<a href="#" class=" o_project_item" data-project-id="2">' +
                                         '<span class="fa fa-folder"></span>Sample Project 2</a>'
                                     );
                                 }
@@ -474,7 +475,7 @@
                             
                             // Add "All Projects" option
                             projectList.append(
-                                '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                                '<a href="#" class=" o_project_item active" data-project-id="0">' +
                                 '<span class="fa fa-folder-o"></span>All Projects</a>'
                             );
                             
@@ -487,7 +488,7 @@
                                     if (projectName && projectName !== '') {
                                         console.log('Found project from list:', projectName, 'ID:', projectId);
                                         projectList.append(
-                                            '<a href="#" class="dropdown-item o_project_item" data-project-id="' + projectId + '">' +
+                                            '<a href="#" class=" o_project_item" data-project-id="' + projectId + '">' +
                                             '<span class="fa fa-folder"></span>' + projectName + '</a>'
                                         );
                                     }
@@ -507,15 +508,15 @@
                         var projectList = $('.o_project_list');
                         projectList.empty();
                         projectList.append(
-                            '<a href="#" class="dropdown-item o_project_item active" data-project-id="0">' +
+                            '<a href="#" class=" o_project_item active" data-project-id="0">' +
                             '<span class="fa fa-folder-o"></span>All Projects</a>'
                         );
                         projectList.append(
-                            '<a href="#" class="dropdown-item o_project_item" data-project-id="1">' +
+                            '<a href="#" class=" o_project_item" data-project-id="1">' +
                             '<span class="fa fa-folder"></span>Sample Project 1</a>'
                         );
                         projectList.append(
-                            '<a href="#" class="dropdown-item o_project_item" data-project-id="2">' +
+                            '<a href="#" class=" o_project_item" data-project-id="2">' +
                             '<span class="fa fa-folder"></span>Sample Project 2</a>'
                         );
                     }

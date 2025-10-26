@@ -20,6 +20,7 @@ from . import stage5_collector_approval
 from . import stage8_section19
 from . import stage9_section21
 from . import stage9_section23
+from . import rate_master
 
 
 

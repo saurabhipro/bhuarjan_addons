@@ -11,6 +11,7 @@
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
+        'data/land_type_data.xml',
         'templates/website.xml',
         'data/chhattisgarh_districts_data.xml',
         'data/raigarh_sub_division_data.xml',
@@ -49,6 +50,7 @@
         'views/stage8_section19_views.xml',
         'views/stage9_section21_views.xml',
         'views/stage9_section23_views.xml',
+        'views/rate_master_views.xml',
         'reports/notification4_report.xml',
         'views/menuitem.xml',
         'static/src/xml/project_switcher.xml',
@@ -58,6 +60,7 @@
         'web.assets_backend': [
             'bhuarjan/static/src/css/menu_styling.css',
             'bhuarjan/static/src/css/menu_icons.css',
+            'bhuarjan/static/src/css/rate_master_form.css',
         ],
     },
     'installable': True,

@@ -196,3 +196,19 @@
     color: #e91e63;
 }
 
+/* Land Types */
+.o_menu_item[data-menu-xmlid*="menu_bhu_land_type"]::before {
+    content: "🏞️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #4caf50;
+}
+
+/* Rate Master */
+.o_menu_item[data-menu-xmlid*="menu_bhu_rate_master"]::before {
+    content: "💰";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #ff9800;
+}
+

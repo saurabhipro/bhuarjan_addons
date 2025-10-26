@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Land Types Master Data -->
+        <record id="land_type_agricultural" model="bhu.land.type">
+            <field name="code">AGR</field>
+            <field name="name">Agricultural Land</field>
+            <field name="description">Land used for agricultural purposes including crop cultivation</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_residential" model="bhu.land.type">
+            <field name="code">RES</field>
+            <field name="name">Residential Land</field>
+            <field name="description">Land designated for residential construction and housing</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_commercial" model="bhu.land.type">
+            <field name="code">COM</field>
+            <field name="name">Commercial Land</field>
+            <field name="description">Land used for commercial activities and business purposes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_industrial" model="bhu.land.type">
+            <field name="code">IND</field>
+            <field name="name">Industrial Land</field>
+            <field name="description">Land designated for industrial development and manufacturing</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_forest" model="bhu.land.type">
+            <field name="code">FOR</field>
+            <field name="name">Forest Land</field>
+            <field name="description">Land covered with forests and natural vegetation</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_wasteland" model="bhu.land.type">
+            <field name="code">WAS</field>
+            <field name="name">Wasteland</field>
+            <field name="description">Unproductive or unused land that may be reclaimed</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_grazing" model="bhu.land.type">
+            <field name="code">GRA</field>
+            <field name="name">Grazing Land</field>
+            <field name="description">Land used for grazing livestock and animals</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_water_body" model="bhu.land.type">
+            <field name="code">WAT</field>
+            <field name="name">Water Body</field>
+            <field name="description">Land covered with water bodies like ponds, lakes, rivers</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_public" model="bhu.land.type">
+            <field name="code">PUB</field>
+            <field name="name">Public Land</field>
+            <field name="description">Land owned by government for public use and infrastructure</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="land_type_mixed" model="bhu.land.type">
+            <field name="code">MIX</field>
+            <field name="name">Mixed Use Land</field>
+            <field name="description">Land used for multiple purposes like residential and commercial</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

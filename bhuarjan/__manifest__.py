@@ -50,7 +50,6 @@
         'views/stage9_section21_views.xml',
         'views/stage9_section23_views.xml',
         'reports/notification4_report.xml',
-        'views/bhu_menu.xml',
         'views/menuitem.xml',
         'static/src/xml/project_switcher.xml',
         'static/src/xml/menu_assets.xml',

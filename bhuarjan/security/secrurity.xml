@@ -117,6 +117,13 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 
+        <record id="record_bhu_survey_company_rule" model="ir.rule">
+            <field name="name">Admin can filter company and check company wise data.</field>
+            <field name="model_id" ref="model_bhu_survey"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
         <record id="record_bhu_district_rule_admin" model="ir.rule">
             <field name="name">Company: Admin can see all data</field>
             <field name="model_id" ref="model_bhu_district"/>

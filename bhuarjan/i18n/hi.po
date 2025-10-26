@@ -1108,7 +1108,7 @@ msgstr "Basic Information / मूल जानकारी"
 #: model_terms:ir.ui.view,arch_db:bhuarjan.res_users_bhuarjan_view_form_inherit
 #: model_terms:ir.ui.view,arch_db:bhuarjan.res_users_view_form_inherit
 msgid "Bhuarjan"
-msgstr "Bhuarjan"
+msgstr "भूअर्जन"
 
 #. module: bhuarjan
 #: model:ir.module.category,description:bhuarjan.module_category_bhuarjan_bhuarjan
@@ -1216,7 +1216,7 @@ msgstr "Circle / circle"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_circle
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_circles
 msgid "Circles"
-msgstr "Circles"
+msgstr "मंडलियां"
 
 #. module: bhuarjan
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_district__circle_ids
@@ -1616,7 +1616,7 @@ msgstr "Department Name"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_departments
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_bhu_department_list
 msgid "Departments"
-msgstr "Departments"
+msgstr "विभाग"
 
 #. module: bhuarjan
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_department__description
@@ -1756,7 +1756,7 @@ msgstr "District with Company"
 #: model_terms:ir.ui.view,arch_db:bhuarjan.bhu_district_view_list
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_district_company_list
 msgid "Districts"
-msgstr "Districts"
+msgstr "जिलों"
 
 #. module: bhuarjan
 #. odoo-python
@@ -2622,7 +2622,7 @@ msgstr "Landowner Name / भूमिस्वामी का नाम"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_landowner
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_landowners
 msgid "Landowners"
-msgstr "Landowners"
+msgstr "भूमिस्वामी"
 
 #. module: bhuarjan
 #: model:ir.actions.act_window,name:bhuarjan.action_bhu_landowner
@@ -2778,7 +2778,7 @@ msgstr "Mark as Paid"
 #. module: bhuarjan
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_master
 msgid "Master Data"
-msgstr "Master Data"
+msgstr "मास्टर डेटा"
 
 #. module: bhuarjan
 #: model:ir.model.fields.selection,name:bhuarjan.selection__bhu_stage4_expert_review__environmental_impact__medium
@@ -3667,7 +3667,7 @@ msgstr "Procedure / प्रक्रिया"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_process
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_post_award_payment_form
 msgid "Process"
-msgstr "Process"
+msgstr "प्रक्रिया"
 
 #. module: bhuarjan
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_post_award_payment_search
@@ -3748,7 +3748,7 @@ msgstr "Project Name"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_projects
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_bhu_project_list
 msgid "Projects"
-msgstr "Projects"
+msgstr "परियोजना"
 
 #. module: bhuarjan
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_bhu_notification4_form
@@ -4676,7 +4676,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_sub_division__name
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_sub_division
 msgid "Sub Division"
-msgstr "Sub Division"
+msgstr "उप प्रभाग"
 
 #. module: bhuarjan
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_circle__sub_division_id
@@ -4770,12 +4770,27 @@ msgstr "Supporting Evidence"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_survey
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_payment_reconciliation_search
 msgid "Survey"
-msgstr "Survey"
+msgstr "सर्वे"
 
 #. module: bhuarjan
 #: model:ir.model,name:bhuarjan.model_bhu_survey
 msgid "Survey (सर्वे)"
 msgstr "Survey (सर्वे)"
+
+#. module: bhuarjan
+#: model:ir.model.fields,field_description:bhuarjan.field_bhu_survey_line__survey_id
+#: model:ir.ui.menu,name:bhuarjan.menu_bhu_land_type
+#: model_terms:ir.ui.view,arch_db:bhuarjan.view_payment_reconciliation_search
+msgid "Land Types"
+msgstr "भूमि के प्रकार"
+
+#. module: bhuarjan
+#: model:ir.model.fields,field_description:bhuarjan.field_bhu_survey_line__survey_id
+#: model:ir.ui.menu,name:bhuarjan.menu_bhu_rate_master
+#: model_terms:ir.ui.view,arch_db:bhuarjan.view_payment_reconciliation_search
+msgid "Rate Master"
+msgstr "रेट मास्टर"
+
 
 #. module: bhuarjan
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_payment_reconciliation__survey_id
@@ -4892,7 +4907,7 @@ msgstr "Survey submitted for approval by %s"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_surveys
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_bhu_landowner_form
 msgid "Surveys"
-msgstr "Surveys"
+msgstr "सर्वे"
 
 #. module: bhuarjan
 #: model:ir.actions.act_window,name:bhuarjan.action_bhu_survey
@@ -4987,7 +5002,7 @@ msgstr "Tehsil Name / तहसील का नाम"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_tehsil
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_tehsils
 msgid "Tehsils"
-msgstr "Tehsils"
+msgstr "तहसीलs"
 
 #. module: bhuarjan
 #: model:ir.actions.act_window,name:bhuarjan.action_bhu_tehsil
@@ -5237,7 +5252,7 @@ msgstr "User Group"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_users
 #: model_terms:ir.ui.view,arch_db:bhuarjan.res_users_bhuarjan_view_form_inherit
 msgid "Users"
-msgstr "Users"
+msgstr "एप्लिकेशन उपयोगकर्ता"
 
 #. module: bhuarjan
 #: model:ir.model.fields,field_description:bhuarjan.field_bhu_village_line__village_domain
@@ -5299,7 +5314,7 @@ msgstr "Village Name / ग्राम का नाम"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_village
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_villages
 msgid "Villages"
-msgstr "Villages"
+msgstr "ग्राम"
 
 #. module: bhuarjan
 #: model:ir.actions.act_window,name:bhuarjan.action_bhu_village

@@ -10,6 +10,9 @@ access_bhu_department_user,bhu.department.model_access,model_bhu_department,base
 access_bhu_survey_user,bhu.survey.model_access,model_bhu_survey,base.group_user,1,1,1,1
 access_bhu_survey_line_user,bhu.survey.line.model_access,model_bhu_survey_line,base.group_user,1,1,1,1
 access_bhu_landowner_user,bhu.landowner.model_access,model_bhu_landowner,base.group_user,1,1,1,1
+access_bhu_stage8_section19,access_bhu_stage8_section19,model_bhu_stage8_section19,base.group_user,1,1,1,1
+access_bhu_stage9_section21,access_bhu_stage9_section21,model_bhu_stage9_section21,base.group_user,1,1,1,1
+access_bhu_stage9_section23,access_bhu_stage9_section23,model_bhu_stage9_section23,base.group_user,1,1,1,1
 
 
 

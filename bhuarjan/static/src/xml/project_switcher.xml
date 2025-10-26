@@ -215,8 +215,8 @@
                 
                 /* Clean dropdown menu styles - no wildcards */
                 .o_project_switcher .dropdown-menu {
-                    min-width: 180px;
-                    max-width: 250px;
+                    min-width: 220px;
+                    max-width: 300px;
                     max-height: 200px;
                     overflow-y: auto;
                     background: white;
@@ -226,19 +226,21 @@
                     position: absolute;
                     z-index: 9999;
                     display: none;
-                    padding: 4px 0;
+                    padding: 6px 0;
                 }
                 
                 .o_project_switcher .dropdown-menu .dropdown-item {
                     display: flex !important;
                     align-items: center;
-                    padding: 6px 12px;
+                    padding: 10px 20px;
                     color: #333;
                     text-decoration: none;
                     border: none;
                     background: none;
                     width: 100%;
                     cursor: pointer;
+                    gap: 16px;
+                    min-height: 40px;
                 }
                 
                 .o_project_switcher .dropdown-menu .dropdown-item:hover {
@@ -249,12 +251,19 @@
                 .o_project_switcher .dropdown-menu .project-name {
                     color: #333;
                     flex: 1;
+                    padding-left: 8px;
+                    line-height: 1.4;
+                    font-size: 14px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 
                 .o_project_switcher .dropdown-menu input[type="checkbox"] {
-                    margin-right: 8px;
-                    width: 14px;
-                    height: 14px;
+                    margin-right: 16px;
+                    width: 18px;
+                    height: 18px;
+                    flex-shrink: 0;
                 }
                 
                         /* Project Info Display Styles */

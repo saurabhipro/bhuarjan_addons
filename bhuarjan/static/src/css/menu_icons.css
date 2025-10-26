@@ -1,0 +1,198 @@
+/* Bhuarjan Menu Icons - CSS-based icons using Unicode symbols */
+
+/* Ensure icons are displayed properly */
+.o_menu_item[data-menu-xmlid*="menu_bhu_"]::before {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Process Menu Icons - Stage-specific icons with colors */
+
+/* Stage 2 Section 4 Notification */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage2_section4"]::before {
+    content: "📢";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #2196f3;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 3 Section 4(1) Jansunwai & SIA */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage3_section4_1"]::before {
+    content: "👥";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #ff9800;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 4 Section 7 Expert Group Review */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage4_section7"]::before {
+    content: "👨‍🔬";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #9c27b0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 5 Section 8 Collector Approval */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage5_section8"]::before {
+    content: "✅";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #4caf50;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 6 Section 11 Notification */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage6_section11"]::before {
+    content: "🔔";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #00bcd4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 7 Section 15 Objections */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage7_section15"]::before {
+    content: "⚠️";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #f44336;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 8 Section 19 Declaration of Award */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage8_section19"]::before {
+    content: "🏆";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #ffc107;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 9 Section 21 Notice to Owner for Award */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage9_section21"]::before {
+    content: "📋";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #00bcd4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stage 9 Section 23 Award Order */
+.o_menu_item[data-menu-xmlid*="menu_bhu_stage9_section23"]::before {
+    content: "📄";
+    font-size: 18px;
+    margin-right: 10px;
+    color: #607d8b;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Surveys */
+.o_menu_item[data-menu-xmlid*="menu_bhu_surveys"]::before {
+    content: "📊";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #9c27b0;
+}
+
+/* Survey */
+.o_menu_item[data-menu-xmlid*="menu_bhu_survey"]::before {
+    content: "📝";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #9c27b0;
+}
+
+/* Master Data */
+.o_menu_item[data-menu-xmlid*="menu_bhu_master"]::before {
+    content: "🗄️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #ff9800;
+}
+
+/* Departments */
+.o_menu_item[data-menu-xmlid*="menu_bhu_department"]::before {
+    content: "🏢";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #2196f3;
+}
+
+/* Projects */
+.o_menu_item[data-menu-xmlid*="menu_bhu_project"]::before {
+    content: "📁";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #4caf50;
+}
+
+/* Districts */
+.o_menu_item[data-menu-xmlid*="menu_bhu_district"]::before {
+    content: "🗺️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #00bcd4;
+}
+
+/* Sub Division */
+.o_menu_item[data-menu-xmlid*="menu_bhu_sub_division"]::before {
+    content: "📍";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #ff5722;
+}
+
+/* Tehsils */
+.o_menu_item[data-menu-xmlid*="menu_bhu_tehsil"]::before {
+    content: "🏘️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #795548;
+}
+
+/* Circles */
+.o_menu_item[data-menu-xmlid*="menu_bhu_circle"]::before {
+    content: "⭕";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #9e9e9e;
+}
+
+/* Villages */
+.o_menu_item[data-menu-xmlid*="menu_bhu_village"]::before {
+    content: "🏘️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #8bc34a;
+}
+
+/* Landowners */
+.o_menu_item[data-menu-xmlid*="menu_bhu_landowner"]::before {
+    content: "👨‍🌾";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #009688;
+}
+
+/* Process */
+.o_menu_item[data-menu-xmlid*="menu_bhu_process"]::before {
+    content: "⚙️";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #4caf50;
+}
+
+/* Users */
+.o_menu_item[data-menu-xmlid*="menu_bhu_users"]::before {
+    content: "👥";
+    font-size: 16px;
+    margin-right: 8px;
+    color: #e91e63;
+}
+

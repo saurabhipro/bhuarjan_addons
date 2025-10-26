@@ -50,5 +50,35 @@
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
         </record>
+        
+        <!-- Sequence for Stage 8 Section 19 Numbers -->
+        <record id="seq_bhu_stage8_section19" model="ir.sequence">
+            <field name="name">Stage 8 Section 19 Number</field>
+            <field name="code">bhu.stage8.section19</field>
+            <field name="prefix">STG8-S19-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Stage 9 Section 21 Numbers -->
+        <record id="seq_bhu_stage9_section21" model="ir.sequence">
+            <field name="name">Stage 9 Section 21 Number</field>
+            <field name="code">bhu.stage9.section21</field>
+            <field name="prefix">STG9-S21-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Stage 9 Section 23 Numbers -->
+        <record id="seq_bhu_stage9_section23" model="ir.sequence">
+            <field name="name">Stage 9 Section 23 Number</field>
+            <field name="code">bhu.stage9.section23</field>
+            <field name="prefix">STG9-S23-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
     </data>
 </odoo>

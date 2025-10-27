@@ -68,6 +68,10 @@
             'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',
         ],
+        'web.assets_frontend': [
+            'bhuarjan/static/src/css/menu_styling.css',
+            'bhuarjan/static/src/css/menu_icons.css',
+        ],
     },
     'installable': True,
     'application': True,

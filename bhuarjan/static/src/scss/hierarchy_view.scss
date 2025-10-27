@@ -107,6 +107,33 @@
     background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
 }
 
+/* IAS role styling - Red color */
+.o_hierarchy_node[data-role="ias"] {
+    border-top: 3px solid #dc3545;
+}
+
+.o_hierarchy_node[data-role="ias"] .o_hierarchy_node_header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+/* IAS COLLECTOR role styling - Red color */
+.o_hierarchy_node[data-role="ias collector"] {
+    border-top: 3px solid #dc3545;
+}
+
+.o_hierarchy_node[data-role="ias collector"] .o_hierarchy_node_header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+/* IAS role styling for any role containing "IAS" */
+.o_hierarchy_node[data-role*="ias"] {
+    border-top: 3px solid #dc3545;
+}
+
+.o_hierarchy_node[data-role*="ias"] .o_hierarchy_node_header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
 .o_hierarchy_node_header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;

@@ -200,7 +200,7 @@
     <field name="name">res.users.hierarchy.view.bhuarjan</field>
     <field name="model">res.users</field>
     <field name="arch" type="xml">
-        <hierarchy child_field="child_ids" icon="fa-sitemap" layout="horizontal">
+        <hierarchy child_field="child_ids" icon="fa-sitemap">
                <field name="name"/>
                <field name="login"/>
                <field name="parent_id"/>

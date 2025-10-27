@@ -200,7 +200,7 @@
     <field name="name">res.users.hierarchy.view.bhuarjan</field>
     <field name="model">res.users</field>
     <field name="arch" type="xml">
-        <hierarchy child_field="child_ids" icon="fa-sitemap">
+        <hierarchy child_field="child_ids" icon="fa-sitemap" layout="horizontal">
                <field name="name"/>
                <field name="login"/>
                <field name="parent_id"/>
@@ -227,8 +227,8 @@
                                <i class="fa fa-users me-1"></i>
                                <span t-esc="child_ids.length"></span>
                            </div>
-                           <div class="fold-button">
-                               <i class="fa fa-chevron-down"></i>
+                           <div class="expand-all-btn" onclick="expandAllNodes()">
+                               <i class="fa fa-expand"></i>
                            </div>
                        </div>
                    </t>

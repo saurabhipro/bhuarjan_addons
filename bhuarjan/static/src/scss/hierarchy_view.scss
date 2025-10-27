@@ -1,25 +1,48 @@
-/* Compact Organizational Chart with Better Connections */
+/* Horizontal PowerPoint-Style Organizational Chart */
 
 .o_hierarchy_view {
     background: #f8f9fa;
     min-height: 100vh;
-    padding: 15px;
+    padding: 10px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: auto;
+}
+
+/* Horizontal layout support */
+.o_hierarchy_view .o_hierarchy_row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.o_hierarchy_view .o_hierarchy_level {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .o_hierarchy_node {
     background: white;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    margin: 5px;
+    margin: 2px;
     transition: all 0.3s ease;
     border: none;
     overflow: hidden;
     position: relative;
-    width: 160px;
-    min-height: 120px;
+    width: 150px;
+    min-height: 110px;
     display: inline-block;
     vertical-align: top;
+    flex-shrink: 0;
 }
 
 .o_hierarchy_node:hover {
@@ -87,10 +110,10 @@
 .o_hierarchy_node_header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 12px 8px;
+    padding: 10px 6px;
     text-align: center;
     position: relative;
-    min-height: 90px;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -99,12 +122,12 @@
 
 .o_hierarchy_node_footer {
     background: white;
-    padding: 6px 8px;
+    padding: 4px 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #e9ecef;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .subordinate-count {
@@ -112,69 +135,90 @@
     font-weight: 500;
 }
 
-.fold-button {
-    color: #6c757d;
+/* Make expand all button more visible */
+.expand-all-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
     cursor: pointer;
-    padding: 2px;
+    border: none;
+    min-width: 20px;
+    text-align: center;
 }
 
-.fold-button:hover {
-    color: #495057;
+.expand-all-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* Avatar styling */
 .o_hierarchy_node_header .fa-user-circle {
-    font-size: 2rem !important;
-    margin-bottom: 6px;
+    font-size: 1.8rem !important;
+    margin-bottom: 4px;
     opacity: 0.9;
 }
 
 /* Name styling */
 .o_hierarchy_node_header .fw-bold {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     color: white;
     line-height: 1.1;
 }
 
 /* Badge styling */
 .badge {
-    font-size: 0.6rem;
-    padding: 3px 6px;
-    border-radius: 8px;
+    font-size: 0.55rem;
+    padding: 2px 5px;
+    border-radius: 6px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Improved connection lines */
+/* Horizontal connection lines */
 .o_hierarchy_connector {
     stroke: #6c757d;
-    stroke-width: 2;
+    stroke-width: 1.5;
     fill: none;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .o_hierarchy_connector:hover {
     stroke: #495057;
-    stroke-width: 3;
+    stroke-width: 2;
     opacity: 1;
 }
 
-/* Better line connections */
+/* Direct line connections for horizontal layout */
 .o_hierarchy_view .o_hierarchy_connector_line {
     stroke: #6c757d;
-    stroke-width: 2;
+    stroke-width: 1.5;
     fill: none;
+    opacity: 0.7;
 }
 
 .o_hierarchy_view .o_hierarchy_connector_line:hover {
     stroke: #495057;
-    stroke-width: 3;
+    stroke-width: 2;
+    opacity: 1;
+}
+
+/* Remove umbrella-style connections */
+.o_hierarchy_view .o_hierarchy_connector_umbrella {
+    display: none;
 }
 
 /* Status indicators */
@@ -185,10 +229,10 @@
 .o_hierarchy_node[data-status="active"]::after {
     content: '';
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
     background-color: #27ae60;
     border-radius: 50%;
     border: 1px solid white;
@@ -201,34 +245,66 @@
 .o_hierarchy_node[data-status="inactive"]::after {
     content: '';
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
     background-color: #e74c3c;
     border-radius: 50%;
     border: 1px solid white;
 }
 
+/* Global Expand All Button */
+.o_hierarchy_view .o_hierarchy_toolbar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.o_hierarchy_view .o_hierarchy_toolbar .btn-expand-all {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.o_hierarchy_view .o_hierarchy_toolbar .btn-expand-all:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .o_hierarchy_view {
-        padding: 8px;
+        padding: 5px;
     }
     
     .o_hierarchy_node {
         width: 100%;
-        margin: 4px 0;
-        max-width: 200px;
+        margin: 2px 0;
+        max-width: 180px;
     }
     
     .o_hierarchy_node_header {
-        padding: 10px;
-        min-height: 80px;
+        padding: 8px;
+        min-height: 70px;
     }
     
     .o_hierarchy_node_header .fa-user-circle {
-        font-size: 1.8rem !important;
+        font-size: 1.5rem !important;
+    }
+    
+    .o_hierarchy_view .o_hierarchy_row {
+        flex-direction: column;
+        align-items: center;
     }
 }
 
@@ -236,7 +312,7 @@
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
@@ -245,7 +321,7 @@
 }
 
 .o_hierarchy_node {
-    animation: fadeInUp 0.4s ease-out;
+    animation: fadeInUp 0.3s ease-out;
 }
 
 /* Custom scrollbar */
@@ -255,17 +331,17 @@
 }
 
 .o_hierarchy_view .o_content::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .o_hierarchy_view .o_content::-webkit-scrollbar-track {
     background: #f8f9fa;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .o_hierarchy_view .o_content::-webkit-scrollbar-thumb {
     background: #bdc3c7;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .o_hierarchy_view .o_content::-webkit-scrollbar-thumb:hover {

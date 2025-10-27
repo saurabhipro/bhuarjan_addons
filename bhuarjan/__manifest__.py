@@ -63,6 +63,7 @@
             'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
+            'bhuarjan/static/src/js/hierarchy_expand.js',
         ],
     },
     'installable': True,

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dashboard_menu,access.dashboard.menu,model_dashboard_menu,base.group_user,1,1,1,1
+access_dashboard_theme,access.dashboard.theme,model_dashboard_theme,base.group_user,1,1,1,1
+access_dashboard_mail,access.dashboard.mail,model_dashboard_mail,base.group_user,1,1,1,1
+access_dashboard_kpi,access.dashboard.kpi,model_dashboard_kpi,base.group_user,1,1,1,1
+access_kpi_functions,access.kpi.functions,model_kpi_functions,base.group_user,1,1,1,1
+
+
+access_dashboard_block_officer,dashboard.block officer,model_dashboard_block,odoo_dynamic_dashboard.group_dashboard_officer,1,1,1,1
+access_dashboard_block_user,dashboard.block user,model_dashboard_block,odoo_dynamic_dashboard.group_dashboard_user,1,1,0,0
+

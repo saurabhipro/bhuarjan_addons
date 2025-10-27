@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record model="ir.module.category" id="module_category_odoo_dynamic_dashboard">
+        <field name="name">Dynamic Dashboard</field>
+        <field name="sequence">45</field>
+    </record>
+
+    <record id="group_dashboard_officer" model="res.groups">
+        <field name="name">Officer</field>
+        <field name="category_id" ref="module_category_odoo_dynamic_dashboard"/> 
+    </record>
+
+    <record id="group_dashboard_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_odoo_dynamic_dashboard"/>
+    </record>
+</odoo>

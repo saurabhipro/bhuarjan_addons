@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t t-name="odoo_dynamic_dashboard.ListView.Buttons" t-inherit="web.ListView.Buttons" t-inherit-mode="primary">
+    <!-- Remove default Save/Discard buttons when using custom select footer -->
+    <xpath expr="//div[@t-if='props.showButtons']" position="replace">
+            <button
+                type="button"
+                class="btn btn-primary remvoe_from_head"
+                t-on-click="onClickCustomSelect">
+                Save Selected
+            </button>
+    </xpath>
+</t>

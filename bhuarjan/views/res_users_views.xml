@@ -211,50 +211,24 @@
                <field name="active"/>
                <templates>
                    <t t-name="hierarchy-box">
-                       <div class="o_hierarchy_node_header d-flex justify-content-between align-items-center p-3" t-att-data-role="bhuarjan_role">
-                           <div class="d-flex align-items-center">
-                               <div class="me-3">
-                                   <i class="fa fa-user-circle fa-2x" t-att-class="'text-' + (bhuarjan_role == 'administrator' ? 'danger' : bhuarjan_role == 'collector' ? 'warning' : bhuarjan_role == 'sdm' ? 'info' : bhuarjan_role == 'tahsildar' ? 'success' : bhuarjan_role == 'nayab_tahsildar' ? 'primary' : bhuarjan_role == 'revenue_inspector' ? 'secondary' : bhuarjan_role == 'patwari' ? 'dark' : 'muted')"></i>
+                       <div class="o_hierarchy_node_header" t-att-data-role="bhuarjan_role">
+                           <div class="text-center">
+                               <i class="fa fa-user-circle fa-2x"></i>
+                               <div class="fw-bold mt-1">
+                                   <field name="name"/>
                                </div>
-                               <div>
-                                   <div class="fw-bold text-dark mb-1">
-                                       <field name="name"/>
-                                   </div>
-                                   <div class="text-muted small mb-1">
-                                       <field name="login"/>
-                                   </div>
-                                   <div class="badge" t-att-class="'badge-' + (bhuarjan_role == 'administrator' ? 'danger' : bhuarjan_role == 'collector' ? 'warning' : bhuarjan_role == 'sdm' ? 'info' : bhuarjan_role == 'tahsildar' ? 'success' : bhuarjan_role == 'nayab_tahsildar' ? 'primary' : bhuarjan_role == 'revenue_inspector' ? 'secondary' : bhuarjan_role == 'patwari' ? 'dark' : 'muted')">
-                                       <field name="bhuarjan_role"/>
-                                   </div>
-                               </div>
-                           </div>
-                           <div class="text-end">
-                               <div class="text-success small mb-1">
-                                   <i class="fa fa-map-marker me-1"></i>
-                                   <field name="state_id"/>
-                               </div>
-                               <div class="text-muted small">
-                                   <i class="fa fa-phone me-1"></i>
-                                   <field name="mobile"/>
+                               <div class="badge mt-1">
+                                   <field name="bhuarjan_role"/>
                                </div>
                            </div>
                        </div>
-                       <div class="o_hierarchy_node_body p-2 bg-light">
-                           <div class="row text-center">
-                               <div class="col-6">
-                                   <small class="text-muted">District</small>
-                                   <div class="fw-bold">
-                                       <field name="district_id"/>
-                                   </div>
-                               </div>
-                               <div class="col-6">
-                                   <small class="text-muted">Status</small>
-                                   <div>
-                                       <span class="badge" t-att-class="active ? 'badge-success' : 'badge-danger'">
-                                           <field name="active"/>
-                                       </span>
-                                   </div>
-                               </div>
+                       <div class="o_hierarchy_node_footer">
+                           <div class="subordinate-count" t-if="child_ids and child_ids.length > 0">
+                               <i class="fa fa-users me-1"></i>
+                               <span t-esc="child_ids.length"></span>
+                           </div>
+                           <div class="fold-button">
+                               <i class="fa fa-chevron-down"></i>
                            </div>
                        </div>
                    </t>

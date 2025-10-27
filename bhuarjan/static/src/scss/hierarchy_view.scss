@@ -1,5 +1,5 @@
-/* Horizontal PowerPoint-Style Organizational Chart */
 
+/* Horizontal PowerPoint-Style Organizational Chart */
 .o_hierarchy_view {
     background: #f8f9fa;
     min-height: 100vh;
@@ -367,4 +367,12 @@
 
 .o_hierarchy_view .o_content::-webkit-scrollbar-thumb:hover {
     background: #95a5a6;
+}
+
+/* Reduce hierarchy row height */
+.o_hierarchy_row {
+    padding-top: 0.25rem !important; /* Reduce from pt-3 */
+    margin-bottom: 0.25rem !important; /* Reduce space between rows */
+    gap: 0.25rem !important; /* Reduce gap between cards */
+    min-height: auto !important; /* Remove minimum height */
 }

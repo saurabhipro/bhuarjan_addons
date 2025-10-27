@@ -145,45 +145,39 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-.o_hierarchy_node_footer {
-    background: white;
-    padding: 4px 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #e9ecef;
-    font-size: 0.7rem;
-}
-
-.subordinate-count {
-    color: #6c757d;
-    font-weight: 500;
-}
-
-/* Make expand all button more visible */
-.expand-all-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 0.6rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
     cursor: pointer;
-    border: none;
-    min-width: 20px;
-    text-align: center;
 }
 
-.expand-all-btn:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+/* Fold/Unfold icon in header */
+.fold-unfold-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.fold-unfold-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.fold-unfold-icon i {
+    font-size: 0.7rem;
+    color: white;
+}
+
+/* Hide footer completely */
+.o_hierarchy_node_footer {
+    display: none !important;
 }
 
 /* Avatar styling */

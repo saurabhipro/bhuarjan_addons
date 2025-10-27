@@ -211,24 +211,19 @@
                <field name="active"/>
                <templates>
                    <t t-name="hierarchy-box">
-                       <div class="o_hierarchy_node_header" t-att-data-role="bhuarjan_role">
+                       <div class="o_hierarchy_node_header" t-att-data-role="bhuarjan_role" 
+                            t-att-title="'Name: ' + name + '\nRole: ' + (bhuarjan_role or 'No Role') + '\nLogin: ' + (login or 'No Login') + '\nState: ' + (state_id and state_id.name or 'No State') + '\nDistrict: ' + (district_id and district_id.name or 'No District') + '\nMobile: ' + (mobile or 'No Mobile') + '\nStatus: ' + (active and 'Active' or 'Inactive') + '\nSubordinates: ' + (child_ids and child_ids.length or 0)">
+                           <div class="fold-unfold-icon" t-if="child_ids and child_ids.length > 0">
+                               <i class="fa fa-chevron-down"></i>
+                           </div>
                            <div class="text-center">
-                               <i class="fa fa-user-circle fa-2x"></i>
-                               <div class="fw-bold mt-1">
+                               <i class="fa fa-user-circle fa-lg"></i>
+                               <div class="fw-bold">
                                    <field name="name"/>
                                </div>
-                               <div class="badge mt-1">
+                               <div class="badge">
                                    <field name="bhuarjan_role"/>
                                </div>
-                           </div>
-                       </div>
-                       <div class="o_hierarchy_node_footer">
-                           <div class="subordinate-count" t-if="child_ids and child_ids.length > 0">
-                               <i class="fa fa-users me-1"></i>
-                               <span t-esc="child_ids.length"></span>
-                           </div>
-                           <div class="expand-all-btn" onclick="expandAllNodes()">
-                               <i class="fa fa-expand"></i>
                            </div>
                        </div>
                    </t>

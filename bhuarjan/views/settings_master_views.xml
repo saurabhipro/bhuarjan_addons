@@ -72,7 +72,7 @@
                         <group>
                             <group>
                                 <field name="project_id" readonly="1"/>
-                                <field name="prefix" placeholder="e.g., SUR_"/>
+                                <field name="prefix" placeholder="e.g., SC_{bhu.project.code}_"/>
                                 <field name="initial_sequence"/>
                             </group>
                             <group>
@@ -82,8 +82,9 @@
                         </group>
                         
                         <div class="alert alert-warning" role="alert">
-                            <strong>Example:</strong> With prefix "SUR_", initial sequence 1, and padding 4, 
-                            the first sequence number will be "SUR_0001".
+                            <strong>Example:</strong> With prefix "SC_{bhu.project.code}_", initial sequence 1, and padding 4, 
+                            the first sequence number will be "SC_RAI_0001" (where RAI is the project code).<br/>
+                            <strong>Supported placeholders:</strong> {%PROJ_CODE%}, {bhu.project.code}, {PROJ_CODE}
                         </div>
                     </sheet>
                 </form>

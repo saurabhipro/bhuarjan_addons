@@ -93,20 +93,45 @@ class Survey(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Generate automatic survey numbers for multiple records"""
+        """Generate automatic survey numbers using bhuarjan settings master"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
-                # Get project code if available
-                project_code = ''
+                # Check if project_id is available
                 if vals.get('project_id'):
                     project = self.env['bhu.project'].browse(vals['project_id'])
                     project_code = project.code or project.name or 'PROJ'
+                    
+                    # Check if sequence settings exist for survey process
+                    sequence_settings = self.env['bhuarjan.sequence.settings'].search([
+                        ('process_name', '=', 'survey'),
+                        ('project_id', '=', vals['project_id']),
+                        ('active', '=', True)
+                    ])
+                    
+                    if sequence_settings:
+                        # Generate sequence number using settings master
+                        sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                            'survey', vals['project_id']
+                        )
+                        if sequence_number:
+                            # Replace all project code placeholders with actual project code
+                            survey_number = sequence_number.replace('{%PROJ_CODE%}', project_code)
+                            survey_number = survey_number.replace('{bhu.project.code}', project_code)
+                            survey_number = survey_number.replace('{PROJ_CODE}', project_code)
+                            vals['name'] = survey_number
+                        else:
+                            # Fallback to default naming if sequence generation fails
+                            sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
+                            vals['name'] = f'SC_{project_code}_{sequence.zfill(3)}'
+                    else:
+                        # No sequence settings found, use fallback naming
+                        sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
+                        vals['name'] = f'SC_{project_code}_{sequence.zfill(3)}'
                 else:
-                    project_code = 'PROJ'
-                
-                # Get the next sequence number
-                sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
-                vals['name'] = f'{project_code}_SUR_{sequence.zfill(3)}'
+                    # No project_id, use default naming
+                    sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
+                    vals['name'] = f'SC_PROJ_{sequence.zfill(3)}'
+        
         records = super(Survey, self).create(vals_list)
         # Log creation
         for record in records:
@@ -326,3 +351,79 @@ class SurveyLine(models.Model):
         for line in self:
             if line.has_well and not line.well_type:
                 raise ValidationError(_('Well type is required when well is present for Khasra %s') % line.khasra_number)
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Override create to validate sequence settings and generate sequence number"""
+        for vals in vals_list:
+            # Get project_id from survey_id if available
+            project_id = None
+            if vals.get('survey_id'):
+                survey = self.env['bhu.survey'].browse(vals['survey_id'])
+                project_id = survey.project_id.id
+            
+            # Check if sequence settings exist for survey process
+            if project_id:
+                sequence_settings = self.env['bhuarjan.sequence.settings'].search([
+                    ('process_name', '=', 'survey'),
+                    ('project_id', '=', project_id),
+                    ('active', '=', True)
+                ])
+                
+                if not sequence_settings:
+                    raise ValidationError(_(
+                        'Sequence settings for Survey process are not defined in Settings Master for project "%s". '
+                        'Please configure sequence settings before creating surveys.'
+                    ) % self.env['bhu.project'].browse(project_id).name)
+                
+                # Generate sequence number if name is 'New'
+                if vals.get('name', 'New') == 'New':
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'survey', project_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        raise ValidationError(_(
+                            'Failed to generate sequence number for Survey process. '
+                            'Please check sequence settings configuration.'
+                        ))
+        
+        return super().create(vals_list)
+    
+    @api.model
+    def check_sequence_settings(self, project_id):
+        """Check if sequence settings are available for survey process"""
+        sequence_settings = self.env['bhuarjan.sequence.settings'].search([
+            ('process_name', '=', 'survey'),
+            ('project_id', '=', project_id),
+            ('active', '=', True)
+        ])
+        
+        if not sequence_settings:
+            project_name = self.env['bhu.project'].browse(project_id).name
+            return {
+                'available': False,
+                'message': _(
+                    'Sequence settings for Survey process are not defined in Settings Master for project "%s". '
+                    'Please configure sequence settings before creating surveys.'
+                ) % project_name
+            }
+        
+        return {
+            'available': True,
+            'message': _('Sequence settings are properly configured for Survey process.')
+        }
+    
+    @api.onchange('survey_id')
+    def _onchange_survey_id(self):
+        """Check sequence settings when survey is changed"""
+        if self.survey_id and self.survey_id.project_id:
+            sequence_check = self.check_sequence_settings(self.survey_id.project_id.id)
+            if not sequence_check['available']:
+                return {
+                    'warning': {
+                        'title': _('Sequence Settings Not Configured'),
+                        'message': sequence_check['message']
+                    }
+                }

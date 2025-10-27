@@ -21,6 +21,7 @@ from . import stage8_section19
 from . import stage9_section21
 from . import stage9_section23
 from . import rate_master
+from . import settings_master
 
 
 

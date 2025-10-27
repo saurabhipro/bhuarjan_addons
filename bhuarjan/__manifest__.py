@@ -1,6 +1,6 @@
 {
     'name' : 'Bhuarjan',
-    'version': '18.0',
+    'version': '18.0.1.0.0',
 
     'summary': 'BhoomiArjan — Land Acquisition Management System.',
     'sequence':'-1',
@@ -22,6 +22,7 @@
         'data/department_data.xml',
         'data/chhattisgarh_tehsils_data.xml',
         'data/chhattisgarh_villages_data.xml',
+        'data/settings_master_data.xml',
         'security/ir.model.access.csv',
         'security/secrurity.xml',
         'security/notification4_security.xml',
@@ -51,6 +52,7 @@
         'views/stage9_section21_views.xml',
         'views/stage9_section23_views.xml',
         'views/rate_master_views.xml',
+        'views/settings_master_views.xml',
         'reports/notification4_report.xml',
         'views/menuitem.xml',
         'static/src/xml/project_switcher.xml',
@@ -63,6 +65,7 @@
             'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
+            'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',
         ],
     },

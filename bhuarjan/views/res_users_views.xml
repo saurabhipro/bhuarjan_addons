@@ -196,41 +196,39 @@
 
 
     
-    <record id="department_details_view_hierarchy_jhg" model="ir.ui.view">
-    <field name="name">res.users.hierarchy.view.bhuarjan</field>
-    <field name="model">res.users</field>
-    <field name="arch" type="xml">
-        <hierarchy child_field="child_ids" icon="fa-sitemap">
-               <field name="name"/>
-               <field name="login"/>
-               <field name="parent_id"/>
-               <field name="bhuarjan_role"/>
-               <field name="state_id"/>
-               <field name="district_id"/>
-               <field name="mobile"/>
-               <field name="active"/>
-               <templates>
-                   <t t-name="hierarchy-box">
-                       <div class="o_hierarchy_node_header" t-att-data-role="bhuarjan_role" 
-                            t-att-title="'Name: ' + name + '\nRole: ' + (bhuarjan_role or 'No Role') + '\nLogin: ' + (login or 'No Login') + '\nState: ' + (state_id and state_id.name or 'No State') + '\nDistrict: ' + (district_id and district_id.name or 'No District') + '\nMobile: ' + (mobile or 'No Mobile') + '\nStatus: ' + (active and 'Active' or 'Inactive') + '\nSubordinates: ' + (child_ids and child_ids.length or 0)">
-                           <div class="fold-unfold-icon" t-if="child_ids and child_ids.length > 0">
-                               <i class="fa fa-chevron-down"></i>
-                           </div>
-                           <div class="text-center">
-                               <i class="fa fa-user-circle fa-lg"></i>
-                               <div class="fw-bold">
-                                   <field name="name"/>
-                               </div>
-                               <div class="badge">
-                                   <field name="bhuarjan_role"/>
-                               </div>
-                           </div>
-                       </div>
-                   </t>
-               </templates>
-           </hierarchy>
-    </field>
-</record>
+    <!-- Beautiful Organization Chart View -->
+    <record id="organization_chart_view" model="ir.ui.view">
+        <field name="name">Organization Chart View</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <hierarchy child_field="child_ids" icon="fa-sitemap" string="Organization Chart">
+                <field name="name"/>
+                <field name="bhuarjan_role"/>
+                <field name="parent_id"/>
+                <field name="child_ids"/>
+                <field name="avatar_128"/>
+                <templates>
+                    <t t-name="hierarchy-box">
+                        <div class="org-chart-card">
+                            <div class="org-chart-avatar">
+                                <img t-if="avatar_128" t-att-src="'data:image/png;base64,' + avatar_128" 
+                                     class="avatar-img" alt="Avatar"/>
+                                <i t-else="" class="fa fa-user-circle avatar-placeholder"></i>
+                            </div>
+                            <div class="org-chart-content">
+                                <div class="org-chart-name">
+                                    <field name="name"/>
+                                </div>
+                                <div class="org-chart-title">
+                                    <field name="bhuarjan_role"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </hierarchy>
+        </field>
+    </record>
 
 
     <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
@@ -238,7 +236,7 @@
             <field name="res_model">res.users</field>
             <field name="view_mode">list,form,hierarchy,kanban</field>
             <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'hierarchy', 'view_id': ref('bhuarjan.department_details_view_hierarchy_jhg')}),
+                (0, 0, {'view_mode': 'hierarchy', 'view_id': ref('bhuarjan.organization_chart_view')}),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('bhuarjan.view_bhu_res_users_kanban')}),
                 (0, 0, {'view_mode': 'list', 'view_id': ref('base.view_users_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>

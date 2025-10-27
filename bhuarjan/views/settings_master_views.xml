@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Settings Master Form View -->
+        <record id="view_bhuarjan_settings_master_form" model="ir.ui.view">
+            <field name="name">bhuarjan.settings.master.form</field>
+            <field name="model">bhuarjan.settings.master</field>
+            <field name="arch" type="xml">
+                <form string="Bhuarjan Settings Master">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="project_id" placeholder="Select Project..." options="{'no_create': True}"/>
+                            </h1>
+                        </div>
+                        
+                        <notebook>
+                            <!-- Sequence Settings Tab -->
+                            <page string="Sequence Settings" name="sequence_settings">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Sequence Number Configuration</strong><br/>
+                                    Configure prefix and initial sequence numbers for each process in this project.
+                                </div>
+                                
+                                <field name="sequence_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_sequence_settings_tree'}"/>
+                            </page>
+                            
+                            <!-- Workflow Settings Tab -->
+                            <page string="Workflow Settings" name="workflow_settings">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Workflow Configuration</strong><br/>
+                                    Configure maker, checker, and approver for each process in this project.
+                                </div>
+                                
+                                <field name="workflow_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_workflow_settings_tree'}"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Settings Master Tree View -->
+        <record id="view_bhuarjan_settings_master_tree" model="ir.ui.view">
+            <field name="name">bhuarjan.settings.master.tree</field>
+            <field name="model">bhuarjan.settings.master</field>
+            <field name="arch" type="xml">
+                <list string="Bhuarjan Settings Master" decoration-info="active == True" decoration-muted="active == False">
+                    <field name="project_id"/>
+                    <field name="sequence_settings_ids" widget="badge" decoration-info="sequence_settings_ids"/>
+                    <field name="workflow_settings_ids" widget="badge" decoration-success="workflow_settings_ids"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="display_name" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Sequence Settings Form View -->
+        <record id="view_bhuarjan_sequence_settings_form" model="ir.ui.view">
+            <field name="name">bhuarjan.sequence.settings.form</field>
+            <field name="model">bhuarjan.sequence.settings</field>
+            <field name="arch" type="xml">
+                <form string="Sequence Settings">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="process_name" required="1"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group>
+                                <field name="project_id" readonly="1"/>
+                                <field name="prefix" placeholder="e.g., SUR_"/>
+                                <field name="initial_sequence"/>
+                            </group>
+                            <group>
+                                <field name="padding"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Example:</strong> With prefix "SUR_", initial sequence 1, and padding 4, 
+                            the first sequence number will be "SUR_0001".
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Workflow Settings Form View -->
+        <record id="view_bhuarjan_workflow_settings_form" model="ir.ui.view">
+            <field name="name">bhuarjan.workflow.settings.form</field>
+            <field name="model">bhuarjan.workflow.settings</field>
+            <field name="arch" type="xml">
+                <form string="Workflow Settings">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="process_name" required="1"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group>
+                                <field name="project_id" readonly="1"/>
+                                <field name="maker_user_ids" widget="many2many_tags" required="1"/>
+                                <field name="checker_user_id"/>
+                                <field name="approver_user_id"/>
+                            </group>
+                            <group>
+                                <field name="require_checker"/>
+                                <field name="require_approver"/>
+                                <field name="notify_maker"/>
+                                <field name="notify_checker"/>
+                                <field name="notify_approver"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <strong>Workflow Process:</strong><br/>
+                            1. <strong>Maker:</strong> Creates/initiates the process<br/>
+                            2. <strong>Checker:</strong> Reviews and verifies the process (if required)<br/>
+                            3. <strong>Approver:</strong> Gives final approval (if required)
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Sequence Settings Tree View -->
+        <record id="view_bhuarjan_sequence_settings_tree" model="ir.ui.view">
+            <field name="name">bhuarjan.sequence.settings.tree</field>
+            <field name="model">bhuarjan.sequence.settings</field>
+            <field name="arch" type="xml">
+                <list string="Sequence Settings" decoration-info="active == True" decoration-muted="active == False">
+                    <field name="process_name"/>
+                    <field name="project_id"/>
+                    <field name="prefix"/>
+                    <field name="initial_sequence"/>
+                    <field name="padding"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="settings_master_id" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Workflow Settings Tree View -->
+        <record id="view_bhuarjan_workflow_settings_tree" model="ir.ui.view">
+            <field name="name">bhuarjan.workflow.settings.tree</field>
+            <field name="model">bhuarjan.workflow.settings</field>
+            <field name="arch" type="xml">
+                <list string="Workflow Settings" decoration-info="active == True" decoration-muted="active == False">
+                    <field name="process_name"/>
+                    <field name="project_id"/>
+                    <field name="maker_user_ids" widget="many2many_tags"/>
+                    <field name="checker_user_id"/>
+                    <field name="approver_user_id"/>
+                    <field name="require_checker" widget="boolean_toggle"/>
+                    <field name="require_approver" widget="boolean_toggle"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="settings_master_id" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Actions -->
+        <record id="action_bhuarjan_settings_master_tree" model="ir.actions.act_window">
+            <field name="name">Settings Master</field>
+            <field name="res_model">bhuarjan.settings.master</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Settings Master
+                </p>
+                <p>
+                    Configure sequence numbers and workflow settings for each project.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_bhuarjan_sequence_settings_tree" model="ir.actions.act_window">
+            <field name="name">Sequence Settings</field>
+            <field name="res_model">bhuarjan.sequence.settings</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Sequence Settings
+                </p>
+                <p>
+                    Configure sequence numbers for each process in your projects.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_bhuarjan_workflow_settings_tree" model="ir.actions.act_window">
+            <field name="name">Workflow Settings</field>
+            <field name="res_model">bhuarjan.workflow.settings</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Workflow Settings
+                </p>
+                <p>
+                    Configure workflow users and approval processes for each project.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Sample data removed to avoid dependency issues -->
+        <!-- Users can create their own settings master records -->
+        
+    </data>
+</odoo>

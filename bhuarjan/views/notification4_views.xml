@@ -205,19 +205,16 @@
                 <field name="acquired_area"/>
                 <field name="survey_date"/>
                 <field name="state" widget="badge"/>
-                <field name="is_single_crop"/>
-                <field name="is_double_crop"/>
-                <field name="is_irrigated"/>
-                <field name="is_unirrigated"/>
+                <field name="crop_type"/>
+                <field name="irrigation_type"/>
                 <field name="tree_development_stage"/>
                 <field name="tree_count"/>
+                <field name="trees_description"/>
                 <field name="house_type"/>
                 <field name="house_area"/>
                 <field name="shed_area"/>
                 <field name="has_well"/>
                 <field name="well_type"/>
-                <field name="has_electricity"/>
-                <field name="has_road_access"/>
                 <field name="has_tubewell"/>
                 <field name="has_pond"/>
                 <field name="landowner_ids" widget="many2many_tags"/>

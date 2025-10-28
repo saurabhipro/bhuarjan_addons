@@ -30,10 +30,15 @@ class Survey(models.Model):
     acquired_area = fields.Float(string='Acquired Area (Hectares) / अधिग्रहित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     
     # Land Details
-    is_single_crop = fields.Boolean(string='Single Crop / एकल फसल', default=False, tracking=True)
-    is_double_crop = fields.Boolean(string='Double Crop / दोहरी फसल', default=False, tracking=True)
-    is_irrigated = fields.Boolean(string='Irrigated / सिंचित', default=False, tracking=True)
-    is_unirrigated = fields.Boolean(string='Unirrigated / असिंचित', default=False, tracking=True)
+    crop_type = fields.Selection([
+        ('single', 'Single Crop / एकल फसल'),
+        ('double', 'Double Crop / दोहरी फसल'),
+    ], string='Crop Type / फसल का प्रकार', default='single', tracking=True)
+    
+    irrigation_type = fields.Selection([
+        ('irrigated', 'Irrigated / सिंचित'),
+        ('unirrigated', 'Unirrigated / असिंचित'),
+    ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
     # Tree Details
     tree_development_stage = fields.Selection([
@@ -57,9 +62,9 @@ class Survey(models.Model):
         ('bore', 'Bore Well / बोर कुआं'),
         ('hand_pump', 'Hand Pump / हैंड पंप')
     ], string='Well Type / कुएं का प्रकार', tracking=True)
-    has_electricity = fields.Boolean(string='Has Electricity / बिजली है', default=False, tracking=True)
-    has_road_access = fields.Boolean(string='Has Road Access / सड़क पहुंच है', default=False, tracking=True)
     has_tubewell = fields.Boolean(string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default=False, tracking=True)
+    trees_description = fields.Text(string='Trees Description / वृक्षों का विवरण', tracking=True, 
+                                   help='Detailed description of trees present on the land')
     has_pond = fields.Boolean(string='Has Pond / तालाब है', default=False, tracking=True)
     
     # Multiple Landowners
@@ -291,10 +296,15 @@ class SurveyLine(models.Model):
     landowner_name = fields.Char(string='Landowner Name / भूमिस्वामी का नाम', required=True)
     
     # Land Type / भूमि का प्रकार
-    is_single_crop = fields.Boolean(string='Single Crop / एक फसली')
-    is_double_crop = fields.Boolean(string='Double Crop / दो फसली')
-    is_irrigated = fields.Boolean(string='Irrigated / सिंचित')
-    is_unirrigated = fields.Boolean(string='Unirrigated / असिंचित')
+    crop_type = fields.Selection([
+        ('single', 'Single Crop / एक फसली'),
+        ('double', 'Double Crop / दो फसली'),
+    ], string='Crop Type / फसल का प्रकार', default='single')
+    
+    irrigation_type = fields.Selection([
+        ('irrigated', 'Irrigated / सिंचित'),
+        ('unirrigated', 'Unirrigated / असिंचित'),
+    ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated')
     
     # Trees on Land / भूमि पर स्थित वृक्ष की संख्या
     tree_development_stage = fields.Selection([

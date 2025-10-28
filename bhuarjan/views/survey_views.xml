@@ -82,10 +82,8 @@
                                     <field name="acquired_area" widget="float" readonly="state == 'locked'"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी">
-                                    <field name="is_single_crop" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="is_double_crop" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="is_irrigated" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="is_unirrigated" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="crop_type" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="irrigation_type" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
                                 </group>
                             </group>
                             
@@ -93,6 +91,8 @@
                                 <group string="Tree Information / वृक्ष की जानकारी">
                                     <field name="tree_development_stage" widget="selection" readonly="state == 'locked'"/>
                                     <field name="tree_count" widget="integer" readonly="state == 'locked'"/>
+                                    <field name="trees_description" widget="text" readonly="state == 'locked'" 
+                                           placeholder="Enter detailed description of trees present on the land"/>
                                 </group>
                                 <group string="House Information / घर की जानकारी">
                                     <field name="house_type" widget="selection" readonly="state == 'locked'"/>
@@ -105,8 +105,6 @@
                                 <group string="Infrastructure / बुनियादी सुविधाएं">
                                     <field name="has_well" widget="boolean_toggle" readonly="state == 'locked'"/>
                                     <field name="well_type" widget="selection" invisible="not has_well" readonly="state == 'locked'"/>
-                                    <field name="has_electricity" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="has_road_access" widget="boolean_toggle" readonly="state == 'locked'"/>
                                     <field name="has_tubewell" widget="boolean_toggle" readonly="state == 'locked'"/>
                                     <field name="has_pond" widget="boolean_toggle" readonly="state == 'locked'"/>
                                 </group>

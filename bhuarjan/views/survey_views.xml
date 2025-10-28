@@ -103,10 +103,10 @@
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं">
-                                    <field name="has_well" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="well_type" widget="selection" invisible="not has_well" readonly="state == 'locked'"/>
-                                    <field name="has_tubewell" widget="boolean_toggle" readonly="state == 'locked'"/>
-                                    <field name="has_pond" widget="boolean_toggle" readonly="state == 'locked'"/>
+                                    <field name="has_well" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="state == 'locked'"/>
+                                    <field name="has_tubewell" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="has_pond" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Survey Image / सर्वे छवि">
                                     <field name="survey_image" widget="image" class="oe_avatar"/>

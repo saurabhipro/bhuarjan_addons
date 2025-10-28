@@ -56,16 +56,25 @@ class Survey(models.Model):
     ], string='House Type / घर का प्रकार', tracking=True)
     house_area = fields.Float(string='House Area (Sq. Ft.) / घर का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)
     shed_area = fields.Float(string='Shed Area (Sq. Ft.) / शेड का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)
-    has_well = fields.Boolean(string='Has Well / कुआं है', default=False, tracking=True)
+    has_well = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Well / कुआं है', default='no', tracking=True)
     well_type = fields.Selection([
         ('open', 'Open Well / खुला कुआं'),
         ('bore', 'Bore Well / बोर कुआं'),
         ('hand_pump', 'Hand Pump / हैंड पंप')
     ], string='Well Type / कुएं का प्रकार', tracking=True)
-    has_tubewell = fields.Boolean(string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default=False, tracking=True)
+    has_tubewell = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default='no', tracking=True)
     trees_description = fields.Text(string='Trees Description / वृक्षों का विवरण', tracking=True, 
                                    help='Detailed description of trees present on the land')
-    has_pond = fields.Boolean(string='Has Pond / तालाब है', default=False, tracking=True)
+    has_pond = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Pond / तालाब है', default='no', tracking=True)
     
     # Multiple Landowners
     landowner_ids = fields.Many2many('bhu.landowner', 'bhu_survey_landowner_rel', 
@@ -326,17 +335,26 @@ class SurveyLine(models.Model):
     shed_area = fields.Float(string='Shed Area (Sq. Ft.) / शेड क्षेत्रफल (वर्गफुट)', digits=(10, 2))
     
     # Well
-    has_well = fields.Boolean(string='Has Well / कुँआ है')
+    has_well = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Well / कुँआ है', default='no')
     well_type = fields.Selection([
         ('kachcha', 'Kachcha / कच्चा'),
         ('pakka', 'Pakka / पक्का')
     ], string='Well Type / कुँआ प्रकार')
     
     # Tubewell/Submersible Pump
-    has_tubewell = fields.Boolean(string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प')
+    has_tubewell = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default='no')
     
     # Pond
-    has_pond = fields.Boolean(string='Has Pond / तालाब है')
+    has_pond = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Pond / तालाब है', default='no')
     
     # Remarks
     remarks = fields.Text(string='Remarks / रिमार्क')
@@ -359,7 +377,7 @@ class SurveyLine(models.Model):
     def _check_well_details(self):
         """Validate well details"""
         for line in self:
-            if line.has_well and not line.well_type:
+            if line.has_well == 'yes' and not line.well_type:
                 raise ValidationError(_('Well type is required when well is present for Khasra %s') % line.khasra_number)
     
     @api.model_create_multi

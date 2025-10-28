@@ -119,7 +119,7 @@
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
                             <field name="landowner_ids" readonly="1">
-                                <list string="Landowner Details / भूमिस्वामी विवरण" decoration-info="is_minor">
+                                <list string="Landowner Details / भूमिस्वामी विवरण">
                                     <field name="name" string="Name / नाम"/>
                                     <field name="father_name" string="Father's Name / पिता का नाम"/>
                                     <field name="age" string="Age / आयु"/>
@@ -133,7 +133,6 @@
                                     <field name="pan_number" string="PAN / पैन"/>
                                     <field name="bank_name" string="Bank / बैंक"/>
                                     <field name="account_number" string="Account / खाता"/>
-                                    <field name="is_minor" string="Minor / नाबालिग"/>
                                 </list>
                             </field>
                         </page>

@@ -17,7 +17,6 @@
                 <field name="pan_number"/>
                 <field name="age"/>
                 <field name="gender"/>
-                <field name="is_minor"/>
             </list>
         </field>
     </record>
@@ -85,11 +84,6 @@
                             <field name="ifsc_code" widget="char"/>
                             <field name="account_holder_name" widget="char"/>
                         </group>
-                        <group string="Minor Information / नाबालिग जानकारी">
-                            <field name="is_minor" widget="boolean_toggle"/>
-                            <field name="guardian_name" widget="char" invisible="not is_minor"/>
-                            <field name="guardian_relation" widget="char" invisible="not is_minor"/>
-                        </group>
                     </group>
                     
                     <notebook>
@@ -153,7 +147,6 @@
                 <field name="tehsil_id"/>
                 <field name="district_id"/>
                 
-                <filter string="Minors / नाबालिग" name="minors" domain="[('is_minor', '=', True)]"/>
                 <filter string="Male / पुरुष" name="male" domain="[('gender', '=', 'male')]"/>
                 <filter string="Female / महिला" name="female" domain="[('gender', '=', 'female')]"/>
                 <filter string="With Bank Details / बैंक विवरण के साथ" name="with_bank" domain="[('bank_name', '!=', False)]"/>
@@ -165,7 +158,6 @@
                     <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>
                     <filter string="Tehsil / तहसील" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
                     <filter string="Village / ग्राम" name="group_village" context="{'group_by': 'village_id'}"/>
-                    <filter string="Minor Status / नाबालिग स्थिति" name="group_minor" context="{'group_by': 'is_minor'}"/>
                 </group>
             </search>
         </field>
@@ -183,7 +175,6 @@
                 <field name="district_id"/>
                 <field name="age"/>
                 <field name="gender"/>
-                <field name="is_minor"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card oe_kanban_global_click">
@@ -206,9 +197,6 @@
                                         </div>
                                         <div>
                                             <i class="fa fa-user" title="Landowner"/> <field name="age"/> years, <field name="gender"/>
-                                        </div>
-                                        <div t-if="record.is_minor.raw_value">
-                                            <i class="fa fa-child" title="Minor"/> Minor
                                         </div>
                                     </div>
                                 </div>

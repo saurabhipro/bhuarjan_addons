@@ -67,6 +67,7 @@
             'bhuarjan/static/src/scss/hierarchy_view.scss',
             'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',
+            'bhuarjan/static/src/js/menu_icons.js',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/css/menu_styling.css',

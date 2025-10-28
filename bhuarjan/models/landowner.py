@@ -59,9 +59,6 @@ class BhuLandowner(models.Model):
     # Additional Information
     occupation = fields.Char(string='Occupation / व्यवसाय', tracking=True)
     annual_income = fields.Float(string='Annual Income / वार्षिक आय', digits=(12, 2), tracking=True)
-    is_minor = fields.Boolean(string='Is Minor / नाबालिग है', default=False, tracking=True)
-    guardian_name = fields.Char(string='Guardian Name / अभिभावक का नाम', tracking=True)
-    guardian_relation = fields.Char(string='Guardian Relation / अभिभावक का संबंध', tracking=True)
     
     # Documents and Photos
     photo = fields.Binary(string='Photo / फोटो')
@@ -160,13 +157,6 @@ class BhuLandowner(models.Model):
     def _onchange_tehsil_id(self):
         if self.tehsil_id:
             self.district_id = self.tehsil_id.district_id
-    
-    @api.onchange('age')
-    def _onchange_age(self):
-        if self.age and self.age < 18:
-            self.is_minor = True
-        else:
-            self.is_minor = False
     
     def action_view_surveys(self):
         """Action to view related surveys"""

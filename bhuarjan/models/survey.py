@@ -91,6 +91,24 @@ class Survey(models.Model):
     
     # Notification 4 Generation
     notification4_generated = fields.Boolean(string='Notification 4 Generated / अधिसूचना 4 जेनरेट', default=False, tracking=True)
+    
+    # Computed fields for Form 10 report
+    is_single_crop = fields.Boolean(string='Is Single Crop', compute='_compute_crop_fields', store=False)
+    is_double_crop = fields.Boolean(string='Is Double Crop', compute='_compute_crop_fields', store=False)
+    is_irrigated = fields.Boolean(string='Is Irrigated', compute='_compute_irrigation_fields', store=False)
+    is_unirrigated = fields.Boolean(string='Is Unirrigated', compute='_compute_irrigation_fields', store=False)
+    
+    @api.depends('crop_type')
+    def _compute_crop_fields(self):
+        for record in self:
+            record.is_single_crop = record.crop_type == 'single'
+            record.is_double_crop = record.crop_type == 'double'
+    
+    @api.depends('irrigation_type')
+    def _compute_irrigation_fields(self):
+        for record in self:
+            record.is_irrigated = record.irrigation_type == 'irrigated'
+            record.is_unirrigated = record.irrigation_type == 'unirrigated'
    
 
 
@@ -234,14 +252,29 @@ class Survey(models.Model):
             report_action = self.env.ref('bhuarjan.action_report_award_letter')
             return report_action.report_action(record)
 
-    def action_bulk_download_award_letter(self):
-        """Download Award Letter PDFs for all selected surveys"""
-        if not self:
-            raise ValidationError(_('Please select at least one survey to download.'))
+    def action_form10_preview(self):
+        """Preview all Form-10s in a single scrollable PDF"""
+        # Get all surveys for the current user based on their role
+        if self.env.user.bhuarjan_role == 'patwari':
+            # Patwari can only see their own surveys and surveys from their assigned villages
+            domain = [
+                '|',
+                ('user_id', '=', self.env.user.id),
+                ('village_id', 'in', self.env.user.village_ids.ids)
+            ]
+        else:
+            # Other users can see all surveys
+            domain = []
         
-        # Generate PDF report for all selected surveys
-        report_action = self.env.ref('bhuarjan.action_report_award_letter')
-        return report_action.report_action(self)
+        # Get all surveys that have Form-10 data
+        surveys = self.env['bhu.survey'].search(domain)
+        
+        if not surveys:
+            raise ValidationError(_('No surveys found to preview.'))
+        
+        # Generate PDF report for all surveys
+        report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        return report_action.report_action(surveys)
 
 
 

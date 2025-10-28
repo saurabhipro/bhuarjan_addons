@@ -33,9 +33,6 @@
                     <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
                     <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
-                    
-                    <button name="action_download_form10" string="Download Form-10 / फार्म-10 डाउनलोड करें" type="object" class="btn-info" icon="fa-download"/>
-                    <button name="action_download_award_letter" string="Download Award Letter" type="object" class="btn-success" icon="fa-file-text"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -232,6 +229,18 @@ if records:
         <field name="code">
 if records:
     action = records.action_bulk_download_award_letter()
+</field>
+    </record>
+
+    <!-- Form 10 Preview Action -->
+    <record id="action_form10_preview" model="ir.actions.server">
+        <field name="name">Form 10 Preview / फार्म-10 पूर्वावलोकन</field>
+        <field name="model_id" ref="model_bhu_survey"/>
+        <field name="binding_model_id" ref="model_bhu_survey"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_form10_preview()
 </field>
     </record>
 

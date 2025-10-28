@@ -253,7 +253,7 @@ class Survey(models.Model):
             return report_action.report_action(record)
 
     def action_form10_preview(self):
-        """Preview all Form-10s in a single scrollable PDF"""
+        """Preview all Form-10s in a single scrollable HTML view"""
         # Get all surveys for the current user based on their role
         if self.env.user.bhuarjan_role == 'patwari':
             # Patwari can only see their own surveys and surveys from their assigned villages
@@ -272,8 +272,9 @@ class Survey(models.Model):
         if not surveys:
             raise ValidationError(_('No surveys found to preview.'))
         
-        # Generate PDF report for all surveys
+        # Generate HTML report for all surveys (inline view)
         report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        report_action.report_type = 'qweb-html'
         return report_action.report_action(surveys)
 
 

@@ -218,27 +218,19 @@ if records:
 </field>
     </record>
 
-    <!-- Bulk Download Award Letter Action -->
-    <record id="action_bulk_download_award_letter" model="ir.actions.server">
-        <field name="name">Download Award Letter PDFs</field>
-        <field name="model_id" ref="model_bhu_survey"/>
-        <field name="binding_model_id" ref="model_bhu_survey"/>
-        <field name="state">code</field>
-        <field name="code">
-if records:
-    action = records.action_bulk_download_award_letter()
-</field>
-    </record>
 
     <!-- Form 10 Preview Action -->
     <record id="action_form10_preview" model="ir.actions.server">
         <field name="name">Form 10 Preview / फार्म-10 पूर्वावलोकन</field>
         <field name="model_id" ref="model_bhu_survey"/>
         <field name="binding_model_id" ref="model_bhu_survey"/>
+        <field name="binding_view_types">list,form</field>
         <field name="state">code</field>
         <field name="code">
-if records:
-    action = records.action_form10_preview()
+# Get all surveys visible in the current list view (respects filters and search)
+surveys = env['bhu.survey'].search([])
+if surveys:
+    action = surveys.action_form10_preview()
 </field>
     </record>
 

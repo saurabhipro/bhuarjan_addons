@@ -117,10 +117,11 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 
+       
         <record id="record_bhu_landowner_rule" model="ir.rule">
             <field name="name">Patwari can see landowners from assigned villages and their surveys</field>
             <field name="model_id" ref="model_bhu_landowner"/>
-            <field name="domain_force">['|', ('village_id', 'in', user.village_ids.ids), ('survey_ids.user_id', '=', user.id)]</field>
+            <field name="domain_force">['&amp;', ('village_id', '!=', False), '|', ('village_id', 'in', user.village_ids.ids), ('survey_ids.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 

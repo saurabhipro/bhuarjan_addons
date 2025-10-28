@@ -37,7 +37,7 @@ class BhuLandowner(models.Model):
     # Address Information
     address_line1 = fields.Char(string='Address Line 1 / पता पंक्ति 1', tracking=True)
     address_line2 = fields.Char(string='Address Line 2 / पता पंक्ति 2', tracking=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
     pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
@@ -174,4 +174,20 @@ class BhuLandowner(models.Model):
         action['domain'] = [('landowner_ids', 'in', self.ids)]
         action['context'] = {'default_landowner_ids': [(6, 0, self.ids)]}
         return action
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None):
+        """Override search to apply role-based filtering for Patwari users"""
+        # Apply role-based domain filtering
+        if self.env.user.bhuarjan_role == 'patwari':
+            # Patwari can only see landowners from their assigned villages
+            # and landowners who are in surveys they created
+            patwari_domain = [
+                '|',  # OR condition
+                ('village_id', 'in', self.env.user.village_ids.ids),  # Landowners from their assigned villages
+                ('survey_ids.user_id', '=', self.env.user.id)  # Landowners in surveys they created
+            ]
+            args = patwari_domain + args
+        
+        return super(BhuLandowner, self)._search(args, offset=offset, limit=limit, order=order)
     

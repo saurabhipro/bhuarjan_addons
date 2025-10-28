@@ -64,9 +64,11 @@
             'bhuarjan/static/src/css/menu_icons.css',
             'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
+            'bhuarjan/static/src/css/mandatory_fields.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
             'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',
+            'bhuarjan/static/src/js/mandatory_fields.js',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/css/menu_styling.css',

@@ -111,9 +111,16 @@
     <!-- Survey access rule for Patwari -->
     <data noupdate="0">
         <record id="record_bhu_survey_rule" model="ir.rule">
-            <field name="name">Patwari can see own survey only</field>
+            <field name="name">Patwari can see own surveys and surveys from assigned villages</field>
             <field name="model_id" ref="model_bhu_survey"/>
-            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="domain_force">['|', ('user_id', '=', user.id), ('village_id', 'in', user.village_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
+        </record>
+
+        <record id="record_bhu_landowner_rule" model="ir.rule">
+            <field name="name">Patwari can see landowners from assigned villages and their surveys</field>
+            <field name="model_id" ref="model_bhu_landowner"/>
+            <field name="domain_force">['|', ('village_id', 'in', user.village_ids.ids), ('survey_ids.user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 

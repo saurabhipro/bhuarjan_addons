@@ -414,6 +414,21 @@ class SurveyLine(models.Model):
             'available': True,
             'message': _('Sequence settings are properly configured for Survey process.')
         }
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None):
+        """Override search to apply role-based filtering for Patwari users"""
+        # Apply role-based domain filtering
+        if self.env.user.bhuarjan_role == 'patwari':
+            # Patwari can only see their own surveys and surveys from their assigned villages
+            patwari_domain = [
+                '|',  # OR condition
+                ('user_id', '=', self.env.user.id),  # Their own surveys
+                ('village_id', 'in', self.env.user.village_ids.ids)  # Surveys from their assigned villages
+            ]
+            args = patwari_domain + args
+        
+        return super(Survey, self)._search(args, offset=offset, limit=limit, order=order)
     
     @api.onchange('survey_id')
     def _onchange_survey_id(self):

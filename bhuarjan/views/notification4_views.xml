@@ -42,7 +42,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <group string="Basic Information / मूल जानकारी">
-                                <field name="notification_date" widget="date"/>
+                                <field name="notification_date" widget="date" options="{'date_format': 'dd/mm/yyyy'}"/>
                                 <field name="public_purpose" widget="text"/>
                             </group>
                         </div>
@@ -62,13 +62,13 @@
                         <page string="Survey Details / सर्वे विवरण" name="survey_details" icon="fa fa-map-marker">
                             <group>
                                 <group string="Public Hearing Details / सार्वजनिक सुनवाई विवरण">
-                                    <field name="hearing_date" widget="date"/>
+                                    <field name="hearing_date" widget="date" options="{'date_format': 'dd/mm/yyyy'}"/>
                                     <field name="hearing_time" widget="char" placeholder="e.g., 10:00 AM"/>
                                     <field name="hearing_location" widget="char" placeholder="Enter hearing location"/>
                                 </group>
                                 <group string="Signature Information / हस्ताक्षर जानकारी">
                                     <field name="signature_place" widget="char" placeholder="Enter signature place"/>
-                                    <field name="signature_date" widget="date"/>
+                                    <field name="signature_date" widget="date" options="{'date_format': 'dd/mm/yyyy'}"/>
                                 </group>
                             </group>
                         </page>

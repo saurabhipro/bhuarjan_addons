@@ -37,7 +37,7 @@
                     
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Enter full name..."/>
+                            <field name="name" placeholder="Enter full name..." required="1"/>
                         </h1>
                     </div>
                     
@@ -63,7 +63,7 @@
                         <group string="Address Information / पता जानकारी">
                             <field name="address_line1" widget="char"/>
                             <field name="address_line2" widget="char"/>
-                            <field name="village_id" widget="selection"/>
+                            <field name="village_id" widget="selection" required="1" string="Village * / ग्राम *"/>
                             <field name="tehsil_id" widget="selection"/>
                             <field name="district_id" widget="selection"/>
                             <field name="pincode" widget="char"/>

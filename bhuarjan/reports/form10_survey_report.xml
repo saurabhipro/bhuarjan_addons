@@ -94,7 +94,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2" style="padding: 5px;">
-                                        <p class="hindi-text"><strong>सर्वे दिनाँक</strong> <span t-field="survey.survey_date"/></p>
+                                        <p class="hindi-text"><strong>सर्वे दिनाँक</strong> <span t-field="survey.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></p>
                                     </td>
                                 </tr>
                             </table>
@@ -184,10 +184,10 @@
                                                     <span t-if="survey.shed_area"><span t-field="survey.shed_area"/></span><span t-if="not survey.shed_area">नहीं</span>
                                                 </td>
                                                 <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 20px;">
-                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'open'">हाँ-कच्चा कुआँ</span>
-                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'bore'">हाँ-पक्का कुआँ</span>
-                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'hand_pump'">हाँ-हैंड पंप</span>
-                                                    <span t-if="survey.has_well == 'yes' and not survey.well_type">हाँ-कुआँ</span>
+                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'open'">हाँ-कच्चा</span>
+                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'bore'">हाँ-पक्का</span>
+                                                    <span t-if="survey.has_well == 'yes' and survey.well_type == 'hand_pump'">हाँ-पक्का</span>
+                                                    <span t-if="survey.has_well == 'yes' and not survey.well_type">हाँ-कच्चा</span>
                                                     <span t-if="survey.has_well == 'no'">नहीं</span>
                                                 </td>
                                                 <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 20px;">

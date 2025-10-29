@@ -329,7 +329,7 @@ if surveys:
                                       or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
                                       or record.state.raw_value == 'draft' and 'background: #fbbf24; color: #92400e; border: 1px solid #f59e0b; box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);' 
                                       or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
-                                    <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;"></i>
+                                    <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
                                     <field name="state"/>
                                 </span>
                                 <div class="d-flex align-items-center text-muted">

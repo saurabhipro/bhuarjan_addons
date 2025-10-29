@@ -269,13 +269,10 @@ class Survey(models.Model):
             return report_action.report_action(record)
 
     def action_bulk_download_form10(self):
-        """Download Form-10 PDFs for all selected surveys"""
-        if not self:
-            raise ValidationError(_('Please select at least one survey to download.'))
-        
-        # Generate PDF report for all selected surveys
+        print("\n\n jhdfjasdgfjasdgfjasgdfjshdgfshj ----------------")
+        all_records = self.search([('village_id', 'in', self.env.user.village_ids.ids)])
         report_action = self.env.ref('bhuarjan.action_report_form10_survey')
-        return report_action.report_action(self)
+        return report_action.report_action(all_records)
 
     def action_download_award_letter(self):
         """Download Award Letter as PDF"""

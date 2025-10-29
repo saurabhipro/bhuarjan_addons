@@ -16,6 +16,7 @@
                 <field name="acquired_area"/>
                 <field name="survey_date"/>
                 <field name="state" widget="badge"/>
+                
             </list>
         </field>
     </record>
@@ -207,14 +208,16 @@
 
     <!-- Bulk Download Form-10 Action -->
     <record id="action_bulk_download_form10" model="ir.actions.server">
-        <field name="name">Download Form-10 PDFs / फार्म-10 PDF डाउनलोड करें</field>
+        <field name="name">Download Form-10 PDFs jhgjhg / फार्म-10 PDF डाउनलोड करें</field>
         <field name="model_id" ref="model_bhu_survey"/>
         <field name="binding_model_id" ref="model_bhu_survey"/>
         <field name="state">code</field>
         <field name="code">
-if records:
-    action = records.action_bulk_download_form10()
-</field>
+        <!-- if records: -->
+            <!-- action = records.action_bulk_download_form10() -->
+                action = model.action_bulk_download_form10()
+
+        </field>
     </record>
 
 

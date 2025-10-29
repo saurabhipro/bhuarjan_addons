@@ -54,6 +54,7 @@
         'views/rate_master_views.xml',
         'views/settings_master_views.xml',
         'reports/notification4_report.xml',
+        'wizard/report_wizard.xml',
         'views/qr_microsite_templates.xml',
         'views/menuitem.xml',
         'static/src/xml/project_switcher.xml',

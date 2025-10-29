@@ -63,7 +63,7 @@ class Survey(models.Model):
     well_type = fields.Selection([
         ('kachcha', 'कच्चा'),
         ('pakka', 'पक्का')
-    ], string='Well Type / कुएं का प्रकार', tracking=True)
+    ], string='Well Type / कुएं का प्रकार', default='kachcha', required=True, tracking=True)
     has_tubewell = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),

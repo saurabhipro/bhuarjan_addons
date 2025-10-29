@@ -50,9 +50,8 @@ class Survey(models.Model):
     
     # House Details
     house_type = fields.Selection([
-        ('kachcha', 'Kachcha / कच्चा'),
-        ('pucca', 'Pucca / पक्का'),
-        ('semi_pucca', 'Semi-Pucca / अर्ध-पक्का')
+        ('kachcha', 'कच्चा'),
+        ('pucca', 'पक्का')
     ], string='House Type / घर का प्रकार', tracking=True)
     house_area = fields.Float(string='House Area (Sq. Ft.) / घर का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)
     shed_area = fields.Float(string='Shed Area (Sq. Ft.) / शेड का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)

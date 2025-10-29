@@ -10,7 +10,7 @@
                 </group>
                 <footer>
                     <button name="action_print_report"
-                            string="Print"
+                            string="Download"
                             type="object"
                             class="btn-primary"/>
                     <button name="action_cancel"

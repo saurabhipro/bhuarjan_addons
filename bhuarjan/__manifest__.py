@@ -64,6 +64,7 @@
         'web.assets_backend': [
             'bhuarjan/static/src/css/menu_styling.css',
             'bhuarjan/static/src/css/menu_icons.css',
+            'bhuarjan/static/src/xml/mail_systray_hide_button.xml',
             'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',

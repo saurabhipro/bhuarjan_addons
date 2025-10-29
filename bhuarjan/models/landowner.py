@@ -26,28 +26,21 @@ class BhuLandowner(models.Model):
     ], string='Gender / लिंग', tracking=True)
     
     # Contact Information
-    mobile = fields.Char(string='Mobile Number / मोबाइल नंबर', tracking=True)
     phone = fields.Char(string='Phone Number / फोन नंबर', tracking=True)
     
     # Company/Organization Information
     company_id = fields.Many2one('res.company', string='Company / कंपनी', required=True, 
                                  default=lambda self: self.env.company, tracking=True)
-    email = fields.Char(string='Email / ईमेल', tracking=True)
     
     # Address Information
-    address_line1 = fields.Char(string='Address Line 1 / पता पंक्ति 1', tracking=True)
-    address_line2 = fields.Char(string='Address Line 2 / पता पंक्ति 2', tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
-    pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
     state = fields.Char(string='State / राज्य', default='Chhattisgarh', readonly=True)
     
     # Identity Documents
     aadhar_number = fields.Char(string='Aadhar Number / आधार नंबर', tracking=True)
     pan_number = fields.Char(string='PAN Number / पैन नंबर', tracking=True)
-    voter_id = fields.Char(string='Voter ID / मतदाता पहचान पत्र', tracking=True)
-    ration_card_number = fields.Char(string='Ration Card Number / राशन कार्ड नंबर', tracking=True)
     
     # Bank Details
     bank_name = fields.Char(string='Bank Name / बैंक का नाम', tracking=True)
@@ -56,60 +49,15 @@ class BhuLandowner(models.Model):
     ifsc_code = fields.Char(string='IFSC Code / आईएफएससी कोड', tracking=True)
     account_holder_name = fields.Char(string='Account Holder Name / खाताधारक का नाम', tracking=True)
     
-    # Additional Information
-    occupation = fields.Char(string='Occupation / व्यवसाय', tracking=True)
-    annual_income = fields.Float(string='Annual Income / वार्षिक आय', digits=(12, 2), tracking=True)
-    
-    # Documents and Photos
-    photo = fields.Binary(string='Photo / फोटो')
+    # Documents
     aadhar_card = fields.Binary(string='Aadhar Card / आधार कार्ड')
     pan_card = fields.Binary(string='PAN Card / पैन कार्ड')
-    voter_id_card = fields.Binary(string='Voter ID Card / मतदाता पहचान पत्र')
-    ration_card = fields.Binary(string='Ration Card / राशन कार्ड')
-    bank_passbook = fields.Binary(string='Bank Passbook / बैंक पासबुक')
-    other_documents = fields.Binary(string='Other Documents / अन्य दस्तावेज')
     
     # Survey Relations
     survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 
                                  'landowner_id', 'survey_id', string='Related Surveys / संबंधित सर्वे')
     
-    # Computed Fields
-    full_address = fields.Text(string='Complete Address / पूरा पता', compute='_compute_full_address', store=True)
-    
-    @api.depends('address_line1', 'address_line2', 'village_id', 'tehsil_id', 'district_id', 'pincode', 'state')
-    def _compute_full_address(self):
-        for record in self:
-            address_parts = []
-            if record.address_line1:
-                address_parts.append(record.address_line1)
-            if record.address_line2:
-                address_parts.append(record.address_line2)
-            if record.village_id:
-                address_parts.append(record.village_id.name)
-            if record.tehsil_id:
-                address_parts.append(record.tehsil_id.name)
-            if record.district_id:
-                address_parts.append(record.district_id.name)
-            if record.pincode:
-                address_parts.append(record.pincode)
-            if record.state:
-                address_parts.append(record.state)
-            record.full_address = ', '.join(address_parts)
-    
     # Validation Methods
-    @api.constrains('mobile')
-    def _check_mobile(self):
-        for record in self:
-            if record.mobile:
-                if not re.match(r'^[6-9]\d{9}$', record.mobile):
-                    raise ValidationError('Please enter a valid 10-digit mobile number starting with 6-9.')
-    
-    @api.constrains('email')
-    def _check_email(self):
-        for record in self:
-            if record.email:
-                if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', record.email):
-                    raise ValidationError('Please enter a valid email address.')
     
     @api.constrains('aadhar_number')
     def _check_aadhar(self):
@@ -151,7 +99,6 @@ class BhuLandowner(models.Model):
         if self.village_id:
             self.tehsil_id = self.village_id.tehsil_id
             self.district_id = self.village_id.district_id
-            self.pincode = self.village_id.pincode
     
     @api.onchange('tehsil_id')
     def _onchange_tehsil_id(self):

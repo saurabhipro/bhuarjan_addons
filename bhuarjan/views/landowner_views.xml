@@ -9,7 +9,6 @@
                 <field name="name"/>
                 <field name="company_id"/>
                 <field name="father_name"/>
-                <field name="mobile"/>
                 <field name="village_id"/>
                 <field name="tehsil_id"/>
                 <field name="district_id"/>
@@ -47,32 +46,23 @@
                             <field name="spouse_name" widget="char"/>
                             <field name="age" widget="integer"/>
                             <field name="gender" widget="selection"/>
-                            <field name="occupation" widget="char"/>
-                            <field name="annual_income" widget="monetary"/>
                         </group>
                         <group string="Contact Information / संपर्क जानकारी">
                             <field name="company_id"/>
-                            <field name="mobile" widget="phone"/>
                             <field name="phone" widget="phone"/>
-                            <field name="email" widget="email"/>
                         </group>
                     </group>
                     
                     <group>
                         <group string="Address Information / पता जानकारी">
-                            <field name="address_line1" widget="char"/>
-                            <field name="address_line2" widget="char"/>
                             <field name="village_id" widget="selection" required="1" string="Village * / ग्राम *"/>
                             <field name="tehsil_id" widget="selection"/>
                             <field name="district_id" widget="selection"/>
-                            <field name="pincode" widget="char"/>
                             <field name="state" widget="char"/>
                         </group>
                         <group string="Identity Documents / पहचान दस्तावेज">
                             <field name="aadhar_number" widget="char"/>
                             <field name="pan_number" widget="char"/>
-                            <field name="voter_id" widget="char"/>
-                            <field name="ration_card_number" widget="char"/>
                         </group>
                     </group>
                     
@@ -87,24 +77,11 @@
                     </group>
                     
                     <notebook>
-                        <page string="Documents &amp; Photos / दस्तावेज और फोटो" name="documents">
+                        <page string="Documents / दस्तावेज" name="documents">
                             <group>
-                                <group>
-                                    <field name="photo" widget="image" class="oe_avatar"/>
-                                </group>
                                 <group>
                                     <field name="aadhar_card" widget="binary"/>
                                     <field name="pan_card" widget="binary"/>
-                                    <field name="voter_id_card" widget="binary"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group>
-                                    <field name="ration_card" widget="binary"/>
-                                    <field name="bank_passbook" widget="binary"/>
-                                </group>
-                                <group>
-                                    <field name="other_documents" widget="binary"/>
                                 </group>
                             </group>
                         </page>
@@ -119,10 +96,6 @@
                                     <field name="state"/>
                                 </list>
                             </field>
-                        </page>
-                        
-                        <page string="Complete Address / पूरा पता" name="address">
-                            <field name="full_address" readonly="1" nolabel="1"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -140,8 +113,6 @@
             <search string="Search Landowners / भूमिस्वामी खोजें">
                 <field name="name"/>
                 <field name="father_name"/>
-                <field name="mobile"/>
-                <field name="email"/>
                 <field name="aadhar_number"/>
                 <field name="pan_number"/>
                 <field name="village_id"/>
@@ -169,35 +140,53 @@
         <field name="name">bhu.landowner.kanban</field>
         <field name="model">bhu.landowner</field>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban string="Landowners / भूमिस्वामी" class="o_kanban_large_column o_kanban_mobile">
                 <field name="name"/>
-                <field name="mobile"/>
+                <field name="father_name"/>
+                <field name="spouse_name"/>
                 <field name="village_id"/>
-                <field name="district_id"/>
-                <field name="age"/>
                 <field name="gender"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong class="o_kanban_record_title">
-                                            <field name="name"/>
-                                        </strong>
-                                        <div class="o_kanban_record_subtitle">
-                                            <field name="father_name"/>
+                        <div class="oe_kanban_card o_kanban_record" style="background: #ffffff; border: 2px solid #20bf6b; border-radius: 8px; transition: all 0.3s ease; min-height: auto; margin-bottom: 12px; width: 100%; max-width: 100%;">
+                            <div class="oe_kanban_content" style="padding: 10px 12px;">
+                                <div class="d-flex justify-content-between align-items-start" style="gap: 8px;">
+                                    <div class="flex-grow-1" style="min-width: 0;">
+                                        <div class="mb-1">
+                                            <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem; font-weight: 700; line-height: 1.3;">
+                                                <field name="name"/>
+                                            </h6>
+                                        </div>
+                                        <div class="mb-1" style="font-size: 0.85rem; color: #6c757d;">
+                                            <t t-if="record.gender.raw_value == 'female' and record.spouse_name.raw_value">
+                                                <i class="fa fa-heart mr-1" style="font-size: 0.75rem;" title="Husband"></i>
+                                                <field name="spouse_name"/>
+                                            </t>
+                                            <t t-if="record.gender.raw_value != 'female'">
+                                                <i class="fa fa-user mr-1" style="font-size: 0.75rem;" title="Father"></i>
+                                                <field name="father_name"/>
+                                            </t>
+                                            <t t-if="record.gender.raw_value == 'female' and (record.spouse_name.raw_value == '' or record.spouse_name.raw_value == False)">
+                                                <i class="fa fa-user mr-1" style="font-size: 0.75rem;" title="Father"></i>
+                                                <field name="father_name"/>
+                                            </t>
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: #495057;">
+                                            <i class="fa fa-map-marker mr-1 text-primary" style="font-size: 0.75rem;" title="Village"></i>
+                                            <field name="village_id"/>
                                         </div>
                                     </div>
-                                    <div class="o_kanban_record_body">
-                                        <div>
-                                            <i class="fa fa-phone" title="Phone"/> <field name="mobile"/>
-                                        </div>
-                                        <div>
-                                            <i class="fa fa-map-marker" title="Location"/> <field name="village_id"/> - <field name="district_id"/>
-                                        </div>
-                                        <div>
-                                            <i class="fa fa-user" title="Landowner"/> <field name="age"/> years, <field name="gender"/>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.85rem; padding: 4px;">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <a role="menuitem" type="edit" class="dropdown-item">
+                                                <i class="fa fa-pencil-alt mr-2 text-primary"></i> Edit
+                                            </a>
+                                            <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                                <i class="fa fa-trash mr-2"></i> Delete
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -215,7 +204,6 @@
         <field name="res_model">bhu.landowner</field>
         <field name="view_mode">list,form,kanban</field>
         <field name="search_view_id" ref="view_bhu_landowner_search"/>
-        <field name="context">{'search_default_group_district': 1}</field>
     </record>
 
 </odoo>

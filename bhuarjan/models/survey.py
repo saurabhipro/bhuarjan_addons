@@ -115,8 +115,8 @@ class Survey(models.Model):
             import io
             import base64
             
-            # Generate QR code URL using localhost for development
-            qr_url = f"http://localhost:8069/form10/{self.survey_uuid}"
+            # Generate QR code URL using production domain for live testing
+            qr_url = f"https://bhuarjan.com/form10/{self.survey_uuid}"
             
             # Create QR code
             qr = qrcode.QRCode(

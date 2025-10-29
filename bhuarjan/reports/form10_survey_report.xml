@@ -212,31 +212,31 @@
                             <!-- Signature Blocks -->
                             <div class="row mt-5">
                                 <div class="col-12">
-                                    <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important;">
-                                        <div style="flex: 1; min-width: 0; margin-right: 10px; display: inline-block !important;">
+                                    <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; justify-content: space-between !important;">
+                                        <div style="width: 18% !important; min-width: 120px !important; margin-right: 15px !important; display: inline-block !important;">
                                             <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
                                             <p class="hindi-text"><strong>अपेक्षक निकाय के</strong></p>
                                             <p class="hindi-text"><strong>अधिकृत प्रतिनिधि</strong></p>
                                             <p class="hindi-text"><strong>नाम -</strong></p>
                                             <p class="hindi-text"><strong>पदनाम</strong></p>
                                         </div>
-                                        <div style="flex: 1; min-width: 0; margin-right: 10px; display: inline-block !important;">
+                                        <div style="width: 18% !important; min-width: 120px !important; margin-right: 15px !important; display: inline-block !important;">
                                             <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
                                             <p class="hindi-text"><strong>तहसीलदार</strong></p>
                                             <p class="hindi-text"><strong>नाम -</strong></p>
                                         </div>
-                                        <div style="flex: 1; min-width: 0; margin-right: 10px; display: inline-block !important;">
+                                        <div style="width: 18% !important; min-width: 120px !important; margin-right: 15px !important; display: inline-block !important;">
                                             <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
                                             <p class="hindi-text"><strong>नायब तहसीलदार</strong></p>
                                             <p class="hindi-text"><strong>नाम -</strong></p>
                                         </div>
-                                        <div style="flex: 1; min-width: 0; margin-right: 10px; display: inline-block !important;">
+                                        <div style="width: 18% !important; min-width: 120px !important; margin-right: 15px !important; display: inline-block !important;">
                                             <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
                                             <p class="hindi-text"><strong>राजस्व निरीक्षक</strong></p>
                                             <p class="hindi-text"><strong>नाम-</strong></p>
                                             <p class="hindi-text"><strong>रा.नि.मं.</strong></p>
                                         </div>
-                                        <div style="flex: 1; min-width: 0; display: inline-block !important;">
+                                        <div style="width: 18% !important; min-width: 120px !important; display: inline-block !important;">
                                             <p class="hindi-text"><strong>(हस्ताक्षर)</strong></p>
                                             <p class="hindi-text"><strong>पटवारी</strong></p>
                                             <p class="hindi-text"><strong>नाम-</strong></p>

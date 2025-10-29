@@ -30,10 +30,5 @@
         <field name="target">new</field>
     </record>
 
-    <!-- Optional: menu to open wizard -->
-    <menuitem id="menu_report_wizard"
-              name="Report Wizard"
-              parent="menu_bhu_reporting"
-              action="action_report_wizard"
-              sequence="50"/>
+
 </odoo>

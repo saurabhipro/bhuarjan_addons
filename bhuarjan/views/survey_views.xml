@@ -35,12 +35,12 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
-                    <div class="oe_title" style="margin-bottom: 10px;">
+                    <!-- <div class="oe_title" style="margin-bottom: 10px;">
                         <h1 style="margin-bottom: 5px;">
                             <field name="name" placeholder="Survey Number / सर्वे नंबर" required="1"/>
                         </h1>
                     </div>
-                    
+                     -->
                     <!-- Locked Survey Warning -->
                     <div class="alert alert-warning" role="alert" invisible="state != 'locked'" style="margin-bottom: 15px;">
                         <strong>Survey Locked / सर्वे लॉक:</strong> This survey has been used to generate Notification 4 and is now locked. No further modifications are allowed.

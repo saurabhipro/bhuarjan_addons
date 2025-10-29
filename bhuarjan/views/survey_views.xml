@@ -28,6 +28,10 @@
         <field name="arch" type="xml">
             <form string="Survey / सर्वे">
                 <header>
+                    <button name="action_submit" string="Edit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
+                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -205,6 +209,7 @@
         <field name="name">Download Form-10 PDFs jhgjhg / फार्म-10 PDF डाउनलोड करें</field>
         <field name="model_id" ref="model_bhu_survey"/>
         <field name="binding_model_id" ref="model_bhu_survey"/>
+        <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
         <!-- if records: -->
@@ -220,7 +225,7 @@
         <field name="name">Form 10 Preview / फार्म-10 पूर्वावलोकन</field>
         <field name="model_id" ref="model_bhu_survey"/>
         <field name="binding_model_id" ref="model_bhu_survey"/>
-        <field name="binding_view_types">list,form</field>
+        <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
 # Get all surveys visible in the current list view (respects filters and search)
@@ -317,17 +322,23 @@ if surveys:
 
                             <!-- Compact Footer -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                      t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
-                                      or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
-                                      or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
-                                      or record.state.raw_value == 'draft' and 'background: #fbbf24; color: #92400e; border: 1px solid #f59e0b; box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);' 
-                                      or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
-                                    <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
-                                    <field name="state"/>
-                                </span>
+                                <t t-if="record.state.raw_value == 'draft'">
+                                    <button type="edit" class="btn btn-success px-3 py-2 text-uppercase small font-weight-bold" style="background: #28a745; color: #ffffff; border: 1px solid #218838; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3); cursor: pointer; border-radius: 4px;">
+                                        <i class="fa fa-pencil-alt mr-1" style="font-size: 0.8rem;" title="Edit"></i>
+                                        Edit / संपादन
+                                    </button>
+                                </t>
+                                <t t-if="record.state.raw_value != 'draft'">
+                                    <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                          t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
+                                          or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
+                                          or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
+                                          or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
+                                        <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
+                                        <field name="state"/>
+                                    </span>
+                                </t>
                                 <div class="d-flex align-items-center text-muted">
-                                    <i class="fa fa-camera mr-1" style="font-size: 0.8rem;" title="Survey"></i>
                                     <span class="small">Survey</span>
                                 </div>
                             </div>

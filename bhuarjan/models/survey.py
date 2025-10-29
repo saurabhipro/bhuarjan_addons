@@ -219,6 +219,48 @@ class Survey(models.Model):
                     raise ValidationError(_('Khasra number %s already exists in village %s in another survey.') % 
                                         (survey.khasra_number, survey.village_id.name))
 
+    def action_submit(self):
+        """Submit the survey for approval"""
+        for record in self:
+            if not record.khasra_number:
+                raise ValidationError(_('Please enter khasra number before submitting.'))
+            record.state = 'submitted'
+            # Log the submission
+            record.message_post(
+                body=_('Survey submitted for approval by %s') % self.env.user.name,
+                message_type='notification'
+            )
+
+    def action_approve(self):
+        """Approve the survey"""
+        for record in self:
+            record.state = 'approved'
+            # Log the approval
+            record.message_post(
+                body=_('Survey approved by %s') % self.env.user.name,
+                message_type='notification'
+            )
+
+    def action_reject(self):
+        """Reject the survey"""
+        for record in self:
+            record.state = 'rejected'
+            # Log the rejection
+            record.message_post(
+                body=_('Survey rejected by %s') % self.env.user.name,
+                message_type='notification'
+            )
+
+    def action_reset_to_draft(self):
+        """Reset survey to draft"""
+        for record in self:
+            record.state = 'draft'
+            # Log the reset
+            record.message_post(
+                body=_('Survey reset to draft by %s') % self.env.user.name,
+                message_type='notification'
+            )
+
     def action_download_form10(self):
         """Download Form-10 as PDF"""
         for record in self:

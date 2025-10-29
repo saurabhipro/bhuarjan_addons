@@ -140,31 +140,53 @@
         <field name="name">bhu.landowner.kanban</field>
         <field name="model">bhu.landowner</field>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban string="Landowners / भूमिस्वामी" class="o_kanban_large_column o_kanban_mobile">
                 <field name="name"/>
+                <field name="father_name"/>
+                <field name="spouse_name"/>
                 <field name="village_id"/>
-                <field name="district_id"/>
-                <field name="age"/>
                 <field name="gender"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong class="o_kanban_record_title">
-                                            <field name="name"/>
-                                        </strong>
-                                        <div class="o_kanban_record_subtitle">
-                                            <field name="father_name"/>
+                        <div class="oe_kanban_card o_kanban_record" style="background: #ffffff; border: 2px solid #20bf6b; border-radius: 8px; transition: all 0.3s ease; min-height: auto; margin-bottom: 12px; width: 100%; max-width: 100%;">
+                            <div class="oe_kanban_content" style="padding: 10px 12px;">
+                                <div class="d-flex justify-content-between align-items-start" style="gap: 8px;">
+                                    <div class="flex-grow-1" style="min-width: 0;">
+                                        <div class="mb-1">
+                                            <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem; font-weight: 700; line-height: 1.3;">
+                                                <field name="name"/>
+                                            </h6>
+                                        </div>
+                                        <div class="mb-1" style="font-size: 0.85rem; color: #6c757d;">
+                                            <t t-if="record.gender.raw_value == 'female' and record.spouse_name.raw_value">
+                                                <i class="fa fa-heart mr-1" style="font-size: 0.75rem;" title="Husband"></i>
+                                                <field name="spouse_name"/>
+                                            </t>
+                                            <t t-if="record.gender.raw_value != 'female'">
+                                                <i class="fa fa-user mr-1" style="font-size: 0.75rem;" title="Father"></i>
+                                                <field name="father_name"/>
+                                            </t>
+                                            <t t-if="record.gender.raw_value == 'female' and (record.spouse_name.raw_value == '' or record.spouse_name.raw_value == False)">
+                                                <i class="fa fa-user mr-1" style="font-size: 0.75rem;" title="Father"></i>
+                                                <field name="father_name"/>
+                                            </t>
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: #495057;">
+                                            <i class="fa fa-map-marker mr-1 text-primary" style="font-size: 0.75rem;" title="Village"></i>
+                                            <field name="village_id"/>
                                         </div>
                                     </div>
-                                    <div class="o_kanban_record_body">
-                                        <div>
-                                            <i class="fa fa-map-marker" title="Location"/> <field name="village_id"/> - <field name="district_id"/>
-                                        </div>
-                                        <div>
-                                            <i class="fa fa-user" title="Landowner"/> <field name="age"/> years, <field name="gender"/>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.85rem; padding: 4px;">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <a role="menuitem" type="edit" class="dropdown-item">
+                                                <i class="fa fa-pencil-alt mr-2 text-primary"></i> Edit
+                                            </a>
+                                            <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                                <i class="fa fa-trash mr-2"></i> Delete
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -182,7 +204,6 @@
         <field name="res_model">bhu.landowner</field>
         <field name="view_mode">list,form,kanban</field>
         <field name="search_view_id" ref="view_bhu_landowner_search"/>
-        <field name="context">{'search_default_group_district': 1}</field>
     </record>
 
 </odoo>

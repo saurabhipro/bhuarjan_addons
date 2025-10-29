@@ -28,4 +28,10 @@
     <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="5" />
     <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="6"/>
     <menuitem id="menu_bhu_reporting_form_10" name="Form 10 Download jhg" action="action_bulk_download_form10" parent="menu_bhu_reporting" sequence="6"/>
+       <!-- Optional: menu to open wizard -->
+    <menuitem id="menu_report_wizard"
+              name="Report Wizard"
+              parent="menu_bhu_reporting"
+              action="action_report_wizard"
+              sequence="50"/>
 </odoo>

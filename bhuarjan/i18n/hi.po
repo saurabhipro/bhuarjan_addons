@@ -4770,7 +4770,7 @@ msgstr "Supporting Evidence"
 #: model:ir.ui.menu,name:bhuarjan.menu_bhu_survey
 #: model_terms:ir.ui.view,arch_db:bhuarjan.view_payment_reconciliation_search
 msgid "Survey"
-msgstr "सर्वे"
+msgstr "+ नया सर्वे"
 
 #. module: bhuarjan
 #: model:ir.model,name:bhuarjan.model_bhu_survey

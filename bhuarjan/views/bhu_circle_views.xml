@@ -31,7 +31,7 @@
                             </group>
                         </group>
                     </sheet>
-                    <chatter/>
+                    <chatter groups="base.group_user"/>
                 </form>
             </field>
         </record>

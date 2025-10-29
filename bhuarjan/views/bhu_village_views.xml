@@ -44,7 +44,8 @@
                         </group>
                     </group>
                 </sheet>
-                <chatter/>
+                <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
+
             </form>
         </field>
     </record>

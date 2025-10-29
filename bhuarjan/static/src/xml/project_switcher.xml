@@ -3,11 +3,11 @@
     <template id="project_switcher_template" name="Project Switcher" inherit_id="web.layout">
         <xpath expr="//head" position="inside">
                     <div id="project_switcher_container" style="display: none;">
-                        <div class="o_project_switcher dropdown">
+                        <div class="o_project_switcher dropdown d-none">
                             <a class="dropdown-toggle o-no-caret" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                 <span class="fa fa-folder-open" title="All Projects"></span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                            <div class="dropdown-menu dropdown-menu-right d-none" role="menu">
                                 <div class="o_project_list">
                                     <div class=" o_project_item active" data-project-id="0">
                                         <input type="checkbox" class="project-checkbox" checked="checked"/>
@@ -28,7 +28,7 @@
                     
                     <!-- Project and District Display -->
                     <div id="project_info_display" style="display: none;">
-                        <div class="o_project_info">
+                        <div class="o_project_info d-none">
                             <div class="o_district_name" style="color: #ffd700; font-weight: bold; font-size: 12px;">All Districts</div>
                             <div class="o_project_name" style="color: #ffd700; font-weight: bold; font-size: 12px;">All Projects</div>
                         </div>

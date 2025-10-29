@@ -14,7 +14,7 @@
     <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="8" />
     <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="9" />
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="10" />
-    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3" />
+    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
     <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4"  groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
 
     <menuitem id="menu_bhu_stage2_section4" name="Stage 2 Section 4 Notification" action="action_bhu_notification4" parent="menu_bhu_process" sequence="1" />

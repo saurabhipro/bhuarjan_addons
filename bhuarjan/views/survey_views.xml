@@ -28,10 +28,6 @@
         <field name="arch" type="xml">
             <form string="Survey / सर्वे">
                 <header>
-                    <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
-                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
-                    <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
                 </header>
                 <sheet>
@@ -125,8 +121,6 @@
                                     <field name="father_name" string="Father's Name / पिता का नाम"/>
                                     <field name="age" string="Age / आयु"/>
                                     <field name="gender" string="Gender / लिंग"/>
-                                    <field name="mobile" string="Mobile / मोबाइल"/>
-                                    <field name="email" string="Email / ईमेल"/>
                                     <field name="village_id" string="Village / ग्राम"/>
                                     <field name="tehsil_id" string="Tehsil / तहसील"/>
                                     <field name="district_id" string="District / जिला"/>

@@ -10,6 +10,7 @@ class ResUsers(models.Model):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
 
+    mobile = fields.Char(string="Mobile")
     state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain())
     district_id = fields.Many2one('bhu.district', string='District / जिला')
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')

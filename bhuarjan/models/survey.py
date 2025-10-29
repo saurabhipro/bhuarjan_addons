@@ -107,6 +107,40 @@ class Survey(models.Model):
         for record in self:
             record.is_irrigated = record.irrigation_type == 'irrigated'
             record.is_unirrigated = record.irrigation_type == 'unirrigated'
+    
+    def get_qr_code_data(self):
+        """Generate QR code data for the survey"""
+        try:
+            import qrcode
+            import io
+            import base64
+            
+            # Generate QR code URL using production domain
+            qr_url = f"https://bhuarjan.com/form10/{self.survey_uuid}"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=2,
+            )
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            
+            # Generate image
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return img_str
+        except ImportError:
+            return None
+        except Exception:
+            return None
    
 
 

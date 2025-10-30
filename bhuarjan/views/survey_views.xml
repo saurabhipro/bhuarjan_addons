@@ -110,11 +110,7 @@
                                 </group>
                             </group>
                             
-                            <group>
-                                <group string="Attachments / संलग्नक">
-                                    <field name="attachment_ids" widget="many2many_binary"/>
-                                </group>
-                            </group>
+                            
                             
                         </page>
                         

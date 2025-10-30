@@ -153,8 +153,7 @@ class Survey(models.Model):
     location_accuracy = fields.Float(string='Location Accuracy (meters) / स्थान सटीकता (मीटर)', digits=(8, 2), help='GPS accuracy in meters', tracking=True)
     location_timestamp = fields.Datetime(string='Location Timestamp / स्थान समय', help='When the GPS coordinates were captured', tracking=True)
     
-    # Attachments
-    attachment_ids = fields.Many2many('ir.attachment', string='Attachments / संलग्नक', tracking=True)
+    # Attachments removed per request
     
     @api.model_create_multi
     def create(self, vals_list):

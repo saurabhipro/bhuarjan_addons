@@ -163,16 +163,16 @@
                                                 <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 20px;"><span t-field="survey.total_area"/></td>
                                                 <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 20px;"><span t-field="survey.acquired_area"/></td>
                                                 <td style="border: 1px solid #000; padding: 8px; font-size: 20px;">
-                                                    <t t-foreach="survey.landowner_ids" t-as="lo" t-foreach-index="i">
-                                                        <div>
-                                                            <t t-esc="(i or 0) + 1"/>. <t t-esc="lo.name"/>
-                                                            <t t-if="lo.gender == 'female' and lo.spouse_name">
-                                                                &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
-                                                            </t>
-                                                            <t t-elif="lo.father_name">
-                                                                &#160;पिता&#160;<t t-esc="lo.father_name"/>
-                                                            </t>
-                                                        </div>
+                                                    <t t-set="owners" t-value="survey.landowner_ids"/>
+                                                    <t t-foreach="owners" t-as="lo" t-foreach-index="i">
+                                                        <t t-esc="lo.name"/>
+                                                        <t t-if="lo.gender == 'female' and lo.spouse_name">
+                                                            &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
+                                                        </t>
+                                                        <t t-elif="lo.father_name">
+                                                            &#160;पिता&#160;<t t-esc="lo.father_name"/>
+                                                        </t>
+                                                        <t t-if="(i or 0) &lt; (len(owners) - 1)">, </t>
                                                     </t>
                                                 </td>
                                                 <td class="text-center" style="border: 1px solid #000; padding: 8px; font-size: 20px;">

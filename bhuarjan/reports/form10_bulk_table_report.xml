@@ -129,16 +129,16 @@
                                     </td>
                                     <td>
                                         <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
-                                            <t t-foreach="s.landowner_ids" t-as="lo" t-foreach-index="li">
-                                                <div>
-                                                    <t t-esc="(li or 0) + 1"/>. <t t-esc="lo.name"/>
-                                                    <t t-if="lo.gender == 'female' and lo.spouse_name">
-                                                        &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
-                                                    </t>
-                                                    <t t-elif="lo.father_name">
-                                                        &#160;पिता&#160;<t t-esc="lo.father_name"/>
-                                                    </t>
-                                                </div>
+                                            <t t-set="owners" t-value="s.landowner_ids"/>
+                                            <t t-foreach="owners" t-as="lo" t-foreach-index="li">
+                                                <t t-esc="lo.name"/>
+                                                <t t-if="lo.gender == 'female' and lo.spouse_name">
+                                                    &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
+                                                </t>
+                                                <t t-elif="lo.father_name">
+                                                    &#160;पिता&#160;<t t-esc="lo.father_name"/>
+                                                </t>
+                                                <t t-if="(li or 0) &lt; (len(owners) - 1)">, </t>
                                             </t>
                                         </t>
                                         <span t-if="not (s.landowner_ids and len(s.landowner_ids) &gt; 0)" style="color:#dc3545;font-weight:bold">नहीं</span>

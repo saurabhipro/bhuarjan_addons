@@ -75,89 +75,94 @@
                         </td>
                     </tr>
                 </table>
-                <table class="bulk-form10-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" style="text-align:center">क्र.</th>
-                            <th rowspan="2" style="text-align:center">प्रभावित खसरा क्रमांक</th>
-                            <th rowspan="2" style="text-align:center">कुल रकबा (हे.में.)</th>
-                            <th rowspan="2" style="text-align:center">कुल अर्जित रकबा (हे.में.)</th>
-                            <th rowspan="2" style="text-align:center">भूमिस्वामी का नाम</th>
-                            <th colspan="4" style="text-align:center">भूमि का प्रकार</th>
-                            <th colspan="3" style="text-align:center">भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</th>
-                            <th colspan="6" style="text-align:center">भूमि पर स्थित परिसंपत्तियों का विवरण</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align:center">एक फसली</th>
-                            <th style="text-align:center">दो फसली</th>
-                            <th style="text-align:center">सिंचित</th>
-                            <th style="text-align:center">असिंचित</th>
-                            <th style="text-align:center">अविकसित</th>
-                            <th style="text-align:center">अर्द्ध विकसित</th>
-                            <th style="text-align:center">पूर्ण विकसित</th>
-                            <th style="text-align:center">मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</th>
-                            <th style="text-align:center">शेड (क्षेत्रफल वर्गफुट में)</th>
-                            <th style="text-align:center">कुँआ (कच्चा/पक्का) (हाँ/नहीं)</th>
-                            <th style="text-align:center">ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</th>
-                            <th style="text-align:center">तालाब (हाँ/नहीं)</th>
-                            <th style="text-align:center">रिमार्क</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="surveys" t-as="s">
-                            <tr t-att-style="'page-break-inside: avoid; break-inside: avoid; -webkit-region-break-inside: avoid;' + ((s_index &gt; 0 and (s_index % 14) == 0) and ' page-break-before: always;' or '')">
-                                <td style="text-align:center"><t t-esc="s_index + 1"/></td>
-                                <td style="text-align:center">
-                                    <t t-if="s.khasra_number">
-                                        <t t-esc="s.khasra_number"/>
-                                    </t>
-                                    <span t-if="not s.khasra_number" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td style="text-align:center">
-                                    <t t-if="s.total_area is not None">
-                                        <t t-esc="s.total_area"/>
-                                    </t>
-                                    <span t-if="s.total_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td style="text-align:center">
-                                    <t t-if="s.acquired_area is not None">
-                                        <t t-esc="s.acquired_area"/>
-                                    </t>
-                                    <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td>
-                                    <t t-set="lo" t-value="s.landowner_ids and s.landowner_ids[0] or False"/>
-                                    <t t-if="lo and lo.name">
-                                        <span t-esc="lo.name"/>
-                                    </t>
-                                    <span t-if="not (lo and lo.name)" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td style="text-align:center"><span t-if="s.is_single_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_single_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.is_double_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_double_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.is_irrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_irrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.is_unirrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_unirrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.tree_development_stage == 'undeveloped'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'undeveloped'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.tree_development_stage == 'semi_developed'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'semi_developed'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.tree_development_stage == 'fully_developed'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'fully_developed'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center">
-                                    <span t-if="s.house_type">
-                                        <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/>
-                                    </span>
-                                    <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center">
-                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
-                                    <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
-                                    <span t-if="s.has_well == 'no'" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                </td>
-                                <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td><span style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                <t t-foreach="range(0, len(surveys), 14)" t-as="start">
+                    <table class="bulk-form10-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="text-align:center">क्र.</th>
+                                <th rowspan="2" style="text-align:center">प्रभावित खसरा क्रमांक</th>
+                                <th rowspan="2" style="text-align:center">कुल रकबा (हे.में.)</th>
+                                <th rowspan="2" style="text-align:center">कुल अर्जित रकबा (हे.में.)</th>
+                                <th rowspan="2" style="text-align:center">भूमिस्वामी का नाम</th>
+                                <th colspan="4" style="text-align:center">भूमि का प्रकार</th>
+                                <th colspan="3" style="text-align:center">भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</th>
+                                <th colspan="6" style="text-align:center">भूमि पर स्थित परिसंपत्तियों का विवरण</th>
                             </tr>
-                        </t>
-                    </tbody>
-                </table>
+                            <tr>
+                                <th style="text-align:center">एक फसली</th>
+                                <th style="text-align:center">दो फसली</th>
+                                <th style="text-align:center">सिंचित</th>
+                                <th style="text-align:center">असिंचित</th>
+                                <th style="text-align:center">अविकसित</th>
+                                <th style="text-align:center">अर्द्ध विकसित</th>
+                                <th style="text-align:center">पूर्ण विकसित</th>
+                                <th style="text-align:center">मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</th>
+                                <th style="text-align:center">शेड (क्षेत्रफल वर्गफुट में)</th>
+                                <th style="text-align:center">कुँआ (कच्चा/पक्का) (हाँ/नहीं)</th>
+                                <th style="text-align:center">ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</th>
+                                <th style="text-align:center">तालाब (हाँ/नहीं)</th>
+                                <th style="text-align:center">रिमार्क</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="surveys[start:start+14]" t-as="s">
+                                <tr>
+                                    <td style="text-align:center"><t t-esc="start + s_index + 1"/></td>
+                                    <td style="text-align:center">
+                                        <t t-if="s.khasra_number">
+                                            <t t-esc="s.khasra_number"/>
+                                        </t>
+                                        <span t-if="not s.khasra_number" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <t t-if="s.total_area is not None">
+                                            <t t-esc="s.total_area"/>
+                                        </t>
+                                        <span t-if="s.total_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <t t-if="s.acquired_area is not None">
+                                            <t t-esc="s.acquired_area"/>
+                                        </t>
+                                        <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td>
+                                        <t t-set="lo" t-value="s.landowner_ids and s.landowner_ids[0] or False"/>
+                                        <t t-if="lo and lo.name">
+                                            <span t-esc="lo.name"/>
+                                        </t>
+                                        <span t-if="not (lo and lo.name)" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td style="text-align:center"><span t-if="s.is_single_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_single_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.is_double_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_double_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.is_irrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_irrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.is_unirrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_unirrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.tree_development_stage == 'undeveloped'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'undeveloped'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.tree_development_stage == 'semi_developed'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'semi_developed'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.tree_development_stage == 'fully_developed'"><span t-esc="s.tree_count"/></span><span t-if="s.tree_development_stage != 'fully_developed'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center">
+                                        <span t-if="s.house_type">
+                                            <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/>
+                                        </span>
+                                        <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center">
+                                        <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
+                                        <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
+                                        <span t-if="s.has_well != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
+                                    <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td><span style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <t t-if="(start + 14) &lt; len(surveys)">
+                        <div style="page-break-after: always;"></div>
+                    </t>
+                </t>
 
                 <!-- Signatures after all rows -->
                 <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; justify-content: space-between !important; margin-top: 30px !important; page-break-inside: avoid; break-inside: avoid;">

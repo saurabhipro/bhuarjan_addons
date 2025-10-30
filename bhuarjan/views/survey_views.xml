@@ -5,7 +5,7 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'" multi_edit="1" default_order="create_date desc">
+            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'" multi_edit="1" default_order="create_date desc">
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="project_id"/>
@@ -26,8 +26,9 @@
         <field name="name">bhu.survey.form</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <form string="Survey / सर्वे">
+            <form string="Survey / सर्वे" duplicate="0">
                 <header>
+                    
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Are you sure you want to submit this survey?"/>
                     <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>

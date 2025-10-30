@@ -95,27 +95,32 @@
                                 <h2 class="hindi-text" style="text-decoration: underline; margin: 0; padding: 0; text-align: center; font-size: 25px; line-height: 1.2;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
                             </div>
                             
-                            <!-- Project Information -->
+                            <!-- Project Information (bordered table as per screenshot) -->
                             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                                 <tr>
-                                    <td style="width: 50%; padding: 5px;">
-                                        <p class="hindi-text"><strong>परियोजना का नाम :</strong> <span t-field="survey.project_id.name"/></p>
+                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                        <strong>परियोजना का नाम :</strong>
+                                        <span t-field="survey.project_id.name"/>
                                     </td>
-                                    <td style="width: 50%; padding: 5px;">
-                                        <p class="hindi-text"><strong>विभाग का नाम</strong> <span t-field="survey.department_id.name"/></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 50%; padding: 5px;">
-                                        <p class="hindi-text"><strong>ग्राम का नाम</strong> <span t-field="survey.village_id.name"/></p>
-                                    </td>
-                                    <td style="width: 50%; padding: 5px;">
-                                        <p class="hindi-text"><strong>तहसील का नाम</strong> <span t-field="survey.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong></p>
+                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                        <strong>विभाग का नाम</strong>
+                                        <span t-field="survey.department_id.name"/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" style="padding: 5px;">
-                                        <p class="hindi-text"><strong>सर्वे दिनाँक</strong> <span t-field="survey.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></p>
+                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                        <strong>ग्राम का नाम</strong>
+                                        <span t-field="survey.village_id.name"/>
+                                    </td>
+                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                        <strong>तहसील का नाम</strong>
+                                        <span t-field="survey.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding: 6px; border: 1px solid #000;">
+                                        <strong>सर्वे दिनाँक</strong>
+                                        <span t-field="survey.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                                     </td>
                                 </tr>
                             </table>

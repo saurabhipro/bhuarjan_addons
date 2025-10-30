@@ -21,6 +21,15 @@
                 .bulk-form10-table { width: 100%; border-collapse: collapse; font-size: 14px; }
                 .bulk-form10-table th, .bulk-form10-table td { border: 1px solid #444; padding: 8px; }
                 .bulk-form10-table th { background: #f2f4f7; text-align: left; font-weight: 700; }
+                /* Keep headers on each page and avoid row splitting across pages */
+                .bulk-form10-table thead { display: table-header-group; }
+                .bulk-form10-table tfoot { display: table-row-group; }
+                .bulk-form10-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+                .bulk-form10-table td, .bulk-form10-table th { page-break-inside: avoid !important; break-inside: avoid !important; }
+                .bulk-form10-table { page-break-inside: auto; page-break-after: auto; }
+                table { page-break-after: auto; }
+                tr { page-break-after: auto; }
+                td { page-break-after: auto; }
                 .page-break { page-break-after: always; }
                 .signature-blocks { display: flex; justify-content: space-between; gap: 0; margin-top: 40px; }
                 .signature { width: 23%; text-align: center; padding-top: 0; }
@@ -96,16 +105,32 @@
                     </thead>
                     <tbody>
                         <t t-foreach="surveys" t-as="s">
-                            <tr t-att-class="(((s_index + 1) % 10) == 0) and 'row-break' or ''">
+                            <tr t-att-style="'page-break-inside: avoid; break-inside: avoid; -webkit-region-break-inside: avoid;' + ((s_index &gt; 0 and (s_index % 14) == 0) and ' page-break-before: always;' or '')">
                                 <td style="text-align:center"><t t-esc="s_index + 1"/></td>
-                                <td style="text-align:center"><t t-esc="s.khasra_number"/></td>
-                                <td style="text-align:center"><t t-esc="s.total_area"/></td>
-                                <td style="text-align:center"><t t-esc="s.acquired_area"/></td>
+                                <td style="text-align:center">
+                                    <t t-if="s.khasra_number">
+                                        <t t-esc="s.khasra_number"/>
+                                    </t>
+                                    <span t-if="not s.khasra_number" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                </td>
+                                <td style="text-align:center">
+                                    <t t-if="s.total_area is not None">
+                                        <t t-esc="s.total_area"/>
+                                    </t>
+                                    <span t-if="s.total_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                </td>
+                                <td style="text-align:center">
+                                    <t t-if="s.acquired_area is not None">
+                                        <t t-esc="s.acquired_area"/>
+                                    </t>
+                                    <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                </td>
                                 <td>
                                     <t t-set="lo" t-value="s.landowner_ids and s.landowner_ids[0] or False"/>
-                                    <t t-if="lo">
+                                    <t t-if="lo and lo.name">
                                         <span t-esc="lo.name"/>
                                     </t>
+                                    <span t-if="not (lo and lo.name)" style="color:#dc3545;font-weight:bold">नहीं</span>
                                 </td>
                                 <td style="text-align:center"><span t-if="s.is_single_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_single_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                 <td style="text-align:center"><span t-if="s.is_double_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_double_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
@@ -128,18 +153,37 @@
                                 </td>
                                 <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                 <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                <td></td>
+                                <td><span style="color:#dc3545;font-weight:bold">नहीं</span></td>
                             </tr>
                         </t>
                     </tbody>
                 </table>
 
                 <!-- Signatures after all rows -->
-                <div class="signature-blocks">
-                    <div class="signature">(हस्ताक्षर)<br/>अपेक्षक निकाय के<br/>अधिकृत प्रतिनिधि<br/>नाम -<br/>पदनाम</div>
-                    <div class="signature">(हस्ताक्षर)<br/>तहसीलदार<br/>नाम -</div>
-                    <div class="signature">(हस्ताक्षर)<br/>नायब तहसीलदार<br/>नाम -</div>
-                    <div class="signature">(हस्ताक्षर)<br/>राजस्व निरीक्षक<br/>नाम-<br/>रा.नि.मं.</div>
+                <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; justify-content: space-between !important; margin-top: 30px !important; page-break-inside: avoid; break-inside: avoid;">
+                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
+                    </div>
+                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                    </div>
+                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                    </div>
+                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
+                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
+                    </div>
                 </div>
             </div>
             </t>

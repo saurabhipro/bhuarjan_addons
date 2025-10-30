@@ -8,7 +8,8 @@
         <field name="report_name">bhuarjan.form10_bulk_table_report</field>
         <field name="report_file">bhuarjan.form10_bulk_table_report</field>
         <field name="print_report_name">'Form10_Bulk_' + (object and object[0].project_id.name or 'All')</field>
-        <field name="binding_model_id" ref="model_bhu_survey"/>
+        <!-- <field name="binding_model_id" ref="model_bhu_survey"/> -->
+        
     </record>
 
     <template id="form10_bulk_table_report">

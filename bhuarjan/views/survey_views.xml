@@ -55,7 +55,7 @@
                             <field name="survey_date" widget="date" readonly="state == 'locked'" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी">
-                            <field name="company_id" readonly="state == 'locked'" required="1" string="Company * / कंपनी *"/>
+                            <field name="company_id" readonly="state == 'locked'" required="1" string="District"/>
                             <field name="village_id" widget="selection" readonly="state == 'locked'" required="1" string="Village * / ग्राम का नाम *"/>
                             <field name="tehsil_id" widget="selection" readonly="state == 'locked'" required="1" string="Tehsil * / तहसील *"/>
                             <field name="district_name" readonly="state == 'locked'"/>

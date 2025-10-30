@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <!-- Sample Department Data -->
-        <record id="dept_land_acquisition" model="bhu.department">
-            <field name="name">Land Acquisition Department</field>
-            <field name="code">LAD</field>
-            <field name="description">Department responsible for land acquisition processes</field>
-            <field name="head_of_department">Land Acquisition Officer</field>
-            <field name="contact_number">+91-1234567890</field>
-            <field name="email">lad@chhattisgarh.gov.in</field>
-            <field name="address">Land Acquisition Department, Raigarh, Chhattisgarh</field>
-        </record>
         
         <record id="dept_public_works" model="bhu.department">
             <field name="name">Public Works Department</field>

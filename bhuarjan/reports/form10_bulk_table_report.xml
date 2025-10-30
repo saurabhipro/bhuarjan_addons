@@ -164,32 +164,34 @@
                     </t>
                 </t>
 
-                <!-- Signatures after all rows -->
-                <div style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; justify-content: space-between !important; margin-top: 30px !important; page-break-inside: avoid; break-inside: avoid;">
-                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
-                    </div>
-                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                    </div>
-                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                    </div>
-                    <div style="width: 22% !important; min-width: 180px !important; text-align: center !important; display: inline-block !important;">
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
-                        <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
-                    </div>
-                </div>
+                <!-- Signatures after all rows (table layout for PDF engine compatibility) -->
+                <table style="width:100%; border-collapse:collapse; margin-top: 30px; page-break-inside: avoid;">
+                    <tr>
+                        <td style="width:25%; text-align:center; padding:6px;">
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
+                        </td>
+                        <td style="width:25%; text-align:center; padding:6px;">
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                        </td>
+                        <td style="width:25%; text-align:center; padding:6px;">
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                        </td>
+                        <td style="width:25%; text-align:center; padding:6px;">
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
+                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
+                        </td>
+                    </tr>
+                </table>
             </div>
             </t>
         </t>

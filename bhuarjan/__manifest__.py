@@ -72,10 +72,12 @@
             'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',
             'bhuarjan/static/src/js/menu_icons.js',
+            'bhuarjan/static/src/js/logout_fix.js',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/css/menu_styling.css',
             'bhuarjan/static/src/css/menu_icons.css',
+            'bhuarjan/static/src/js/logout_fix.js',
         ],
     },
     'installable': True,

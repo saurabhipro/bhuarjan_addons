@@ -7,9 +7,17 @@ class ReportWizard(models.TransientModel):
 
     form_10 = fields.Boolean(string="Form 10 Download")
     village_id = fields.Many2one('bhu.village', string='Village', required=True)
+    allowed_village_ids = fields.Many2many(
+        'bhu.village',
+        string='Allowed Villages',
+        default=lambda self: [(6, 0, self.env.user.village_ids.ids)],
+    )
 
     def action_print_report(self):
         # Fetch all surveys for the selected village, irrespective of status
+        # Safety: if user is patwari, ensure selected village is assigned to them
+        if self.env.user.bhuarjan_role == 'patwari' and self.village_id and self.village_id.id not in self.env.user.village_ids.ids:
+            raise UserError("You are not allowed to download for this village.")
         all_records = self.env['bhu.survey'].search([
             ('village_id', '=', self.village_id.id)
         ])

@@ -7,7 +7,8 @@
             <form string="Generate Report">
                 <group>
                     <field name="form_10"/>
-                    <field name="village_id" options="{'no_open': True}"/>
+                    <field name="allowed_village_ids" invisible="1"/>
+                    <field name="village_id" options="{'no_open': True}" domain="[('id','in', allowed_village_ids)]"/>
                 </group>
                 <footer>
                     <button name="action_print_report"
@@ -24,11 +25,12 @@
     </record>
 
     <!-- Wizard Action -->
-    <record id="action_report_wizard" model="ir.actions.act_window">
+            <record id="action_report_wizard" model="ir.actions.act_window">
         <field name="name">Report Wizard</field>
         <field name="res_model">report.wizard</field>
         <field name="view_mode">form</field>
-        <field name="target">new</field>
+                <field name="target">new</field>
+                <field name="context">{}</field>
     </record>
 
 

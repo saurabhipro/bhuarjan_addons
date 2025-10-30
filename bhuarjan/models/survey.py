@@ -7,7 +7,8 @@ class Survey(models.Model):
     _name = 'bhu.survey'
     _description = 'Survey (सर्वे)'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'survey_date desc, name'
+    # Show latest surveys first everywhere (kanban, list, search)
+    _order = 'create_date desc, id desc'
 
     # Basic Information
     user_id = fields.Many2one('res.users', string="User", default=lambda self : self.env.user.id, readonly=True)

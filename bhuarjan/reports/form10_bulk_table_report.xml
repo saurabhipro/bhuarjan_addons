@@ -75,7 +75,7 @@
                         </td>
                     </tr>
                 </table>
-                <t t-foreach="range(0, len(surveys), 14)" t-as="start">
+                <t t-foreach="range(0, len(surveys), 10)" t-as="start">
                     <table class="bulk-form10-table">
                         <thead>
                             <tr>
@@ -105,7 +105,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="surveys[start:start+14]" t-as="s">
+                            <t t-foreach="surveys[start:start+10]" t-as="s">
                                 <tr>
                                     <td style="text-align:center"><t t-esc="start + s_index + 1"/></td>
                                     <td style="text-align:center">
@@ -159,39 +159,38 @@
                             </t>
                         </tbody>
                     </table>
-                    <t t-if="(start + 14) &lt; len(surveys)">
+                    <!-- Footer (signatures) on every page -->
+                    <table style="width:100%; border-collapse:collapse; margin-top: 20px; page-break-inside: avoid;">
+                        <tr>
+                            <td style="width:25%; text-align:center; padding:6px;">
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
+                            </td>
+                            <td style="width:25%; text-align:center; padding:6px;">
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                            </td>
+                            <td style="width:25%; text-align:center; padding:6px;">
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
+                            </td>
+                            <td style="width:25%; text-align:center; padding:6px;">
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <t t-if="(start + 10) &lt; len(surveys)">
                         <div style="page-break-after: always;"></div>
                     </t>
                 </t>
-
-                <!-- Signatures after all rows (table layout for PDF engine compatibility) -->
-                <table style="width:100%; border-collapse:collapse; margin-top: 30px; page-break-inside: avoid;">
-                    <tr>
-                        <td style="width:25%; text-align:center; padding:6px;">
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
-                        </td>
-                        <td style="width:25%; text-align:center; padding:6px;">
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                        </td>
-                        <td style="width:25%; text-align:center; padding:6px;">
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
-                        </td>
-                        <td style="width:25%; text-align:center; padding:6px;">
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
-                            <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
-                        </td>
-                    </tr>
-                </table>
             </div>
             </t>
         </t>

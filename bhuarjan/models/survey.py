@@ -28,7 +28,7 @@ class Survey(models.Model):
     # Single Khasra Details - One survey per khasra
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, tracking=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
-    acquired_area = fields.Float(string='Acquired Area (Hectares) / अधिग्रहित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
+    acquired_area = fields.Float(string='Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     
     # Land Details
     crop_type = fields.Selection([
@@ -416,7 +416,7 @@ class SurveyLine(models.Model):
     survey_id = fields.Many2one('bhu.survey', string='Survey', required=True, ondelete='cascade')
     khasra_number = fields.Char(string='Khasra Number / प्रभावित खसरा क्रमांक', required=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल रकबा (हे.में.)', required=True, digits=(10, 4))
-    acquired_area = fields.Float(string='Acquired Area (Hectares) / कुल अर्जित रकबा (हे.में.)', required=True, digits=(10, 4))
+    acquired_area = fields.Float(string='Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हे.में.)', required=True, digits=(10, 4))
     landowner_name = fields.Char(string='Landowner Name / भूमिस्वामी का नाम', required=True)
     
     # Land Type / भूमि का प्रकार

@@ -4,7 +4,7 @@ import { registry } from "@odoo/web";
 import { Menu } from "@web/webclient/menu/menu";
 import { patch } from "@web/core/utils/patch";
 
-patch(Menu.prototype, "bhuarjan.menu_icons", {
+patch(Menu.prototype, {
     _updateMenuIcons() {
         // Check if element exists before accessing it
         if (!this.el || !this.el.querySelector) {

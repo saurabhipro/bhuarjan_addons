@@ -19,6 +19,7 @@ access_bhuarjan_settings_master,access_bhuarjan_settings_master,model_bhuarjan_s
 access_bhuarjan_sequence_settings,access_bhuarjan_sequence_settings,model_bhuarjan_sequence_settings,base.group_user,1,1,1,1
 access_bhuarjan_workflow_settings,access_bhuarjan_workflow_settings,model_bhuarjan_workflow_settings,base.group_user,1,1,1,1
 access_report_wizard,access_report_wizard,model_report_wizard,base.group_user,1,1,1,1
+access_bhu_survey_message_wizard,access_bhu_survey_message_wizard,model_bhu_survey_message_wizard,base.group_user,1,0,1,0
 
 
 

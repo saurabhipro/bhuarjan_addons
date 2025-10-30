@@ -230,6 +230,18 @@ class Survey(models.Model):
                 body=_('Survey submitted for approval by %s') % self.env.user.name,
                 message_type='notification'
             )
+        # After submit, open a small popup with Survey No
+        wiz = self.env['bhu.survey.message.wizard'].create({
+            'message': _('Survey Submitted.\nSurvey No: %s') % ', '.join(self.mapped('name'))
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.survey.message.wizard',
+            'res_id': wiz.id,
+            'view_mode': 'form',
+            'target': 'new',
+            'name': _('Information'),
+        }
 
     def action_approve(self):
         """Approve the survey"""

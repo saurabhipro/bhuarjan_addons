@@ -132,16 +132,11 @@
                                             <t t-foreach="s.landowner_ids" t-as="lo" t-foreach-index="li">
                                                 <div>
                                                     <t t-esc="(li or 0) + 1"/>. <t t-esc="lo.name"/>
-                                                    <t t-if="lo.gender == 'female'">
-                                                        <t t-if="lo.spouse_name">
-                                                            &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            &#160;पुत्री&#160;<t t-esc="lo.father_name or ''"/>
-                                                        </t>
+                                                    <t t-if="lo.gender == 'female' and lo.spouse_name">
+                                                        &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
                                                     </t>
-                                                    <t t-else="">
-                                                        &#160;पुत्र&#160;<t t-esc="lo.father_name or ''"/>
+                                                    <t t-elif="lo.father_name">
+                                                        &#160;पिता&#160;<t t-esc="lo.father_name"/>
                                                     </t>
                                                 </div>
                                             </t>

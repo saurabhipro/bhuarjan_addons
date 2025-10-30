@@ -6,15 +6,18 @@ class ReportWizard(models.TransientModel):
     _description = 'Report Wizard'
 
     form_10 = fields.Boolean(string="Form 10 Download")
+    village_id = fields.Many2one('bhu.village', string='Village', required=True)
 
     def action_print_report(self):
+        # Fetch all surveys for the selected village, irrespective of status
         all_records = self.env['bhu.survey'].search([
-            ('village_id', 'in', self.env.user.village_ids.ids)
+            ('village_id', '=', self.village_id.id)
         ])
         if not all_records:
             raise UserError("No records found for your villages.")
 
-        report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        # Use consolidated single-PDF table report
+        report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
         return report_action.report_action(all_records)  
 
     def action_cancel(self):

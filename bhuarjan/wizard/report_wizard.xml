@@ -7,6 +7,7 @@
             <form string="Generate Report">
                 <group>
                     <field name="form_10"/>
+                    <field name="village_id" options="{'no_open': True}"/>
                 </group>
                 <footer>
                     <button name="action_print_report"

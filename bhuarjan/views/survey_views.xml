@@ -37,7 +37,7 @@
                 <sheet>
                     <!-- <div class="oe_title" style="margin-bottom: 10px;">
                         <h1 style="margin-bottom: 5px;">
-                            <field name="name" placeholder="Survey Number / सर्वे नंबर" required="1"/>
+                            <field name="name" placeholder="Survey Number / सर्वे नंबर" required="1" invisible="1"/>
                         </h1>
                     </div>
                      -->

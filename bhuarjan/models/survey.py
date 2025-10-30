@@ -269,9 +269,18 @@ class Survey(models.Model):
             return report_action.report_action(record)
 
     def action_bulk_download_form10(self):
-        print("\n\n jhdfjasdgfjasdgfjasgdfjshdgfshj ----------------")
-        all_records = self.search([('village_id', 'in', self.env.user.village_ids.ids)])
-        report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        """Download one PDF containing all visible surveys in a table layout.
+        - 10 rows per page, signature section at the end.
+        """
+        # Respect current user's visibility (patwari: own + assigned villages)
+        if self.env.user.bhuarjan_role == 'patwari':
+            domain = ['|', ('user_id', '=', self.env.user.id), ('village_id', 'in', self.env.user.village_ids.ids)]
+        else:
+            domain = []
+
+        all_records = self.search(domain)
+        # Use consolidated single-PDF table report
+        report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
         return report_action.report_action(all_records)
 
     def action_download_award_letter(self):

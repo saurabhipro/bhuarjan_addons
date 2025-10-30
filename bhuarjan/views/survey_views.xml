@@ -104,6 +104,9 @@
                                     <field name="has_tubewell" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
                                     <field name="has_pond" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
                                 </group>
+                                <group string="Remarks / टिप्पणी">
+                                    <field name="remarks" placeholder="Enter any additional notes"/>
+                                </group>
                                 <group string="Survey Image / सर्वे छवि">
                                     <field name="survey_image" widget="image" class="oe_avatar"/>
                                     <field name="survey_image_filename" invisible="1"/>

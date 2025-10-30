@@ -154,6 +154,9 @@ class Survey(models.Model):
     location_timestamp = fields.Datetime(string='Location Timestamp / स्थान समय', help='When the GPS coordinates were captured', tracking=True)
     
     # Attachments removed per request
+
+    # Remarks
+    remarks = fields.Text(string='Remarks / टिप्पणी', tracking=True)
     
     @api.model_create_multi
     def create(self, vals_list):

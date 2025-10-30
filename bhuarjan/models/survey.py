@@ -222,6 +222,25 @@ class Survey(models.Model):
                     raise ValidationError(_('Khasra number %s already exists in village %s in another survey.') % 
                                         (survey.khasra_number, survey.village_id.name))
 
+    # Business validations
+    @api.constrains('total_area', 'acquired_area')
+    def _check_areas_positive_and_relation(self):
+        for rec in self:
+            # both areas must be strictly greater than zero
+            if rec.total_area is None or rec.total_area <= 0:
+                raise ValidationError(_('Total Area must be greater than 0.'))
+            if rec.acquired_area is None or rec.acquired_area <= 0:
+                raise ValidationError(_('Acquired Area must be greater than 0.'))
+            # acquired cannot exceed total
+            if rec.acquired_area > rec.total_area:
+                raise ValidationError(_('Acquired Area cannot be greater than Total Area.'))
+
+    @api.constrains('landowner_ids')
+    def _check_landowners_present(self):
+        for rec in self:
+            if not rec.landowner_ids:
+                raise ValidationError(_('At least one landowner is required on the survey.'))
+
     def action_submit(self):
         """Submit the survey for approval"""
         for record in self:

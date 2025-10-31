@@ -26,7 +26,8 @@
         <field name="name">bhu.survey.form</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <form string="Survey / सर्वे" duplicate="0">
+            <form string="Survey / सर्वे" duplicate="0" 
+            js_class="confirm_save_form" >
                 <header>
                     
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Are you sure you want to submit this survey?"/>

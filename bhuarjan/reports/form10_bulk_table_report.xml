@@ -26,7 +26,40 @@
         </t>
         <!-- Custom Header -->
         <div class="header">
-            
+            <style>
+                .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 2px solid #000; margin-bottom: 0; }
+                .header-info-table td { border: 1px solid #000; padding: 6px; }
+            </style>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
+
+            <table class="header-info-table table1" >
+                <tr>
+                    <td style="width: 50%;">
+                        <strong>परियोजना का नाम :</strong>
+                        <span t-if="first" t-field="first.project_id.name"/>
+                    </td>
+                    <td style="width: 50%;">
+                        <strong>विभाग का नाम</strong>
+                        <span t-if="first" t-field="first.department_id.name"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        <strong>ग्राम का नाम</strong>
+                        <span t-if="first" t-field="first.village_id.name"/>
+                    </td>
+                    <td style="width: 50%;">
+                        <strong>तहसील का नाम</strong>
+                        <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <strong>सर्वे दिनाँक</strong>
+                        <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                    </td>
+                </tr>
+            </table>
         </div>
         <!-- Custom Footer -->
         <div class="footer o_standard_footer" style="position: relative;">
@@ -112,8 +145,7 @@
                     unicode-bidi: embed;
                     direction: ltr;
                 }
-                .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 2px solid #000; margin-bottom: 0; }
-                .header-info-table td { border: 1px solid #000; padding: 6px; }
+                
                 .signature-footer { 
                     position: absolute;
                     bottom: 1cm;
@@ -139,37 +171,9 @@
                 <t t-foreach="range(0, len(surveys), 5)" t-as="start">
                     <div class="page-container" style="position: relative; min-height: calc(100vh - 6cm); padding-bottom: 6cm;">
                         <div class="content-wrapper">
-                    <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
 
                     <!-- Header info (project / department / village / tehsil / date) - unified with main table -->
-                    <table class="header-info-table table1" >
-                        <tr>
-                            <td style="width: 50%;">
-                                <strong>परियोजना का नाम :</strong>
-                                <span t-if="first" t-field="first.project_id.name"/>
-                            </td>
-                            <td style="width: 50%;">
-                                <strong>विभाग का नाम</strong>
-                                <span t-if="first" t-field="first.department_id.name"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%;">
-                                <strong>ग्राम का नाम</strong>
-                                <span t-if="first" t-field="first.village_id.name"/>
-                            </td>
-                            <td style="width: 50%;">
-                                <strong>तहसील का नाम</strong>
-                                <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <strong>सर्वे दिनाँक</strong>
-                                <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
-                            </td>
-                        </tr>
-                    </table>
+                    
                     <table class="bulk-form10-table" style="margin-top: 0; border-top: none;">
                         <thead>
                             <tr>

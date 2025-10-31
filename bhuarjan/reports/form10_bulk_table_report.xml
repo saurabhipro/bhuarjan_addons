@@ -19,8 +19,14 @@
             <t t-set="first" t-value="surveys and surveys[0] or False"/>
 
             <style>
-                .bulk-form10-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-                .bulk-form10-table th, .bulk-form10-table td { border: 1px solid #444; padding: 8px; }
+                @page {
+                    margin-top: 1cm;
+                    margin-bottom: 5.5cm;
+                    margin-left: 1cm;
+                    margin-right: 1cm;
+                }
+                .bulk-form10-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 3px solid #000; }
+                .bulk-form10-table th, .bulk-form10-table td { border: 2px solid #000; padding: 8px; }
                 .bulk-form10-table th { background: #f2f4f7; text-align: left; font-weight: 700; }
                 /* Keep headers on each page and avoid row splitting across pages */
                 .bulk-form10-table thead { display: table-header-group; }
@@ -28,9 +34,9 @@
                 .bulk-form10-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
                 .bulk-form10-table td, .bulk-form10-table th { page-break-inside: avoid !important; break-inside: avoid !important; }
                 .bulk-form10-table { page-break-inside: auto; page-break-after: auto; }
-                table { page-break-after: auto; }
+                table { page-break-after: auto; border: 3px solid #000; }
                 tr { page-break-after: auto; }
-                td { page-break-after: auto; }
+                td { page-break-after: auto; border: 2px solid #000; }
                 .page-break { page-break-after: always; }
                 .signature-blocks { display: flex; justify-content: space-between; gap: 0; margin-top: 40px; }
                 .signature { width: 23%; text-align: center; padding-top: 0; }
@@ -42,48 +48,68 @@
                     unicode-bidi: embed;
                     direction: ltr;
                 }
+                .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 3px solid #000; margin-bottom: 0; }
+                .header-info-table td { border: 2px solid #000; padding: 6px; }
+                .signature-footer { 
+                    position: absolute;
+                    bottom: 1cm;
+                    left: 1cm;
+                    right: 1cm;
+                    width: calc(100% - 2cm);
+                    page-break-inside: avoid;
+                }
+                .page-container {
+                    position: relative;
+                    min-height: calc(100vh - 6cm);
+                    padding-bottom: 6cm;
+                }
+                .content-wrapper {
+                    margin-bottom: 0;
+                }
             </style>
 
             <div class="page">
-                <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
+                <t t-foreach="range(0, len(surveys), 5)" t-as="start">
+                    <div class="page-container" style="position: relative; min-height: calc(100vh - 6cm); padding-bottom: 6cm;">
+                        <div class="content-wrapper">
+                    <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
 
-                <!-- Header info (project / department / village / tehsil / date) -->
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 14px;">
-                    <tr>
-                        <td style="width: 50%; padding: 6px; border: 1px solid #000;">
-                            <strong>परियोजना का नाम :</strong>
-                            <span t-if="first" t-field="first.project_id.name"/>
-                        </td>
-                        <td style="width: 50%; padding: 6px; border: 1px solid #000;">
-                            <strong>विभाग का नाम</strong>
-                            <span t-if="first" t-field="first.department_id.name"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50%; padding: 6px; border: 1px solid #000;">
-                            <strong>ग्राम का नाम</strong>
-                            <span t-if="first" t-field="first.village_id.name"/>
-                        </td>
-                        <td style="width: 50%; padding: 6px; border: 1px solid #000;">
-                            <strong>तहसील का नाम</strong>
-                            <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="padding: 6px; border: 1px solid #000;">
-                            <strong>सर्वे दिनाँक</strong>
-                            <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
-                        </td>
-                    </tr>
-                </table>
-                <t t-foreach="range(0, len(surveys), 10)" t-as="start">
-                    <table class="bulk-form10-table">
+                    <!-- Header info (project / department / village / tehsil / date) - unified with main table -->
+                    <table class="header-info-table">
+                        <tr>
+                            <td style="width: 50%;">
+                                <strong>परियोजना का नाम :</strong>
+                                <span t-if="first" t-field="first.project_id.name"/>
+                            </td>
+                            <td style="width: 50%;">
+                                <strong>विभाग का नाम</strong>
+                                <span t-if="first" t-field="first.department_id.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 50%;">
+                                <strong>ग्राम का नाम</strong>
+                                <span t-if="first" t-field="first.village_id.name"/>
+                            </td>
+                            <td style="width: 50%;">
+                                <strong>तहसील का नाम</strong>
+                                <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <strong>सर्वे दिनाँक</strong>
+                                <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="bulk-form10-table" style="margin-top: 0; border-top: none;">
                         <thead>
                             <tr>
                                 <th rowspan="2" style="text-align:center">क्र.</th>
                                 <th rowspan="2" style="text-align:center">प्रभावित खसरा क्रमांक</th>
                                 <th rowspan="2" style="text-align:center">कुल रकबा (हे.में.)</th>
-                                <th rowspan="2" style="text-align:center">कुल अर्जित रकबा (हे.में.)</th>
+                                <th rowspan="2" style="text-align:center">अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</th>
                                 <th rowspan="2" style="text-align:center">भूमिस्वामी का नाम</th>
                                 <th colspan="4" style="text-align:center">भूमि का प्रकार</th>
                                 <th colspan="3" style="text-align:center">भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</th>
@@ -106,7 +132,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="surveys[start:start+10]" t-as="s">
+                            <t t-foreach="surveys[start:start+5]" t-as="s">
                                 <tr>
                                     <td style="text-align:center"><t t-esc="start + s_index + 1"/></td>
                                     <td style="text-align:center">
@@ -129,21 +155,18 @@
                                     </td>
                                     <td>
                                         <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
-                                            <t t-foreach="s.landowner_ids" t-as="lo" t-foreach-index="li">
+                                            <t t-set="counter" t-value="1"/>
+                                            <t t-foreach="s.landowner_ids" t-as="lo">
                                                 <div>
-                                                    <t t-esc="(li or 0) + 1"/>. <t t-esc="lo.name"/>
-                                                    <t t-if="lo.gender == 'female'">
-                                                        <t t-if="lo.spouse_name">
-                                                            &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            &#160;पुत्री&#160;<t t-esc="lo.father_name or ''"/>
-                                                        </t>
+                                                    <t t-esc="counter"/>. <t t-esc="lo.name"/>
+                                                    <t t-if="lo.gender == 'female' and lo.spouse_name">
+                                                        &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
                                                     </t>
-                                                    <t t-else="">
-                                                        &#160;पुत्र&#160;<t t-esc="lo.father_name or ''"/>
+                                                    <t t-elif="lo.father_name">
+                                                        &#160;पिता&#160;<t t-esc="lo.father_name"/>
                                                     </t>
                                                 </div>
+                                                <t t-set="counter" t-value="counter + 1"/>
                                             </t>
                                         </t>
                                         <span t-if="not (s.landowner_ids and len(s.landowner_ids) &gt; 0)" style="color:#dc3545;font-weight:bold">नहीं</span>
@@ -169,40 +192,56 @@
                                     </td>
                                     <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                     <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                    <td><span style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                    <td>
+                                        <t t-if="s.remarks">
+                                            <t t-esc="s.remarks"/>
+                                        </t>
+                                        <span t-if="not s.remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                    </td>
                                 </tr>
                             </t>
                         </tbody>
                     </table>
-                    <!-- Footer (signatures) on every page -->
-                    <table style="width:100%; border-collapse:collapse; margin-top: 20px; page-break-inside: avoid;">
+                            <p style="margin: 4px 0 4px 0; font-size: 16px; font-weight: 700;"><strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong></p>
+                        </div>
+                        <!-- Footer (signatures) on every page - positioned at bottom -->
+                        <div class="signature-footer">
+                    <table style="width:100%; border-collapse:collapse; border: none;">
                         <tr>
-                            <td style="width:25%; text-align:center; padding:6px;">
+                            <td style="width:20%; text-align:center; padding:6px; border: none;">
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अपेक्षक निकाय के</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">अधिकृत प्रतिनिधि</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पदनाम</p>
                             </td>
-                            <td style="width:25%; text-align:center; padding:6px;">
+                            <td style="width:20%; text-align:center; padding:6px; border: none;">
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">तहसीलदार</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
                             </td>
-                            <td style="width:25%; text-align:center; padding:6px;">
+                            <td style="width:20%; text-align:center; padding:6px; border: none;">
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नायब तहसीलदार</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम -</p>
                             </td>
-                            <td style="width:25%; text-align:center; padding:6px;">
+                            <td style="width:20%; text-align:center; padding:6px; border: none;">
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">राजस्व निरीक्षक</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
                                 <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">रा.नि.मं.</p>
                             </td>
+                            <td style="width:20%; text-align:center; padding:6px; border: none;">
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">(हस्ताक्षर)</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">पटवारी</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">नाम-</p>
+                                <p style="margin: 4px 0; font-size: 16px; font-weight: 700;">हल्का नम्बर</p>
+                            </td>
                         </tr>
                     </table>
-                    <t t-if="(start + 10) &lt; len(surveys)">
+                        </div>
+                    </div>
+                    <t t-if="(start + 5) &lt; len(surveys)">
                         <div style="page-break-after: always;"></div>
                     </t>
                 </t>

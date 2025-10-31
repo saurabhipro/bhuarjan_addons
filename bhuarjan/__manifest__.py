@@ -23,6 +23,7 @@
         'data/chhattisgarh_tehsils_data.xml',
         'data/chhattisgarh_villages_data.xml',
         'data/settings_master_data.xml',
+        'data/qweb_report_paper_format.xml',
         'security/ir.model.access.csv',
         'security/secrurity.xml',
         'security/notification4_security.xml',

@@ -19,6 +19,12 @@
             <t t-set="first" t-value="surveys and surveys[0] or False"/>
 
             <style>
+                @page {
+                    margin-top: 1cm;
+                    margin-bottom: 5.5cm;
+                    margin-left: 1cm;
+                    margin-right: 1cm;
+                }
                 .bulk-form10-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 3px solid #000; }
                 .bulk-form10-table th, .bulk-form10-table td { border: 2px solid #000; padding: 8px; }
                 .bulk-form10-table th { background: #f2f4f7; text-align: left; font-weight: 700; }
@@ -45,25 +51,26 @@
                 .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 3px solid #000; margin-bottom: 0; }
                 .header-info-table td { border: 2px solid #000; padding: 6px; }
                 .signature-footer { 
-                    margin-top: auto;
+                    position: absolute;
+                    bottom: 1cm;
+                    left: 1cm;
+                    right: 1cm;
+                    width: calc(100% - 2cm);
                     page-break-inside: avoid;
-                    padding-top: 100px;
-                    margin-bottom: 0;
                 }
                 .page-container {
-                    display: flex;
-                    flex-direction: column;
-                    min-height: 100vh;
-                    justify-content: space-between;
+                    position: relative;
+                    min-height: calc(100vh - 6cm);
+                    padding-bottom: 6cm;
                 }
                 .content-wrapper {
-                    flex: 0 1 auto;
+                    margin-bottom: 0;
                 }
             </style>
 
             <div class="page">
                 <t t-foreach="range(0, len(surveys), 5)" t-as="start">
-                    <div class="page-container" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="page-container" style="position: relative; min-height: calc(100vh - 6cm); padding-bottom: 6cm;">
                         <div class="content-wrapper">
                     <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 20px;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
 

@@ -34,21 +34,21 @@
 
             <table class="header-info-table table1" >
                 <tr>
-                    <td style="width: 45%;">
+                    <td rowspan="3" style="width: 10%; text-align: center; vertical-align: middle;">
+                        <!-- Logo -->
+                        <img src="/bhuarjan/static/description/logo.png" 
+                             alt="Logo" 
+                             style="width: 95%; height: auto; max-width: 95%; display: block; margin: 0 auto;"/>
+                    </td>
+                    <td style="width: 40%;">
                         <strong>परियोजना का नाम :</strong>
                         <span t-if="first" t-field="first.project_id.name"/>
                     </td>
-                    <td style="width: 45%;">
+                    <td style="width: 40%;">
                         <strong>विभाग का नाम</strong>
                         <span t-if="first" t-field="first.department_id.name"/>
                     </td>
                     <td rowspan="3" style="width: 10%; text-align: center; vertical-align: middle;">
-                        <!-- Logo -->
-                        <div style="margin-bottom: 5px;">
-                            <img src="/bhuarjan/static/description/logo.png" 
-                                 alt="Logo" 
-                                 style="width: 90%; height: auto; max-height: 35px; display: block; margin: 0 auto;"/>
-                        </div>
                         <!-- QR Code -->
                         <t t-if="first">
                             <t t-set="qr_code_img" t-value="first.get_qr_code_data()"/>
@@ -70,11 +70,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 45%;">
+                    <td style="width: 40%;">
                         <strong>ग्राम का नाम</strong>
                         <span t-if="first" t-field="first.village_id.name"/>
                     </td>
-                    <td style="width: 45%;">
+                    <td style="width: 40%;">
                         <strong>तहसील का नाम</strong>
                         <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
                     </td>

@@ -112,21 +112,21 @@
                             <!-- Project Information (bordered table as per screenshot) -->
                             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                                 <tr>
-                                    <td style="width: 45%; padding: 6px; border: 1px solid #000;">
+                                    <td rowspan="3" style="width: 10%; padding: 6px; border: 1px solid #000; text-align: center; vertical-align: middle;">
+                                        <!-- Logo -->
+                                        <img src="/bhuarjan/static/description/logo.png" 
+                                             alt="Logo" 
+                                             style="width: 95%; height: auto; max-width: 95%; display: block; margin: 0 auto;"/>
+                                    </td>
+                                    <td style="width: 40%; padding: 6px; border: 1px solid #000;">
                                         <strong>परियोजना का नाम :</strong>
                                         <span t-field="survey.project_id.name"/>
                                     </td>
-                                    <td style="width: 45%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 40%; padding: 6px; border: 1px solid #000;">
                                         <strong>विभाग का नाम</strong>
                                         <span t-field="survey.department_id.name"/>
                                     </td>
                                     <td rowspan="3" style="width: 10%; padding: 6px; border: 1px solid #000; text-align: center; vertical-align: middle;">
-                                        <!-- Logo -->
-                                        <div style="margin-bottom: 5px;">
-                                            <img src="/bhuarjan/static/description/logo.png" 
-                                                 alt="Logo" 
-                                                 style="width: 90%; height: auto; max-height: 40px; display: block; margin: 0 auto;"/>
-                                        </div>
                                         <!-- QR Code -->
                                         <t t-set="qr_code_img" t-value="survey.get_qr_code_data()"/>
                                         <t t-if="qr_code_img">
@@ -146,11 +146,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="width: 45%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 40%; padding: 6px; border: 1px solid #000;">
                                         <strong>ग्राम का नाम</strong>
                                         <span t-field="survey.village_id.name"/>
                                     </td>
-                                    <td style="width: 45%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 40%; padding: 6px; border: 1px solid #000;">
                                         <strong>तहसील का नाम</strong>
                                         <span t-field="survey.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
                                     </td>

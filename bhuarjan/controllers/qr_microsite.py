@@ -32,20 +32,27 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
-            # Get all surveys from the same village as the scanned survey
-            # This ensures the PDF contains all relevant surveys, not just the one scanned
-            all_surveys = request.env['bhu.survey'].sudo().search([
+            # Get all surveys from the same village (matching the report wizard behavior)
+            # This ensures the PDF contains all relevant surveys from the village
+            domain = [
                 ('village_id', '=', survey.village_id.id)
-            ])
+            ]
+            all_surveys = request.env['bhu.survey'].sudo().search(domain, order='id')
             
             if not all_surveys:
                 return request.not_found("No surveys found for this village")
             
-            # Generate PDF directly using Odoo's report rendering
-            # Convert to list of integers to avoid any type issues
-            res_ids = all_surveys.ids
+            # Log how many surveys we're including for debugging
+            _logger.info(f"Generating PDF for {len(all_surveys)} surveys from village {survey.village_id.name} (IDs: {all_surveys.ids})")
             
-            # Render PDF directly
+            # Convert recordset to list of IDs for PDF rendering
+            # Odoo's _render_qweb_pdf expects a list of integer IDs
+            res_ids = list(all_surveys.ids)
+            
+            if not res_ids:
+                return request.not_found("No survey IDs found")
+            
+            # Render PDF directly - Odoo will populate 'docs' in template with these records
             try:
                 pdf_result = report_action.sudo()._render_qweb_pdf(res_ids, data=None)
             except Exception as render_error:

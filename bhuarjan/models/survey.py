@@ -120,8 +120,9 @@ class Survey(models.Model):
             import io
             import base64
             
-            # Generate QR code URL pointing to PDF download
-            qr_url = f"https://bhuarjan.com/bhuarjan/form10/{self.survey_uuid}/download"
+            # Generate QR code with just UUID - shorter and more secure
+            # Format: https://bhuarjan.com/qr/{uuid}
+            qr_url = f"https://bhuarjan.com/qr/{self.survey_uuid}"
             
             # Create QR code
             qr = qrcode.QRCode(

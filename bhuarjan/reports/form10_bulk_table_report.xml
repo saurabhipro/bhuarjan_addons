@@ -152,7 +152,7 @@
                             padding:3px
                         }
                         .bulk-form10-table thead th {
-                            background-color: #d3d3d3;
+                            background-color: #f0f0f0;
                             font-weight: bold;
                         }
                         

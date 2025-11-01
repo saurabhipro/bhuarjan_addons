@@ -79,7 +79,7 @@
                         </div>
                         <group string="Bhuarjan">
                             <group>
-                                <field name="bhuarjan_role" invisible="0"/>
+                                <field name="bhuarjan_role"/>
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>

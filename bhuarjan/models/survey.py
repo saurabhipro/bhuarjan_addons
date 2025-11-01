@@ -50,6 +50,10 @@ class Survey(models.Model):
     tree_count = fields.Integer(string='Number of Trees / वृक्षों की संख्या', default=0, tracking=True)
     
     # House Details
+    has_house = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has House / घर है', default='no', tracking=True)
     house_type = fields.Selection([
         ('kachcha', 'कच्चा'),
         ('pucca', 'पक्का')
@@ -440,6 +444,10 @@ class SurveyLine(models.Model):
     
     # Assets on Land / भूमि पर स्थित परिसंपत्तियों का विवरण
     # House Details
+    has_house = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has House / घर है', default='no')
     house_type = fields.Selection([
         ('kachcha', 'Kachcha / कच्चा'),
         ('pakka', 'Pakka / पक्का')
@@ -481,12 +489,15 @@ class SurveyLine(models.Model):
             if line.acquired_area > line.total_area:
                 raise ValidationError(_('Acquired area cannot be more than total area for Khasra %s') % line.khasra_number)
     
-    @api.constrains('house_type', 'house_area')
+    @api.constrains('has_house', 'house_type', 'house_area')
     def _check_house_details(self):
         """Validate house details"""
         for line in self:
-            if line.house_type and not line.house_area:
-                raise ValidationError(_('House area is required when house type is selected for Khasra %s') % line.khasra_number)
+            if line.has_house == 'yes':
+                if not line.house_type:
+                    raise ValidationError(_('House type is required when house exists for Khasra %s') % line.khasra_number)
+                if not line.house_area:
+                    raise ValidationError(_('House area is required when house exists for Khasra %s') % line.khasra_number)
     
     @api.constrains('has_well', 'well_type')
     def _check_well_details(self):

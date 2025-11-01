@@ -3,6 +3,10 @@ from odoo.exceptions import UserError
 import base64
 import io
 import csv
+import uuid
+import logging
+
+_logger = logging.getLogger(__name__)
 
 try:
     import xlsxwriter
@@ -20,7 +24,8 @@ class ReportWizard(models.TransientModel):
         ('excel', 'Excel'),
         ('csv', 'CSV')
     ], string='Export Type', default='pdf', required=True)
-    village_id = fields.Many2one('bhu.village', string='Village', required=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
     allowed_village_ids = fields.Many2many(
         'bhu.village',
         string='Allowed Villages',
@@ -32,16 +37,99 @@ class ReportWizard(models.TransientModel):
         if self.env.user.bhuarjan_role == 'patwari' and self.village_id and self.village_id.id not in self.env.user.village_ids.ids:
             raise UserError("You are not allowed to download for this village.")
         
-        all_records = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id)
-        ])
-        if not all_records:
-            raise UserError("No records found for your villages.")
+        # Ensure UUIDs exist and are UNIQUE
+        if not self.project_id.project_uuid:
+            self.project_id.write({'project_uuid': str(uuid.uuid4())})
+        
+        # Check for duplicate village UUIDs - regenerate if found
+        if not self.village_id.village_uuid:
+            self.village_id.write({'village_uuid': str(uuid.uuid4())})
+        else:
+            # Verify this UUID is unique to this village
+            duplicate_villages = self.env['bhu.village'].search([
+                ('village_uuid', '=', self.village_id.village_uuid),
+                ('id', '!=', self.village_id.id)
+            ])
+            if duplicate_villages:
+                _logger.warning(f"Village {self.village_id.id} ({self.village_id.name}) has duplicate UUID! Regenerating...")
+                self.village_id.write({'village_uuid': str(uuid.uuid4())})
+        
+        # STRICT FILTERING: Only get surveys for the EXACT project AND village
+        # Verify village is correctly selected
+        if not self.village_id:
+            raise UserError("Please select a village.")
+        if not self.project_id:
+            raise UserError("Please select a project.")
+        
+        # Log the exact village being used
+        selected_village_id = self.village_id.id
+        selected_village_name = self.village_id.name
+        selected_village_uuid = self.village_id.village_uuid
+        selected_project_id = self.project_id.id
+        selected_project_name = self.project_id.name
+        
+        _logger.info(f"Wizard: SELECTED Village - ID={selected_village_id}, Name='{selected_village_name}', UUID={selected_village_uuid}")
+        _logger.info(f"Wizard: SELECTED Project - ID={selected_project_id}, Name='{selected_project_name}'")
+        
+        # Clear context completely to avoid any mixin interference (project.filter, etc.)
+        # Use explicit domain with AND logic
+        domain = [
+            '&',  # Explicit AND operator
+            ('project_id', '=', selected_project_id),
+            ('village_id', '=', selected_village_id)
+        ]
+        
+        _logger.info(f"Wizard: Search domain: {domain}")
+        
+        # Search with completely cleared context to avoid any mixin filters
+        all_records = self.env['bhu.survey'].sudo().with_context(
+            active_test=False,
+            bhuarjan_current_project_id=False
+        ).search(domain, order='id')
+        
+        # STRICT VALIDATION: Filter out any surveys that don't match exactly
+        # This ensures data integrity even if there are database inconsistencies
+        _logger.info(f"Wizard: Found {len(all_records)} surveys from search. Validating each one...")
+        correct_records = self.env['bhu.survey']
+        for survey in all_records:
+            survey_village_id = survey.village_id.id
+            survey_village_name = survey.village_id.name
+            survey_project_id = survey.project_id.id
+            
+            # Strict validation - must match exactly
+            if survey_project_id != selected_project_id:
+                _logger.error(f"Wizard: FILTERING OUT Survey {survey.id} - Wrong Project! Expected Project ID={selected_project_id} ('{selected_project_name}'), got Project ID={survey_project_id} ('{survey.project_id.name}')")
+                continue
+            if survey_village_id != selected_village_id:
+                _logger.error(f"Wizard: FILTERING OUT Survey {survey.id} - Wrong Village! Expected Village ID={selected_village_id} (Name='{selected_village_name}'), got Village ID={survey_village_id} (Name='{survey_village_name}')")
+                continue
+            
+            # Survey matches - include it
+            _logger.info(f"Wizard: Survey {survey.id} VALID - Project ID={survey_project_id}, Village ID={survey_village_id} (Name='{survey_village_name}')")
+            correct_records |= survey
+        
+        if not correct_records:
+            _logger.warning(f"Wizard: No valid records found for Project ID={self.project_id.id}, Village ID={self.village_id.id}")
+            raise UserError(f"No records found for this project ({self.project_id.name}) and village ({self.village_id.name}).")
+        
+        if len(correct_records) != len(all_records):
+            _logger.warning(f"Wizard: Filtered out {len(all_records) - len(correct_records)} incorrect surveys. Using {len(correct_records)} correct surveys.")
+        
+        _logger.info(f"Wizard: Found {len(correct_records)} correct surveys: {correct_records.ids}")
+        
+        all_records = correct_records
 
         if self.export_type == 'pdf':
-            # Use consolidated single-PDF table report
-            report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
-            return report_action.report_action(all_records)
+            # Use the same controller route as QR code for consistency
+            # Redirect to the download URL with project and village UUIDs
+            project_uuid = self.project_id.project_uuid
+            village_uuid = self.village_id.village_uuid
+            download_url = f'/bhuarjan/form10/{project_uuid}/{village_uuid}/download'
+            return {
+                'type': 'ir.actions.act_url',
+                'url': download_url,
+                'target': 'new',
+            }
         elif self.export_type == 'excel':
             return self._export_to_excel(all_records)
         elif self.export_type == 'csv':

@@ -166,7 +166,28 @@ class imageCapture extends Component {
             this.player.el.classList.remove('d-none');
             this.capture.el.classList.remove('d-none');
             this.camera.el.classList.add('d-none');
-            this.state.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            
+            // Use back camera (environment) on mobile devices
+            // If environment camera is not available, fall back to default camera
+            let videoConstraints = {
+                facingMode: 'environment' // 'environment' = back camera, 'user' = front camera
+            };
+            
+            try {
+                this.state.stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: videoConstraints, 
+                    audio: false 
+                });
+            } catch (envError) {
+                // If back camera fails, try default camera
+                console.log("Back camera not available, trying default camera:", envError);
+                videoConstraints = true; // Use default camera
+                this.state.stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: videoConstraints, 
+                    audio: false 
+                });
+            }
+            
             this.player.el.srcObject = this.state.stream;
         } catch (error) {
             console.error("Error accessing camera:", error);

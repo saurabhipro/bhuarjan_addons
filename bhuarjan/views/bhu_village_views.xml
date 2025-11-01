@@ -35,6 +35,7 @@
                             <field name="circle_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="name"/>
                             <field name="village_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
+                            <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link"/>
                             <field name="pincode"/>
                         </group>
                         <group>
@@ -77,6 +78,19 @@
         <field name="res_model">bhu.village</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="bhu_village_view_search"/>
+        <field name="context">{}</field>
+    </record>
+    
+    <!-- Server Action to Regenerate All UUIDs -->
+    <record id="action_regenerate_village_uuids" model="ir.actions.server">
+        <field name="name">Regenerate All Village UUIDs</field>
+        <field name="model_id" ref="model_bhu_village"/>
+        <field name="binding_model_id" ref="model_bhu_village"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env['bhu.village'].action_regenerate_all_uuids()
+        </field>
     </record>
     </data>
 </odoo>

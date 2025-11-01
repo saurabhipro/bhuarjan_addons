@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api, _
 import uuid
 
 class BhuProject(models.Model):
@@ -8,6 +8,28 @@ class BhuProject(models.Model):
 
     name = fields.Char(string='Project Name', required=True, tracking=True)
     project_uuid = fields.Char(string='Project UUID', readonly=True, copy=False, default=lambda self: str(uuid.uuid4()))
+    
+    def action_regenerate_uuid(self):
+        """Regenerate UUID for a single project"""
+        if not self:
+            return
+        new_uuid = str(uuid.uuid4())
+        # Ensure the new UUID is unique
+        while self.env['bhu.project'].search([('project_uuid', '=', new_uuid)]):
+            new_uuid = str(uuid.uuid4())
+        
+        self.write({'project_uuid': new_uuid})
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'UUID Regenerated',
+                'message': f'New UUID: {new_uuid}',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     code = fields.Char(string='Project Code', tracking=True)
     description = fields.Text(string='Description', tracking=True)
     budget = fields.Float(string='Budget', tracking=True)
@@ -19,7 +41,7 @@ class BhuProject(models.Model):
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
-    village_ids = fields.Many2many('bhu.village.line', string="Villages", tracking=True)
+    village_ids = fields.Many2many('bhu.village', string="Villages", tracking=True)
     
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 

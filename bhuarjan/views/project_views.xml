@@ -23,7 +23,9 @@
                         <group>
                             <field name="name"/>
                             <field name="project_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
-                            <field name="village_ids" widget="many2many_tags"/>
+                            <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link"/>
+                            <field name="village_ids" widget="many2many" 
+                                   options="{'no_create_edit': True}"/>
                         </group>
                         <group>
                             <field name="budget"/>

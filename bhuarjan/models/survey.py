@@ -121,16 +121,27 @@ class Survey(models.Model):
             import base64
             
             # Generate QR code with project UUID and village UUID
-            # Format: https://bhuarjan.com/qr/{project_uuid}/{village_uuid}
-            # Ensure UUIDs exist - generate if missing
+            # Format: https://bhuarjan.com/bhuarjan/form10/{project_uuid}/{village_uuid}/download
+            # Ensure UUIDs exist and are UNIQUE - generate if missing or duplicate
             if not self.project_id.project_uuid:
                 self.project_id.write({'project_uuid': str(uuid.uuid4())})
+            
+            # Check for duplicate village UUIDs - regenerate if found
             if not self.village_id.village_uuid:
                 self.village_id.write({'village_uuid': str(uuid.uuid4())})
+            else:
+                # Verify this UUID is unique to this village
+                duplicate_villages = self.env['bhu.village'].search([
+                    ('village_uuid', '=', self.village_id.village_uuid),
+                    ('id', '!=', self.village_id.id)
+                ])
+                if duplicate_villages:
+                    # UUID is duplicated - regenerate it
+                    self.village_id.write({'village_uuid': str(uuid.uuid4())})
             
             project_uuid = self.project_id.project_uuid
             village_uuid = self.village_id.village_uuid
-            qr_url = f"https://bhuarjan.com/qr/{project_uuid}/{village_uuid}"
+            qr_url = f"https://bhuarjan.com/bhuarjan/form10/{project_uuid}/{village_uuid}/download"
             
             # Create QR code
             qr = qrcode.QRCode(

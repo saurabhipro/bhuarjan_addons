@@ -33,10 +33,10 @@ class ProjectController(http.Controller):
                             'name': project.name, 
                             'villages_ids':[
                                 {
-                                    'district_id':village.district_id.id,
-                                    'district_name':village.district_id.name,
-                                    'village_id':village.village_id.id,
-                                    'village_name':village.village_id.name
+                                    'district_id':village.district_id.id if village.district_id else None,
+                                    'district_name':village.district_id.name if village.district_id else '',
+                                    'village_id':village.id,
+                                    'village_name':village.name
                                 }   
                             for village in project.village_ids
                             ]

@@ -156,8 +156,8 @@ class imageCapture extends Component {
             const permissionCheck = await this.checkCameraPermission();
             if (permissionCheck.state === "denied") {
                 this.notification.add(
-                    this.env._t("Camera access is denied. Please enable camera permissions in your browser settings and try again."),
-                    { type: "warning", title: this.env._t("Camera Permission Required") }
+                    _t("Camera access is denied. Please enable camera permissions in your browser settings and try again."),
+                    { type: "warning", title: _t("Camera Permission Required") }
                 );
                 return;
             }
@@ -174,20 +174,20 @@ class imageCapture extends Component {
             this.capture.el.classList.add('d-none');
             this.camera.el.classList.remove('d-none');
             
-            let errorMessage = this.env._t("Error accessing camera");
+            let errorMessage = _t("Error accessing camera");
             if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-                errorMessage = this.env._t("Camera access denied. Please allow camera access in your browser settings and reload the page.");
+                errorMessage = _t("Camera access denied. Please allow camera access in your browser settings and reload the page.");
             } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
-                errorMessage = this.env._t("No camera found. Please connect a camera device.");
+                errorMessage = _t("No camera found. Please connect a camera device.");
             } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-                errorMessage = this.env._t("Camera is being used by another application. Please close other apps using the camera and try again.");
+                errorMessage = _t("Camera is being used by another application. Please close other apps using the camera and try again.");
             } else {
-                errorMessage = this.env._t("Error accessing camera: %s").replace("%s", error.message);
+                errorMessage = _t("Error accessing camera: %s").replace("%s", error.message);
             }
             
             this.notification.add(errorMessage, { 
                 type: "danger", 
-                title: this.env._t("Camera Error") 
+                title: _t("Camera Error") 
             });
         }
     }

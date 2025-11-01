@@ -112,11 +112,11 @@
                             <!-- Project Information (bordered table as per screenshot) -->
                             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                                 <tr>
-                                    <td rowspan="3" style="width: 10%; padding: 6px; border: 1px solid #000; text-align: center; vertical-align: middle;">
+                                    <td rowspan="3" style="width: 10%; padding: 0; border: 1px solid #000; text-align: center; vertical-align: middle;">
                                         <!-- Logo -->
                                         <img src="/bhuarjan/static/description/logo.png" 
                                              alt="Logo" 
-                                             style="width: 95%; height: auto; max-width: 95%; display: block; margin: 0 auto;"/>
+                                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
                                     </td>
                                     <td style="width: 40%; padding: 6px; border: 1px solid #000;">
                                         <strong>परियोजना का नाम :</strong>
@@ -126,22 +126,27 @@
                                         <strong>विभाग का नाम</strong>
                                         <span t-field="survey.department_id.name"/>
                                     </td>
-                                    <td rowspan="3" style="width: 10%; padding: 6px; border: 1px solid #000; text-align: center; vertical-align: middle;">
+                                    <td rowspan="3" style="width: 10%; padding: 0; border: 1px solid #000; text-align: center; vertical-align: middle;">
                                         <!-- QR Code -->
                                         <t t-set="qr_code_img" t-value="survey.get_qr_code_data()"/>
+                                        <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/form10/' + str(survey.survey_uuid) + '/download'"/>
                                         <t t-if="qr_code_img">
-                                            <img t-att-src="'data:image/png;base64,' + qr_code_img" 
-                                                 alt="QR Code" 
-                                                 style="width: 95%; max-width: 95%; height: auto; aspect-ratio: 1; border: 2px solid #000; display: block; margin: 0 auto;"/>
+                                            <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                                <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                     alt="QR Code - Click to download PDF" 
+                                                     style="width: 100%; max-width: 100%; height: auto; aspect-ratio: 1; border: none; display: block; margin: 0; padding: 0;"/>
+                                            </a>
                                         </t>
                                         <t t-if="not qr_code_img">
-                                            <div style="width: 95%; padding-top: 95%; position: relative; border: 2px solid #000; background: white; margin: 0 auto;">
-                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                                    <div style="text-align: center; font-size: 8px;">
-                                                        <div style="font-weight: bold;">QR Code</div>
+                                            <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                                <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
+                                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                        <div style="text-align: center; font-size: 8px;">
+                                                            <div style="font-weight: bold;">QR Code</div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </a>
                                         </t>
                                     </td>
                                 </tr>

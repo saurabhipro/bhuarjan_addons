@@ -170,11 +170,11 @@ class imageCapture extends Component {
     }
     async OnClickCaptureImage() {
         // Capture the image from webcam and close the webcam
-        var context = snapshot.getContext('2d');
-        var canvas = document.getElementById('snapshot')
+        var canvas = document.getElementById('snapshot');
+        var context = canvas.getContext('2d');
         var image = document.getElementById('image');
         this.save_image.el.classList.remove('d-none');
-        context.drawImage(player, 0, 0, 320, 240);
+        context.drawImage(this.player.el, 0, 0, 320, 240);
         image.value = context.canvas.toDataURL();
         canvas.classList.remove('d-none');
         this.url = context.canvas.toDataURL();

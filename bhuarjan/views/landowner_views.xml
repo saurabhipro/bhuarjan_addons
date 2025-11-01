@@ -79,9 +79,11 @@
                     <notebook>
                         <page string="Documents / दस्तावेज" name="documents">
                             <group>
-                                <group>
-                                    <field name="aadhar_card" widget="binary"/>
-                                    <field name="pan_card" widget="binary"/>
+                                <group string="Aadhar Card / आधार कार्ड">
+                                    <field name="aadhar_card" widget="capture_image"/>
+                                </group>
+                                <group string="PAN Card / पैन कार्ड">
+                                    <field name="pan_card" widget="capture_image"/>
                                 </group>
                             </group>
                         </page>

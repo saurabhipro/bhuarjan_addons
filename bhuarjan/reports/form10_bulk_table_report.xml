@@ -45,18 +45,15 @@
                     <td rowspan="3" style="width: 30%; text-align: center; vertical-align: middle;">
                         <t t-if="first">
                             <t t-set="qr_code_img" t-value="first.get_qr_code_data()"/>
-                            <t t-set="qr_url" t-value="'https://bhuarjan.com/bhuarjan/form10/' + str(first.survey_uuid) + '/download'"/>
                             <t t-if="qr_code_img">
                                 <img t-att-src="'data:image/png;base64,' + qr_code_img" 
                                      alt="QR Code" 
                                      style="width: 100px; height: 100px; border: 2px solid #000; display: block; margin: 0 auto;"/>
-                                <p style="margin: 5px 0 0 0; font-size: 9px; word-break: break-all; color: #333;" t-esc="qr_url"/>
                             </t>
                             <t t-if="not qr_code_img">
                                 <div style="width: 100px; height: 100px; border: 2px solid #000; background: white; padding: 5px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
                                     <div style="text-align: center; font-size: 8px;">
-                                        <div style="font-weight: bold; margin-bottom: 5px;">QR Code</div>
-                                        <div style="font-size: 6px; word-break: break-all; color: #666;" t-esc="qr_url"/>
+                                        <div style="font-weight: bold;">QR Code</div>
                                     </div>
                                 </div>
                             </t>

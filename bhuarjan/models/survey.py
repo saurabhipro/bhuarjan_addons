@@ -120,10 +120,16 @@ class Survey(models.Model):
             import io
             import base64
             
-            # Generate QR code with project UUID and village UUID for secure access
+            # Generate QR code with project UUID and village UUID
             # Format: https://bhuarjan.com/qr/{project_uuid}/{village_uuid}
-            project_uuid = self.project_id.project_uuid or ''
-            village_uuid = self.village_id.village_uuid or ''
+            # Ensure UUIDs exist - generate if missing
+            if not self.project_id.project_uuid:
+                self.project_id.write({'project_uuid': str(uuid.uuid4())})
+            if not self.village_id.village_uuid:
+                self.village_id.write({'village_uuid': str(uuid.uuid4())})
+            
+            project_uuid = self.project_id.project_uuid
+            village_uuid = self.village_id.village_uuid
             qr_url = f"https://bhuarjan.com/qr/{project_uuid}/{village_uuid}"
             
             # Create QR code

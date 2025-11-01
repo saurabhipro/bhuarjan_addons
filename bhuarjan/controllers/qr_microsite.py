@@ -9,14 +9,21 @@ class Form10PDFController(http.Controller):
     """Controller for direct PDF download from QR code scan"""
 
     @http.route('/bhuarjan/qr/<string:project_uuid>/<string:village_uuid>', type='http', auth='public', methods=['GET'], csrf=False, website=False)
-    def qr_redirect(self, project_uuid, village_uuid, **kwargs):
-        """Redirect QR code scan (project and village UUIDs) to PDF download"""
-        # Redirect to the download route
-        return request.redirect(f'/bhuarjan/form10/{project_uuid}/{village_uuid}/download')
+    def qr_download(self, project_uuid, village_uuid, **kwargs):
+        """Direct PDF download from QR code scan (project and village UUIDs)"""
+        try:
+            if not project_uuid or not village_uuid:
+                _logger.error(f"Missing UUIDs: project_uuid={project_uuid}, village_uuid={village_uuid}")
+                return request.not_found("Invalid QR code: Missing project or village UUID")
+            # Directly download PDF - no redirect
+            return self.download_pdf(project_uuid, village_uuid, **kwargs)
+        except Exception as e:
+            _logger.error(f"Error in QR download route: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")
 
     @http.route('/bhuarjan/form10/<string:project_uuid>/<string:village_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_pdf(self, project_uuid, village_uuid, **kwargs):
-        """Download Form 10 PDF directly using project and village UUIDs"""
+        """Download Form 10 PDF directly using project and village UUIDs - gets all surveys for that project in that village"""
         try:
             # Find project by UUID
             project = request.env['bhu.project'].sudo().search([('project_uuid', '=', project_uuid)], limit=1)
@@ -37,8 +44,8 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
-            # Get all surveys for the specific project and village
-            # This ensures the PDF contains all relevant surveys from that project in that village
+            # Get all surveys for the specific project AND village
+            # This ensures the PDF contains all surveys for that project in that village
             domain = [
                 ('project_id', '=', project.id),
                 ('village_id', '=', village.id)
@@ -92,9 +99,9 @@ class Form10PDFController(http.Controller):
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
             # Return PDF response with proper headers
-            # Use village and project name in filename
-            village_name = village.name or 'All'
+            # Use project and village name in filename
             project_name = project.name or 'All'
+            village_name = village.name or 'All'
             filename = f"Form10_{project_name}_{village_name}.pdf".replace(' ', '_')
             return request.make_response(
                 pdf_data,

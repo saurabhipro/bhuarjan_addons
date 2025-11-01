@@ -45,7 +45,7 @@
                     <td rowspan="3" style="width: 30%; text-align: center; vertical-align: middle;">
                         <t t-if="first">
                             <t t-set="qr_code_img" t-value="first.get_qr_code_data()"/>
-                            <t t-set="qr_url" t-value="'https://bhuarjan.com/form10/' + str(first.survey_uuid) + '/pdf'"/>
+                            <t t-set="qr_url" t-value="'https://bhuarjan.com/bhuarjan/form10/' + str(first.survey_uuid) + '/download'"/>
                             <t t-if="qr_code_img">
                                 <img t-att-src="'data:image/png;base64,' + qr_code_img" 
                                      alt="QR Code" 

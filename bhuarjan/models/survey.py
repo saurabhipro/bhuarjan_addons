@@ -121,7 +121,7 @@ class Survey(models.Model):
             import base64
             
             # Generate QR code URL pointing to PDF download
-            qr_url = f"https://bhuarjan.com/form10/{self.survey_uuid}/pdf"
+            qr_url = f"https://bhuarjan.com/bhuarjan/form10/{self.survey_uuid}/download"
             
             # Create QR code
             qr = qrcode.QRCode(

@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class Form10PDFController(http.Controller):
     """Controller for direct PDF download from QR code scan"""
 
-    @http.route('/form10/<string:survey_uuid>/pdf', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    @http.route('/bhuarjan/form10/<string:survey_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_pdf(self, survey_uuid, **kwargs):
         """Download Form 10 PDF directly"""
         try:

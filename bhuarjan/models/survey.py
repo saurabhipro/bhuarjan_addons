@@ -301,10 +301,9 @@ class Survey(models.Model):
 
     def action_download_form10(self):
         """Download Form-10 as PDF"""
-        for record in self:
-            # Generate PDF report
-            report_action = self.env.ref('bhuarjan.action_report_form10_survey')
-            return report_action.report_action(record)
+        # Use bulk table report for all selected records (works for single or multiple)
+        report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
+        return report_action.report_action(self)
 
     def action_bulk_download_form10(self):
         """Download one PDF containing all visible surveys in a table layout.
@@ -358,7 +357,7 @@ class Survey(models.Model):
             raise ValidationError(_('No surveys found to preview.'))
         
         # Generate HTML report for all surveys (inline view)
-        report_action = self.env.ref('bhuarjan.action_report_form10_survey')
+        report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
         report_action.report_type = 'qweb-html'
         return report_action.report_action(surveys)
 

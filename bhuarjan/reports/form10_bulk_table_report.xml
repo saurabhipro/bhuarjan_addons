@@ -151,6 +151,10 @@
                             font-size: 14px;
                             padding:3px
                         }
+                        .bulk-form10-table thead th {
+                            background-color: #d3d3d3;
+                            font-weight: bold;
+                        }
                         
                     </style>
                     <div class="content-wrapper">

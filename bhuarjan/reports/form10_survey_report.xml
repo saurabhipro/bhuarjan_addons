@@ -84,28 +84,8 @@
                 </style>
                 <t t-foreach="docs" t-as="survey">
                     <div class="page" style="padding: 0px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; page-break-inside: avoid;" t-att-style="'page-break-before: always;' if survey_index > 0 else ''">
-                            <!-- QR Code in Top Right -->
-                            <div style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
-                                <t t-set="qr_code_img" t-value="survey.get_qr_code_data()"/>
-                                <t t-if="qr_code_img">
-                                    <img t-att-src="'data:image/png;base64,' + qr_code_img" 
-                                         alt="QR Code" 
-                                         style="width: 100px; height: 100px; border: 2px solid #000;"/>
-                                </t>
-                                <t t-if="not qr_code_img">
-                                    <div style="width: 100px; height: 100px; border: 2px solid #000; background: white; padding: 5px;">
-                                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 8px; text-align: center; line-height: 1.0;">
-                                            <div>
-                                                <div style="font-weight: bold; margin-bottom: 2px;">QR</div>
-                                                <div style="font-size: 6px; word-break: break-all; color: #666;" t-esc="survey.survey_uuid"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </t>
-                            </div>
-                            
                             <!-- Header -->
-                            <div style="margin: 0; padding: 0; margin-right: 110px;">
+                            <div style="margin: 0; padding: 0;">
                                 <h2 class="hindi-text" style="text-decoration: underline; margin: 0; padding: 0; text-align: center; font-size: 32px; font-weight: bold; line-height: 1.2;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
                             </div>
                             

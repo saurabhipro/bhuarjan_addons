@@ -5,5 +5,9 @@
             </xpath>
         </template>
 
+        <template id="hide_auth_providers" inherit_id="auth_oauth.providers" name="Remove OAuth Providers and Separator">
+            <xpath expr="//em[contains(text(), '- or -')]" position="replace"/>
+            <xpath expr="//div[@class='o_auth_oauth_providers list-group mt-1 mb-1 text-start']" position="replace"/>
+        </template>
     </data>
 </odoo>

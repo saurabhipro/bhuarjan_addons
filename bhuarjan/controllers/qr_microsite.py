@@ -26,34 +26,32 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
-            # Render PDF - ensure res_ids is a simple list of integers (not recordset)
-            # Convert to plain list to avoid any recordset-related issues
-            survey_id = int(survey.id) if survey.id else None
-            if not survey_id:
-                return request.not_found("Invalid survey ID")
+            # Render PDF - The 'split' error suggests Odoo is processing something incorrectly
+            # Use the recordset's IDs list directly without conversion
+            res_ids = survey.ids  # This is already a list-like object from recordset
             
-            res_ids = [survey_id]
-            
-            # Render PDF using the standard Odoo method
-            # _render_qweb_pdf(res_ids, data=None) returns tuple (pdf_bytes, format)
+            # Render PDF with empty data dict (not None) to avoid internal processing issues
             try:
-                # First try with data=None
-                pdf_result = report_action.sudo()._render_qweb_pdf(res_ids, data=None)
-            except (TypeError, AttributeError) as e1:
-                # If that fails, try without data parameter (some Odoo versions)
-                try:
-                    pdf_result = report_action.sudo()._render_qweb_pdf(res_ids)
-                except Exception as e2:
-                    # Last resort: try with empty dict
-                    _logger.warning(f"Render attempts failed. Trying with empty dict. Error 1: {str(e1)}, Error 2: {str(e2)}")
-                    pdf_result = report_action.sudo()._render_qweb_pdf(res_ids, data={})
+                # Use empty dict - Odoo expects dict type for data parameter
+                pdf_result = report_action.sudo()._render_qweb_pdf(res_ids, data={})
+            except Exception as e:
+                _logger.error(f"PDF rendering failed: {str(e)}", exc_info=True)
+                # Log full traceback to understand where 'split' is being called
+                raise
             
-            # Extract PDF bytes from tuple result
-            if not isinstance(pdf_result, tuple) or len(pdf_result) < 1:
-                _logger.error(f"Unexpected PDF result format: {type(pdf_result)}")
-                return request.not_found("Error: Invalid PDF result format")
+            # Extract PDF bytes from result (always returns tuple: (pdf_bytes, format))
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
             
-            pdf_data = pdf_result[0]
+            if isinstance(pdf_result, tuple):
+                pdf_data = pdf_result[0] if len(pdf_result) > 0 else None
+            elif isinstance(pdf_result, list):
+                pdf_data = pdf_result[0] if len(pdf_result) > 0 else None
+            else:
+                pdf_data = pdf_result
+            
+            if pdf_data is None:
+                return request.not_found("Error: PDF data is None")
             
             # Ensure pdf_data is bytes
             if not isinstance(pdf_data, bytes):
@@ -63,7 +61,7 @@ class Form10PDFController(http.Controller):
                     _logger.error("PDF data is None")
                     return request.not_found("Error: PDF generation returned None")
                 else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}, value: {pdf_data[:100] if hasattr(pdf_data, '__getitem__') else 'N/A'}")
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
             return request.make_response(

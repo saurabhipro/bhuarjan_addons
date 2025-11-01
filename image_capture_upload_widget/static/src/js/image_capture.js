@@ -56,11 +56,22 @@ class imageCapture extends Component {
          this.camera = useRef("camera");
          this.save_image = useRef("save_image");
        this.rawCacheKey = this.props.record.data.write_date;
+       
+       // Initialize props.value from record data if not set (for persistence after refresh)
+       if (!this.props.value && this.props.record.data[this.props.name]) {
+           this.props.value = this.props.record.data[this.props.name];
+           this.state.isValid = true;
+       }
+       
         onWillUpdateProps((nextProps) => {
             const { record } = this.props;
             const { record: nextRecord } = nextProps;
             if (record.resId !== nextRecord.resId || nextRecord.mode === "readonly") {
                 this.rawCacheKey = nextRecord.data.write_date;
+            }
+            // Sync props.value with record data when record updates
+            if (nextRecord.data[nextProps.name] && nextRecord.data[nextProps.name] !== nextProps.value) {
+                nextProps.value = nextRecord.data[nextProps.name];
             }
         });
     }
@@ -163,9 +174,24 @@ class imageCapture extends Component {
             }
             
             // Try to access camera - this will trigger browser permission prompt if needed
+            if (!this.player.el) {
+                console.error("Video element not found");
+                return;
+            }
+            
+            // Hide image if shown, show video
+            const previewImg = this.player.el.parentElement.querySelector('.o_preview_img');
+            if (previewImg) {
+                previewImg.style.display = 'none';
+            }
+            
             this.player.el.classList.remove('d-none');
-            this.capture.el.classList.remove('d-none');
-            this.camera.el.classList.add('d-none');
+            if (this.capture.el) {
+                this.capture.el.classList.remove('d-none');
+            }
+            if (this.camera.el) {
+                this.camera.el.classList.add('d-none');
+            }
             
             // Use back camera (environment) on mobile devices
             // If environment camera is not available, fall back to default camera
@@ -188,12 +214,26 @@ class imageCapture extends Component {
                 });
             }
             
-            this.player.el.srcObject = this.state.stream;
+            if (this.player.el) {
+                this.player.el.srcObject = this.state.stream;
+            }
         } catch (error) {
             console.error("Error accessing camera:", error);
-            this.player.el.classList.add('d-none');
-            this.capture.el.classList.add('d-none');
-            this.camera.el.classList.remove('d-none');
+            if (this.player.el) {
+                this.player.el.classList.add('d-none');
+            }
+            if (this.capture.el) {
+                this.capture.el.classList.add('d-none');
+            }
+            if (this.camera.el) {
+                this.camera.el.classList.remove('d-none');
+            }
+            
+            // Show image again if it was hidden
+            const previewImg = document.querySelector('.o_preview_img');
+            if (previewImg) {
+                previewImg.style.display = '';
+            }
             
             let errorMessage = _t("Error accessing camera");
             if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
@@ -218,47 +258,223 @@ class imageCapture extends Component {
         }
     }
     async OnClickCaptureImage() {
-        // Capture the image from webcam and close the webcam
+        // Capture the image from webcam
+        if (!this.player.el) {
+            console.error("Video element not found");
+            return;
+        }
+        
         var canvas = document.getElementById('snapshot');
+        if (!canvas) {
+            console.error("Canvas element not found");
+            return;
+        }
+        
         var context = canvas.getContext('2d');
         var image = document.getElementById('image');
-        this.save_image.el.classList.remove('d-none');
-        context.drawImage(this.player.el, 0, 0, 320, 240);
-        image.value = context.canvas.toDataURL();
+        
+        // Use actual video dimensions for better quality
+        var videoWidth = this.player.el.videoWidth || 1920;
+        var videoHeight = this.player.el.videoHeight || 1080;
+        canvas.width = videoWidth;
+        canvas.height = videoHeight;
+        
+        // Draw video frame to canvas
+        context.drawImage(this.player.el, 0, 0, videoWidth, videoHeight);
+        
+        // Convert to base64 data URL
+        this.url = canvas.toDataURL('image/png');
+        
+        // Extract base64 data (remove data:image/png;base64, prefix)
+        const base64Data = this.url.split(',')[1];
+        
+        // Update hidden input
+        if (image) {
+            image.value = this.url;
+        }
+        
+        // Stop video stream and hide video
+        if (this.state.stream) {
+            this.stopTracksOnMediaStream(this.state.stream);
+            this.state.stream = null;
+        }
+        if (this.player.el) {
+            this.player.el.srcObject = null;
+            this.player.el.classList.add('d-none');
+        }
+        
+        // Show canvas as preview immediately after capture
         canvas.classList.remove('d-none');
-        this.url = context.canvas.toDataURL();
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+        canvas.style.display = 'block';
+        canvas.style.borderRadius = '12px';
+        
+        // Hide any existing saved image preview to show captured canvas
+        const existingImg = this.player.el.parentElement.querySelector('.o_preview_img');
+        if (existingImg) {
+            existingImg.style.display = 'none';
+        }
+        
+        // Don't update props.value yet - keep canvas visible as preview
+        // Canvas will show the captured image immediately
+        // props.value will be updated when user clicks Save Image
+        
+        // Show save button, hide capture button
+        if (this.save_image.el) {
+            this.save_image.el.classList.remove('d-none');
+        }
+        if (this.capture.el) {
+            this.capture.el.classList.add('d-none');
+        }
     }
     async OnClickSaveImage(){
         // Saving the image to that field
-        var self = this
-         await rpc('/web/dataset/call_kw', {
+        var self = this;
+        await rpc('/web/dataset/call_kw', {
             model: 'image.capture',
             method: 'action_save_image',
             args: [[], this.url],
             kwargs: {}
-        }).then(function(results){
-            self.props.value = results
+        }).then(async function(results){
+            // Stop video stream first
+            if (self.state.stream) {
+                self.stopTracksOnMediaStream(self.state.stream);
+                self.state.stream = null;
+            }
+            
+            if (self.player.el) {
+                self.player.el.classList.add('d-none');
+                self.player.el.srcObject = null;
+            }
+            
+            // Update props and state before updating UI
+            self.props.value = results;
+            self.state.isValid = true;
+            
+            // Reset cache to force image reload
+            self.rawCacheKey = null;
+            self.lastURL = null;
+            
             var data = {
-                    data:  results,
-                    name : "ImageFile.png",
-                    objectUrl: null,
-                    size : 106252,
-                    type: "image/png"
+                data: results,
+                name: "ImageFile.png",
+                objectUrl: null,
+                size: 106252,
+                type: "image/png"
+            };
+            
+            // Update the record to trigger re-render with new image
+            self.onFileUploaded(data);
+            
+            // Save the record to database so it persists after refresh
+            // Only save if record has an ID (already exists in database)
+            if (self.props.record.resId) {
+                try {
+                    console.log("Saving image to database:", {
+                        model: self.props.record.resModel,
+                        resId: self.props.record.resId,
+                        field: self.props.name,
+                        imageLength: results ? results.length : 0
+                    });
+                    
+                    // Use RPC to directly write to the database
+                    const writeResult = await rpc('/web/dataset/call_kw', {
+                        model: self.props.record.resModel,
+                        method: 'write',
+                        args: [[self.props.record.resId], { [self.props.name]: results }],
+                        kwargs: {}
+                    });
+                    
+                    console.log("Write result:", writeResult);
+                    
+                    if (writeResult !== false) {
+                        // Verify the data was saved by reading it back
+                        const readResult = await rpc('/web/dataset/call_kw', {
+                            model: self.props.record.resModel,
+                            method: 'read',
+                            args: [[self.props.record.resId], [self.props.name]],
+                            kwargs: {}
+                        });
+                        
+                        console.log("Read back from database:", readResult);
+                        
+                        if (readResult && readResult[0] && readResult[0][self.props.name]) {
+                            // Update record data with saved value from database
+                            const savedImageData = readResult[0][self.props.name];
+                            self.props.record.data[self.props.name] = savedImageData;
+                            
+                            // Also update props.value to ensure it matches database
+                            self.props.value = savedImageData;
+                            
+                            // Update state to ensure image is valid
+                            self.state.isValid = true;
+                            
+                            // Update rawCacheKey to force image refresh
+                            self.rawCacheKey = new Date().getTime();
+                            self.lastURL = null;
+                            
+                            // Force component to re-render by updating the record
+                            self.props.record.update({ [self.props.name]: savedImageData });
+                            
+                            // Hide canvas and show saved image
+                            var snapshot = document.getElementById('snapshot');
+                            if (snapshot) {
+                                snapshot.classList.add('d-none');
+                                snapshot.style.display = 'none';
+                            }
+                            
+                            // Ensure saved image preview is visible
+                            setTimeout(function() {
+                                const previewImg = document.querySelector('.o_preview_img');
+                                if (previewImg) {
+                                    previewImg.style.display = '';
+                                }
+                            }, 50);
+                            
+                            self.notification.add(
+                                _t("Image saved successfully to database"),
+                                { type: "success", title: _t("Success") }
+                            );
+                        } else {
+                            throw new Error("Image not found after save");
+                        }
+                    } else {
+                        throw new Error("Write operation returned false");
+                    }
+                } catch (error) {
+                    console.error("Error saving record:", error);
+                    self.notification.add(
+                        _t("Error saving record: %s. Please save the form manually.", error.message || error),
+                        { type: "warning", title: _t("Save Warning") }
+                    );
                 }
-            self.onFileUploaded(data)
-        })
-        this.player.el.classList.add('d-none');
-        var snapshot = document.getElementById('snapshot')
-        snapshot.classList.add('d-none');
-        this.capture.el.classList.add('d-none');
-        this.save_image.el.classList.add('d-none');
-        this.camera.el.classList.remove('d-none');
-         this.player.el.srcObject = null;
-        if (!this.state.stream) {
-            return;
-        }
-        this.stopTracksOnMediaStream(this.state.stream);
-        this.state.stream = null;
+            } else {
+                // If record doesn't have ID yet, notify user to save the form
+                console.log("Record has no ID, cannot save to database");
+                self.notification.add(
+                    _t("Please save the form first, then capture the image to persist it."),
+                    { type: "info", title: _t("Save Required") }
+                );
+            }
+            
+            // Hide buttons immediately
+            if (self.capture.el) {
+                self.capture.el.classList.add('d-none');
+            }
+            if (self.save_image.el) {
+                self.save_image.el.classList.add('d-none');
+            }
+            if (self.camera.el) {
+                self.camera.el.classList.remove('d-none');
+            }
+        }).catch(function(error){
+            console.error("Error saving image:", error);
+            self.notification.add(
+                _t("Error saving image. Please try again."),
+                { type: "danger", title: _t("Save Error") }
+            );
+        });
     }
     onLoadFailed() {
         this.state.isValid = false;

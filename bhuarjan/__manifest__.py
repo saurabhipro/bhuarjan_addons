@@ -69,6 +69,7 @@
             'bhuarjan/static/src/xml/mail_systray_hide_button.xml',
             'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
+            'bhuarjan/static/src/css/landowner_documents.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
             'bhuarjan/static/src/scss/organization_chart.scss',
             'bhuarjan/static/src/js/hierarchy_expand.js',

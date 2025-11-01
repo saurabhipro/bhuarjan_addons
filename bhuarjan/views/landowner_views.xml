@@ -78,11 +78,11 @@
                     
                     <notebook>
                         <page string="Documents / दस्तावेज" name="documents">
-                            <group>
-                                <group string="Aadhar Card / आधार कार्ड">
+                            <group class="o_document_groups">
+                                <group string="AADHAR CARD / आधार कार्ड" class="o_document_group">
                                     <field name="aadhar_card" widget="capture_image"/>
                                 </group>
-                                <group string="PAN Card / पैन कार्ड">
+                                <group string="PAN CARD / पैन कार्ड" class="o_document_group">
                                     <field name="pan_card" widget="capture_image"/>
                                 </group>
                             </group>

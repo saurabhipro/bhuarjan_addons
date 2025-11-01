@@ -106,7 +106,7 @@
                             
                             <!-- Header -->
                             <div style="margin: 0; padding: 0; margin-right: 110px;">
-                                <h2 class="hindi-text" style="text-decoration: underline; margin: 0; padding: 0; text-align: center; font-size: 25px; line-height: 1.2;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
+                                <h2 class="hindi-text" style="text-decoration: underline; margin: 0; padding: 0; text-align: center; font-size: 32px; font-weight: bold; line-height: 1.2;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
                             </div>
                             
                             <!-- Project Information (bordered table as per screenshot) -->

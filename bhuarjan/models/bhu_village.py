@@ -109,11 +109,16 @@ class BhuVillage(models.Model):
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     circle_id = fields.Many2one('bhu.circle', string='Circle / circle', tracking=True)
     name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
+    village_code = fields.Char(string='Village Code / ग्राम कोड', required=True, tracking=True, copy=False, help='Unique code for the village')
     pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
     population = fields.Integer(string='Population / जनसंख्या', tracking=True)
     area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
     is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र', tracking=True)
     is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र', tracking=True)
+    
+    _sql_constraints = [
+        ('village_code_unique', 'UNIQUE(village_code)', 'Village Code must be unique! / ग्राम कोड अद्वितीय होना चाहिए!')
+    ]
 
 
 

@@ -10,32 +10,50 @@
         width: 100%;
         position: relative;
         border-radius: 12px;
-        overflow: hidden;
+        overflow: hidden; // Keep for border-radius, but images will use object-fit: contain
         background: #f8f9fa;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 200px;
+        padding: 8px; // Add padding to prevent edge cropping
 
         .o_preview_img {
-            width: 100%;
+            max-width: calc(100% - 16px); // Account for padding
+            width: auto;
             height: auto;
+            max-height: 600px;
             display: block;
-            border-radius: 12px;
+            border-radius: 8px;
+            object-fit: contain; // Show full image without cropping
+            box-sizing: border-box;
+            margin: 0 auto; // Center the image
         }
 
         .o_video_player {
+            max-width: calc(100% - 16px); // Account for padding
             width: 100%;
             height: auto;
+            max-height: 600px;
             display: block;
             background: #000;
-            border-radius: 12px;
+            border-radius: 8px;
+            object-fit: contain;
+            margin: 0 auto;
         }
 
         .o_snapshot_canvas {
-            width: 100%;
+            max-width: calc(100% - 16px); // Account for padding
+            width: auto;
             height: auto;
+            max-height: 600px;
             display: block;
             background: #f8f9fa;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 0 auto;
         }
 
         // Overlay actions for edit/delete
@@ -117,15 +135,20 @@
             transition: all 0.2s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             flex: 1;
-            min-width: 150px;
-            max-width: 300px;
+            min-width: 160px; // Increased to fit "Open Camera" text
+            max-width: 100%;
+            white-space: nowrap; // Prevent text wrapping
+            overflow: visible; // Ensure text is visible
 
             i {
                 font-size: 18px;
+                flex-shrink: 0; // Prevent icon from shrinking
             }
 
             span {
                 font-size: 15px;
+                white-space: nowrap; // Prevent text wrapping
+                overflow: visible;
             }
 
             &:hover {
@@ -172,11 +195,15 @@
 
         .o_preview_section {
             border-radius: 8px;
+            min-height: 180px;
+            padding: 6px;
 
             .o_preview_img,
             .o_video_player,
             .o_snapshot_canvas {
-                border-radius: 8px;
+                border-radius: 6px;
+                max-height: 500px; // Reduced for mobile
+                max-width: calc(100% - 12px);
             }
         }
 
@@ -191,13 +218,18 @@
                 padding: 16px 24px;
                 font-size: 16px;
                 min-height: 54px;
+                white-space: nowrap;
+                overflow: visible;
 
                 i {
                     font-size: 20px;
+                    flex-shrink: 0;
                 }
 
                 span {
                     font-size: 16px;
+                    white-space: nowrap;
+                    overflow: visible;
                 }
             }
         }

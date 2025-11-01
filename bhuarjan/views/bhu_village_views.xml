@@ -6,6 +6,7 @@
         <field name="model">bhu.village</field>
         <field name="arch" type="xml">
             <list string="Villages / ग्राम">
+                <field name="village_code"/>
                 <field name="name"/>
                 <field name="state_id"/>
                 <field name="district_id"/>
@@ -28,12 +29,13 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="village_code" placeholder="Enter unique village code..."/>
+                            <field name="name"/>
                             <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="district_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="tehsil_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="circle_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="name"/>
                             <field name="village_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link"/>
                             <field name="pincode"/>
@@ -57,6 +59,7 @@
         <field name="model">bhu.village</field>
         <field name="arch" type="xml">
             <search string="Search Villages / ग्राम खोजें">
+                <field name="village_code"/>
                 <field name="name"/>
                 <field name="district_id"/>
                 <field name="tehsil_id"/>

@@ -86,12 +86,34 @@
     box-sizing: border-box;
 }
 
-/* Ensure preview images don't overflow */
+/* Ensure preview images don't overflow and show full image */
 .o_form_view .o_notebook [name="documents"] .o_preview_img,
-.o_form_view .o_notebook [name="documents"] .o_snapshot_canvas {
+.o_form_view .o_notebook [name="documents"] .o_snapshot_canvas,
+.o_form_view .o_group .o_preview_img,
+.o_form_view .o_group .o_snapshot_canvas {
     max-width: 100% !important;
     height: auto !important;
     box-sizing: border-box;
+    object-fit: contain !important; /* Show full image without cropping */
+}
+
+/* Fix image capture widget in all forms (survey and landowner) */
+.o_form_view .o_image_capture_container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.o_form_view .o_image_capture_container .o_preview_section {
+    overflow: hidden; /* Keep for border-radius */
+    padding: 8px; /* Add padding to prevent edge cropping */
+}
+
+/* Ensure survey form image widget has proper sizing */
+.o_form_view .o_group .oe_avatar .o_image_capture_container {
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 /* Mobile Responsive - Stack vertically on small screens */

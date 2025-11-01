@@ -26,21 +26,30 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
-            # Use _render_qweb_pdf - it expects a list of record IDs and returns (pdf_data, format)
-            pdf_result = report_action.sudo()._render_qweb_pdf([survey.id])
+            # Render PDF - use positional arguments with empty data dict
+            # _render_qweb_pdf(res_ids, data={}) returns (pdf_bytes, format)
+            pdf_result = report_action.sudo()._render_qweb_pdf(survey.ids, {})
             
-            # Handle the return value - it's a tuple (pdf_bytes, format)
+            # Extract PDF bytes from the result
             if isinstance(pdf_result, tuple):
                 pdf_data = pdf_result[0]
+            elif isinstance(pdf_result, list):
+                pdf_data = pdf_result[0] if pdf_result else b''
             else:
                 pdf_data = pdf_result
             
-            # Ensure we have bytes
+            # Ensure pdf_data is bytes
             if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, (list, tuple)):
-                    pdf_data = pdf_data[0] if pdf_data else b''
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                elif pdf_data is None:
+                    pdf_data = b''
                 else:
-                    pdf_data = bytes(pdf_data) if not isinstance(pdf_data, str) else pdf_data.encode('utf-8')
+                    try:
+                        pdf_data = bytes(pdf_data)
+                    except (TypeError, ValueError):
+                        _logger.error(f"Could not convert PDF data to bytes. Type: {type(pdf_data)}")
+                        return request.not_found("Error: Invalid PDF data format")
             
             return request.make_response(
                 pdf_data,

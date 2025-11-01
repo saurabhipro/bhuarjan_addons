@@ -67,6 +67,20 @@
                         page-break-after: always;
                         break-after: page;
                     }
+                    .table thead { 
+                        display: table-header-group; 
+                    }
+                    .table tfoot { 
+                        display: table-footer-group; 
+                    }
+                    .table tbody tr { 
+                        page-break-inside: avoid !important; 
+                        break-inside: avoid !important; 
+                    }
+                    .table tfoot tr {
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                    }
                 </style>
                 <t t-foreach="docs" t-as="survey">
                     <div class="page" style="padding: 0px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; page-break-inside: avoid;" t-att-style="'page-break-before: always;' if survey_index > 0 else ''">
@@ -221,14 +235,14 @@
                                                 <td style="border: 1px solid #000; padding: 8px; font-size: 20px;"></td>
                                             </tr>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="18" style="border: 1px solid #000; padding: 8px; font-size: 16px; font-weight: 700;">
+                                                    <strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
-                                </div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <p class="hindi-text"><strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong></p>
                                 </div>
                             </div>
 

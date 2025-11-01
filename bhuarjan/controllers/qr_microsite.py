@@ -8,6 +8,12 @@ _logger = logging.getLogger(__name__)
 class Form10PDFController(http.Controller):
     """Controller for direct PDF download from QR code scan"""
 
+    @http.route('/bhuarjan/qr/<string:survey_uuid>', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def qr_redirect(self, survey_uuid, **kwargs):
+        """Redirect QR code scan (UUID only) to PDF download"""
+        # Redirect to the download route
+        return request.redirect(f'/bhuarjan/form10/{survey_uuid}/download')
+
     @http.route('/bhuarjan/form10/<string:survey_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_pdf(self, survey_uuid, **kwargs):
         """Download Form 10 PDF directly"""
@@ -26,9 +32,18 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
+            # Get all surveys from the same village as the scanned survey
+            # This ensures the PDF contains all relevant surveys, not just the one scanned
+            all_surveys = request.env['bhu.survey'].sudo().search([
+                ('village_id', '=', survey.village_id.id)
+            ])
+            
+            if not all_surveys:
+                return request.not_found("No surveys found for this village")
+            
             # Generate PDF directly using Odoo's report rendering
             # Convert to list of integers to avoid any type issues
-            res_ids = [int(survey.id)]
+            res_ids = all_surveys.ids
             
             # Render PDF directly
             try:
@@ -62,11 +77,14 @@ class Form10PDFController(http.Controller):
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
             # Return PDF response with proper headers
+            # Use village name in filename since it contains all surveys from that village
+            village_name = survey.village_id.name or 'All'
+            filename = f"Form10_{village_name}_{survey.project_id.name or ''}.pdf".replace(' ', '_')
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="Form10_{survey.name or survey_uuid}.pdf"'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )

@@ -120,8 +120,8 @@ class Survey(models.Model):
             import io
             import base64
             
-            # Generate QR code URL using production domain for live testing
-            qr_url = f"https://bhuarjan.com/form10/{self.survey_uuid}"
+            # Generate QR code URL pointing to PDF download
+            qr_url = f"https://bhuarjan.com/form10/{self.survey_uuid}/pdf"
             
             # Create QR code
             qr = qrcode.QRCode(

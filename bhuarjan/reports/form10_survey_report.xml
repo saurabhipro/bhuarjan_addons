@@ -112,21 +112,39 @@
                             <!-- Project Information (bordered table as per screenshot) -->
                             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                                 <tr>
-                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 35%; padding: 6px; border: 1px solid #000;">
                                         <strong>परियोजना का नाम :</strong>
                                         <span t-field="survey.project_id.name"/>
                                     </td>
-                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 35%; padding: 6px; border: 1px solid #000;">
                                         <strong>विभाग का नाम</strong>
                                         <span t-field="survey.department_id.name"/>
                                     </td>
+                                    <td rowspan="3" style="width: 30%; padding: 6px; border: 1px solid #000; text-align: center; vertical-align: middle;">
+                                        <t t-set="qr_code_img" t-value="survey.get_qr_code_data()"/>
+                                        <t t-set="qr_url" t-value="'https://bhuarjan.com/form10/' + str(survey.survey_uuid) + '/pdf'"/>
+                                        <t t-if="qr_code_img">
+                                            <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                 alt="QR Code" 
+                                                 style="width: 120px; height: 120px; border: 2px solid #000; display: block; margin: 0 auto;"/>
+                                            <p style="margin: 5px 0 0 0; font-size: 11px; word-break: break-all; color: #333;" t-esc="qr_url"/>
+                                        </t>
+                                        <t t-if="not qr_code_img">
+                                            <div style="width: 120px; height: 120px; border: 2px solid #000; background: white; padding: 5px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                                <div style="text-align: center; font-size: 9px;">
+                                                    <div style="font-weight: bold; margin-bottom: 5px;">QR Code</div>
+                                                    <div style="font-size: 7px; word-break: break-all; color: #666;" t-esc="qr_url"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 35%; padding: 6px; border: 1px solid #000;">
                                         <strong>ग्राम का नाम</strong>
                                         <span t-field="survey.village_id.name"/>
                                     </td>
-                                    <td style="width: 50%; padding: 6px; border: 1px solid #000;">
+                                    <td style="width: 35%; padding: 6px; border: 1px solid #000;">
                                         <strong>तहसील का नाम</strong>
                                         <span t-field="survey.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
                                     </td>

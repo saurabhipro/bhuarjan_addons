@@ -129,30 +129,40 @@ class imageCapture extends Component {
 
     async checkCameraPermission() {
         try {
-            const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-            console.log("Camera permission state:", permissionStatus.state);
-            if (permissionStatus.state === "granted") {
-                return true;  // Permission is granted
-            } else if (permissionStatus.state === "prompt") {
-                console.warn("Camera permission needs to be granted by the user.");
-            } else if (permissionStatus.state === "denied") {
-                console.error("Camera access denied. Please enable it in browser settings.");
+            // Check if permissions API is available
+            if (navigator.permissions && navigator.permissions.query) {
+                const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+                console.log("Camera permission state:", permissionStatus.state);
+                if (permissionStatus.state === "granted") {
+                    return { allowed: true, state: "granted" };
+                } else if (permissionStatus.state === "prompt") {
+                    return { allowed: true, state: "prompt" }; // Allow prompt to trigger browser dialog
+                } else if (permissionStatus.state === "denied") {
+                    return { allowed: false, state: "denied" };
+                }
             }
-            return false;
+            // If permissions API is not available, try to access camera anyway
+            return { allowed: true, state: "unknown" };
         } catch (error) {
             console.error("Error checking camera permission:", error);
-            return false;
+            // If permission check fails, still try to access camera
+            return { allowed: true, state: "unknown" };
         }
     }
 
     async OnClickOpenCamera() {
         // opening the camera for capture the image
         try {
-            const hasPermission = await this.checkCameraPermission();
-            if (!hasPermission) {
-                alert("Camera access denied. Please enable it in browser settings.");
+            const permissionCheck = await this.checkCameraPermission();
+            if (permissionCheck.state === "denied") {
+                this.notification.add(
+                    _t("Camera access is denied. Please enable camera permissions in your browser settings and try again."),
+                    { type: "warning", title: _t("Camera Permission Required") }
+                );
                 return;
             }
+            
+            // Try to access camera - this will trigger browser permission prompt if needed
             this.player.el.classList.remove('d-none');
             this.capture.el.classList.remove('d-none');
             this.camera.el.classList.add('d-none');
@@ -160,7 +170,25 @@ class imageCapture extends Component {
             this.player.el.srcObject = this.state.stream;
         } catch (error) {
             console.error("Error accessing camera:", error);
-            alert("Error accessing camera: " + error.message);
+            this.player.el.classList.add('d-none');
+            this.capture.el.classList.add('d-none');
+            this.camera.el.classList.remove('d-none');
+            
+            let errorMessage = _t("Error accessing camera");
+            if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+                errorMessage = _t("Camera access denied. Please allow camera access in your browser settings and reload the page.");
+            } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+                errorMessage = _t("No camera found. Please connect a camera device.");
+            } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+                errorMessage = _t("Camera is being used by another application. Please close other apps using the camera and try again.");
+            } else {
+                errorMessage = _t("Error accessing camera: %s").replace("%s", error.message);
+            }
+            
+            this.notification.add(errorMessage, { 
+                type: "danger", 
+                title: _t("Camera Error") 
+            });
         }
     }
     stopTracksOnMediaStream(mediaStream) {

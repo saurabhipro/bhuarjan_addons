@@ -52,7 +52,7 @@
                         <!-- QR Code -->
                         <t t-if="first">
                             <t t-set="qr_code_img" t-value="first.get_qr_code_data()"/>
-                            <t t-set="qr_download_url" t-value="'https://bhuarjan.com/qr/' + str(first.survey_uuid)"/>
+                            <t t-set="qr_download_url" t-value="'https://bhuarjan.com/qr/' + str(first.project_id.project_uuid or '') + '/' + str(first.village_id.village_uuid or '')"/>
                             <t t-if="qr_code_img">
                                 <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
                                     <img t-att-src="'data:image/png;base64,' + qr_code_img" 

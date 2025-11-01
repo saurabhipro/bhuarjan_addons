@@ -22,6 +22,7 @@
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="project_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
                             <field name="village_ids" widget="many2many_tags"/>
                         </group>
                         <group>

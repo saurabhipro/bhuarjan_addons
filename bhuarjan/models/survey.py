@@ -120,9 +120,11 @@ class Survey(models.Model):
             import io
             import base64
             
-            # Generate QR code with just UUID - shorter and more secure
-            # Format: https://bhuarjan.com/qr/{uuid}
-            qr_url = f"https://bhuarjan.com/qr/{self.survey_uuid}"
+            # Generate QR code with project UUID and village UUID for secure access
+            # Format: https://bhuarjan.com/qr/{project_uuid}/{village_uuid}
+            project_uuid = self.project_id.project_uuid or ''
+            village_uuid = self.village_id.village_uuid or ''
+            qr_url = f"https://bhuarjan.com/qr/{project_uuid}/{village_uuid}"
             
             # Create QR code
             qr = qrcode.QRCode(

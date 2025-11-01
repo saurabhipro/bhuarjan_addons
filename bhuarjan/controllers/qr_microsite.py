@@ -8,20 +8,25 @@ _logger = logging.getLogger(__name__)
 class Form10PDFController(http.Controller):
     """Controller for direct PDF download from QR code scan"""
 
-    @http.route('/bhuarjan/qr/<string:survey_uuid>', type='http', auth='public', methods=['GET'], csrf=False, website=False)
-    def qr_redirect(self, survey_uuid, **kwargs):
-        """Redirect QR code scan (UUID only) to PDF download"""
+    @http.route('/bhuarjan/qr/<string:project_uuid>/<string:village_uuid>', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def qr_redirect(self, project_uuid, village_uuid, **kwargs):
+        """Redirect QR code scan (project and village UUIDs) to PDF download"""
         # Redirect to the download route
-        return request.redirect(f'/bhuarjan/form10/{survey_uuid}/download')
+        return request.redirect(f'/bhuarjan/form10/{project_uuid}/{village_uuid}/download')
 
-    @http.route('/bhuarjan/form10/<string:survey_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
-    def download_pdf(self, survey_uuid, **kwargs):
-        """Download Form 10 PDF directly"""
+    @http.route('/bhuarjan/form10/<string:project_uuid>/<string:village_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_pdf(self, project_uuid, village_uuid, **kwargs):
+        """Download Form 10 PDF directly using project and village UUIDs"""
         try:
-            survey = request.env['bhu.survey'].sudo().search([('survey_uuid', '=', survey_uuid)], limit=1)
+            # Find project by UUID
+            project = request.env['bhu.project'].sudo().search([('project_uuid', '=', project_uuid)], limit=1)
+            if not project:
+                return request.not_found("Project not found")
             
-            if not survey:
-                return request.not_found("Survey not found")
+            # Find village by UUID
+            village = request.env['bhu.village'].sudo().search([('village_uuid', '=', village_uuid)], limit=1)
+            if not village:
+                return request.not_found("Village not found")
             
             # Generate PDF report using Odoo's standard rendering
             try:
@@ -32,18 +37,19 @@ class Form10PDFController(http.Controller):
             if not report_action.exists():
                 return request.not_found("Report not found")
             
-            # Get all surveys from the same village (matching the report wizard behavior)
-            # This ensures the PDF contains all relevant surveys from the village
+            # Get all surveys for the specific project and village
+            # This ensures the PDF contains all relevant surveys from that project in that village
             domain = [
-                ('village_id', '=', survey.village_id.id)
+                ('project_id', '=', project.id),
+                ('village_id', '=', village.id)
             ]
             all_surveys = request.env['bhu.survey'].sudo().search(domain, order='id')
             
             if not all_surveys:
-                return request.not_found("No surveys found for this village")
+                return request.not_found("No surveys found for this project and village")
             
             # Log how many surveys we're including for debugging
-            _logger.info(f"Generating PDF for {len(all_surveys)} surveys from village {survey.village_id.name} (IDs: {all_surveys.ids})")
+            _logger.info(f"Generating PDF for {len(all_surveys)} surveys from project {project.name} in village {village.name} (IDs: {all_surveys.ids})")
             
             # Convert recordset to list of IDs for PDF rendering
             # Odoo's _render_qweb_pdf expects a list of integer IDs
@@ -61,9 +67,11 @@ class Form10PDFController(http.Controller):
                     pdf_result = report_action.sudo()._render_qweb_pdf(res_ids, data={})
                 except Exception as render_error2:
                     _logger.error(f"PDF rendering failed: {str(render_error2)}", exc_info=True)
-                    # Final fallback: redirect to Odoo's standard URL
-                    report_url = f'/report/pdf/{report_action.report_name}/{survey.id}'
-                    return request.redirect(report_url)
+                    # Final fallback: redirect to Odoo's standard URL (use first survey ID)
+                    if all_surveys:
+                        report_url = f'/report/pdf/{report_action.report_name}/{all_surveys[0].id}'
+                        return request.redirect(report_url)
+                    return request.not_found("No surveys available for PDF generation")
             
             # Extract PDF bytes from result
             if not pdf_result:
@@ -84,9 +92,10 @@ class Form10PDFController(http.Controller):
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
             # Return PDF response with proper headers
-            # Use village name in filename since it contains all surveys from that village
-            village_name = survey.village_id.name or 'All'
-            filename = f"Form10_{village_name}_{survey.project_id.name or ''}.pdf".replace(' ', '_')
+            # Use village and project name in filename
+            village_name = village.name or 'All'
+            project_name = project.name or 'All'
+            filename = f"Form10_{project_name}_{village_name}.pdf".replace(' ', '_')
             return request.make_response(
                 pdf_data,
                 headers=[
@@ -97,5 +106,5 @@ class Form10PDFController(http.Controller):
             )
             
         except Exception as e:
-            _logger.error(f"Error generating PDF for survey {survey_uuid}: {str(e)}", exc_info=True)
+            _logger.error(f"Error generating PDF for project {project_uuid} and village {village_uuid}: {str(e)}", exc_info=True)
             return request.not_found(f"Error generating PDF: {str(e)}")

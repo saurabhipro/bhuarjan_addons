@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+import uuid
 
 class BhuVillage(models.Model):
     _name = 'bhu.village'
@@ -9,6 +10,7 @@ class BhuVillage(models.Model):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
 
+    village_uuid = fields.Char(string='Village UUID', readonly=True, copy=False, default=lambda self: str(uuid.uuid4()))
     state_id = fields.Many2one('res.country.state', string='State', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
     sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', tracking=True)

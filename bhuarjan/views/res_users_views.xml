@@ -203,7 +203,7 @@
         <field name="arch" type="xml">
             <hierarchy child_field="child_ids" icon="fa-sitemap" string="Organization Chart">
                 <field name="name"/>
-                <field name="bhuarjan_role"/>
+                <field name="bhuarjan_role" optional="hide"/>
                 <field name="parent_id"/>
                 <field name="child_ids"/>
                 <field name="avatar_128"/>
@@ -219,9 +219,9 @@
                                 <div class="org-chart-name">
                                     <field name="name"/>
                                 </div>
-                                <div class="org-chart-title">
+                                <!-- <div class="org-chart-title" t-if="record.bhuarjan_role.raw_value">
                                     <field name="bhuarjan_role"/>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </t>

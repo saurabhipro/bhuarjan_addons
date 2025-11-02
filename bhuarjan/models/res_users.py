@@ -5,6 +5,8 @@ class ResUsers(models.Model):
 
     parent_id = fields.Many2one('res.users', string="Parent")
     child_ids = fields.One2many('res.users', 'parent_id', string='Direct subordinates')
+    # color = fields.Integer(string="Color Index")
+    department_color = fields.Char(string="Color", default="#4c7cf3")
 
     def _get_state_domain(self):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    

@@ -10,6 +10,8 @@
             <field name="pincode">493118</field>
             <field name="population">45000</field>
             <field name="area_hectares">125.5</field>
+            <field name="village_code">CH_JR</field>
+
         </record>
     </data>
 </odoo>

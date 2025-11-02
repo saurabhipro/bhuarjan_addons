@@ -9,6 +9,8 @@
             <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
+            <field name="village_code">RG_JR</field>
+
         </record>
 
         <!-- Pandripani Village -->
@@ -19,6 +21,8 @@
             <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
+            <field name="village_code">RG_PD</field>
+
         </record>
 
         <!-- Gopalpur Village -->
@@ -29,6 +33,8 @@
             <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
+            <field name="village_code">RG_GP</field>
+
         </record>
 
         <!-- Bhikharimal Village -->
@@ -39,6 +45,8 @@
             <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
+            <field name="village_code">RG_BM</field>
+
         </record>
     </data>
 </odoo>

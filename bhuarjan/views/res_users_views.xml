@@ -76,6 +76,9 @@
                             <group>
                                 <field name="mobile"/>
                             </group>
+                            <group>
+                                <field name="department_color" widget="color"/>
+                            </group>
                         </div>
                         <group string="Bhuarjan">
                             <group>
@@ -201,32 +204,48 @@
         <field name="name">Organization Chart View</field>
         <field name="model">res.users</field>
         <field name="arch" type="xml">
-            <hierarchy child_field="child_ids" icon="fa-sitemap" string="Organization Chart">
-                <field name="name"/>
-                <field name="bhuarjan_role" optional="hide"/>
-                <field name="parent_id"/>
-                <field name="child_ids"/>
-                <field name="avatar_128"/>
-                <templates>
-                    <t t-name="hierarchy-box">
-                        <div class="org-chart-card">
-                            <div class="org-chart-avatar">
-                                <img t-if="avatar_128" t-att-src="'data:image/png;base64,' + avatar_128" 
-                                     class="avatar-img" alt="Avatar"/>
-                                <i t-else="" class="fa fa-user-circle avatar-placeholder"></i>
-                            </div>
-                            <div class="org-chart-content">
-                                <div class="org-chart-name">
-                                    <field name="name"/>
-                                </div>
-                                <!-- <div class="org-chart-title" t-if="record.bhuarjan_role.raw_value">
-                                    <field name="bhuarjan_role"/>
-                                </div> -->
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </hierarchy>
+            
+        <hierarchy
+            child_field="child_ids"
+            js_class="hr_employee_hierarchy"
+            icon="fa-users"
+            draggable="0"
+            string="User Hierarchy"
+        >
+            <field name="name"/>
+            <field name="email"/>
+            <field name="department_color"/>
+            <field name="image_1024"/>
+            <field name="parent_id"/>
+            <field name="child_ids"/>
+
+            <templates>
+                <t t-name="hierarchy-box">
+                    <div class="o_hierarchy_node_header d-flex justify-content-center pb-4"
+t-att-style="'background-color:' + (record.department_color.raw_value or '#692020ff') + ';'"
+                        t-att-title="record.value">
+                        <field
+                            name="image_1024"
+                            preview_image="image_128"
+                            widget="background_image"
+                            options="{'zoom': true, 'zoom_delay': 1000}"
+                        />
+                    </div>
+
+        <div class="d-flex flex-column text-center p-2">
+            <div class="d-flex align-items-center justify-content-center">
+                <field class="fw-bold w-100" name="name"/>
+            </div>
+            <div class="text-muted small">
+                <field name="email"/>
+            </div>
+        </div>
+    </t>
+</templates>
+        </hierarchy>
+
+
+
         </field>
     </record>
 

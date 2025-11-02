@@ -54,6 +54,7 @@
         'reports/notification4_report.xml',
         'wizard/report_wizard.xml',
         'views/qr_microsite_templates.xml',
+        'data/mail_data.xml',
         'views/menuitem.xml',
     ],
     'assets': {

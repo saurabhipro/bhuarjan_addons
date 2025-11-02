@@ -3,8 +3,7 @@
         <record id="email_bhuarjan_survey_submit_form" model="mail.template">
             <field name="name">Survrey:Submitted</field>
             <field name="model_id" ref="bhuarjan.model_bhu_survey"/>
-            <field name="email_from">anjli@bhuarjan.com</field>
-            <field name="partner_to">admin@bhuarjan.com</field>
+            <field name="partner_to">saurabh@iprosonic.com,anjlis062024@gmail.com</field>
             <field name="subject">Survey Submited</field>
             <field name="description">Sent to customers with their invoices in attachment</field>
             <field name="body_html" type="html">
@@ -12,7 +11,7 @@
                 <p>mail is working</p>
                 </div>
             </field>
-            <field name="auto_delete" eval="False"/>
+            <field name="auto_delete" eval="True"/>
         </record>
     </data>
 </odoo>

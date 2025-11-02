@@ -64,11 +64,6 @@
                         </group>
                     </group>
                     
-                    <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
-                        <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
-                               context="{'default_company_id': company_id, 'default_village_id': village_id, 'default_tehsil_id': tehsil_id}"/>
-                    </group>
-                    
                     <field name="survey_uuid" readonly="1" invisible="1"/>
                     
                     <notebook>
@@ -121,21 +116,28 @@
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
-                            <field name="landowner_ids" readonly="1">
-                                <list string="Landowner Details / भूमिस्वामी विवरण">
-                                    <field name="name" string="Name / नाम"/>
-                                    <field name="father_name" string="Father's Name / पिता का नाम"/>
-                                    <field name="age" string="Age / आयु"/>
-                                    <field name="gender" string="Gender / लिंग"/>
-                                    <field name="village_id" string="Village / ग्राम"/>
-                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                    <field name="district_id" string="District / जिला"/>
-                                    <field name="aadhar_number" string="Aadhar / आधार"/>
-                                    <field name="pan_number" string="PAN / पैन"/>
-                                    <field name="bank_name" string="Bank / बैंक"/>
-                                    <field name="account_number" string="Account / खाता"/>
-                                </list>
-                            </field>
+                            <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
+                                <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
+                                       context="{'default_company_id': company_id, 'default_village_id': village_id, 'default_tehsil_id': tehsil_id}"/>
+                            </group>
+                            
+                            <group string="Landowner Details / भूमिस्वामी विवरण" style="margin-top: 20px;">
+                                <field name="landowner_ids" readonly="1">
+                                    <list string="Landowner Details / भूमिस्वामी विवरण">
+                                        <field name="name" string="Name / नाम"/>
+                                        <field name="father_name" string="Father's Name / पिता का नाम"/>
+                                        <field name="age" string="Age / आयु"/>
+                                        <field name="gender" string="Gender / लिंग"/>
+                                        <field name="village_id" string="Village / ग्राम"/>
+                                        <field name="tehsil_id" string="Tehsil / तहसील"/>
+                                        <field name="district_id" string="District / जिला"/>
+                                        <field name="aadhar_number" string="Aadhar / आधार"/>
+                                        <field name="pan_number" string="PAN / पैन"/>
+                                        <field name="bank_name" string="Bank / बैंक"/>
+                                        <field name="account_number" string="Account / खाता"/>
+                                    </list>
+                                </field>
+                            </group>
                         </page>
                     </notebook>
                     

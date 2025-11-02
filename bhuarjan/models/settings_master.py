@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+import re
 
 
 class BhuarjanSequenceSettings(models.Model):
@@ -23,7 +24,7 @@ class BhuarjanSequenceSettings(models.Model):
         ('section23', 'Section 23'),
     ], string='Process Name', required=True)
     
-    prefix = fields.Char(string='Prefix', required=True, help='Prefix for sequence number (e.g., SC_{%PROJ_CODE%}_ or SC_{bhu.project.code}_)')
+    prefix = fields.Char(string='Prefix', required=True, help='Prefix for sequence number (e.g., SC_{%PROJ_CODE%}_ or SC_{bhu.project.code}_{bhu.village.code}_)')
     initial_sequence = fields.Integer(string='Initial Sequence', default=1, help='Starting number for sequence')
     padding = fields.Integer(string='Padding', default=4, help='Number of digits for sequence (e.g., 4 for 0001)')
     project_id = fields.Many2one('bhu.project', string='Project', compute='_compute_project_id', store=True)
@@ -59,7 +60,7 @@ class BhuarjanSequenceSettings(models.Model):
                 # Validate template placeholder format
                 if '{' in record.prefix and '}' in record.prefix:
                     # Check for valid template placeholders
-                    valid_placeholders = ['{%PROJ_CODE%}', '{bhu.project.code}', '{PROJ_CODE}']
+                    valid_placeholders = ['{%PROJ_CODE%}', '{bhu.project.code}', '{PROJ_CODE}', '{bhu.village.code}']
                     import re
                     placeholder_pattern = r'\{[^}]+\}'
                     placeholders = re.findall(placeholder_pattern, record.prefix)
@@ -108,11 +109,13 @@ class BhuarjanSequenceSettings(models.Model):
             
         sequence_code = f'bhuarjan.{self.process_name}.{self.project_id.id}'
         
-        # Prepare prefix for Odoo sequence (replace template placeholders)
+        # Prepare prefix for Odoo sequence (replace project placeholders only)
+        # Village placeholders will be replaced at runtime when sequence is used
         project_code = self.project_id.code or self.project_id.name or 'PROJ'
         sequence_prefix = self.prefix.replace('{%PROJ_CODE%}', project_code)
         sequence_prefix = sequence_prefix.replace('{bhu.project.code}', project_code)
         sequence_prefix = sequence_prefix.replace('{PROJ_CODE}', project_code)
+        # Note: {bhu.village.code} is left as-is and will be replaced at runtime
         
         # Check if sequence already exists
         existing_sequence = self.env['ir.sequence'].search([
@@ -245,8 +248,57 @@ class BhuarjanSettingsMaster(models.Model):
                 record.display_name = "Settings Master"
     
     @api.model
-    def get_sequence_number(self, process_name, project_id):
-        """Get next sequence number for a process"""
+    def _get_last_sequence_number(self, model_name, prefix_pattern, project_id=None, village_id=None, initial_seq=1):
+        """Get the last sequence number used for a project+village combination
+        
+        Args:
+            model_name: Name of the model (e.g., 'bhu.survey')
+            prefix_pattern: Expected prefix pattern (e.g., 'SC_PROJ01_JR_')
+            project_id: Project ID to filter records
+            village_id: Village ID to filter records
+            initial_seq: Starting sequence number if no records exist
+            
+        Returns:
+            int: Last sequence number + 1, or initial_seq if no records exist
+        """
+        # Build domain to find existing records
+        domain = [('name', '!=', 'New'), ('name', '!=', False)]
+        if project_id:
+            domain.append(('project_id', '=', project_id))
+        if village_id:
+            domain.append(('village_id', '=', village_id))
+        
+        # Get all existing records matching the criteria
+        model = self.env[model_name]
+        existing_records = model.search(domain)
+        
+        # Extract sequence numbers from existing names
+        sequence_numbers = []
+        prefix_escaped = re.escape(prefix_pattern)
+        # Pattern to match: prefix followed by digits at the end
+        pattern = re.compile(rf'^{prefix_escaped}(\d+)$')
+        
+        for record in existing_records:
+            if record.name and pattern.match(record.name):
+                match = pattern.match(record.name)
+                seq_num = int(match.group(1))
+                sequence_numbers.append(seq_num)
+        
+        # If no existing sequences, return initial sequence
+        if not sequence_numbers:
+            return initial_seq
+        
+        # Return the highest sequence number + 1
+        return max(sequence_numbers) + 1
+    
+    @api.model
+    def get_sequence_number(self, process_name, project_id, village_id=None):
+        """Get next sequence number for a process
+        
+        If village_id is provided, creates separate sequences per village
+        so each village starts from the initial sequence (typically 1).
+        The next number is based on the last existing sequence number for that village.
+        """
         # First, try to get sequence from settings master
         sequence_setting = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', process_name),
@@ -259,31 +311,108 @@ class BhuarjanSettingsMaster(models.Model):
             project = self.env['bhu.project'].browse(project_id)
             project_code = project.code or project.name or 'PROJ'
             
-            # Use the sequence from ir.sequence if it exists, otherwise use settings
-            sequence_code = f'bhuarjan.{process_name}.{project_id}'
+            # Get village code for substitution if village_id is provided
+            village_code = ''
+            if village_id:
+                village = self.env['bhu.village'].browse(village_id)
+                village_code = village.village_code if village.exists() else ''
+            
+            # Prepare prefix with all placeholders replaced
+            sequence_prefix = sequence_setting.prefix.replace('{%PROJ_CODE%}', project_code)
+            sequence_prefix = sequence_prefix.replace('{bhu.project.code}', project_code)
+            sequence_prefix = sequence_prefix.replace('{PROJ_CODE}', project_code)
+            sequence_prefix = sequence_prefix.replace('{bhu.village.code}', village_code)
+            
+            # Determine sequence code - include village_id if provided for separate counters
+            if village_id:
+                sequence_code = f'bhuarjan.{process_name}.{project_id}.{village_id}'
+            else:
+                sequence_code = f'bhuarjan.{process_name}.{project_id}'
+            
+            # Get last sequence number from existing records (for survey process with village)
+            next_seq_number = None
+            if process_name == 'survey' and village_id:
+                model_name = 'bhu.survey'
+                next_seq_number = self._get_last_sequence_number(
+                    model_name,
+                    sequence_prefix,
+                    project_id=project_id,
+                    village_id=village_id,
+                    initial_seq=sequence_setting.initial_sequence
+                )
+            
+            # Check if sequence exists, if not create it
+            existing_sequence = self.env['ir.sequence'].search([
+                ('code', '=', sequence_code)
+            ], limit=1)
+            
+            # If we calculated next_seq_number from existing records, use it directly
+            if next_seq_number is not None:
+                # Update or create the sequence with the calculated number
+                if not existing_sequence:
+                    # Create new sequence starting from calculated number
+                    # Set number_next to next_seq_number + 1 since we'll use next_seq_number now
+                    existing_sequence = self.env['ir.sequence'].create({
+                        'name': f'Bhuarjan {process_name.title()} Sequence - Project {project.name}' + 
+                               (f' - Village {village.name}' if village_id and village.exists() else ''),
+                        'code': sequence_code,
+                        'prefix': sequence_prefix,
+                        'number_next': next_seq_number + 1,  # Set to +1 since we're using next_seq_number now
+                        'padding': sequence_setting.padding,
+                        'company_id': False,
+                    })
+                else:
+                    # Update existing sequence counter to use the calculated number
+                    existing_sequence.write({'number_next': next_seq_number + 1})  # Set to +1 since we're using next_seq_number now
+                
+                # Generate the sequence number directly using the calculated value
+                sequence_number = f"{sequence_prefix}{str(next_seq_number).zfill(sequence_setting.padding)}"
+                return sequence_number
+            
+            # If no next_seq_number calculated, use ir.sequence as normal
+            if not existing_sequence:
+                # Create new sequence for this project-village combination
+                self.env['ir.sequence'].create({
+                    'name': f'Bhuarjan {process_name.title()} Sequence - Project {project.name}' + 
+                           (f' - Village {village.name}' if village_id and village.exists() else ''),
+                    'code': sequence_code,
+                    'prefix': sequence_prefix,
+                    'number_next': sequence_setting.initial_sequence,
+                    'padding': sequence_setting.padding,
+                    'company_id': False,
+                })
+            
+            # Get next sequence number from ir.sequence
             sequence = self.env['ir.sequence'].next_by_code(sequence_code)
             
             if sequence:
-                # Ensure any remaining placeholders are substituted
+                # Replace any remaining placeholders (shouldn't be needed but safety check)
                 sequence = sequence.replace('{%PROJ_CODE%}', project_code)
                 sequence = sequence.replace('{bhu.project.code}', project_code)
                 sequence = sequence.replace('{PROJ_CODE}', project_code)
+                sequence = sequence.replace('{bhu.village.code}', village_code)
                 return sequence
             else:
                 # Fallback: generate sequence using settings master format
-                sequence_number = f"{sequence_setting.prefix}{str(sequence_setting.initial_sequence).zfill(sequence_setting.padding)}"
+                seq_num = sequence_setting.initial_sequence
+                sequence_number = f"{sequence_setting.prefix}{str(seq_num).zfill(sequence_setting.padding)}"
                 # Substitute placeholders in the generated sequence
                 sequence_number = sequence_number.replace('{%PROJ_CODE%}', project_code)
                 sequence_number = sequence_number.replace('{bhu.project.code}', project_code)
                 sequence_number = sequence_number.replace('{PROJ_CODE}', project_code)
-                # Update the initial sequence for next time
-                sequence_setting.write({
-                    'initial_sequence': sequence_setting.initial_sequence + 1
-                })
+                sequence_number = sequence_number.replace('{bhu.village.code}', village_code)
+                # Update the initial sequence for next time (only if no village-specific sequence)
+                if not village_id:
+                    sequence_setting.write({
+                        'initial_sequence': sequence_setting.initial_sequence + 1
+                    })
                 return sequence_number
         
         # If no settings found, try ir.sequence as last resort
-        sequence_code = f'bhuarjan.{process_name}.{project_id}'
+        if village_id:
+            sequence_code = f'bhuarjan.{process_name}.{project_id}.{village_id}'
+        else:
+            sequence_code = f'bhuarjan.{process_name}.{project_id}'
         sequence = self.env['ir.sequence'].next_by_code(sequence_code)
         
         return sequence
@@ -324,6 +453,7 @@ class BhuarjanSettingsMaster(models.Model):
             
             if existing_sequence:
                 # Update the sequence with properly substituted prefix
+                # Note: Village placeholders are replaced at runtime
                 sequence_prefix = sequence_setting.prefix.replace('{%PROJ_CODE%}', project_code)
                 sequence_prefix = sequence_prefix.replace('{bhu.project.code}', project_code)
                 sequence_prefix = sequence_prefix.replace('{PROJ_CODE}', project_code)

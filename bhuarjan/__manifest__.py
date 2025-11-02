@@ -16,12 +16,8 @@
         'data/chhattisgarh_districts_data.xml',
         'data/raigarh_sub_division_data.xml',
         'data/raipur_sub_division_data.xml',
-        'data/raigarh_tehsil_data.xml',
         'data/raigarh_circle_data.xml',
-        'data/raigarh_village_data.xml',
         'data/department_data.xml',
-        'data/chhattisgarh_tehsils_data.xml',
-        'data/chhattisgarh_villages_data.xml',
         'data/settings_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'security/ir.model.access.csv',
@@ -75,5 +71,6 @@
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
+    'post_init_hook': 'post_init_hook',
 
 }

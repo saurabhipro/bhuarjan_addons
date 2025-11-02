@@ -101,6 +101,10 @@
                         </page>
                     </notebook>
                 </sheet>
+                <footer>
+                    <button string="Save &amp; Close / सहेजें और बंद करें" special="save" class="btn-primary"/>
+                    <button string="Close / बंद करें" special="cancel" class="btn-secondary"/>
+                </footer>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
 
             </form>

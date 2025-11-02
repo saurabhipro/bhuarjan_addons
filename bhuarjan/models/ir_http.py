@@ -1,0 +1,128 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models
+from odoo.http import request
+import logging
+import os
+
+_logger = logging.getLogger(__name__)
+
+
+class IrHttp(models.AbstractModel):
+    _inherit = 'ir.http'
+    
+    @classmethod
+    def _authenticate(cls, endpoint):
+        """Override authenticate to check for server restart and force logout"""
+        # Check server restart BEFORE authentication
+        cls._check_server_restart()
+        return super(IrHttp, cls)._authenticate(endpoint)
+    
+    @classmethod
+    def _check_server_restart(cls):
+        """Check if server has restarted and invalidate sessions"""
+        try:
+            if not hasattr(request, 'db') or not request.db:
+                _logger.warning("=== BHUARJAN: No request.db ===")
+                return
+            
+            # Get current process ID
+            current_pid = str(os.getpid())
+            
+            # Get registry and cursor directly
+            try:
+                from odoo.modules.registry import Registry
+                from odoo import api
+                registry = Registry(request.db)
+                
+                # First, get stored PID and check if restart occurred
+                stored_pid = ''
+                try:
+                    with registry.cursor() as cr:
+                        env = api.Environment(cr, 1, {})
+                        # Try SQL first
+                        try:
+                            cr.execute("SELECT value FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
+                            result = cr.fetchone()
+                            if result:
+                                stored_pid = result[0] or ''
+                        except Exception:
+                            # Fallback to ORM
+                            try:
+                                Param = env.get('ir.config_parameter')
+                                if Param:
+                                    stored_pid = Param.get_param('bhuarjan.server_pid', default='')
+                            except:
+                                pass
+                except Exception as read_err:
+                    _logger.warning("Could not read PID: %s", read_err)
+                
+                # Log PID check - ALWAYS log so we can see it
+                _logger.warning("=== BHUARJAN PID CHECK === Current: %s, Stored: %s ===", current_pid, stored_pid)
+                
+                # If PIDs don't match, server was restarted - handle session deletion in separate transaction
+                if stored_pid and stored_pid != current_pid:
+                    _logger.warning("=== SERVER RESTART DETECTED! PID changed from %s to %s ===", stored_pid, current_pid)
+                    
+                    # Invalidate ALL sessions using ORM in a separate transaction
+                    try:
+                        with registry.cursor() as cr:
+                            env = api.Environment(cr, 1, {})
+                            Session = env.get('ir.session')
+                            if Session:
+                                sessions = Session.search([])
+                                session_count = len(sessions)
+                                if session_count > 0:
+                                    sessions.unlink()
+                                    cr.commit()
+                                    _logger.warning("=== DELETED %d SESSIONS VIA ORM DUE TO SERVER RESTART ===", session_count)
+                                else:
+                                    _logger.info("=== NO ACTIVE SESSIONS FOUND ===")
+                            cr.commit()
+                    except Exception as session_err:
+                        _logger.error("Failed to delete sessions: %s", session_err, exc_info=True)
+                    
+                    # Force invalidate current session
+                    if hasattr(request, 'session'):
+                        try:
+                            request.session.clear()
+                            _logger.warning("=== CLEARED CURRENT SESSION ===")
+                        except Exception as e:
+                            _logger.error("Failed to clear session: %s", e)
+                
+                # Always update PID in a separate transaction
+                try:
+                    with registry.cursor() as cr:
+                        env = api.Environment(cr, 1, {})
+                        # Try ORM first (more reliable)
+                        try:
+                            Param = env.get('ir.config_parameter')
+                            if Param:
+                                Param.set_param('bhuarjan.server_pid', current_pid)
+                                cr.commit()
+                                _logger.info("PID stored via ORM: %s", current_pid)
+                            else:
+                                # Fallback to SQL
+                                cr.execute("SELECT id FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
+                                existing = cr.fetchone()
+                                if existing:
+                                    cr.execute("UPDATE ir_config_parameter SET value = %s WHERE key = 'bhuarjan.server_pid'", (current_pid,))
+                                else:
+                                    cr.execute("""
+                                        INSERT INTO ir_config_parameter (key, value) 
+                                        VALUES ('bhuarjan.server_pid', %s)
+                                    """, (current_pid,))
+                                cr.commit()
+                                _logger.info("PID stored via SQL: %s", current_pid)
+                        except Exception as pid_err:
+                            _logger.error("Could not store PID: %s", pid_err)
+                            cr.rollback()
+                except Exception as pid_trans_err:
+                    _logger.error("Could not create transaction for PID storage: %s", pid_trans_err)
+                        
+            except Exception as env_err:
+                _logger.error("Could not access database: %s", env_err, exc_info=True)
+                
+        except Exception as e:
+            _logger.error("Error in _check_server_restart: %s", e, exc_info=True)
+

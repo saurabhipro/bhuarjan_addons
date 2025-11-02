@@ -23,6 +23,7 @@ from . import stage9_section23
 from . import rate_master
 from . import settings_master
 from . import message_wizard
+from . import ir_http
 
 
 

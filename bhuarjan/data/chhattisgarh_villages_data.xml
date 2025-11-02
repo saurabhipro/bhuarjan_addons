@@ -5,6 +5,7 @@
         
         <record id="village_bhatapara" model="bhu.village">
             <field name="name">Jurda</field>
+            <field name="village_code">JR</field>
             <field name="district_id" ref="district_raipur"/>
             <field name="tehsil_id" ref="tehsil_raipur"/>
             <field name="pincode">493118</field>

@@ -153,7 +153,7 @@
                 <field name="village_id"/>
                 <field name="gender"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_card o_kanban_record" style="background: #ffffff; border: 2px solid #20bf6b; border-radius: 8px; transition: all 0.3s ease; min-height: auto; margin-bottom: 12px; width: 100%; max-width: 100%;">
                             <div class="oe_kanban_content" style="padding: 10px 12px;">
                                 <div class="d-flex justify-content-between align-items-start" style="gap: 8px;">

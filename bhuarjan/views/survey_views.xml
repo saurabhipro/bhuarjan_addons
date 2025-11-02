@@ -225,100 +225,99 @@
                 <field name="khasra_number"/>
 
                 <templates>
-                    <t t-name="kanban-box">
-                    <div class="oe_kanban_card o_kanban_record" style="background: #ffffff; border: 2px solid #d1d5db; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">
-                        <div class="oe_kanban_content p-3">
-                            
-                            <!-- Compact Header -->
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="flex-grow-1">
+                    <t t-name="card">
+                        <div class="p-3">
+                                
+                                <!-- Compact Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="flex-grow-1">
+                                        
+                                        <h5 class="mb-1 text-dark font-weight-bold" style="font-size: 1rem; font-weight: 700;">
+                                            <field name="name"/>
+                                        </h5>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="fa fa-folder mr-1 text-muted" style="font-size: 0.8rem;" title="Project"></i>
+                                            <span class="text-muted small">
+                                                <field name="project_id"/>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-map-marker mr-1 text-muted" style="font-size: 0.8rem;" title="Khasra"></i>
+                                            <span class="text-muted small">
+                                                Khasra: <field name="khasra_number"/>
+                                            </span>
+                                        </div>
+                                    </div>
                                     
-                                    <h5 class="mb-1 text-dark font-weight-bold" style="font-size: 1rem; font-weight: 700;">
-                                        <field name="name"/>
-                                    </h5>
+                                    <!-- User Image/Avatar -->
+                                    <div class="d-flex flex-column align-items-center">
+                                        
+                                            <field name="user_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                    
+                                    <!-- Actions Dropdown -->
+                                    <div class="dropdown ml-1">
+                                        <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.9rem;">
+                                            <i class="fa fa-ellipsis-v" title="More Actions"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="border: 1px solid #e5e7eb; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                            <a role="menuitem" type="edit" class="dropdown-item">
+                                                <i class="fa fa-pencil-alt mr-2 text-primary" title="Edit"></i> Edit
+                                            </a>
+                                            <a role="menuitem" class="dropdown-item" onclick="shareOnWhatsApp()">
+                                                <i class="fab fa-whatsapp mr-2 text-success" title="Share on WhatsApp"></i> Share on WhatsApp
+                                            </a>
+                                            <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                                <i class="fa fa-trash mr-2" title="Delete"></i> Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Compact Body -->
+                                <div class="mb-2">
                                     <div class="d-flex align-items-center mb-1">
-                                        <i class="fa fa-folder mr-1 text-muted" style="font-size: 0.8rem;" title="Project"></i>
-                                        <span class="text-muted small">
-                                            <field name="project_id"/>
+                                        <i class="fa fa-home mr-3 text-muted" style="font-size: 0.8rem;" title="Village"></i>
+                                        <span class="text-muted small mr-3">Village:</span>
+                                        <span class="text-dark small">
+                                            <field name="village_id"/>
                                         </span>
                                     </div>
-                                    <div class="d-flex align-items-center">
-                                        <i class="fa fa-map-marker mr-1 text-muted" style="font-size: 0.8rem;" title="Khasra"></i>
-                                        <span class="text-muted small">
-                                            Khasra: <field name="khasra_number"/>
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <!-- User Image/Avatar -->
-                                <div class="d-flex flex-column align-items-center">
                                     
-                                        <field name="user_id" widget="many2one_avatar_user"/>
-                                </div>
-                                
-                                <!-- Actions Dropdown -->
-                                <div class="dropdown ml-1">
-                                    <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.9rem;">
-                                        <i class="fa fa-ellipsis-v" title="More Actions"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right" role="menu" style="border: 1px solid #e5e7eb; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                        <a role="menuitem" type="edit" class="dropdown-item">
-                                            <i class="fa fa-pencil-alt mr-2 text-primary" title="Edit"></i> Edit
-                                        </a>
-                                        <a role="menuitem" class="dropdown-item" onclick="shareOnWhatsApp()">
-                                            <i class="fab fa-whatsapp mr-2 text-success" title="Share on WhatsApp"></i> Share on WhatsApp
-                                        </a>
-                                        <a role="menuitem" type="delete" class="dropdown-item text-danger">
-                                            <i class="fa fa-trash mr-2" title="Delete"></i> Delete
-                                        </a>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fa fa-calendar mr-3 text-muted" style="font-size: 0.8rem;" title="Date"></i>
+                                        <span class="text-muted small mr-3">Date:</span>
+                                        <span class="text-dark small">
+                                            <field name="survey_date"/>
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Compact Body -->
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="fa fa-home mr-3 text-muted" style="font-size: 0.8rem;" title="Village"></i>
-                                    <span class="text-muted small mr-3">Village:</span>
-                                    <span class="text-dark small">
-                                        <field name="village_id"/>
-                                    </span>
-                                </div>
-                                
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="fa fa-calendar mr-3 text-muted" style="font-size: 0.8rem;" title="Date"></i>
-                                    <span class="text-muted small mr-3">Date:</span>
-                                    <span class="text-dark small">
-                                        <field name="survey_date"/>
-                                    </span>
-                                </div>
-                            </div>
+                                <!-- Compact Footer -->
+                                <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
+                                    <t t-if="record.state.raw_value == 'draft'">
+                                        <button type="edit" class="btn btn-success px-3 py-2 text-uppercase small font-weight-bold" style="background: #28a745; color: #ffffff; border: 1px solid #218838; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3); cursor: pointer; border-radius: 4px;">
+                                            <i class="fa fa-pencil-alt mr-1" style="font-size: 0.8rem;" title="Edit"></i>
+                                            Edit / संपादन
+                                        </button>
+                                    </t>
+                                    <t t-if="record.state.raw_value != 'draft'">
+                                        <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                            t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
+                                            or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
+                                            or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
+                                            or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
 
-                            <!-- Compact Footer -->
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                <t t-if="record.state.raw_value == 'draft'">
-                                    <button type="edit" class="btn btn-success px-3 py-2 text-uppercase small font-weight-bold" style="background: #28a745; color: #ffffff; border: 1px solid #218838; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3); cursor: pointer; border-radius: 4px;">
-                                        <i class="fa fa-pencil-alt mr-1" style="font-size: 0.8rem;" title="Edit"></i>
-                                        Edit / संपादन
-                                    </button>
-                                </t>
-                                <t t-if="record.state.raw_value != 'draft'">
-                                    <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                          t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
-                                          or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
-                                          or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
-                                          or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
-                                        <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
-                                        <field name="state"/>
-                                    </span>
-                                </t>
-                                <div class="d-flex align-items-center text-muted">
-                                    <span class="small">Survey</span>
+                                            <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
+                                            <field name="state"/>
+                                        </span>
+                                    </t>
+                                    <div class="d-flex align-items-center text-muted">
+                                        <span class="small">Survey</span>
+                                    </div>
                                 </div>
-                            </div>
 
                         </div>
-                    </div>
                     </t>
                 </templates>
             </kanban>

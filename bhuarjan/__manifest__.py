@@ -20,7 +20,6 @@
         'data/raigarh_circle_data.xml',
         'data/department_data.xml',
         'data/chhattisgarh_tehsils_data.xml',
-        'data/chhattisgarh_villages_data.xml',
         'data/settings_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'security/ir.model.access.csv',

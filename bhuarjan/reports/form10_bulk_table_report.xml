@@ -9,7 +9,8 @@
         <field name="report_file">bhuarjan.form10_bulk_table_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_form10_paper_format"/>
         <field name="print_report_name">'Form10_Bulk_' + (object and object[0].project_id.name or 'All')</field>
-        
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_view_types" eval="False"/>
     </record>
     
     <!-- Custom Layout header and footer -->

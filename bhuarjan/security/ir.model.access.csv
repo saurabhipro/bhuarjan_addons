@@ -7,7 +7,8 @@ access_bhu_village,bhu.village.model_access,model_bhu_village,base.group_user,1,
 access_bhu_village_line,bhu.village.line.model_access,model_bhu_village_line,base.group_user,1,1,1,1
 access_bhu_project_user,bhu.project.model_access,model_bhu_project,base.group_user,1,1,1,1
 access_bhu_department_user,bhu.department.model_access,model_bhu_department,base.group_user,1,1,1,1
-access_bhu_survey_user,bhu.survey.model_access,model_bhu_survey,base.group_user,1,1,1,1
+access_bhu_survey_user,bhu.survey.model_access,model_bhu_survey,base.group_user,1,1,1,0
+access_bhu_survey_admin,bhu.survey.model_access_admin,model_bhu_survey,bhuarjan.group_bhuarjan_admin,1,1,1,1
 access_bhu_survey_line_user,bhu.survey.line.model_access,model_bhu_survey_line,base.group_user,1,1,1,1
 access_bhu_landowner_user,bhu.landowner.model_access,model_bhu_landowner,base.group_user,1,1,1,1
 access_bhu_stage8_section19,access_bhu_stage8_section19,model_bhu_stage8_section19,base.group_user,1,1,1,1

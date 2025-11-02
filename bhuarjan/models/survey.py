@@ -331,7 +331,6 @@ class Survey(models.Model):
                 raise ValidationError(_('At least one landowner is required on the survey.'))
 
     def action_submit(self):
-        print("\n\n khdfkashdfkahdsj")
         """Submit the survey for approval"""
         for record in self:
             if not record.khasra_number:
@@ -348,7 +347,6 @@ class Survey(models.Model):
                 if template:
                     template.send_mail(user.id, force_send=True)
 
-            print("\n\n fine code - ",template.id)
                     
         wiz = self.env['bhu.survey.message.wizard'].create({
             'message': _('Survey Submitted.\nSurvey No: %s') % ', '.join(self.mapped('name'))

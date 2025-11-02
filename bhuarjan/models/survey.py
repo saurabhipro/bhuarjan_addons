@@ -200,16 +200,15 @@ class Survey(models.Model):
                     ])
                     
                     if sequence_settings:
-                        # Generate sequence number using settings master
+                        # Get village_id if available
+                        village_id = vals.get('village_id')
+                        
+                        # Generate sequence number using settings master (placeholders already replaced)
                         sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                            'survey', vals['project_id']
+                            'survey', vals['project_id'], village_id=village_id
                         )
                         if sequence_number:
-                            # Replace all project code placeholders with actual project code
-                            survey_number = sequence_number.replace('{%PROJ_CODE%}', project_code)
-                            survey_number = survey_number.replace('{bhu.project.code}', project_code)
-                            survey_number = survey_number.replace('{PROJ_CODE}', project_code)
-                            vals['name'] = survey_number
+                            vals['name'] = sequence_number
                         else:
                             # Fallback to default naming if sequence generation fails
                             sequence = self.env['ir.sequence'].next_by_code('bhu.survey') or '001'
@@ -231,6 +230,72 @@ class Survey(models.Model):
                 message_type='notification'
             )
         return records
+    
+    def unlink(self):
+        """Override unlink to reset sequence counter after deletion"""
+        # Store project_id and village_id before deletion
+        project_village_map = {}
+        for record in self:
+            if record.project_id and record.village_id:
+                key = (record.project_id.id, record.village_id.id)
+                if key not in project_village_map:
+                    project_village_map[key] = {
+                        'project_id': record.project_id.id,
+                        'village_id': record.village_id.id,
+                        'project_code': record.project_id.code or record.project_id.name or 'PROJ',
+                        'village_code': record.village_id.village_code if record.village_id.village_code else '',
+                    }
+        
+        # Delete the records
+        result = super(Survey, self).unlink()
+        
+        # After deletion, update sequence counters for affected project+village combinations
+        for key, info in project_village_map.items():
+            self._reset_sequence_after_deletion(
+                info['project_id'],
+                info['village_id'],
+                info['project_code'],
+                info['village_code']
+            )
+        
+        return result
+    
+    def _reset_sequence_after_deletion(self, project_id, village_id, project_code, village_code):
+        """Reset sequence counter based on highest remaining sequence number"""
+        # Check if sequence settings exist
+        sequence_setting = self.env['bhuarjan.sequence.settings'].search([
+            ('process_name', '=', 'survey'),
+            ('project_id', '=', project_id),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not sequence_setting:
+            return
+        
+        # Prepare prefix pattern
+        sequence_prefix = sequence_setting.prefix.replace('{%PROJ_CODE%}', project_code)
+        sequence_prefix = sequence_prefix.replace('{bhu.project.code}', project_code)
+        sequence_prefix = sequence_prefix.replace('{PROJ_CODE}', project_code)
+        sequence_prefix = sequence_prefix.replace('{bhu.village.code}', village_code)
+        
+        # Get the last sequence number from existing records
+        next_seq_number = self.env['bhuarjan.settings.master']._get_last_sequence_number(
+            'bhu.survey',
+            sequence_prefix,
+            project_id=project_id,
+            village_id=village_id,
+            initial_seq=sequence_setting.initial_sequence
+        )
+        
+        # Update the ir.sequence counter
+        sequence_code = f'bhuarjan.survey.{project_id}.{village_id}'
+        ir_sequence = self.env['ir.sequence'].search([
+            ('code', '=', sequence_code)
+        ], limit=1)
+        
+        if ir_sequence:
+            # Set counter to next_seq_number (which is already last + 1)
+            ir_sequence.write({'number_next': next_seq_number})
     
     @api.constrains('khasra_number', 'village_id')
     def _check_unique_khasra_per_village(self):
@@ -529,11 +594,13 @@ class SurveyLine(models.Model):
     def create(self, vals_list):
         """Override create to validate sequence settings and generate sequence number"""
         for vals in vals_list:
-            # Get project_id from survey_id if available
+            # Get project_id and village_id from survey_id if available
             project_id = None
+            village_id = None
             if vals.get('survey_id'):
                 survey = self.env['bhu.survey'].browse(vals['survey_id'])
-                project_id = survey.project_id.id
+                project_id = survey.project_id.id if survey.project_id else None
+                village_id = survey.village_id.id if survey.village_id else None
             
             # Check if sequence settings exist for survey process
             if project_id:
@@ -552,7 +619,7 @@ class SurveyLine(models.Model):
                 # Generate sequence number if name is 'New'
                 if vals.get('name', 'New') == 'New':
                     sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'survey', project_id
+                        'survey', project_id, village_id=village_id
                     )
                     if sequence_number:
                         vals['name'] = sequence_number

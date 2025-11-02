@@ -82,9 +82,11 @@
                         </group>
                         
                         <div class="alert alert-warning" role="alert">
-                            <strong>Example:</strong> With prefix "SC_{bhu.project.code}_", initial sequence 1, and padding 4, 
-                            the first sequence number will be "SC_RAI_0001" (where RAI is the project code).<br/>
-                            <strong>Supported placeholders:</strong> {%PROJ_CODE%}, {bhu.project.code}, {PROJ_CODE}
+                            <strong>Example:</strong> With prefix "SC_{bhu.project.code}_{bhu.village.code}_", initial sequence 1, and padding 4, 
+                            the first sequence number will be "SC_RAI_VIL001_0001" (where RAI is the project code and VIL001 is the village code).<br/>
+                            <strong>Note:</strong> When using {bhu.village.code}, each village will have its own sequence counter starting from the initial sequence (e.g., 1). 
+                            This means Village A will get SC_RAI_VIL001_0001, SC_RAI_VIL001_0002, etc., and Village B will also start from SC_RAI_VIL002_0001, SC_RAI_VIL002_0002, etc.<br/>
+                            <strong>Supported placeholders:</strong> {%PROJ_CODE%}, {bhu.project.code}, {PROJ_CODE}, {bhu.village.code}
                         </div>
                     </sheet>
                 </form>

@@ -11,17 +11,8 @@ class BhuarjanSequenceSettings(models.Model):
     process_name = fields.Selection([
         ('survey', 'Survey'),
         ('form10', 'Form 10'),
-        ('notification4', 'Notification 4'),
-        ('section11', 'Section 11'),
-        ('section15', 'Section 15'),
         ('post_award_payment', 'Post Award Payment'),
         ('payment_reconciliation', 'Payment Reconciliation'),
-        ('jansunwai', 'Jansunwai'),
-        ('expert_review', 'Expert Review'),
-        ('collector_approval', 'Collector Approval'),
-        ('section19', 'Section 19'),
-        ('section21', 'Section 21'),
-        ('section23', 'Section 23'),
     ], string='Process Name', required=True)
     
     prefix = fields.Char(string='Prefix', required=True, help='Prefix for sequence number (e.g., SC_{%PROJ_CODE%}_ or SC_{bhu.project.code}_{bhu.village.code}_)')
@@ -159,17 +150,8 @@ class BhuarjanWorkflowSettings(models.Model):
     process_name = fields.Selection([
         ('survey', 'Survey'),
         ('form10', 'Form 10'),
-        ('notification4', 'Notification 4'),
-        ('section11', 'Section 11'),
-        ('section15', 'Section 15'),
         ('post_award_payment', 'Post Award Payment'),
         ('payment_reconciliation', 'Payment Reconciliation'),
-        ('jansunwai', 'Jansunwai'),
-        ('expert_review', 'Expert Review'),
-        ('collector_approval', 'Collector Approval'),
-        ('section19', 'Section 19'),
-        ('section21', 'Section 21'),
-        ('section23', 'Section 23'),
     ], string='Process Name', required=True)
     
     project_id = fields.Many2one('bhu.project', string='Project', compute='_compute_project_id', store=True)

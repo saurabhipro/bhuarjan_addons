@@ -90,5 +90,25 @@
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
         </record>
+        
+        <!-- Sequence for SIA Team Numbers -->
+        <record id="seq_bhu_sia_team" model="ir.sequence">
+            <field name="name">SIA Team Number</field>
+            <field name="code">bhu.sia.team</field>
+            <field name="prefix">SIA-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Section 15 Objection Numbers -->
+        <record id="seq_bhu_section15_objection" model="ir.sequence">
+            <field name="name">Section 15 Objection Number</field>
+            <field name="code">bhu.section15.objection</field>
+            <field name="prefix">OBJ-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
     </data>
 </odoo>

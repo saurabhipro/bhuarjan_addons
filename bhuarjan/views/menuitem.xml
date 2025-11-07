@@ -19,17 +19,34 @@
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
     <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage2_section4" name="Stage 2 Section 4 Notification" action="action_bhu_notification4" parent="menu_bhu_process" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage3_section4_1" name="Stage 3 Section 4(1) Jansunwai &amp; SIA" action="action_bhu_stage3_jansunwai" parent="menu_bhu_process" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage4_section7" name="Stage 4 Section 7 Expert Group Review" action="action_bhu_stage4_expert_review" parent="menu_bhu_process" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage5_section8" name="Stage 5 Section 8 Collector Approval" action="action_bhu_stage5_collector_approval" parent="menu_bhu_process" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage6_section11" name="Stage 6 Section 11 Notification" action="action_section11_notification" parent="menu_bhu_process" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage7_section15" name="Stage 7 Section 15 Objections" action="action_section15_objection" parent="menu_bhu_process" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage8_section19" name="Stage 8 Section 19 Declaration of Award" action="action_bhu_stage8_section19" parent="menu_bhu_process" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage9_section21" name="Stage 9 Section 21 Notice to Owner for Award" action="action_bhu_stage9_section21" parent="menu_bhu_process" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_stage9_section23" name="Stage 9 Section 23 Award Order" action="action_bhu_stage9_section23" parent="menu_bhu_process" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="5"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="6"/>
+    
+    <!-- Process Menu -->
+    <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec4_create_sia_team" name="(Sec 4) Create SIA Team" action="action_create_sia_team" parent="menu_bhu_process" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec4_generate_notification" name="(Sec 4) Generate Section 4 Notification" action="action_generate_section4_notification" parent="menu_bhu_process" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec4_upload_signed" name="(Sec 4) Upload Signed Notification" action="action_upload_section4_signed" parent="menu_bhu_process" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec7_upload_expert_report" name="(Sec 7) Upload Expert Committee Report" action="action_upload_expert_committee_report" parent="menu_bhu_process" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec7_generate_expert_order" name="(Sec 7) Generate Expert Committee Order" action="action_generate_expert_committee_order" parent="menu_bhu_process" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec8_approve_reject" name="(Sec 8) Approve / Reject Expert Committee Report" action="action_approve_reject_expert_report" parent="menu_bhu_process" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec11_generate_preliminary" name="(Sec 11) Generate Section 11 Preliminary Report" action="action_generate_section11_preliminary" parent="menu_bhu_process" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec15_objections" name="(Sec 15) Objections" action="action_section15_objections" parent="menu_bhu_process" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec19_generate_notification" name="(Sec 19) Generate Section 19 Notification" action="action_generate_section19_notification" parent="menu_bhu_process" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec21_generate_draft_award" name="(Sec 21) Generate Draft Award" action="action_generate_draft_award" parent="menu_bhu_process" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec21_generate_notices" name="(Sec 21) Generate Notices" action="action_generate_notices" parent="menu_bhu_process" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec21_download_notices" name="(Sec 21) Download Notices" action="action_download_notices" parent="menu_bhu_process" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec23_generate_award_notification" name="(Sec 23) Generate Award Notification" action="action_generate_award_notification" parent="menu_bhu_process" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_sec23_download_award_notification" name="(Sec 23) Download Award Notification" action="action_download_award_notification" parent="menu_bhu_process" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    
+    <!-- Payment Menu -->
+    <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    
+    <!-- Document Vault Menu -->
+    <menuitem id="menu_bhu_document_vault" name="Document Vault" parent="menu_bhu_root" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_document_vault_list" name="Documents" action="action_document_vault" parent="menu_bhu_document_vault" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    
+    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
     
 </odoo>

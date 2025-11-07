@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Stub Views for Process Wizards -->
+    
+    <!-- Section 4 Notification Wizard -->
+    <record id="view_section4_notification_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.section4.notification.wizard.form</field>
+        <field name="model">bhu.section4.notification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Section 4 Notification / धारा 4 अधिसूचना जेनरेट करें">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1"/>
+                            <field name="village_ids" widget="many2many_tags" required="1" 
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
+                               widget="text" nolabel="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_pdf" string="Generate PDF / PDF जेनरेट करें" type="object" class="btn-primary"/>
+                    <button string="Cancel / रद्द करें" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Expert Committee Report Views -->
+    <record id="view_expert_committee_report_list" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.report.list</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_expert_committee_report_form" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.report.form</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="project_id"/>
+                        <field name="village_id"/>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="report_file" filename="report_filename"/>
+                        <field name="report_filename" invisible="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Expert Committee Order Wizard -->
+    <record id="view_expert_committee_order_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.order.wizard.form</field>
+        <field name="model">bhu.expert.committee.order.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Expert Committee Order">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_order" string="Generate Order" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 11 Preliminary Wizard -->
+    <record id="view_section11_preliminary_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.wizard.form</field>
+        <field name="model">bhu.section11.preliminary.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Section 11 Preliminary Report">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_report" string="Generate Report" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 19 Notification Wizard -->
+    <record id="view_section19_notification_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.section19.notification.wizard.form</field>
+        <field name="model">bhu.section19.notification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Section 19 Notification">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_notification" string="Generate Notification" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Draft Award Wizard -->
+    <record id="view_draft_award_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.draft.award.wizard.form</field>
+        <field name="model">bhu.draft.award.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Draft Award">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_draft_award" string="Generate Draft Award" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Generate Notices Wizard -->
+    <record id="view_generate_notices_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.generate.notices.wizard.form</field>
+        <field name="model">bhu.generate.notices.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Notices">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_notices" string="Generate Notices" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Download Notices Wizard -->
+    <record id="view_download_notices_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.download.notices.wizard.form</field>
+        <field name="model">bhu.download.notices.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Notices">
+                <sheet>
+                    <group>
+                        <field name="project_id"/>
+                        <field name="village_id"/>
+                        <field name="landowner_id"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_download_notices" string="Download" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Award Notification Wizard -->
+    <record id="view_award_notification_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.award.notification.wizard.form</field>
+        <field name="model">bhu.award.notification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Award Notification">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_award_notification" string="Generate Notification" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Download Award Notification Wizard -->
+    <record id="view_download_award_notification_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.download.award.notification.wizard.form</field>
+        <field name="model">bhu.download.award.notification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Award Notification">
+                <sheet>
+                    <group>
+                        <field name="project_id"/>
+                        <field name="village_id"/>
+                        <field name="landowner_id"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_download_award_notification" string="Download" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Generate Payment File Wizard -->
+    <record id="view_generate_payment_file_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.generate.payment.file.wizard.form</field>
+        <field name="model">bhu.generate.payment.file.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Payment File">
+                <sheet>
+                    <group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_payment_file" string="Generate Payment File" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
+

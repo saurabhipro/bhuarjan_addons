@@ -47,36 +47,6 @@ class BhuLandownerProjectFilter(models.Model):
     _inherit = ['bhu.landowner', 'bhu.project.filter']
 
 
-class BhuNotification4ProjectFilter(models.Model):
-    _name = 'bhu.notification4'
-    _inherit = ['bhu.notification4', 'bhu.project.filter']
-
-
-class BhuSection11NotificationProjectFilter(models.Model):
-    _name = 'bhu.section11.notification'
-    _inherit = ['bhu.section11.notification', 'bhu.project.filter']
-
-
-class BhuSection15ObjectionProjectFilter(models.Model):
-    _name = 'bhu.section15.objection'
-    _inherit = ['bhu.section15.objection', 'bhu.project.filter']
-
-
-class BhuStage3JansunwaiProjectFilter(models.Model):
-    _name = 'bhu.stage3.jansunwai'
-    _inherit = ['bhu.stage3.jansunwai', 'bhu.project.filter']
-
-
-class BhuStage4ExpertReviewProjectFilter(models.Model):
-    _name = 'bhu.stage4.expert.review'
-    _inherit = ['bhu.stage4.expert.review', 'bhu.project.filter']
-
-
-class BhuStage5CollectorApprovalProjectFilter(models.Model):
-    _name = 'bhu.stage5.collector.approval'
-    _inherit = ['bhu.stage5.collector.approval', 'bhu.project.filter']
-
-
 class BhuPostAwardPaymentProjectFilter(models.Model):
     _name = 'bhu.post.award.payment'
     _inherit = ['bhu.post.award.payment', 'bhu.project.filter']

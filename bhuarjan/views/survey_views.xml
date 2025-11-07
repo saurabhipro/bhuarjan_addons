@@ -208,6 +208,18 @@
         </field>
     </record>
 
+    <!-- Bulk Approval Server Action -->
+    <record id="action_survey_bulk_approval" model="ir.actions.server">
+        <field name="name">Bulk Approval / बल्क अनुमोदन</field>
+        <field name="model_id" ref="model_bhu_survey"/>
+        <field name="binding_model_id" ref="model_bhu_survey"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_approval_wizard')
+        </field>
+    </record>
+
 
     <!-- Survey Kanban View -->
     <record id="view_bhu_survey_kanban" model="ir.ui.view">

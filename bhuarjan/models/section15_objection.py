@@ -6,144 +6,54 @@ from odoo.exceptions import ValidationError
 
 class Section15Objection(models.Model):
     _name = 'bhu.section15.objection'
-    _description = 'Section 15 Objection / धारा 15 आपत्ति'
+    _description = 'Section 15 Objections'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'objection_date desc, name'
+    _order = 'create_date desc'
 
-    name = fields.Char(string='Objection Number / आपत्ति संख्या', required=True, tracking=True)
-    objection_date = fields.Date(string='Objection Date / आपत्ति दिनाँक', required=True, 
-                                default=fields.Date.today, tracking=True)
+    name = fields.Char(string='Objection Reference / आपत्ति संदर्भ', required=True, tracking=True, default='New')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=True, tracking=True)
+    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', tracking=True)
     
-    # Company/Organization Information
-    company_id = fields.Many2one('res.company', string='Company / कंपनी', required=True, 
-                                 default=lambda self: self.env.company, tracking=True)
-    
-    # Related Records
-    section11_notification_id = fields.Many2one('bhu.section11.notification', 
-                                               string='Section 11 Notification / धारा 11 सूचना', 
-                                               required=True, tracking=True)
-    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', 
-                               related='section11_notification_id.survey_id', store=True)
-    landowner_id = fields.Many2one('bhu.landowner', string='Objector / आपत्तिकर्ता', 
-                                  required=True, tracking=True)
-    
-    # Objection Details
-    objection_type = fields.Selection([
-        ('compensation', 'Compensation / मुआवजा'),
-        ('land_measurement', 'Land Measurement / भूमि माप'),
-        ('ownership', 'Ownership / स्वामित्व'),
-        ('procedure', 'Procedure / प्रक्रिया'),
-        ('other', 'Other / अन्य')
-    ], string='Objection Type / आपत्ति प्रकार', required=True, tracking=True)
-    
-    objection_reason = fields.Text(string='Objection Reason / आपत्ति का कारण', required=True, tracking=True)
-    supporting_documents = fields.Text(string='Supporting Documents / समर्थन दस्तावेज', tracking=True)
-    
-    # Status
-    state = fields.Selection([
-        ('draft', 'Draft / मसौदा'),
-        ('submitted', 'Submitted / प्रस्तुत'),
-        ('under_review', 'Under Review / समीक्षा में'),
-        ('accepted', 'Accepted / स्वीकृत'),
+    objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
+    objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=True, tracking=True)
+    status = fields.Selection([
+        ('draft', 'Draft / प्रारूप'),
+        ('received', 'Received / प्राप्त'),
+        ('under_review', 'Under Review / समीक्षा के अधीन'),
+        ('resolved', 'Resolved / हल'),
         ('rejected', 'Rejected / अस्वीकृत'),
-        ('resolved', 'Resolved / हल')
     ], string='Status / स्थिति', default='draft', tracking=True)
     
-    # Review Details
-    review_date = fields.Date(string='Review Date / समीक्षा दिनाँक', tracking=True)
-    reviewer_id = fields.Many2one('res.users', string='Reviewer / समीक्षक', tracking=True)
-    review_notes = fields.Text(string='Review Notes / समीक्षा नोट्स', tracking=True)
-    decision_date = fields.Date(string='Decision Date / निर्णय दिनाँक', tracking=True)
-    decision_notes = fields.Text(string='Decision Notes / निर्णय नोट्स', tracking=True)
+    resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
+    resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
     
-    # Resolution
-    resolution_type = fields.Selection([
-        ('compensation_adjustment', 'Compensation Adjustment / मुआवजा समायोजन'),
-        ('re_survey', 'Re-survey / पुनः सर्वेक्षण'),
-        ('legal_proceedings', 'Legal Proceedings / कानूनी कार्यवाही'),
-        ('withdrawn', 'Withdrawn / वापस लिया गया'),
-        ('other', 'Other / अन्य')
-    ], string='Resolution Type / समाधान प्रकार', tracking=True)
-    
-    resolution_notes = fields.Text(string='Resolution Notes / समाधान नोट्स', tracking=True)
-    resolution_date = fields.Date(string='Resolution Date / समाधान दिनाँक', tracking=True)
-    
-    # Attachments
-    attachment_ids = fields.One2many('ir.attachment', 'res_id', string='Attachments / अनुलग्नक', 
-                                   domain=[('res_model', '=', 'bhu.section15.objection')])
-    
-    @api.constrains('objection_date', 'review_date', 'decision_date', 'resolution_date')
-    def _check_dates(self):
-        """Validate objection dates"""
-        for record in self:
-            if record.review_date and record.objection_date:
-                if record.review_date < record.objection_date:
-                    raise ValidationError(_('Review date cannot be before objection date.'))
-            if record.decision_date and record.review_date:
-                if record.decision_date < record.review_date:
-                    raise ValidationError(_('Decision date cannot be before review date.'))
-            if record.resolution_date and record.decision_date:
-                if record.resolution_date < record.decision_date:
-                    raise ValidationError(_('Resolution date cannot be before decision date.'))
-    
-    def action_submit(self):
-        """Submit the objection"""
-        for record in self:
-            if record.state == 'draft':
-                record.write({'state': 'submitted'})
-                record.message_post(
-                    body=_('Objection submitted for review'),
-                    message_type='notification'
-                )
-    
-    def action_under_review(self):
-        """Mark objection as under review"""
-        for record in self:
-            if record.state == 'submitted':
-                record.write({
-                    'state': 'under_review',
-                    'review_date': fields.Date.today()
-                })
-                record.message_post(
-                    body=_('Objection is now under review'),
-                    message_type='notification'
-                )
-    
-    def action_accept(self):
-        """Accept the objection"""
-        for record in self:
-            if record.state == 'under_review':
-                record.write({
-                    'state': 'accepted',
-                    'decision_date': fields.Date.today()
-                })
-                record.message_post(
-                    body=_('Objection accepted'),
-                    message_type='notification'
-                )
-    
-    def action_reject(self):
-        """Reject the objection"""
-        for record in self:
-            if record.state == 'under_review':
-                record.write({
-                    'state': 'rejected',
-                    'decision_date': fields.Date.today()
-                })
-                record.message_post(
-                    body=_('Objection rejected'),
-                    message_type='notification'
-                )
-    
+    @api.model
+    def create(self, vals):
+        """Generate objection reference if not provided"""
+        if vals.get('name', 'New') == 'New':
+            sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
+            vals['name'] = f'OBJ-{sequence}'
+        return super(Section15Objection, self).create(vals)
+
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset village when project changes and set domain"""
+        self.village_id = False
+        if self.project_id and self.project_id.village_ids:
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_id': []}}
+
     def action_resolve(self):
-        """Resolve the objection"""
+        """Mark objection as resolved"""
         for record in self:
-            if record.state in ['accepted', 'rejected']:
-                record.write({
-                    'state': 'resolved',
-                    'resolution_date': fields.Date.today()
-                })
-                record.message_post(
-                    body=_('Objection resolved'),
-                    message_type='notification'
-                )
+            if not record.resolution_details:
+                raise ValidationError(_('Please enter resolution details before resolving.'))
+            record.status = 'resolved'
+            record.resolved_date = fields.Date.today()
+            record.message_post(
+                body=_('Objection resolved by %s') % self.env.user.name,
+                message_type='notification'
+            )
+

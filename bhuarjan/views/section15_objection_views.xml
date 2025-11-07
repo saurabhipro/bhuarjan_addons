@@ -5,14 +5,13 @@
         <field name="name">bhu.section15.objection.list</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <list string="Section 15 Objections" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-primary="state == 'under_review'" decoration-success="state == 'accepted'" decoration-danger="state == 'rejected'" decoration-muted="state == 'resolved'">
+            <list string="Objections / आपत्तियां">
                 <field name="name"/>
-                <field name="company_id"/>
-                <field name="objection_date"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
                 <field name="landowner_id"/>
-                <field name="objection_type"/>
-                <field name="state"/>
-                <field name="section11_notification_id"/>
+                <field name="objection_date"/>
+                <field name="status" widget="badge"/>
             </list>
         </field>
     </record>
@@ -22,73 +21,35 @@
         <field name="name">bhu.section15.objection.form</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Objection / आपत्ति">
                 <header>
-                    <button name="action_submit" string="Submit" type="object" class="btn-primary" 
-                            invisible="state != 'draft'" icon="fa-paper-plane"/>
-                    <button name="action_under_review" string="Under Review" type="object" class="btn-info" 
-                            invisible="state != 'submitted'" icon="fa-search"/>
-                    <button name="action_accept" string="Accept" type="object" class="btn-success" 
-                            invisible="state != 'under_review'" icon="fa-check"/>
-                    <button name="action_reject" string="Reject" type="object" class="btn-danger" 
-                            invisible="state != 'under_review'" icon="fa-times"/>
-                    <button name="action_resolve" string="Resolve" type="object" class="btn-warning" 
-                            invisible="state not in ['accepted', 'rejected']" icon="fa-check-circle"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,accepted,rejected,resolved"/>
+                    <button name="action_resolve" string="Resolve / हल करें" type="object" class="btn-success" 
+                            invisible="status == 'resolved'" icon="fa-check"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,received,under_review,resolved"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" placeholder="Objection Number"/>
-                        </h1>
-                    </div>
-                    
                     <group>
-                        <group string="Basic Information">
-                            <field name="name"/>
-                            <field name="objection_date"/>
-                            <field name="objection_type"/>
-                            <field name="state"/>
-                        </group>
-                        <group string="Company Information">
-                            <field name="company_id"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <group string="Related Records">
-                            <field name="section11_notification_id"/>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="project_id" required="1"/>
+                            <field name="village_id" required="1"/>
+                            <field name="landowner_id" required="1"/>
                             <field name="survey_id"/>
-                            <field name="landowner_id"/>
                         </group>
-                        <group string="Review Details">
-                            <field name="reviewer_id"/>
-                            <field name="review_date"/>
-                            <field name="decision_date"/>
+                        <group>
+                            <field name="objection_date" required="1"/>
+                            <field name="resolved_date" readonly="1"/>
                         </group>
                     </group>
-                    
                     <group>
-                        <group string="Resolution">
-                            <field name="resolution_type"/>
-                            <field name="resolution_date"/>
-                        </group>
+                        <field name="objection_details" required="1" placeholder="Enter objection details..."/>
                     </group>
-                    
-                    <group string="Objection Details">
-                        <field name="objection_reason" nolabel="1"/>
-                        <field name="supporting_documents" nolabel="1"/>
-                    </group>
-                    
-                    <group string="Review Information">
-                        <field name="review_notes" nolabel="1"/>
-                        <field name="decision_notes" nolabel="1"/>
-                    </group>
-                    
-                    <group string="Resolution Information">
-                        <field name="resolution_notes" nolabel="1"/>
+                    <group>
+                        <field name="resolution_details" placeholder="Enter resolution details..." 
+                               invisible="status != 'under_review' and status != 'resolved'"/>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -98,41 +59,29 @@
         <field name="name">bhu.section15.objection.search</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <search string="Search Section 15 Objections">
+            <search string="Search Objections">
                 <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
                 <field name="landowner_id"/>
-                <field name="objection_type"/>
-                <field name="section11_notification_id"/>
-                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
-                <filter string="Under Review" name="under_review" domain="[('state', '=', 'under_review')]"/>
-                <filter string="Accepted" name="accepted" domain="[('state', '=', 'accepted')]"/>
-                <filter string="Rejected" name="rejected" domain="[('state', '=', 'rejected')]"/>
-                <filter string="Resolved" name="resolved" domain="[('state', '=', 'resolved')]"/>
-                <filter string="This Month" name="this_month" domain="[('objection_date', '>=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Draft" name="draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Under Review" name="under_review" domain="[('status', '=', 'under_review')]"/>
+                <filter string="Resolved" name="resolved" domain="[('status', '=', 'resolved')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
-                    <filter string="Objection Type" name="group_type" context="{'group_by': 'objection_type'}"/>
-                    <filter string="Date" name="group_date" context="{'group_by': 'objection_date'}"/>
-                    <filter string="Landowner" name="group_landowner" context="{'group_by': 'landowner_id'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
                 </group>
             </search>
         </field>
     </record>
 
-    <!-- Section 15 Objection Action -->
-    <record id="action_section15_objection" model="ir.actions.act_window">
-        <field name="name">Section 15 Objections</field>
+    <!-- Update Section 15 Objection Action -->
+    <record id="action_section15_objections" model="ir.actions.act_window">
+        <field name="name">Section 15 Objections / धारा 15 आपत्तियां</field>
         <field name="res_model">bhu.section15.objection</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_section15_objection_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create a new Section 15 Objection
-            </p>
-            <p>
-                Section 15 Objections are filed by landowners in response to Section 11 Notifications.
-            </p>
-        </field>
     </record>
 </odoo>
+

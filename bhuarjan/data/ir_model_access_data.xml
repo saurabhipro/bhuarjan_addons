@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Section 11 Notification access rights -->
-        <record id="access_bhu_section11_notification_user" model="ir.model.access">
-            <field name="name">bhu.section11.notification.model_access</field>
-            <field name="model_id" ref="model_bhu_section11_notification"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
         <!-- Section 15 Objection access rights -->
         <record id="access_bhu_section15_objection_user" model="ir.model.access">
             <field name="name">bhu.section15.objection.model_access</field>
@@ -38,39 +27,6 @@
         <record id="access_bhu_payment_reconciliation_user" model="ir.model.access">
             <field name="name">bhu.payment.reconciliation.model_access</field>
             <field name="model_id" ref="model_bhu_payment_reconciliation"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
-        <!-- Stage 3 Jansunwai access rights -->
-        <record id="access_bhu_stage3_jansunwai_user" model="ir.model.access">
-            <field name="name">bhu.stage3.jansunwai.model_access</field>
-            <field name="model_id" ref="model_bhu_stage3_jansunwai"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
-        <!-- Stage 4 Expert Review access rights -->
-        <record id="access_bhu_stage4_expert_review_user" model="ir.model.access">
-            <field name="name">bhu.stage4.expert.review.model_access</field>
-            <field name="model_id" ref="model_bhu_stage4_expert_review"/>
-            <field name="group_id" ref="base.group_user"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
-        <!-- Stage 5 Collector Approval access rights -->
-        <record id="access_bhu_stage5_collector_approval_user" model="ir.model.access">
-            <field name="name">bhu.stage5.collector.approval.model_access</field>
-            <field name="model_id" ref="model_bhu_stage5_collector_approval"/>
             <field name="group_id" ref="base.group_user"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>

@@ -85,16 +85,64 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Override create to ensure counts are computed"""
+        """Override create to compute and cache counts immediately"""
+        # Pre-compute all counts once
+        counts = self._get_all_counts()
+        
+        # Apply computed values to all records
+        for vals in vals_list:
+            vals.update(counts)
+        
         records = super().create(vals_list)
-        # Force computation
-        for record in records:
-            record._compute_all_counts()
         return records
+    
+    @api.model
+    def _get_all_counts(self):
+        """Get all counts - cached computation"""
+        return {
+            # Master Data Counts
+            'total_districts': self.env['bhu.district'].search_count([]),
+            'total_sub_divisions': self.env['bhu.sub.division'].search_count([]),
+            'total_tehsils': self.env['bhu.tehsil'].search_count([]),
+            'total_circles': self.env['bhu.circle'].search_count([]),
+            'total_villages': self.env['bhu.village'].search_count([]),
+            'total_projects': self.env['bhu.project'].search_count([]),
+            'total_departments': self.env['bhu.department'].search_count([]),
+            'total_landowners': self.env['bhu.landowner'].search_count([]),
+            
+            # Survey Counts
+            'total_surveys': self.env['bhu.survey'].search_count([]),
+            'draft_surveys': self.env['bhu.survey'].search_count([('state', '=', 'draft')]),
+            'submitted_surveys': self.env['bhu.survey'].search_count([('state', '=', 'submitted')]),
+            'approved_surveys': self.env['bhu.survey'].search_count([('state', '=', 'approved')]),
+            'locked_surveys': self.env['bhu.survey'].search_count([('state', '=', 'locked')]),
+            
+            # Section 4 Notifications
+            'total_section4_notifications': self.env['bhu.section4.notification'].search_count([]),
+            'draft_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'draft')]),
+            'generated_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'generated')]),
+            'signed_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'signed')]),
+            
+            # Section 11 Reports
+            'total_section11_reports': self.env['bhu.section11.preliminary.report'].search_count([]),
+            'draft_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'draft')]),
+            'generated_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'generated')]),
+            'signed_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'signed')]),
+            
+            # Expert Committee Reports
+            'total_expert_committee_reports': self.env['bhu.expert.committee.report'].search_count([]),
+            
+            # Section 15 Objections
+            'total_section15_objections': self.env['bhu.section15.objection'].search_count([]),
+            
+            # Document Vault
+            'total_documents': self.env['bhu.document.vault'].search_count([]),
+        }
     
     def action_refresh(self):
         """Refresh dashboard data"""
-        self._compute_all_counts()
+        counts = self._get_all_counts()
+        self.write(counts)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -113,10 +161,19 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model
     def action_open_dashboard(self):
-        """Open dashboard - creates a new record if needed"""
-        dashboard = self.search([], limit=1)
+        """Open dashboard - reuses existing record or creates new one with cached values"""
+        # Try to find existing dashboard record (transient models persist until server restart)
+        dashboard = self.search([], limit=1, order='create_date desc')
+        
         if not dashboard:
+            # Create new dashboard with pre-computed values
             dashboard = self.create({})
+        else:
+            # Update existing dashboard with fresh values (but they're already cached)
+            # Only refresh if values are 0
+            if dashboard.total_districts == 0 and dashboard.total_surveys == 0:
+                counts = self._get_all_counts()
+                dashboard.write(counts)
         
         return {
             'type': 'ir.actions.act_window',

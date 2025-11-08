@@ -96,6 +96,23 @@ class BhuarjanDashboard(models.TransientModel):
         records = super().create(vals_list)
         return records
     
+    def read(self, fields=None, load='_classic_read'):
+        """Override read to ensure values are computed if missing"""
+        result = super().read(fields=fields, load=load)
+        
+        # If any record has zero values, refresh them
+        for record_data in result:
+            if record_data.get('total_districts', 0) == 0:
+                # This record needs refreshing
+                record = self.browse(record_data['id'])
+                counts = self._get_all_counts()
+                record.write(counts)
+                # Re-read to get updated values
+                result = super().read(fields=fields, load=load)
+                break
+        
+        return result
+    
     @api.model
     def _get_all_counts(self):
         """Get all counts - cached computation"""
@@ -169,11 +186,21 @@ class BhuarjanDashboard(models.TransientModel):
             # Create new dashboard with pre-computed values
             dashboard = self.create({})
         else:
-            # Update existing dashboard with fresh values (but they're already cached)
-            # Only refresh if values are 0
-            if dashboard.total_districts == 0 and dashboard.total_surveys == 0:
+            # Always refresh values to ensure they're up-to-date, but do it efficiently
+            # Check if any key field is 0, which might indicate stale data
+            needs_refresh = (
+                dashboard.total_districts == 0 and 
+                dashboard.total_surveys == 0 and 
+                dashboard.total_section4_notifications == 0
+            )
+            if needs_refresh:
                 counts = self._get_all_counts()
                 dashboard.write(counts)
+        
+        # Ensure values are always present (double-check)
+        if dashboard.total_districts == 0:
+            counts = self._get_all_counts()
+            dashboard.write(counts)
         
         return {
             'type': 'ir.actions.act_window',

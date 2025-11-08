@@ -38,16 +38,22 @@
 .dashboard-kpi-card::before {
     content: '';
     position: absolute;
-    top: -30%;
-    right: -30%;
-    width: 120px;
-    height: 120px;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    top: -40%;
+    right: -40%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 70%);
     border-radius: 50%;
     transition: all 0.3s ease;
+    z-index: 0;
 }
 .dashboard-kpi-card:hover::before {
-    transform: scale(1.1);
+    transform: scale(1.2);
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0) 70%);
+}
+.dashboard-kpi-card > * {
+    position: relative;
+    z-index: 1;
 }
 .kpi-header {
     display: flex;
@@ -129,16 +135,22 @@
 .process-card::before {
     content: '';
     position: absolute;
-    top: -30%;
-    right: -30%;
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+    top: -40%;
+    right: -40%;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0) 70%);
     border-radius: 50%;
     transition: all 0.3s ease;
+    z-index: 0;
 }
 .process-card:hover::before {
-    transform: scale(1.1);
+    transform: scale(1.2);
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 70%);
+}
+.process-card > * {
+    position: relative;
+    z-index: 1;
 }
 .process-header {
     display: flex;

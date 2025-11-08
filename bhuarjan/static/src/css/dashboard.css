@@ -85,6 +85,14 @@
     border-bottom: 2px solid #ecf0f1;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.dashboard-section-title i {
+    font-size: 18px;
+    color: #228B22;
+    opacity: 0.9;
 }
 .dashboard-grid {
     display: grid;

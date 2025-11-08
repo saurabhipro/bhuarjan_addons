@@ -20,7 +20,9 @@
                         </button>
                     </div>
                     
-                    <div class="dashboard-section-title">MASTER DATA STATISTICS</div>
+                    <div class="dashboard-section-title">
+                        <i class="fa fa-database"/> MASTER DATA STATISTICS
+                    </div>
                     <div class="dashboard-grid">
                         <button name="action_open_districts" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
@@ -80,7 +82,9 @@
                         </button>
                     </div>
                     
-                    <div class="dashboard-section-title">SURVEY STATISTICS</div>
+                    <div class="dashboard-section-title">
+                        <i class="fa fa-clipboard-list"/> SURVEY STATISTICS
+                    </div>
                     <div class="dashboard-grid">
                         <button name="action_open_surveys" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
@@ -119,7 +123,9 @@
                         </button>
                     </div>
                     
-                    <div class="dashboard-section-title">PROCESS STATISTICS</div>
+                    <div class="dashboard-section-title">
+                        <i class="fa fa-cogs"/> PROCESS STATISTICS
+                    </div>
                     <div class="dashboard-grid">
                         <button name="%(action_section4_notification)d" type="action" class="process-card kpi-card-green" style="background: linear-gradient(135deg, rgba(34, 139, 34, 0.9) 0%, rgba(85, 107, 47, 0.9) 100%); color: white;">
                             <div class="process-header">

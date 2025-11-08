@@ -6,6 +6,10 @@
         <field name="model">bhu.section11.preliminary.report</field>
         <field name="arch" type="xml">
             <list string="Section 11 Preliminary Reports" delete="1">
+                <button name="action_generate_pdf" string="Generate PDF" type="object" icon="fa-file-pdf" 
+                        invisible="state == 'signed'"/>
+                <button name="action_open_wizard" string="Generate" type="object" icon="fa-plus" 
+                        class="oe_highlight" title="Generate new Section 11 Preliminary Report"/>
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
@@ -139,7 +143,7 @@
         <field name="name">Section 11 Preliminary Reports</field>
         <field name="res_model">bhu.section11.preliminary.report</field>
         <field name="view_mode">list,form</field>
-        <field name="context">{}</field>
+        <field name="context">{'search_default_my_reports': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first Section 11 Preliminary Report!
@@ -148,9 +152,17 @@
                 Create and manage Section 11 preliminary reports for land acquisition. You can generate PDFs and upload signed documents.
             </p>
             <p>
-                Use the "Create" button to create a new report, or use "Generate New" action from the menu to use the wizard.
+                Use the "Generate" button to create a new report via the wizard.
             </p>
         </field>
+    </record>
+    
+    <!-- Action to generate new report via wizard -->
+    <record id="action_generate_section11_preliminary" model="ir.actions.act_window">
+        <field name="name">Generate Section 11 Preliminary Report</field>
+        <field name="res_model">bhu.section11.preliminary.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
     </record>
 
 </odoo>

@@ -22,12 +22,10 @@
         <field name="name">bhu.section4.notification.form</field>
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
-            <form string="Section 4 Notification / धारा 4 अधिसूचना">
+            <form string="Section 4 Notification">
                 <header>
-                    <button name="action_generate_pdf" string="Generate PDF / PDF जेनरेट करें" type="object" class="btn-primary" icon="fa-file-pdf"
+                    <button name="action_generate_pdf" string="Generate PDF" type="object" class="btn-primary" icon="fa-file-pdf"
                             invisible="state == 'signed'"/>
-                    <button name="action_mark_signed" string="Mark as Signed / हस्ताक्षरित के रूप में चिह्नित करें" type="object" class="btn-success" 
-                            invisible="state == 'signed' or not has_signed_document"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
                 <sheet>
@@ -40,12 +38,12 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Basic Information / मूल जानकारी">
-                            <group string="Public Purpose / लोक प्रयोजन">
+                        <page string="Basic Information">
+                            <group string="Public Purpose">
                                 <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
                                        widget="html" nolabel="1"/>
                             </group>
-                            <group string="Public Hearing Details / जन सुनवाई विवरण">
+                            <group string="Public Hearing Details">
                                 <group col="3">
                                     <field name="public_hearing_date"/>
                                     <field name="public_hearing_time"/>
@@ -53,37 +51,49 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Section 4 Questions / धारा 4 प्रश्न">
-                            <group string="(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose">
+                        <page string="Section 4 Questions">
+                            <group string="(1) Brief Description of Public Purpose">
                                 <field name="q1_brief_description" widget="html" nolabel="1"/>
                             </group>
-                            <field name="q2_directly_affected"/>
-                            <field name="q3_indirectly_affected"/>
-                            <field name="q4_private_assets"/>
-                            <field name="q5_government_assets"/>
-                            <field name="q6_minimal_acquisition"/>
-                            <group string="(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?">
+                            <group string="(2) Number of Directly Affected Families">
+                                <field name="q2_directly_affected" nolabel="1"/>
+                            </group>
+                            <group string="(3) Number of Indirectly Affected Families">
+                                <field name="q3_indirectly_affected" nolabel="1"/>
+                            </group>
+                            <group string="(4) Estimated Number of Private Houses and Other Assets">
+                                <field name="q4_private_assets" nolabel="1"/>
+                            </group>
+                            <group string="(5) Estimated Number of Government Houses and Other Assets">
+                                <field name="q5_government_assets" nolabel="1"/>
+                            </group>
+                            <group string="(6) Is the Proposed Acquisition Minimal?">
+                                <field name="q6_minimal_acquisition" nolabel="1"/>
+                            </group>
+                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered?">
                                 <field name="q7_alternatives_considered" widget="html" nolabel="1"/>
                             </group>
-                            <field name="q8_total_cost"/>
-                            <group string="(नौ) परियोजना से होने वाला लाभ / Benefits from the project">
+                            <group string="(8) Total Cost of the Project">
+                                <field name="q8_total_cost" nolabel="1"/>
+                            </group>
+                            <group string="(9) Benefits from the Project">
                                 <field name="q9_project_benefits" widget="html" nolabel="1"/>
                             </group>
-                            <group string="(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure">
+                            <group string="(10) Measures for Compensation and Likely Expenditure">
                                 <field name="q10_compensation_measures" widget="html" nolabel="1"/>
                             </group>
-                            <group string="(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project">
+                            <group string="(11) Other Components Affected by the Project">
                                 <field name="q11_other_components" widget="html" nolabel="1"/>
                             </group>
                         </page>
-                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
-                            <group string="Signed Notification / हस्ताक्षरित अधिसूचना">
+                        <page string="Signed Document">
+                            <group string="Signed Notification">
                                 <field name="has_signed_document" readonly="1"/>
                                 <field name="signed_document_file" filename="signed_document_filename"/>
                                 <field name="signed_document_filename" invisible="1"/>
                                 <field name="signed_date"/>
                             </group>
-                            <group string="Collector Signature / कलेक्टर हस्ताक्षर">
+                            <group string="Collector Signature">
                                 <field name="collector_signature" filename="collector_signature_filename"/>
                                 <field name="collector_signature_filename" invisible="1"/>
                                 <field name="collector_name"/>

@@ -33,13 +33,6 @@
     </record>
 
 
-    <!-- (Sec 11) Generate Section 11 Preliminary Report -->
-    <record id="action_generate_section11_preliminary" model="ir.actions.act_window">
-        <field name="name">Generate Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट जेनरेट करें</field>
-        <field name="res_model">bhu.section11.preliminary.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-    </record>
 
     <!-- (Sec 15) Objections -->
     <record id="action_section15_objections" model="ir.actions.act_window">

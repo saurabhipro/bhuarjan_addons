@@ -656,6 +656,17 @@ class Section11PreliminaryReport(models.Model):
         self.state = 'generated'
         return self.env.ref('bhuarjan.action_report_section11_preliminary').report_action(self)
     
+    @api.model
+    def action_open_wizard(self):
+        """Open wizard to generate new report - works without record selection"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Generate Section 11 Preliminary Report',
+            'res_model': 'bhu.section11.preliminary.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+    
 
 
 class Section11LandParcel(models.Model):

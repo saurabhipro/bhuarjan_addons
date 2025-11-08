@@ -19,6 +19,7 @@ from . import sia_team
 from . import section15_objection
 from . import process_stubs
 from . import ir_http
+from . import dashboard
 
 
 

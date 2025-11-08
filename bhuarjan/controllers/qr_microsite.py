@@ -312,3 +312,72 @@ class Form10PDFController(http.Controller):
         except Exception as e:
             _logger.error(f"Error in download_section4_pdf: {str(e)}", exc_info=True)
             return request.not_found(f"Error: {str(e)}")
+    
+    @http.route('/bhuarjan/section11/<path:report_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_section11_pdf(self, report_uuid, **kwargs):
+        """Download Section 11 Preliminary Report PDF using report UUID - serves signed document if exists, else unsigned PDF"""
+        _logger.info(f"Section 11 PDF download route called: report_uuid={report_uuid}")
+        try:
+            # Find report by UUID
+            report = request.env['bhu.section11.preliminary.report'].sudo().with_context({}).search([('report_uuid', '=', report_uuid)], limit=1)
+            
+            if not report:
+                _logger.error(f"Report not found with UUID: {report_uuid}")
+                return request.not_found("Report not found")
+            
+            _logger.info(f"Report found: id={report.id}, name={report.name}, has_signed={bool(report.signed_document_file)}")
+            
+            # If signed document exists, serve it
+            if report.signed_document_file:
+                _logger.info("Serving signed document")
+                pdf_data = base64.b64decode(report.signed_document_file)
+                filename = report.signed_document_filename or f"Section11_Preliminary_Report_{report.name}_Signed.pdf"
+                
+                response = request.make_response(
+                    pdf_data,
+                    headers=[
+                        ('Content-Type', 'application/pdf'),
+                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Length', str(len(pdf_data))),
+                    ]
+                )
+                return response
+            
+            # Otherwise, generate unsigned PDF
+            _logger.info("Generating unsigned PDF")
+            report_action = request.env.ref('bhuarjan.action_report_section11_preliminary')
+            
+            # Generate PDF directly from report record
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [report.id], data={})
+            
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
+            
+            # Extract PDF bytes
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+            
+            if not isinstance(pdf_data, bytes):
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                else:
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
+                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
+            
+            # Return PDF response
+            filename = f"Section11_Preliminary_Report_{report.name}.pdf"
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data))),
+                ]
+            )
+            return response
+        
+        except Exception as e:
+            _logger.error(f"Error in download_section11_pdf: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")

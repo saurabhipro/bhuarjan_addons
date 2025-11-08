@@ -11,75 +11,162 @@
         <field name="print_report_name">'Section11_Preliminary_Report_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
     </record>
 
+    <!-- Custom Layout header for Section 11 -->
+    <template id="section11_report_custom_layout">
+        <div class="header-section" style="margin-bottom: 12px;">
+            <style>
+                .header-info-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 14px; 
+                    border: 2px solid #000; 
+                    margin-bottom: 0; 
+                }
+                .header-info-table td { 
+                    border: 1px solid #000; 
+                    padding: 6px; 
+                    vertical-align: middle;
+                }
+            </style>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;">
+                <strong>प्ररूप-एक (नियम 11 देखिये)</strong>
+            </h2>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 18px; font-weight: bold;">
+                <strong>कार्यालय कलेक्टर एवं पदेन उप सचिव, राजस्व एवं आपदा प्रबंधन विभाग</strong>
+            </h2>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 22px; font-weight: bold;">
+                <strong>प्रारंभिक अधिसूचना</strong>
+            </h2>
+
+            <table class="header-info-table">
+                <tr>
+                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
+                        <!-- Logo - Left Header Box -->
+                        <img src="/bhuarjan/static/description/logo.png" 
+                             alt="Logo" 
+                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>परियोजना का नाम :</strong>
+                        <span t-if="report and report.project_id" t-esc="report.project_id.name"/>
+                        <span t-if="not report or not report.project_id">........................</span>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>विभाग का नाम :</strong>
+                        <t t-set="department_name" t-value="''"/>
+                        <t t-if="report and report.project_id and report.village_id">
+                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', '=', report.village_id.id)], limit=1)"/>
+                            <t t-if="first_survey and first_survey.department_id">
+                                <t t-set="department_name" t-value="first_survey.department_id.name"/>
+                            </t>
+                        </t>
+                        <span t-esc="department_name if department_name else 'Public Works Department'"/>
+                    </td>
+                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
+                        <!-- QR Code - Right Header Box -->
+                        <t t-if="report">
+                            <t t-set="qr_code_img" t-value="report.get_qr_code_data()"/>
+                            <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section11/' + str(report.report_uuid or '') + '/download'"/>
+                            <t t-if="qr_code_img">
+                                <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                    <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                         alt="QR Code - Click to download PDF" 
+                                         style="width: 100%; max-width: 100%; height: auto; aspect-ratio: 1; border: none; display: block; margin: 0; padding: 0;"/>
+                                </a>
+                            </t>
+                            <t t-if="not qr_code_img">
+                                <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                    <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
+                                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                            <div style="text-align: center; font-size: 7px;">
+                                                <div style="font-weight: bold;">QR Code</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </t>
+                        </t>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>ग्राम का नाम :</strong>
+                        <span t-if="report and report.village_id" t-esc="report.village_id.name"/>
+                        <span t-if="not report or not report.village_id">........................</span>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>तहसील का नाम :</strong>
+                        <span t-if="report and report.village_id and report.village_id.tehsil_id">
+                            <t t-esc="report.village_id.tehsil_id.name"/>
+                            <t t-if="report.district_id"> जिला-<t t-esc="report.district_id.name"/> (छ.ग.)</t>
+                        </span>
+                        <span t-if="not report or not report.village_id or not report.village_id.tehsil_id">रायगढ़ जिला-रायगढ़ (छ.ग.)</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>सर्वे दिनाँक :</strong>
+                        <t t-set="survey_date" t-value="''"/>
+                        <t t-if="report and report.project_id and report.village_id">
+                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', '=', report.village_id.id)], limit=1, order='survey_date desc')"/>
+                            <t t-if="first_survey and first_survey.survey_date">
+                                <t t-set="survey_date" t-value="first_survey.survey_date.strftime('%d/%m/%Y')"/>
+                            </t>
+                        </t>
+                        <span t-esc="survey_date if survey_date else '........................'"/>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <!-- Empty cell -->
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+
     <template id="section11_preliminary_report">
         <t t-call="web.html_container">
+            <meta charset="utf-8"/>
             <t t-foreach="docs" t-as="report">
-                <t t-call="web.external_layout">
-                    <div class="page">
-                        <style>
-                            .report-header {
-                                text-align: center;
-                                margin-bottom: 20px;
-                            }
-                            .report-title {
-                                font-size: 22px;
-                                font-weight: bold;
-                                text-decoration: underline;
-                                margin: 10px 0;
-                            }
-                            .report-subtitle {
-                                font-size: 18px;
-                                font-weight: bold;
-                                text-decoration: underline;
-                                margin: 10px 0;
-                            }
-                            .report-body {
-                                font-size: 14px;
-                                line-height: 1.6;
-                                text-align: justify;
-                                margin: 15px 0;
-                            }
-                            .schedule-table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin: 20px 0;
-                                font-size: 12px;
-                            }
-                            .schedule-table th,
-                            .schedule-table td {
-                                border: 1px solid #000;
-                                padding: 8px;
-                                text-align: left;
-                            }
-                            .schedule-table th {
-                                background-color: #f0f0f0;
-                                font-weight: bold;
-                                text-align: center;
-                            }
-                            .paragraph-section {
-                                margin: 15px 0;
-                                font-size: 14px;
-                                line-height: 1.6;
-                            }
-                            .paragraph-number {
-                                font-weight: bold;
-                            }
-                        </style>
-                        
-                        <!-- Header -->
-                        <div class="report-header">
-                            <div class="report-title">प्रारूप अधिसूचना</div>
-                            <div style="font-size: 16px; margin: 10px 0;">
-                                कार्यालय कलेक्टर, जिला 
-                                <span t-if="report.district_id" t-esc="report.district_id.name"/>
-                                <span t-if="not report.district_id">........................</span>
-                                एवं पदेन उप सचिव
-                            </div>
-                            <div style="font-size: 16px; margin: 10px 0;">
-                                छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग
-                            </div>
-                            <div class="report-subtitle">प्रारंभिक अधिसूचना</div>
-                        </div>
+                <t t-call="bhuarjan.section11_report_custom_layout"/>
+                <style>
+                    @page {
+                        margin: 2cm 1.5cm;
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                    }
+                    .report-body {
+                        font-size: 14px;
+                        line-height: 1.6;
+                        text-align: justify;
+                        margin: 15px 0;
+                    }
+                    .schedule-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        font-size: 12px;
+                    }
+                    .schedule-table th,
+                    .schedule-table td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    .schedule-table th {
+                        background-color: #f0f0f0;
+                        font-weight: bold;
+                        text-align: center;
+                    }
+                    .paragraph-section {
+                        margin: 15px 0;
+                        font-size: 14px;
+                        line-height: 1.6;
+                    }
+                    .paragraph-number {
+                        font-weight: bold;
+                    }
+                </style>
+                
+                <div class="page">
                         
                         <!-- Notification Number -->
                         <div class="report-body">
@@ -225,7 +312,6 @@
                     </div>
                 </t>
             </t>
-        </t>
     </template>
 
 </odoo>

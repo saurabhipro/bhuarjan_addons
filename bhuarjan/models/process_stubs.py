@@ -18,6 +18,16 @@ class Section4Notification(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, 
                                   default=lambda self: self._default_project_id())
     village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
+    
+    # Computed field to show surveys for selected villages
+    survey_ids = fields.Many2many('bhu.survey', compute='_compute_survey_ids', string='Surveys', readonly=True)
+    survey_count = fields.Integer(string='Survey Count', compute='_compute_survey_ids', readonly=True)
+    approved_survey_count = fields.Integer(string='Approved Survey Count', compute='_compute_survey_ids', readonly=True)
+    all_surveys_approved = fields.Boolean(string='All Surveys Approved', compute='_compute_survey_ids', readonly=True)
+    
+    # Check if Section 11 exists for any of the villages (makes form read-only)
+    has_section11 = fields.Boolean(string='Has Section 11', compute='_compute_has_section11', readonly=True)
+    
     public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', 
                                  help='Description of public purpose for land acquisition', tracking=True)
     
@@ -65,6 +75,41 @@ class Section4Notification(models.Model):
         for record in self:
             record.has_signed_document = bool(record.signed_document_file)
     
+    @api.depends('project_id', 'village_ids')
+    def _compute_survey_ids(self):
+        """Compute surveys for selected villages and project"""
+        for record in self:
+            if record.project_id and record.village_ids:
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', 'in', record.village_ids.ids)
+                ])
+                record.survey_ids = [(6, 0, surveys.ids)]
+                record.survey_count = len(surveys)
+                # Treat both 'approved' and 'locked' as approved
+                approved_or_locked_surveys = surveys.filtered(lambda s: s.state in ('approved', 'locked'))
+                record.approved_survey_count = len(approved_or_locked_surveys)
+                # Check if all surveys are approved or locked (and there are surveys)
+                record.all_surveys_approved = len(surveys) > 0 and len(approved_or_locked_surveys) == len(surveys)
+            else:
+                record.survey_ids = [(5, 0, 0)]
+                record.survey_count = 0
+                record.approved_survey_count = 0
+                record.all_surveys_approved = False
+    
+    @api.depends('project_id', 'village_ids')
+    def _compute_has_section11(self):
+        """Check if Section 11 Preliminary Report exists for any of the villages"""
+        for record in self:
+            if record.project_id and record.village_ids:
+                section11_reports = self.env['bhu.section11.preliminary.report'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', 'in', record.village_ids.ids)
+                ], limit=1)
+                record.has_section11 = bool(section11_reports)
+            else:
+                record.has_section11 = False
+    
     @api.model
     def _default_project_id(self):
         """Default project_id to PROJ01 if it exists, otherwise use first available project"""
@@ -102,11 +147,11 @@ class Section4Notification(models.Model):
         """Get consolidated survey data grouped by village"""
         self.ensure_one()
         
-        # Get all approved surveys for selected villages in the project
+        # Get all approved or locked surveys for selected villages in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', 'in', self.village_ids.ids),
-            ('state', '=', 'approved')
+            ('state', 'in', ('approved', 'locked'))
         ])
         
         # Group surveys by village and calculate totals
@@ -185,25 +230,45 @@ class Section4Notification(models.Model):
     def action_generate_pdf(self):
         """Generate Section 4 Notification PDF"""
         self.ensure_one()
+        
+        # Validate that all surveys for selected villages are approved
+        if not self.project_id or not self.village_ids:
+            raise ValidationError(_('Please select a project and at least one village.'))
+        
+        # Get all surveys for selected villages
+        all_surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', 'in', self.village_ids.ids)
+        ])
+        
+        if not all_surveys:
+            raise ValidationError(_('No surveys found for the selected villages. Please create surveys first.'))
+        
+        # Check if all surveys are approved or locked (treat locked as approved)
+        non_approved_surveys = all_surveys.filtered(lambda s: s.state not in ('approved', 'locked'))
+        if non_approved_surveys:
+            village_names = ', '.join(set(non_approved_surveys.mapped('village_id.name')))
+            raise ValidationError(_(
+                'Cannot generate Section 4 Notification. Some surveys are not approved yet.\n\n'
+                'Villages with non-approved surveys: %s\n'
+                'Please approve all surveys before generating the notification.'
+            ) % village_names)
+        
         self.state = 'generated'
         
-        # Lock all approved surveys for the selected villages
-        if self.village_ids and self.project_id:
-            approved_surveys = self.env['bhu.survey'].search([
-                ('village_id', 'in', self.village_ids.ids),
-                ('project_id', '=', self.project_id.id),
-                ('state', '=', 'approved')
-            ])
-            if approved_surveys:
-                approved_surveys.write({'state': 'locked'})
-                self.message_post(
-                    body=_('Locked %d survey(s) for villages: %s') % (
-                        len(approved_surveys),
-                        ', '.join(self.village_ids.mapped('name'))
-                    )
+        # Lock all approved surveys for the selected villages (skip already locked ones)
+        approved_surveys = all_surveys.filtered(lambda s: s.state == 'approved')
+        if approved_surveys:
+            approved_surveys.write({'state': 'locked'})
+            self.message_post(
+                body=_('Locked %d survey(s) for villages: %s') % (
+                    len(approved_surveys),
+                    ', '.join(self.village_ids.mapped('name'))
                 )
+            )
         
         # Use wizard to generate PDF (reuse existing logic)
+        # Always create a fresh wizard with current data to ensure report has all data
         wizard = self.env['bhu.section4.notification.wizard'].create({
             'project_id': self.project_id.id,
             'village_ids': [(6, 0, self.village_ids.ids)],
@@ -277,11 +342,11 @@ class Section4NotificationWizard(models.TransientModel):
         """Get consolidated survey data grouped by village"""
         self.ensure_one()
         
-        # Get all approved surveys for selected villages in the project
+        # Get all approved or locked surveys for selected villages in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', 'in', self.village_ids.ids),
-            ('state', '=', 'approved')
+            ('state', 'in', ('approved', 'locked'))
         ])
         
         # Group surveys by village and calculate totals
@@ -643,12 +708,54 @@ class Section11PreliminaryReport(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Create records with batch support"""
+        for vals in vals_list:
+            # Generate UUID if not provided
+            if not vals.get('report_uuid'):
+                vals['report_uuid'] = str(uuid.uuid4())
         records = super().create(vals_list)
         # Auto-populate land parcels after creation if village and project are set
         for record in records:
             if record.village_id and record.project_id:
                 record._populate_land_parcels_from_surveys()
         return records
+    
+    def get_qr_code_data(self):
+        """Generate QR code data for the report"""
+        try:
+            import qrcode
+            import io
+            import base64
+            
+            # Ensure UUID exists
+            if not self.report_uuid:
+                self.write({'report_uuid': str(uuid.uuid4())})
+            
+            # Generate QR code URL - using report UUID
+            qr_url = f"https://bhuarjan.com/bhuarjan/section11/{self.report_uuid}/download"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=2,
+            )
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            
+            # Generate image
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return img_str
+        except ImportError:
+            return None
+        except Exception as e:
+            return None
     
     def action_generate_pdf(self):
         """Generate Section 11 Preliminary Report PDF"""

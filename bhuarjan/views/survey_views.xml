@@ -201,7 +201,7 @@
         <field name="res_model">bhu.survey</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_bhu_survey_search"/>
-        <field name="context">{'search_default_this_year': 1, 'create_name': 'नया सर्वे'}</field>
+        <field name="context">{'create_name': 'नया सर्वे'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first Survey!

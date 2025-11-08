@@ -15,6 +15,25 @@ class Section4NotificationWizard(models.TransientModel):
     village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True)
     public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', 
                                  help='Description of public purpose for land acquisition')
+    
+    # Public Hearing Details
+    public_hearing_date = fields.Date(string='Public Hearing Date / जन सुनवाई दिनांक')
+    public_hearing_time = fields.Char(string='Public Hearing Time / जन सुनवाई समय', 
+                                      help='e.g., 10:00 AM')
+    public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान')
+    
+    # 11 Questions from the template
+    q1_brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose')
+    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families')
+    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
+    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
+    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
+    q6_minimal_acquisition = fields.Char(string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?')
+    q7_alternatives_considered = fields.Text(string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?')
+    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
+    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
+    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure')
+    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project')
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -63,6 +82,13 @@ class Section4NotificationWizard(models.TransientModel):
         
         return consolidated_list
 
+    def get_formatted_hearing_date(self):
+        """Format public hearing date for display"""
+        self.ensure_one()
+        if self.public_hearing_date:
+            return self.public_hearing_date.strftime('%d/%m/%Y')
+        return '........................'
+    
     def action_generate_pdf(self):
         """Generate Section 4 Notification PDF with consolidated village data"""
         self.ensure_one()

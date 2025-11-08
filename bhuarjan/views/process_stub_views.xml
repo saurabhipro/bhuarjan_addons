@@ -10,16 +10,48 @@
             <form string="Generate Section 4 Notification / धारा 4 अधिसूचना जेनरेट करें">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="project_id" required="1"/>
-                            <field name="village_ids" widget="many2many_tags" required="1" 
-                                   options="{'no_create_edit': True}"/>
-                        </group>
+                        <field name="project_id" required="1"/>
+                        <field name="village_ids" widget="many2many_tags" required="1" 
+                               options="{'no_create_edit': True}"/>
                     </group>
-                    <group>
-                        <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
-                               widget="text" nolabel="1"/>
-                    </group>
+                    <notebook>
+                        <page string="Basic Information / मूल जानकारी">
+                            <group string="Public Purpose / लोक प्रयोजन">
+                                <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
+                                       widget="html" nolabel="1"/>
+                            </group>
+                            <group string="Public Hearing Details / जन सुनवाई विवरण">
+                                <group col="3">
+                                    <field name="public_hearing_date"/>
+                                    <field name="public_hearing_time"/>
+                                    <field name="public_hearing_place"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Section 4 Questions / धारा 4 प्रश्न">
+                            <group string="(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose">
+                                <field name="q1_brief_description" widget="html" nolabel="1"/>
+                            </group>
+                            <field name="q2_directly_affected"/>
+                            <field name="q3_indirectly_affected"/>
+                            <field name="q4_private_assets"/>
+                            <field name="q5_government_assets"/>
+                            <field name="q6_minimal_acquisition"/>
+                            <group string="(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?">
+                                <field name="q7_alternatives_considered" widget="html" nolabel="1"/>
+                            </group>
+                            <field name="q8_total_cost"/>
+                            <group string="(नौ) परियोजना से होने वाला लाभ / Benefits from the project">
+                                <field name="q9_project_benefits" widget="html" nolabel="1"/>
+                            </group>
+                            <group string="(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure">
+                                <field name="q10_compensation_measures" widget="html" nolabel="1"/>
+                            </group>
+                            <group string="(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project">
+                                <field name="q11_other_components" widget="html" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <footer>
                     <button name="action_generate_pdf" string="Generate PDF / PDF जेनरेट करें" type="object" class="btn-primary"/>

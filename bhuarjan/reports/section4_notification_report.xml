@@ -62,13 +62,20 @@
             <t t-set="wizard" t-value="object or (docs and docs[0]) or None"/>
             <t t-if="wizard">
                 <div class="header">
-                    <h1>धारा 4 अधिसूचना</h1>
-                    <h2>Section 4 Notification</h2>
-                    <p><strong>परियोजना:</strong> <span t-esc="wizard.project_id.name or ''"/></p>
+                    <p style="text-align: center; font-size: 14px; margin-bottom: 5px;"><strong>प्ररूप-एक</strong></p>
+                    <p style="text-align: center; font-size: 12px; margin-bottom: 15px;">(नियम 11 देखिये)</p>
+                    <h1 style="text-align: center; font-size: 16px; margin-bottom: 10px;">कार्यालय कलेक्टर एवं पदेन उप सचिव, राजस्व एवं आपदा प्रबंधन विभाग</h1>
+                    <h2 style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; text-decoration: underline;">अधिसूचना</h2>
                 </div>
 
                 <div class="content">
-                    <p style="text-align: right; margin-bottom: 10px;"><strong>अर्थात् :-</strong></p>
+                    <p style="text-align: justify; margin-bottom: 15px;">
+                        भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर तथा पारदर्शिता का अधिकार अधिनियम, 2013 की धारा 4 सहपठित नियम 7 के अंतर्गत
+                    </p>
+                    
+                    <p style="text-align: justify; margin-bottom: 15px;">
+                        नीचे अनुसूची में उल्लिखित भूमि का अर्जन लोक प्रयोजन हेतु राज्य सरकार द्वारा आशयित है, अर्थात् :-
+                    </p>
                     
                     <table class="notification-table">
                         <thead>
@@ -94,6 +101,82 @@
                             </t>
                         </tbody>
                     </table>
+                    
+                    <p style="text-align: justify; margin-top: 20px; margin-bottom: 15px;">
+                        उपरोक्त उल्लिखित भूमि के अर्जन हेतु सामाजिक समाघात निर्धारण के अध्ययन हेतु जन सुनवाई (दिनांक) 
+                        <strong><t t-esc="wizard.get_formatted_hearing_date()"/></strong> को 
+                        (समय) <strong><t t-esc="wizard.public_hearing_time or '........................'"/></strong> बजे 
+                        (स्थान) <strong><t t-esc="wizard.public_hearing_place or '........................'"/></strong> पर नियत की गई है। 
+                        प्रस्तावित भूमि अर्जन का अन्य विवरण निम्नानुसार है :-
+                    </p>
+                    
+                    <div class="questions-section" style="margin-top: 20px;">
+                        <p style="margin-bottom: 10px;"><strong>(एक)</strong> लोक प्रयोजन का संक्षिप्त विवरण।</p>
+                        <t t-if="wizard.q1_brief_description">
+                            <div style="margin-left: 30px; margin-bottom: 15px; text-align: justify;"><t t-raw="wizard.q1_brief_description"/></div>
+                        </t>
+                        <t t-if="not wizard.q1_brief_description">
+                            <p style="margin-left: 30px; margin-bottom: 15px;">........................</p>
+                        </t>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(दो)</strong> प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q2_directly_affected or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(तीन)</strong> अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q3_indirectly_affected or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(चार)</strong> प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q4_private_assets or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(पाँच)</strong> प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q5_government_assets or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(छः)</strong> क्या प्रस्तावित अर्जन न्यूनतम है ?</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q6_minimal_acquisition or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(सात)</strong> क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</p>
+                        <t t-if="wizard.q7_alternatives_considered">
+                            <div style="margin-left: 30px; margin-bottom: 15px; text-align: justify;"><t t-raw="wizard.q7_alternatives_considered"/></div>
+                        </t>
+                        <t t-if="not wizard.q7_alternatives_considered">
+                            <p style="margin-left: 30px; margin-bottom: 15px;">........................</p>
+                        </t>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(आठ)</strong> परियोजना की कुल लागत।</p>
+                        <p style="margin-left: 30px; margin-bottom: 15px;"><t t-esc="wizard.q8_total_cost or '........................'"/></p>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(नौ)</strong> परियोजना से होने वाला लाभ।</p>
+                        <t t-if="wizard.q9_project_benefits">
+                            <div style="margin-left: 30px; margin-bottom: 15px; text-align: justify;"><t t-raw="wizard.q9_project_benefits"/></div>
+                        </t>
+                        <t t-if="not wizard.q9_project_benefits">
+                            <p style="margin-left: 30px; margin-bottom: 15px;">........................</p>
+                        </t>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(दस)</strong> प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</p>
+                        <t t-if="wizard.q10_compensation_measures">
+                            <div style="margin-left: 30px; margin-bottom: 15px; text-align: justify;"><t t-raw="wizard.q10_compensation_measures"/></div>
+                        </t>
+                        <t t-if="not wizard.q10_compensation_measures">
+                            <p style="margin-left: 30px; margin-bottom: 15px;">........................</p>
+                        </t>
+                        
+                        <p style="margin-bottom: 10px;"><strong>(ग्यारह)</strong> परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</p>
+                        <t t-if="wizard.q11_other_components">
+                            <div style="margin-left: 30px; margin-bottom: 15px; text-align: justify;"><t t-raw="wizard.q11_other_components"/></div>
+                        </t>
+                        <t t-if="not wizard.q11_other_components">
+                            <p style="margin-left: 30px; margin-bottom: 15px;">........................</p>
+                        </t>
+                    </div>
+                    
+                    <p style="text-align: justify; margin-top: 20px; margin-bottom: 30px;">
+                        उपरोक्त भूमि अर्जन के संबंध में किसी व्यक्ति/संस्था या अन्य किसी व्यक्ति को कोई जानकारी / सुझाव देना हो, तो विहित तिथि/समय एवं स्थान पर दी जा सकेगी।
+                    </p>
+                    
+                    <div style="text-align: right; margin-top: 50px;">
+                        <p style="font-weight: bold; font-size: 14px;">जिला कलेक्टर</p>
+                    </div>
                 </div>
             </t>
         </t>

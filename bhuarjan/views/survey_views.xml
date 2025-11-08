@@ -15,7 +15,12 @@
                 <field name="total_area"/>
                 <field name="acquired_area"/>
                 <field name="survey_date"/>
-                <field name="state" widget="badge"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'approved'"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state == 'locked'"/>
                 
             </list>
         </field>

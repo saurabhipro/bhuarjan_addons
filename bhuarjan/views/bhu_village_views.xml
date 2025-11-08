@@ -26,6 +26,13 @@
         <field name="model">bhu.village</field>
         <field name="arch" type="xml">
             <form string="Village / ग्राम">
+                <header>
+                    <button name="action_view_section4_notifications" string="Section 4 Notifications" 
+                            type="object" class="oe_stat_button" icon="fa-file-text"
+                            invisible="section4_notification_count == 0">
+                        <field name="section4_notification_count" widget="statinfo" string="Notifications"/>
+                    </button>
+                </header>
                 <sheet>
                     <group>
                         <group>

@@ -6,9 +6,36 @@ _logger = logging.getLogger(__name__)
 
 
 def post_init_hook(env):
-    """Hook to invalidate all sessions after module update or server restart"""
+    """Hook to invalidate all sessions after module update or server restart and set project_id for sample data"""
     try:
         _logger.warning("=== POST_INIT_HOOK: Module update/restart detected ===")
+        
+        # Set project_id for sample data records that don't have it set
+        try:
+            # Find project with code PROJ01
+            project = env['bhu.project'].search([('code', '=', 'PROJ01')], limit=1)
+            if project:
+                # Update Expert Committee Reports
+                expert_reports = env['bhu.expert.committee.report'].search([
+                    ('name', 'like', 'Expert Committee Report -'),
+                    ('project_id', '=', False)
+                ])
+                if expert_reports:
+                    expert_reports.write({'project_id': project.id})
+                    _logger.info("POST_INIT_HOOK: Updated %d Expert Committee Reports with project PROJ01", len(expert_reports))
+                
+                # Update Section 4 Notifications
+                section4_notifications = env['bhu.section4.notification'].search([
+                    ('name', 'like', 'Section 4 Notification -'),
+                    ('project_id', '=', False)
+                ])
+                if section4_notifications:
+                    section4_notifications.write({'project_id': project.id})
+                    _logger.info("POST_INIT_HOOK: Updated %d Section 4 Notifications with project PROJ01", len(section4_notifications))
+            else:
+                _logger.warning("POST_INIT_HOOK: Project with code PROJ01 not found, skipping sample data update")
+        except Exception as e:
+            _logger.error("POST_INIT_HOOK: Error updating sample data project_id: %s", e, exc_info=True)
         
         # Delete all active sessions using ORM
         try:

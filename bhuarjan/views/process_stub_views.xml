@@ -61,57 +61,22 @@
         </field>
     </record>
 
-    <!-- Expert Committee Report Views -->
-    <record id="view_expert_committee_report_list" model="ir.ui.view">
-        <field name="name">bhu.expert.committee.report.list</field>
-        <field name="model">bhu.expert.committee.report</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="project_id"/>
-                <field name="village_id"/>
-                <field name="state" widget="badge"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="view_expert_committee_report_form" model="ir.ui.view">
-        <field name="name">bhu.expert.committee.report.form</field>
-        <field name="model">bhu.expert.committee.report</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="name"/>
-                        <field name="project_id"/>
-                        <field name="village_id"/>
-                        <field name="state"/>
-                    </group>
-                    <group>
-                        <field name="report_file" filename="report_filename"/>
-                        <field name="report_filename" invisible="1"/>
-                    </group>
-                </sheet>
-                <chatter/>
-            </form>
-        </field>
-    </record>
+    <!-- Expert Committee Report Views - Moved to expert_committee_report_views.xml -->
 
     <!-- Expert Committee Order Wizard -->
     <record id="view_expert_committee_order_wizard_form" model="ir.ui.view">
         <field name="name">bhu.expert.committee.order.wizard.form</field>
         <field name="model">bhu.expert.committee.order.wizard</field>
         <field name="arch" type="xml">
-            <form string="Generate Expert Committee Order">
+            <form string="Generate Expert Committee Order / विशेषज्ञ समिति आदेश जेनरेट करें">
                 <sheet>
                     <group>
-                        <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                        <field name="project_id" required="1" options="{'no_create_edit': True}"/>
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_generate_order" string="Generate Order" type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" type="object" class="btn-primary"/>
+                    <button string="Cancel / रद्द करें" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

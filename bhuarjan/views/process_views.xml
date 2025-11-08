@@ -18,29 +18,11 @@
         </field>
     </record>
 
-    <!-- (Sec 4) Generate Section 4 Notification -->
-    <record id="action_generate_section4_notification" model="ir.actions.act_window">
-        <field name="name">Generate Section 4 Notification / धारा 4 अधिसूचना जेनरेट करें</field>
-        <field name="res_model">bhu.section4.notification.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-    </record>
+    <!-- (Sec 4) Section 4 Notifications - Main List View -->
+    <!-- Note: action_section4_notification is defined in section4_notification_views.xml -->
 
-    <!-- (Sec 4) Upload Signed Notification -->
-    <record id="action_upload_section4_signed" model="ir.actions.act_window">
-        <field name="name">Upload Signed Notification / हस्ताक्षरित अधिसूचना अपलोड करें</field>
-        <field name="res_model">bhu.document.vault</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{'default_document_type': 'sec4_signed_notification'}</field>
-    </record>
-
-    <!-- (Sec 7) Upload Expert Committee Report -->
-    <record id="action_upload_expert_committee_report" model="ir.actions.act_window">
-        <field name="name">Upload Expert Committee Report / विशेषज्ञ समिति रिपोर्ट अपलोड करें</field>
-        <field name="res_model">bhu.expert.committee.report</field>
-        <field name="view_mode">list,form</field>
-    </record>
+    <!-- (Sec 7) Upload Expert Committee Report - Use the main action from expert_committee_report_views.xml -->
+    <!-- action_expert_committee_report is defined in expert_committee_report_views.xml -->
 
     <!-- (Sec 7) Generate Expert Committee Order -->
     <record id="action_generate_expert_committee_order" model="ir.actions.act_window">
@@ -50,13 +32,6 @@
         <field name="target">new</field>
     </record>
 
-    <!-- (Sec 8) Approve / Reject Expert Committee Report -->
-    <record id="action_approve_reject_expert_report" model="ir.actions.act_window">
-        <field name="name">Approve / Reject Expert Committee Report / विशेषज्ञ समिति रिपोर्ट अनुमोदित/अस्वीकृत करें</field>
-        <field name="res_model">bhu.expert.committee.report</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('state', 'in', ['draft', 'submitted'])]</field>
-    </record>
 
     <!-- (Sec 11) Generate Section 11 Preliminary Report -->
     <record id="action_generate_section11_preliminary" model="ir.actions.act_window">

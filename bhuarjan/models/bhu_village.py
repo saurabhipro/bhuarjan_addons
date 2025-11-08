@@ -116,6 +116,30 @@ class BhuVillage(models.Model):
     is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र', tracking=True)
     is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र', tracking=True)
     
+    # Related records counts
+    section4_notification_count = fields.Integer(string='Section 4 Notifications', compute='_compute_notification_counts', store=False)
+    
+    def _compute_notification_counts(self):
+        """Compute counts of related notifications"""
+        for village in self:
+            # Count Section 4 Notifications that include this village
+            section4_count = self.env['bhu.section4.notification'].search_count([
+                ('village_ids', 'in', [village.id])
+            ])
+            village.section4_notification_count = section4_count
+    
+    def action_view_section4_notifications(self):
+        """Open Section 4 Notifications for this village"""
+        self.ensure_one()
+        return {
+            'name': _('Section 4 Notifications / धारा 4 अधिसूचनाएं'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.section4.notification',
+            'view_mode': 'list,form',
+            'domain': [('village_ids', 'in', [self.id])],
+            'context': {'default_village_ids': [(6, 0, [self.id])]},
+        }
+    
     _sql_constraints = [
         ('village_code_unique', 'UNIQUE(village_code)', 'Village Code must be unique! / ग्राम कोड अद्वितीय होना चाहिए!')
     ]

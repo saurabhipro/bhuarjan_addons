@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Expert Committee Report List View -->
+    <record id="view_expert_committee_report_list" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.report.list</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="arch" type="xml">
+            <list string="Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'signed'" 
+                       decoration-info="state == 'approved'" 
+                       decoration-warning="state == 'submitted'" 
+                       decoration-muted="state == 'draft'"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="has_signed_document" widget="boolean_toggle"/>
+                <field name="signed_date"/>
+                <field name="signatory_name"/>
+                <button name="action_approve" string="Approve" type="object" 
+                        class="btn-success" icon="fa-check" 
+                        invisible="state not in ['draft', 'submitted']"
+                        title="Approve Expert Committee Report"/>
+                <button name="action_reject" string="Reject" type="object" 
+                        class="btn-danger" icon="fa-times" 
+                        invisible="state not in ['draft', 'submitted']"
+                        title="Reject Expert Committee Report"/>
+                <button name="action_generate_order" string="Generate Order" type="object" 
+                        class="btn-primary" icon="fa-file-text" title="Generate Expert Committee Order"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Expert Committee Report Form View -->
+    <record id="view_expert_committee_report_form" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.report.form</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="arch" type="xml">
+            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट">
+                <header>
+                    <button name="action_submit" string="Submit / प्रस्तुत करें" 
+                            type="object" class="btn-primary" icon="fa-paper-plane"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve / अनुमोदित करें" 
+                            type="object" class="btn-success" icon="fa-check"
+                            invisible="state not in ['draft', 'submitted']"/>
+                    <button name="action_reject" string="Reject / अस्वीकृत करें" 
+                            type="object" class="btn-danger" icon="fa-times"
+                            invisible="state not in ['draft', 'submitted']"/>
+                    <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" 
+                            type="object" class="btn-primary" icon="fa-file-text"/>
+                    <button name="action_mark_signed" string="Mark as Signed / हस्ताक्षरित के रूप में चिह्नित करें" 
+                            type="object" class="btn-success" 
+                            invisible="state == 'signed' or not has_signed_document"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,signed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="project_id" required="1" options="{'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Report Information / रिपोर्ट जानकारी">
+                            <group string="Original Report / मूल रिपोर्ट">
+                                <field name="report_file" filename="report_filename"/>
+                                <field name="report_filename" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
+                            <group string="Signed Report / हस्ताक्षरित रिपोर्ट">
+                                <field name="has_signed_document" readonly="1"/>
+                                <field name="signed_document_file" filename="signed_document_filename"/>
+                                <field name="signed_document_filename" invisible="1"/>
+                                <field name="signed_date"/>
+                            </group>
+                            <group string="Signatory Information / हस्ताक्षरकर्ता जानकारी">
+                                <field name="signatory_name"/>
+                                <field name="signatory_designation"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Expert Committee Report Search View -->
+    <record id="view_expert_committee_report_search" model="ir.ui.view">
+        <field name="name">bhu.expert.committee.report.search</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="arch" type="xml">
+            <search string="Expert Committee Reports">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="signatory_name"/>
+                <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Submitted / प्रस्तुत" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="Approved / स्वीकृत" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Rejected / अस्वीकृत" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter string="Signed / हस्ताक्षरित" name="signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Has Signed Document / हस्ताक्षरित दस्तावेज़ है" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
+                <separator/>
+                <filter string="My Reports / मेरी रिपोर्ट" name="my_reports" domain="[('create_uid', '=', uid)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Expert Committee Report Action -->
+    <record id="action_expert_committee_report" model="ir.actions.act_window">
+        <field name="name">Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट</field>
+        <field name="res_model">bhu.expert.committee.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_my_reports': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Expert Committee Report!
+            </p>
+            <p>
+                Create and manage Expert Committee reports. You can:
+            </p>
+            <ul>
+                <li>Upload original reports and signed documents</li>
+                <li>Generate Expert Committee Orders directly from reports</li>
+                <li>Track signatory information and approval status</li>
+            </ul>
+            <p>
+                Use the "Create" button to create a new report, then upload files and generate orders as needed.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 11 Preliminary Report -->
+    <record id="action_report_section11_preliminary" model="ir.actions.report">
+        <field name="name">Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.section11_preliminary_report</field>
+        <field name="report_file">bhuarjan.section11_preliminary_report</field>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_form10_paper_format"/>
+        <field name="print_report_name">'Section11_Preliminary_Report_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+    </record>
+
+    <template id="section11_preliminary_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="report">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            .report-header {
+                                text-align: center;
+                                margin-bottom: 20px;
+                            }
+                            .report-title {
+                                font-size: 22px;
+                                font-weight: bold;
+                                text-decoration: underline;
+                                margin: 10px 0;
+                            }
+                            .report-subtitle {
+                                font-size: 18px;
+                                font-weight: bold;
+                                text-decoration: underline;
+                                margin: 10px 0;
+                            }
+                            .report-body {
+                                font-size: 14px;
+                                line-height: 1.6;
+                                text-align: justify;
+                                margin: 15px 0;
+                            }
+                            .schedule-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 20px 0;
+                                font-size: 12px;
+                            }
+                            .schedule-table th,
+                            .schedule-table td {
+                                border: 1px solid #000;
+                                padding: 8px;
+                                text-align: left;
+                            }
+                            .schedule-table th {
+                                background-color: #f0f0f0;
+                                font-weight: bold;
+                                text-align: center;
+                            }
+                            .paragraph-section {
+                                margin: 15px 0;
+                                font-size: 14px;
+                                line-height: 1.6;
+                            }
+                            .paragraph-number {
+                                font-weight: bold;
+                            }
+                        </style>
+                        
+                        <!-- Header -->
+                        <div class="report-header">
+                            <div class="report-title">प्रारूप अधिसूचना</div>
+                            <div style="font-size: 16px; margin: 10px 0;">
+                                कार्यालय कलेक्टर, जिला 
+                                <span t-if="report.district_id" t-esc="report.district_id.name"/>
+                                <span t-if="not report.district_id">........................</span>
+                                एवं पदेन उप सचिव
+                            </div>
+                            <div style="font-size: 16px; margin: 10px 0;">
+                                छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग
+                            </div>
+                            <div class="report-subtitle">प्रारंभिक अधिसूचना</div>
+                        </div>
+                        
+                        <!-- Notification Number -->
+                        <div class="report-body">
+                            <strong>क्रमांक</strong> 
+                            <span t-if="report.notification_number" t-esc="report.notification_number"/>
+                            <span t-if="not report.notification_number">/अ-82/2015-16-</span>
+                        </div>
+                        
+                        <!-- Main Body Text -->
+                        <div class="report-body">
+                            चूँकि राज्य शासन को यह प्रतीत होता है, कि नीचे अनुसूची में कॉलम (1) से (5) में दर्शायी गई भूमि, अनुसूची के कॉलम (7) में उल्लिखित सार्वजनिक प्रयोजन के लिए आवश्यक है या आवश्यक होने की संभावना है, इसलिए, भूमि अर्जन, पुनर्वासन तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे इसके बाद "अधिनियम, 2013" कहा जाएगा) की धारा 11 की उपधारा (1) के उपबंधों के अनुसार, सभी संबंधित व्यक्तियों को इसके द्वारा सूचित किया जाता है कि राज्य शासन, इसके द्वारा, अनुसूची के कॉलम (6) में उल्लिखित के रूप में, उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता हैं :-
+                        </div>
+                        
+                        <!-- Schedule Table -->
+                        <div style="margin: 20px 0;">
+                            <div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                                अनुसूची
+                            </div>
+                            <div style="text-align: center; font-size: 14px; margin-bottom: 10px;">
+                                भूमि का प्रकार
+                            </div>
+                            <table class="schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">(1) जिला</th>
+                                        <th style="width: 10%;">(2) तहसील</th>
+                                        <th style="width: 15%;">(3) ग्राम/प.ह.नं.</th>
+                                        <th style="width: 15%;">(4) खसरा नं.</th>
+                                        <th style="width: 10%;">(5) क्षेत्रफल (हेक्टर में)</th>
+                                        <th style="width: 20%;">(6) धारा 12 द्वारा प्राधिकृत अधिकारी</th>
+                                        <th style="width: 20%;">(7) सार्वजनिक प्रयोजन का विवरण</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="report.land_parcel_ids and len(report.land_parcel_ids) > 0">
+                                        <t t-foreach="report.land_parcel_ids" t-as="parcel">
+                                            <tr>
+                                                <td t-esc="report.district_id.name if report.district_id else '........................'"/>
+                                                <td t-esc="report.tehsil_id.name if report.tehsil_id else '........................'"/>
+                                                <td t-esc="report.village_id.name if report.village_id else '........................'"/>
+                                                <td t-esc="parcel.khasra_number or '........................'"/>
+                                                <td style="text-align: right;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
+                                                <td t-esc="parcel.authorized_officer or '........................'"/>
+                                                <td t-esc="parcel.public_purpose_description or '........................'"/>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-if="not report.land_parcel_ids or len(report.land_parcel_ids) == 0">
+                                        <tr>
+                                            <td colspan="7" style="text-align: center; padding: 20px;">
+                                                कोई भूमि खंड जोड़ा नहीं गया है
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Paragraph 2: Claims/Objections -->
+                        <div class="paragraph-section">
+                            <div class="paragraph-number">2.</div>
+                            <div style="margin-left: 20px;">
+                                <t t-if="report.paragraph_2_claims_info">
+                                    <t t-raw="report.paragraph_2_claims_info"/>
+                                </t>
+                                <t t-if="not report.paragraph_2_claims_info">
+                                    रुचि रखने वाले किसी भी व्यक्ति को, अर्जित भूमि के क्षेत्र, उपयुक्तता, सार्वजनिक प्रयोजन के औचित्य और सामाजिक समाघात अध्ययन के निष्कर्षों के संबंध में दावे या आपत्तियां, अधिसूचना की प्रकाशन तिथि से 60 दिनों के भीतर, कलेक्टर या प्राधिकृत व्यक्ति को लिखित रूप में प्रस्तुत करने का अधिकार है, जैसा कि अधिनियम, 2013 की धारा 15(1) के अंतर्गत प्रदान किया गया है।
+                                </t>
+                            </div>
+                        </div>
+                        
+                        <!-- Paragraph 3: Map Inspection -->
+                        <div class="paragraph-section">
+                            <div class="paragraph-number">3.</div>
+                            <div style="margin-left: 20px;">
+                                भूमि का नक्शा (योजना) 
+                                <span t-if="report.paragraph_3_map_inspection_location" t-esc="report.paragraph_3_map_inspection_location"/>
+                                <span t-if="not report.paragraph_3_map_inspection_location">........................</span>
+                                के कार्यालय में निरीक्षण किया जा सकता है।
+                            </div>
+                        </div>
+                        
+                        <!-- Paragraph 4: Displacement -->
+                        <div class="paragraph-section">
+                            <div class="paragraph-number">4.</div>
+                            <div style="margin-left: 20px;">
+                                <t t-if="report.paragraph_4_is_displacement">
+                                    प्रस्तावित भू-अर्जन से 
+                                    <span t-if="report.paragraph_4_affected_families_count" t-esc="report.paragraph_4_affected_families_count"/>
+                                    <span t-if="not report.paragraph_4_affected_families_count">........................</span>
+                                    प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
+                                </t>
+                                <t t-if="not report.paragraph_4_is_displacement">
+                                    प्रस्तावित भू-अर्जन से किसी भी प्रभावित परिवार का विस्थापन निहित नहीं है।
+                                </t>
+                            </div>
+                        </div>
+                        
+                        <!-- Paragraph 5: Exemption or SIA -->
+                        <div class="paragraph-section">
+                            <div class="paragraph-number">5.</div>
+                            <div style="margin-left: 20px;">
+                                <t t-if="report.paragraph_5_is_exemption">
+                                    <t t-if="report.paragraph_5_exemption_details">
+                                        <t t-raw="report.paragraph_5_exemption_details"/>
+                                    </t>
+                                    <t t-if="not report.paragraph_5_exemption_details">
+                                        प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनांक 02-03-2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।
+                                    </t>
+                                </t>
+                                <t t-if="not report.paragraph_5_is_exemption">
+                                    <t t-if="report.paragraph_5_sia_justification">
+                                        <t t-raw="report.paragraph_5_sia_justification"/>
+                                    </t>
+                                    <t t-if="not report.paragraph_5_sia_justification">
+                                        प्रस्तावित प्रयोजन के भू-अर्जन के लिए कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+                        
+                        <!-- Paragraph 6: Rehabilitation Administrator -->
+                        <div class="paragraph-section">
+                            <div class="paragraph-number">6.</div>
+                            <div style="margin-left: 20px;">
+                                प्रस्तावित भू-अर्जन के लिए, 
+                                <span t-if="report.paragraph_6_rehab_admin_name" t-esc="report.paragraph_6_rehab_admin_name"/>
+                                <span t-if="not report.paragraph_6_rehab_admin_name">........................</span>
+                                को अधिनियम, 2013 की धारा 43 के अंतर्गत पुनर्वासन और पुनर्व्यवस्थापन प्रशासक के रूप में नियुक्त किया गया है।
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div style="margin-top: 40px; text-align: right;">
+                            <div style="margin: 10px 0;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
+                            <div style="margin: 10px 0;">तथा आदेशानुसार</div>
+                            <div style="margin: 20px 0;">
+                                <span t-if="report.collector_name" t-esc="report.collector_name"/>
+                                <span t-if="not report.collector_name">(........................)</span>
+                            </div>
+                            <div style="margin: 10px 0; font-weight: bold;">कलेक्टर</div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
+

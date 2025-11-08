@@ -187,6 +187,22 @@ class Section4Notification(models.Model):
         self.ensure_one()
         self.state = 'generated'
         
+        # Lock all approved surveys for the selected villages
+        if self.village_ids and self.project_id:
+            approved_surveys = self.env['bhu.survey'].search([
+                ('village_id', 'in', self.village_ids.ids),
+                ('project_id', '=', self.project_id.id),
+                ('state', '=', 'approved')
+            ])
+            if approved_surveys:
+                approved_surveys.write({'state': 'locked'})
+                self.message_post(
+                    body=_('Locked %d survey(s) for villages: %s') % (
+                        len(approved_surveys),
+                        ', '.join(self.village_ids.mapped('name'))
+                    )
+                )
+        
         # Use wizard to generate PDF (reuse existing logic)
         wizard = self.env['bhu.section4.notification.wizard'].create({
             'project_id': self.project_id.id,
@@ -483,23 +499,203 @@ class ExpertCommitteeOrderWizard(models.TransientModel):
         }
 
 
+class Section11PreliminaryReport(models.Model):
+    _name = 'bhu.section11.preliminary.report'
+    _description = 'Section 11 Preliminary Report'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'create_date desc'
+
+    name = fields.Char(string='Report Name', required=True, default='New', tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project', required=True, tracking=True,
+                                  default=lambda self: self._default_project_id())
+    village_id = fields.Many2one('bhu.village', string='Village', required=True, tracking=True)
+    district_id = fields.Many2one('bhu.district', string='District', related='village_id.district_id', 
+                                   store=True, readonly=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil', related='village_id.tehsil_id', 
+                                store=True, readonly=True)
+    
+    # Notification Details
+    notification_number = fields.Char(string='Notification Number', tracking=True)
+    publication_date = fields.Date(string='Publication Date', tracking=True)
+    
+    # Schedule/Table - Land Parcels (One2many)
+    land_parcel_ids = fields.One2many('bhu.section11.land.parcel', 'report_id', 
+                                      string='Land Parcels', tracking=True)
+    
+    # Paragraph 2: Claims/Objections Information
+    paragraph_2_claims_info = fields.Text(string='Paragraph 2: Claims/Objections Info',
+                                          help='Information about claims/objections submission (60 days deadline)',
+                                          tracking=True)
+    
+    # Paragraph 3: Land Map Inspection
+    paragraph_3_map_inspection_location = fields.Char(string='Map Inspection Location',
+                                                       help='Location where land map can be inspected (SDO Revenue office)',
+                                                       tracking=True)
+    
+    # Paragraph 4: Displacement
+    paragraph_4_is_displacement = fields.Boolean(string='Is Displacement Involved?',
+                                                 default=False, tracking=True)
+    paragraph_4_affected_families_count = fields.Integer(string='Affected Families Count',
+                                                         tracking=True)
+    
+    # Paragraph 5: Exemption or SIA Justification
+    paragraph_5_is_exemption = fields.Boolean(string='Is Exemption Granted?',
+                                               default=False, tracking=True)
+    paragraph_5_exemption_details = fields.Text(string='Exemption Details',
+                                                 help='Details of exemption notification (number, date, exempted chapters)',
+                                                 tracking=True)
+    paragraph_5_sia_justification = fields.Text(string='SIA Justification',
+                                                help='SIA justification details (last resort, social benefits)',
+                                                tracking=True)
+    
+    # Paragraph 6: Rehabilitation Administrator
+    paragraph_6_rehab_admin_name = fields.Char(string='Rehabilitation Administrator',
+                                               help='Name/Designation of Rehabilitation and Resettlement Administrator',
+                                               tracking=True)
+    
+    # Signed document fields
+    signed_document_file = fields.Binary(string='Signed Report')
+    signed_document_filename = fields.Char(string='Signed File Name')
+    signed_date = fields.Date(string='Signed Date', tracking=True)
+    has_signed_document = fields.Boolean(string='Has Signed Document', 
+                                         compute='_compute_has_signed_document', store=True)
+    
+    # Collector signature
+    collector_signature = fields.Binary(string='Collector Signature')
+    collector_signature_filename = fields.Char(string='Signature File Name')
+    collector_name = fields.Char(string='Collector Name', tracking=True)
+    
+    # UUID for QR code
+    report_uuid = fields.Char(string='Report UUID', copy=False, readonly=True, index=True)
+    
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('generated', 'Generated'),
+        ('signed', 'Signed'),
+    ], string='Status', default='draft', tracking=True)
+    
+    @api.depends('signed_document_file')
+    def _compute_has_signed_document(self):
+        for record in self:
+            record.has_signed_document = bool(record.signed_document_file)
+            # Auto-sign when signed document is uploaded
+            if record.has_signed_document and record.state != 'signed':
+                record.state = 'signed'
+                if not record.signed_date:
+                    record.signed_date = fields.Date.today()
+    
+    @api.onchange('village_id', 'project_id')
+    def _onchange_village_populate_surveys(self):
+        """Auto-populate land parcels from locked surveys when village is selected"""
+        self._populate_land_parcels_from_surveys()
+    
+    def _populate_land_parcels_from_surveys(self):
+        """Helper method to populate land parcels from locked surveys"""
+        self.ensure_one()
+        if not self.village_id or not self.project_id:
+            return
+        
+        # Search for locked surveys for the selected village and project
+        locked_surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', '=', 'locked')
+        ], order='khasra_number')
+        
+        # Clear existing land parcels
+        self.land_parcel_ids = [(5, 0, 0)]
+        
+        # Create land parcel records from locked surveys
+        parcel_vals = []
+        for survey in locked_surveys:
+            # Get department name for authorized officer if available
+            authorized_officer = ''
+            if survey.department_id:
+                authorized_officer = survey.department_id.name or ''
+            
+            # Get public purpose from project if available
+            public_purpose = ''
+            if self.project_id:
+                public_purpose = self.project_id.name or ''
+            
+            parcel_vals.append((0, 0, {
+                'khasra_number': survey.khasra_number or '',
+                'area_in_hectares': survey.acquired_area or 0.0,
+                'authorized_officer': authorized_officer,
+                'public_purpose_description': public_purpose,
+            }))
+        
+        # Set the land parcels
+        if parcel_vals:
+            self.land_parcel_ids = parcel_vals
+    
+    
+    @api.model
+    def _default_project_id(self):
+        """Default project_id to PROJ01 if it exists, otherwise use first available project"""
+        project = self.env['bhu.project'].search([('code', '=', 'PROJ01')], limit=1)
+        if project:
+            return project.id
+        # Fallback to first available project if PROJ01 doesn't exist
+        fallback_project = self.env['bhu.project'].search([], limit=1)
+        return fallback_project.id if fallback_project else False
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Create records with batch support"""
+        records = super().create(vals_list)
+        # Auto-populate land parcels after creation if village and project are set
+        for record in records:
+            if record.village_id and record.project_id:
+                record._populate_land_parcels_from_surveys()
+        return records
+    
+    def action_generate_pdf(self):
+        """Generate Section 11 Preliminary Report PDF"""
+        self.ensure_one()
+        self.state = 'generated'
+        return self.env.ref('bhuarjan.action_report_section11_preliminary').report_action(self)
+    
+
+
+class Section11LandParcel(models.Model):
+    _name = 'bhu.section11.land.parcel'
+    _description = 'Section 11 Land Parcel'
+    _order = 'khasra_number'
+
+    report_id = fields.Many2one('bhu.section11.preliminary.report', string='Report', required=True, ondelete='cascade')
+    khasra_number = fields.Char(string='Khasra Number', required=True)
+    area_in_hectares = fields.Float(string='Area (Hectares)', required=True, digits=(16, 4))
+    authorized_officer = fields.Char(string='Authorized Officer',
+                                     help='Officer authorized by Section 12')
+    public_purpose_description = fields.Text(string='Public Purpose Description')
+
+
 class Section11PreliminaryWizard(models.TransientModel):
     _name = 'bhu.section11.preliminary.wizard'
     _description = 'Section 11 Preliminary Report Wizard'
 
-    project_id = fields.Many2one('bhu.project', string='Project', required=True)
-    village_ids = fields.Many2many('bhu.village', string='Villages', required=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
 
     def action_generate_report(self):
-        """Generate Report - To be implemented"""
+        """Create Section 11 Preliminary Report record"""
+        self.ensure_one()
+        
+        # Create the report record
+        report = self.env['bhu.section11.preliminary.report'].create({
+            'project_id': self.project_id.id,
+            'village_id': self.village_id.id,
+        })
+        
+        # Open the form view
         return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Info'),
-                'message': _('Report generation will be implemented soon.'),
-                'type': 'info',
-            }
+            'type': 'ir.actions.act_window',
+            'name': _('Section 11 Preliminary Report'),
+            'res_model': 'bhu.section11.preliminary.report',
+            'res_id': report.id,
+            'view_mode': 'form',
+            'target': 'current',
         }
 
 

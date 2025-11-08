@@ -87,16 +87,16 @@
         <field name="name">bhu.section11.preliminary.wizard.form</field>
         <field name="model">bhu.section11.preliminary.wizard</field>
         <field name="arch" type="xml">
-            <form string="Generate Section 11 Preliminary Report">
+            <form string="Generate Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट जेनरेट करें">
                 <sheet>
                     <group>
-                        <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                        <field name="project_id" required="1" options="{'no_create_edit': True}"/>
+                        <field name="village_id" required="1" options="{'no_create_edit': True}"/>
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_generate_report" string="Generate Report" type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <button name="action_generate_report" string="Generate Report / रिपोर्ट जेनरेट करें" type="object" class="btn-primary"/>
+                    <button string="Cancel / रद्द करें" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

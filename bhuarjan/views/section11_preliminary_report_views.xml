@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 11 Preliminary Report List View -->
+    <record id="view_section11_preliminary_report_list" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.report.list</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="arch" type="xml">
+            <list string="Section 11 Preliminary Reports" delete="1">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="district_id"/>
+                <field name="notification_number"/>
+                <field name="publication_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="has_signed_document" widget="boolean_toggle"/>
+                <field name="signed_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Section 11 Preliminary Report Form View -->
+    <record id="view_section11_preliminary_report_form" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.report.form</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="arch" type="xml">
+            <form string="Section 11 Preliminary Report">
+                <header>
+                    <button name="action_generate_pdf" string="Generate PDF" type="object" class="btn-primary" icon="fa-file-pdf"
+                            invisible="state == 'signed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="project_id" required="1" options="{'no_create_edit': True}"/>
+                            <field name="village_id" required="1" options="{'no_create_edit': True}"/>
+                            <field name="district_id" readonly="1"/>
+                            <field name="tehsil_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="notification_number"/>
+                            <field name="publication_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Schedule">
+                            <field name="land_parcel_ids" nolabel="1">
+                                <list string="Land Parcels" editable="bottom">
+                                    <field name="khasra_number" required="1"/>
+                                    <field name="area_in_hectares" required="1"/>
+                                    <field name="authorized_officer"/>
+                                    <field name="public_purpose_description"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Paragraphs">
+                            <group string="Paragraph 2: Claims/Objections Information">
+                                <field name="paragraph_2_claims_info" widget="text" nolabel="1" 
+                                       placeholder="Information about claims/objections submission (60 days deadline)"/>
+                            </group>
+                            <group string="Paragraph 3: Land Map Inspection">
+                                <field name="paragraph_3_map_inspection_location" 
+                                       placeholder="Location where land map can be inspected (SDO Revenue office)"/>
+                            </group>
+                            <group string="Paragraph 4: Displacement">
+                                <field name="paragraph_4_is_displacement"/>
+                                <field name="paragraph_4_affected_families_count" 
+                                       invisible="not paragraph_4_is_displacement"/>
+                            </group>
+                            <group string="Paragraph 5: Exemption or SIA Justification">
+                                <field name="paragraph_5_is_exemption"/>
+                                <group string="Exemption Details" 
+                                       invisible="not paragraph_5_is_exemption">
+                                    <field name="paragraph_5_exemption_details" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="SIA Justification" 
+                                       invisible="paragraph_5_is_exemption">
+                                    <field name="paragraph_5_sia_justification" widget="text" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group string="Paragraph 6: Rehabilitation Administrator">
+                                <field name="paragraph_6_rehab_admin_name" 
+                                       placeholder="Name/Designation of Rehabilitation and Resettlement Administrator"/>
+                            </group>
+                        </page>
+                        <page string="Signed Document">
+                            <group string="Signed Report">
+                                <field name="has_signed_document" readonly="1"/>
+                                <field name="signed_document_file" filename="signed_document_filename"/>
+                                <field name="signed_document_filename" invisible="1"/>
+                                <field name="signed_date"/>
+                            </group>
+                            <group string="Collector Signature">
+                                <field name="collector_signature" filename="collector_signature_filename"/>
+                                <field name="collector_signature_filename" invisible="1"/>
+                                <field name="collector_name"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 11 Preliminary Report Search View -->
+    <record id="view_section11_preliminary_report_search" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.report.search</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="arch" type="xml">
+            <search string="Section 11 Preliminary Reports">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="district_id"/>
+                <field name="notification_number"/>
+                <field name="publication_date"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Has Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
+                <separator/>
+                <filter string="My Reports" name="my_reports" domain="[('create_uid', '=', uid)]"/>
+                <filter string="All Reports" name="all" domain="[]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Village" name="group_by_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="District" name="group_by_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Section 11 Preliminary Report Action -->
+    <record id="action_section11_preliminary_report" model="ir.actions.act_window">
+        <field name="name">Section 11 Preliminary Reports</field>
+        <field name="res_model">bhu.section11.preliminary.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Section 11 Preliminary Report!
+            </p>
+            <p>
+                Create and manage Section 11 preliminary reports for land acquisition. You can generate PDFs and upload signed documents.
+            </p>
+            <p>
+                Use the "Create" button to create a new report, or use "Generate New" action from the menu to use the wizard.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

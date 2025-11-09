@@ -57,6 +57,8 @@
         'views/company_switcher_views.xml',
         'views/post_award_payment_views.xml',
         'views/payment_reconciliation_views.xml',
+        'views/payment_file_views.xml',
+        'views/payment_reconciliation_bank_views.xml',
         'views/rate_master_views.xml',
         'views/settings_master_views.xml',
         'wizard/report_wizard.xml',

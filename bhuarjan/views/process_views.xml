@@ -83,10 +83,10 @@
 
     <!-- Payment Actions -->
     <record id="action_generate_payment_file" model="ir.actions.act_window">
-        <field name="name">Generate Payment File / भुगतान फ़ाइल जेनरेट करें</field>
-        <field name="res_model">bhu.generate.payment.file.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
+        <field name="name">Payment Files / भुगतान फ़ाइलें</field>
+        <field name="res_model">bhu.payment.file</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
     </record>
 
     <record id="action_payment_reconciliation" model="ir.actions.act_window">

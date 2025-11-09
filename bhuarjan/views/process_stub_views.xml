@@ -204,24 +204,5 @@
         </field>
     </record>
 
-    <!-- Generate Payment File Wizard -->
-    <record id="view_generate_payment_file_wizard_form" model="ir.ui.view">
-        <field name="name">bhu.generate.payment.file.wizard.form</field>
-        <field name="model">bhu.generate.payment.file.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Generate Payment File">
-                <sheet>
-                    <group>
-                        <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1"/>
-                    </group>
-                </sheet>
-                <footer>
-                    <button name="action_generate_payment_file" string="Generate Payment File" type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
 </odoo>
 

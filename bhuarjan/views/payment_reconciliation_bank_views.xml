@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Payment Reconciliation Bank List View -->
+    <record id="view_payment_reconciliation_bank_list" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.list</field>
+        <field name="model">bhu.payment.reconciliation.bank</field>
+        <field name="arch" type="xml">
+            <list string="Payment Reconciliation / भुगतान समाधान" delete="1">
+                <field name="name"/>
+                <field name="payment_file_id"/>
+                <field name="village_id"/>
+                <field name="project_id"/>
+                <field name="reconciliation_date"/>
+                <field name="total_payments"/>
+                <field name="settled_count"/>
+                <field name="failed_count"/>
+                <field name="pending_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="settled_amount" sum="Total"/>
+                <field name="failed_amount" sum="Total"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'completed'"
+                       decoration-info="state == 'processed'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Payment Reconciliation Bank Form View -->
+    <record id="view_payment_reconciliation_bank_form" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.form</field>
+        <field name="model">bhu.payment.reconciliation.bank</field>
+        <field name="arch" type="xml">
+            <form string="Payment Reconciliation / भुगतान समाधान">
+                <header>
+                    <button name="action_process_bank_file" string="Process Bank File" type="object" class="btn-primary" icon="fa-upload"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,processed,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="payment_file_id" required="1"/>
+                            <field name="village_id" readonly="1"/>
+                            <field name="project_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="reconciliation_date"/>
+                            <field name="upload_date"/>
+                            <field name="bank_file" filename="bank_file_filename" widget="binary"/>
+                            <field name="bank_file_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Summary / सारांश">
+                        <field name="total_payments" readonly="1"/>
+                        <field name="settled_count" readonly="1"/>
+                        <field name="failed_count" readonly="1"/>
+                        <field name="pending_count" readonly="1"/>
+                        <field name="total_amount" readonly="1"/>
+                        <field name="settled_amount" readonly="1"/>
+                        <field name="failed_amount" readonly="1"/>
+                    </group>
+                    
+                    <group string="Reconciliation Lines / समाधान पंक्तियां">
+                        <field name="reconciliation_line_ids" nolabel="1">
+                            <list string="Reconciliation Lines" editable="bottom">
+                                <field name="utr_number"/>
+                                <field name="transaction_reference"/>
+                                <field name="beneficiary_account"/>
+                                <field name="beneficiary_name"/>
+                                <field name="beneficiary_bank_code"/>
+                                <field name="credit_amount" sum="Total"/>
+                                <field name="expected_amount" sum="Total"/>
+                                <field name="amount_difference" sum="Total"/>
+                                <field name="status" widget="badge"
+                                       decoration-danger="status == 'failed'"
+                                       decoration-success="status == 'settled'"
+                                       decoration-muted="status == 'pending'"/>
+                                <field name="error"/>
+                                <field name="payment_line_id"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Payment Reconciliation Bank Search View -->
+    <record id="view_payment_reconciliation_bank_search" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.search</field>
+        <field name="model">bhu.payment.reconciliation.bank</field>
+        <field name="arch" type="xml">
+            <search string="Payment Reconciliation">
+                <field name="name"/>
+                <field name="payment_file_id"/>
+                <field name="village_id"/>
+                <field name="project_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Processed" name="processed" domain="[('state', '=', 'processed')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="Has Failed Payments" name="has_failed" domain="[('failed_count', '>', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Payment Reconciliation Bank Action -->
+    <record id="action_payment_reconciliation_bank" model="ir.actions.act_window">
+        <field name="name">Payment Reconciliation / भुगतान समाधान</field>
+        <field name="res_model">bhu.payment.reconciliation.bank</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Payment Reconciliation
+            </p>
+            <p>
+                Upload bank files to reconcile payments and identify settled and failed transactions.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

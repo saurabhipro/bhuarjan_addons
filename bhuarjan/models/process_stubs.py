@@ -1930,23 +1930,3 @@ class DownloadAwardNotificationWizard(models.TransientModel):
             }
         }
 
-
-class GeneratePaymentFileWizard(models.TransientModel):
-    _name = 'bhu.generate.payment.file.wizard'
-    _description = 'Generate Payment File Wizard'
-
-    project_id = fields.Many2one('bhu.project', string='Project', required=True)
-    village_ids = fields.Many2many('bhu.village', string='Villages', required=True)
-
-    def action_generate_payment_file(self):
-        """Generate Payment File - To be implemented"""
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Info'),
-                'message': _('Payment file generation will be implemented soon.'),
-                'type': 'info',
-            }
-        }
-

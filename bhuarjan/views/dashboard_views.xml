@@ -127,12 +127,12 @@
                         <i class="fa fa-cogs"/> PROCESS STATISTICS
                     </div>
                     <div class="dashboard-grid">
-                        <button name="%(action_section4_notification)d" type="action" class="process-card kpi-card-green" style="background: linear-gradient(135deg, rgba(34, 139, 34, 0.9) 0%, rgba(85, 107, 47, 0.9) 100%); color: white;">
+                        <button name="%(action_section4_notification)d" type="action" class="process-card process-card-green">
                             <div class="process-header">
-                                <div class="kpi-label" style="color: white;">Section 4 Notifications</div>
-                                <div class="kpi-icon" style="color: white;"><i class="fa fa-file-text"/></div>
+                                <div class="kpi-label">Section 4 Notifications</div>
+                                <div class="kpi-icon"><i class="fa fa-file-text"/></div>
                             </div>
-                            <div class="kpi-value" style="color: white; font-size: 24px;"><field name="total_section4_notifications" nolabel="1" readonly="1"/></div>
+                            <div class="kpi-value process-value"><field name="total_section4_notifications" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
                                 <div class="process-sub-stat">
                                     <span class="process-sub-stat-value"><field name="draft_section4" nolabel="1" readonly="1"/></span>
@@ -148,12 +148,12 @@
                                 </div>
                             </div>
                         </button>
-                        <button name="%(action_section11_preliminary_report)d" type="action" class="process-card kpi-card-brown" style="background: linear-gradient(135deg, rgba(139, 69, 19, 0.9) 0%, rgba(160, 82, 45, 0.9) 100%); color: white;">
+                        <button name="%(action_section11_preliminary_report)d" type="action" class="process-card process-card-brown">
                             <div class="process-header">
-                                <div class="kpi-label" style="color: white;">Section 11 Reports</div>
-                                <div class="kpi-icon" style="color: white;"><i class="fa fa-file-pdf"/></div>
+                                <div class="kpi-label">Section 11 Reports</div>
+                                <div class="kpi-icon"><i class="fa fa-file-pdf"/></div>
                             </div>
-                            <div class="kpi-value" style="color: white; font-size: 24px;"><field name="total_section11_reports" nolabel="1" readonly="1"/></div>
+                            <div class="kpi-value process-value"><field name="total_section11_reports" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
                                 <div class="process-sub-stat">
                                     <span class="process-sub-stat-value"><field name="draft_section11" nolabel="1" readonly="1"/></span>

@@ -107,23 +107,43 @@
     margin-bottom: 25px;
 }
 .process-card {
-    border-radius: 10px;
-    padding: 12px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-left: 4px solid;
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    border-left: 5px solid;
     position: relative;
     cursor: pointer;
     text-decoration: none;
     display: block;
-    color: inherit;
     border-right: none;
     border-top: none;
     border-bottom: none;
     width: 100%;
     text-align: left;
-    background: transparent;
     transition: all 0.3s ease;
     min-height: 90px;
+    overflow: hidden;
+}
+.process-card-green {
+    background: linear-gradient(135deg, rgba(34, 139, 34, 0.95) 0%, rgba(85, 107, 47, 0.95) 100%);
+    border-left-color: #1a6b1a;
+    color: white;
+}
+.process-card-brown {
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.95) 0%, rgba(160, 82, 45, 0.95) 100%);
+    border-left-color: #6b3410;
+    color: white;
+}
+.process-card-green .kpi-label,
+.process-card-green .kpi-icon,
+.process-card-green .kpi-value,
+.process-card-brown .kpi-label,
+.process-card-brown .kpi-icon,
+.process-card-brown .kpi-value {
+    color: white;
+}
+.process-value {
+    font-size: 24px !important;
 }
 .process-card:hover {
     transform: translateY(-2px);
@@ -135,18 +155,30 @@
 .process-card::before {
     content: '';
     position: absolute;
-    top: -40%;
-    right: -40%;
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0) 70%);
+    top: -50%;
+    right: -50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.1) 60%, rgba(255,255,255,0) 80%);
     border-radius: 50%;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     z-index: 0;
 }
 .process-card:hover::before {
-    transform: scale(1.2);
-    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 70%);
+    transform: scale(1.3);
+    background: radial-gradient(circle, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.15) 60%, rgba(255,255,255,0) 80%);
+}
+.process-card-green::before {
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.3) 30%, rgba(255,255,255,0.15) 60%, rgba(255,255,255,0) 80%);
+}
+.process-card-brown::before {
+    background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.12) 60%, rgba(255,255,255,0) 80%);
+}
+.process-card-green:hover::before {
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0) 80%);
+}
+.process-card-brown:hover::before {
+    background: radial-gradient(circle, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.18) 60%, rgba(255,255,255,0) 80%);
 }
 .process-card > * {
     position: relative;
@@ -161,28 +193,36 @@
 .process-sub-stats {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.4);
     font-size: 11px;
 }
 .process-sub-stat {
     flex: 1;
     text-align: center;
-    background: rgba(255,255,255,0.15);
-    padding: 6px;
-    border-radius: 6px;
-    backdrop-filter: blur(5px);
+    background: rgba(255,255,255,0.25);
+    padding: 8px 6px;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+.process-sub-stat:hover {
+    background: rgba(255,255,255,0.35);
+    transform: translateY(-1px);
 }
 .process-sub-stat-value {
     font-size: 16px;
     font-weight: 700;
     display: block;
     margin-bottom: 2px;
+    color: white;
 }
 .process-sub-stat-label {
     font-size: 10px;
-    opacity: 0.9;
+    opacity: 0.95;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    color: rgba(255,255,255,0.95);
 }

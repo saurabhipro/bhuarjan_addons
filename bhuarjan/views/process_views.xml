@@ -49,14 +49,6 @@
         <field name="target">new</field>
     </record>
 
-    <!-- (Sec 21) Generate Draft Award -->
-    <record id="action_generate_draft_award" model="ir.actions.act_window">
-        <field name="name">Generate Draft Award / मसौदा पुरस्कार जेनरेट करें</field>
-        <field name="res_model">bhu.draft.award.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-    </record>
-
     <!-- (Sec 21) Generate Notices -->
     <record id="action_generate_notices" model="ir.actions.act_window">
         <field name="name">Generate Notices / नोटिस जेनरेट करें</field>

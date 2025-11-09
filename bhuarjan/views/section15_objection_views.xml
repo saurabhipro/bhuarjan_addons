@@ -31,6 +31,7 @@
                 <field name="village_id"/>
                 <field name="landowner_id"/>
                 <field name="survey_id"/>
+                <field name="survey_khasra_number"/>
                 <field name="objection_type"/>
                 <field name="objection_date"/>
                 <field name="age_days"/>

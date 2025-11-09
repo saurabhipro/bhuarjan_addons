@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 19 Notification Report -->
+    <record id="action_report_section19_notification" model="ir.actions.report">
+        <field name="name">Section 19 Notification / धारा 19 अधिसूचना</field>
+        <field name="model">bhu.section19.notification</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.section19_notification_report</field>
+        <field name="report_file">bhuarjan.section19_notification_report</field>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_form10_paper_format"/>
+        <field name="print_report_name">'Section19_Notification_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+    </record>
+
+    <!-- Custom Layout header for Section 19 -->
+    <template id="section19_report_custom_layout">
+        <div class="header-section" style="margin-bottom: 12px;">
+            <style>
+                .header-info-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 14px; 
+                    border: 2px solid #000; 
+                    margin-bottom: 0; 
+                }
+                .header-info-table td { 
+                    border: 1px solid #000; 
+                    padding: 6px; 
+                    vertical-align: middle;
+                }
+            </style>
+            <h2 style="text-align: right; margin: 0 0 12px 0; font-size: 16px; font-weight: bold;">
+                <strong>प्रारूप अधिसूचना</strong>
+            </h2>
+            <h2 style="text-align: center; margin: 0 0 12px 0; font-size: 18px; font-weight: bold;">
+                <strong>कार्यालय कलेक्टर, जिला ........................... एवं पदेन उप सचिव,</strong>
+            </h2>
+            <h2 style="text-align: center; margin: 0 0 12px 0; font-size: 18px; font-weight: bold;">
+                <strong>छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग</strong>
+            </h2>
+            <h2 style="text-align: center; margin: 0 0 12px 0; font-size: 22px; font-weight: bold; text-decoration: underline;">
+                <strong>अधिसूचना</strong>
+            </h2>
+
+            <table class="header-info-table">
+                <tr>
+                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
+                        <!-- Logo - Left Header Box -->
+                        <img src="/bhuarjan/static/description/logo.png" 
+                             alt="Logo" 
+                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>परियोजना का नाम :</strong>
+                        <span t-if="notification and notification.project_id" t-esc="notification.project_id.name"/>
+                        <span t-if="not notification or not notification.project_id">........................</span>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>विभाग का नाम :</strong>
+                        <t t-set="department_name" t-value="''"/>
+                        <t t-if="notification and notification.project_id and notification.village_ids and len(notification.village_ids) > 0">
+                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', 'in', notification.village_ids.ids)], limit=1)"/>
+                            <t t-if="first_survey and first_survey.department_id">
+                                <t t-set="department_name" t-value="first_survey.department_id.name"/>
+                            </t>
+                        </t>
+                        <span t-esc="department_name if department_name else 'Public Works Department'"/>
+                    </td>
+                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
+                        <!-- QR Code - Right Header Box -->
+                        <t t-if="notification">
+                            <t t-set="qr_code_img" t-value="notification.get_qr_code_data()"/>
+                            <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section19/' + str(notification.notification_uuid or '') + '/download'"/>
+                            <t t-if="qr_code_img">
+                                <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                    <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                         alt="QR Code - Click to download PDF" 
+                                         style="width: 100%; max-width: 100%; height: auto; aspect-ratio: 1; border: none; display: block; margin: 0; padding: 0;"/>
+                                </a>
+                            </t>
+                            <t t-if="not qr_code_img">
+                                <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
+                                    <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
+                                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                            <div style="text-align: center; font-size: 7px;">
+                                                <div style="font-weight: bold;">QR Code</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </t>
+                        </t>
+                        <t t-if="not notification">
+                            <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <div style="text-align: center; font-size: 7px;">
+                                        <div style="font-weight: bold;">QR Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>ग्राम/नगर का नाम :</strong>
+                        <span t-if="notification and notification.village_ids and len(notification.village_ids) > 0">
+                            <t t-foreach="notification.village_ids" t-as="village">
+                                <t t-esc="village.name"/>
+                                <t t-if="not village_last">, </t>
+                            </t>
+                        </span>
+                        <span t-if="not notification or not notification.village_ids or len(notification.village_ids) == 0">........................</span>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>तहसील का नाम :</strong>
+                        <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
+                        <span t-if="not notification or not notification.tehsil_id">........................</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>जिला :</strong>
+                        <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
+                        <span t-if="not notification or not notification.district_id">........................</span>
+                    </td>
+                    <td style="width: 40%; font-size: 14px;">
+                        <strong>सर्वे दिनाँक :</strong>
+                        <t t-set="survey_date" t-value="''"/>
+                        <t t-if="notification and notification.project_id and notification.village_ids and len(notification.village_ids) > 0">
+                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', 'in', notification.village_ids.ids)], limit=1, order='survey_date desc')"/>
+                            <t t-if="first_survey and first_survey.survey_date">
+                                <t t-set="survey_date" t-value="first_survey.survey_date.strftime('%d/%m/%Y')"/>
+                            </t>
+                        </t>
+                        <span t-esc="survey_date if survey_date else '........................'"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <!-- Section 19 Notification Report Template -->
+    <template id="section19_notification_report">
+        <t t-call="web.html_container">
+            <meta charset="utf-8"/>
+            <t t-set="notification" t-value="object or (docs and docs[0]) or None"/>
+            <t t-call="bhuarjan.section19_report_custom_layout"/>
+            
+            <div class="page" style="font-family: 'Noto Sans Devanagari', Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 20px;">
+                <style>
+                    .notification-content {
+                        margin-top: 20px;
+                    }
+                    .notification-number {
+                        text-align: right;
+                        margin-bottom: 15px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    }
+                    .legal-preamble {
+                        text-align: justify;
+                        margin-bottom: 20px;
+                        line-height: 1.8;
+                    }
+                    .schedule-section {
+                        margin: 20px 0;
+                    }
+                    .schedule-title {
+                        font-weight: bold;
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                    }
+                    .schedule-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 15px 0;
+                        border: 1px solid #000;
+                    }
+                    .schedule-table th,
+                    .schedule-table td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    .schedule-table th {
+                        background-color: #f0f0f0;
+                        font-weight: bold;
+                        text-align: center;
+                    }
+                    .schedule-table .total-row {
+                        font-weight: bold;
+                        background-color: #f9f9f9;
+                    }
+                    .paragraph {
+                        margin: 15px 0;
+                        text-align: justify;
+                        line-height: 1.8;
+                    }
+                    .paragraph-number {
+                        font-weight: bold;
+                        display: inline;
+                    }
+                    .footer-section {
+                        margin-top: 40px;
+                        text-align: right;
+                    }
+                    .signature-line {
+                        margin-top: 60px;
+                        text-align: right;
+                    }
+                </style>
+
+                <!-- Notification Number -->
+                <div class="notification-number">
+                    <strong>क्र. <t t-if="notification and notification.notification_number" t-esc="notification.notification_number"/><t t-if="not notification or not notification.notification_number">/अ-82/2015-16</t></strong>
+                </div>
+
+                <!-- Legal Preamble -->
+                <div class="legal-preamble">
+                    <p>
+                        चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की 
+                        <t t-if="notification and notification.public_purpose">
+                            <t t-raw="notification.public_purpose"/>
+                        </t>
+                        <t t-if="not notification or not notification.public_purpose">
+                            <strong>सार्वजनिक प्रयोजन</strong>
+                        </t>
+                        के लिए आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिले एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 19 के तहत् यह घोषित किया जाता है, कि इस भूमि का उक्त प्रयोजन के लिए आवश्यकता है :-
+                    </p>
+                </div>
+
+                <!-- Schedule Section -->
+                <div class="schedule-section">
+                    <div class="schedule-title">भूमि का वर्णन -</div>
+                    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                        <tr>
+                            <td style="padding: 5px; border: 1px solid #000;"><strong>जिला :</strong> 
+                                <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
+                                <span t-if="not notification or not notification.district_id">........................</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; border: 1px solid #000;"><strong>तहसील :</strong> 
+                                <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
+                                <span t-if="not notification or not notification.tehsil_id">........................</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; border: 1px solid #000;"><strong>ग्राम/नगर :</strong> 
+                                <span t-if="notification and notification.village_ids and len(notification.village_ids) > 0">
+                                    <t t-foreach="notification.village_ids" t-as="village">
+                                        <t t-esc="village.name"/>
+                                        <t t-if="not village_last">, </t>
+                                    </t>
+                                </span>
+                                <span t-if="not notification or not notification.village_ids or len(notification.village_ids) == 0">........................</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; border: 1px solid #000;"><strong>भूमि का क्षेत्रफल :</strong> 
+                                <span t-if="notification and notification.total_land_area">
+                                    <t t-esc="'{:.4f}'.format(notification.total_land_area)"/> हेक्टेयर
+                                </span>
+                                <span t-if="not notification or not notification.total_land_area">........................</span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Land Parcels Table -->
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">खसरा नंबर</th>
+                                <th style="width: 50%;">रकबा (हेक्टेयर में)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="notification and notification.land_parcel_ids and len(notification.land_parcel_ids) > 0">
+                                <t t-foreach="notification.land_parcel_ids" t-as="parcel">
+                                    <tr>
+                                        <td t-esc="parcel.khasra_number or ''"/>
+                                        <td style="text-align: right;" t-esc="'{:.4f}'.format(parcel.area_hectares) if parcel.area_hectares else '0.0000'"/>
+                                    </tr>
+                                </t>
+                                <tr class="total-row">
+                                    <td><strong>योग -</strong></td>
+                                    <td style="text-align: right;">
+                                        <strong>
+                                            <t t-if="notification and notification.total_land_area">
+                                                <t t-esc="'{:.4f}'.format(notification.total_land_area)"/>
+                                            </t>
+                                            <t t-if="not notification or not notification.total_land_area">0.0000</t>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="not notification or not notification.land_parcel_ids or len(notification.land_parcel_ids) == 0">
+                                <tr>
+                                    <td colspan="2" style="text-align: center; padding: 20px;">
+                                        कोई भूमि खंड उपलब्ध नहीं है / No land parcels available
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paragraph 2: Map Inspection -->
+                <div class="paragraph">
+                    <span class="paragraph-number">2.</span>
+                    भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व) 
+                    <t t-if="notification and notification.sdo_office_location" t-esc="notification.sdo_office_location"/>
+                    <t t-if="not notification or not notification.sdo_office_location">...........................</t>
+                    के कार्यालय में किया जा सकता है।
+                </div>
+
+                <!-- Paragraph 3: Displacement and Rehabilitation -->
+                <div class="paragraph">
+                    <span class="paragraph-number">3.</span>
+                    <t t-if="notification and notification.is_displacement_involved">
+                        उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित व्यक्तियों का पुनर्वासित किया जाना प्रस्तावित है। पुनर्वासन तथा पुनर्व्यवस्थापन हेतु ग्राम 
+                        <t t-if="notification.rehab_village_id" t-esc="notification.rehab_village_id.name"/>
+                        <t t-if="not notification.rehab_village_id">...........................</t>
+                        तहसील 
+                        <t t-if="notification.rehab_tehsil_id" t-esc="notification.rehab_tehsil_id.name"/>
+                        <t t-if="not notification.rehab_tehsil_id">...........................</t>
+                        जिला 
+                        <t t-if="notification.rehab_district_id" t-esc="notification.rehab_district_id.name"/>
+                        <t t-if="not notification.rehab_district_id">...........................</t>
+                        की भूमि खसरा नंबर 
+                        <t t-if="notification.rehab_khasra_number" t-esc="notification.rehab_khasra_number"/>
+                        <t t-if="not notification.rehab_khasra_number">...........................</t>
+                        रकवा 
+                        <t t-if="notification.rehab_area_hectares">
+                            <t t-esc="'{:.4f}'.format(notification.rehab_area_hectares)"/> हेक्टेयर
+                        </t>
+                        <t t-if="not notification.rehab_area_hectares">...........................</t>
+                        का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व) 
+                        <t t-if="notification.rehab_officer_office_location" t-esc="notification.rehab_officer_office_location"/>
+                        <t t-if="not notification.rehab_officer_office_location">...........................</t>
+                        के कार्यालय में किया जा सकता है।
+                    </t>
+                    <t t-if="not notification or not notification.is_displacement_involved">
+                        उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निहित नहीं है।
+                    </t>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer-section">
+                    <div style="margin-top: 40px;">
+                        <p><strong>छत्तीसगढ़ के राज्यपाल के नाम से</strong></p>
+                        <p><strong>तथा आदेशानुसार</strong></p>
+                    </div>
+                    <div class="signature-line">
+                        <p style="margin-top: 60px;">
+                            <t t-if="notification and notification.collector_name" t-esc="notification.collector_name"/>
+                            <t t-if="not notification or not notification.collector_name">(.........................)</t>
+                        </p>
+                        <p><strong>कलेक्टर</strong></p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
+

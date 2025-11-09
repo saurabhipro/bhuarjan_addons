@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Draft Award List View -->
+    <record id="view_draft_award_list" model="ir.ui.view">
+        <field name="name">bhu.draft.award.list</field>
+        <field name="model">bhu.draft.award</field>
+        <field name="arch" type="xml">
+            <list string="Draft Awards / अवार्ड आदेश" delete="1">
+                <field name="name"/>
+                <field name="award_number"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="case_number"/>
+                <field name="award_date"/>
+                <field name="total_land_area"/>
+                <field name="total_khasra_count"/>
+                <field name="total_compensation_amount"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'signed'"
+                       decoration-info="state == 'generated'"
+                       decoration-muted="state == 'draft'"/>
+                <field name="has_signed_document" widget="boolean_toggle"/>
+                <field name="signed_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Draft Award Form View -->
+    <record id="view_draft_award_form" model="ir.ui.view">
+        <field name="name">bhu.draft.award.form</field>
+        <field name="model">bhu.draft.award</field>
+        <field name="arch" type="xml">
+            <form string="Draft Award / अवार्ड आदेश">
+                <header>
+                    <button name="action_generate_pdf" string="Generate Draft Award" type="object" class="btn-primary" icon="fa-file-pdf"
+                            invisible="state == 'signed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="project_id" required="1"/>
+                            <field name="village_id" required="1"/>
+                            <field name="case_number"/>
+                            <field name="patwari_halka_number"/>
+                        </group>
+                        <group>
+                            <field name="district_id" readonly="1"/>
+                            <field name="tehsil_id" readonly="1"/>
+                            <field name="award_number"/>
+                            <field name="award_date"/>
+                            <field name="total_land_area" readonly="1"/>
+                            <field name="total_khasra_count" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Applicant / आवेदक">
+                        <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..."/>
+                        <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..."/>
+                    </group>
+                    
+                    <group string="Respondents / अनावेदक (Auto-populated from Section 11)">
+                        <field name="respondent_ids" widget="many2many_tags" readonly="1" nolabel="1"/>
+                    </group>
+                    
+                    <group string="Land Parcels / भूमि खंड (Auto-populated from Section 11)">
+                        <field name="land_parcel_ids" nolabel="1">
+                            <list string="Land Parcels" editable="bottom">
+                                <field name="khasra_number" required="1"/>
+                                <field name="area_hectares" required="1"/>
+                            </list>
+                        </field>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Publication Details / प्रकाशन विवरण">
+                            <div style="padding: 16px;">
+                                <group string="Section 11 Publication / धारा 11 प्रकाशन" col="2">
+                                    <field name="section11_gazette_date"/>
+                                    <field name="section11_gazette_part"/>
+                                    <field name="section11_gazette_page"/>
+                                    <field name="section11_newspaper_1_name"/>
+                                    <field name="section11_newspaper_1_date"/>
+                                    <field name="section11_newspaper_2_name"/>
+                                    <field name="section11_newspaper_2_date"/>
+                                    <field name="section11_munadi_date"/>
+                                </group>
+                                <group string="Section 19 Publication / धारा 19 प्रकाशन" col="2">
+                                    <field name="section19_gazette_date"/>
+                                    <field name="section19_gazette_part"/>
+                                    <field name="section19_gazette_page"/>
+                                    <field name="section19_newspaper_1_name"/>
+                                    <field name="section19_newspaper_1_date"/>
+                                    <field name="section19_newspaper_2_name"/>
+                                    <field name="section19_newspaper_2_date"/>
+                                    <field name="section19_munadi_date"/>
+                                </group>
+                                <group string="Section 21 Details / धारा 21 विवरण" col="2">
+                                    <field name="section21_notice_date"/>
+                                    <field name="section21_hearing_date"/>
+                                </group>
+                            </div>
+                        </page>
+                        <page string="Compensation / मुआवजा">
+                            <group>
+                                <field name="total_compensation_amount" readonly="1"/>
+                                <field name="compensation_amount_text" placeholder="Enter amount in words..."/>
+                                <field name="is_displacement_involved"/>
+                            </group>
+                        </page>
+                        <page string="References / संदर्भ">
+                            <group>
+                                <field name="section11_report_id" readonly="1"/>
+                                <field name="section19_notification_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
+                            <group>
+                                <field name="has_signed_document" readonly="1"/>
+                                <field name="signed_document_file" filename="signed_document_filename"/>
+                                <field name="signed_document_filename" invisible="1"/>
+                                <field name="signed_date"/>
+                                <field name="officer_signature" filename="officer_signature_filename"/>
+                                <field name="officer_signature_filename" invisible="1"/>
+                                <field name="officer_name"/>
+                                <field name="officer_designation"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Draft Award Search View -->
+    <record id="view_draft_award_search" model="ir.ui.view">
+        <field name="name">bhu.draft.award.search</field>
+        <field name="model">bhu.draft.award</field>
+        <field name="arch" type="xml">
+            <search string="Draft Awards">
+                <field name="name"/>
+                <field name="award_number"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="case_number"/>
+                <field name="award_date"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
+                <separator/>
+                <filter string="Has Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Draft Award Action -->
+    <record id="action_draft_award" model="ir.actions.act_window">
+        <field name="name">Draft Awards / अवार्ड आदेश</field>
+        <field name="res_model">bhu.draft.award</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Draft Award
+            </p>
+            <p>
+                Draft Awards are generated for each village based on Section 11 Preliminary Reports.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

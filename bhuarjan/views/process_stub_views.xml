@@ -122,26 +122,6 @@
         </field>
     </record>
 
-    <!-- Draft Award Wizard -->
-    <record id="view_draft_award_wizard_form" model="ir.ui.view">
-        <field name="name">bhu.draft.award.wizard.form</field>
-        <field name="model">bhu.draft.award.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Generate Draft Award">
-                <sheet>
-                    <group>
-                        <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1"/>
-                    </group>
-                </sheet>
-                <footer>
-                    <button name="action_generate_draft_award" string="Generate Draft Award" type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
     <!-- Generate Notices Wizard -->
     <record id="view_generate_notices_wizard_form" model="ir.ui.view">
         <field name="name">bhu.generate.notices.wizard.form</field>

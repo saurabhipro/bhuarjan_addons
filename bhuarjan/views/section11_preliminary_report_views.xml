@@ -6,14 +6,17 @@
         <field name="model">bhu.section11.preliminary.report</field>
         <field name="arch" type="xml">
             <list string="Section 11 Preliminary Reports" delete="1">
-                <button name="action_generate_pdf" string="Generate PDF" type="object" icon="fa-file-pdf" 
-                        invisible="state == 'signed'"/>
-                <button name="action_open_wizard" string="Generate" type="object" icon="fa-plus" 
-                        class="oe_highlight" title="Generate new Section 11 Preliminary Report"/>
+                <header>
+                    <button name="action_open_wizard" string="Generate" type="object" icon="fa-plus" 
+                            class="oe_highlight" title="Generate new Section 11 Preliminary Report"/>
+                </header>
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
-                <field name="district_id"/>
+                <field name="survey_numbers"/>
+                <field name="survey_date"/>
+                <field name="khasra_numbers"/>
+                <field name="khasra_count"/>
                 <field name="notification_number"/>
                 <field name="publication_date"/>
                 <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
@@ -54,8 +57,11 @@
                                 <list string="Land Parcels" editable="bottom">
                                     <field name="khasra_number" required="1"/>
                                     <field name="area_in_hectares" required="1"/>
-                                    <field name="authorized_officer"/>
-                                    <field name="public_purpose_description"/>
+                                    <field name="survey_number"/>
+                                    <field name="survey_date"/>
+                                    <field name="district_id"/>
+                                    <field name="village_id"/>
+                                    <field name="project_id"/>
                                 </list>
                             </field>
                         </page>

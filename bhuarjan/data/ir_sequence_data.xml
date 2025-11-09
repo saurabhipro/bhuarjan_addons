@@ -140,5 +140,25 @@
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
         </record>
+        
+        <!-- Sequence for Section 19 Notification Numbers -->
+        <record id="seq_bhu_section19_notification" model="ir.sequence">
+            <field name="name">Section 19 Notification Number</field>
+            <field name="code">bhu.section19.notification</field>
+            <field name="prefix">SEC19-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Draft Award Numbers -->
+        <record id="seq_bhu_draft_award" model="ir.sequence">
+            <field name="name">Draft Award Number</field>
+            <field name="code">bhu.draft.award</field>
+            <field name="prefix">AWARD-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
     </data>
 </odoo>

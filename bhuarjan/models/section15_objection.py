@@ -58,6 +58,49 @@ class Section15Objection(models.Model):
         ('approved', 'Approved / स्वीकृत'),
         ('locked', 'Locked / लॉक'),
     ], string='Survey Status / सर्वे स्थिति', readonly=True, compute='_compute_survey_details', store=False)
+    survey_project_id = fields.Many2one('bhu.project', string='Survey Project', readonly=True, compute='_compute_survey_details', store=False)
+    survey_village_id = fields.Many2one('bhu.village', string='Survey Village', readonly=True, compute='_compute_survey_details', store=False)
+    survey_department_id = fields.Many2one('bhu.department', string='Survey Department', readonly=True, compute='_compute_survey_details', store=False)
+    survey_crop_type = fields.Selection([
+        ('single', 'Single Crop / एकल फसल'),
+        ('double', 'Double Crop / दोहरी फसल'),
+    ], string='Crop Type / फसल का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
+    survey_irrigation_type = fields.Selection([
+        ('irrigated', 'Irrigated / सिंचित'),
+        ('unirrigated', 'Unirrigated / असिंचित'),
+    ], string='Irrigation Type / सिंचाई का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
+    survey_tree_count = fields.Integer(string='Tree Count / वृक्ष संख्या', readonly=True, compute='_compute_survey_details', store=False)
+    survey_tree_development_stage = fields.Selection([
+        ('undeveloped', 'Undeveloped / अविकसित'),
+        ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
+        ('fully_developed', 'Fully developed / पूर्ण विकसित')
+    ], string='Tree Development Stage / वृक्ष विकास स्तर', readonly=True, compute='_compute_survey_details', store=False)
+    survey_has_house = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has House / घर है', readonly=True, compute='_compute_survey_details', store=False)
+    survey_house_type = fields.Selection([
+        ('kachcha', 'कच्चा'),
+        ('pucca', 'पक्का')
+    ], string='House Type / घर का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
+    survey_house_area = fields.Float(string='House Area (Sq. Ft.) / घर का क्षेत्रफल', readonly=True, compute='_compute_survey_details', store=False)
+    survey_has_well = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Well / कुआं है', readonly=True, compute='_compute_survey_details', store=False)
+    survey_well_type = fields.Selection([
+        ('kachcha', 'कच्चा'),
+        ('pakka', 'पक्का')
+    ], string='Well Type / कुएं का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
+    survey_has_tubewell = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Tubewell / ट्यूबवेल है', readonly=True, compute='_compute_survey_details', store=False)
+    survey_has_pond = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Pond / तालाब है', readonly=True, compute='_compute_survey_details', store=False)
+    survey_landowner_ids = fields.Many2many('bhu.landowner', string='Survey Landowners', readonly=True, compute='_compute_survey_details', store=False)
     
     @api.depends('survey_id')
     def _compute_survey_details(self):
@@ -69,12 +112,42 @@ class Section15Objection(models.Model):
                 record.survey_acquired_area = record.survey_id.acquired_area
                 record.survey_date = record.survey_id.survey_date
                 record.survey_state = record.survey_id.state
+                record.survey_project_id = record.survey_id.project_id
+                record.survey_village_id = record.survey_id.village_id
+                record.survey_department_id = record.survey_id.department_id
+                record.survey_crop_type = record.survey_id.crop_type
+                record.survey_irrigation_type = record.survey_id.irrigation_type
+                record.survey_tree_count = record.survey_id.tree_count
+                record.survey_tree_development_stage = record.survey_id.tree_development_stage
+                record.survey_has_house = record.survey_id.has_house
+                record.survey_house_type = record.survey_id.house_type
+                record.survey_house_area = record.survey_id.house_area
+                record.survey_has_well = record.survey_id.has_well
+                record.survey_well_type = record.survey_id.well_type
+                record.survey_has_tubewell = record.survey_id.has_tubewell
+                record.survey_has_pond = record.survey_id.has_pond
+                record.survey_landowner_ids = record.survey_id.landowner_ids
             else:
                 record.survey_khasra_number = False
                 record.survey_total_area = 0.0
                 record.survey_acquired_area = 0.0
                 record.survey_date = False
                 record.survey_state = False
+                record.survey_project_id = False
+                record.survey_village_id = False
+                record.survey_department_id = False
+                record.survey_crop_type = False
+                record.survey_irrigation_type = False
+                record.survey_tree_count = 0
+                record.survey_tree_development_stage = False
+                record.survey_has_house = False
+                record.survey_house_type = False
+                record.survey_house_area = 0.0
+                record.survey_has_well = False
+                record.survey_well_type = False
+                record.survey_has_tubewell = False
+                record.survey_has_pond = False
+                record.survey_landowner_ids = False
     
     objection_type = fields.Selection([
         ('area_increase', 'Area Increase / क्षेत्रफल वृद्धि'),
@@ -99,16 +172,17 @@ class Section15Objection(models.Model):
     
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
     objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=True, tracking=True)
-    objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज', tracking=True, 
-                                       help='Upload PDF document related to this objection')
-    objection_document_filename = fields.Char(string='Document Filename / दस्तावेज फ़ाइलनाम')
-    has_document = fields.Boolean(string='Has Document / दस्तावेज है', compute='_compute_has_document', store=False)
     
-    @api.depends('objection_document')
-    def _compute_has_document(self):
-        """Compute if objection document exists"""
+    # Attachments using Odoo's attachment system
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', string='Attachments / अनुलग्नक',
+                                     domain=[('res_model', '=', 'bhu.section15.objection')])
+    attachment_count = fields.Integer(string='Attachment Count', compute='_compute_attachment_count', store=False)
+    
+    @api.depends('attachment_ids')
+    def _compute_attachment_count(self):
+        """Compute attachment count"""
         for record in self:
-            record.has_document = bool(record.objection_document)
+            record.attachment_count = len(record.attachment_ids)
     status = fields.Selection([
         ('draft', 'Draft / प्रारूप'),
         ('received', 'Received / प्राप्त'),

@@ -11,11 +11,13 @@
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
+        'security/secrurity.xml',
+        'security/ir.model.access.csv',
         'data/land_type_data.xml',
-        'templates/website.xml',
         'data/chhattisgarh_districts_data.xml',
         'data/raigarh_sub_division_data.xml',
         'data/raipur_sub_division_data.xml',
+        'data/tehsil_data.xml',
         'data/raigarh_circle_data.xml',
         'data/raigarh_village_data.xml',
         'data/department_data.xml',
@@ -23,8 +25,6 @@
         'data/sample_project_data.xml',
         'data/sample_process_data.xml',
         'data/qweb_report_paper_format.xml',
-        'security/ir.model.access.csv',
-        'security/secrurity.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',
         'reports/section4_notification_report.xml',
@@ -59,6 +59,7 @@
         'views/qr_microsite_templates.xml',
         'data/mail_data.xml',
         'views/menuitem.xml',
+
     ],
     'assets': {
         'web.assets_backend': [

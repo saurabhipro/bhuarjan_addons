@@ -11,8 +11,10 @@
                              'web',
                              'mail',
                              'portal',
+                             'auth_oauth',
                             ],
   "data"                 :  [
+                               'views/website.xml',
                             #  'views/res_config_view.xml',
                             #  'views/web_client_template.xml',
                             #  'views/portal_templates.xml',

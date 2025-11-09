@@ -10,7 +10,9 @@
                 <field name="project_id"/>
                 <field name="village_id"/>
                 <field name="landowner_id"/>
+                <field name="objection_type"/>
                 <field name="objection_date"/>
+                <field name="has_document" widget="boolean_toggle" string="Document"/>
                 <field name="status" widget="badge"/>
             </list>
         </field>
@@ -33,21 +35,67 @@
                             <field name="name" required="1"/>
                             <field name="project_id" required="1"/>
                             <field name="village_id" required="1"/>
-                            <field name="landowner_id" required="1"/>
-                            <field name="survey_id"/>
+                            <field name="filtered_landowner_ids" invisible="1"/>
+                            <field name="landowner_id" required="1" 
+                                   domain="[('id', 'in', filtered_landowner_ids)]"/>
+                            <field name="filtered_survey_ids" invisible="1"/>
+                            <field name="survey_id" options="{'no_create': True, 'no_open': True}" 
+                                   context="{'show_khasra': True}"
+                                   domain="[('id', 'in', filtered_survey_ids)]"/>
                         </group>
                         <group>
                             <field name="objection_date" required="1"/>
                             <field name="resolved_date" readonly="1"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="objection_details" required="1" placeholder="Enter objection details..."/>
-                    </group>
-                    <group>
-                        <field name="resolution_details" placeholder="Enter resolution details..." 
-                               invisible="status != 'under_review' and status != 'resolved'"/>
-                    </group>
+                    <notebook>
+                        <page string="Survey Details / सर्वे विवरण" invisible="not survey_id">
+                            <group>
+                                <group>
+                                    <field name="survey_khasra_number"/>
+                                    <field name="survey_date"/>
+                                    <field name="survey_state" widget="badge"/>
+                                </group>
+                                <group>
+                                    <field name="survey_total_area"/>
+                                    <field name="survey_acquired_area"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Objection Details / आपत्ति विवरण">
+                            <group>
+                                <group>
+                                    <field name="objection_type" required="1"/>
+                                    <field name="new_area" invisible="objection_type != 'area_increase'"/>
+                                    <field name="new_rate" invisible="objection_type != 'rate_increase'"/>
+                                    <field name="other_specific_details" 
+                                           invisible="objection_type == 'area_increase' or objection_type == 'rate_increase'"
+                                           placeholder="Enter specific details (e.g., tree count, boundary description, etc.)..."/>
+                                </group>
+                                <group>
+                                    <field name="objection_date" required="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"/>
+                            </group>
+                            <group string="Attachments / संलग्नक">
+                                <field name="objection_document" filename="objection_document_filename" 
+                                       widget="binary" 
+                                       options="{'accept': '.pdf'}"
+                                       placeholder="Upload PDF document (e.g., objection letter, supporting documents)..."/>
+                                <field name="objection_document_filename" invisible="1"/>
+                                <div class="alert alert-info" role="alert" invisible="not objection_document">
+                                    <strong>Document uploaded:</strong> <field name="objection_document_filename" nolabel="1" readonly="1"/>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Resolution / समाधान" invisible="status != 'under_review' and status != 'resolved'">
+                            <group>
+                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter/>
             </form>
@@ -64,13 +112,17 @@
                 <field name="project_id"/>
                 <field name="village_id"/>
                 <field name="landowner_id"/>
+                <field name="objection_type"/>
                 <filter string="Draft" name="draft" domain="[('status', '=', 'draft')]"/>
                 <filter string="Under Review" name="under_review" domain="[('status', '=', 'under_review')]"/>
                 <filter string="Resolved" name="resolved" domain="[('status', '=', 'resolved')]"/>
+                <filter string="Area Increase" name="area_increase" domain="[('objection_type', '=', 'area_increase')]"/>
+                <filter string="Rate Increase" name="rate_increase" domain="[('objection_type', '=', 'rate_increase')]"/>
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
                     <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Objection Type" name="group_objection_type" context="{'group_by': 'objection_type'}"/>
                 </group>
             </search>
         </field>

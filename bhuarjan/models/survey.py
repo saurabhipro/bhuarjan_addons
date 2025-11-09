@@ -182,6 +182,18 @@ class Survey(models.Model):
     # Remarks
     remarks = fields.Text(string='Remarks / टिप्पणी', tracking=True)
     
+    def name_get(self):
+        """Override name_get to include khasra number when called from Section 15 objections"""
+        result = []
+        show_khasra = self.env.context.get('show_khasra', False)
+        
+        for record in self:
+            name = record.name or 'New'
+            if show_khasra and record.khasra_number:
+                name = f"{name} - Khasra: {record.khasra_number}"
+            result.append((record.id, name))
+        return result
+    
     @api.model_create_multi
     def create(self, vals_list):
         """Generate automatic survey numbers using bhuarjan settings master"""

@@ -173,16 +173,9 @@ class Section15Objection(models.Model):
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
     objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=True, tracking=True)
     
-    # Attachments using Odoo's attachment system
-    attachment_ids = fields.One2many('ir.attachment', 'res_id', string='Attachments / अनुलग्नक',
-                                     domain=[('res_model', '=', 'bhu.section15.objection')])
-    attachment_count = fields.Integer(string='Attachment Count', compute='_compute_attachment_count', store=False)
-    
-    @api.depends('attachment_ids')
-    def _compute_attachment_count(self):
-        """Compute attachment count"""
-        for record in self:
-            record.attachment_count = len(record.attachment_ids)
+    # Single attachment file
+    objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज़')
+    objection_document_filename = fields.Char(string='Document Filename / दस्तावेज़ फ़ाइल नाम')
     status = fields.Selection([
         ('draft', 'Draft / प्रारूप'),
         ('received', 'Received / प्राप्त'),
@@ -194,13 +187,14 @@ class Section15Objection(models.Model):
     resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
     
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate objection reference if not provided"""
-        if vals.get('name', 'New') == 'New':
-            sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
-            vals['name'] = f'OBJ-{sequence}'
-        return super(Section15Objection, self).create(vals)
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
+                vals['name'] = f'OBJ-{sequence}'
+        return super().create(vals_list)
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -239,8 +233,9 @@ class Section15Objection(models.Model):
     def action_resolve(self):
         """Mark objection as resolved"""
         for record in self:
-            if not record.resolution_details:
-                raise ValidationError(_('Please enter resolution details before resolving.'))
+            # Check if resolution_details is empty or only whitespace
+            if not record.resolution_details or not record.resolution_details.strip():
+                raise ValidationError(_('Please enter resolution details in the "Resolution / समाधान" tab before resolving.'))
             record.status = 'resolved'
             record.resolved_date = fields.Date.today()
             record.message_post(

@@ -32,7 +32,6 @@
                 <field name="landowner_id"/>
                 <field name="objection_type"/>
                 <field name="objection_date"/>
-                <field name="attachment_count" widget="statinfo" string="Attachments"/>
                 <field name="status" widget="badge"/>
             </list>
         </field>
@@ -147,32 +146,26 @@
                                 </div>
                                 <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"/>
                             </group>
-                        </page>
-                        <page string="Attachments / संलग्नक">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px;">
-                                <i class="fa fa-info-circle" style="margin-right: 8px;"/>
-                                <strong>Upload Documents:</strong> You can upload multiple PDF files, images, or other documents related to this objection. Click on a file to preview it.
-                            </div>
-                            <field name="attachment_ids" 
-                                   context="{'default_res_model': 'bhu.section15.objection', 'default_res_id': id, 'default_res_name': name}"
-                                   nolabel="1">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="mimetype" invisible="1"/>
-                                    <field name="file_size"/>
-                                    <field name="create_date"/>
-                                    <button name="action_preview_attachment" type="object" 
-                                            icon="fa-eye" 
-                                            string="Preview" 
-                                            class="oe_link"
-                                            invisible="mimetype != 'application/pdf'"
-                                            title="Preview PDF in popup"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Resolution / समाधान" invisible="status != 'under_review' and status != 'resolved'">
                             <group>
-                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1"/>
+                                <div style="margin-bottom: 10px;">
+                                    <i class="fa fa-file-pdf-o" style="color: #d9534f; margin-right: 8px; font-size: 16px;"/>
+                                    <span style="font-weight: bold; font-size: 14px;">Objection Document / आपत्ति दस्तावेज़</span>
+                                </div>
+                                <field name="objection_document_filename" invisible="1"/>
+                                <field name="objection_document" filename="objection_document_filename" 
+                                       widget="binary" 
+                                       options="{'filename': 'objection_document_filename'}"
+                                       placeholder="Upload a PDF, image, or other document related to this objection..."/>
+                            </group>
+                        </page>
+                        <page string="Resolution / समाधान">
+                            <group>
+                                <div style="margin-bottom: 10px;">
+                                    <i class="fa fa-check-circle" style="color: #5cb85c; margin-right: 8px; font-size: 16px;"/>
+                                    <span style="font-weight: bold; font-size: 14px;">Resolution Details / समाधान विवरण</span>
+                                    <span style="color: #d9534f; margin-left: 10px;">*</span>
+                                </div>
+                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"/>
                             </group>
                         </page>
                     </notebook>

@@ -30,9 +30,16 @@
                 <field name="project_id"/>
                 <field name="village_id"/>
                 <field name="landowner_id"/>
+                <field name="survey_id"/>
                 <field name="objection_type"/>
                 <field name="objection_date"/>
-                <field name="status" widget="badge"/>
+                <field name="age_days"/>
+                <field name="status" widget="badge" 
+                       decoration-danger="status == 'rejected'"
+                       decoration-warning="status == 'under_review'"
+                       decoration-info="status == 'received'"
+                       decoration-success="status == 'resolved'"
+                       decoration-muted="status == 'draft'"/>
             </list>
         </field>
     </record>

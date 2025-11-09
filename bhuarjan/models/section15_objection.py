@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from datetime import date
 
 
 class Section15Objection(models.Model):
@@ -186,6 +187,20 @@ class Section15Objection(models.Model):
     
     resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
+    
+    # Age in days since objection date
+    age_days = fields.Integer(string='Age (Days) / आयु (दिन)', compute='_compute_age_days', store=False)
+    
+    @api.depends('objection_date')
+    def _compute_age_days(self):
+        """Compute age of objection in days"""
+        today = date.today()
+        for record in self:
+            if record.objection_date:
+                delta = today - record.objection_date
+                record.age_days = delta.days
+            else:
+                record.age_days = 0
     
     @api.model_create_multi
     def create(self, vals_list):

@@ -169,6 +169,27 @@
                                 </div>
                             </div>
                         </button>
+                        <button name="action_open_section19" type="object" class="process-card process-card-green">
+                            <div class="process-header">
+                                <div class="kpi-label">Section 19 Notifications</div>
+                                <div class="kpi-icon"><i class="fa fa-bell"/></div>
+                            </div>
+                            <div class="kpi-value process-value"><field name="total_section19_notifications" nolabel="1" readonly="1"/></div>
+                            <div class="process-sub-stats">
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="draft_section19" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Draft</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="generated_section19" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Generated</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="signed_section19" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Signed</span>
+                                </div>
+                            </div>
+                        </button>
                         <button name="action_open_expert_committee" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Expert Committee Reports</div>
@@ -189,6 +210,50 @@
                                 <div class="kpi-icon"><i class="fa fa-folder"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_documents" nolabel="1" readonly="1"/></div>
+                        </button>
+                    </div>
+                    
+                    <div class="dashboard-section-title">
+                        <i class="fa fa-money"/> PAYMENT &amp; RECONCILIATION STATISTICS
+                    </div>
+                    <div class="dashboard-grid">
+                        <button name="action_open_payment_files" type="object" class="process-card process-card-green">
+                            <div class="process-header">
+                                <div class="kpi-label">Payment Files</div>
+                                <div class="kpi-icon"><i class="fa fa-file-excel-o"/></div>
+                            </div>
+                            <div class="kpi-value process-value"><field name="total_payment_files" nolabel="1" readonly="1"/></div>
+                            <div class="process-sub-stats">
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="draft_payment_files" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Draft</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="generated_payment_files" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Generated</span>
+                                </div>
+                            </div>
+                        </button>
+                        <button name="action_open_payment_reconciliations" type="object" class="process-card process-card-brown">
+                            <div class="process-header">
+                                <div class="kpi-label">Payment Reconciliations</div>
+                                <div class="kpi-icon"><i class="fa fa-check-square-o"/></div>
+                            </div>
+                            <div class="kpi-value process-value"><field name="total_payment_reconciliations" nolabel="1" readonly="1"/></div>
+                            <div class="process-sub-stats">
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="draft_reconciliations" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Draft</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="processed_reconciliations" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Processed</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="completed_reconciliations" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Completed</span>
+                                </div>
+                            </div>
                         </button>
                     </div>
                 </sheet>

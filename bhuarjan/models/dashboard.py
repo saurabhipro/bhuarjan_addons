@@ -39,6 +39,23 @@ class BhuarjanDashboard(models.TransientModel):
     total_expert_committee_reports = fields.Integer(string='Expert Committee Reports', readonly=True, default=0)
     total_section15_objections = fields.Integer(string='Section 15 Objections', readonly=True, default=0)
     
+    # Section 19 Notifications
+    total_section19_notifications = fields.Integer(string='Section 19 Notifications', readonly=True, default=0)
+    draft_section19 = fields.Integer(string='Draft Section 19', readonly=True, default=0)
+    generated_section19 = fields.Integer(string='Generated Section 19', readonly=True, default=0)
+    signed_section19 = fields.Integer(string='Signed Section 19', readonly=True, default=0)
+    
+    # Payment File Counts
+    total_payment_files = fields.Integer(string='Payment Files', readonly=True, default=0)
+    draft_payment_files = fields.Integer(string='Draft Payment Files', readonly=True, default=0)
+    generated_payment_files = fields.Integer(string='Generated Payment Files', readonly=True, default=0)
+    
+    # Payment Reconciliation Counts
+    total_payment_reconciliations = fields.Integer(string='Payment Reconciliations', readonly=True, default=0)
+    draft_reconciliations = fields.Integer(string='Draft Reconciliations', readonly=True, default=0)
+    processed_reconciliations = fields.Integer(string='Processed Reconciliations', readonly=True, default=0)
+    completed_reconciliations = fields.Integer(string='Completed Reconciliations', readonly=True, default=0)
+    
     # Document Vault Counts
     total_documents = fields.Integer(string='Total Documents', readonly=True, default=0)
 
@@ -79,6 +96,23 @@ class BhuarjanDashboard(models.TransientModel):
             
             # Section 15 Objections
             record.total_section15_objections = self.env['bhu.section15.objection'].search_count([])
+            
+            # Section 19 Notifications
+            record.total_section19_notifications = self.env['bhu.section19.notification'].search_count([])
+            record.draft_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')])
+            record.generated_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'generated')])
+            record.signed_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'signed')])
+            
+            # Payment Files
+            record.total_payment_files = self.env['bhu.payment.file'].search_count([])
+            record.draft_payment_files = self.env['bhu.payment.file'].search_count([('state', '=', 'draft')])
+            record.generated_payment_files = self.env['bhu.payment.file'].search_count([('state', '=', 'generated')])
+            
+            # Payment Reconciliations
+            record.total_payment_reconciliations = self.env['bhu.payment.reconciliation.bank'].search_count([])
+            record.draft_reconciliations = self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'draft')])
+            record.processed_reconciliations = self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'processed')])
+            record.completed_reconciliations = self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'completed')])
             
             # Document Vault
             record.total_documents = self.env['bhu.document.vault'].search_count([])
@@ -152,6 +186,23 @@ class BhuarjanDashboard(models.TransientModel):
             # Section 15 Objections
             'total_section15_objections': self.env['bhu.section15.objection'].search_count([]),
             
+            # Section 19 Notifications
+            'total_section19_notifications': self.env['bhu.section19.notification'].search_count([]),
+            'draft_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')]),
+            'generated_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'generated')]),
+            'signed_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'signed')]),
+            
+            # Payment Files
+            'total_payment_files': self.env['bhu.payment.file'].search_count([]),
+            'draft_payment_files': self.env['bhu.payment.file'].search_count([('state', '=', 'draft')]),
+            'generated_payment_files': self.env['bhu.payment.file'].search_count([('state', '=', 'generated')]),
+            
+            # Payment Reconciliations
+            'total_payment_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([]),
+            'draft_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'draft')]),
+            'processed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'processed')]),
+            'completed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'completed')]),
+            
             # Document Vault
             'total_documents': self.env['bhu.document.vault'].search_count([]),
         }
@@ -191,7 +242,8 @@ class BhuarjanDashboard(models.TransientModel):
             needs_refresh = (
                 dashboard.total_districts == 0 and 
                 dashboard.total_surveys == 0 and 
-                dashboard.total_section4_notifications == 0
+                dashboard.total_section4_notifications == 0 and
+                dashboard.total_payment_files == 0
             )
             if needs_refresh:
                 counts = self._get_all_counts()
@@ -267,4 +319,53 @@ class BhuarjanDashboard(models.TransientModel):
     
     def action_open_documents(self):
         return self.env.ref('bhuarjan.action_document_vault').read()[0]
+    
+    def action_open_section19(self):
+        return self.env.ref('bhuarjan.action_section19_notification').read()[0]
+    
+    def action_open_section19_draft(self):
+        action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
+        action['domain'] = [('state', '=', 'draft')]
+        return action
+    
+    def action_open_section19_generated(self):
+        action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
+        action['domain'] = [('state', '=', 'generated')]
+        return action
+    
+    def action_open_section19_signed(self):
+        action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
+        action['domain'] = [('state', '=', 'signed')]
+        return action
+    
+    def action_open_payment_files(self):
+        return self.env.ref('bhuarjan.action_payment_file').read()[0]
+    
+    def action_open_payment_files_draft(self):
+        action = self.env.ref('bhuarjan.action_payment_file').read()[0]
+        action['domain'] = [('state', '=', 'draft')]
+        return action
+    
+    def action_open_payment_files_generated(self):
+        action = self.env.ref('bhuarjan.action_payment_file').read()[0]
+        action['domain'] = [('state', '=', 'generated')]
+        return action
+    
+    def action_open_payment_reconciliations(self):
+        return self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
+    
+    def action_open_reconciliations_draft(self):
+        action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
+        action['domain'] = [('state', '=', 'draft')]
+        return action
+    
+    def action_open_reconciliations_processed(self):
+        action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
+        action['domain'] = [('state', '=', 'processed')]
+        return action
+    
+    def action_open_reconciliations_completed(self):
+        action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
+        action['domain'] = [('state', '=', 'completed')]
+        return action
 

@@ -1,8 +1,8 @@
 /* Dashboard KPI Cards */
 .dashboard-kpi-card {
-    border-radius: 8px;
-    padding: 8px 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 6px 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     transition: all 0.3s ease;
     border: none;
     position: relative;
@@ -13,7 +13,7 @@
     color: #2c3e50;
     width: 100%;
     text-align: left;
-    min-height: 60px;
+    min-height: 55px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -40,9 +40,9 @@
 
 /* Process Cards */
 .process-card {
-    border-radius: 8px;
-    padding: 8px 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 6px 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     border: none;
     position: relative;
     cursor: pointer;
@@ -51,7 +51,7 @@
     width: 100%;
     text-align: left;
     transition: all 0.3s ease;
-    min-height: 60px;
+    min-height: 55px;
     overflow: hidden;
     background-size: cover;
     background-position: center;
@@ -111,12 +111,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 /* Icons */
 .kpi-icon {
-    font-size: 18px;
+    font-size: 16px;
     opacity: 1;
     flex-shrink: 0;
     color: #2c3e50;
@@ -124,19 +124,19 @@
 
 /* Labels */
 .kpi-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     flex: 1;
-    margin-left: 6px;
+    margin-left: 4px;
     opacity: 1;
     color: #2c3e50;
 }
 
 /* Values */
 .kpi-value {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
     line-height: 1.1;
     margin: 0;
@@ -148,11 +148,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .process-value {
-    font-size: 18px !important;
+    font-size: 16px !important;
     font-weight: 900;
     color: #2c3e50;
 }
@@ -225,8 +225,8 @@
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-    margin-bottom: 30px;
+    gap: 8px;
+    margin-bottom: 25px;
 }
 
 @media (max-width: 1600px) {

@@ -16,12 +16,13 @@ class SiaTeam(models.Model):
     description = fields.Text(string='Description / विवरण', tracking=True)
     active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
     
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate team name if not provided"""
-        if vals.get('name', 'New') == 'New':
-            project = self.env['bhu.project'].browse(vals.get('project_id'))
-            sequence = self.env['ir.sequence'].next_by_code('bhu.sia.team') or 'New'
-            vals['name'] = f'SIA Team - {project.name} - {sequence}'
-        return super(SiaTeam, self).create(vals)
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                project = self.env['bhu.project'].browse(vals.get('project_id'))
+                sequence = self.env['ir.sequence'].next_by_code('bhu.sia.team') or 'New'
+                vals['name'] = f'SIA Team - {project.name} - {sequence}'
+        return super(SiaTeam, self).create(vals_list)
 

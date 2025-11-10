@@ -31,14 +31,14 @@
                             </div>
                             <div class="kpi-value"><field name="total_districts" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-brown">
+                        <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Sub Divisions</div>
                                 <div class="kpi-icon"><i class="fa fa-sitemap"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_sub_divisions" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_tehsils" type="object" class="dashboard-kpi-card kpi-card-green">
+                        <button name="action_open_tehsils" type="object" class="dashboard-kpi-card kpi-card-purple">
                             <div class="kpi-header">
                                 <div class="kpi-label">Tehsils</div>
                                 <div class="kpi-icon"><i class="fa fa-building"/></div>
@@ -52,14 +52,14 @@
                             </div>
                             <div class="kpi-value"><field name="total_circles" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_villages" type="object" class="dashboard-kpi-card kpi-card-green">
+                        <button name="action_open_villages" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Villages</div>
                                 <div class="kpi-icon"><i class="fa fa-home"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_villages" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_projects" type="object" class="dashboard-kpi-card kpi-card-brown">
+                        <button name="action_open_projects" type="object" class="dashboard-kpi-card kpi-card-yellow">
                             <div class="kpi-header">
                                 <div class="kpi-label">Projects</div>
                                 <div class="kpi-icon"><i class="fa fa-folder-open"/></div>
@@ -73,7 +73,7 @@
                             </div>
                             <div class="kpi-value"><field name="total_departments" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_landowners" type="object" class="dashboard-kpi-card kpi-card-brown">
+                        <button name="action_open_landowners" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Landowners</div>
                                 <div class="kpi-icon"><i class="fa fa-users"/></div>
@@ -86,35 +86,35 @@
                         <i class="fa fa-clipboard-list"/> SURVEY STATISTICS
                     </div>
                     <div class="dashboard-grid">
-                        <button name="action_open_surveys" type="object" class="dashboard-kpi-card kpi-card-green">
+                        <button name="action_open_surveys" type="object" class="dashboard-kpi-card kpi-card-purple">
                             <div class="kpi-header">
                                 <div class="kpi-label">Total Surveys</div>
                                 <div class="kpi-icon"><i class="fa fa-list-alt"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_surveys" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_surveys_draft" type="object" class="dashboard-kpi-card kpi-card-brown">
+                        <button name="action_open_surveys_draft" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Draft</div>
                                 <div class="kpi-icon"><i class="fa fa-file-o"/></div>
                             </div>
                             <div class="kpi-value"><field name="draft_surveys" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_surveys_submitted" type="object" class="dashboard-kpi-card kpi-card-green">
+                        <button name="action_open_surveys_submitted" type="object" class="dashboard-kpi-card kpi-card-yellow">
                             <div class="kpi-header">
                                 <div class="kpi-label">Submitted</div>
                                 <div class="kpi-icon"><i class="fa fa-paper-plane"/></div>
                             </div>
                             <div class="kpi-value"><field name="submitted_surveys" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_surveys_approved" type="object" class="dashboard-kpi-card kpi-card-brown">
+                        <button name="action_open_surveys_approved" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Approved</div>
                                 <div class="kpi-icon"><i class="fa fa-check-circle"/></div>
                             </div>
                             <div class="kpi-value"><field name="approved_surveys" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_surveys_locked" type="object" class="dashboard-kpi-card kpi-card-green">
+                        <button name="action_open_surveys_locked" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Locked</div>
                                 <div class="kpi-icon"><i class="fa fa-lock"/></div>

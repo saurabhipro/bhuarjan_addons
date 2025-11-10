@@ -1,7 +1,7 @@
 /* Dashboard KPI Cards */
 .dashboard-kpi-card {
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 8px;
+    padding: 8px 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transition: all 0.3s ease;
     border: none;
@@ -13,7 +13,7 @@
     color: #2c3e50;
     width: 100%;
     text-align: left;
-    min-height: 70px;
+    min-height: 60px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -40,8 +40,8 @@
 
 /* Process Cards */
 .process-card {
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 8px;
+    padding: 8px 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border: none;
     position: relative;
@@ -51,7 +51,7 @@
     width: 100%;
     text-align: left;
     transition: all 0.3s ease;
-    min-height: 70px;
+    min-height: 60px;
     overflow: hidden;
     background-size: cover;
     background-position: center;
@@ -111,12 +111,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 /* Icons */
 .kpi-icon {
-    font-size: 28px;
+    font-size: 18px;
     opacity: 1;
     flex-shrink: 0;
     color: #2c3e50;
@@ -124,19 +124,19 @@
 
 /* Labels */
 .kpi-label {
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.3px;
     flex: 1;
-    margin-left: 12px;
+    margin-left: 6px;
     opacity: 1;
     color: #2c3e50;
 }
 
 /* Values */
 .kpi-value {
-    font-size: 32px;
+    font-size: 20px;
     font-weight: 900;
     line-height: 1.1;
     margin: 0;
@@ -148,11 +148,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
 }
 
 .process-value {
-    font-size: 28px !important;
+    font-size: 18px !important;
     font-weight: 900;
     color: #2c3e50;
 }
@@ -224,9 +224,33 @@
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
     margin-bottom: 30px;
+}
+
+@media (max-width: 1600px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Ensure all text in cards is black */
@@ -236,6 +260,18 @@
 .kpi-card-brown .kpi-label,
 .kpi-card-brown .kpi-icon,
 .kpi-card-brown .kpi-value,
+.kpi-card-blue .kpi-label,
+.kpi-card-blue .kpi-icon,
+.kpi-card-blue .kpi-value,
+.kpi-card-purple .kpi-label,
+.kpi-card-purple .kpi-icon,
+.kpi-card-purple .kpi-value,
+.kpi-card-pink .kpi-label,
+.kpi-card-pink .kpi-icon,
+.kpi-card-pink .kpi-value,
+.kpi-card-yellow .kpi-label,
+.kpi-card-yellow .kpi-icon,
+.kpi-card-yellow .kpi-value,
 .process-card-green .kpi-label,
 .process-card-green .kpi-icon,
 .process-card-green .kpi-value,

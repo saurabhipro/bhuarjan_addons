@@ -126,7 +126,20 @@ class Section4Notification(models.Model):
         """Create records with batch support"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section4_notification', project_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
             if not vals.get('notification_uuid'):
                 vals['notification_uuid'] = str(uuid.uuid4())
             # Set default project_id if not provided - always set it to avoid NOT NULL constraint violation
@@ -802,6 +815,22 @@ class Section11PreliminaryReport(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
+            if vals.get('name', 'New') == 'New' or not vals.get('name'):
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                village_id = vals.get('village_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section11_notification', project_id, village_id=village_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
             # Generate UUID if not provided
             if not vals.get('report_uuid'):
                 vals['report_uuid'] = str(uuid.uuid4())
@@ -1109,7 +1138,20 @@ class Section19Notification(models.Model):
         """Create records with batch support"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section19.notification') or 'New'
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section19_notification', project_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section19.notification') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section19.notification') or 'New'
             # Generate UUID if not provided
             if not vals.get('notification_uuid'):
                 vals['notification_uuid'] = str(uuid.uuid4())
@@ -1580,7 +1622,21 @@ class DraftAward(models.Model):
         """Create records with batch support"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.draft.award') or 'New'
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                village_id = vals.get('village_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'draft_award', project_id, village_id=village_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.draft.award') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.draft.award') or 'New'
             # Generate UUID if not provided
             if not vals.get('award_uuid'):
                 vals['award_uuid'] = str(uuid.uuid4())
@@ -1699,6 +1755,36 @@ class DraftAward(models.Model):
         self.state = 'signed'
         if not self.signed_date:
             self.signed_date = fields.Date.today()
+    
+    def action_open_generate_award_notification(self):
+        """Open Generate Award Notification wizard"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Generate Award Notification / पुरस्कार अधिसूचना जेनरेट करें',
+            'res_model': 'bhu.award.notification.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_project_id': self.project_id.id,
+                'default_village_ids': [(6, 0, [self.village_id.id])],
+            }
+        }
+    
+    def action_open_download_award_notification(self):
+        """Open Download Award Notification wizard"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Download Award Notification / पुरस्कार अधिसूचना डाउनलोड करें',
+            'res_model': 'bhu.download.award.notification.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_project_id': self.project_id.id,
+                'default_village_id': self.village_id.id,
+            }
+        }
 
 
 class DraftAwardLandParcel(models.Model):

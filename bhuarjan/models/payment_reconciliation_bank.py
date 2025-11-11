@@ -61,7 +61,25 @@ class PaymentReconciliationBank(models.Model):
         """Generate reconciliation number if not provided"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.reconciliation.bank') or 'New'
+                # Try to use sequence settings from settings master
+                # Get project_id from payment_file_id if available
+                project_id = vals.get('project_id')
+                if not project_id and vals.get('payment_file_id'):
+                    payment_file = self.env['bhu.payment.file'].browse(vals['payment_file_id'])
+                    if payment_file.exists():
+                        project_id = payment_file.project_id.id
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'payment_reconciliation', project_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.reconciliation.bank') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.reconciliation.bank') or 'New'
         return super().create(vals_list)
     
     def action_process_bank_file(self):

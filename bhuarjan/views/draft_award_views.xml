@@ -34,6 +34,8 @@
                 <header>
                     <button name="action_generate_pdf" string="Generate Draft Award" type="object" class="btn-primary" icon="fa-file-pdf"
                             invisible="state == 'signed'"/>
+                    <button name="action_open_generate_award_notification" string="Generate Award Notification" type="object" class="btn-secondary" icon="fa-bell"/>
+                    <button name="action_open_download_award_notification" string="Download Award Notification" type="object" class="btn-secondary" icon="fa-download"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
                 <sheet>

@@ -286,7 +286,14 @@ class BhuarjanDashboard(models.TransientModel):
         return self.env.ref('bhuarjan.action_bhu_department').read()[0]
     
     def action_open_landowners(self):
-        return self.env.ref('bhuarjan.action_bhu_landowner').read()[0]
+        action = self.env.ref('bhuarjan.action_bhu_landowner').read()[0]
+        # Clear any default filters to prevent saved filters from auto-applying
+        if 'context' not in action:
+            action['context'] = {}
+        action['context'].update({
+            'search_default_district_id': False,
+        })
+        return action
     
     def action_open_surveys(self):
         return self.env.ref('bhuarjan.action_bhu_survey').read()[0]

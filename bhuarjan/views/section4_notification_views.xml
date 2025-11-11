@@ -5,7 +5,7 @@
         <field name="name">bhu.section4.notification.list</field>
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
-            <list string="Section 4 Notifications / धारा 4 अधिसूचनाएं" delete="1">
+            <list string="Section 4 Notifications" delete="1">
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="village_ids" widget="many2many_tags"/>
@@ -24,7 +24,7 @@
         <field name="arch" type="xml">
             <form string="Section 4 Notification">
                 <header>
-                    <button name="action_generate_pdf" string="Generate PDF" type="object" class="btn-primary" icon="fa-file-pdf"
+                    <button name="action_generate_pdf" string="Generate Notification 4" type="object" class="btn-primary" icon="fa-file-pdf"
                             invisible="state == 'signed' or (state == 'draft' and not all_surveys_approved)"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
@@ -43,7 +43,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Basic Information">
+                        <page string="Basic Information" icon="fa-info-circle">
                             <group string="Public Purpose">
                                 <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
                                        widget="html" nolabel="1"/>
@@ -54,7 +54,7 @@
                                 <field name="public_hearing_place"/>
                             </group>
                         </page>
-                        <page string="Section 4 Questions">
+                        <page string="Section 4 Questions" icon="fa-question-circle">
                             <group string="(1) Brief Description of Public Purpose">
                                 <field name="q1_brief_description" widget="html" nolabel="1"/>
                             </group>
@@ -89,7 +89,7 @@
                                 <field name="q11_other_components" widget="html" nolabel="1"/>
                             </group>
                         </page>
-                        <page string="Signed Document">
+                        <page string="Signed Document" icon="fa-file-signature">
                             <group string="Signed Notification">
                                 <field name="has_signed_document" readonly="1"/>
                                 <field name="signed_document_file" filename="signed_document_filename"/>
@@ -102,24 +102,19 @@
                                 <field name="collector_name"/>
                             </group>
                         </page>
-                        <page string="Surveys" invisible="not project_id or not village_ids">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 20px; padding: 15px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                                <strong>Survey Status:</strong><br/>
-                                <span>Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong></span> | 
-                                <span>Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong></span>
-                                <div style="color: green; font-weight: bold; margin-top: 10px;" invisible="not all_surveys_approved">
-                                    ✓ All surveys are approved or locked - You can generate the notification
-                                </div>
-                                <div style="color: red; font-weight: bold; margin-top: 10px;" invisible="all_surveys_approved or survey_count == 0">
-                                    ⚠ Some surveys are not approved yet - Please approve all surveys first
-                                </div>
-                                <div style="color: orange; font-weight: bold; margin-top: 10px;" invisible="survey_count != 0">
-                                    ⚠ No surveys found for selected villages
-                                </div>
+                        <page string="Surveys" icon="fa-clipboard-list" invisible="not project_id or not village_ids">
+                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                                <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
+                                <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked - You can generate the notification</span>
+                                <span style="color: red; font-weight: bold; margin-left: 15px;" invisible="all_surveys_approved or survey_count == 0">⚠ Some surveys are not approved yet - Please approve all surveys first</span>
+                                <span style="color: orange; font-weight: bold; margin-left: 15px;" invisible="survey_count != 0">⚠ No surveys found for selected villages</span>
                             </div>
                             <field name="survey_ids" readonly="1" nolabel="1">
                                 <list>
                                     <field name="name"/>
+                                    <field name="user_id" string="Surveyor"/>
+                                    <field name="project_id"/>
+                                    <field name="district_name" string="District"/>
                                     <field name="village_id"/>
                                     <field name="khasra_number"/>
                                     <field name="total_area"/>
@@ -152,20 +147,20 @@
                 <field name="village_ids"/>
                 <field name="public_hearing_date"/>
                 <field name="public_hearing_place"/>
-                <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Generated / जेनरेट किया गया" name="generated" domain="[('state', '=', 'generated')]"/>
-                <filter string="Signed / हस्ताक्षरित" name="signed" domain="[('state', '=', 'signed')]"/>
-                <filter string="Has Signed Document / हस्ताक्षरित दस्तावेज़ है" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Has Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
                 <separator/>
-                <filter string="My Notifications / मेरी अधिसूचनाएं" name="my_notifications" domain="[('create_uid', '=', uid)]"/>
-                <filter string="All Notifications / सभी अधिसूचनाएं" name="all" domain="[]"/>
+                <filter string="My Notifications" name="my_notifications" domain="[('create_uid', '=', uid)]"/>
+                <filter string="All Notifications" name="all" domain="[]"/>
             </search>
         </field>
     </record>
 
     <!-- Section 4 Notification Action -->
     <record id="action_section4_notification" model="ir.actions.act_window">
-        <field name="name">Section 4 Notifications / धारा 4 अधिसूचनाएं</field>
+        <field name="name">Section 4 Notifications</field>
         <field name="res_model">bhu.section4.notification</field>
         <field name="view_mode">list,form</field>
         <field name="context">{}</field>
@@ -184,7 +179,7 @@
     
     <!-- Action to create notification via wizard -->
     <record id="action_create_section4_notification_wizard" model="ir.actions.act_window">
-        <field name="name">Generate Section 4 Notification / धारा 4 अधिसूचना जेनरेट करें</field>
+        <field name="name">Generate Section 4 Notification</field>
         <field name="res_model">bhu.section4.notification.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>

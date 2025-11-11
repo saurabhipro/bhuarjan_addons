@@ -207,8 +207,23 @@ class Section15Objection(models.Model):
         """Generate objection reference if not provided"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
-                sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
-                vals['name'] = f'OBJ-{sequence}'
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                village_id = vals.get('village_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section15_objection', project_id, village_id=village_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
+                        vals['name'] = f'OBJ-{sequence}'
+                else:
+                    # No project_id, use fallback
+                    sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
+                    vals['name'] = f'OBJ-{sequence}'
         return super().create(vals_list)
 
     @api.onchange('project_id')

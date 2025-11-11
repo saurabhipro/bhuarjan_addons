@@ -68,7 +68,21 @@ class PaymentFile(models.Model):
         """Generate payment file number if not provided"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                village_id = vals.get('village_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'payment_file', project_id, village_id=village_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
         records = super().create(vals_list)
         # Auto-populate payment lines from award compensation lines
         for record in records:

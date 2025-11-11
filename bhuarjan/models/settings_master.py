@@ -11,8 +11,14 @@ class BhuarjanSequenceSettings(models.Model):
     process_name = fields.Selection([
         ('survey', 'Survey'),
         ('form10', 'Form 10'),
-        ('post_award_payment', 'Post Award Payment'),
+        ('section4_notification', 'Section 4 Notification'),
+        ('section11_notification', 'Section 11 Notification'),
+        ('section19_notification', 'Section 19 Notification'),
+        ('section15_objection', 'Section 15 Objection'),
+        ('draft_award', 'Draft Award'),
+        ('payment_file', 'Payment File'),
         ('payment_reconciliation', 'Payment Reconciliation'),
+        ('post_award_payment', 'Post Award Payment'),
     ], string='Process Name', required=True)
     
     prefix = fields.Char(string='Prefix', required=True, help='Prefix for sequence number (e.g., SC_{%PROJ_CODE%}_ or SC_{bhu.project.code}_{bhu.village.code}_)')
@@ -150,8 +156,14 @@ class BhuarjanWorkflowSettings(models.Model):
     process_name = fields.Selection([
         ('survey', 'Survey'),
         ('form10', 'Form 10'),
-        ('post_award_payment', 'Post Award Payment'),
+        ('section4_notification', 'Section 4 Notification'),
+        ('section11_notification', 'Section 11 Notification'),
+        ('section19_notification', 'Section 19 Notification'),
+        ('section15_objection', 'Section 15 Objection'),
+        ('draft_award', 'Draft Award'),
+        ('payment_file', 'Payment File'),
         ('payment_reconciliation', 'Payment Reconciliation'),
+        ('post_award_payment', 'Post Award Payment'),
     ], string='Process Name', required=True)
     
     project_id = fields.Many2one('bhu.project', string='Project', compute='_compute_project_id', store=True)

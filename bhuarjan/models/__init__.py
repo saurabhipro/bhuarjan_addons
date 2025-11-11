@@ -19,8 +19,11 @@ from . import survey_bulk_approval_wizard
 from . import document_vault
 from . import sia_team
 from . import section15_objection
-from . import process_stubs
-# Section 19 is in process_stubs.py
+from . import section4_notification
+from . import expert_committee_report
+from . import section11_preliminary_report
+from . import section19_notification
+from . import draft_award
 from . import ir_http
 from . import ir_attachment
 from . import dashboard

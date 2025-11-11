@@ -1,0 +1,446 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
+import uuid
+
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
+import uuid
+
+
+# Stub models for Process menu items - to be implemented later
+# These are minimal models to allow the module to load
+
+class Section4Notification(models.Model):
+    _name = 'bhu.section4.notification'
+    _description = 'Section 4 Notification'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'create_date desc'
+
+    name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, 
+                                  default=lambda self: self._default_project_id())
+    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
+    
+    # Computed field to show surveys for selected villages
+    survey_ids = fields.Many2many('bhu.survey', compute='_compute_survey_ids', string='Surveys', readonly=True)
+    survey_count = fields.Integer(string='Survey Count', compute='_compute_survey_ids', readonly=True)
+    approved_survey_count = fields.Integer(string='Approved Survey Count', compute='_compute_survey_ids', readonly=True)
+    all_surveys_approved = fields.Boolean(string='All Surveys Approved', compute='_compute_survey_ids', readonly=True)
+    
+    # Check if Section 11 exists for any of the villages (makes form read-only)
+    has_section11 = fields.Boolean(string='Has Section 11', compute='_compute_has_section11', readonly=True)
+    
+    public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', 
+                                 help='Description of public purpose for land acquisition', tracking=True)
+    
+    # Public Hearing Details
+    public_hearing_date = fields.Date(string='Public Hearing Date / जन सुनवाई दिनांक', tracking=True)
+    public_hearing_time = fields.Char(string='Public Hearing Time / जन सुनवाई समय', 
+                                      help='e.g., 10:00 AM', tracking=True)
+    public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
+    
+    # 11 Questions from the template
+    q1_brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose', tracking=True)
+    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', tracking=True)
+    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', tracking=True)
+    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', tracking=True)
+    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True)
+    q6_minimal_acquisition = fields.Char(string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', tracking=True)
+    q7_alternatives_considered = fields.Text(string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', tracking=True)
+    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True)
+    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True)
+    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', tracking=True)
+    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', tracking=True)
+    
+    # Signed document fields
+    signed_document_file = fields.Binary(string='Signed Notification / हस्ताक्षरित अधिसूचना')
+    signed_document_filename = fields.Char(string='Signed File Name / हस्ताक्षरित फ़ाइल नाम')
+    signed_date = fields.Date(string='Signed Date / हस्ताक्षर दिनांक', tracking=True)
+    has_signed_document = fields.Boolean(string='Has Signed Document / हस्ताक्षरित दस्तावेज़ है', compute='_compute_has_signed_document', store=True)
+    
+    # Collector signature
+    collector_signature = fields.Binary(string='Collector Signature / कलेक्टर हस्ताक्षर')
+    collector_signature_filename = fields.Char(string='Signature File Name')
+    collector_name = fields.Char(string='Collector Name / कलेक्टर का नाम', tracking=True)
+    
+    # UUID for QR code
+    notification_uuid = fields.Char(string='Notification UUID', copy=False, readonly=True, index=True)
+    
+    state = fields.Selection([
+        ('draft', 'Draft / प्रारूप'),
+        ('generated', 'Generated / जेनरेट किया गया'),
+        ('signed', 'Signed / हस्ताक्षरित'),
+    ], string='Status / स्थिति', default='draft', tracking=True)
+    
+    @api.depends('signed_document_file')
+    def _compute_has_signed_document(self):
+        for record in self:
+            record.has_signed_document = bool(record.signed_document_file)
+    
+    @api.depends('project_id', 'village_ids')
+    def _compute_survey_ids(self):
+        """Compute surveys for selected villages and project"""
+        for record in self:
+            if record.project_id and record.village_ids:
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', 'in', record.village_ids.ids)
+                ])
+                record.survey_ids = [(6, 0, surveys.ids)]
+                record.survey_count = len(surveys)
+                # Treat both 'approved' and 'locked' as approved
+                approved_or_locked_surveys = surveys.filtered(lambda s: s.state in ('approved', 'locked'))
+                record.approved_survey_count = len(approved_or_locked_surveys)
+                # Check if all surveys are approved or locked (and there are surveys)
+                record.all_surveys_approved = len(surveys) > 0 and len(approved_or_locked_surveys) == len(surveys)
+            else:
+                record.survey_ids = [(5, 0, 0)]
+                record.survey_count = 0
+                record.approved_survey_count = 0
+                record.all_surveys_approved = False
+    
+    @api.depends('project_id', 'village_ids')
+    def _compute_has_section11(self):
+        """Check if Section 11 Preliminary Report exists for any of the villages"""
+        for record in self:
+            if record.project_id and record.village_ids:
+                section11_reports = self.env['bhu.section11.preliminary.report'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', 'in', record.village_ids.ids)
+                ], limit=1)
+                record.has_section11 = bool(section11_reports)
+            else:
+                record.has_section11 = False
+    
+    @api.model
+    def _default_project_id(self):
+        """Default project_id to PROJ01 if it exists, otherwise use first available project"""
+        project = self.env['bhu.project'].search([('code', '=', 'PROJ01')], limit=1)
+        if project:
+            return project.id
+        # Fallback to first available project if PROJ01 doesn't exist
+        fallback_project = self.env['bhu.project'].search([], limit=1)
+        return fallback_project.id if fallback_project else False
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Create records with batch support"""
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New' or not vals.get('name'):
+                # Try to use sequence settings from settings master
+                project_id = vals.get('project_id')
+                if project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section4_notification', project_id
+                    )
+                    if sequence_number:
+                        vals['name'] = sequence_number
+                    else:
+                        # Fallback to ir.sequence
+                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+                else:
+                    # No project_id, use fallback
+                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+            if not vals.get('notification_uuid'):
+                vals['notification_uuid'] = str(uuid.uuid4())
+            # Set default project_id if not provided - always set it to avoid NOT NULL constraint violation
+            if not vals.get('project_id'):
+                project_id = self._default_project_id()
+                if project_id:
+                    vals['project_id'] = project_id
+                else:
+                    # If no project exists at all, we can't create the record
+                    # This should not happen if sample_project_data.xml is loaded first
+                    # But if it does, the post-init hook will fix it
+                    # For now, we'll try to use any project as a last resort
+                    any_project = self.env['bhu.project'].search([], limit=1)
+                    if any_project:
+                        vals['project_id'] = any_project.id
+        return super().create(vals_list)
+    
+    def _get_consolidated_village_data(self):
+        """Get consolidated survey data grouped by village"""
+        self.ensure_one()
+        
+        # Get all approved or locked surveys for selected villages in the project
+        surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', 'in', self.village_ids.ids),
+            ('state', 'in', ('approved', 'locked'))
+        ])
+        
+        # Group surveys by village and calculate totals
+        village_data = {}
+        for survey in surveys:
+            village = survey.village_id
+            if village.id not in village_data:
+                # Get district and tehsil from village or survey
+                district_name = village.district_id.name if village.district_id else (survey.district_name or 'Raigarh (Chhattisgarh)')
+                tehsil_name = village.tehsil_id.name if village.tehsil_id else (survey.tehsil_id.name or '')
+                
+                village_data[village.id] = {
+                    'village_id': village.id,
+                    'village_name': village.name,
+                    'district': district_name,
+                    'tehsil': tehsil_name,
+                    'total_area': 0.0,
+                    'surveys': []
+                }
+            # Sum up acquired area for all khasras in this village
+            village_data[village.id]['total_area'] += survey.acquired_area or 0.0
+            village_data[village.id]['surveys'].append(survey.id)
+        
+        # Convert to list sorted by village name
+        consolidated_list = []
+        for village_id in sorted(village_data.keys(), key=lambda x: village_data[x]['village_name']):
+            consolidated_list.append(village_data[village_id])
+        
+        return consolidated_list
+    
+    def get_formatted_hearing_date(self):
+        """Format public hearing date for display"""
+        self.ensure_one()
+        if self.public_hearing_date:
+            return self.public_hearing_date.strftime('%d/%m/%Y')
+        return '........................'
+    
+    def get_qr_code_data(self):
+        """Generate QR code data for the notification"""
+        try:
+            import qrcode
+            import io
+            import base64
+            
+            # Ensure UUID exists
+            if not self.notification_uuid:
+                self.write({'notification_uuid': str(uuid.uuid4())})
+            
+            # Generate QR code URL - using notification UUID
+            qr_url = f"https://bhuarjan.com/bhuarjan/section4/{self.notification_uuid}/download"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=2,
+            )
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            
+            # Generate image
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return img_str
+        except ImportError:
+            return None
+        except Exception as e:
+            return None
+    
+    def action_generate_pdf(self):
+        """Generate Section 4 Notification PDF"""
+        self.ensure_one()
+        
+        # Validate that all surveys for selected villages are approved
+        if not self.project_id or not self.village_ids:
+            raise ValidationError(_('Please select a project and at least one village.'))
+        
+        # Get all surveys for selected villages
+        all_surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', 'in', self.village_ids.ids)
+        ])
+        
+        if not all_surveys:
+            raise ValidationError(_('No surveys found for the selected villages. Please create surveys first.'))
+        
+        # Check if all surveys are approved or locked (treat locked as approved)
+        non_approved_surveys = all_surveys.filtered(lambda s: s.state not in ('approved', 'locked'))
+        if non_approved_surveys:
+            village_names = ', '.join(set(non_approved_surveys.mapped('village_id.name')))
+            raise ValidationError(_(
+                'Cannot generate Section 4 Notification. Some surveys are not approved yet.\n\n'
+                'Villages with non-approved surveys: %s\n'
+                'Please approve all surveys before generating the notification.'
+            ) % village_names)
+        
+        self.state = 'generated'
+        
+        # Lock all approved surveys for the selected villages (skip already locked ones)
+        approved_surveys = all_surveys.filtered(lambda s: s.state == 'approved')
+        if approved_surveys:
+            approved_surveys.write({'state': 'locked'})
+            self.message_post(
+                body=_('Locked %d survey(s) for villages: %s') % (
+                    len(approved_surveys),
+                    ', '.join(self.village_ids.mapped('name'))
+                )
+            )
+        
+        # Use wizard to generate PDF (reuse existing logic)
+        # Always create a fresh wizard with current data to ensure report has all data
+        wizard = self.env['bhu.section4.notification.wizard'].create({
+            'project_id': self.project_id.id,
+            'village_ids': [(6, 0, self.village_ids.ids)],
+            'public_purpose': self.public_purpose,
+            'public_hearing_date': self.public_hearing_date,
+            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_place': self.public_hearing_place,
+            'q1_brief_description': self.q1_brief_description,
+            'q2_directly_affected': self.q2_directly_affected,
+            'q3_indirectly_affected': self.q3_indirectly_affected,
+            'q4_private_assets': self.q4_private_assets,
+            'q5_government_assets': self.q5_government_assets,
+            'q6_minimal_acquisition': self.q6_minimal_acquisition,
+            'q7_alternatives_considered': self.q7_alternatives_considered,
+            'q8_total_cost': self.q8_total_cost,
+            'q9_project_benefits': self.q9_project_benefits,
+            'q10_compensation_measures': self.q10_compensation_measures,
+            'q11_other_components': self.q11_other_components,
+        })
+        
+        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
+        return report_action.report_action(wizard)
+    
+    def action_mark_signed(self):
+        """Mark notification as signed"""
+        self.ensure_one()
+        if not self.signed_document_file:
+            raise ValidationError(_('Please upload signed document first.'))
+        self.state = 'signed'
+        if not self.signed_date:
+            self.signed_date = fields.Date.today()
+
+
+class Section4NotificationWizard(models.TransientModel):
+    _name = 'bhu.section4.notification.wizard'
+    _description = 'Section 4 Notification Wizard'
+
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
+    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True)
+    public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', 
+                                 help='Description of public purpose for land acquisition')
+    
+    # Public Hearing Details
+    public_hearing_date = fields.Date(string='Public Hearing Date / जन सुनवाई दिनांक')
+    public_hearing_time = fields.Char(string='Public Hearing Time / जन सुनवाई समय', 
+                                      help='e.g., 10:00 AM')
+    public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान')
+    
+    # 11 Questions from the template
+    q1_brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose')
+    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families')
+    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
+    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
+    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
+    q6_minimal_acquisition = fields.Char(string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?')
+    q7_alternatives_considered = fields.Text(string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?')
+    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
+    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
+    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure')
+    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project')
+
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset villages when project changes and set domain"""
+        self.village_ids = False
+        if self.project_id and self.project_id.village_ids:
+            return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_ids': []}}
+
+    def _get_consolidated_village_data(self):
+        """Get consolidated survey data grouped by village"""
+        self.ensure_one()
+        
+        # Get all approved or locked surveys for selected villages in the project
+        surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', 'in', self.village_ids.ids),
+            ('state', 'in', ('approved', 'locked'))
+        ])
+        
+        # Group surveys by village and calculate totals
+        village_data = {}
+        for survey in surveys:
+            village = survey.village_id
+            if village.id not in village_data:
+                # Get district and tehsil from village or survey
+                district_name = village.district_id.name if village.district_id else (survey.district_name or 'Raigarh (Chhattisgarh)')
+                tehsil_name = village.tehsil_id.name if village.tehsil_id else (survey.tehsil_id.name or '')
+                
+                village_data[village.id] = {
+                    'village_id': village.id,
+                    'village_name': village.name,
+                    'district': district_name,
+                    'tehsil': tehsil_name,
+                    'total_area': 0.0,
+                    'surveys': []
+                }
+            # Sum up acquired area for all khasras in this village
+            village_data[village.id]['total_area'] += survey.acquired_area or 0.0
+            village_data[village.id]['surveys'].append(survey.id)
+        
+        # Convert to list sorted by village name
+        consolidated_list = []
+        for village_id in sorted(village_data.keys(), key=lambda x: village_data[x]['village_name']):
+            consolidated_list.append(village_data[village_id])
+        
+        return consolidated_list
+
+    def get_formatted_hearing_date(self):
+        """Format public hearing date for display"""
+        self.ensure_one()
+        if self.public_hearing_date:
+            return self.public_hearing_date.strftime('%d/%m/%Y')
+        return '........................'
+    
+    def action_generate_pdf(self):
+        """Generate Section 4 Notification PDF and create notification record"""
+        self.ensure_one()
+        
+        if not self.village_ids:
+            raise ValidationError(_('Please select at least one village.'))
+        
+        # Get consolidated data
+        consolidated_data = self._get_consolidated_village_data()
+        
+        if not consolidated_data:
+            raise ValidationError(_('No approved surveys found for the selected villages.'))
+        
+        # Create notification record
+        notification = self.env['bhu.section4.notification'].create({
+            'project_id': self.project_id.id,
+            'village_ids': [(6, 0, self.village_ids.ids)],
+            'public_purpose': self.public_purpose,
+            'public_hearing_date': self.public_hearing_date,
+            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_place': self.public_hearing_place,
+            'q1_brief_description': self.q1_brief_description,
+            'q2_directly_affected': self.q2_directly_affected,
+            'q3_indirectly_affected': self.q3_indirectly_affected,
+            'q4_private_assets': self.q4_private_assets,
+            'q5_government_assets': self.q5_government_assets,
+            'q6_minimal_acquisition': self.q6_minimal_acquisition,
+            'q7_alternatives_considered': self.q7_alternatives_considered,
+            'q8_total_cost': self.q8_total_cost,
+            'q9_project_benefits': self.q9_project_benefits,
+            'q10_compensation_measures': self.q10_compensation_measures,
+            'q11_other_components': self.q11_other_components,
+            'state': 'generated',
+        })
+        
+        # Generate PDF report - pass the wizard recordset
+        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
+        return report_action.report_action(self)
+

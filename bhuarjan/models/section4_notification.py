@@ -83,6 +83,14 @@ class Section4Notification(models.Model):
         for record in self:
             record.has_signed_document = bool(record.signed_document_file)
     
+    @api.onchange('signed_document_file')
+    def _onchange_signed_document_file(self):
+        """Auto-change status to 'signed' when signed document is uploaded"""
+        if self.signed_document_file and self.state != 'signed':
+            self.state = 'signed'
+            if not self.signed_date:
+                self.signed_date = fields.Date.today()
+    
     @api.depends('project_id', 'village_ids')
     def _compute_survey_ids(self):
         """Compute surveys for selected villages and project"""

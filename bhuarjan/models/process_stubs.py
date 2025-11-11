@@ -593,6 +593,10 @@ class Section11PreliminaryReport(models.Model):
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil', related='village_id.tehsil_id', 
                                 store=True, readonly=True)
     
+    # Section 4 Notification reference
+    section4_notification_id = fields.Many2one('bhu.section4.notification', string='Section 4 Notification',
+                                               tracking=True, help='Select Section 4 Notification to auto-populate survey details')
+    
     # Notification Details
     notification_number = fields.Char(string='Notification Number', tracking=True)
     publication_date = fields.Date(string='Publication Date', tracking=True)
@@ -702,10 +706,44 @@ class Section11PreliminaryReport(models.Model):
                 if not record.signed_date:
                     record.signed_date = fields.Date.today()
     
+    @api.onchange('signed_document_file')
+    def _onchange_signed_document_file(self):
+        """Auto-change status to 'signed' when signed document is uploaded"""
+        if self.signed_document_file and self.state != 'signed':
+            self.state = 'signed'
+            if not self.signed_date:
+                self.signed_date = fields.Date.today()
+    
+    @api.onchange('section4_notification_id')
+    def _onchange_section4_notification(self):
+        """Auto-populate project, village, and surveys when Section 4 Notification is selected"""
+        if self.section4_notification_id:
+            # Set project from Section 4
+            if self.section4_notification_id.project_id:
+                self.project_id = self.section4_notification_id.project_id
+            
+            # If Section 4 has only one village, auto-select it
+            # Otherwise, user needs to select the village manually
+            if len(self.section4_notification_id.village_ids) == 1:
+                self.village_id = self.section4_notification_id.village_ids[0]
+                # Auto-populate surveys after village is set
+                self._populate_land_parcels_from_surveys()
+            elif len(self.section4_notification_id.village_ids) > 1:
+                # Multiple villages - user needs to select one
+                # But we can still populate if village is already selected and matches
+                if self.village_id and self.village_id in self.section4_notification_id.village_ids:
+                    self._populate_land_parcels_from_surveys()
+    
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_surveys(self):
-        """Auto-populate land parcels from locked surveys when village is selected"""
-        self._populate_land_parcels_from_surveys()
+        """Auto-populate land parcels when village or project changes"""
+        # Only auto-populate if Section 4 is not selected, or if village matches Section 4's villages
+        if not self.section4_notification_id:
+            self._populate_land_parcels_from_surveys()
+        elif self.section4_notification_id and self.village_id:
+            # Check if selected village is in Section 4's villages
+            if self.village_id in self.section4_notification_id.village_ids:
+                self._populate_land_parcels_from_surveys()
     
     def _populate_land_parcels_from_surveys(self):
         """Helper method to populate land parcels from locked surveys"""
@@ -713,12 +751,23 @@ class Section11PreliminaryReport(models.Model):
         if not self.village_id or not self.project_id:
             return
         
-        # Search for locked surveys for the selected village and project
-        locked_surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', '=', 'locked')
-        ], order='khasra_number')
+        # If Section 4 Notification is selected, use its surveys (which should be locked)
+        # Otherwise, search for locked surveys for the selected village and project
+        if self.section4_notification_id:
+            # Get surveys from Section 4 that match the selected village
+            section4_surveys = self.section4_notification_id.survey_ids.filtered(
+                lambda s: s.village_id.id == self.village_id.id and 
+                         s.project_id.id == self.project_id.id and
+                         s.state in ('approved', 'locked')
+            )
+            locked_surveys = section4_surveys.sorted('khasra_number')
+        else:
+            # Search for locked surveys for the selected village and project
+            locked_surveys = self.env['bhu.survey'].search([
+                ('village_id', '=', self.village_id.id),
+                ('project_id', '=', self.project_id.id),
+                ('state', '=', 'locked')
+            ], order='khasra_number')
         
         # Clear existing land parcels
         self.land_parcel_ids = [(5, 0, 0)]
@@ -746,60 +795,6 @@ class Section11PreliminaryReport(models.Model):
         # Set the land parcels
         if parcel_vals:
             self.land_parcel_ids = parcel_vals
-        
-        # Auto-populate compensation lines
-        self._populate_compensation_lines()
-    
-    def _populate_compensation_lines(self):
-        """Helper method to populate compensation lines from land parcels and surveys"""
-        self.ensure_one()
-        if not self.land_parcel_ids:
-            return
-        
-        # Clear existing compensation lines
-        self.compensation_line_ids = [(5, 0, 0)]
-        
-        # Get all surveys for the khasras in land parcels
-        khasra_numbers = self.land_parcel_ids.mapped('khasra_number')
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('khasra_number', 'in', khasra_numbers),
-            ('state', '=', 'locked')
-        ])
-        
-        # Create compensation line for each survey
-        line_vals = []
-        serial = 1
-        for survey in surveys:
-            # Get land parcel for this khasra
-            parcel = self.land_parcel_ids.filtered(lambda p: p.khasra_number == survey.khasra_number)
-            if not parcel:
-                continue
-            
-            # Create a line for each landowner
-            for landowner in survey.landowner_ids:
-                # Determine land type
-                is_irrigated = survey.irrigation_type == 'irrigated'
-                is_unirrigated = survey.irrigation_type == 'unirrigated'
-                
-                line_vals.append((0, 0, {
-                    'serial_number': serial,
-                    'landowner_id': landowner.id,
-                    'khasra_number': survey.khasra_number or '',
-                    'acquired_area': parcel[0].area_hectares or 0.0,
-                    'is_irrigated': is_irrigated,
-                    'is_unirrigated': is_unirrigated,
-                    'is_fallow': False,  # Default, can be updated manually
-                    'total_held_khasra': survey.khasra_number or '',
-                    'total_held_area': survey.total_area or 0.0,
-                    'acquired_revenue': 0.0,  # Can be updated manually
-                }))
-                serial += 1
-        
-        # Set the compensation lines
-        if line_vals:
-            self.compensation_line_ids = line_vals
     
     @api.model
     def _default_project_id(self):
@@ -814,11 +809,27 @@ class Section11PreliminaryReport(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Create records with batch support"""
+        # Check for existing records to avoid unique constraint violations
+        existing_records = []
+        new_vals_list = []
+        
         for vals in vals_list:
+            project_id = vals.get('project_id')
+            village_id = vals.get('village_id')
+            
+            # Check if a record already exists for this village and project
+            if project_id and village_id:
+                existing = self.env['bhu.section11.preliminary.report'].search([
+                    ('project_id', '=', project_id),
+                    ('village_id', '=', village_id)
+                ], limit=1)
+                if existing:
+                    existing_records.append(existing)
+                    continue  # Skip creating this record
+            
+            # Generate name if needed
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
-                project_id = vals.get('project_id')
-                village_id = vals.get('village_id')
                 if project_id:
                     sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
                         'section11_notification', project_id, village_id=village_id
@@ -834,7 +845,15 @@ class Section11PreliminaryReport(models.Model):
             # Generate UUID if not provided
             if not vals.get('report_uuid'):
                 vals['report_uuid'] = str(uuid.uuid4())
-        records = super().create(vals_list)
+            new_vals_list.append(vals)
+        
+        # Create only new records
+        records = super().create(new_vals_list) if new_vals_list else self.env['bhu.section11.preliminary.report']
+        
+        # Add existing records to the result
+        if existing_records:
+            records = records | self.env['bhu.section11.preliminary.report'].browse([r.id for r in existing_records])
+        
         # Auto-populate land parcels after creation if village and project are set
         for record in records:
             if record.village_id and record.project_id:

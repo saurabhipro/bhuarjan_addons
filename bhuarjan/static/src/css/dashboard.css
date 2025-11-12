@@ -38,6 +38,11 @@
     background-image: url('/bhuarjan/static/img/orange_pattern.jpg');
 }
 
+/* Orange Cards - using orange_pattern.jpg */
+.kpi-card-orange {
+    background-image: url('/bhuarjan/static/img/orange_pattern.jpg');
+}
+
 /* Process Cards */
 .process-card {
     border-radius: 6px;
@@ -272,6 +277,9 @@
 .kpi-card-yellow .kpi-label,
 .kpi-card-yellow .kpi-icon,
 .kpi-card-yellow .kpi-value,
+.kpi-card-orange .kpi-label,
+.kpi-card-orange .kpi-icon,
+.kpi-card-orange .kpi-value,
 .process-card-green .kpi-label,
 .process-card-green .kpi-icon,
 .process-card-green .kpi-value,

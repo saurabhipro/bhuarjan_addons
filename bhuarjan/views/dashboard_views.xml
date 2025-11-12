@@ -80,6 +80,13 @@
                             </div>
                             <div class="kpi-value"><field name="total_landowners" nolabel="1" readonly="1"/></div>
                         </button>
+                        <button name="action_open_rate_masters" type="object" class="dashboard-kpi-card kpi-card-orange">
+                            <div class="kpi-header">
+                                <div class="kpi-label">Rate Masters</div>
+                                <div class="kpi-icon"><i class="fa fa-money"/></div>
+                            </div>
+                            <div class="kpi-value"><field name="total_rate_masters" nolabel="1" readonly="1"/></div>
+                        </button>
                     </div>
                     
                     <div class="dashboard-section-title">

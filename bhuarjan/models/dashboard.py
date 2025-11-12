@@ -17,6 +17,7 @@ class BhuarjanDashboard(models.TransientModel):
     total_projects = fields.Integer(string='Total Projects', readonly=True, default=0)
     total_departments = fields.Integer(string='Total Departments', readonly=True, default=0)
     total_landowners = fields.Integer(string='Total Landowners', readonly=True, default=0)
+    total_rate_masters = fields.Integer(string='Total Rate Masters', readonly=True, default=0)
     
     # Survey Counts
     total_surveys = fields.Integer(string='Total Surveys', readonly=True, default=0)
@@ -71,6 +72,7 @@ class BhuarjanDashboard(models.TransientModel):
             record.total_projects = self.env['bhu.project'].search_count([])
             record.total_departments = self.env['bhu.department'].search_count([])
             record.total_landowners = self.env['bhu.landowner'].search_count([])
+            record.total_rate_masters = self.env['bhu.rate.master'].search_count([])
             
             # Survey Counts
             record.total_surveys = self.env['bhu.survey'].search_count([])
@@ -160,6 +162,7 @@ class BhuarjanDashboard(models.TransientModel):
             'total_projects': self.env['bhu.project'].search_count([]),
             'total_departments': self.env['bhu.department'].search_count([]),
             'total_landowners': self.env['bhu.landowner'].search_count([]),
+            'total_rate_masters': self.env['bhu.rate.master'].search_count([]),
             
             # Survey Counts
             'total_surveys': self.env['bhu.survey'].search_count([]),
@@ -243,14 +246,15 @@ class BhuarjanDashboard(models.TransientModel):
                 dashboard.total_districts == 0 and 
                 dashboard.total_surveys == 0 and 
                 dashboard.total_section4_notifications == 0 and
-                dashboard.total_payment_files == 0
+                dashboard.total_payment_files == 0 and
+                dashboard.total_rate_masters == 0
             )
             if needs_refresh:
                 counts = self._get_all_counts()
                 dashboard.write(counts)
         
         # Ensure values are always present (double-check)
-        if dashboard.total_districts == 0:
+        if dashboard.total_districts == 0 or dashboard.total_rate_masters == 0:
             counts = self._get_all_counts()
             dashboard.write(counts)
         
@@ -294,6 +298,9 @@ class BhuarjanDashboard(models.TransientModel):
             'search_default_district_id': False,
         })
         return action
+    
+    def action_open_rate_masters(self):
+        return self.env.ref('bhuarjan.action_bhu_rate_master').read()[0]
     
     def action_open_surveys(self):
         return self.env.ref('bhuarjan.action_bhu_survey').read()[0]

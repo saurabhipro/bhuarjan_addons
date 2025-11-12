@@ -32,6 +32,7 @@
         'data/sample_section15_objections.xml',
         'data/sample_section11_reports.xml',
         'data/sample_section19_notifications.xml',
+        'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',

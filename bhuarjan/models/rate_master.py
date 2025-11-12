@@ -45,9 +45,8 @@ class RateMaster(models.Model):
     
     # Road Proximity
     road_proximity = fields.Selection([
-        ('close_to_road', 'Close to Road (0-100m)'),
-        ('near_road', 'Near Road (100-500m)'),
-        ('far_from_road', 'Far from Road (500m+)')
+        ('within_20m', 'Within 20 meters'),
+        ('beyond_20m', 'Beyond 20 meters')
     ], string='Road Proximity', required=True, tracking=True)
     
     # Rate Information

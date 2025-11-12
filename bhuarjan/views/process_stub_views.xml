@@ -11,7 +11,7 @@
                 <sheet>
                     <group>
                         <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1" 
+                        <field name="village_id" required="1" 
                                options="{'no_create_edit': True}"/>
                     </group>
                     <notebook>

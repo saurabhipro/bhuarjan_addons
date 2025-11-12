@@ -8,7 +8,7 @@
             <list string="Section 4 Notifications" delete="1">
                 <field name="name"/>
                 <field name="project_id"/>
-                <field name="village_ids" widget="many2many_tags"/>
+                <field name="village_id"/>
                 <field name="public_hearing_date"/>
                 <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
@@ -38,7 +38,7 @@
                         <group>
                             <field name="name"/>
                             <field name="project_id" required="1"/>
-                            <field name="village_ids" widget="many2many_tags" required="1" 
+                            <field name="village_id" required="1" 
                                    options="{'no_create_edit': True}"/>
                         </group>
                     </group>
@@ -102,7 +102,7 @@
                                 <field name="collector_name"/>
                             </group>
                         </page>
-                        <page string="Surveys" icon="fa-clipboard-list" invisible="not project_id or not village_ids">
+                        <page string="Surveys" icon="fa-clipboard-list" invisible="not project_id or not village_id">
                             <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
                                 <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
                                 <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked - You can generate the notification</span>
@@ -144,7 +144,7 @@
             <search string="Section 4 Notifications">
                 <field name="name"/>
                 <field name="project_id"/>
-                <field name="village_ids"/>
+                <field name="village_id"/>
                 <field name="public_hearing_date"/>
                 <field name="public_hearing_place"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>

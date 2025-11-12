@@ -1,33 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Sample Section 4 Notifications (4 records - one per village) - All fields filled, Draft state -->
-        <!-- Using existing project PROJ01 and existing villages: Jurda, Pandripani, Gopalpur, Bhikharimal -->
-        <record id="section4_notification_jurda" model="bhu.section4.notification">
-            <field name="name">Section 4 Notification - Jurda</field>
-            <field name="village_ids" eval="[(6, 0, [ref('jurda_village')])]"/>
-            <field name="state">draft</field>
-            <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन। यह परियोजना शहर के यातायात को सुविधाजनक बनाने और आर्थिक विकास को बढ़ावा देने के लिए है।</p>]]></field>
-            <field name="public_hearing_date">2024-12-15</field>
-            <field name="public_hearing_time">10:00 AM</field>
-            <field name="public_hearing_place">ग्राम पंचायत भवन, जुर्दा</field>
-            <field name="q1_brief_description"><![CDATA[<p><strong>लोक प्रयोजन:</strong> रिंग रोड रायगढ़ परियोजना के अंतर्गत जुर्दा ग्राम में <strong>3.0000 हेक्टेयर</strong> भूमि का अर्जन किया जा रहा है। यह परियोजना शहर के यातायात प्रबंधन में सुधार लाएगी और आर्थिक विकास को गति देगी।</p>]]></field>
-            <field name="q2_directly_affected">15</field>
-            <field name="q3_indirectly_affected">25</field>
-            <field name="q4_private_assets">12 निजी मकान, 8 दुकानें, 5 कृषि भूमि</field>
-            <field name="q5_government_assets">2 शासकीय मकान, 1 पंचायत भवन</field>
-            <field name="q6_minimal_acquisition">हाँ, प्रस्तावित अर्जन न्यूनतम है और केवल आवश्यक भूमि शामिल है।</field>
-            <field name="q7_alternatives_considered"><![CDATA[<p><strong>विकल्पों का अध्ययन:</strong></p><ul><li>वैकल्पिक मार्गों का सर्वेक्षण किया गया</li><li>न्यूनतम प्रभाव वाला मार्ग चुना गया</li><li>पर्यावरणीय प्रभाव का मूल्यांकन किया गया</li></ul>]]></field>
-            <field name="q8_total_cost">₹ 50 करोड़</field>
-            <field name="q9_project_benefits"><![CDATA[<p><strong>परियोजना के लाभ:</strong></p><ul><li>यातायात की सुविधा में सुधार</li><li>आर्थिक विकास में वृद्धि</li><li>रोजगार के अवसरों में वृद्धि</li><li>शहरी विकास में योगदान</li></ul>]]></field>
-            <field name="q10_compensation_measures"><![CDATA[<p><strong>प्रतिकर उपाय:</strong></p><ul><li>भूमि मालिकों को उचित मुआवजा</li><li>पुनर्वासन पैकेज</li><li>रोजगार के अवसर</li><li>शिक्षा और स्वास्थ्य सुविधाएं</li></ul><p><strong>अनुमानित व्यय:</strong> ₹ 5 करोड़</p>]]></field>
-            <field name="q11_other_components"><![CDATA[<p><strong>अन्य प्रभावित घटक:</strong></p><ul><li>कृषि भूमि</li><li>वन क्षेत्र</li><li>जल स्रोत</li><li>सड़क और बिजली की सुविधाएं</li></ul>]]></field>
-        </record>
-        
+        <!-- Sample Section 4 Notifications (2 records - one per village: Pandripani, Gopalpur) -->
+        <!-- Using existing project PROJ01 and existing villages -->
+        <!-- Surveys for these villages are locked (as they have Section 4 notifications) -->
+        <!-- Note: Jurda village surveys remain in draft state (no Section 4 notification) -->
         <record id="section4_notification_pandripani" model="bhu.section4.notification">
-            <field name="name">Section 4 Notification - Pandripani</field>
-            <field name="village_ids" eval="[(6, 0, [ref('pandripani_village')])]"/>
-            <field name="state">draft</field>
+            <field name="name">NOT4_RRR-001_PP</field>
+            <field name="village_id" ref="pandripani_village"/>
+            <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन। यह परियोजना शहर के यातायात को सुविधाजनक बनाने और आर्थिक विकास को बढ़ावा देने के लिए है।</p>]]></field>
             <field name="public_hearing_date">2024-12-20</field>
             <field name="public_hearing_time">11:00 AM</field>
@@ -46,9 +27,9 @@
         </record>
         
         <record id="section4_notification_gopalpur" model="bhu.section4.notification">
-            <field name="name">Section 4 Notification - Gopalpur</field>
-            <field name="village_ids" eval="[(6, 0, [ref('gopalpur_village')])]"/>
-            <field name="state">draft</field>
+            <field name="name">NOT4_RRR-001_GL</field>
+            <field name="village_id" ref="gopalpur_village"/>
+            <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन।</p>]]></field>
             <field name="public_hearing_date">2024-12-25</field>
             <field name="public_hearing_time">2:00 PM</field>
@@ -66,25 +47,7 @@
             <field name="q11_other_components"><![CDATA[<p>कृषि भूमि, वन क्षेत्र, जल स्रोत प्रभावित।</p>]]></field>
         </record>
         
-        <record id="section4_notification_bhikharimal" model="bhu.section4.notification">
-            <field name="name">Section 4 Notification - Bhikharimal</field>
-            <field name="village_ids" eval="[(6, 0, [ref('bhikharimal_village')])]"/>
-            <field name="state">draft</field>
-            <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन। यह परियोजना शहर के यातायात को सुविधाजनक बनाने के लिए है।</p>]]></field>
-            <field name="public_hearing_date">2025-01-05</field>
-            <field name="public_hearing_time">10:30 AM</field>
-            <field name="public_hearing_place">ग्राम पंचायत भवन, भिखारीमल</field>
-            <field name="q1_brief_description"><![CDATA[<p><strong>लोक प्रयोजन:</strong> भिखारीमल ग्राम में <strong>3.5000 हेक्टेयर</strong> भूमि का अर्जन।</p>]]></field>
-            <field name="q2_directly_affected">16</field>
-            <field name="q3_indirectly_affected">28</field>
-            <field name="q4_private_assets">13 निजी मकान, 9 दुकानें, 6 कृषि भूमि</field>
-            <field name="q5_government_assets">2 शासकीय मकान, 1 पंचायत भवन</field>
-            <field name="q6_minimal_acquisition">हाँ, प्रस्तावित अर्जन न्यूनतम है।</field>
-            <field name="q7_alternatives_considered"><![CDATA[<p>वैकल्पिक मार्गों का सर्वेक्षण और पर्यावरणीय प्रभाव का मूल्यांकन।</p>]]></field>
-            <field name="q8_total_cost">₹ 52 करोड़</field>
-            <field name="q9_project_benefits"><![CDATA[<p>यातायात सुविधा में सुधार और आर्थिक विकास।</p>]]></field>
-            <field name="q10_compensation_measures"><![CDATA[<p>उचित मुआवजा और पुनर्वासन पैकेज। <strong>अनुमानित व्यय:</strong> ₹ 5.5 करोड़</p>]]></field>
-            <field name="q11_other_components"><![CDATA[<p>कृषि भूमि और जल स्रोत प्रभावित होंगे।</p>]]></field>
-        </record>
+        <!-- Note: Jurda and Bhikharimal villages do not have Section 4 Notifications -->
+        <!-- Jurda surveys remain in draft state, Bhikharimal surveys also in draft state -->
     </data>
 </odoo>

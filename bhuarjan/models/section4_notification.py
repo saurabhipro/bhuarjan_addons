@@ -25,7 +25,12 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, 
                                   default=lambda self: self._default_project_id())
-    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    
+    _sql_constraints = [
+        ('unique_village_project', 'UNIQUE(village_id, project_id)', 
+         'Only one Section 4 Notification can be created per village per project!')
+    ]
     
     # Computed field to show surveys for selected villages
     survey_ids = fields.Many2many('bhu.survey', compute='_compute_survey_ids', string='Surveys', readonly=True)
@@ -91,14 +96,14 @@ class Section4Notification(models.Model):
             if not self.signed_date:
                 self.signed_date = fields.Date.today()
     
-    @api.depends('project_id', 'village_ids')
+    @api.depends('project_id', 'village_id')
     def _compute_survey_ids(self):
-        """Compute surveys for selected villages and project"""
+        """Compute surveys for selected village and project"""
         for record in self:
-            if record.project_id and record.village_ids:
+            if record.project_id and record.village_id:
                 surveys = self.env['bhu.survey'].search([
                     ('project_id', '=', record.project_id.id),
-                    ('village_id', 'in', record.village_ids.ids)
+                    ('village_id', '=', record.village_id.id)
                 ])
                 record.survey_ids = [(6, 0, surveys.ids)]
                 record.survey_count = len(surveys)
@@ -113,14 +118,14 @@ class Section4Notification(models.Model):
                 record.approved_survey_count = 0
                 record.all_surveys_approved = False
     
-    @api.depends('project_id', 'village_ids')
+    @api.depends('project_id', 'village_id')
     def _compute_has_section11(self):
-        """Check if Section 11 Preliminary Report exists for any of the villages"""
+        """Check if Section 11 Preliminary Report exists for the village"""
         for record in self:
-            if record.project_id and record.village_ids:
+            if record.project_id and record.village_id:
                 section11_reports = self.env['bhu.section11.preliminary.report'].search([
                     ('project_id', '=', record.project_id.id),
-                    ('village_id', 'in', record.village_ids.ids)
+                    ('village_id', '=', record.village_id.id)
                 ], limit=1)
                 record.has_section11 = bool(section11_reports)
             else:
@@ -139,13 +144,28 @@ class Section4Notification(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Create records with batch support"""
+        existing_records = []
+        new_vals_list = []
+        
         for vals in vals_list:
+            project_id = vals.get('project_id')
+            village_id = vals.get('village_id')
+            
+            # Check for existing records to prevent UniqueViolation
+            if project_id and village_id:
+                existing = self.env['bhu.section4.notification'].search([
+                    ('project_id', '=', project_id),
+                    ('village_id', '=', village_id)
+                ], limit=1)
+                if existing:
+                    existing_records.append(existing)
+                    continue
+            
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
-                project_id = vals.get('project_id')
                 if project_id:
                     sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'section4_notification', project_id
+                        'section4_notification', project_id, village_id=village_id
                     )
                     if sequence_number:
                         vals['name'] = sequence_number
@@ -170,46 +190,43 @@ class Section4Notification(models.Model):
                     any_project = self.env['bhu.project'].search([], limit=1)
                     if any_project:
                         vals['project_id'] = any_project.id
-        return super().create(vals_list)
+            new_vals_list.append(vals)
+        
+        records = super().create(new_vals_list) if new_vals_list else self.env['bhu.section4.notification']
+        
+        if existing_records:
+            records = records | self.env['bhu.section4.notification'].browse([r.id for r in existing_records])
+        
+        return records
     
     def _get_consolidated_village_data(self):
-        """Get consolidated survey data grouped by village"""
+        """Get consolidated survey data for the village"""
         self.ensure_one()
         
-        # Get all approved or locked surveys for selected villages in the project
+        # Get all approved or locked surveys for the selected village in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
-            ('village_id', 'in', self.village_ids.ids),
+            ('village_id', '=', self.village_id.id),
             ('state', 'in', ('approved', 'locked'))
         ])
         
-        # Group surveys by village and calculate totals
-        village_data = {}
-        for survey in surveys:
-            village = survey.village_id
-            if village.id not in village_data:
-                # Get district and tehsil from village or survey
-                district_name = village.district_id.name if village.district_id else (survey.district_name or 'Raigarh (Chhattisgarh)')
-                tehsil_name = village.tehsil_id.name if village.tehsil_id else (survey.tehsil_id.name or '')
-                
-                village_data[village.id] = {
-                    'village_id': village.id,
-                    'village_name': village.name,
-                    'district': district_name,
-                    'tehsil': tehsil_name,
-                    'total_area': 0.0,
-                    'surveys': []
-                }
-            # Sum up acquired area for all khasras in this village
-            village_data[village.id]['total_area'] += survey.acquired_area or 0.0
-            village_data[village.id]['surveys'].append(survey.id)
+        # Return data for the single village
+        if self.village_id and surveys:
+            district_name = self.village_id.district_id.name if self.village_id.district_id else 'Raigarh (Chhattisgarh)'
+            tehsil_name = self.village_id.tehsil_id.name if self.village_id.tehsil_id else ''
+            
+            total_area = sum(surveys.mapped('acquired_area'))
+            
+            return [{
+                'village_id': self.village_id.id,
+                'village_name': self.village_id.name,
+                'district': district_name,
+                'tehsil': tehsil_name,
+                'total_area': total_area,
+                'surveys': surveys.ids
+            }]
         
-        # Convert to list sorted by village name
-        consolidated_list = []
-        for village_id in sorted(village_data.keys(), key=lambda x: village_data[x]['village_name']):
-            consolidated_list.append(village_data[village_id])
-        
-        return consolidated_list
+        return []
     
     def get_formatted_hearing_date(self):
         """Format public hearing date for display"""
@@ -260,39 +277,37 @@ class Section4Notification(models.Model):
         """Generate Section 4 Notification PDF"""
         self.ensure_one()
         
-        # Validate that all surveys for selected villages are approved
-        if not self.project_id or not self.village_ids:
-            raise ValidationError(_('Please select a project and at least one village.'))
+        # Validate that all surveys for selected village are approved
+        if not self.project_id or not self.village_id:
+            raise ValidationError(_('Please select a project and village.'))
         
-        # Get all surveys for selected villages
+        # Get all surveys for selected village
         all_surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
-            ('village_id', 'in', self.village_ids.ids)
+            ('village_id', '=', self.village_id.id)
         ])
         
         if not all_surveys:
-            raise ValidationError(_('No surveys found for the selected villages. Please create surveys first.'))
+            raise ValidationError(_('No surveys found for the selected village. Please create surveys first.'))
         
         # Check if all surveys are approved or locked (treat locked as approved)
         non_approved_surveys = all_surveys.filtered(lambda s: s.state not in ('approved', 'locked'))
         if non_approved_surveys:
-            village_names = ', '.join(set(non_approved_surveys.mapped('village_id.name')))
             raise ValidationError(_(
                 'Cannot generate Section 4 Notification. Some surveys are not approved yet.\n\n'
-                'Villages with non-approved surveys: %s\n'
                 'Please approve all surveys before generating the notification.'
-            ) % village_names)
+            ))
         
         self.state = 'generated'
         
-        # Lock all approved surveys for the selected villages (skip already locked ones)
+        # Lock all approved surveys for the selected village (skip already locked ones)
         approved_surveys = all_surveys.filtered(lambda s: s.state == 'approved')
         if approved_surveys:
             approved_surveys.write({'state': 'locked'})
             self.message_post(
-                body=_('Locked %d survey(s) for villages: %s') % (
+                body=_('Locked %d survey(s) for village: %s') % (
                     len(approved_surveys),
-                    ', '.join(self.village_ids.mapped('name'))
+                    self.village_id.name
                 )
             )
         
@@ -300,7 +315,7 @@ class Section4Notification(models.Model):
         # Always create a fresh wizard with current data to ensure report has all data
         wizard = self.env['bhu.section4.notification.wizard'].create({
             'project_id': self.project_id.id,
-            'village_ids': [(6, 0, self.village_ids.ids)],
+            'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
             'public_hearing_date': self.public_hearing_date,
             'public_hearing_time': self.public_hearing_time,
@@ -336,7 +351,7 @@ class Section4NotificationWizard(models.TransientModel):
     _description = 'Section 4 Notification Wizard'
 
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
-    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
     public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन का विवरण', 
                                  help='Description of public purpose for land acquisition')
     
@@ -361,50 +376,40 @@ class Section4NotificationWizard(models.TransientModel):
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset villages when project changes and set domain"""
-        self.village_ids = False
+        """Reset village when project changes and set domain"""
+        self.village_id = False
         if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
-        return {'domain': {'village_ids': []}}
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_id': []}}
 
     def _get_consolidated_village_data(self):
-        """Get consolidated survey data grouped by village"""
+        """Get consolidated survey data for the village"""
         self.ensure_one()
         
-        # Get all approved or locked surveys for selected villages in the project
+        # Get all approved or locked surveys for the selected village in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
-            ('village_id', 'in', self.village_ids.ids),
+            ('village_id', '=', self.village_id.id),
             ('state', 'in', ('approved', 'locked'))
         ])
         
-        # Group surveys by village and calculate totals
-        village_data = {}
-        for survey in surveys:
-            village = survey.village_id
-            if village.id not in village_data:
-                # Get district and tehsil from village or survey
-                district_name = village.district_id.name if village.district_id else (survey.district_name or 'Raigarh (Chhattisgarh)')
-                tehsil_name = village.tehsil_id.name if village.tehsil_id else (survey.tehsil_id.name or '')
-                
-                village_data[village.id] = {
-                    'village_id': village.id,
-                    'village_name': village.name,
-                    'district': district_name,
-                    'tehsil': tehsil_name,
-                    'total_area': 0.0,
-                    'surveys': []
-                }
-            # Sum up acquired area for all khasras in this village
-            village_data[village.id]['total_area'] += survey.acquired_area or 0.0
-            village_data[village.id]['surveys'].append(survey.id)
+        # Return data for the single village
+        if self.village_id and surveys:
+            district_name = self.village_id.district_id.name if self.village_id.district_id else 'Raigarh (Chhattisgarh)'
+            tehsil_name = self.village_id.tehsil_id.name if self.village_id.tehsil_id else ''
+            
+            total_area = sum(surveys.mapped('acquired_area'))
+            
+            return [{
+                'village_id': self.village_id.id,
+                'village_name': self.village_id.name,
+                'district': district_name,
+                'tehsil': tehsil_name,
+                'total_area': total_area,
+                'surveys': surveys.ids
+            }]
         
-        # Convert to list sorted by village name
-        consolidated_list = []
-        for village_id in sorted(village_data.keys(), key=lambda x: village_data[x]['village_name']):
-            consolidated_list.append(village_data[village_id])
-        
-        return consolidated_list
+        return []
 
     def get_formatted_hearing_date(self):
         """Format public hearing date for display"""
@@ -417,19 +422,19 @@ class Section4NotificationWizard(models.TransientModel):
         """Generate Section 4 Notification PDF and create notification record"""
         self.ensure_one()
         
-        if not self.village_ids:
-            raise ValidationError(_('Please select at least one village.'))
+        if not self.village_id:
+            raise ValidationError(_('Please select a village.'))
         
         # Get consolidated data
         consolidated_data = self._get_consolidated_village_data()
         
         if not consolidated_data:
-            raise ValidationError(_('No approved surveys found for the selected villages.'))
+            raise ValidationError(_('No approved surveys found for the selected village.'))
         
         # Create notification record
         notification = self.env['bhu.section4.notification'].create({
             'project_id': self.project_id.id,
-            'village_ids': [(6, 0, self.village_ids.ids)],
+            'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
             'public_hearing_date': self.public_hearing_date,
             'public_hearing_time': self.public_hearing_time,

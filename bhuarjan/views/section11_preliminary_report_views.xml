@@ -53,6 +53,13 @@
                     </group>
                     <notebook>
                         <page string="Schedule">
+                            <div class="alert alert-info" role="alert" style="margin-bottom: 10px;">
+                                <strong>Note:</strong> Land parcels are auto-populated when Section 4 Notification is selected. 
+                                If parcels are not populated, click the button below.
+                                <button name="action_populate_from_surveys" string="Populate from Surveys" type="object" 
+                                        class="btn btn-sm btn-primary" style="margin-left: 10px;"
+                                        invisible="not village_id or not project_id"/>
+                            </div>
                             <field name="land_parcel_ids" nolabel="1">
                                 <list string="Land Parcels" editable="bottom">
                                     <field name="khasra_number" required="1"/>

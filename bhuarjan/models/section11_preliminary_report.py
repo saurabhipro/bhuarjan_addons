@@ -149,27 +149,24 @@ class Section11PreliminaryReport(models.Model):
             if self.section4_notification_id.project_id:
                 self.project_id = self.section4_notification_id.project_id
             
-            # If Section 4 has only one village, auto-select it
-            # Otherwise, user needs to select the village manually
-            if len(self.section4_notification_id.village_ids) == 1:
-                self.village_id = self.section4_notification_id.village_ids[0]
-                # Auto-populate surveys after village is set
+            # Set village from Section 4 (now it's a single village, not many)
+            if self.section4_notification_id.village_id:
+                self.village_id = self.section4_notification_id.village_id
+            
+            # Auto-populate surveys after project and village are set
+            # Use a small delay to ensure project and village are set first
+            if self.village_id and self.project_id:
                 self._populate_land_parcels_from_surveys()
-            elif len(self.section4_notification_id.village_ids) > 1:
-                # Multiple villages - user needs to select one
-                # But we can still populate if village is already selected and matches
-                if self.village_id and self.village_id in self.section4_notification_id.village_ids:
-                    self._populate_land_parcels_from_surveys()
     
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_surveys(self):
         """Auto-populate land parcels when village or project changes"""
-        # Only auto-populate if Section 4 is not selected, or if village matches Section 4's villages
+        # Only auto-populate if Section 4 is not selected, or if village matches Section 4's village
         if not self.section4_notification_id:
             self._populate_land_parcels_from_surveys()
         elif self.section4_notification_id and self.village_id:
-            # Check if selected village is in Section 4's villages
-            if self.village_id in self.section4_notification_id.village_ids:
+            # Check if selected village matches Section 4's village
+            if self.village_id == self.section4_notification_id.village_id:
                 self._populate_land_parcels_from_surveys()
     
     def _populate_land_parcels_from_surveys(self):
@@ -178,28 +175,26 @@ class Section11PreliminaryReport(models.Model):
         if not self.village_id or not self.project_id:
             return
         
-        # If Section 4 Notification is selected, use its surveys (which should be locked)
-        # Otherwise, search for locked surveys for the selected village and project
-        if self.section4_notification_id:
-            # Get surveys from Section 4 that match the selected village
-            section4_surveys = self.section4_notification_id.survey_ids.filtered(
-                lambda s: s.village_id.id == self.village_id.id and 
-                         s.project_id.id == self.project_id.id and
-                         s.state in ('approved', 'locked')
-            )
-            locked_surveys = section4_surveys.sorted('khasra_number')
-        else:
-            # Search for locked surveys for the selected village and project
+        # Always search directly for locked surveys for the selected village and project
+        # This ensures we get the surveys even if Section 4's computed survey_ids is not ready
+        locked_surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', '=', 'locked')
+        ], order='khasra_number')
+        
+        # If no locked surveys found, also check for approved surveys
+        if not locked_surveys:
             locked_surveys = self.env['bhu.survey'].search([
                 ('village_id', '=', self.village_id.id),
                 ('project_id', '=', self.project_id.id),
-                ('state', '=', 'locked')
+                ('state', '=', 'approved')
             ], order='khasra_number')
         
         # Clear existing land parcels
         self.land_parcel_ids = [(5, 0, 0)]
         
-        # Create land parcel records from locked surveys
+        # Create land parcel records from locked/approved surveys
         parcel_vals = []
         for survey in locked_surveys:
             # Get department name for authorized officer if available
@@ -324,6 +319,23 @@ class Section11PreliminaryReport(models.Model):
             return None
         except Exception as e:
             return None
+    
+    def action_populate_from_surveys(self):
+        """Manually populate land parcels from surveys"""
+        self.ensure_one()
+        if not self.village_id or not self.project_id:
+            raise ValidationError(_('Please select Village and Project first.'))
+        self._populate_land_parcels_from_surveys()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Land parcels have been populated from surveys.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def action_generate_pdf(self):
         """Generate Section 11 Preliminary Report PDF"""

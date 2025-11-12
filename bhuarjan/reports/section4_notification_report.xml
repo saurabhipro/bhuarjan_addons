@@ -54,8 +54,8 @@
                     <td style="width: 40%; font-size: 14px;">
                         <strong>विभाग का नाम :</strong>
                         <t t-set="department_name" t-value="''"/>
-                        <t t-if="wizard and wizard.project_id and wizard.village_ids and len(wizard.village_ids) > 0">
-                            <t t-set="first_survey" t-value="wizard.env['bhu.survey'].search([('project_id', '=', wizard.project_id.id), ('village_id', 'in', wizard.village_ids.ids)], limit=1)"/>
+                        <t t-if="wizard and wizard.project_id and wizard.village_id">
+                            <t t-set="first_survey" t-value="wizard.env['bhu.survey'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1)"/>
                             <t t-if="first_survey and first_survey.department_id">
                                 <t t-set="department_name" t-value="first_survey.department_id.name"/>
                             </t>
@@ -65,7 +65,7 @@
                     <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
                         <!-- QR Code - Right Header Box -->
                         <t t-if="wizard">
-                            <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_ids', 'in', wizard.village_ids.ids)], limit=1, order='create_date desc')"/>
+                            <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1, order='create_date desc')"/>
                             <t t-if="notification">
                                 <t t-set="qr_code_img" t-value="notification.get_qr_code_data()"/>
                                 <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section4/' + str(notification.notification_uuid or '') + '/download'"/>
@@ -103,30 +103,26 @@
                 <tr>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>ग्राम का नाम :</strong>
-                        <span t-if="wizard and wizard.village_ids and len(wizard.village_ids) > 0">
-                            <t t-foreach="wizard.village_ids" t-as="village">
-                                <t t-esc="village.name"/>
-                                <t t-if="not village_last">, </t>
-                            </t>
+                        <span t-if="wizard and wizard.village_id">
+                            <t t-esc="wizard.village_id.name"/>
                         </span>
-                        <span t-if="not wizard or not wizard.village_ids or len(wizard.village_ids) == 0">........................</span>
+                        <span t-if="not wizard or not wizard.village_id">........................</span>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>तहसील का नाम :</strong>
-                        <span t-if="wizard and wizard.village_ids and len(wizard.village_ids) > 0">
-                            <t t-set="first_village" t-value="wizard.village_ids[0]"/>
-                            <t t-esc="first_village.tehsil_id.name if first_village and first_village.tehsil_id else ''"/>
-                            <t t-if="first_village and first_village.district_id"> जिला-<t t-esc="first_village.district_id.name"/> (छ.ग.)</t>
+                        <span t-if="wizard and wizard.village_id">
+                            <t t-esc="wizard.village_id.tehsil_id.name if wizard.village_id and wizard.village_id.tehsil_id else ''"/>
+                            <t t-if="wizard.village_id and wizard.village_id.district_id"> जिला-<t t-esc="wizard.village_id.district_id.name"/> (छ.ग.)</t>
                         </span>
-                        <span t-if="not wizard or not wizard.village_ids or len(wizard.village_ids) == 0">रायगढ़ जिला-रायगढ़ (छ.ग.)</span>
+                        <span t-if="not wizard or not wizard.village_id">रायगढ़ जिला-रायगढ़ (छ.ग.)</span>
                     </td>
                 </tr>
                 <tr>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>सर्वे दिनाँक :</strong>
                         <t t-set="survey_date" t-value="''"/>
-                        <t t-if="wizard and wizard.project_id and wizard.village_ids and len(wizard.village_ids) > 0">
-                            <t t-set="first_survey" t-value="wizard.env['bhu.survey'].search([('project_id', '=', wizard.project_id.id), ('village_id', 'in', wizard.village_ids.ids)], limit=1, order='survey_date desc')"/>
+                        <t t-if="wizard and wizard.project_id and wizard.village_id">
+                            <t t-set="first_survey" t-value="wizard.env['bhu.survey'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1, order='survey_date desc')"/>
                             <t t-if="first_survey and first_survey.survey_date">
                                 <t t-set="survey_date" t-value="first_survey.survey_date.strftime('%d/%m/%Y')"/>
                             </t>
@@ -436,7 +432,7 @@
                     <div class="section-divider"></div>
                     
                     <div class="signature-block">
-                        <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_ids', 'in', wizard.village_ids.ids)], limit=1, order='create_date desc')"/>
+                        <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1, order='create_date desc')"/>
                         <t t-if="notification and notification.collector_signature">
                             <div style="text-align: center; margin-top: 80px; margin-bottom: 15px;">
                                 <img t-attf-src="data:image/png;base64,{{ notification.collector_signature }}" style="max-height: 100px; max-width: 300px;"/>

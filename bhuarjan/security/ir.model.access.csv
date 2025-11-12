@@ -44,6 +44,9 @@ access_bhu_payment_file,access_bhu_payment_file,model_bhu_payment_file,base.grou
 access_bhu_payment_file_line,access_bhu_payment_file_line,model_bhu_payment_file_line,base.group_user,1,1,1,1
 access_bhu_payment_reconciliation_bank,access_bhu_payment_reconciliation_bank,model_bhu_payment_reconciliation_bank,base.group_user,1,1,1,1
 access_bhu_payment_reconciliation_bank_line,access_bhu_payment_reconciliation_bank_line,model_bhu_payment_reconciliation_bank_line,base.group_user,1,1,1,1
+access_mobile_otp,mobile.otp,model_mobile_otp,base.group_user,1,1,1,1
+access_jwt_token,jwt.token,model_jwt_token,base.group_user,1,1,1,1
+
 
 
 

@@ -9,6 +9,7 @@ from odoo.http import request, Response
 import json
 import logging
 import base64
+from .main import *
 
 _logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class BhuarjanAPIController(http.Controller):
     """REST API Controller for Bhuarjan mobile app"""
 
     @http.route('/api/bhuarjan/user/projects', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
     def get_user_projects(self, **kwargs):
         """
         Get projects and villages mapped to a specific user
@@ -116,6 +118,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/users', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
     def get_all_users(self, **kwargs):
         """
         Get all users with their details
@@ -216,6 +219,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey', type='http', auth='public', methods=['POST'], csrf=False)
+    @check_permission
     def create_survey(self, **kwargs):
         """
         Create a new survey
@@ -312,6 +316,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
     def get_survey_details(self, survey_id, **kwargs):
         """
         Get detailed survey information
@@ -400,6 +405,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/surveys', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
     def list_surveys(self, **kwargs):
         """
         List surveys with optional filters
@@ -469,6 +475,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/form10/download', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
     def download_form10(self, **kwargs):
         """
         Download Form 10 (Section 4 Notification) PDF
@@ -575,6 +582,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/landowner', type='http', auth='public', methods=['POST'], csrf=False)
+    @check_permission
     def create_landowner(self, **kwargs):
         """
         Create a new landowner

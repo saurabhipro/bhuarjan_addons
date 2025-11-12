@@ -70,6 +70,8 @@
         'views/payment_reconciliation_bank_views.xml',
         'views/rate_master_views.xml',
         'views/settings_master_views.xml',
+        'views/jwt_token_views.xml',
+        'views/mobile_otp_views.xml',
         'wizard/report_wizard.xml',
         'views/qr_microsite_templates.xml',
         'data/mail_data.xml',

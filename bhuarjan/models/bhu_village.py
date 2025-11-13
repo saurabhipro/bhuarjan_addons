@@ -124,7 +124,7 @@ class BhuVillage(models.Model):
         for village in self:
             # Count Section 4 Notifications that include this village
             section4_count = self.env['bhu.section4.notification'].search_count([
-                ('village_ids', 'in', [village.id])
+                ('village_id', '=', village.id)
             ])
             village.section4_notification_count = section4_count
     
@@ -136,8 +136,8 @@ class BhuVillage(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'bhu.section4.notification',
             'view_mode': 'list,form',
-            'domain': [('village_ids', 'in', [self.id])],
-            'context': {'default_village_ids': [(6, 0, [self.id])]},
+            'domain': [('village_id', '=', self.id)],
+            'context': {'default_village_id': self.id},
         }
     
     _sql_constraints = [

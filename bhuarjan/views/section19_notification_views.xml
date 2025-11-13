@@ -39,11 +39,18 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="project_id" required="1"/>
+                            <field name="section11_report_id" 
+                                   domain="[('state', 'in', ('generated', 'signed'))]"
+                                   options="{'no_create_edit': True}"
+                                   placeholder="Select Section 11 Preliminary Report to auto-populate data"
+                                   help="Select Section 11 Preliminary Report to auto-populate all data including land parcels"/>
+                            <field name="name" readonly="section11_report_id"/>
+                            <field name="project_id" required="1" readonly="section11_report_id"
+                                   options="{'no_create': True, 'no_open': True}"/>
                             <field name="village_ids" widget="many2many_tags" required="1" 
+                                   readonly="section11_report_id"
                                    options="{'no_create_edit': True}"/>
-                            <field name="notification_number"/>
+                            <field name="notification_number" readonly="section11_report_id"/>
                             <field name="notification_date"/>
                         </group>
                         <group>
@@ -60,9 +67,23 @@
                     
                     <group string="Land Parcels Schedule / भूमि खंड अनुसूची (Auto-populated from Section 11, excluding objections)">
                         <field name="land_parcel_ids" nolabel="1">
-                            <list>
-                                <field name="khasra_number"/>
-                                <field name="area_hectares"/>
+                            <list string="Khasra Details" editable="bottom">
+                                <field name="khasra_number" required="1" string="Khasra Number"/>
+                                <field name="area_hectares" required="1" string="Area (Hectares)"/>
+                                <field name="survey_number" string="Survey Number"/>
+                                <field name="survey_date" string="Survey Date"/>
+                                <field name="survey_state" string="Status" widget="badge"
+                                       decoration-success="survey_state == 'approved'"
+                                       decoration-info="survey_state == 'submitted'"
+                                       decoration-warning="survey_state == 'draft'"
+                                       decoration-danger="survey_state == 'rejected'"
+                                       decoration-muted="survey_state == 'locked'"/>
+                                <field name="district_id" string="District"/>
+                                <field name="tehsil_id" string="Tehsil"/>
+                                <field name="village_id" string="Village"/>
+                                <field name="project_id" string="Project"/>
+                                <field name="authorized_officer" string="Authorized Officer"/>
+                                <field name="public_purpose_description" string="Public Purpose" widget="text"/>
                             </list>
                         </field>
                     </group>

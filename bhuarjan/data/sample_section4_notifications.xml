@@ -49,8 +49,7 @@
             <field name="q9_project_benefits"><![CDATA[<p>यातायात सुविधा, आर्थिक विकास, रोजगार के अवसर।</p>]]></field>
             <field name="q10_compensation_measures"><![CDATA[<p>मुआवजा और पुनर्वासन। <strong>अनुमानित व्यय:</strong> ₹ 6 करोड़</p>]]></field>
             <field name="q11_other_components"><![CDATA[<p>कृषि भूमि, वन क्षेत्र, जल स्रोत प्रभावित।</p>]]></field>
-        </record>
-        
+        </record>        
         <!-- Note: Jurda and Bhikharimal villages do not have Section 4 Notifications -->
         <!-- Jurda surveys remain in draft state, Bhikharimal surveys also in draft state -->
     </data>

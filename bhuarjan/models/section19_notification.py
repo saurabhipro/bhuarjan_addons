@@ -13,6 +13,11 @@ class Section19Notification(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
+    
+    # Section 11 Preliminary Report reference
+    section11_report_id = fields.Many2one('bhu.section11.preliminary.report', string='Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट',
+                                          tracking=True, help='Select Section 11 Preliminary Report to auto-populate data')
+    
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True,
                                   default=lambda self: self._default_project_id())
     village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
@@ -130,10 +135,77 @@ class Section19Notification(models.Model):
                 record.khasra_numbers = ''
                 record.khasra_count = 0
     
+    @api.onchange('section11_report_id')
+    def _onchange_section11_report(self):
+        """Auto-populate data from Section 11 Preliminary Report"""
+        if self.section11_report_id:
+            # Set project from Section 11
+            if self.section11_report_id.project_id:
+                self.project_id = self.section11_report_id.project_id
+            
+            # Set village from Section 11 (convert to many2many)
+            if self.section11_report_id.village_id:
+                self.village_ids = [(6, 0, [self.section11_report_id.village_id.id])]
+            
+            # Set notification number from Section 11
+            if self.section11_report_id.notification_number:
+                self.notification_number = self.section11_report_id.notification_number
+            
+            # Set name from Section 11 if not already set
+            if (self.name == 'New' or not self.name) and self.section11_report_id.name:
+                self.name = self.section11_report_id.name
+            
+            # Populate land parcels from Section 11
+            self._populate_land_parcels_from_section11()
+    
+    def _populate_land_parcels_from_section11(self):
+        """Populate land parcels from selected Section 11 report"""
+        self.ensure_one()
+        if not self.section11_report_id:
+            return
+        
+        # Clear existing land parcels
+        self.land_parcel_ids = [(5, 0, 0)]
+        
+        # Get all khasra numbers that have objections (Section 15) - exclude them
+        objections = self.env['bhu.section15.objection'].search([
+            ('project_id', '=', self.section11_report_id.project_id.id),
+            ('village_id', '=', self.section11_report_id.village_id.id),
+            ('status', '!=', 'resolved')
+        ])
+        
+        objection_khasras = set()
+        for objection in objections:
+            if objection.survey_id and objection.survey_id.khasra_number:
+                objection_khasras.add(objection.survey_id.khasra_number)
+        
+        # Create land parcel records from Section 11, excluding objections
+        parcel_vals = []
+        for parcel in self.section11_report_id.land_parcel_ids:
+            if parcel.khasra_number and parcel.khasra_number not in objection_khasras:
+                parcel_vals.append((0, 0, {
+                    'khasra_number': parcel.khasra_number,
+                    'area_hectares': parcel.area_in_hectares,
+                    'survey_number': parcel.survey_number,
+                    'survey_date': parcel.survey_date,
+                    'survey_state': parcel.survey_state,
+                    'district_id': parcel.district_id.id if parcel.district_id else False,
+                    'tehsil_id': parcel.tehsil_id.id if parcel.tehsil_id else False,
+                    'village_id': parcel.village_id.id if parcel.village_id else False,
+                    'project_id': parcel.project_id.id if parcel.project_id else False,
+                    'authorized_officer': parcel.authorized_officer,
+                    'public_purpose_description': parcel.public_purpose_description,
+                }))
+        
+        if parcel_vals:
+            self.land_parcel_ids = parcel_vals
+    
     @api.onchange('village_ids', 'project_id')
     def _onchange_village_populate_surveys(self):
         """Auto-populate land parcels from Section 11 approved khasras (excluding objections) when villages are selected"""
-        self._populate_land_parcels_from_surveys()
+        # Only populate if section11_report_id is not set
+        if not self.section11_report_id:
+            self._populate_land_parcels_from_surveys()
     
     def _populate_land_parcels_from_surveys(self):
         """Helper method to populate land parcels from Section 11 approved khasras, excluding those with objections"""
@@ -201,6 +273,24 @@ class Section19Notification(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
+            # If section11_report_id is provided, populate data from it
+            section11_report_id = vals.get('section11_report_id')
+            if section11_report_id:
+                section11_report = self.env['bhu.section11.preliminary.report'].browse(section11_report_id)
+                if section11_report.exists():
+                    # Set project from Section 11 if not already set
+                    if not vals.get('project_id') and section11_report.project_id:
+                        vals['project_id'] = section11_report.project_id.id
+                    # Set village from Section 11 if not already set
+                    if not vals.get('village_ids') and section11_report.village_id:
+                        vals['village_ids'] = [(6, 0, [section11_report.village_id.id])]
+                    # Set notification number from Section 11 if not already set
+                    if not vals.get('notification_number') and section11_report.notification_number:
+                        vals['notification_number'] = section11_report.notification_number
+                    # Set name from Section 11 if not already set
+                    if (vals.get('name', 'New') == 'New' or not vals.get('name')) and section11_report.name:
+                        vals['name'] = section11_report.name
+            
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 project_id = vals.get('project_id')
@@ -225,9 +315,13 @@ class Section19Notification(models.Model):
                 if project_id:
                     vals['project_id'] = project_id
         records = super().create(vals_list)
-        # Auto-populate land parcels after creation if villages and project are set
+        # Auto-populate land parcels after creation
         for record in records:
-            if record.village_ids and record.project_id:
+            if record.section11_report_id:
+                # Populate from Section 11
+                record._populate_land_parcels_from_section11()
+            elif record.village_ids and record.project_id:
+                # Populate from surveys (old method)
                 record._populate_land_parcels_from_surveys()
         return records
     
@@ -304,6 +398,28 @@ class Section19LandParcel(models.Model):
     notification_id = fields.Many2one('bhu.section19.notification', string='Notification', required=True, ondelete='cascade')
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True)
     area_hectares = fields.Float(string='Area (Hectares) / रकबा (हेक्टेयर में)', required=True, digits=(16, 4))
+    
+    # Additional fields from Section 11
+    survey_number = fields.Char(string='Survey Number / सर्वे नंबर')
+    survey_date = fields.Date(string='Survey Date / सर्वे दिनांक')
+    survey_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('locked', 'Locked'),
+        ('rejected', 'Rejected'),
+    ], string='Survey Status / सर्वे स्थिति')
+    
+    # Location fields
+    district_id = fields.Many2one('bhu.district', string='District / जिला')
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील')
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना')
+    
+    # Additional details
+    authorized_officer = fields.Char(string='Authorized Officer / प्राधिकृत अधिकारी',
+                                    help='Officer authorized by Section 12')
+    public_purpose_description = fields.Text(string='Public Purpose Description / लोक प्रयोजन विवरण')
 
 
 class Section19NotificationWizard(models.TransientModel):

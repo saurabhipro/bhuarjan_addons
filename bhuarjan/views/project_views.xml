@@ -19,6 +19,10 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="alert alert-info" role="alert" 
+                         style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                        <strong>ℹ Information:</strong> Only villages mapped to this project will appear in the dropdown below. To add villages to this project, select them from the list.
+                    </div>
                     <group>
                         <group>
                             <field name="name"/>

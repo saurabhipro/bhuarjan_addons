@@ -6,17 +6,17 @@
         <field name="model">bhu.village</field>
         <field name="arch" type="xml">
             <list string="Villages / ग्राम">
-                <field name="village_code"/>
-                <field name="name"/>
-                <field name="state_id"/>
-                <field name="district_id"/>
-                <field name="sub_division_id"/>
-                <field name="tehsil_id"/>
-                <field name="circle_id"/>
-                <field name="pincode"/>
-                <field name="population"/>
-                <field name="is_tribal_area"/>
-                <field name="is_forest_area"/>
+                <field name="village_code" string="Village Code"/>
+                <field name="name" string="Village Name"/>
+                <field name="state_id" string="State"/>
+                <field name="district_id" string="District"/>
+                <field name="sub_division_id" string="Sub Division"/>
+                <field name="tehsil_id" string="Tehsil"/>
+                <field name="circle_id" string="Circle"/>
+                <field name="pincode" string="Pincode"/>
+                <field name="population" string="Population"/>
+                <field name="is_tribal_area" string="Tribal Area"/>
+                <field name="is_forest_area" string="Forest Area"/>
             </list>
         </field>
     </record>

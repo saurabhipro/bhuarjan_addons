@@ -218,6 +218,58 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/departments', type='http', auth='public', methods=['GET'], csrf=False)
+    def get_all_departments(self, **kwargs):
+        """
+        Get all departments
+        Query params: limit, offset
+        Returns: JSON list of departments
+        """
+        try:
+            # Get query parameters
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+
+            # Search departments
+            departments = request.env['bhu.department'].sudo().search([], limit=limit, offset=offset, order='name')
+
+            # Build response
+            departments_data = []
+            for dept in departments:
+                departments_data.append({
+                    'id': dept.id,
+                    'name': dept.name,
+                    'code': dept.code or '',
+                    'description': dept.description or '',
+                    'head_of_department': dept.head_of_department or '',
+                    'contact_number': dept.contact_number or '',
+                    'email': dept.email or '',
+                    'address': dept.address or '',
+                })
+
+            # Get total count
+            total_count = request.env['bhu.department'].sudo().search_count([])
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': departments_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_all_departments: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/survey', type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
     def create_survey(self, **kwargs):

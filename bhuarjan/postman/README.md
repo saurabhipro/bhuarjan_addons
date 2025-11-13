@@ -39,7 +39,17 @@ This Postman collection contains all the REST API endpoints for the Bhuarjan mob
   - `offset` (integer) - Skip records (default: 0)
   - `role` (string) - Filter by bhuarjan_role: `patwari`, `revenue_inspector`, `nayab_tahsildar`, `tahsildar`, `sdm`, `additional_collector`, `collector`, `administrator`
 
-### 3. Surveys
+### 3. Departments
+
+#### Get All Departments
+- **Method:** GET
+- **URL:** `/api/bhuarjan/departments`
+- **Description:** Returns all departments with their details
+- **Query Parameters (all optional):**
+  - `limit` (integer) - Number of records (default: 100)
+  - `offset` (integer) - Skip records (default: 0)
+
+### 4. Surveys
 
 #### Create Survey
 - **Method:** POST
@@ -72,7 +82,7 @@ This Postman collection contains all the REST API endpoints for the Bhuarjan mob
   - `limit` (integer) - Number of records (default: 100)
   - `offset` (integer) - Skip records (default: 0)
 
-### 4. Form 10 (Section 4 Notification)
+### 5. Form 10 (Section 4 Notification)
 
 #### Download Form 10 PDF
 - **Method:** GET
@@ -82,7 +92,7 @@ This Postman collection contains all the REST API endpoints for the Bhuarjan mob
   - Option 1: `project_id` + `village_id`
   - Option 2: `notification_id`
 
-### 5. Landowners
+### 6. Landowners
 
 #### Create Landowner
 - **Method:** POST

@@ -6,11 +6,11 @@
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
             <list string="Section 4 Notifications" delete="1">
-                <field name="name"/>
+                <field name="notification_seq_number" string="Notification Sequence Number"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
                 <field name="public_hearing_date"/>
-                <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="state" widget="badge" decoration-success="state in ('signed', 'notification_11')" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
             </list>
@@ -25,83 +25,46 @@
             <form string="Section 4 Notification">
                 <header>
                     <button name="action_generate_pdf" string="Generate Notification 4" type="object" class="btn-primary" icon="fa-file-pdf"
-                            invisible="state == 'signed' or (state == 'draft' and not all_surveys_approved)"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
+                            invisible="state != 'draft' or (state == 'draft' and not all_surveys_approved)"/>
+                    <button name="action_download_pdf" string="Download Notification 4" type="object" class="btn-primary" icon="fa-download"
+                            invisible="state not in ('generated', 'signed', 'notification_11')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed,notification_11"/>
                 </header>
+                <div class="alert alert-info" role="alert" invisible="state != 'draft' or not project_id or not village_id" 
+                     style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                    <strong>ℹ Information:</strong> You are about to generate Notification 4 for <strong><field name="project_id" readonly="1" nolabel="1" invisible="not project_id"/></strong> project and <strong><field name="village_id" readonly="1" nolabel="1" invisible="not village_id"/></strong> village. This notification will be generated for approved surveys only.
+                </div>
                 <div class="alert alert-warning" role="alert" invisible="all_surveys_approved or survey_count == 0 or state != 'draft'" 
                      style="margin: 10px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
                     <strong>⚠ Warning:</strong> Cannot generate Section 4 Notification. Some surveys are not approved yet. 
                     Please approve all surveys for the selected villages before generating the notification.
                 </div>
-                <sheet readonly="has_section11">
+                <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
+                    <div class="alert alert-info" role="alert" 
+                         style="margin: 10px; padding: 12px; background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+                        <strong>📋 Section 4 Notification - LARA Act 2013:</strong>
+                        <br/>
+                        <strong>Importance:</strong> Section 4 Notification is a critical step in the land acquisition process under the Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act, 2013 (LARA Act 2013). This notification serves as the preliminary notification indicating the government's intent to acquire land for a public purpose.
+                        <br/><br/>
+                        <strong>Key Deadlines:</strong>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li>After Section 4 notification is published, affected persons have <strong>60 days</strong> to submit objections/claims under Section 15 of the Act.</li>
+                            <li>The Social Impact Assessment (SIA) must be completed and submitted within the timeframe specified by the Act.</li>
+                            <li>Section 11 Preliminary Notification must be issued after considering all objections and SIA findings.</li>
+                        </ul>
+                        <strong>Note:</strong> Ensure all surveys are approved and locked before generating this notification, as it cannot be modified once generated.
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="project_id" required="1"/>
+                            <field name="name" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <field name="project_id" required="1" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 
+                                   options="{'no_create': True, 'no_open': True}"/>
                             <field name="village_id" required="1" 
-                                   options="{'no_create_edit': True}"/>
+                                   options="{'no_create_edit': True}"
+                                   readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Basic Information" icon="fa-info-circle">
-                            <group string="Public Purpose">
-                                <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
-                                       widget="html" nolabel="1"/>
-                            </group>
-                            <group string="Public Hearing Details">
-                                <field name="public_hearing_date"/>
-                                <field name="public_hearing_time"/>
-                                <field name="public_hearing_place"/>
-                            </group>
-                        </page>
-                        <page string="Section 4 Questions" icon="fa-question-circle">
-                            <group string="(1) Brief Description of Public Purpose">
-                                <field name="q1_brief_description" widget="html" nolabel="1"/>
-                            </group>
-                            <group string="(2) Number of Directly Affected Families">
-                                <field name="q2_directly_affected" nolabel="1"/>
-                            </group>
-                            <group string="(3) Number of Indirectly Affected Families">
-                                <field name="q3_indirectly_affected" nolabel="1"/>
-                            </group>
-                            <group string="(4) Estimated Number of Private Houses and Other Assets">
-                                <field name="q4_private_assets" nolabel="1"/>
-                            </group>
-                            <group string="(5) Estimated Number of Government Houses and Other Assets">
-                                <field name="q5_government_assets" nolabel="1"/>
-                            </group>
-                            <group string="(6) Is the Proposed Acquisition Minimal?">
-                                <field name="q6_minimal_acquisition" nolabel="1"/>
-                            </group>
-                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered?">
-                                <field name="q7_alternatives_considered" widget="html" nolabel="1"/>
-                            </group>
-                            <group string="(8) Total Cost of the Project">
-                                <field name="q8_total_cost" nolabel="1"/>
-                            </group>
-                            <group string="(9) Benefits from the Project">
-                                <field name="q9_project_benefits" widget="html" nolabel="1"/>
-                            </group>
-                            <group string="(10) Measures for Compensation and Likely Expenditure">
-                                <field name="q10_compensation_measures" widget="html" nolabel="1"/>
-                            </group>
-                            <group string="(11) Other Components Affected by the Project">
-                                <field name="q11_other_components" widget="html" nolabel="1"/>
-                            </group>
-                        </page>
-                        <page string="Signed Document" icon="fa-file-signature">
-                            <group string="Signed Notification">
-                                <field name="has_signed_document" readonly="1"/>
-                                <field name="signed_document_file" filename="signed_document_filename"/>
-                                <field name="signed_document_filename" invisible="1"/>
-                                <field name="signed_date"/>
-                            </group>
-                            <group string="Collector Signature">
-                                <field name="collector_signature" filename="collector_signature_filename"/>
-                                <field name="collector_signature_filename" invisible="1"/>
-                                <field name="collector_name"/>
-                            </group>
-                        </page>
                         <page string="Surveys" icon="fa-clipboard-list" invisible="not project_id or not village_id">
                             <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
                                 <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
@@ -113,21 +76,96 @@
                                 <list>
                                     <field name="name"/>
                                     <field name="user_id" string="Surveyor"/>
-                                    <field name="project_id"/>
+                                    <field name="project_id" string="Project"/>
                                     <field name="district_name" string="District"/>
-                                    <field name="village_id"/>
-                                    <field name="khasra_number"/>
-                                    <field name="total_area"/>
-                                    <field name="acquired_area"/>
-                                    <field name="state" widget="badge" 
+                                    <field name="village_id" string="Village"/>
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="total_area" string="Total Area"/>
+                                    <field name="acquired_area" string="Acquired Area"/>
+                                    <field name="state" widget="badge" string="Status"
                                            decoration-success="state == 'approved'" 
                                            decoration-info="state == 'submitted'" 
                                            decoration-warning="state == 'draft'"
                                            decoration-danger="state == 'rejected'"
                                            decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date"/>
+                                    <field name="survey_date" string="Survey Date"/>
                                 </list>
                             </field>
+                        </page>
+                        <page string="Basic Information" icon="fa-info-circle">
+                            <group string="Public Purpose">
+                                <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
+                                       widget="html" nolabel="1"
+                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            </group>
+                            <group string="Public Hearing Details">
+                                <field name="public_hearing_date" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                <field name="public_hearing_time" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                <field name="public_hearing_place" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            </group>
+                        </page>
+                        <page string="Section 4 Questions" icon="fa-question-circle">
+                            <group>
+                                <group string="(1) Brief Description of Public Purpose">
+                                    <field name="q1_brief_description" widget="html" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                                <group string="(2) Number of Directly Affected Families">
+                                    <field name="q2_directly_affected" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(3) Number of Indirectly Affected Families">
+                                    <field name="q3_indirectly_affected" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                                <group string="(4) Estimated Number of Private Houses and Other Assets">
+                                    <field name="q4_private_assets" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(5) Estimated Number of Government Houses and Other Assets">
+                                    <field name="q5_government_assets" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                                <group string="(6) Is the Proposed Acquisition Minimal?">
+                                    <field name="q6_minimal_acquisition" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                            </group>
+                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered?">
+                                <field name="q7_alternatives_considered" widget="html" nolabel="1"
+                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            </group>
+                            <group>
+                                <group string="(8) Total Cost of the Project">
+                                    <field name="q8_total_cost" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                                <group string="(9) Benefits from the Project">
+                                    <field name="q9_project_benefits" widget="html" nolabel="1"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
+                            </group>
+                            <group string="(10) Measures for Compensation and Likely Expenditure">
+                                <field name="q10_compensation_measures" widget="html" nolabel="1"
+                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            </group>
+                            <group string="(11) Other Components Affected by the Project">
+                                <field name="q11_other_components" widget="html" nolabel="1"
+                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            </group>
+                        </page>
+                        <page string="Signed Document" icon="fa-file-signature">
+                            <group string="Signed Notification">
+                                <field name="has_signed_document" readonly="1"/>
+                                <field name="signed_document_file" filename="signed_document_filename"
+                                      readonly="state in ('signed', 'notification_11')"/>
+                                <field name="signed_document_filename" invisible="1"/>
+                                <field name="signed_date" readonly="state in ('signed', 'notification_11')"/>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

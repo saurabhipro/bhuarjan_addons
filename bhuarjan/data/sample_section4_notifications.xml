@@ -7,6 +7,8 @@
         <!-- Note: Jurda village surveys remain in draft state (no Section 4 notification) -->
         <record id="section4_notification_pandripani" model="bhu.section4.notification">
             <field name="name">NOT4_RRR-001_PP</field>
+            <field name="notification_seq_number">NOT4_RRR-001_PP</field>
+            <field name="project_id" ref="project_ring_road_raigarh"/>
             <field name="village_id" ref="pandripani_village"/>
             <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन। यह परियोजना शहर के यातायात को सुविधाजनक बनाने और आर्थिक विकास को बढ़ावा देने के लिए है।</p>]]></field>
@@ -28,6 +30,8 @@
         
         <record id="section4_notification_gopalpur" model="bhu.section4.notification">
             <field name="name">NOT4_RRR-001_GL</field>
+            <field name="notification_seq_number">NOT4_RRR-001_GL</field>
+            <field name="project_id" ref="project_ring_road_raigarh"/>
             <field name="village_id" ref="gopalpur_village"/>
             <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन।</p>]]></field>

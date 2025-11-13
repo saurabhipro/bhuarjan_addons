@@ -5,13 +5,6 @@ from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 import uuid
 
-# -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
-from dateutil.relativedelta import relativedelta
-import uuid
-
 
 # Stub models for Process menu items - to be implemented later
 # These are minimal models to allow the module to load
@@ -23,6 +16,8 @@ class Section4Notification(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
+    notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
+                                          help='Sequence number for this notification')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, 
                                   default=lambda self: self._default_project_id())
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
@@ -69,10 +64,6 @@ class Section4Notification(models.Model):
     signed_date = fields.Date(string='Signed Date / हस्ताक्षर दिनांक', tracking=True)
     has_signed_document = fields.Boolean(string='Has Signed Document / हस्ताक्षरित दस्तावेज़ है', compute='_compute_has_signed_document', store=True)
     
-    # Collector signature
-    collector_signature = fields.Binary(string='Collector Signature / कलेक्टर हस्ताक्षर')
-    collector_signature_filename = fields.Char(string='Signature File Name')
-    collector_name = fields.Char(string='Collector Name / कलेक्टर का नाम', tracking=True)
     
     # UUID for QR code
     notification_uuid = fields.Char(string='Notification UUID', copy=False, readonly=True, index=True)
@@ -81,12 +72,14 @@ class Section4Notification(models.Model):
         ('draft', 'Draft / प्रारूप'),
         ('generated', 'Generated / जेनरेट किया गया'),
         ('signed', 'Signed / हस्ताक्षरित'),
+        ('notification_11', 'Notification 11 / अधिसूचना 11'),
     ], string='Status / स्थिति', default='draft', tracking=True)
     
-    @api.depends('signed_document_file')
+    @api.depends('signed_document_file', 'state', 'signed_date')
     def _compute_has_signed_document(self):
         for record in self:
-            record.has_signed_document = bool(record.signed_document_file)
+            # Consider it signed if there's a signed document file OR if state is 'signed'
+            record.has_signed_document = bool(record.signed_document_file) or record.state == 'signed'
     
     @api.onchange('signed_document_file')
     def _onchange_signed_document_file(self):
@@ -131,6 +124,14 @@ class Section4Notification(models.Model):
             else:
                 record.has_section11 = False
     
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset village when project changes and set domain"""
+        self.village_id = False
+        if self.project_id and self.project_id.village_ids:
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_id': []}}
+    
     @api.model
     def _default_project_id(self):
         """Default project_id to PROJ01 if it exists, otherwise use first available project"""
@@ -152,15 +153,21 @@ class Section4Notification(models.Model):
             village_id = vals.get('village_id')
             
             # Check for existing records to prevent UniqueViolation
-            if project_id and village_id:
+            # Skip this check during data loading - let Odoo's mechanism handle it
+            is_data_loading = self.env.context.get('install_mode') or self.env.context.get('load') or \
+                             self.env.context.get('module') or '_force_unlink' in self.env.context
+            if project_id and village_id and not is_data_loading:
                 existing = self.env['bhu.section4.notification'].search([
                     ('project_id', '=', project_id),
                     ('village_id', '=', village_id)
                 ], limit=1)
                 if existing:
+                    # In normal create, return existing to prevent duplicate
                     existing_records.append(existing)
                     continue
             
+            # Generate sequence number for both name and notification_seq_number
+            sequence_number = None
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 if project_id:
@@ -172,9 +179,19 @@ class Section4Notification(models.Model):
                     else:
                         # Fallback to ir.sequence
                         vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+                        sequence_number = vals['name']
                 else:
                     # No project_id, use fallback
                     vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
+                    sequence_number = vals['name']
+            else:
+                # If name is provided, use it as sequence number
+                sequence_number = vals.get('name')
+            
+            # Auto-generate notification sequence number if not provided (use same as name)
+            if not vals.get('notification_seq_number') and sequence_number:
+                vals['notification_seq_number'] = sequence_number
+            
             if not vals.get('notification_uuid'):
                 vals['notification_uuid'] = str(uuid.uuid4())
             # Set default project_id if not provided - always set it to avoid NOT NULL constraint violation
@@ -192,7 +209,11 @@ class Section4Notification(models.Model):
                         vals['project_id'] = any_project.id
             new_vals_list.append(vals)
         
-        records = super().create(new_vals_list) if new_vals_list else self.env['bhu.section4.notification']
+        # Create new records
+        if new_vals_list:
+            records = super().create(new_vals_list)
+        else:
+            records = self.env['bhu.section4.notification']
         
         if existing_records:
             records = records | self.env['bhu.section4.notification'].browse([r.id for r in existing_records])
@@ -344,6 +365,45 @@ class Section4Notification(models.Model):
         self.state = 'signed'
         if not self.signed_date:
             self.signed_date = fields.Date.today()
+    
+    def action_download_pdf(self):
+        """Download Section 4 Notification PDF (for generated/signed notifications)"""
+        self.ensure_one()
+        
+        if self.state not in ('generated', 'signed'):
+            raise ValidationError(_('Notification must be generated before downloading.'))
+        
+        # If signed document exists, download it
+        if self.signed_document_file:
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'/web/content/bhu.section4.notification/{self.id}/signed_document_file/{self.signed_document_filename or "signed_notification.pdf"}?download=true',
+                'target': 'self',
+            }
+        
+        # Otherwise, generate PDF using wizard (same as action_generate_pdf but for download)
+        wizard = self.env['bhu.section4.notification.wizard'].create({
+            'project_id': self.project_id.id,
+            'village_id': self.village_id.id,
+            'public_purpose': self.public_purpose,
+            'public_hearing_date': self.public_hearing_date,
+            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_place': self.public_hearing_place,
+            'q1_brief_description': self.q1_brief_description,
+            'q2_directly_affected': self.q2_directly_affected,
+            'q3_indirectly_affected': self.q3_indirectly_affected,
+            'q4_private_assets': self.q4_private_assets,
+            'q5_government_assets': self.q5_government_assets,
+            'q6_minimal_acquisition': self.q6_minimal_acquisition,
+            'q7_alternatives_considered': self.q7_alternatives_considered,
+            'q8_total_cost': self.q8_total_cost,
+            'q9_project_benefits': self.q9_project_benefits,
+            'q10_compensation_measures': self.q10_compensation_measures,
+            'q11_other_components': self.q11_other_components,
+        })
+        
+        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
+        return report_action.report_action(wizard)
 
 
 class Section4NotificationWizard(models.TransientModel):

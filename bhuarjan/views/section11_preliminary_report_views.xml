@@ -33,16 +33,25 @@
                             invisible="state == 'signed'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
+                <div class="alert alert-info" role="alert" invisible="state != 'draft' or not project_id or not village_id" 
+                     style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                    <strong>ℹ Information:</strong> You are about to generate Notification 11 for <strong><field name="project_id" readonly="1" nolabel="1" invisible="not project_id"/></strong> project and <strong><field name="village_id" readonly="1" nolabel="1" invisible="not village_id"/></strong> village based on the selected Section 4 Notification.
+                </div>
                 <sheet>
                     <group>
                         <group>
                             <field name="name"/>
                             <field name="section4_notification_id" 
                                    options="{'no_create_edit': True}"
-                                   placeholder="Select Section 4 Notification to auto-populate survey details"/>
-                            <field name="project_id" required="1" options="{'no_create_edit': True}"/>
+                                   domain="[('state', '=', 'signed')]"
+                                   placeholder="Select Section 4 Notification to auto-populate survey details"
+                                   help="Only signed Section 4 Notifications that haven't been used for Notification 11 can be selected"/>
+                            <field name="project_id" required="1" 
+                                   options="{'no_create_edit': True}"
+                                   readonly="section4_notification_id"/>
                             <field name="village_id" required="1" 
-                                   options="{'no_create_edit': True}"/>
+                                   options="{'no_create_edit': True}"
+                                   readonly="section4_notification_id"/>
                         </group>
                         <group>
                             <field name="notification_number"/>
@@ -52,39 +61,50 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Schedule">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 10px;">
-                                <strong>Note:</strong> Land parcels are auto-populated when Section 4 Notification is selected. 
-                                If parcels are not populated, click the button below.
-                                <button name="action_populate_from_surveys" string="Populate from Surveys" type="object" 
-                                        class="btn btn-sm btn-primary" style="margin-left: 10px;"
-                                        invisible="not village_id or not project_id"/>
+                        <page string="Surveys">
+                            <div class="alert alert-info" role="alert" invisible="not section4_notification_id" 
+                                 style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                                <strong>ℹ Information:</strong> The surveys shown below are locked because they have been used to generate <strong><field name="section4_notification_id" readonly="1" nolabel="1" invisible="not section4_notification_id"/></strong> (Notification 4). These locked surveys are included in this Notification 11 report.
                             </div>
                             <field name="land_parcel_ids" nolabel="1">
-                                <list string="Land Parcels" editable="bottom">
-                                    <field name="khasra_number" required="1"/>
-                                    <field name="area_in_hectares" required="1"/>
-                                    <field name="survey_number"/>
-                                    <field name="survey_date"/>
-                                    <field name="district_id"/>
-                                    <field name="village_id"/>
-                                    <field name="project_id"/>
+                                <list string="Surveys" editable="bottom">
+                                    <field name="khasra_number" required="1" string="Khasra Number"/>
+                                    <field name="area_in_hectares" required="1" string="Area (Hectares)"/>
+                                    <field name="survey_number" string="Survey Number"/>
+                                    <field name="survey_date" string="Survey Date"/>
+                                    <field name="district_id" string="District"/>
+                                    <field name="village_id" string="Village"/>
+                                    <field name="project_id" string="Project"/>
+                                    <field name="survey_state" string="Status" widget="badge"
+                                           decoration-success="survey_state == 'approved'"
+                                           decoration-info="survey_state == 'submitted'"
+                                           decoration-warning="survey_state == 'draft'"
+                                           decoration-danger="survey_state == 'rejected'"
+                                           decoration-muted="survey_state == 'locked'"/>
                                 </list>
                             </field>
                         </page>
                         <page string="Paragraphs">
-                            <group string="Paragraph 2: Claims/Objections Information">
-                                <field name="paragraph_2_claims_info" widget="text" nolabel="1" 
-                                       placeholder="Information about claims/objections submission (60 days deadline)"/>
+                            <group>
+                                <group string="Paragraph 2: Claims/Objections Information">
+                                    <field name="paragraph_2_claims_info" widget="text" nolabel="1" 
+                                           placeholder="Information about claims/objections submission (60 days deadline)"/>
+                                </group>
+                                <group string="Paragraph 3: Land Map Inspection">
+                                    <field name="paragraph_3_map_inspection_location" 
+                                           placeholder="Location where land map can be inspected (SDO Revenue office)"/>
+                                </group>
                             </group>
-                            <group string="Paragraph 3: Land Map Inspection">
-                                <field name="paragraph_3_map_inspection_location" 
-                                       placeholder="Location where land map can be inspected (SDO Revenue office)"/>
-                            </group>
-                            <group string="Paragraph 4: Displacement">
-                                <field name="paragraph_4_is_displacement"/>
-                                <field name="paragraph_4_affected_families_count" 
-                                       invisible="not paragraph_4_is_displacement"/>
+                            <group>
+                                <group string="Paragraph 4: Displacement">
+                                    <field name="paragraph_4_is_displacement"/>
+                                    <field name="paragraph_4_affected_families_count" 
+                                           invisible="not paragraph_4_is_displacement"/>
+                                </group>
+                                <group string="Paragraph 6: Rehabilitation Administrator">
+                                    <field name="paragraph_6_rehab_admin_name" 
+                                           placeholder="Name/Designation of Rehabilitation and Resettlement Administrator"/>
+                                </group>
                             </group>
                             <group string="Paragraph 5: Exemption or SIA Justification">
                                 <field name="paragraph_5_is_exemption"/>
@@ -97,10 +117,6 @@
                                     <field name="paragraph_5_sia_justification" widget="text" nolabel="1"/>
                                 </group>
                             </group>
-                            <group string="Paragraph 6: Rehabilitation Administrator">
-                                <field name="paragraph_6_rehab_admin_name" 
-                                       placeholder="Name/Designation of Rehabilitation and Resettlement Administrator"/>
-                            </group>
                         </page>
                         <page string="Signed Document">
                             <group string="Signed Report">
@@ -108,11 +124,6 @@
                                 <field name="signed_document_file" filename="signed_document_filename"/>
                                 <field name="signed_document_filename" invisible="1"/>
                                 <field name="signed_date"/>
-                            </group>
-                            <group string="Collector Signature">
-                                <field name="collector_signature" filename="collector_signature_filename"/>
-                                <field name="collector_signature_filename" invisible="1"/>
-                                <field name="collector_name"/>
                             </group>
                         </page>
                     </notebook>

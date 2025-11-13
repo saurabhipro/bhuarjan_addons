@@ -432,22 +432,10 @@
                     <div class="section-divider"></div>
                     
                     <div class="signature-block">
-                        <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1, order='create_date desc')"/>
-                        <t t-if="notification and notification.collector_signature">
-                            <div style="text-align: center; margin-top: 80px; margin-bottom: 15px;">
-                                <img t-attf-src="data:image/png;base64,{{ notification.collector_signature }}" style="max-height: 100px; max-width: 300px;"/>
-                            </div>
+                        <div style="text-align: center; margin-top: 80px;">
+                            <div class="signature-line"></div>
                             <p class="signature-label">जिला कलेक्टर</p>
-                            <t t-if="notification.collector_name">
-                                <p style="text-align: center; font-size: 18px; margin-top: 8px;"><t t-esc="notification.collector_name"/></p>
-                            </t>
-                        </t>
-                        <t t-if="not notification or not notification.collector_signature">
-                            <div style="text-align: center; margin-top: 80px;">
-                                <div class="signature-line"></div>
-                                <p class="signature-label">जिला कलेक्टर</p>
-                            </div>
-                        </t>
+                        </div>
                     </div>
                 </div>
             </t>

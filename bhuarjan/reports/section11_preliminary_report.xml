@@ -303,10 +303,7 @@
                         <div style="margin-top: 40px; text-align: right;">
                             <div style="margin: 10px 0;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
                             <div style="margin: 10px 0;">तथा आदेशानुसार</div>
-                            <div style="margin: 20px 0;">
-                                <span t-if="report.collector_name" t-esc="report.collector_name"/>
-                                <span t-if="not report.collector_name">(........................)</span>
-                            </div>
+                            <div style="margin: 20px 0;">(........................)</div>
                             <div style="margin: 10px 0; font-weight: bold;">कलेक्टर</div>
                         </div>
                     </div>

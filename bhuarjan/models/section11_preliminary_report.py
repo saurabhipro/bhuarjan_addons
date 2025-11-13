@@ -109,10 +109,6 @@ class Section11PreliminaryReport(models.Model):
     has_signed_document = fields.Boolean(string='Has Signed Document', 
                                          compute='_compute_has_signed_document', store=True)
     
-    # Collector signature
-    collector_signature = fields.Binary(string='Collector Signature')
-    collector_signature_filename = fields.Char(string='Signature File Name')
-    collector_name = fields.Char(string='Collector Name', tracking=True)
     
     # UUID for QR code
     report_uuid = fields.Char(string='Report UUID', copy=False, readonly=True, index=True)
@@ -143,7 +139,7 @@ class Section11PreliminaryReport(models.Model):
     
     @api.onchange('section4_notification_id')
     def _onchange_section4_notification(self):
-        """Auto-populate project, village, and surveys when Section 4 Notification is selected"""
+        """Auto-populate project, village, notification_number, name, and surveys when Section 4 Notification is selected"""
         if self.section4_notification_id:
             # Set project from Section 4
             if self.section4_notification_id.project_id:
@@ -152,6 +148,14 @@ class Section11PreliminaryReport(models.Model):
             # Set village from Section 4 (now it's a single village, not many)
             if self.section4_notification_id.village_id:
                 self.village_id = self.section4_notification_id.village_id
+            
+            # Set notification_number from Section 4's notification_seq_number
+            if self.section4_notification_id.notification_seq_number:
+                self.notification_number = self.section4_notification_id.notification_seq_number
+            
+            # Set name from Section 4's name
+            if self.section4_notification_id.name:
+                self.name = self.section4_notification_id.name
             
             # Auto-populate surveys after project and village are set
             # Use a small delay to ensure project and village are set first
@@ -236,8 +240,40 @@ class Section11PreliminaryReport(models.Model):
         new_vals_list = []
         
         for vals in vals_list:
+            # If section4_notification_id is provided, populate project_id and village_id from it
+            section4_notification_id = vals.get('section4_notification_id')
+            if section4_notification_id:
+                section4_notif = self.env['bhu.section4.notification'].browse(section4_notification_id)
+                if section4_notif.exists():
+                    # Check if Section 4 is already in 'notification_11' status - prevent recreation
+                    if section4_notif.state == 'notification_11':
+                        raise ValidationError(_(
+                            'Notification 11 has already been generated for this Section 4 Notification (%s). '
+                            'Cannot create another Notification 11 for the same village and project.'
+                        ) % section4_notif.name)
+                    
+                    # Set project_id from Section 4 if not already set
+                    if not vals.get('project_id') and section4_notif.project_id:
+                        vals['project_id'] = section4_notif.project_id.id
+                    # Set village_id from Section 4 if not already set
+                    if not vals.get('village_id') and section4_notif.village_id:
+                        vals['village_id'] = section4_notif.village_id.id
+                    # Set notification_number from Section 4 if not already set (for reference only)
+                    if not vals.get('notification_number') and section4_notif.notification_seq_number:
+                        vals['notification_number'] = section4_notif.notification_seq_number
+                    # Don't use Section 4's name - generate new sequence number using sequence master
+                    # The name will be generated below using the sequence master for section11_notification
+            
             project_id = vals.get('project_id')
             village_id = vals.get('village_id')
+            
+            # Ensure required fields are set
+            if not village_id:
+                # Try to get from default if available
+                if not project_id:
+                    project_id = self._default_project_id()
+                    if project_id:
+                        vals['project_id'] = project_id
             
             # Check if a record already exists for this village and project
             if project_id and village_id:
@@ -277,9 +313,13 @@ class Section11PreliminaryReport(models.Model):
             records = records | self.env['bhu.section11.preliminary.report'].browse([r.id for r in existing_records])
         
         # Auto-populate land parcels after creation if village and project are set
+        # Also update Section 4 Notification status to 'notification_11'
         for record in records:
             if record.village_id and record.project_id:
                 record._populate_land_parcels_from_surveys()
+            # Update Section 4 Notification status to 'notification_11' when Section 11 is created
+            if record.section4_notification_id and record.section4_notification_id.state != 'notification_11':
+                record.section4_notification_id.write({'state': 'notification_11'})
         return records
     
     def get_qr_code_data(self):
@@ -341,6 +381,9 @@ class Section11PreliminaryReport(models.Model):
         """Generate Section 11 Preliminary Report PDF"""
         self.ensure_one()
         self.state = 'generated'
+        # Update Section 4 Notification status to 'notification_11' when Section 11 is generated
+        if self.section4_notification_id and self.section4_notification_id.state != 'notification_11':
+            self.section4_notification_id.write({'state': 'notification_11'})
         return self.env.ref('bhuarjan.action_report_section11_preliminary').report_action(self)
     
     @api.model
@@ -377,27 +420,37 @@ class Section11LandParcel(models.Model):
     # Computed fields from related survey
     survey_number = fields.Char(string='Survey Number', compute='_compute_survey_info', store=False)
     survey_date = fields.Date(string='Survey Date', compute='_compute_survey_info', store=False)
+    survey_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('locked', 'Locked'),
+        ('rejected', 'Rejected'),
+    ], string='Survey Status', compute='_compute_survey_info', store=False)
     
     @api.depends('khasra_number', 'report_id.village_id', 'report_id.project_id')
     def _compute_survey_info(self):
-        """Compute survey number and date from related survey"""
+        """Compute survey number, date, and state from related survey"""
         for record in self:
             if record.khasra_number and record.report_id and record.report_id.village_id and record.report_id.project_id:
                 survey = self.env['bhu.survey'].search([
                     ('khasra_number', '=', record.khasra_number),
                     ('village_id', '=', record.report_id.village_id.id),
                     ('project_id', '=', record.report_id.project_id.id),
-                    ('state', '=', 'locked')
+                    ('state', 'in', ('locked', 'approved'))
                 ], limit=1)
                 if survey:
                     record.survey_number = survey.name or ''
                     record.survey_date = survey.survey_date or False
+                    record.survey_state = survey.state or False
                 else:
                     record.survey_number = ''
                     record.survey_date = False
+                    record.survey_state = False
             else:
                 record.survey_number = ''
                 record.survey_date = False
+                record.survey_state = False
 
 
 class Section19Notification(models.Model):

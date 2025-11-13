@@ -22,7 +22,7 @@
         <record id="seq_section11_notification" model="bhuarjan.sequence.settings">
             <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
             <field name="process_name">section11_notification</field>
-            <field name="prefix">NOTI11_{bhu.project.code}_{bhu.village.code}</field>
+            <field name="prefix">NOT11_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
             <field name="padding">3</field>
         </record>

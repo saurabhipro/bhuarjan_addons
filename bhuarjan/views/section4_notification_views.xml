@@ -42,17 +42,9 @@
                 <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
                     <div class="alert alert-info" role="alert" 
                          style="margin: 10px; padding: 12px; background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px;">
-                        <strong>📋 Section 4 Notification - LARA Act 2013:</strong>
+                        <strong>📋 Section 4 Notification (LARA Act 2013):</strong> Preliminary notification for land acquisition under LARA Act 2013.
                         <br/>
-                        <strong>Importance:</strong> Section 4 Notification is a critical step in the land acquisition process under the Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act, 2013 (LARA Act 2013). This notification serves as the preliminary notification indicating the government's intent to acquire land for a public purpose.
-                        <br/><br/>
-                        <strong>Key Deadlines:</strong>
-                        <ul style="margin: 5px 0; padding-left: 20px;">
-                            <li>After Section 4 notification is published, affected persons have <strong>60 days</strong> to submit objections/claims under Section 15 of the Act.</li>
-                            <li>The Social Impact Assessment (SIA) must be completed and submitted within the timeframe specified by the Act.</li>
-                            <li>Section 11 Preliminary Notification must be issued after considering all objections and SIA findings.</li>
-                        </ul>
-                        <strong>Note:</strong> Ensure all surveys are approved and locked before generating this notification, as it cannot be modified once generated.
+                        Affected persons have <strong>60 days</strong> to submit objections/claims under Section 15 after publication.
                     </div>
                     <group>
                         <group>

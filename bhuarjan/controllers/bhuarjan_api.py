@@ -787,3 +787,191 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/s3/presigned-urls', type='http', auth='public', methods=['POST'], csrf=False)
+    @check_permission
+    def generate_s3_presigned_urls(self, **kwargs):
+        """
+        Generate S3 presigned URLs for file upload (supports single or multiple files)
+        Accepts: JSON data with file_names (list) or file_name (string) and survey_id
+        Returns: Presigned URLs for S3 upload
+        """
+        try:
+            if not HAS_BOTO3:
+                return Response(
+                    json.dumps({'error': 'boto3 library is not installed. Please install it to use S3 presigned URLs.'}),
+                    status=500,
+                    content_type='application/json'
+                )
+            
+            # Parse request data
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+            
+            # Support both single file_name and multiple file_names
+            file_names = data.get('file_names', [])
+            file_name = data.get('file_name')
+            survey_id = data.get('survey_id')
+            
+            # Track if single file was provided
+            is_single_file = False
+            
+            # If single file_name provided, convert to list
+            if file_name and not file_names:
+                file_names = [file_name]
+                is_single_file = True
+            
+            if not file_names or not isinstance(file_names, list) or len(file_names) == 0:
+                return Response(
+                    json.dumps({'error': 'file_names (list) or file_name (string) is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            if not survey_id:
+                return Response(
+                    json.dumps({'error': 'survey_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Get survey to find project
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                return Response(
+                    json.dumps({'error': f'Survey with ID {survey_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+            
+            if not survey.project_id:
+                return Response(
+                    json.dumps({'error': 'Survey does not have an associated project'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Get AWS settings from settings master for this project
+            settings_master = request.env['bhuarjan.settings.master'].sudo().search([
+                ('project_id', '=', survey.project_id.id),
+                ('active', '=', True)
+            ], limit=1)
+            
+            if not settings_master:
+                return Response(
+                    json.dumps({'error': f'AWS settings not found for project {survey.project_id.name}'}),
+                    status=404,
+                    content_type='application/json'
+                )
+            
+            if not settings_master.s3_bucket_name:
+                return Response(
+                    json.dumps({'error': 'S3 bucket name is not configured in settings'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            if not settings_master.aws_access_key or not settings_master.aws_secret_key:
+                return Response(
+                    json.dumps({'error': 'AWS credentials are not configured in settings'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Get AWS region (default to ap-south-1 if not set)
+            aws_region = settings_master.aws_region or 'ap-south-1'
+            
+            # Create S3 client
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings_master.aws_access_key,
+                aws_secret_access_key=settings_master.aws_secret_key,
+                region_name=aws_region
+            )
+            
+            # Generate presigned URL (valid for 1 hour)
+            expiration = timedelta(hours=1)
+            expires_at = datetime.utcnow() + expiration
+            
+            # Generate presigned URLs for all files
+            presigned_urls = []
+            errors = []
+            
+            for file_name in file_names:
+                try:
+                    # Generate S3 key (path) for the file
+                    s3_key = f"surveys/{survey_id}/{file_name}"
+                    
+                    presigned_url = s3_client.generate_presigned_url(
+                        'put_object',
+                        Params={
+                            'Bucket': settings_master.s3_bucket_name,
+                            'Key': s3_key,
+                            'ContentType': 'application/octet-stream'
+                        },
+                        ExpiresIn=int(expiration.total_seconds())
+                    )
+                    
+                    presigned_urls.append({
+                        'file_name': file_name,
+                        'presigned_url': presigned_url,
+                        's3_key': s3_key,
+                        'bucket_name': settings_master.s3_bucket_name,
+                        'expires_in': int(expiration.total_seconds()),
+                        'expires_at': expires_at.isoformat()
+                    })
+                    
+                except ClientError as e:
+                    error_msg = f"Error generating presigned URL for {file_name}: {str(e)}"
+                    _logger.error(error_msg, exc_info=True)
+                    errors.append({
+                        'file_name': file_name,
+                        'error': str(e)
+                    })
+                except Exception as e:
+                    error_msg = f"Unexpected error for {file_name}: {str(e)}"
+                    _logger.error(error_msg, exc_info=True)
+                    errors.append({
+                        'file_name': file_name,
+                        'error': str(e)
+                    })
+            
+            # Return response
+            # If single file, return simplified response for backward compatibility
+            if is_single_file and len(presigned_urls) == 1:
+                return Response(
+                    json.dumps({
+                        'success': True,
+                        'data': presigned_urls[0]
+                    }),
+                    status=200,
+                    content_type='application/json'
+                )
+            
+            # Multiple files response
+            response_data = {
+                'success': True,
+                'data': {
+                    'presigned_urls': presigned_urls,
+                    'total_files': len(file_names),
+                    'successful': len(presigned_urls),
+                    'failed': len(errors),
+                    'survey_id': survey_id
+                }
+            }
+            
+            if errors:
+                response_data['data']['errors'] = errors
+            
+            return Response(
+                json.dumps(response_data),
+                status=200,
+                content_type='application/json'
+            )
+            
+        except Exception as e:
+            _logger.error(f"Error in generate_s3_presigned_urls: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+

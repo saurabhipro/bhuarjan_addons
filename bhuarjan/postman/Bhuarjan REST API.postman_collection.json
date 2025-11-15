@@ -201,6 +201,48 @@
 			]
 		},
 		{
+			"name": "Land Types",
+			"item": [
+				{
+					"name": "Get All Land Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/land-types?limit=100&offset=0&active=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"land-types"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"description": "Filter by active status: true/false/1/0/yes (optional, default: true - returns only active land types)"
+								}
+							]
+						},
+						"description": "Get all land types with their details. Returns active land types by default."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Surveys",
 			"item": [
 				{
@@ -413,7 +455,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8069",
+			"value": "https://bhuarjan.com",
 			"type": "string"
 		}
 	]

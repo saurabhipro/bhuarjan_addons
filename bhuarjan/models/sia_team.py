@@ -17,7 +17,7 @@ class SiaTeam(models.Model):
     requiring_body = fields.Char(string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
                                 help='Name of the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
     
     # Workflow
     state = fields.Selection([
@@ -74,11 +74,11 @@ class SiaTeam(models.Model):
     description = fields.Text(string='Description / विवरण', tracking=True)
     active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
     
-    @api.depends('project_id', 'village_id', 'sub_division_id')
+    @api.depends('project_id', 'sub_division_id')
     def _compute_name(self):
-        """Generate team name from project, village and subdivision"""
+        """Generate team name from project and subdivision"""
         for record in self:
-            if record.project_id and record.village_id and record.sub_division_id:
+            if record.project_id and record.sub_division_id:
                 sequence = self.env['ir.sequence'].next_by_code('bhu.sia.team') or 'New'
                 record.name = f'SIA-{sequence}'
             else:

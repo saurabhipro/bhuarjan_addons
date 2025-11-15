@@ -9,7 +9,6 @@
                 <field name="name"/>
                 <field name="sub_division_id"/>
                 <field name="project_id"/>
-                <field name="village_id"/>
                 <field name="requiring_body"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'approved'"
@@ -47,7 +46,6 @@
                             <field name="sub_division_id" required="1"/>
                             <field name="requiring_body" required="1"/>
                             <field name="project_id" required="1"/>
-                            <field name="village_id" required="1"/>
                         </group>
                         <group>
                             <field name="active"/>

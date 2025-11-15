@@ -52,7 +52,14 @@
                         <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
                             अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ द्वारा समाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव प्रस्तुत किया गया है। 
                             यह प्रस्ताव <span t-esc="sia_team.requiring_body or ''"/> द्वारा <span t-esc="sia_team.project_id.name or ''"/> परियोजना के अंतर्गत 
-                            <span t-esc="sia_team.village_id.name or ''"/> ग्राम में भूमि अर्जन के संबंध में है। 
+                            <t t-if="sia_team.project_id and sia_team.project_id.village_ids">
+                                <t t-foreach="sia_team.project_id.village_ids" t-as="village" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                </t> ग्राम में भूमि अर्जन के संबंध में है।
+                            </t>
+                            <t t-if="not sia_team.project_id or not sia_team.project_id.village_ids">
+                                <span t-esc="'[ग्राम]'"/> ग्राम में भूमि अर्जन के संबंध में है।
+                            </t>
                             प्रभावित भूमि निजी भूमि, खसरा नंबर <span t-esc="'[खसरा विवरण]'"/> है, जिसका कुल क्षेत्रफल <span t-esc="'[क्षेत्रफल]'"/> हेक्टेयर है।
                         </p>
                     </div>

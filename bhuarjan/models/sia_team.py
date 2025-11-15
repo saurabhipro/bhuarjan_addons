@@ -124,29 +124,4 @@ class SiaTeam(models.Model):
         self.ensure_one()
         return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
     
-    def action_upload_sia_order(self):
-        """Upload SIA Order document (SDM)"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Upload SIA Order / SIA आदेश अपलोड करें',
-            'res_model': 'bhu.sia.team',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {'form_view_initial_mode': 'edit', 'focus': 'sia_order_file'}
-        }
-    
-    def action_upload_sia_report(self):
-        """Upload SIA Report (SDM)"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Upload SIA Report / SIA रिपोर्ट अपलोड करें',
-            'res_model': 'bhu.sia.team',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {'form_view_initial_mode': 'edit', 'focus': 'sia_report_file'}
-        }
 

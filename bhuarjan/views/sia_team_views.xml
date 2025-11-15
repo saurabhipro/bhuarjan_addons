@@ -39,18 +39,11 @@
                     <button name="action_download_sia_order" string="Download SIA Order" type="object" 
                             class="btn-primary" icon="fa-download"
                             invisible="state not in ('submitted', 'approved')"/>
-                    <button name="action_upload_sia_order" string="Upload SIA Order (SDM)" type="object" 
-                            class="btn-secondary" icon="fa-upload"
-                            invisible="state not in ('submitted', 'approved')"/>
-                    <button name="action_upload_sia_report" string="Upload SIA Report (SDM)" type="object" 
-                            class="btn-secondary" icon="fa-upload"
-                            invisible="state not in ('submitted', 'approved')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>
                 <sheet>
-                    <group>
+                    <group col="2">
                         <group>
-                            <field name="name" readonly="1"/>
                             <field name="sub_division_id" required="1"/>
                             <field name="requiring_body" required="1"/>
                             <field name="project_id" required="1"/>
@@ -58,10 +51,6 @@
                         </group>
                         <group>
                             <field name="active"/>
-                            <field name="sia_order_file" filename="sia_order_filename" 
-                                   invisible="not sia_order_file"/>
-                            <field name="sia_report_file" filename="sia_report_filename"
-                                   invisible="not sia_report_file"/>
                         </group>
                     </group>
                     
@@ -98,6 +87,18 @@
                         <page string="Description / विवरण">
                             <group>
                                 <field name="description" nolabel="1" placeholder="Enter team description..."/>
+                            </group>
+                        </page>
+                        <page string="Signed Documents / हस्ताक्षरित दस्तावेज़">
+                            <group col="2">
+                                <group string="SIA Order / SIA आदेश">
+                                    <field name="sia_order_file" filename="sia_order_filename" 
+                                           string="Upload SIA Order (SDM) / SIA आदेश अपलोड करें (SDM)"/>
+                                </group>
+                                <group string="SIA Report / SIA रिपोर्ट">
+                                    <field name="sia_report_file" filename="sia_report_filename"
+                                           string="Upload SIA Report (SDM) / SIA रिपोर्ट अपलोड करें (SDM)"/>
+                                </group>
                             </group>
                         </page>
                     </notebook>

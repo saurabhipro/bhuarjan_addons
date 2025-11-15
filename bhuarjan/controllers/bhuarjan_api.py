@@ -9,9 +9,18 @@ from odoo.http import request, Response
 import json
 import logging
 import base64
+from datetime import datetime, timedelta
 from .main import *
 
 _logger = logging.getLogger(__name__)
+
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+    HAS_BOTO3 = True
+except ImportError:
+    HAS_BOTO3 = False
+    _logger.warning("boto3 library not found. S3 presigned URL generation will not be available.")
 
 
 class BhuarjanAPIController(http.Controller):

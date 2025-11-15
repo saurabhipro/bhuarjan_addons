@@ -788,7 +788,7 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/s3/presigned-urls', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_permission
+    # @check_permission
     def generate_s3_presigned_urls(self, **kwargs):
         """
         Generate S3 presigned URLs for file upload (supports single or multiple files)

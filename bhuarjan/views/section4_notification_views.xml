@@ -92,54 +92,54 @@
                         </page>
                         <page string="Section 4 Questions" icon="fa-question-circle">
                             <group>
-                                <group string="(1) Brief Description of Public Purpose">
+                                <group string="(1) Brief Description of Public Purpose / लोक प्रयोजन का संक्षिप्त विवरण">
                                     <field name="q1_brief_description" widget="html" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
-                                <group string="(2) Number of Directly Affected Families">
+                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
                                     <field name="q2_directly_affected" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(3) Number of Indirectly Affected Families">
+                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
                                     <field name="q3_indirectly_affected" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
-                                <group string="(4) Estimated Number of Private Houses and Other Assets">
+                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
                                     <field name="q4_private_assets" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(5) Estimated Number of Government Houses and Other Assets">
+                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
                                     <field name="q5_government_assets" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
-                                <group string="(6) Is the Proposed Acquisition Minimal?">
+                                <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है?">
                                     <field name="q6_minimal_acquisition" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                             </group>
-                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered?">
+                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है?">
                                 <field name="q7_alternatives_considered" widget="html" nolabel="1"
                                        readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                             </group>
                             <group>
-                                <group string="(8) Total Cost of the Project">
+                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
                                     <field name="q8_total_cost" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
-                                <group string="(9) Benefits from the Project">
+                                <group string="(9) Benefits from the Project / परियोजना से लाभ">
                                     <field name="q9_project_benefits" widget="html" nolabel="1"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                             </group>
-                            <group string="(10) Measures for Compensation and Likely Expenditure">
+                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
                                 <field name="q10_compensation_measures" widget="html" nolabel="1"
                                        readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                             </group>
-                            <group string="(11) Other Components Affected by the Project">
+                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
                                 <field name="q11_other_components" widget="html" nolabel="1"
                                        readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                             </group>

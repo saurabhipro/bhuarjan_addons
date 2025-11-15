@@ -231,6 +231,18 @@ class BhuarjanSettingsMaster(models.Model):
     workflow_settings_ids = fields.One2many('bhuarjan.workflow.settings', 'settings_master_id', 
                                            string='Workflow Settings')
     
+    # AWS Configuration
+    s3_bucket_name = fields.Char(string='S3 Bucket Name', help='AWS S3 bucket name for storing files')
+    aws_region = fields.Char(string='AWS Region', help='AWS region (e.g., ap-south-1, us-east-1)')
+    aws_access_key = fields.Char(string='AWS Access Key', help='AWS access key ID')
+    aws_secret_key = fields.Char(string='AWS Secret Key', help='AWS secret access key', password=True)
+    
+    # OTP API Configuration
+    otp_api_url = fields.Char(string='OTP API URL', help='Base URL for OTP API service')
+    otp_api_key = fields.Char(string='OTP API Key', help='API key for OTP service')
+    otp_api_secret = fields.Char(string='OTP API Secret', help='API secret for OTP service', password=True)
+    otp_sender_id = fields.Char(string='OTP Sender ID', help='Sender ID for OTP messages')
+    
     active = fields.Boolean(string='Active', default=True)
     
     @api.depends('project_id')

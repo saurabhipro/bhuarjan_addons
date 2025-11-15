@@ -7,7 +7,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.section19_notification_report</field>
         <field name="report_file">bhuarjan.section19_notification_report</field>
-        <field name="paperformat_id" ref="bhuarjan.bhuarjan_form10_paper_format"/>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
         <field name="print_report_name">'Section19_Notification_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
     </record>
 
@@ -27,6 +27,10 @@
                     padding: 6px; 
                     vertical-align: middle;
                 }
+                h2,td{
+                    font-family: 'Noto Sans Devanagari', sans-serif;
+                }
+                
             </style>
             <h2 style="text-align: right; margin: 0 0 12px 0; font-size: 16px; font-weight: bold;">
                 <strong>प्रारूप अधिसूचना</strong>
@@ -44,10 +48,11 @@
             <table class="header-info-table">
                 <tr>
                     <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
-                        <!-- Logo - Left Header Box -->
-                        <img src="/bhuarjan/static/description/logo.png" 
-                             alt="Logo" 
-                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
+                        
+                            <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                                height="100"
+                                width="100"/>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>

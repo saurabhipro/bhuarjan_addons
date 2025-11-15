@@ -25,10 +25,10 @@
                 <strong>प्रारंभिक अधिसूचना</strong>
             </h2>
             <div>
-                                       <img src="/bhuarjan/static/description/logo.png" 
-                             alt="Logo" 
-                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
-
+                <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                                height="100"
+                                width="100"/>
             </div>
             <table class="header-info-table">
                 <tr>

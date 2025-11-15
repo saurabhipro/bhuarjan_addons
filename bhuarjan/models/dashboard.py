@@ -46,6 +46,13 @@ class BhuarjanDashboard(models.TransientModel):
     generated_section19 = fields.Integer(string='Generated Section 19', readonly=True, default=0)
     signed_section19 = fields.Integer(string='Signed Section 19', readonly=True, default=0)
     
+    # SIA Team Counts
+    total_sia_teams = fields.Integer(string='Total SIA Teams', readonly=True, default=0)
+    draft_sia_teams = fields.Integer(string='Draft SIA Teams', readonly=True, default=0)
+    submitted_sia_teams = fields.Integer(string='Submitted SIA Teams', readonly=True, default=0)
+    approved_sia_teams = fields.Integer(string='Approved SIA Teams', readonly=True, default=0)
+    send_back_sia_teams = fields.Integer(string='Send Back SIA Teams', readonly=True, default=0)
+    
     # Payment File Counts
     total_payment_files = fields.Integer(string='Payment Files', readonly=True, default=0)
     draft_payment_files = fields.Integer(string='Draft Payment Files', readonly=True, default=0)
@@ -104,6 +111,13 @@ class BhuarjanDashboard(models.TransientModel):
             record.draft_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')])
             record.generated_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'generated')])
             record.signed_section19 = self.env['bhu.section19.notification'].search_count([('state', '=', 'signed')])
+            
+            # SIA Teams
+            record.total_sia_teams = self.env['bhu.sia.team'].search_count([])
+            record.draft_sia_teams = self.env['bhu.sia.team'].search_count([('state', '=', 'draft')])
+            record.submitted_sia_teams = self.env['bhu.sia.team'].search_count([('state', '=', 'submitted')])
+            record.approved_sia_teams = self.env['bhu.sia.team'].search_count([('state', '=', 'approved')])
+            record.send_back_sia_teams = self.env['bhu.sia.team'].search_count([('state', '=', 'send_back')])
             
             # Payment Files
             record.total_payment_files = self.env['bhu.payment.file'].search_count([])
@@ -194,6 +208,13 @@ class BhuarjanDashboard(models.TransientModel):
             'draft_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')]),
             'generated_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'generated')]),
             'signed_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'signed')]),
+            
+            # SIA Teams
+            'total_sia_teams': self.env['bhu.sia.team'].search_count([]),
+            'draft_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'draft')]),
+            'submitted_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'submitted')]),
+            'approved_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'approved')]),
+            'send_back_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'send_back')]),
             
             # Payment Files
             'total_payment_files': self.env['bhu.payment.file'].search_count([]),
@@ -381,5 +402,28 @@ class BhuarjanDashboard(models.TransientModel):
     def action_open_reconciliations_completed(self):
         action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
         action['domain'] = [('state', '=', 'completed')]
+        return action
+    
+    def action_open_sia_teams(self):
+        return self.env.ref('bhuarjan.action_create_sia_team').read()[0]
+    
+    def action_open_sia_teams_draft(self):
+        action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
+        action['domain'] = [('state', '=', 'draft')]
+        return action
+    
+    def action_open_sia_teams_submitted(self):
+        action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
+        action['domain'] = [('state', '=', 'submitted')]
+        return action
+    
+    def action_open_sia_teams_approved(self):
+        action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
+        action['domain'] = [('state', '=', 'approved')]
+        return action
+    
+    def action_open_sia_teams_send_back(self):
+        action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
+        action['domain'] = [('state', '=', 'send_back')]
         return action
 

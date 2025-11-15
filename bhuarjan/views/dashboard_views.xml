@@ -211,6 +211,31 @@
                             </div>
                             <div class="kpi-value"><field name="total_section15_objections" nolabel="1" readonly="1"/></div>
                         </button>
+                        <button name="action_open_sia_teams" type="object" class="process-card process-card-blue">
+                            <div class="process-header">
+                                <div class="kpi-label">SIA Teams</div>
+                                <div class="kpi-icon"><i class="fa fa-users"/></div>
+                            </div>
+                            <div class="kpi-value process-value"><field name="total_sia_teams" nolabel="1" readonly="1"/></div>
+                            <div class="process-sub-stats">
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="draft_sia_teams" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Draft</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="submitted_sia_teams" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Submitted</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="approved_sia_teams" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Approved</span>
+                                </div>
+                                <div class="process-sub-stat">
+                                    <span class="process-sub-stat-value"><field name="send_back_sia_teams" nolabel="1" readonly="1"/></span>
+                                    <span class="process-sub-stat-label">Send Back</span>
+                                </div>
+                            </div>
+                        </button>
                         <button name="action_open_documents" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Total Documents</div>

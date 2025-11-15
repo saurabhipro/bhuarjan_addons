@@ -35,6 +35,44 @@
                                 
                                 <field name="workflow_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_workflow_settings_tree'}"/>
                             </page>
+                            
+                            <!-- AWS Configuration Tab -->
+                            <page string="AWS Configuration" name="aws_configuration">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>AWS Configuration</strong><br/>
+                                    Configure AWS S3 settings for file storage and management.
+                                </div>
+                                
+                                <group col="2">
+                                    <group>
+                                        <field name="s3_bucket_name" placeholder="e.g., ddnsambhajinagar"/>
+                                        <field name="aws_region" placeholder="e.g., ap-south-1"/>
+                                    </group>
+                                    <group>
+                                        <field name="aws_access_key" placeholder="e.g., AKIAX3YCG3CX33RUJKAL"/>
+                                        <field name="aws_secret_key" placeholder="Enter AWS Secret Key"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                            <!-- OTP API Settings Tab -->
+                            <page string="OTP API Settings" name="otp_api_settings">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>OTP API Configuration</strong><br/>
+                                    Configure OTP API settings for sending SMS messages.
+                                </div>
+                                
+                                <group col="2">
+                                    <group>
+                                        <field name="otp_api_url" placeholder="e.g., https://api.example.com/otp"/>
+                                        <field name="otp_api_key" placeholder="Enter OTP API Key"/>
+                                    </group>
+                                    <group>
+                                        <field name="otp_api_secret" placeholder="Enter OTP API Secret"/>
+                                        <field name="otp_sender_id" placeholder="e.g., BHUAJN"/>
+                                    </group>
+                                </group>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>

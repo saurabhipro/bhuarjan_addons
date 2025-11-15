@@ -270,6 +270,65 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/land-types', type='http', auth='public', methods=['GET'], csrf=False)
+    def get_all_land_types(self, **kwargs):
+        """
+        Get all land types
+        Query params: limit, offset, active (optional filter - default True)
+        Returns: JSON list of land types
+        """
+        try:
+            # Get query parameters
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+            active_filter = request.httprequest.args.get('active')
+            
+            # Build domain - filter by active if specified
+            domain = []
+            if active_filter is not None:
+                active_bool = active_filter.lower() in ('true', '1', 'yes')
+                domain.append(('active', '=', active_bool))
+            else:
+                # Default to active only
+                domain.append(('active', '=', True))
+
+            # Search land types
+            land_types = request.env['bhu.land.type'].sudo().search(domain, limit=limit, offset=offset, order='name')
+
+            # Build response
+            land_types_data = []
+            for land_type in land_types:
+                land_types_data.append({
+                    'id': land_type.id,
+                    'name': land_type.name or '',
+                    'code': land_type.code or '',
+                    'description': land_type.description or '',
+                    'active': land_type.active,
+                })
+
+            # Get total count
+            total_count = request.env['bhu.land.type'].sudo().search_count(domain)
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': land_types_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_all_land_types: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/survey', type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
     def create_survey(self, **kwargs):

@@ -7,12 +7,8 @@
         <field name="arch" type="xml">
             <list string="Districts">
                 <field name="name"/>
-                <field name="company_id"/>
+                <field name="code"/>
                 <field name="state_id"/>
-                <field name="district_type"/>
-                <field name="headquarters"/>
-                <field name="collector_name"/>
-                <field name="population"/>
             </list>
         </field>
     </record>
@@ -24,49 +20,15 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" placeholder="District Name"/>
-                        </h1>
-                    </div>
-                    
                     <group>
-                        <group string="Basic Information">
-                            <field name="name"/>
+                        <group>
+                            <field name="name" required="1"/>
                             <field name="code"/>
-                            <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="district_type"/>
-                        </group>
-                        <group string="Company Information">
-                            <field name="company_id"/>
-                            <field name="company_name"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <group string="Geographic Information">
-                            <field name="latitude"/>
-                            <field name="longitude"/>
-                            <field name="area_sq_km"/>
-                            <field name="population"/>
-                        </group>
-                        <group string="Administrative Information">
-                            <field name="headquarters"/>
-                            <field name="collector_name"/>
-                            <field name="collector_contact"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <group string="Status">
-                            <field name="is_tribal_district"/>
-                            <field name="is_forest_district"/>
-                            <field name="is_naxal_affected"/>
+                            <field name="state_id" required="1" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                         </group>
                     </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
-
             </form>
         </field>
     </record>

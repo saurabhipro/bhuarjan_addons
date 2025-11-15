@@ -40,12 +40,6 @@
                     Please approve all surveys for the selected villages before generating the notification.
                 </div>
                 <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
-                    <div class="alert alert-info" role="alert" 
-                         style="margin: 10px; padding: 12px; background-color: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px;">
-                        <strong>📋 Section 4 Notification (LARA Act 2013):</strong> Preliminary notification for land acquisition under LARA Act 2013.
-                        <br/>
-                        Affected persons have <strong>60 days</strong> to submit objections/claims under Section 15 after publication.
-                    </div>
                     <group>
                         <group>
                             <field name="name" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>

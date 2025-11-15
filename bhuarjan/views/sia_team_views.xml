@@ -7,8 +7,15 @@
         <field name="arch" type="xml">
             <list string="SIA Teams / SIA टीमें">
                 <field name="name"/>
+                <field name="sub_division_id"/>
                 <field name="project_id"/>
-                <field name="team_member_ids" widget="many2many_tags"/>
+                <field name="village_id"/>
+                <field name="requiring_body"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state == 'draft'"
+                       decoration-danger="state == 'send_back'"/>
                 <field name="active"/>
             </list>
         </field>
@@ -20,24 +27,80 @@
         <field name="model">bhu.sia.team</field>
         <field name="arch" type="xml">
             <form string="SIA Team / SIA टीम">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary" 
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                            invisible="state != 'submitted'"/>
+                    <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                            invisible="state not in ('submitted', 'approved')"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
+                            invisible="state == 'draft'"/>
+                    <button name="action_download_sia_order" string="Download SIA Order" type="object" 
+                            class="btn-primary" icon="fa-download"
+                            invisible="state not in ('submitted', 'approved')"/>
+                    <button name="action_upload_sia_order" string="Upload SIA Order (SDM)" type="object" 
+                            class="btn-secondary" icon="fa-upload"
+                            invisible="state not in ('submitted', 'approved')"/>
+                    <button name="action_upload_sia_report" string="Upload SIA Report (SDM)" type="object" 
+                            class="btn-secondary" icon="fa-upload"
+                            invisible="state not in ('submitted', 'approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name" required="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="sub_division_id" required="1"/>
+                            <field name="requiring_body" required="1"/>
                             <field name="project_id" required="1"/>
+                            <field name="village_id" required="1"/>
                         </group>
                         <group>
                             <field name="active"/>
+                            <field name="sia_order_file" filename="sia_order_filename" 
+                                   invisible="not sia_order_file"/>
+                            <field name="sia_report_file" filename="sia_report_filename"
+                                   invisible="not sia_report_file"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="team_member_ids" widget="many2many_tags" required="1" 
-                               options="{'no_create_edit': True}" 
-                               placeholder="Select team members..."/>
-                    </group>
-                    <group>
-                        <field name="description" placeholder="Enter team description..."/>
-                    </group>
+                    
+                    <notebook>
+                        <page string="Team Members / टीम सदस्य">
+                            <group col="2">
+                                <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
+                                    <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
+                                           options="{'no_create_edit': True}" 
+                                           placeholder="Select non-government social scientist..."/>
+                                </group>
+                                <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
+                                    <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
+                                           options="{'no_create_edit': True}" 
+                                           placeholder="Select representatives of local bodies..."/>
+                                </group>
+                                <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
+                                    <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
+                                           options="{'no_create_edit': True}" 
+                                           placeholder="Select resettlement expert..."/>
+                                </group>
+                                <group string="(घ) Technical Expert / तकनीकी विशेषज्ञ">
+                                    <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
+                                           options="{'no_create_edit': True}" 
+                                           placeholder="Select technical expert..."/>
+                                </group>
+                            </group>
+                            <group string="(ड.) Tehsildar (Convener) / तहसीलदार (संयोजक)">
+                                <field name="tehsildar_id" nolabel="1"
+                                       options="{'no_create_edit': True}" 
+                                       placeholder="Select Tehsildar (Convener)..."/>
+                            </group>
+                        </page>
+                        <page string="Description / विवरण">
+                            <group>
+                                <field name="description" nolabel="1" placeholder="Enter team description..."/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter/>
             </form>

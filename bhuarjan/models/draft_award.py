@@ -14,6 +14,13 @@ class DraftAward(models.Model):
     name = fields.Char(string='Award Name / अवार्ड का नाम', required=True, default='New', tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True,
                                  default=lambda self: self._default_project_id())
+    
+    # Section 19 Notification selection
+    section19_notification_id = fields.Many2one('bhu.section19.notification',
+                                                 string='Section 19 Notification / धारा 19 अधिसूचना',
+                                                 tracking=True,
+                                                 help='Select signed Section 19 Notification to auto-populate land parcels')
+    
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
     # Case Details
@@ -54,10 +61,6 @@ class DraftAward(models.Model):
                                           string='Section 11 Report / धारा 11 रिपोर्ट',
                                           compute='_compute_section11_report', store=True)
     
-    # Section 19 Reference
-    section19_notification_id = fields.Many2one('bhu.section19.notification',
-                                                 string='Section 19 Notification / धारा 19 अधिसूचना',
-                                                 compute='_compute_section19_notification', store=True)
     
     # Publication Details
     section11_gazette_date = fields.Date(string='Section 11 Gazette Date / धारा 11 राजपत्र दिनांक', tracking=True)
@@ -164,19 +167,121 @@ class DraftAward(models.Model):
             else:
                 record.section11_report_id = False
     
-    @api.depends('village_id', 'project_id')
-    def _compute_section19_notification(self):
-        """Find Section 19 notification for this village and project"""
-        for record in self:
-            if record.village_id and record.project_id:
-                section19 = self.env['bhu.section19.notification'].search([
-                    ('village_ids', 'in', [record.village_id.id]),
-                    ('project_id', '=', record.project_id.id),
-                    ('state', 'in', ['generated', 'signed'])
-                ], limit=1, order='create_date desc')
-                record.section19_notification_id = section19.id if section19 else False
+    
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Clear Section 19 selection when project changes"""
+        if self.project_id:
+            # Keep section19_notification_id if it matches the project
+            if self.section19_notification_id and self.section19_notification_id.project_id != self.project_id:
+                self.section19_notification_id = False
+                self.village_id = False
+                self.land_parcel_ids = [(5, 0, 0)]
+        else:
+            self.section19_notification_id = False
+            self.village_id = False
+            self.land_parcel_ids = [(5, 0, 0)]
+    
+    @api.onchange('section19_notification_id')
+    def _onchange_section19_notification(self):
+        """Auto-populate data when Section 19 Notification is selected"""
+        if self.section19_notification_id:
+            # Set project from Section 19 if not already set
+            if not self.project_id and self.section19_notification_id.project_id:
+                self.project_id = self.section19_notification_id.project_id
+            # Set village from Section 19 (get first village from many2many)
+            if self.section19_notification_id.village_ids:
+                self.village_id = self.section19_notification_id.village_ids[0].id
+            # Populate land parcels
+            self._populate_land_parcels_from_section19()
+        else:
+            # Clear village and land parcels if Section 19 is cleared
+            self.village_id = False
+            self.land_parcel_ids = [(5, 0, 0)]
+    
+    def _populate_land_parcels_from_section19(self):
+        """Populate land parcels from Survey tables based on Section 19 Notification"""
+        self.ensure_one()
+        if not self.section19_notification_id:
+            return
+        
+        # Clear existing land parcels
+        self.land_parcel_ids = [(5, 0, 0)]
+        
+        # Get khasra numbers from Section 19 land parcels
+        section19_khasras = self.section19_notification_id.land_parcel_ids.mapped('khasra_number')
+        if not section19_khasras:
+            return
+        
+        # Find surveys for these khasras
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('khasra_number', 'in', section19_khasras),
+        ])
+        
+        # Create a mapping of khasra to survey for quick lookup
+        survey_map = {survey.khasra_number: survey for survey in surveys}
+        
+        # Create land parcel records from surveys
+        parcel_vals = []
+        for parcel in self.section19_notification_id.land_parcel_ids:
+            survey = survey_map.get(parcel.khasra_number)
+            if survey:
+                # Populate from survey data
+                parcel_data = {
+                    'khasra_number': survey.khasra_number or '',
+                    'area_hectares': survey.acquired_area or survey.total_area or 0.0,
+                    'survey_number': survey.name or '',
+                    'survey_date': survey.survey_date or False,
+                    'survey_state': survey.state or False,
+                }
+                # Add location fields from survey
+                # Survey has district_name (Char) not district_id, so try to find district by name
+                if survey.district_name:
+                    district = self.env['bhu.district'].search([('name', 'ilike', survey.district_name)], limit=1)
+                    if district:
+                        parcel_data['district_id'] = district.id
+                if survey.tehsil_id:
+                    parcel_data['tehsil_id'] = survey.tehsil_id.id
+                if survey.village_id:
+                    parcel_data['village_id'] = survey.village_id.id
+                if survey.project_id:
+                    parcel_data['project_id'] = survey.project_id.id
+                # Add authorized officer and public purpose from Section 19 parcel if available
+                if parcel.authorized_officer:
+                    parcel_data['authorized_officer'] = parcel.authorized_officer
+                if parcel.public_purpose_description:
+                    parcel_data['public_purpose_description'] = parcel.public_purpose_description
+                parcel_vals.append((0, 0, parcel_data))
             else:
-                record.section19_notification_id = False
+                # If no survey found, use Section 19 parcel data as fallback
+                parcel_data = {
+                    'khasra_number': parcel.khasra_number or '',
+                    'area_hectares': parcel.area_hectares or 0.0,
+                }
+                if parcel.survey_number:
+                    parcel_data['survey_number'] = parcel.survey_number
+                if parcel.survey_date:
+                    parcel_data['survey_date'] = parcel.survey_date
+                if parcel.survey_state:
+                    parcel_data['survey_state'] = parcel.survey_state
+                if parcel.district_id:
+                    parcel_data['district_id'] = parcel.district_id.id
+                if parcel.tehsil_id:
+                    parcel_data['tehsil_id'] = parcel.tehsil_id.id
+                if parcel.village_id:
+                    parcel_data['village_id'] = parcel.village_id.id
+                if parcel.project_id:
+                    parcel_data['project_id'] = parcel.project_id.id
+                if parcel.authorized_officer:
+                    parcel_data['authorized_officer'] = parcel.authorized_officer
+                if parcel.public_purpose_description:
+                    parcel_data['public_purpose_description'] = parcel.public_purpose_description
+                parcel_vals.append((0, 0, parcel_data))
+        
+        if parcel_vals:
+            self.land_parcel_ids = parcel_vals
     
     @api.depends('village_id', 'project_id')
     def _compute_respondents(self):
@@ -212,8 +317,10 @@ class DraftAward(models.Model):
     
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_land_parcels(self):
-        """Auto-populate land parcels from Section 11 when village/project changes"""
-        self._populate_land_parcels_from_section11()
+        """Auto-populate land parcels from Section 11 when village/project changes (only if Section 19 is not selected)"""
+        # Only populate from Section 11 if Section 19 is not selected
+        if not self.section19_notification_id:
+            self._populate_land_parcels_from_section11()
     
     def _populate_land_parcels_from_section11(self):
         """Helper method to populate land parcels from Section 11 report"""
@@ -313,6 +420,18 @@ class DraftAward(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
+            # If section19_notification_id is provided, populate village from it
+            section19_notification_id = vals.get('section19_notification_id')
+            if section19_notification_id:
+                section19 = self.env['bhu.section19.notification'].browse(section19_notification_id)
+                if section19.exists():
+                    # Set project from Section 19 if not already set
+                    if not vals.get('project_id') and section19.project_id:
+                        vals['project_id'] = section19.project_id.id
+                    # Set village from Section 19 if not already set (get first village from many2many)
+                    if not vals.get('village_id') and section19.village_ids:
+                        vals['village_id'] = section19.village_ids[0].id
+            
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 project_id = vals.get('project_id')
@@ -338,9 +457,13 @@ class DraftAward(models.Model):
                 if project_id:
                     vals['project_id'] = project_id
         records = super().create(vals_list)
-        # Auto-populate land parcels after creation if village and project are set
+        # Auto-populate land parcels after creation
         for record in records:
-            if record.village_id and record.project_id:
+            if record.section19_notification_id:
+                # Populate from Section 19
+                record._populate_land_parcels_from_section19()
+            elif record.village_id and record.project_id:
+                # Populate from Section 11 (old method)
                 record._populate_land_parcels_from_section11()
         return records
     
@@ -487,6 +610,28 @@ class DraftAwardLandParcel(models.Model):
     award_id = fields.Many2one('bhu.draft.award', string='Award', required=True, ondelete='cascade')
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True)
     area_hectares = fields.Float(string='Area (Hectares) / रकबा (हेक्टेयर में)', required=True, digits=(16, 4))
+    
+    # Additional fields from Section 19
+    survey_number = fields.Char(string='Survey Number / सर्वे नंबर')
+    survey_date = fields.Date(string='Survey Date / सर्वे दिनांक')
+    survey_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('locked', 'Locked'),
+        ('rejected', 'Rejected'),
+    ], string='Survey Status / सर्वे स्थिति')
+    
+    # Location fields
+    district_id = fields.Many2one('bhu.district', string='District / जिला')
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील')
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना')
+    
+    # Additional details
+    authorized_officer = fields.Char(string='Authorized Officer / प्राधिकृत अधिकारी',
+                                    help='Officer authorized by Section 12')
+    public_purpose_description = fields.Text(string='Public Purpose Description / लोक प्रयोजन विवरण')
 
 
 class DraftAwardCompensationLine(models.Model):

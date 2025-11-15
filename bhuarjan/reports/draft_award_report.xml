@@ -188,7 +188,6 @@
                                                 <t t-esc="counter"/>. 
                                                 <span t-esc="respondent.name or ''"/>
                                                 <t t-if="respondent.father_name"> व. <span t-esc="respondent.father_name"/></t>
-                                                <t t-if="respondent.caste"> जाति <span t-esc="respondent.caste"/></t>
                                                 <span> सा. दे. भूमिस्वामी</span>
                                             </p>
                                         </t>

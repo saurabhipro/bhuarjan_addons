@@ -40,6 +40,7 @@
         'reports/section11_preliminary_report.xml',
         'reports/section19_notification_report.xml',
         'reports/draft_award_report.xml',
+        'reports/sia_order_report.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',

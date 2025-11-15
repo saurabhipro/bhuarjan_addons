@@ -64,6 +64,7 @@
         'views/dashboard_views.xml',
         'views/expert_committee_report_views.xml',
         'views/message_wizard_views.xml',
+        'views/company_switcher_views.xml',
         'views/post_award_payment_views.xml',
         'views/payment_reconciliation_views.xml',
         'views/payment_file_views.xml',

@@ -51,8 +51,8 @@
                         
                             <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
                             <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
-                                height="100"
-                                width="100"/>
+                                height="65"
+                                width="80"/>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>

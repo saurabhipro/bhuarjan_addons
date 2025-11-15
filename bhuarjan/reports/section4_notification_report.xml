@@ -7,7 +7,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.section4_notification_report</field>
         <field name="report_file">bhuarjan.section4_notification_report</field>
-        <field name="paperformat_id" ref="bhuarjan.bhuarjan_form10_paper_format"/>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
         <field name="print_report_name">'Section4_Notification_' + ((object and object.project_id and object.project_id.name) or (docs and docs[0] and docs[0].project_id and docs[0].project_id.name) or 'All')</field>
     </record>
 
@@ -44,8 +44,8 @@
                         <!-- Logo - Left Header Box -->
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
                             <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
-                                height="100"
-                                width="100"/>
+                                height="65"
+                                width="80"/>
                         </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>
@@ -145,17 +145,7 @@
             <t t-set="wizard" t-value="object or (docs and docs[0]) or None"/>
             <t t-call="bhuarjan.section4_report_custom_layout"/>
             <style>
-                @page {
-                    margin: 2cm 1.5cm;
-                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
-                }
-                body {
-                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
-                    direction: ltr;
-                    font-size: 18px;
-                    line-height: 2.0;
-                    color: #000;
-                }
+
                 .content {
                     font-size: 18px;
                     lin
@@ -224,7 +214,7 @@
                     line-height: 1.8;
                     padding: 12px;
                     background-color: #ffffff;
-                    border-left: 4px solid #0066cc;
+                    <!-- border-left: 4px solid #0066cc; -->
                     padding-left: 20px;
                 }
                 .section-divider {
@@ -246,7 +236,7 @@
                     line-height: 1.8;
                 }
                 .hearing-info {
-                    border: 2px solid #0066cc;
+                    <!-- border: 2px solid #0066cc; -->
                     border-radius: 5px;
                     padding: 18px;
                     margin: 25px 0;
@@ -255,7 +245,7 @@
                     line-height: 1.8;
                 }
                 .hearing-info strong {
-                    color: #004080;
+                    <!-- color: #004080; -->
                     font-size: 19px;
                 }
                 .signature-block {

@@ -25,16 +25,16 @@
                 <strong>प्रारंभिक अधिसूचना</strong>
             </h2>
             <div>
-                <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
-                                height="100"
-                                width="100"/>
+                
             </div>
             <table class="header-info-table">
                 <tr>
                     <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
                         <!-- Logo - Left Header Box -->
-
+                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                                height="65"
+                                width="80"/>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>

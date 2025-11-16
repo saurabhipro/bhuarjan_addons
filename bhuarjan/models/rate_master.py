@@ -36,7 +36,6 @@ class RateMaster(models.Model):
     village_id = fields.Many2one('bhu.village', string='Village', required=True, tracking=True)
     
     # Land Classification
-    land_type_id = fields.Many2one('bhu.land.type', string='Land Type', required=True, tracking=True)
     irrigation_status = fields.Selection([
         ('irrigated', 'Irrigated'),
         ('non_irrigated', 'Non-Irrigated'),
@@ -82,11 +81,11 @@ class RateMaster(models.Model):
     # Computed Fields
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
     
-    @api.depends('district_id', 'village_id', 'land_type_id', 'irrigation_status', 'road_proximity')
+    @api.depends('district_id', 'village_id', 'irrigation_status', 'road_proximity')
     def _compute_display_name(self):
         for record in self:
-            if record.district_id and record.village_id and record.land_type_id:
-                record.display_name = f"{record.district_id.name} - {record.village_id.name} - {record.land_type_id.name}"
+            if record.district_id and record.village_id:
+                record.display_name = f"{record.district_id.name} - {record.village_id.name}"
             else:
                 record.display_name = record.name
 
@@ -107,12 +106,11 @@ class RateMaster(models.Model):
         self.write({'state': 'draft'})
 
     @api.model
-    def get_rate_for_land(self, district_id, village_id, land_type_id, irrigation_status, road_proximity):
+    def get_rate_for_land(self, district_id, village_id, irrigation_status, road_proximity):
         """Get the current rate for specific land parameters"""
         domain = [
             ('district_id', '=', district_id),
             ('village_id', '=', village_id),
-            ('land_type_id', '=', land_type_id),
             ('irrigation_status', '=', irrigation_status),
             ('road_proximity', '=', road_proximity),
             ('state', '=', 'active'),

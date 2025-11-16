@@ -85,7 +85,6 @@
                 <field name="name"/>
                 <field name="district_id"/>
                 <field name="village_id"/>
-                <field name="land_type_id"/>
                 <field name="irrigation_status"/>
                 <field name="road_proximity"/>
                 <field name="rate_per_hectare"/>
@@ -129,7 +128,6 @@
                             <field name="village_id" widget="many2one_tags"/>
                         </group>
                         <group string="🏞️ Land Classification" class="oe_group_col_2">
-                            <field name="land_type_id" widget="many2one_tags"/>
                             <field name="irrigation_status" widget="radio" options="{'horizontal': true}"/>
                             <field name="road_proximity" widget="radio" options="{'horizontal': true}"/>
                         </group>
@@ -176,7 +174,6 @@
                 <field name="name"/>
                 <field name="district_id"/>
                 <field name="village_id"/>
-                <field name="land_type_id"/>
                 <field name="irrigation_status"/>
                 <field name="road_proximity"/>
                 <field name="rate_per_hectare"/>
@@ -190,7 +187,6 @@
                     <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
-                    <filter string="Land Type" name="group_land_type" context="{'group_by': 'land_type_id'}"/>
                     <filter string="Irrigation Status" name="group_irrigation" context="{'group_by': 'irrigation_status'}"/>
                     <filter string="Road Proximity" name="group_road" context="{'group_by': 'road_proximity'}"/>
                 </group>
@@ -210,7 +206,7 @@
                 Create your first Rate Master record!
             </p>
             <p>
-                Set land valuation rates for villages based on land type, irrigation status, and road proximity.
+                Set land valuation rates for villages based on irrigation status and road proximity.
             </p>
         </field>
     </record>

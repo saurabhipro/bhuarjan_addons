@@ -24,7 +24,7 @@
         'data/settings_master_data.xml',
         # Process-related sample data - commented out to prevent default import
         # 'data/sample_project_data.xml',
-        # 'data/sample_sequence_settings.xml',
+        'data/sample_sequence_settings.xml',
         # 'data/sample_expert_committee_report.xml',
         # 'data/sample_landowners.xml',  # Disabled - not importing sample landowners
         # 'data/sample_surveys.xml',  # Disabled - not importing sample surveys

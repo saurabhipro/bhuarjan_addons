@@ -9,6 +9,15 @@
             <!-- No project_id - this is a global settings master -->
         </record>
         
+        <!-- Survey Sequence -->
+        <record id="seq_survey" model="bhuarjan.sequence.settings">
+            <field name="settings_master_id" ref="settings_master_global"/>
+            <field name="process_name">survey</field>
+            <field name="prefix">SC_{bhu.project.code}_{bhu.village.code}_</field>
+            <field name="initial_sequence">1</field>
+            <field name="padding">3</field>
+        </record>
+        
         <!-- Section 4 Notification Sequence -->
         <record id="seq_section4_notification" model="bhuarjan.sequence.settings">
             <field name="settings_master_id" ref="settings_master_global"/>

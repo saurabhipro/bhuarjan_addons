@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <!-- Sequence for Survey Numbers -->
-        <record id="seq_bhu_survey" model="ir.sequence">
-            <field name="name">Survey Number</field>
-            <field name="code">bhu.survey</field>
-            <field name="prefix">SC_</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
+        <!-- Sequences for processes NOT managed by Settings Master -->
+        <!-- Processes managed by Settings Master (Survey, Section 4, Section 11, Section 19, Section 15, Draft Award, Payment File, Payment Reconciliation) -->
+        <!-- are created dynamically by the get_sequence_number method and don't need to be defined here -->
         
         <!-- Sequence for Rate Master Numbers -->
         <record id="seq_bhu_rate_master" model="ir.sequence">
@@ -31,51 +25,11 @@
             <field name="number_increment">1</field>
         </record>
         
-        <!-- Sequence for Section 15 Objection Numbers -->
-        <record id="seq_bhu_section15_objection" model="ir.sequence">
-            <field name="name">Section 15 Objection Number</field>
-            <field name="code">bhu.section15.objection</field>
-            <field name="prefix">OBJ_</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
         <!-- Sequence for Expert Committee Report Numbers -->
         <record id="seq_bhu_expert_committee_report" model="ir.sequence">
             <field name="name">Expert Committee Report Number</field>
             <field name="code">bhu.expert.committee.report</field>
             <field name="prefix">ECR_</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Section 11 Preliminary Report Numbers -->
-        <record id="seq_bhu_section11_preliminary_report" model="ir.sequence">
-            <field name="name">Section 11 Preliminary Report Number</field>
-            <field name="code">bhu.section11.preliminary.report</field>
-            <field name="prefix">NOT11_</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Draft Award Numbers -->
-        <record id="seq_bhu_draft_award" model="ir.sequence">
-            <field name="name">Draft Award Number</field>
-            <field name="code">bhu.draft.award</field>
-            <field name="prefix">AWARD_</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Payment File Numbers -->
-        <record id="seq_bhu_payment_file" model="ir.sequence">
-            <field name="name">Payment File Number</field>
-            <field name="code">bhu.payment.file</field>
-            <field name="prefix">PAY_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -90,5 +44,16 @@
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
         </record>
+        
+        <!-- Note: Sequences for processes managed by Settings Master are created dynamically -->
+        <!-- and don't need to be defined here. These include: -->
+        <!-- - Survey (managed via bhuarjan.sequence.settings) -->
+        <!-- - Section 4 Notification (managed via bhuarjan.sequence.settings) -->
+        <!-- - Section 11 Notification (managed via bhuarjan.sequence.settings) -->
+        <!-- - Section 19 Notification (managed via bhuarjan.sequence.settings) -->
+        <!-- - Section 15 Objection (managed via bhuarjan.sequence.settings) -->
+        <!-- - Draft Award (managed via bhuarjan.sequence.settings) -->
+        <!-- - Payment File (managed via bhuarjan.sequence.settings) -->
+        <!-- - Payment Reconciliation (managed via bhuarjan.sequence.settings) -->
     </data>
 </odoo>

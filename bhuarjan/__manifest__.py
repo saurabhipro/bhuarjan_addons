@@ -29,7 +29,7 @@
         'data/sample_surveys.xml',
         'data/sample_section4_config.xml',
         'data/sample_section4_notifications.xml',
-        'data/sample_section15_objections.xml',
+        # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data
         'data/sample_section11_reports.xml',
         'data/sample_section19_notifications.xml',
         'data/kharsiyan_rate_master_data.xml',

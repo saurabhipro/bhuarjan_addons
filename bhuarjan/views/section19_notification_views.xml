@@ -6,10 +6,6 @@
         <field name="model">bhu.section19.notification</field>
         <field name="arch" type="xml">
             <list string="Section 19 Notifications / धारा 19 अधिसूचनाएं" delete="1">
-                <header>
-                    <button name="action_open_wizard" string="Generate" type="object" 
-                            class="oe_highlight" icon="fa-plus" title="Generate new Section 19 Notification"/>
-                </header>
                 <field name="name"/>
                 <field name="notification_number"/>
                 <field name="project_id"/>

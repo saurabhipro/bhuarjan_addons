@@ -76,6 +76,9 @@
                             <group>
                                 <group string="Land Information / भूमि की जानकारी" class="survey-icon-land">
                                     <field name="khasra_number" widget="char" readonly="state == 'locked'" required="1" string="Khasra Number * / खसरा नंबर *"/>
+                                    <field name="land_type_id" widget="selection" readonly="state == 'locked'" 
+                                           options="{'no_create_edit': True}" 
+                                           string="Land Type / भूमि का प्रकार"/>
                                     <field name="total_area" widget="float" readonly="state == 'locked'"/>
                                     <field name="acquired_area" widget="float" readonly="state == 'locked'" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
                                 </group>

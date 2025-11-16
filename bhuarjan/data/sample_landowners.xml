@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <!-- Sample Landowners (50 records) -->
         <!-- These landowners will be mapped to surveys (5 per survey) -->
         <!-- Some landowners will appear in multiple surveys to show one landowner can have multiple khasras -->

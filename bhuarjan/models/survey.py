@@ -31,6 +31,8 @@ class Survey(models.Model):
     acquired_area = fields.Float(string='Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     
     # Land Details
+    land_type_id = fields.Many2one('bhu.land.type', string='Land Type / भूमि का प्रकार', tracking=True,
+                                    help='Select the type of land from the master list')
     crop_type = fields.Selection([
         ('single', 'Single Crop / एकल फसल'),
         ('double', 'Double Crop / दोहरी फसल'),

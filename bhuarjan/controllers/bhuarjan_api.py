@@ -449,7 +449,6 @@ class BhuarjanAPIController(http.Controller):
                 'house_area': data.get('house_area', 0.0),
                 'shed_area': data.get('shed_area', 0.0),
                 'has_well': data.get('has_well', 'no'),
-                'well_type': data.get('well_type', 'kachcha'),
                 'has_tubewell': data.get('has_tubewell', 'no'),
                 'has_pond': data.get('has_pond', 'no'),
                 'trees_description': data.get('trees_description'),
@@ -460,6 +459,10 @@ class BhuarjanAPIController(http.Controller):
                 'remarks': data.get('remarks'),
                 'state': data.get('state', 'draft'),
             }
+            
+            # Handle well_type separately - only set if provided (optional field)
+            if 'well_type' in data and data.get('well_type'):
+                survey_vals['well_type'] = data.get('well_type')
 
             # Handle survey image if provided (base64 encoded)
             if data.get('survey_image'):
@@ -1180,6 +1183,7 @@ class BhuarjanAPIController(http.Controller):
             update_vals = {}
             for field, value in data.items():
                 if field in allowed_fields:
+                    # Handle well_type - no conversion needed, use as is
                     # Handle Many2many fields (landowner_ids)
                     if field == 'landowner_ids' and isinstance(value, list):
                         update_vals[field] = [(6, 0, value)]  # Replace all

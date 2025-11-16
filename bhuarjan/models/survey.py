@@ -61,8 +61,8 @@ class Survey(models.Model):
         ('no', 'No / नहीं'),
     ], string='Has House / घर है', default='no', tracking=True)
     house_type = fields.Selection([
-        ('kachcha', 'कच्चा'),
-        ('pucca', 'पक्का')
+        ('kaccha', 'कच्चा'),
+        ('pakka', 'पक्का')
     ], string='House Type / घर का प्रकार', tracking=True)
     house_area = fields.Float(string='House Area (Sq. Ft.) / घर का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)
     shed_area = fields.Float(string='Shed Area (Sq. Ft.) / शेड का क्षेत्रफल (वर्ग फुट)', digits=(10, 2), tracking=True)
@@ -71,9 +71,9 @@ class Survey(models.Model):
         ('no', 'No / नहीं'),
     ], string='Has Well / कुआं है', default='no', tracking=True)
     well_type = fields.Selection([
-        ('kachcha', 'कच्चा'),
+        ('kaccha', 'कच्चा'),
         ('pakka', 'पक्का')
-    ], string='Well Type / कुएं का प्रकार', default='kachcha', required=True, tracking=True)
+    ], string='Well Type / कुएं का प्रकार', default='kaccha', required=False, tracking=True)
     has_tubewell = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),
@@ -627,7 +627,7 @@ class SurveyLine(models.Model):
         ('no', 'No / नहीं'),
     ], string='Has House / घर है', default='no')
     house_type = fields.Selection([
-        ('kachcha', 'Kachcha / कच्चा'),
+        ('kaccha', 'Kaccha / कच्चा'),
         ('pakka', 'Pakka / पक्का')
     ], string='House Type / मकान प्रकार')
     house_area = fields.Float(string='House Area (Sq. Ft.) / मकान क्षेत्रफल (वर्गफुट)', digits=(10, 2))
@@ -641,7 +641,7 @@ class SurveyLine(models.Model):
         ('no', 'No / नहीं'),
     ], string='Has Well / कुँआ है', default='no')
     well_type = fields.Selection([
-        ('kachcha', 'Kachcha / कच्चा'),
+        ('kaccha', 'Kaccha / कच्चा'),
         ('pakka', 'Pakka / पक्का')
     ], string='Well Type / कुँआ प्रकार')
     

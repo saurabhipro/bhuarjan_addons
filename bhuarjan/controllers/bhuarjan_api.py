@@ -9,8 +9,9 @@ from odoo.http import request, Response
 import json
 import logging
 import base64
-from datetime import datetime, timedelta, timezone
 from .main import *
+import datetime
+from datetime import timedelta, timezone
 
 _logger = logging.getLogger(__name__)
 
@@ -889,7 +890,7 @@ class BhuarjanAPIController(http.Controller):
             
             # Generate presigned URL (valid for 1 hour)
             expiration = timedelta(hours=1)
-            expires_at = datetime.now(timezone.utc) + expiration
+            expires_at = datetime.datetime.now(timezone.utc) + expiration
             
             # Generate presigned URLs for all files
             presigned_urls = []

@@ -70,9 +70,10 @@
                 <tr>
                     <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
                         <!-- Logo - Left Header Box -->
-                        <img src="/bhuarjan/static/description/logo.png" 
-                             alt="Logo" 
-                             style="width: 100%; height: auto; max-width: 100%; display: block; margin: 0; padding: 2px;"/>
+                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                             height="65"
+                             width="80"/>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>
@@ -137,6 +138,7 @@
                         <span t-if="award and award.tehsil_id" t-esc="award.tehsil_id.name"/>
                         <span t-if="not award or not award.tehsil_id">........................</span>
                         <t t-if="award and award.district_id"> जिला-<t t-esc="award.district_id.name"/> (छ.ग.)</t>
+                        <t t-if="not award or not award.district_id"> जिला-........................ (छ.ग.)</t>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <!-- Empty cell -->
@@ -150,19 +152,23 @@
     <template id="draft_award_report">
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
-            <t t-set="award" t-value="object or (docs and docs[0]) or None"/>
-            <t t-call="bhuarjan.draft_award_report_custom_layout"/>
-            
-            <style>
-                /* Global Font Settings for Draft Award Report */
-                body, .page, div, p, span, td, th, h2, h3, strong, .report-paragraph,
-                .header-info-table, .report-content-table {
-                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                }
-            </style>
+            <t t-foreach="docs" t-as="award">
+                <t t-call="bhuarjan.draft_award_report_custom_layout"/>
+                
+                <style>
+                    /* Global Font Settings for Draft Award Report */
+                    body, .page, div, p, span, td, th, h2, h3, strong, .report-paragraph,
+                    .header-info-table, .report-content-table {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                    }
+                    
+                    @page {
+                        margin: 2cm 1.5cm;
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
+                    }
+                </style>
 
-            <div class="page" style="font-size: 14px; color: #333; padding: 15px;">
-                <div class="oe_structure"/>
+                <div class="page" style="font-size: 14px; color: #333; padding: 15px;">
 
                 <!-- Case Number and Location -->
                 <p class="report-paragraph" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
@@ -440,7 +446,8 @@
                     </p>
                 </div>
 
-            </div>
+                </div>
+            </t>
         </t>
     </template>
 

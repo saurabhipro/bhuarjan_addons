@@ -27,7 +27,7 @@ class JWTAuthController(http.Controller):
             'mobile': mobile,
             'user_id': user.id,
             'otp': otp_code,
-            'expire_date': expire_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'expire_date': expire_time,
         })
 
         try:
@@ -138,9 +138,15 @@ class JWTAuthController(http.Controller):
             return Response( json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json' )
 
         expire_date = otp_record.expire_date
-        if datetime.datetime.now(datetime.timezone.utc) > expire_date:
-            otp_record.unlink()
-            return Response(json.dumps({'error': 'OTP expired'}),status=400, content_type='application/json')
+        # Convert expire_date to timezone-aware datetime if needed
+        if expire_date:
+            # If expire_date is timezone-naive, make it timezone-aware (UTC)
+            if expire_date.tzinfo is None:
+                expire_date = expire_date.replace(tzinfo=datetime.timezone.utc)
+            current_time = datetime.datetime.now(datetime.timezone.utc)
+            if current_time > expire_date:
+                otp_record.unlink()
+                return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
 
         user = otp_record.user_id.id
         otp_record.unlink()
@@ -153,7 +159,7 @@ class JWTAuthController(http.Controller):
 
         request.env['jwt.token'].sudo().create({'user_id': user, 'token': token})
 
-        return Response( json.dumps({'user_id': user, 'token': token}), status=400, content_type='application/json' )
+        return Response(json.dumps({'user_id': user, 'token': token}), status=200, content_type='application/json')
 
     @http.route('/api/get_contacts', type='json', auth='none', methods=['POST'], csrf=False)
     def get_contacts(self, **kwargs):

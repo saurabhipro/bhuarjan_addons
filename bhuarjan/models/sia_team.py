@@ -63,9 +63,9 @@ class SiaTeam(models.Model):
                                    help='Tehsildar of the affected area who will be the convener')
     
     # Documents
-    sia_order_file = fields.Binary(string='SIA Order File / SIA आदेश फ़ाइल', tracking=True)
+    sia_order_file = fields.Binary(string='SIA Order File / SIA आदेश फ़ाइल')
     sia_order_filename = fields.Char(string='SIA Order Filename')
-    sia_report_file = fields.Binary(string='SIA Report File / SIA रिपोर्ट फ़ाइल', tracking=True)
+    sia_report_file = fields.Binary(string='SIA Report File / SIA रिपोर्ट फ़ाइल')
     sia_report_filename = fields.Char(string='SIA Report Filename')
     
     # Legacy fields (kept for backward compatibility)

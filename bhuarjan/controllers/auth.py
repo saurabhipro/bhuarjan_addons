@@ -1,4 +1,5 @@
 from .main import *
+from datetime import timezone
 
 SECRET_KEY = 'secret'
 
@@ -21,7 +22,7 @@ class JWTAuthController(http.Controller):
             existing_otp.unlink()
 
         otp_code = str(random.randint(1000, 9999))
-        expire_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5)
+        expire_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
 
         request.env['mobile.otp'].sudo().create({
             'mobile': mobile,
@@ -37,7 +38,7 @@ class JWTAuthController(http.Controller):
             print("\n\n response.status_code - ", response.status_code)
             if response.status_code == 200:
                 # return Response(json.dumps({'message': 'OTP sent successfully','details': response.text}), content_type='application/json')
-                return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), content_type='application/json')
+                return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), status=200, content_type='application/json')
 
             else:
                 return Response(json.dumps({'error': 'Failed to send OTP via SMS API', 'details': response.text}), status=400, content_type='application/json')
@@ -142,8 +143,8 @@ class JWTAuthController(http.Controller):
         if expire_date:
             # If expire_date is timezone-naive, make it timezone-aware (UTC)
             if expire_date.tzinfo is None:
-                expire_date = expire_date.replace(tzinfo=datetime.timezone.utc)
-            current_time = datetime.datetime.now(datetime.timezone.utc)
+                expire_date = expire_date.replace(tzinfo=timezone.utc)
+            current_time = datetime.datetime.now(timezone.utc)
             if current_time > expire_date:
                 otp_record.unlink()
                 return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
@@ -153,7 +154,7 @@ class JWTAuthController(http.Controller):
 
         payload = {
             'user_id': user,
-            'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+            'exp': datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=24)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 

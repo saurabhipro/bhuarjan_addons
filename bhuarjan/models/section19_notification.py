@@ -9,7 +9,7 @@ import uuid
 class Section19Notification(models.Model):
     _name = 'bhu.section19.notification'
     _description = 'Section 19 Notification'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)

@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
+from . import utils
 import uuid
 
 
@@ -12,7 +13,7 @@ import uuid
 class Section4Notification(models.Model):
     _name = 'bhu.section4.notification'
     _description = 'Section 4 Notification'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
@@ -409,6 +410,7 @@ class Section4Notification(models.Model):
 class Section4NotificationWizard(models.TransientModel):
     _name = 'bhu.section4.notification.wizard'
     _description = 'Section 4 Notification Wizard'
+    _inherit = ['bhu.notification.mixin']
 
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
@@ -477,6 +479,7 @@ class Section4NotificationWizard(models.TransientModel):
         if self.public_hearing_date:
             return self.public_hearing_date.strftime('%d/%m/%Y')
         return '........................'
+    
     
     def action_generate_pdf(self):
         """Generate Section 4 Notification PDF and create notification record"""

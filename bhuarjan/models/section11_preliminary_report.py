@@ -8,7 +8,7 @@ import uuid
 class Section11PreliminaryReport(models.Model):
     _name = 'bhu.section11.preliminary.report'
     _description = 'Section 11 Preliminary Report'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Report Name', required=True, default='New', tracking=True)
@@ -384,7 +384,19 @@ class Section11PreliminaryReport(models.Model):
         # Update Section 4 Notification status to 'notification_11' when Section 11 is generated
         if self.section4_notification_id and self.section4_notification_id.state != 'notification_11':
             self.section4_notification_id.write({'state': 'notification_11'})
-        return self.env.ref('bhuarjan.action_report_section11_preliminary').report_action(self)
+        report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
+        return report_action.report_action(self.ids)
+    
+    def action_download_pdf(self):
+        """Download Section 11 Preliminary Report PDF (for generated/signed notifications)"""
+        self.ensure_one()
+        
+        if self.state not in ('generated', 'signed'):
+            raise ValidationError(_('Notification must be generated before downloading.'))
+        
+        # Always generate PDF report (signed document download will be separate from document vault)
+        report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
+        return report_action.report_action(self.ids)
     
     @api.model
     def action_open_wizard(self):

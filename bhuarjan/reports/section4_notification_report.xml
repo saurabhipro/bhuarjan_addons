@@ -298,6 +298,7 @@
                         <tbody>
                             <t t-set="consolidated_data" t-value="wizard._get_consolidated_village_data() if wizard else []"/>
                             <t t-set="public_purpose" t-value="wizard.public_purpose if wizard and wizard.public_purpose else (wizard.project_id.name if wizard and wizard.project_id else '')"/>
+                            <t t-set="public_purpose_clean" t-value="wizard.get_plain_text_from_html(public_purpose) if wizard and public_purpose else (public_purpose if public_purpose else '')"/>
                             <t t-if="consolidated_data and len(consolidated_data) > 0">
                                 <t t-foreach="consolidated_data" t-as="v_data">
                                     <tr>
@@ -305,7 +306,7 @@
                                         <td style="font-size: 12px;"><t t-esc="v_data.get('tehsil', '')"/></td>
                                         <td style="font-size: 12px;"><t t-esc="v_data.get('village_name', '')"/></td>
                                         <td style="font-size: 12px;"><t t-esc="'{:.4f}'.format(v_data.get('total_area', 0.0))"/></td>
-                                        <td style="font-size: 12px; text-align: left;"><t t-esc="public_purpose"/></td>
+                                        <td style="font-size: 12px; text-align: left;"><t t-esc="public_purpose_clean"/></td>
                                     </tr>
                                 </t>
                             </t>

@@ -30,7 +30,9 @@
             <form string="Section 11 Preliminary Report">
                 <header>
                     <button name="action_generate_pdf" string="Generate Notification 11" type="object" class="btn-primary" icon="fa-file-pdf"
-                            invisible="state == 'signed'"/>
+                            invisible="state in ('generated', 'signed')"/>
+                    <button name="action_download_pdf" string="Download Notification 11" type="object" class="btn-primary" icon="fa-download"
+                            invisible="state not in ('generated', 'signed')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
                 <div class="alert alert-info" role="alert" invisible="state != 'draft' or not project_id or not village_id" 

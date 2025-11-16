@@ -26,12 +26,14 @@ class JWTAuthController(http.Controller):
 
             otp_code = str(random.randint(1000, 9999))
             expire_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
+            # Convert to naive datetime (Odoo Datetime fields expect naive datetimes)
+            expire_time_naive = expire_time.replace(tzinfo=None)
 
             request.env['mobile.otp'].sudo().create({
                 'mobile': mobile,
                 'user_id': user.id,
                 'otp': otp_code,
-                'expire_date': expire_time,
+                'expire_date': expire_time_naive,
             })
 
             try:
@@ -148,13 +150,10 @@ class JWTAuthController(http.Controller):
                 return Response(json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json')
 
             expire_date = otp_record.expire_date
-            # Convert expire_date to timezone-aware datetime if needed
+            # Odoo returns naive datetime, convert current time to naive UTC for comparison
             if expire_date:
-                # If expire_date is timezone-naive, make it timezone-aware (UTC)
-                if expire_date.tzinfo is None:
-                    expire_date = expire_date.replace(tzinfo=timezone.utc)
-                current_time = datetime.datetime.now(timezone.utc)
-                if current_time > expire_date:
+                current_time_naive = datetime.datetime.now(timezone.utc).replace(tzinfo=None)
+                if current_time_naive > expire_date:
                     otp_record.unlink()
                     return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
 

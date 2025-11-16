@@ -684,7 +684,7 @@ class BhuarjanAPIController(http.Controller):
             # Get query parameters
             village_id = request.httprequest.args.get('village_id', type=int)
             project_id = request.httprequest.args.get('project_id', type=int)
-            limit = request.httprequest.args.get('limit', type=int, default=100)
+            limit = min(request.httprequest.args.get('limit', type=int, default=20), 50)  # Default 20, max 50
 
             if not village_id:
                 _logger.warning("Form 10 download: village_id is missing")
@@ -728,10 +728,11 @@ class BhuarjanAPIController(http.Controller):
             _logger.info(f"Form 10 download: Searching surveys with domain {domain}")
 
             # Get all surveys for the village (and project if specified)
+            # Limit to prevent server overload
             surveys = request.env['bhu.survey'].sudo().with_context(
                 active_test=False,
                 bhuarjan_current_project_id=False
-            ).search(domain, order='id', limit=min(limit, 100))  # Limit to max 100 surveys
+            ).search(domain, order='id', limit=limit)
 
             _logger.info(f"Form 10 download: Found {len(surveys)} surveys")
 
@@ -796,10 +797,22 @@ class BhuarjanAPIController(http.Controller):
 
             # Generate PDF with error handling
             report_name = report_action.report_name
-            _logger.info(f"Form 10 download: Starting PDF generation with report_name: {report_name}")
+            _logger.info(f"Form 10 download: Starting PDF generation with report_name: {report_name} for {len(res_ids)} surveys")
+            
             try:
-                pdf_result = report_action.sudo()._render_qweb_pdf(report_name, res_ids, data={})
+                # Use with_context to ensure clean environment
+                pdf_result = report_action.sudo().with_context(
+                    lang='en_US',
+                    tz='UTC'
+                )._render_qweb_pdf(report_name, res_ids, data={})
                 _logger.info(f"Form 10 download: PDF generation completed, result type: {type(pdf_result)}")
+            except MemoryError as mem_error:
+                _logger.error(f"Form 10 download: Memory error during PDF generation: {str(mem_error)}")
+                return Response(
+                    json.dumps({'error': 'PDF generation failed due to memory constraints. Please reduce the number of surveys or contact administrator.'}),
+                    status=500,
+                    content_type='application/json'
+                )
             except Exception as render_error:
                 _logger.error(f"Form 10 download: PDF rendering failed: {str(render_error)}", exc_info=True)
                 return Response(

@@ -674,71 +674,84 @@ class BhuarjanAPIController(http.Controller):
     @check_permission
     def download_form10(self, **kwargs):
         """
-        Download Form 10 (Section 4 Notification) PDF
-        Query params: project_id, village_id (or notification_id)
+        Download Form 10 (Bulk Table Report) PDF based on village_id
+        Query params: village_id (required), project_id (optional)
         Returns: PDF file
         """
         try:
             # Get query parameters
-            project_id = request.httprequest.args.get('project_id', type=int)
             village_id = request.httprequest.args.get('village_id', type=int)
-            notification_id = request.httprequest.args.get('notification_id', type=int)
+            project_id = request.httprequest.args.get('project_id', type=int)
 
-            if notification_id:
-                # Get notification by ID
-                notification = request.env['bhu.section4.notification'].sudo().browse(notification_id)
-                if not notification.exists():
-                    return Response(
-                        json.dumps({'error': 'Notification not found'}),
-                        status=404,
-                        content_type='application/json'
-                    )
-                project_id = notification.project_id.id
-                village_id = notification.village_id.id
-            elif not project_id or not village_id:
+            if not village_id:
                 return Response(
-                    json.dumps({'error': 'project_id and village_id (or notification_id) are required'}),
+                    json.dumps({'error': 'village_id is required'}),
                     status=400,
                     content_type='application/json'
                 )
 
-            # Get or create Section 4 notification
-            notification = request.env['bhu.section4.notification'].sudo().search([
-                ('project_id', '=', project_id),
-                ('village_id', '=', village_id)
-            ], limit=1, order='create_date desc')
-
-            if not notification:
+            # Verify village exists
+            village = request.env['bhu.village'].sudo().browse(village_id)
+            if not village.exists():
                 return Response(
-                    json.dumps({'error': 'Section 4 Notification not found for this project and village'}),
+                    json.dumps({'error': 'Village not found'}),
                     status=404,
                     content_type='application/json'
                 )
 
-            # Create wizard for PDF generation
-            wizard = request.env['bhu.section4.notification.wizard'].sudo().create({
-                'project_id': project_id,
-                'village_id': village_id,
-                'public_purpose': notification.public_purpose or '',
-                'public_hearing_date': notification.public_hearing_date,
-                'public_hearing_time': notification.public_hearing_time or '',
-                'public_hearing_place': notification.public_hearing_place or '',
-                'q1_brief_description': notification.q1_brief_description or '',
-                'q2_directly_affected': notification.q2_directly_affected or '',
-                'q3_indirectly_affected': notification.q3_indirectly_affected or '',
-                'q4_private_assets': notification.q4_private_assets or '',
-                'q5_government_assets': notification.q5_government_assets or '',
-                'q6_minimal_acquisition': notification.q6_minimal_acquisition or '',
-                'q7_alternatives_considered': notification.q7_alternatives_considered or '',
-                'q8_total_cost': notification.q8_total_cost or '',
-                'q9_project_benefits': notification.q9_project_benefits or '',
-                'q10_compensation_measures': notification.q10_compensation_measures or '',
-                'q11_other_components': notification.q11_other_components or '',
-            })
+            # Build domain to get surveys for the village
+            domain = [('village_id', '=', village_id)]
+            
+            # If project_id is provided, filter by project as well
+            if project_id:
+                # Verify project exists
+                project = request.env['bhu.project'].sudo().browse(project_id)
+                if not project.exists():
+                    return Response(
+                        json.dumps({'error': 'Project not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                domain.append(('project_id', '=', project_id))
+                project_name = project.name
+            else:
+                project_name = 'All'
+
+            # Get all surveys for the village (and project if specified)
+            surveys = request.env['bhu.survey'].sudo().with_context(
+                active_test=False,
+                bhuarjan_current_project_id=False
+            ).search(domain, order='id')
+
+            if not surveys:
+                return Response(
+                    json.dumps({'error': f'No surveys found for village_id={village_id}' + (f' and project_id={project_id}' if project_id else '')}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Get the Form 10 bulk table report
+            try:
+                report_action = request.env.ref('bhuarjan.action_report_form10_bulk_table')
+            except ValueError:
+                return Response(
+                    json.dumps({'error': 'Form 10 report not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            if not report_action.exists():
+                return Response(
+                    json.dumps({'error': 'Form 10 report not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Convert surveys to list of IDs for PDF rendering
+            res_ids = [int(sid) for sid in surveys.ids]
 
             # Generate PDF
-            report_action = request.env.ref('bhuarjan.action_report_section4_notification')
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [wizard.id], data={})
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, res_ids, data={})
 
             if not pdf_result:
                 return Response(
@@ -760,12 +773,19 @@ class BhuarjanAPIController(http.Controller):
                     content_type='application/json'
                 )
 
+            # Generate filename
+            village_name_ascii = village.name.replace(' ', '_').replace('/', '_')[:50] if village.name else 'Village'
+            filename = f"Form10_{village_name_ascii}.pdf"
+            if project_id:
+                project_name_ascii = project_name.replace(' ', '_').replace('/', '_')[:30] if project_name else 'Project'
+                filename = f"Form10_{project_name_ascii}_{village_name_ascii}.pdf"
+
             # Return PDF
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="Section4_Notification_{notification.name or "Form10"}.pdf"')
+                    ('Content-Disposition', f'attachment; filename="{filename}"')
                 ]
             )
 

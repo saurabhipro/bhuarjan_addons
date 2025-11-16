@@ -434,15 +434,15 @@
 			]
 		},
 		{
-			"name": "Form 10 (Section 4 Notification)",
+			"name": "Form 10 (Bulk Table Report)",
 			"item": [
 				{
-					"name": "Download Form 10 PDF (by project and village)",
+					"name": "Download Form 10 PDF (by village)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?project_id=1&village_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -454,28 +454,23 @@
 							],
 							"query": [
 								{
-									"key": "project_id",
-									"value": "1",
-									"description": "Project ID"
-								},
-								{
 									"key": "village_id",
 									"value": "1",
-									"description": "Village ID"
+									"description": "Village ID (required)"
 								}
 							]
 						},
-						"description": "Download Form 10 (Section 4 Notification) PDF using project_id and village_id"
+						"description": "Download Form 10 (Bulk Table Report) PDF based on village_id. Returns all surveys for the specified village across all projects."
 					},
 					"response": []
 				},
 				{
-					"name": "Download Form 10 PDF (by notification ID)",
+					"name": "Download Form 10 PDF (by village and project)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?notification_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&project_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -487,13 +482,18 @@
 							],
 							"query": [
 								{
-									"key": "notification_id",
+									"key": "village_id",
 									"value": "1",
-									"description": "Section 4 Notification ID"
+									"description": "Village ID (required)"
+								},
+								{
+									"key": "project_id",
+									"value": "1",
+									"description": "Project ID (optional)"
 								}
 							]
 						},
-						"description": "Download Form 10 (Section 4 Notification) PDF using notification_id"
+						"description": "Download Form 10 (Bulk Table Report) PDF based on village_id and project_id. Returns surveys for the specified village and project only."
 					},
 					"response": []
 				}

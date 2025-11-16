@@ -69,9 +69,9 @@
                                 <strong>ℹ Information:</strong> The surveys shown below are locked because they have been used to generate <strong><field name="section4_notification_id" readonly="1" nolabel="1" invisible="not section4_notification_id"/></strong> (Notification 4). These locked surveys are included in this Notification 11 report.
                             </div>
                             <field name="land_parcel_ids" nolabel="1">
-                                <list string="Surveys" editable="bottom">
-                                    <field name="khasra_number" required="1" string="Khasra Number"/>
-                                    <field name="area_in_hectares" required="1" string="Area (Hectares)"/>
+                                <list string="Surveys">
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="area_in_hectares" string="Area (Hectares)"/>
                                     <field name="survey_number" string="Survey Number"/>
                                     <field name="survey_date" string="Survey Date"/>
                                     <field name="district_id" string="District"/>

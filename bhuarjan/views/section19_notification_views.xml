@@ -67,9 +67,9 @@
                     
                     <group string="Land Parcels Schedule / भूमि खंड अनुसूची (Auto-populated from Section 11, excluding objections)">
                         <field name="land_parcel_ids" nolabel="1">
-                            <list string="Khasra Details" editable="bottom">
-                                <field name="khasra_number" required="1" string="Khasra Number"/>
-                                <field name="area_hectares" required="1" string="Area (Hectares)"/>
+                            <list string="Khasra Details">
+                                <field name="khasra_number" string="Khasra Number"/>
+                                <field name="area_hectares" string="Area (Hectares)"/>
                                 <field name="survey_number" string="Survey Number"/>
                                 <field name="survey_date" string="Survey Date"/>
                                 <field name="survey_state" string="Status" widget="badge"

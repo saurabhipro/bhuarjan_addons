@@ -78,9 +78,9 @@
                     </div>
                     <group string="Land Parcels / भूमि खंड (Auto-populated from Section 19)">
                         <field name="land_parcel_ids" nolabel="1">
-                            <list string="Land Parcels" editable="bottom">
-                                <field name="khasra_number" required="1" string="Khasra Number"/>
-                                <field name="area_hectares" required="1" string="Area (Hectares)"/>
+                            <list string="Land Parcels">
+                                <field name="khasra_number" string="Khasra Number"/>
+                                <field name="area_hectares" string="Area (Hectares)"/>
                                 <field name="survey_number" string="Survey Number"/>
                                 <field name="survey_date" string="Survey Date"/>
                                 <field name="district_id" string="District"/>

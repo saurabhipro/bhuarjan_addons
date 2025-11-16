@@ -732,40 +732,59 @@ class BhuarjanAPIController(http.Controller):
 
             # Get the Form 10 bulk table report
             try:
-                # Use ir.model.data to get the report action with sudo access
-                report_data = request.env['ir.model.data'].sudo().search([
-                    ('module', '=', 'bhuarjan'),
-                    ('name', '=', 'action_report_form10_bulk_table')
+                # Use sudo() to bypass access rights when getting the report action
+                report_action = request.env['ir.actions.report'].sudo().search([
+                    ('report_name', '=', 'bhuarjan.form10_bulk_table_report')
                 ], limit=1)
                 
-                if not report_data or not report_data.res_id:
+                if not report_action:
+                    # Fallback: try using ir.model.data
+                    try:
+                        report_data = request.env['ir.model.data'].sudo().search([
+                            ('module', '=', 'bhuarjan'),
+                            ('name', '=', 'action_report_form10_bulk_table')
+                        ], limit=1)
+                        if report_data and report_data.res_id:
+                            report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
+                    except Exception:
+                        pass
+                
+                if not report_action or not report_action.exists():
+                    _logger.error("Form 10 report action not found")
                     return Response(
                         json.dumps({'error': 'Form 10 report not found'}),
                         status=404,
                         content_type='application/json'
                     )
-                
-                report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
             except Exception as e:
                 _logger.error(f"Error getting report action: {str(e)}", exc_info=True)
                 return Response(
-                    json.dumps({'error': 'Form 10 report not found'}),
-                    status=404,
-                    content_type='application/json'
-                )
-
-            if not report_action.exists():
-                return Response(
-                    json.dumps({'error': 'Form 10 report not found'}),
-                    status=404,
+                    json.dumps({'error': f'Error accessing report: {str(e)}'}),
+                    status=500,
                     content_type='application/json'
                 )
 
             # Convert surveys to list of IDs for PDF rendering
             res_ids = [int(sid) for sid in surveys.ids]
+            
+            if not res_ids:
+                return Response(
+                    json.dumps({'error': 'No survey IDs found'}),
+                    status=404,
+                    content_type='application/json'
+                )
 
-            # Generate PDF
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, res_ids, data={})
+            # Generate PDF with error handling
+            report_name = report_action.report_name
+            try:
+                pdf_result = report_action.sudo()._render_qweb_pdf(report_name, res_ids, data={})
+            except Exception as render_error:
+                _logger.error(f"PDF rendering failed: {str(render_error)}", exc_info=True)
+                return Response(
+                    json.dumps({'error': f'Error generating PDF: {str(render_error)}'}),
+                    status=500,
+                    content_type='application/json'
+                )
 
             if not pdf_result:
                 return Response(

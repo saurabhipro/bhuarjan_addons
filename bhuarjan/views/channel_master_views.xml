@@ -33,6 +33,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="id" readonly="1" string="Internal ID"/>
                             <field name="code"/>
                             <field name="channel_type" widget="radio" options="{'horizontal': true}"/>
                             <field name="active"/>

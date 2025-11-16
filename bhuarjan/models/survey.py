@@ -22,6 +22,17 @@ class Survey(models.Model):
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)
+    
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset village when project changes and filter villages to only those mapped to the project"""
+        if self.project_id:
+            # Reset village if it's not in the project's villages
+            if self.village_id and self.village_id not in self.project_id.village_ids:
+                self.village_id = False
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        else:
+            return {'domain': {'village_id': []}}
     district_name = fields.Char(string='District / जिला', default='Raigarh (Chhattisgarh)', readonly=True, tracking=True)
     survey_date = fields.Date(string='Survey Date / सर्वे दिनाँक', required=True, tracking=True, default=fields.Date.today)
     

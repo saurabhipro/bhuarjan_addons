@@ -439,7 +439,6 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': data.get('khasra_number'),
                 'total_area': data.get('total_area', 0.0),
                 'acquired_area': data.get('acquired_area', 0.0),
-                'survey_date': data.get('survey_date'),
                 'crop_type': data.get('crop_type', 'single'),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
                 'tree_development_stage': data.get('tree_development_stage'),
@@ -459,6 +458,10 @@ class BhuarjanAPIController(http.Controller):
                 'remarks': data.get('remarks'),
                 'state': data.get('state', 'draft'),
             }
+            
+            # Handle survey_date - only set if explicitly provided, otherwise use model default (today's date)
+            if 'survey_date' in data and data.get('survey_date'):
+                survey_vals['survey_date'] = data.get('survey_date')
             
             # Handle well_type separately - only set if provided (optional field)
             if 'well_type' in data and data.get('well_type'):

@@ -642,7 +642,7 @@
 								"{{presigned_url}}"
 							]
 						},
-						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API. Replace {{presigned_url}} with the actual presigned_url from the previous API response. Set the file in the Body tab (binary mode). The Content-Type header should match your file type.\n\nIMPORTANT: Do NOT include any Authorization header when uploading to presigned URLs. The presigned URL already contains all authentication information in the query parameters. If you see 'Only one auth mechanism allowed' error, remove the Authorization header from this request."
+						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API. Replace {{presigned_url}} with the actual presigned_url from the previous API response. Set the file in the Body tab (binary mode). The Content-Type header should match the 'content_type' value from the API response.\n\nCRITICAL REQUIREMENTS:\n1. Method MUST be PUT (not GET or POST) - presigned URLs are generated for PUT operations\n2. Do NOT include any Authorization header - the presigned URL contains all authentication\n3. Content-Type header must match exactly what was used when generating the presigned URL\n4. Use the 'content_type' value from the API response for the Content-Type header\n\nCommon Errors:\n- 'SignatureDoesNotMatch': Usually means wrong HTTP method (use PUT) or wrong Content-Type header\n- 'Only one auth mechanism allowed': Remove Authorization header\n- 'AccessDenied': Check AWS IAM permissions"
 					},
 					"response": []
 				},

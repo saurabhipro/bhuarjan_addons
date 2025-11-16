@@ -1093,12 +1093,30 @@ class BhuarjanAPIController(http.Controller):
                     # Generate S3 key (path) for the file
                     s3_key = f"surveys/{survey_id}/{file_name}"
                     
+                    # Determine content type based on file extension
+                    content_type = 'application/octet-stream'  # default
+                    file_ext = file_name.lower().split('.')[-1] if '.' in file_name else ''
+                    content_type_map = {
+                        'jpg': 'image/jpeg',
+                        'jpeg': 'image/jpeg',
+                        'png': 'image/png',
+                        'gif': 'image/gif',
+                        'pdf': 'application/pdf',
+                        'doc': 'application/msword',
+                        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'xls': 'application/vnd.ms-excel',
+                        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    }
+                    if file_ext in content_type_map:
+                        content_type = content_type_map[file_ext]
+                    
+                    # Generate presigned URL for PUT operation
                     presigned_url = s3_client.generate_presigned_url(
                         'put_object',
                         Params={
                             'Bucket': settings_master.s3_bucket_name,
                             'Key': s3_key,
-                            'ContentType': 'application/octet-stream'
+                            'ContentType': content_type
                         },
                         ExpiresIn=int(expiration.total_seconds())
                     )
@@ -1108,6 +1126,7 @@ class BhuarjanAPIController(http.Controller):
                         'presigned_url': presigned_url,
                         's3_key': s3_key,
                         'bucket_name': settings_master.s3_bucket_name,
+                        'content_type': content_type,
                         'expires_in': int(expiration.total_seconds()),
                         'expires_at': expires_at.isoformat()
                     })

@@ -41,16 +41,21 @@
 
 #### Option A: Using Postman
 
-1. **Create a new PUT request**
+1. **Create a new PUT request** (IMPORTANT: Must be PUT, not GET or POST)
 2. **Set the URL** to the `presigned_url` from Step 1 response
 3. **Set Auth to "No Auth"** (IMPORTANT: Do not use Bearer token or any auth)
-4. **Set Method to PUT**
+4. **Set Method to PUT** (Double-check this - the error shows GET was used)
 5. **In Body tab:**
    - Select "binary" mode
    - Click "Select File" and choose your image file
 6. **Set Headers:**
-   - `Content-Type: image/jpeg` (or appropriate type: `image/png`, `application/pdf`, etc.)
+   - `Content-Type: image/jpeg` (Use the `content_type` value from the API response, or match the file type)
+   - For `.jpg` files: `image/jpeg`
+   - For `.png` files: `image/png`
+   - For `.pdf` files: `application/pdf`
 7. **Send the request**
+
+**CRITICAL:** The presigned URL is generated for PUT method. If you use GET or POST, you'll get "SignatureDoesNotMatch" error.
 
 #### Option B: Using cURL
 
@@ -131,7 +136,10 @@ with open(file_path, 'rb') as file:
 - **Solution**: Check AWS IAM permissions for the user. The user needs `s3:PutObject` permission.
 
 ### Error: "SignatureDoesNotMatch"
-- **Solution**: The presigned URL may have expired. Generate a new one.
+- **Solution 1**: Make sure you're using **PUT method** (not GET or POST). The presigned URL is generated for PUT operation.
+- **Solution 2**: The `Content-Type` header must match exactly what was used when generating the presigned URL. Use the `content_type` value from the API response.
+- **Solution 3**: The presigned URL may have expired. Generate a new one (they expire after 1 hour).
+- **Solution 4**: Make sure you're not modifying the presigned URL in any way (don't add/remove query parameters).
 
 ### Error: "403 Forbidden"
 - **Solution**: Check that the S3 bucket name and AWS credentials are correct in Bhuarjan Settings Master.

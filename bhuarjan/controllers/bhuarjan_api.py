@@ -423,6 +423,100 @@ class BhuarjanAPIController(http.Controller):
                     content_type='application/json'
                 )
             
+            # Validate that all landowner IDs exist and are valid
+            if isinstance(landowner_ids, list):
+                invalid_ids = []
+                valid_ids = []
+                for landowner_id in landowner_ids:
+                    if not isinstance(landowner_id, int):
+                        invalid_ids.append(f"{landowner_id} (not an integer)")
+                    else:
+                        landowner = request.env['bhu.landowner'].sudo().browse(landowner_id)
+                        if not landowner.exists():
+                            invalid_ids.append(str(landowner_id))
+                        else:
+                            valid_ids.append(landowner_id)
+                
+                if invalid_ids:
+                    return Response(
+                        json.dumps({
+                            'error': 'Invalid landowner ID(s)',
+                            'message': f'The following landowner ID(s) do not exist or are invalid: {", ".join(invalid_ids)}',
+                            'invalid_ids': invalid_ids,
+                            'valid_ids': valid_ids
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+                
+                # Use only valid IDs
+                landowner_ids = valid_ids
+            
+            # Validate required fields
+            required_fields = {
+                'project_id': 'Project',
+                'village_id': 'Village',
+                'department_id': 'Department',
+                'tehsil_id': 'Tehsil',
+                'khasra_number': 'Khasra Number',
+                'total_area': 'Total Area',
+                'acquired_area': 'Acquired Area'
+            }
+            
+            missing_fields = []
+            for field, label in required_fields.items():
+                if field not in data or data.get(field) is None or data.get(field) == '':
+                    missing_fields.append(label)
+            
+            if missing_fields:
+                return Response(
+                    json.dumps({
+                        'error': 'Missing required fields',
+                        'message': f'The following required fields are missing: {", ".join(missing_fields)}',
+                        'missing_fields': missing_fields
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Validate that referenced IDs exist
+            validation_errors = []
+            
+            # Validate project_id
+            if data.get('project_id'):
+                project = request.env['bhu.project'].sudo().browse(data['project_id'])
+                if not project.exists():
+                    validation_errors.append(f'Project ID {data["project_id"]} does not exist')
+            
+            # Validate village_id
+            if data.get('village_id'):
+                village = request.env['bhu.village'].sudo().browse(data['village_id'])
+                if not village.exists():
+                    validation_errors.append(f'Village ID {data["village_id"]} does not exist')
+            
+            # Validate department_id
+            if data.get('department_id'):
+                department = request.env['bhu.department'].sudo().browse(data['department_id'])
+                if not department.exists():
+                    validation_errors.append(f'Department ID {data["department_id"]} does not exist')
+            
+            # Validate tehsil_id
+            if data.get('tehsil_id'):
+                tehsil = request.env['bhu.tehsil'].sudo().browse(data['tehsil_id'])
+                if not tehsil.exists():
+                    validation_errors.append(f'Tehsil ID {data["tehsil_id"]} does not exist')
+            
+            if validation_errors:
+                return Response(
+                    json.dumps({
+                        'error': 'Invalid reference ID(s)',
+                        'message': '; '.join(validation_errors),
+                        'details': validation_errors
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
             # Get default user (admin) or use provided user_id
             user_id = data.get('user_id')
             if not user_id:

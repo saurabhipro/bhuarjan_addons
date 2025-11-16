@@ -243,7 +243,19 @@ class BhuarjanSettingsMaster(models.Model):
     otp_api_secret = fields.Char(string='OTP API Secret', help='API secret for OTP service', password=True)
     otp_sender_id = fields.Char(string='OTP Sender ID', help='Sender ID for OTP messages')
     
+    # Static OTP Configuration (for testing/development when SMS API is disabled)
+    enable_static_otp = fields.Boolean(string='Enable Static OTP', default=False,
+                                      help='If enabled, use static OTP instead of sending SMS. Useful when SMS API is disabled.')
+    static_otp_value = fields.Char(string='Static OTP Value', help='Static OTP value to use when static OTP is enabled (e.g., 1234)')
+    
     active = fields.Boolean(string='Active', default=True)
+    
+    @api.constrains('enable_static_otp', 'static_otp_value')
+    def _check_static_otp_value(self):
+        """Ensure static_otp_value is provided when enable_static_otp is True"""
+        for record in self:
+            if record.enable_static_otp and not record.static_otp_value:
+                raise ValidationError('Static OTP Value is required when Enable Static OTP is checked.')
     
     @api.depends('project_id')
     def _compute_display_name(self):

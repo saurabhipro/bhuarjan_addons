@@ -72,6 +72,20 @@
                                         <field name="otp_sender_id" placeholder="e.g., BHUAJN"/>
                                     </group>
                                 </group>
+                                
+                                <div class="alert alert-warning" role="alert" style="margin-top: 16px;">
+                                    <strong>Static OTP Configuration</strong><br/>
+                                    Enable static OTP to use a fixed OTP value instead of sending SMS. This is useful when SMS API is disabled or for testing purposes.
+                                </div>
+                                
+                                <group col="2">
+                                    <group>
+                                        <field name="enable_static_otp"/>
+                                    </group>
+                                    <group>
+                                        <field name="static_otp_value" placeholder="e.g., 1234"/>
+                                    </group>
+                                </group>
                             </page>
                         </notebook>
                     </sheet>

@@ -24,7 +24,20 @@ class JWTAuthController(http.Controller):
             if existing_otp:
                 existing_otp.unlink()
 
-            otp_code = str(random.randint(1000, 9999))
+            # Check if static OTP is enabled in any active settings master
+            settings_master = request.env['bhuarjan.settings.master'].sudo().search([
+                ('active', '=', True),
+                ('enable_static_otp', '=', True),
+                ('static_otp_value', '!=', False)
+            ], limit=1)
+
+            # Use static OTP if enabled, otherwise generate random OTP
+            if settings_master and settings_master.static_otp_value:
+                otp_code = str(settings_master.static_otp_value)
+                _logger.info(f"Using static OTP: {otp_code} for mobile: {mobile}")
+            else:
+                otp_code = str(random.randint(1000, 9999))
+
             expire_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
             # Convert to naive datetime (Odoo Datetime fields expect naive datetimes)
             expire_time_naive = expire_time.replace(tzinfo=None)
@@ -36,6 +49,19 @@ class JWTAuthController(http.Controller):
                 'expire_date': expire_time_naive,
             })
 
+            # If static OTP is enabled, skip SMS sending
+            if settings_master and settings_master.static_otp_value:
+                return Response(
+                    json.dumps({
+                        'message': 'Static OTP generated successfully',
+                        'details': otp_code,
+                        'static_otp': True
+                    }),
+                    status=200,
+                    content_type='application/json'
+                )
+
+            # Send SMS if static OTP is not enabled
             try:
                 msg = f"Your SELECTIAL OPT {otp_code}"
                 api_url = f"https://webmsg.smsbharti.com/app/smsapi/index.php?key=5640415B1D6730&campaign=0&routeid=9&type=text&contacts={mobile}&senderid=SPTSMS&msg=Your%20otp%20is%20{otp_code}%20SELECTIAL&template_id=1707166619134631839"

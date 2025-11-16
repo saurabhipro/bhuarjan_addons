@@ -66,6 +66,10 @@ class BhuarjanDashboard(models.TransientModel):
     
     # Document Vault Counts
     total_documents = fields.Integer(string='Total Documents', readonly=True, default=0)
+    
+    # Active Mobile Users (based on JWT tokens)
+    active_mobile_users = fields.Integer(string='Active Mobile Users', readonly=True, default=0,
+                                        help='Number of unique users currently logged in via mobile channel')
 
     def _compute_all_counts(self):
         """Compute all counts for the dashboard"""
@@ -132,6 +136,11 @@ class BhuarjanDashboard(models.TransientModel):
             
             # Document Vault
             record.total_documents = self.env['bhu.document.vault'].search_count([])
+            
+            # Active Mobile Users (unique users with JWT tokens from mobile channel)
+            mobile_tokens = self.env['jwt.token'].search([('channel_type', '=', 'mobile')])
+            unique_mobile_users = len(set(mobile_tokens.mapped('user_id').ids))
+            record.active_mobile_users = unique_mobile_users
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -229,6 +238,9 @@ class BhuarjanDashboard(models.TransientModel):
             
             # Document Vault
             'total_documents': self.env['bhu.document.vault'].search_count([]),
+            
+            # Active Mobile Users (unique users with JWT tokens from mobile channel)
+            'active_mobile_users': len(set(self.env['jwt.token'].search([('channel_type', '=', 'mobile')]).mapped('user_id').ids)),
         }
     
     def action_refresh(self):

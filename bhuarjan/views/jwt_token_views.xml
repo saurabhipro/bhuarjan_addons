@@ -4,9 +4,12 @@
         <field name="name">jwt.token</field>
         <field name="model">jwt.token</field>
         <field name="arch" type="xml">
-            <list>
+            <list string="JWT Tokens">
                 <field name="user_id"/>
-                <field name="token"/>
+                <field name="channel_id"/>
+                <field name="channel_type"/>
+                <field name="create_date"/>
+                <field name="token" optional="hide"/>
             </list>
         </field>
     </record>
@@ -16,9 +19,32 @@
 
     <!-- Link the list view to the menu -->
      <record model="ir.actions.act_window" id="jwt_token_action">
-      <field name="name">jwt.token window</field>
+      <field name="name">JWT Tokens</field>
       <field name="res_model">jwt.token</field>
       <field name="view_mode">list,form</field>
+    </record>
+    
+    <!-- JWT Token Form View -->
+    <record id="view_jwt_token_form" model="ir.ui.view">
+        <field name="name">jwt.token.form</field>
+        <field name="model">jwt.token</field>
+        <field name="arch" type="xml">
+            <form string="JWT Token">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="channel_id"/>
+                            <field name="channel_type"/>
+                        </group>
+                        <group>
+                            <field name="create_date"/>
+                            <field name="token" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
     </record>
 
     <!-- Add the menu item to the action -->

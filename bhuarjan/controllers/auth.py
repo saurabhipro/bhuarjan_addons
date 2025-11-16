@@ -224,13 +224,23 @@ class JWTAuthController(http.Controller):
             user = otp_record.user_id.id
             otp_record.unlink()
 
+            # Delete old JWT tokens for the same user before creating a new one
+            old_tokens = request.env['jwt.token'].sudo().search([('user_id', '=', user)])
+            if old_tokens:
+                old_tokens.unlink()
+
             payload = {
                 'user_id': user,
                 'exp': datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=24)
             }
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
-            request.env['jwt.token'].sudo().create({'user_id': user, 'token': token})
+            # Create new JWT token with channel information
+            request.env['jwt.token'].sudo().create({
+                'user_id': user,
+                'token': token,
+                'channel_id': channel_id
+            })
 
             return Response(json.dumps({'user_id': user, 'token': token}), status=200, content_type='application/json')
 

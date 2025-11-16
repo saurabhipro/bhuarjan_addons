@@ -87,6 +87,13 @@
                             </div>
                             <div class="kpi-value"><field name="total_rate_masters" nolabel="1" readonly="1"/></div>
                         </button>
+                        <div class="dashboard-kpi-card kpi-card-blue" style="cursor: default;">
+                            <div class="kpi-header">
+                                <div class="kpi-label">Active Mobile Users</div>
+                                <div class="kpi-icon"><i class="fa fa-mobile"/></div>
+                            </div>
+                            <div class="kpi-value"><field name="active_mobile_users" nolabel="1" readonly="1"/></div>
+                        </div>
                     </div>
                     
                     <div class="dashboard-section-title">

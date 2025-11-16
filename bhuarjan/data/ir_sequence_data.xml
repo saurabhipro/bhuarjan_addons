@@ -11,81 +11,11 @@
             <field name="number_increment">1</field>
         </record>
         
-        <!-- Sequence for Notification 4 Numbers -->
-        <record id="seq_bhu_notification4" model="ir.sequence">
-            <field name="name">Notification 4 Number</field>
-            <field name="code">bhu.notification4</field>
-            <field name="prefix">NOT4_</field>
-            <field name="padding">3</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 3 Jansunwai Numbers -->
-        <record id="seq_bhu_stage3_jansunwai" model="ir.sequence">
-            <field name="name">Stage 3 Jansunwai Number</field>
-            <field name="code">bhu.stage3.jansunwai</field>
-            <field name="prefix">STG3_</field>
-            <field name="padding">3</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 4 Expert Review Numbers -->
-        <record id="seq_bhu_stage4_expert_review" model="ir.sequence">
-            <field name="name">Stage 4 Expert Review Number</field>
-            <field name="code">bhu.stage4.expert.review</field>
-            <field name="prefix">STG4_</field>
-            <field name="padding">3</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 5 Collector Approval Numbers -->
-        <record id="seq_bhu_stage5_collector_approval" model="ir.sequence">
-            <field name="name">Stage 5 Collector Approval Number</field>
-            <field name="code">bhu.stage5.collector.approval</field>
-            <field name="prefix">STG5_</field>
-            <field name="padding">3</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 8 Section 19 Numbers -->
-        <record id="seq_bhu_stage8_section19" model="ir.sequence">
-            <field name="name">Stage 8 Section 19 Number</field>
-            <field name="code">bhu.stage8.section19</field>
-            <field name="prefix">STG8-S19-</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 9 Section 21 Numbers -->
-        <record id="seq_bhu_stage9_section21" model="ir.sequence">
-            <field name="name">Stage 9 Section 21 Number</field>
-            <field name="code">bhu.stage9.section21</field>
-            <field name="prefix">STG9-S21-</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Stage 9 Section 23 Numbers -->
-        <record id="seq_bhu_stage9_section23" model="ir.sequence">
-            <field name="name">Stage 9 Section 23 Number</field>
-            <field name="code">bhu.stage9.section23</field>
-            <field name="prefix">STG9-S23-</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
         <!-- Sequence for Rate Master Numbers -->
         <record id="seq_bhu_rate_master" model="ir.sequence">
             <field name="name">Rate Master Number</field>
             <field name="code">bhu.rate.master</field>
-            <field name="prefix">RM-</field>
+            <field name="prefix">RM_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -95,7 +25,7 @@
         <record id="seq_bhu_sia_team" model="ir.sequence">
             <field name="name">SIA Team Number</field>
             <field name="code">bhu.sia.team</field>
-            <field name="prefix">SIA-</field>
+            <field name="prefix">SIA_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -105,17 +35,7 @@
         <record id="seq_bhu_section15_objection" model="ir.sequence">
             <field name="name">Section 15 Objection Number</field>
             <field name="code">bhu.section15.objection</field>
-            <field name="prefix">OBJ-</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
-        <!-- Sequence for Section 4 Notification Numbers -->
-        <record id="seq_bhu_section4_notification" model="ir.sequence">
-            <field name="name">Section 4 Notification Number</field>
-            <field name="code">bhu.section4.notification</field>
-            <field name="prefix">SEC4-</field>
+            <field name="prefix">OBJ_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -125,7 +45,7 @@
         <record id="seq_bhu_expert_committee_report" model="ir.sequence">
             <field name="name">Expert Committee Report Number</field>
             <field name="code">bhu.expert.committee.report</field>
-            <field name="prefix">ECR-</field>
+            <field name="prefix">ECR_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -141,21 +61,11 @@
             <field name="number_increment">1</field>
         </record>
         
-        <!-- Sequence for Section 19 Notification Numbers -->
-        <record id="seq_bhu_section19_notification" model="ir.sequence">
-            <field name="name">Section 19 Notification Number</field>
-            <field name="code">bhu.section19.notification</field>
-            <field name="prefix">SEC19-</field>
-            <field name="padding">4</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-        
         <!-- Sequence for Draft Award Numbers -->
         <record id="seq_bhu_draft_award" model="ir.sequence">
             <field name="name">Draft Award Number</field>
             <field name="code">bhu.draft.award</field>
-            <field name="prefix">AWARD-</field>
+            <field name="prefix">AWARD_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -165,7 +75,7 @@
         <record id="seq_bhu_payment_file" model="ir.sequence">
             <field name="name">Payment File Number</field>
             <field name="code">bhu.payment.file</field>
-            <field name="prefix">PAY-</field>
+            <field name="prefix">PAY_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
@@ -175,7 +85,7 @@
         <record id="seq_bhu_payment_reconciliation_bank" model="ir.sequence">
             <field name="name">Payment Reconciliation Bank Number</field>
             <field name="code">bhu.payment.reconciliation.bank</field>
-            <field name="prefix">RECON-</field>
+            <field name="prefix">RECON_</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>

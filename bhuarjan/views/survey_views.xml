@@ -14,9 +14,9 @@
                 <field name="khasra_number"/>
                 <field name="total_area"/>
                 <field name="acquired_area"/>
-                <field name="landowner_count" string="Landowners / भूमिस्वामी"/>
+                <field name="landowner_count" string="Landowners"/>
                 <field name="survey_date"/>
-                <field name="pending_since" string="Pending Since / लंबित" invisible="state != 'submitted'"/>
+                <field name="pending_since" string="Pending Since" invisible="state != 'submitted'"/>
                 <field name="state" widget="badge" 
                        decoration-success="state == 'approved'"
                        decoration-info="state == 'draft'"

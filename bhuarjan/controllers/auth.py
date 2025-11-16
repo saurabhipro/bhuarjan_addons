@@ -143,25 +143,32 @@ class JWTAuthController(http.Controller):
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
 
-            # Validate channel if provided
-            if channel_id:
-                channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
-                if not channel.exists():
-                    return Response(
-                        json.dumps({'error': f'Channel with ID {channel_id} not found'}),
-                        status=404,
-                        content_type='application/json'
-                    )
-                if not channel.active:
-                    return Response(
-                        json.dumps({
-                            'error': 'Channel is inactive. Please contact Administrator.',
-                            'channel_name': channel.name or '',
-                            'channel_type': channel.channel_type or ''
-                        }),
-                        status=403,
-                        content_type='application/json'
-                    )
+            # Channel ID is required
+            if not channel_id:
+                return Response(
+                    json.dumps({'error': 'channel_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Validate channel
+            channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
+            if not channel.exists():
+                return Response(
+                    json.dumps({'error': f'Channel with ID {channel_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+            if not channel.active:
+                return Response(
+                    json.dumps({
+                        'error': 'Channel is inactive. Please contact Administrator.',
+                        'channel_name': channel.name or '',
+                        'channel_type': channel.channel_type or ''
+                    }),
+                    status=403,
+                    content_type='application/json'
+                )
 
             otp_record = request.env['mobile.otp'].sudo().search([
                 ('mobile', '=', mobile),
@@ -189,19 +196,16 @@ class JWTAuthController(http.Controller):
 
             request.env['jwt.token'].sudo().create({'user_id': user, 'token': token})
 
+            # Include channel info in response
             response_data = {
                 'user_id': user,
-                'token': token
-            }
-            
-            # Include channel info if provided
-            if channel_id:
-                channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
-                response_data['channel'] = {
+                'token': token,
+                'channel': {
                     'id': channel.id,
                     'name': channel.name or '',
                     'channel_type': channel.channel_type or ''
                 }
+            }
 
             return Response(json.dumps(response_data), status=200, content_type='application/json')
 

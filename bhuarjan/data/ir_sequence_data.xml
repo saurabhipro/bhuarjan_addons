@@ -5,8 +5,8 @@
         <record id="seq_bhu_survey" model="ir.sequence">
             <field name="name">Survey Number</field>
             <field name="code">bhu.survey</field>
-            <field name="prefix"></field>
-            <field name="padding">3</field>
+            <field name="prefix">SC_</field>
+            <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>
         </record>

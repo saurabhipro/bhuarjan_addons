@@ -574,6 +574,111 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "S3 File Upload",
+			"item": [
+				{
+					"name": "Generate S3 Presigned URLs",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"survey_id\": 1,\n    \"file_names\": [\"image1.jpg\", \"document1.pdf\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"s3",
+								"presigned-urls"
+							]
+						},
+						"description": "Generate S3 presigned URLs for file upload. Supports single file (file_name) or multiple files (file_names array). The presigned URLs are valid for 1 hour. After getting the presigned URL, use it to upload files directly to S3 using a PUT request."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File to S3 (using presigned URL)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/octet-stream",
+								"description": "Or use the appropriate content type for your file (e.g., image/jpeg, application/pdf)"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							},
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{presigned_url}}",
+							"host": [
+								"{{presigned_url}}"
+							]
+						},
+						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API. Replace {{presigned_url}} with the actual presigned_url from the previous API response. Set the file in the Body tab (binary mode). The Content-Type header should match your file type."
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Single File Presigned URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"survey_id\": 1,\n    \"file_name\": \"image1.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"s3",
+								"presigned-urls"
+							]
+						},
+						"description": "Generate a presigned URL for a single file. Use file_name (string) instead of file_names (array) for single file uploads."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

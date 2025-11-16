@@ -1043,15 +1043,14 @@ class BhuarjanAPIController(http.Controller):
                     content_type='application/json'
                 )
             
-            # Get AWS settings from settings master for this project
+            # Get AWS settings from global settings master
             settings_master = request.env['bhuarjan.settings.master'].sudo().search([
-                ('project_id', '=', survey.project_id.id),
                 ('active', '=', True)
             ], limit=1)
             
             if not settings_master:
                 return Response(
-                    json.dumps({'error': f'AWS settings not found for project {survey.project_id.name}'}),
+                    json.dumps({'error': 'AWS settings not found. Please configure AWS settings in Bhuarjan Settings Master.'}),
                     status=404,
                     content_type='application/json'
                 )

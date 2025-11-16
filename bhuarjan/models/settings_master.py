@@ -431,10 +431,9 @@ class BhuarjanSettingsMaster(models.Model):
     
     @api.model
     def get_workflow_users(self, process_name, project_id):
-        """Get workflow users for a process"""
+        """Get workflow users for a process (global settings, no project dependency)"""
         workflow_settings = self.env['bhuarjan.workflow.settings'].search([
             ('process_name', '=', process_name),
-            ('project_id', '=', project_id),
             ('active', '=', True)
         ])
         

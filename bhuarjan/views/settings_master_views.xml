@@ -110,6 +110,19 @@
             </field>
         </record>
 
+        <!-- Settings Master Search View -->
+        <record id="view_bhuarjan_settings_master_search" model="ir.ui.view">
+            <field name="name">bhuarjan.settings.master.search</field>
+            <field name="model">bhuarjan.settings.master</field>
+            <field name="arch" type="xml">
+                <search string="Bhuarjan Settings Master">
+                    <field name="name"/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
         <!-- Sequence Settings Form View -->
         <record id="view_bhuarjan_sequence_settings_form" model="ir.ui.view">
             <field name="name">bhuarjan.sequence.settings.form</field>
@@ -225,6 +238,7 @@
             <field name="name">Settings Master</field>
             <field name="res_model">bhuarjan.settings.master</field>
             <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_bhuarjan_settings_master_search"/>
             <field name="context">{'search_default_active': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

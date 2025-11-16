@@ -67,7 +67,7 @@
 								"login"
 							]
 						},
-						"description": "Login with mobile and OTP. channel_id is optional - if provided, validates that the channel is active. If channel is inactive, returns error: 'Channel is inactive. Please contact Administrator.'"
+						"description": "Login with mobile and OTP. channel_id is REQUIRED. Validates that the channel exists and is active. If channel is inactive, returns error: 'Channel is inactive. Please contact Administrator.'"
 					},
 					"response": []
 				},

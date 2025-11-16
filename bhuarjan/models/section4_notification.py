@@ -367,10 +367,10 @@ class Section4Notification(models.Model):
             self.signed_date = fields.Date.today()
     
     def action_download_pdf(self):
-        """Download Section 4 Notification PDF (for generated/signed notifications)"""
+        """Download Section 4 Notification PDF (for generated/signed/notification_11 notifications)"""
         self.ensure_one()
         
-        if self.state not in ('generated', 'signed'):
+        if self.state not in ('generated', 'signed', 'notification_11'):
             raise ValidationError(_('Notification must be generated before downloading.'))
         
         # If signed document exists, download it

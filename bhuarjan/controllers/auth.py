@@ -21,7 +21,7 @@ class JWTAuthController(http.Controller):
             existing_otp.unlink()
 
         otp_code = str(random.randint(1000, 9999))
-        expire_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+        expire_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5)
 
         request.env['mobile.otp'].sudo().create({
             'mobile': mobile,
@@ -138,7 +138,7 @@ class JWTAuthController(http.Controller):
             return Response( json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json' )
 
         expire_date = otp_record.expire_date
-        if datetime.datetime.utcnow() > expire_date:
+        if datetime.datetime.now(datetime.timezone.utc) > expire_date:
             otp_record.unlink()
             return Response(json.dumps({'error': 'OTP expired'}),status=400, content_type='application/json')
 
@@ -147,7 +147,7 @@ class JWTAuthController(http.Controller):
 
         payload = {
             'user_id': user,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 

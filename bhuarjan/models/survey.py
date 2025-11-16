@@ -18,7 +18,7 @@ class Survey(models.Model):
     user_id = fields.Many2one('res.users', string="User", default=lambda self : self.env.user.id, readonly=True)
     name = fields.Char(string='Survey Number', required=True, tracking=True, readonly=True, copy=False, default='New')
     survey_uuid = fields.Char(string='Survey UUID', readonly=True, copy=False, default=lambda self: str(uuid.uuid4()))
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)

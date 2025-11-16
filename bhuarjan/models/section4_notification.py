@@ -19,7 +19,7 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, 
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     

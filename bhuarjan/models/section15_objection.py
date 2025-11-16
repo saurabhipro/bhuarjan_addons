@@ -12,7 +12,7 @@ class Section15Objection(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Objection Reference / आपत्ति संदर्भ', required=True, tracking=True, default='New')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=True, tracking=True)
     survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', tracking=True)

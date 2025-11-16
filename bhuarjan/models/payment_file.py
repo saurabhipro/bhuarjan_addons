@@ -23,7 +23,7 @@ class PaymentFile(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Payment File Number / भुगतान फ़ाइल संख्या', required=True, default='New', tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     award_id = fields.Many2one('bhu.draft.award', string='Draft Award / अवार्ड', required=True, tracking=True)
     

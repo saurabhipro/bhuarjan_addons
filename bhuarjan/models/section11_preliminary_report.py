@@ -12,7 +12,7 @@ class Section11PreliminaryReport(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Report Name', required=True, default='New', tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project', required=True, tracking=True,
+    project_id = fields.Many2one('bhu.project', string='Project', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     village_id = fields.Many2one('bhu.village', string='Village', required=True, tracking=True)
     district_id = fields.Many2one('bhu.district', string='District', related='village_id.district_id', 

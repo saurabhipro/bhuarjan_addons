@@ -12,7 +12,7 @@ class ExpertCommitteeReport(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Report Name / रिपोर्ट का नाम', required=True, default='New', tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True,
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True)
     
     _sql_constraints = [

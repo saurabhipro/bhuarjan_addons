@@ -12,7 +12,7 @@ class DraftAward(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Award Name / अवार्ड का नाम', required=True, default='New', tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True,
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
                                  default=lambda self: self._default_project_id())
     
     # Section 19 Notification selection

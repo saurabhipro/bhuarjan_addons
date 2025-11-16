@@ -18,7 +18,7 @@ class Section19Notification(models.Model):
     section11_report_id = fields.Many2one('bhu.section11.preliminary.report', string='Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट',
                                           tracking=True, help='Select Section 11 Preliminary Report to auto-populate data')
     
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True,
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
     

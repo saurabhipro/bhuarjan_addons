@@ -220,7 +220,7 @@ class BhuarjanSettingsMaster(models.Model):
     _description = 'Bhuarjan Settings Master'
     _rec_name = 'display_name'
 
-    project_id = fields.Many2one('bhu.project', string='Project', required=True)
+    project_id = fields.Many2one('bhu.project', string='Project', required=True, ondelete='cascade')
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
     
     # Sequence Settings

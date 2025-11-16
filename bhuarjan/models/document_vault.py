@@ -12,7 +12,7 @@ class DocumentVault(models.Model):
     _order = 'signed_date desc, create_date desc'
 
     name = fields.Char(string='Document Name / दस्तावेज़ का नाम', required=True, tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     document_type = fields.Selection([
         ('sec4_signed_notification', 'Section 4 Signed Notification / धारा 4 हस्ताक्षरित अधिसूचना'),

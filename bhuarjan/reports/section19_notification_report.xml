@@ -27,10 +27,10 @@
                     padding: 6px; 
                     vertical-align: middle;
                 }
-                h2,td{
-                    font-family: 'Noto Sans Devanagari', sans-serif;
+                /* Global Font Settings */
+                body, .header-section, .header-info-table, h2, strong, span, td, th {
+                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 }
-                
             </style>
             <h2 style="text-align: right; margin: 0 0 12px 0; font-size: 16px; font-weight: bold;">
                 <strong>प्रारूप अधिसूचना</strong>
@@ -151,7 +151,15 @@
             <t t-set="notification" t-value="object or (docs and docs[0]) or None"/>
             <t t-call="bhuarjan.section19_report_custom_layout"/>
             
-            <div class="page" style="font-family: 'Noto Sans Devanagari', Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 20px;">
+            <style>
+                /* Global Font Settings for Section 19 Report */
+                body, .page, div, p, span, td, th, h2, h3, strong, .notification-content,
+                .header-info-table, .schedule-section, .legal-preamble {
+                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                }
+            </style>
+            
+            <div class="page" style="font-size: 14px; line-height: 1.6; padding: 20px;">
                 <style>
                     .notification-content {
                         margin-top: 20px;

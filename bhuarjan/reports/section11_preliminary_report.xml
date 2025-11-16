@@ -14,6 +14,12 @@
     <!-- Custom Layout header for Section 11 -->
     <template id="section11_report_custom_layout">
         <div class="header-section" style="margin-bottom: 12px;">
+            <style>
+                /* Global Font Settings */
+                body, .header-section, .header-info-table, h2, strong, span, td, th {
+                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                }
+            </style>
 
             <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;">
                 <strong>प्ररूप-एक (नियम 11 देखिये)</strong>
@@ -119,6 +125,12 @@
             <t t-foreach="docs" t-as="report">
                 <t t-call="bhuarjan.section11_report_custom_layout"/>
                 <style>
+                    /* Global Font Settings for Section 11 Report */
+                    body, .page, div, p, span, td, th, h2, h3, strong, .report-body, 
+                    .schedule-table, .header-info-table {
+                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                    }
+                    
                     @page {
                         margin: 2cm 1.5cm;
                         font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;

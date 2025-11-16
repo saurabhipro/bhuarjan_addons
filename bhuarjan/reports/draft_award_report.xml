@@ -15,6 +15,11 @@
     <template id="draft_award_report_custom_layout">
         <div class="header-section" style="margin-bottom: 12px;">
             <style>
+                /* Global Font Settings */
+                body, .header-section, .header-info-table, h2, strong, span, td, th {
+                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                }
+                
                 .header-info-table { 
                     width: 100%; 
                     border-collapse: collapse; 
@@ -147,8 +152,16 @@
             <meta charset="utf-8"/>
             <t t-set="award" t-value="object or (docs and docs[0]) or None"/>
             <t t-call="bhuarjan.draft_award_report_custom_layout"/>
+            
+            <style>
+                /* Global Font Settings for Draft Award Report */
+                body, .page, div, p, span, td, th, h2, h3, strong, .report-paragraph,
+                .header-info-table, .report-content-table {
+                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                }
+            </style>
 
-            <div class="page" style="font-family: 'Arial', sans-serif; font-size: 14px; color: #333; padding: 15px;">
+            <div class="page" style="font-size: 14px; color: #333; padding: 15px;">
                 <div class="oe_structure"/>
 
                 <!-- Case Number and Location -->

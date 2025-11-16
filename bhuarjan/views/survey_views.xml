@@ -85,7 +85,7 @@
                                     <field name="acquired_area" widget="float" readonly="state == 'locked'" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी" class="survey-icon-crop">
-                                    <field name="crop_type" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="crop_type_id" widget="selection" readonly="state == 'locked'" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
                                     <field name="irrigation_type" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
                                 </group>
                             </group>

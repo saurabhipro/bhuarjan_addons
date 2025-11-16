@@ -48,10 +48,8 @@ class Survey(models.Model):
     # Land Details
     land_type_id = fields.Many2one('bhu.land.type', string='Land Type / भूमि का प्रकार', tracking=True,
                                     help='Select the type of land from the master list')
-    crop_type = fields.Selection([
-        ('single', 'Single Crop / एकल फसल'),
-        ('double', 'Double Crop / दोहरी फसल'),
-    ], string='Crop Type / फसल का प्रकार', default='single', tracking=True)
+    crop_type_id = fields.Many2one('bhu.land.type', string='Crop Type / फसल का प्रकार', tracking=True,
+                                    help='Select the crop type from the land type master (एक फसली, दो फसली, पड़ती)')
     
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
@@ -163,11 +161,18 @@ class Survey(models.Model):
     is_irrigated = fields.Boolean(string='Is Irrigated', compute='_compute_irrigation_fields', store=False)
     is_unirrigated = fields.Boolean(string='Is Unirrigated', compute='_compute_irrigation_fields', store=False)
     
-    @api.depends('crop_type')
+    @api.depends('crop_type_id')
     def _compute_crop_fields(self):
         for record in self:
-            record.is_single_crop = record.crop_type == 'single'
-            record.is_double_crop = record.crop_type == 'double'
+            if record.crop_type_id:
+                # Check if it's single crop or double crop based on land type code or name
+                crop_code = record.crop_type_id.code or ''
+                crop_name = record.crop_type_id.name or ''
+                record.is_single_crop = 'SINGLE_CROP' in crop_code or 'एक फसली' in crop_name
+                record.is_double_crop = 'DOUBLE_CROP' in crop_code or 'दो फसली' in crop_name
+            else:
+                record.is_single_crop = False
+                record.is_double_crop = False
     
     @api.depends('irrigation_type')
     def _compute_irrigation_fields(self):

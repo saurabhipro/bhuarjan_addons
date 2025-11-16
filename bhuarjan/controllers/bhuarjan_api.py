@@ -430,6 +430,54 @@ class BhuarjanAPIController(http.Controller):
                 admin_user = request.env['res.users'].sudo().search([('login', '=', 'admin')], limit=1)
                 user_id = admin_user.id if admin_user else 2  # Fallback to user ID 2 (usually admin)
             
+            # Handle crop_type - accept crop_type (ID) and map to crop_type_id in model
+            crop_type_id = None
+            if 'crop_type' in data:
+                crop_type_value = data.get('crop_type')
+                if isinstance(crop_type_value, int):
+                    # If it's an integer, treat it as land type ID
+                    # Validate that the land type exists
+                    land_type = request.env['bhu.land.type'].sudo().browse(crop_type_value)
+                    if land_type.exists():
+                        crop_type_id = crop_type_value
+                    else:
+                        return Response(
+                            json.dumps({
+                                'error': f'Invalid crop_type: Land type with ID {crop_type_value} does not exist'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
+                elif isinstance(crop_type_value, str):
+                    # Backward compatibility: map old crop_type string to land type ID
+                    crop_type_str = crop_type_value.lower()
+                    if crop_type_str in ('single', 'single1'):
+                        single_crop = request.env['bhu.land.type'].sudo().search([
+                            ('code', '=', 'SINGLE_CROP')
+                        ], limit=1)
+                        crop_type_id = single_crop.id if single_crop else None
+                    elif crop_type_str in ('double', 'double1'):
+                        double_crop = request.env['bhu.land.type'].sudo().search([
+                            ('code', '=', 'DOUBLE_CROP')
+                        ], limit=1)
+                        crop_type_id = double_crop.id if double_crop else None
+            elif 'crop_type_id' in data:
+                # Also support crop_type_id for backward compatibility
+                crop_type_id_value = data.get('crop_type_id')
+                if crop_type_id_value:
+                    # Validate that the land type exists
+                    land_type = request.env['bhu.land.type'].sudo().browse(crop_type_id_value)
+                    if land_type.exists():
+                        crop_type_id = crop_type_id_value
+                    else:
+                        return Response(
+                            json.dumps({
+                                'error': f'Invalid crop_type_id: Land type with ID {crop_type_id_value} does not exist'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
+            
             # Prepare survey values
             survey_vals = {
                 'user_id': user_id,
@@ -440,7 +488,6 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': data.get('khasra_number'),
                 'total_area': data.get('total_area', 0.0),
                 'acquired_area': data.get('acquired_area', 0.0),
-                'crop_type': data.get('crop_type', 'single'),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
                 'tree_development_stage': data.get('tree_development_stage'),
                 'tree_count': data.get('tree_count', 0),
@@ -459,6 +506,13 @@ class BhuarjanAPIController(http.Controller):
                 'remarks': data.get('remarks'),
                 'state': data.get('state', 'draft'),
             }
+            
+            # Set crop_type_id only if it has a valid value (not None)
+            if crop_type_id:
+                survey_vals['crop_type_id'] = crop_type_id
+            
+            # Explicitly remove crop_type from survey_vals if it exists (shouldn't happen, but safety check)
+            survey_vals.pop('crop_type', None)
             
             # Handle survey_date - only set if explicitly provided, otherwise use model default (today's date)
             if 'survey_date' in data and data.get('survey_date'):
@@ -551,7 +605,9 @@ class BhuarjanAPIController(http.Controller):
                 'total_area': survey.total_area,
                 'acquired_area': survey.acquired_area,
                 'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
-                'crop_type': survey.crop_type,
+                'crop_type': survey.crop_type_id.id if survey.crop_type_id else None,
+                'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
+                'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type,
                 'tree_development_stage': survey.tree_development_stage,
                 'tree_count': survey.tree_count,
@@ -1311,12 +1367,35 @@ class BhuarjanAPIController(http.Controller):
             allowed_fields = [
                 'project_id', 'department_id', 'village_id', 'tehsil_id', 'survey_date',
                 'khasra_number', 'total_area', 'acquired_area', 'land_type_id',
-                'crop_type', 'irrigation_type', 'tree_development_stage', 'tree_count',
+                'crop_type_id', 'irrigation_type', 'tree_development_stage', 'tree_count',
                 'has_house', 'house_type', 'house_area', 'shed_area',
                 'has_well', 'well_type', 'has_tubewell', 'has_pond',
                 'trees_description', 'landowner_ids', 'survey_image', 'survey_image_filename',
                 'remarks', 'notes'
             ]
+            
+            # Note: 'crop_type' is handled separately above and mapped to 'crop_type_id'
+
+            # Handle crop_type - accept crop_type (ID) and map to crop_type_id in model
+            if 'crop_type' in data:
+                crop_type_value = data.get('crop_type')
+                if isinstance(crop_type_value, int):
+                    # If it's an integer, treat it as land type ID
+                    data['crop_type_id'] = crop_type_value
+                elif isinstance(crop_type_value, str):
+                    # Backward compatibility: map old crop_type string to land type ID
+                    crop_type_str = crop_type_value.lower()
+                    if crop_type_str in ('single', 'single1'):
+                        single_crop = request.env['bhu.land.type'].sudo().search([('code', '=', 'SINGLE_CROP')], limit=1)
+                        data['crop_type_id'] = single_crop.id if single_crop else None
+                    elif crop_type_str in ('double', 'double1'):
+                        double_crop = request.env['bhu.land.type'].sudo().search([('code', '=', 'DOUBLE_CROP')], limit=1)
+                        data['crop_type_id'] = double_crop.id if double_crop else None
+                # Remove crop_type from data as we'll use crop_type_id internally
+                data.pop('crop_type', None)
+            elif 'crop_type_id' in data:
+                # Also support crop_type_id for backward compatibility
+                pass  # Keep it as is
 
             # Prepare update values
             update_vals = {}
@@ -1373,7 +1452,9 @@ class BhuarjanAPIController(http.Controller):
                 'acquired_area': survey.acquired_area or 0.0,
                 'land_type_id': survey.land_type_id.id if survey.land_type_id else None,
                 'land_type_name': survey.land_type_id.name if survey.land_type_id else '',
-                'crop_type': survey.crop_type or '',
+                'crop_type': survey.crop_type_id.id if survey.crop_type_id else None,
+                'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
+                'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type or '',
                 'tree_development_stage': survey.tree_development_stage or '',
                 'tree_count': survey.tree_count or 0,

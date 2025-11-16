@@ -27,7 +27,7 @@
         # 'data/sample_sequence_settings.xml',
         # 'data/sample_expert_committee_report.xml',
         'data/sample_landowners.xml',
-        'data/sample_surveys.xml',
+        # 'data/sample_surveys.xml',  # Disabled - not importing sample surveys
         # 'data/sample_section4_config.xml',
         # 'data/sample_section4_notifications.xml',
         # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data

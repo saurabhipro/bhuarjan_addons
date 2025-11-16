@@ -155,7 +155,7 @@
             <field name="village_id" ref="jurda_village"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="department_id" ref="dept_public_works"/>
-            <field name="khasra_number">103</field>
+            <field name="khasra_number">104</field>
             <field name="total_area">1.7500</field>
             <field name="acquired_area">1.5000</field>
             <field name="crop_type">single</field>

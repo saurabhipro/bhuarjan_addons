@@ -356,10 +356,10 @@ class Survey(models.Model):
                 message_type='notification'
             )
 
-            template = self.env.ref("bhuarjan.email_bhuarjan_survey_submit_form")
-            for user in self:
-                if template:
-                    template.send_mail(user.id, force_send=True)
+            # Send email notification to the user
+            template = self.env.ref("bhuarjan.email_bhuarjan_survey_submit_form", raise_if_not_found=False)
+            if template and record.user_id and (record.user_id.partner_id.email or record.user_id.email):
+                template.send_mail(record.id, force_send=True)
 
                     
         wiz = self.env['bhu.survey.message.wizard'].create({

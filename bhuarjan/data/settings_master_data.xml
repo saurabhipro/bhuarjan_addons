@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <!-- Settings Master Data -->
+        <!-- This file contains settings master records for projects -->
+        <!-- Users can create their own settings master records through the UI -->
+        <!-- Or uncomment and modify the example below to create one via data file -->
         
-        <!-- Sample data removed to avoid dependency issues -->
-        <!-- Users can create their own settings master records -->
+        <!-- Example: Settings Master for Ring Road Raigarh Project -->
+        <!-- Uncomment and modify as needed -->
+        <!--
+        <record id="settings_master_ring_road_raigarh" model="bhuarjan.settings.master">
+            <field name="project_id" ref="project_ring_road_raigarh"/>
+            <field name="active" eval="True"/>
+        </record>
+        -->
         
     </data>
 </odoo>

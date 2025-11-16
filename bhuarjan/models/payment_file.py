@@ -364,7 +364,7 @@ class PaymentFileLine(models.Model):
     award_serial_number = fields.Integer(string='Award Serial Number / अवॉर्ड स.क.', required=True)
     
     # Landowner Details
-    landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=True)
+    landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=False, ondelete='set null')
     landowner_name = fields.Char(string='Landowner Name / पक्षकार का नाम', related='landowner_id.name', store=True, readonly=True)
     father_husband_name = fields.Char(string='Father/Husband Name / पिता/पति का नाम', 
                                      related='landowner_id.father_name', store=True, readonly=True)

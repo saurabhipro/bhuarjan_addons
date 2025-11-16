@@ -18,6 +18,7 @@
     <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
     <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     

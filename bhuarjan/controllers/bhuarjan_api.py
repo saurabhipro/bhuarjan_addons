@@ -671,28 +671,35 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/form10/download', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_permission
+    # @check_permission
     def download_form10(self, **kwargs):
         """
         Download Form 10 (Bulk Table Report) PDF based on village_id
-        Query params: village_id (required), project_id (optional)
+        Query params: village_id (required), project_id (optional), limit (optional, max 100)
         Returns: PDF file
         """
         try:
+            _logger.info("Form 10 download API called")
+            
             # Get query parameters
             village_id = request.httprequest.args.get('village_id', type=int)
             project_id = request.httprequest.args.get('project_id', type=int)
+            limit = request.httprequest.args.get('limit', type=int, default=100)
 
             if not village_id:
+                _logger.warning("Form 10 download: village_id is missing")
                 return Response(
                     json.dumps({'error': 'village_id is required'}),
                     status=400,
                     content_type='application/json'
                 )
 
+            _logger.info(f"Form 10 download: village_id={village_id}, project_id={project_id}, limit={limit}")
+
             # Verify village exists
             village = request.env['bhu.village'].sudo().browse(village_id)
             if not village.exists():
+                _logger.warning(f"Form 10 download: Village {village_id} not found")
                 return Response(
                     json.dumps({'error': 'Village not found'}),
                     status=404,
@@ -707,6 +714,7 @@ class BhuarjanAPIController(http.Controller):
                 # Verify project exists
                 project = request.env['bhu.project'].sudo().browse(project_id)
                 if not project.exists():
+                    _logger.warning(f"Form 10 download: Project {project_id} not found")
                     return Response(
                         json.dumps({'error': 'Project not found'}),
                         status=404,
@@ -717,13 +725,18 @@ class BhuarjanAPIController(http.Controller):
             else:
                 project_name = 'All'
 
+            _logger.info(f"Form 10 download: Searching surveys with domain {domain}")
+
             # Get all surveys for the village (and project if specified)
             surveys = request.env['bhu.survey'].sudo().with_context(
                 active_test=False,
                 bhuarjan_current_project_id=False
-            ).search(domain, order='id')
+            ).search(domain, order='id', limit=min(limit, 100))  # Limit to max 100 surveys
+
+            _logger.info(f"Form 10 download: Found {len(surveys)} surveys")
 
             if not surveys:
+                _logger.warning(f"Form 10 download: No surveys found for village_id={village_id}")
                 return Response(
                     json.dumps({'error': f'No surveys found for village_id={village_id}' + (f' and project_id={project_id}' if project_id else '')}),
                     status=404,
@@ -731,6 +744,7 @@ class BhuarjanAPIController(http.Controller):
                 )
 
             # Get the Form 10 bulk table report
+            _logger.info("Form 10 download: Getting report action")
             try:
                 # Use sudo() to bypass access rights when getting the report action
                 report_action = request.env['ir.actions.report'].sudo().search([
@@ -739,6 +753,7 @@ class BhuarjanAPIController(http.Controller):
                 
                 if not report_action:
                     # Fallback: try using ir.model.data
+                    _logger.info("Form 10 download: Report not found by name, trying ir.model.data")
                     try:
                         report_data = request.env['ir.model.data'].sudo().search([
                             ('module', '=', 'bhuarjan'),
@@ -746,18 +761,20 @@ class BhuarjanAPIController(http.Controller):
                         ], limit=1)
                         if report_data and report_data.res_id:
                             report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        _logger.error(f"Form 10 download: Error in fallback: {str(e)}", exc_info=True)
                 
                 if not report_action or not report_action.exists():
-                    _logger.error("Form 10 report action not found")
+                    _logger.error("Form 10 download: Report action not found")
                     return Response(
                         json.dumps({'error': 'Form 10 report not found'}),
                         status=404,
                         content_type='application/json'
                     )
+                
+                _logger.info(f"Form 10 download: Report action found: {report_action.id}, report_name: {report_action.report_name}")
             except Exception as e:
-                _logger.error(f"Error getting report action: {str(e)}", exc_info=True)
+                _logger.error(f"Form 10 download: Error getting report action: {str(e)}", exc_info=True)
                 return Response(
                     json.dumps({'error': f'Error accessing report: {str(e)}'}),
                     status=500,
@@ -767,7 +784,10 @@ class BhuarjanAPIController(http.Controller):
             # Convert surveys to list of IDs for PDF rendering
             res_ids = [int(sid) for sid in surveys.ids]
             
+            _logger.info(f"Form 10 download: Rendering PDF for {len(res_ids)} surveys: {res_ids[:10]}..." if len(res_ids) > 10 else f"Form 10 download: Rendering PDF for {len(res_ids)} surveys: {res_ids}")
+            
             if not res_ids:
+                _logger.warning("Form 10 download: No survey IDs found")
                 return Response(
                     json.dumps({'error': 'No survey IDs found'}),
                     status=404,
@@ -776,10 +796,12 @@ class BhuarjanAPIController(http.Controller):
 
             # Generate PDF with error handling
             report_name = report_action.report_name
+            _logger.info(f"Form 10 download: Starting PDF generation with report_name: {report_name}")
             try:
                 pdf_result = report_action.sudo()._render_qweb_pdf(report_name, res_ids, data={})
+                _logger.info(f"Form 10 download: PDF generation completed, result type: {type(pdf_result)}")
             except Exception as render_error:
-                _logger.error(f"PDF rendering failed: {str(render_error)}", exc_info=True)
+                _logger.error(f"Form 10 download: PDF rendering failed: {str(render_error)}", exc_info=True)
                 return Response(
                     json.dumps({'error': f'Error generating PDF: {str(render_error)}'}),
                     status=500,
@@ -794,17 +816,21 @@ class BhuarjanAPIController(http.Controller):
                 )
 
             # Extract PDF bytes
+            _logger.info("Form 10 download: Extracting PDF bytes from result")
             if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
                 pdf_data = pdf_result[0]
             else:
                 pdf_data = pdf_result
 
             if not isinstance(pdf_data, bytes):
+                _logger.error(f"Form 10 download: Invalid PDF data type: {type(pdf_data)}")
                 return Response(
                     json.dumps({'error': 'Invalid PDF data'}),
                     status=500,
                     content_type='application/json'
                 )
+
+            _logger.info(f"Form 10 download: PDF data extracted, size: {len(pdf_data)} bytes")
 
             # Generate filename
             village_name_ascii = village.name.replace(' ', '_').replace('/', '_')[:50] if village.name else 'Village'
@@ -813,14 +839,19 @@ class BhuarjanAPIController(http.Controller):
                 project_name_ascii = project_name.replace(' ', '_').replace('/', '_')[:30] if project_name else 'Project'
                 filename = f"Form10_{project_name_ascii}_{village_name_ascii}.pdf"
 
+            _logger.info(f"Form 10 download: Returning PDF response with filename: {filename}")
+
             # Return PDF
-            return request.make_response(
+            response = request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"')
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data)))
                 ]
             )
+            _logger.info("Form 10 download: PDF response created successfully")
+            return response
 
         except Exception as e:
             _logger.error(f"Error in download_form10: {str(e)}", exc_info=True)

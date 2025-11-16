@@ -348,6 +348,53 @@
 						"description": "List surveys with optional filters"
 					},
 					"response": []
+				},
+				{
+					"name": "Update Survey (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "JWT token from login API"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"crop_type\": \"double\",\n    \"irrigation_type\": \"irrigated\",\n    \"tree_count\": 30,\n    \"landowner_ids\": [1, 2]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/survey/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"survey",
+								"1"
+							],
+							"variable": [
+								{
+									"key": "survey_id",
+									"value": "1",
+									"description": "Replace with actual survey ID"
+								}
+							]
+						},
+						"description": "Update a survey. Only surveys in 'draft' or 'submitted' state can be edited. Once approved or locked, surveys cannot be edited. Include only the fields you want to update in the request body."
+					},
+					"response": []
 				}
 			]
 		},
@@ -446,6 +493,48 @@
 							]
 						},
 						"description": "Create a new landowner. Replace IDs with actual values from your database."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Landowners",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/landowners?survey_id=&village_id=&limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"landowners"
+							],
+							"query": [
+								{
+									"key": "survey_id",
+									"value": "",
+									"description": "Filter by survey ID (optional)"
+								},
+								{
+									"key": "village_id",
+									"value": "",
+									"description": "Filter by village ID (optional)"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								}
+							]
+						},
+						"description": "Get landowners based on survey_id and/or village_id (both optional). If both are provided, returns landowners that match both criteria."
 					},
 					"response": []
 				}

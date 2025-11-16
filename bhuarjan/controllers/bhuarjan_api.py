@@ -976,3 +976,232 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/landowners', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def get_landowners(self, **kwargs):
+        """
+        Get landowners based on survey_id and/or village_id (both optional)
+        Query params: survey_id (optional), village_id (optional), limit (optional, default 100), offset (optional, default 0)
+        Returns: JSON list of landowners
+        """
+        try:
+            survey_id = request.httprequest.args.get('survey_id', type=int)
+            village_id = request.httprequest.args.get('village_id', type=int)
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+
+            domain = []
+            
+            # Filter by survey_id if provided
+            if survey_id:
+                survey = request.env['bhu.survey'].sudo().browse(survey_id)
+                if not survey.exists():
+                    return Response(
+                        json.dumps({'error': f'Survey with ID {survey_id} not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                # Get landowners from the survey
+                domain.append(('survey_ids', 'in', [survey_id]))
+            
+            # Filter by village_id if provided
+            if village_id:
+                village = request.env['bhu.village'].sudo().browse(village_id)
+                if not village.exists():
+                    return Response(
+                        json.dumps({'error': f'Village with ID {village_id} not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                domain.append(('village_id', '=', village_id))
+
+            landowners = request.env['bhu.landowner'].sudo().search(domain, limit=limit, offset=offset, order='name')
+
+            landowners_data = []
+            for landowner in landowners:
+                landowners_data.append({
+                    'id': landowner.id,
+                    'name': landowner.name or '',
+                    'father_name': landowner.father_name or '',
+                    'mother_name': landowner.mother_name or '',
+                    'spouse_name': landowner.spouse_name or '',
+                    'age': landowner.age or 0,
+                    'gender': landowner.gender or '',
+                    'phone': landowner.phone or '',
+                    'village_id': landowner.village_id.id if landowner.village_id else None,
+                    'village_name': landowner.village_id.name if landowner.village_id else '',
+                    'tehsil_id': landowner.tehsil_id.id if landowner.tehsil_id else None,
+                    'tehsil_name': landowner.tehsil_id.name if landowner.tehsil_id else '',
+                    'district_id': landowner.district_id.id if landowner.district_id else None,
+                    'district_name': landowner.district_id.name if landowner.district_id else '',
+                    'aadhar_number': landowner.aadhar_number or '',
+                    'pan_number': landowner.pan_number or '',
+                    'bank_name': landowner.bank_name or '',
+                    'bank_branch': landowner.bank_branch or '',
+                    'account_number': landowner.account_number or '',
+                    'ifsc_code': landowner.ifsc_code or '',
+                    'account_holder_name': landowner.account_holder_name or '',
+                    'survey_ids': landowner.survey_ids.ids if landowner.survey_ids else [],
+                })
+
+            total_count = request.env['bhu.landowner'].sudo().search_count(domain)
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': landowners_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_landowners: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['PATCH'], csrf=False)
+    @check_permission
+    def update_survey(self, survey_id, **kwargs):
+        """
+        Update survey (PATCH) - only allowed if state is 'draft' or 'submitted'
+        Request body: JSON with fields to update
+        Returns: Updated survey data
+        """
+        try:
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                return Response(
+                    json.dumps({'error': f'Survey with ID {survey_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Check if survey can be edited (only draft and submitted states allow editing)
+            if survey.state not in ('draft', 'submitted'):
+                return Response(
+                    json.dumps({
+                        'error': f'Survey cannot be edited. Current state: {survey.state}. Only surveys in draft or submitted state can be edited.'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Parse request data
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+
+            # List of fields that can be updated via API
+            allowed_fields = [
+                'project_id', 'department_id', 'village_id', 'tehsil_id', 'survey_date',
+                'khasra_number', 'total_area', 'acquired_area', 'land_type_id',
+                'crop_type', 'irrigation_type', 'tree_development_stage', 'tree_count',
+                'has_house', 'house_type', 'house_area', 'shed_area',
+                'has_well', 'well_type', 'has_tubewell', 'has_pond',
+                'trees_description', 'landowner_ids', 'survey_image', 'survey_image_filename',
+                'remarks', 'notes'
+            ]
+
+            # Prepare update values
+            update_vals = {}
+            for field, value in data.items():
+                if field in allowed_fields:
+                    # Handle Many2many fields (landowner_ids)
+                    if field == 'landowner_ids' and isinstance(value, list):
+                        update_vals[field] = [(6, 0, value)]  # Replace all
+                    # Handle Many2one fields
+                    elif field.endswith('_id') and value:
+                        update_vals[field] = value
+                    # Handle binary fields (survey_image)
+                    elif field == 'survey_image' and value:
+                        # If base64 encoded, decode it
+                        if isinstance(value, str) and value.startswith('data:'):
+                            # Extract base64 part
+                            base64_data = value.split(',')[1] if ',' in value else value
+                            update_vals[field] = base64.b64decode(base64_data)
+                        else:
+                            update_vals[field] = value
+                    # Handle other fields
+                    else:
+                        update_vals[field] = value
+                else:
+                    _logger.warning(f"Field '{field}' is not allowed to be updated via API")
+
+            if not update_vals:
+                return Response(
+                    json.dumps({'error': 'No valid fields to update'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Update the survey
+            survey.write(update_vals)
+
+            # Return updated survey data
+            survey_data = {
+                'id': survey.id,
+                'name': survey.name or '',
+                'survey_uuid': survey.survey_uuid or '',
+                'project_id': survey.project_id.id if survey.project_id else None,
+                'project_name': survey.project_id.name if survey.project_id else '',
+                'department_id': survey.department_id.id if survey.department_id else None,
+                'department_name': survey.department_id.name if survey.department_id else '',
+                'village_id': survey.village_id.id if survey.village_id else None,
+                'village_name': survey.village_id.name if survey.village_id else '',
+                'tehsil_id': survey.tehsil_id.id if survey.tehsil_id else None,
+                'tehsil_name': survey.tehsil_id.name if survey.tehsil_id else '',
+                'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else '',
+                'khasra_number': survey.khasra_number or '',
+                'total_area': survey.total_area or 0.0,
+                'acquired_area': survey.acquired_area or 0.0,
+                'land_type_id': survey.land_type_id.id if survey.land_type_id else None,
+                'land_type_name': survey.land_type_id.name if survey.land_type_id else '',
+                'crop_type': survey.crop_type or '',
+                'irrigation_type': survey.irrigation_type or '',
+                'tree_development_stage': survey.tree_development_stage or '',
+                'tree_count': survey.tree_count or 0,
+                'has_house': survey.has_house or '',
+                'house_type': survey.house_type or '',
+                'house_area': survey.house_area or 0.0,
+                'shed_area': survey.shed_area or 0.0,
+                'has_well': survey.has_well or '',
+                'well_type': survey.well_type or '',
+                'has_tubewell': survey.has_tubewell or '',
+                'has_pond': survey.has_pond or '',
+                'trees_description': survey.trees_description or '',
+                'landowner_ids': survey.landowner_ids.ids if survey.landowner_ids else [],
+                'state': survey.state or 'draft',
+                'remarks': survey.remarks or '',
+                'notes': survey.notes or '',
+            }
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'message': 'Survey updated successfully',
+                    'data': survey_data
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except json.JSONDecodeError as e:
+            _logger.error(f"JSON decode error in update_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': 'Invalid JSON in request body', 'details': str(e)}),
+                status=400,
+                content_type='application/json'
+            )
+        except Exception as e:
+            _logger.error(f"Error in update_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+

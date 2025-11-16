@@ -151,6 +151,16 @@ class JWTAuthController(http.Controller):
                     content_type='application/json'
                 )
 
+            # Convert channel_id to integer if it's a string
+            try:
+                channel_id = int(channel_id) if channel_id else None
+            except (ValueError, TypeError):
+                return Response(
+                    json.dumps({'error': 'channel_id must be a valid integer'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
             # Validate channel
             channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
             if not channel.exists():

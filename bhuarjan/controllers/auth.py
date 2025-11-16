@@ -138,9 +138,30 @@ class JWTAuthController(http.Controller):
             data = json.loads(request.httprequest.data or "{}")
             mobile = data.get('mobile')
             otp_input = data.get('otp_input')
+            channel_id = data.get('channel_id')
 
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
+
+            # Validate channel if provided
+            if channel_id:
+                channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
+                if not channel.exists():
+                    return Response(
+                        json.dumps({'error': f'Channel with ID {channel_id} not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                if not channel.active:
+                    return Response(
+                        json.dumps({
+                            'error': 'Channel is inactive. Please contact Administrator.',
+                            'channel_name': channel.name or '',
+                            'channel_type': channel.channel_type or ''
+                        }),
+                        status=403,
+                        content_type='application/json'
+                    )
 
             otp_record = request.env['mobile.otp'].sudo().search([
                 ('mobile', '=', mobile),
@@ -168,7 +189,21 @@ class JWTAuthController(http.Controller):
 
             request.env['jwt.token'].sudo().create({'user_id': user, 'token': token})
 
-            return Response(json.dumps({'user_id': user, 'token': token}), status=200, content_type='application/json')
+            response_data = {
+                'user_id': user,
+                'token': token
+            }
+            
+            # Include channel info if provided
+            if channel_id:
+                channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
+                response_data['channel'] = {
+                    'id': channel.id,
+                    'name': channel.name or '',
+                    'channel_type': channel.channel_type or ''
+                }
+
+            return Response(json.dumps(response_data), status=200, content_type='application/json')
 
         except json.JSONDecodeError as e:
             _logger.error(f"JSON decode error in login: {str(e)}", exc_info=True)

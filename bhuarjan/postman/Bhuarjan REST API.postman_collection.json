@@ -49,7 +49,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\"\n}",
+							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -66,7 +66,8 @@
 								"auth",
 								"login"
 							]
-						}
+						},
+						"description": "Login with mobile and OTP. channel_id is optional - if provided, validates that the channel is active. If channel is inactive, returns error: 'Channel is inactive. Please contact Administrator.'"
 					},
 					"response": []
 				},

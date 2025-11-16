@@ -31,6 +31,7 @@ from . import ir_attachment
 from . import dashboard
 from . import otp
 from . import token
+from . import channel_master
 
 
 

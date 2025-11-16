@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Channel Master List View -->
+    <record id="view_bhu_channel_master_list" model="ir.ui.view">
+        <field name="name">bhu.channel.master.list</field>
+        <field name="model">bhu.channel.master</field>
+        <field name="arch" type="xml">
+            <list string="Channel Master" decoration-success="active==True" decoration-muted="active==False">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="channel_type"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Channel Master Form View -->
+    <record id="view_bhu_channel_master_form" model="ir.ui.view">
+        <field name="name">bhu.channel.master.form</field>
+        <field name="model">bhu.channel.master</field>
+        <field name="arch" type="xml">
+            <form string="Channel Master">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-toggle-on">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Channel Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="channel_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description" placeholder="Description"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Channel Master Search View -->
+    <record id="view_bhu_channel_master_search" model="ir.ui.view">
+        <field name="name">bhu.channel.master.search</field>
+        <field name="model">bhu.channel.master</field>
+        <field name="arch" type="xml">
+            <search string="Channel Master">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="channel_type"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="Web" name="web" domain="[('channel_type', '=', 'web')]"/>
+                <filter string="Mobile" name="mobile" domain="[('channel_type', '=', 'mobile')]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Channel Master Action -->
+    <record id="action_bhu_channel_master" model="ir.actions.act_window">
+        <field name="name">Channel Master</field>
+        <field name="res_model">bhu.channel.master</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_channel_master_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new channel
+            </p>
+            <p>
+                Channels define the access points for users (Web or Mobile). 
+                If a channel is inactive, users cannot login through that channel.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

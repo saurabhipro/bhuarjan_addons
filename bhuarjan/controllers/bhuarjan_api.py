@@ -280,6 +280,65 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/channels', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def get_all_channels(self, **kwargs):
+        """
+        Get all channels
+        Query params: limit, offset, active (optional filter - default True), channel_type (optional: web/mobile)
+        Returns: JSON list of channels
+        """
+        try:
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+            active_filter = request.httprequest.args.get('active')
+            channel_type = request.httprequest.args.get('channel_type')
+            
+            domain = []
+            if active_filter is not None:
+                active_bool = active_filter.lower() in ('true', '1', 'yes')
+                domain.append(('active', '=', active_bool))
+            else:
+                domain.append(('active', '=', True))
+            
+            if channel_type:
+                domain.append(('channel_type', '=', channel_type))
+        
+            channels = request.env['bhu.channel.master'].sudo().search(domain, limit=limit, offset=offset, order='name')
+        
+            channels_data = []
+            for channel in channels:
+                channels_data.append({
+                    'id': channel.id,
+                    'name': channel.name or '',
+                    'code': channel.code or '',
+                    'channel_type': channel.channel_type or '',
+                    'active': channel.active,
+                    'description': channel.description or '',
+                })
+        
+            total_count = request.env['bhu.channel.master'].sudo().search_count(domain)
+        
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': channels_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset
+                }),
+                status=200,
+                content_type='application/json'
+            )
+        
+        except Exception as e:
+            _logger.error(f"Error in get_all_channels: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/land-types', type='http', auth='public', methods=['GET'], csrf=False)
     def get_all_land_types(self, **kwargs):
         """

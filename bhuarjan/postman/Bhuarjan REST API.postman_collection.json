@@ -616,6 +616,9 @@
 				{
 					"name": "Upload File to S3 (using presigned URL)",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "PUT",
 						"header": [
 							{
@@ -639,7 +642,7 @@
 								"{{presigned_url}}"
 							]
 						},
-						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API. Replace {{presigned_url}} with the actual presigned_url from the previous API response. Set the file in the Body tab (binary mode). The Content-Type header should match your file type."
+						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API. Replace {{presigned_url}} with the actual presigned_url from the previous API response. Set the file in the Body tab (binary mode). The Content-Type header should match your file type.\n\nIMPORTANT: Do NOT include any Authorization header when uploading to presigned URLs. The presigned URL already contains all authentication information in the query parameters. If you see 'Only one auth mechanism allowed' error, remove the Authorization header from this request."
 					},
 					"response": []
 				},

@@ -732,8 +732,22 @@ class BhuarjanAPIController(http.Controller):
 
             # Get the Form 10 bulk table report
             try:
-                report_action = request.env.ref('bhuarjan.action_report_form10_bulk_table')
-            except ValueError:
+                # Use ir.model.data to get the report action with sudo access
+                report_data = request.env['ir.model.data'].sudo().search([
+                    ('module', '=', 'bhuarjan'),
+                    ('name', '=', 'action_report_form10_bulk_table')
+                ], limit=1)
+                
+                if not report_data or not report_data.res_id:
+                    return Response(
+                        json.dumps({'error': 'Form 10 report not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                
+                report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
+            except Exception as e:
+                _logger.error(f"Error getting report action: {str(e)}", exc_info=True)
                 return Response(
                     json.dumps({'error': 'Form 10 report not found'}),
                     status=404,

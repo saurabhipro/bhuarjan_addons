@@ -1205,3 +1205,80 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/dashboard/village', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def get_village_dashboard(self, **kwargs):
+        """
+        Get survey statistics dashboard for a village
+        Query params: village_id (required)
+        Returns: JSON with survey counts by state (total, draft, submitted, approved, rejected, locked)
+        """
+        try:
+            village_id = request.httprequest.args.get('village_id', type=int)
+            
+            if not village_id:
+                return Response(
+                    json.dumps({'error': 'village_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Verify village exists
+            village = request.env['bhu.village'].sudo().browse(village_id)
+            if not village.exists():
+                return Response(
+                    json.dumps({'error': f'Village with ID {village_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Get all surveys for this village
+            all_surveys = request.env['bhu.survey'].sudo().search([('village_id', '=', village_id)])
+            
+            # Count surveys by state
+            total_surveys = len(all_surveys)
+            draft_count = len(all_surveys.filtered(lambda s: s.state == 'draft'))
+            submitted_count = len(all_surveys.filtered(lambda s: s.state == 'submitted'))
+            approved_count = len(all_surveys.filtered(lambda s: s.state == 'approved'))
+            rejected_count = len(all_surveys.filtered(lambda s: s.state == 'rejected'))
+            locked_count = len(all_surveys.filtered(lambda s: s.state == 'locked'))
+
+            # Build response
+            dashboard_data = {
+                'village_id': village_id,
+                'village_name': village.name or '',
+                'village_code': village.village_code or '',
+                'statistics': {
+                    'total_surveys': total_surveys,
+                    'draft': draft_count,
+                    'submitted': submitted_count,
+                    'approved': approved_count,
+                    'rejected': rejected_count,
+                    'locked': locked_count
+                },
+                'breakdown': {
+                    'draft_percentage': round((draft_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
+                    'submitted_percentage': round((submitted_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
+                    'approved_percentage': round((approved_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
+                    'rejected_percentage': round((rejected_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
+                    'locked_percentage': round((locked_count / total_surveys * 100) if total_surveys > 0 else 0, 2)
+                }
+            }
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': dashboard_data
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_village_dashboard: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+

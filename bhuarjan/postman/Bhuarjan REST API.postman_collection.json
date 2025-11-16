@@ -164,6 +164,40 @@
 			]
 		},
 		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Village Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/dashboard/village?village_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"dashboard",
+								"village"
+							],
+							"query": [
+								{
+									"key": "village_id",
+									"value": "1",
+									"description": "Village ID (required)",
+									"disabled": false
+								}
+							]
+						},
+						"description": "Get survey statistics dashboard for a village. Returns total surveys, and counts by state (draft, submitted, approved, rejected, locked) with percentages."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Departments",
 			"item": [
 				{

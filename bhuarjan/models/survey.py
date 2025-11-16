@@ -1,6 +1,9 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import uuid
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class Survey(models.Model):
@@ -358,8 +361,15 @@ class Survey(models.Model):
 
             # Send email notification to the user
             template = self.env.ref("bhuarjan.email_bhuarjan_survey_submit_form", raise_if_not_found=False)
-            if template and record.user_id and (record.user_id.partner_id.email or record.user_id.email):
-                template.send_mail(record.id, force_send=True)
+            if template and record.user_id and record.user_id.partner_id:
+                # Check if partner has a valid email address
+                partner_email = record.user_id.partner_id.email
+                if partner_email and '@' in partner_email:
+                    try:
+                        template.send_mail(record.id, force_send=True)
+                    except Exception as e:
+                        # Log error but don't fail the submission
+                        _logger.warning(f"Failed to send email notification for survey {record.name}: {str(e)}")
 
                     
         wiz = self.env['bhu.survey.message.wizard'].create({

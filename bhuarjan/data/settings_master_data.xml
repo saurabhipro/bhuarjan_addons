@@ -2,18 +2,8 @@
 <odoo>
     <data noupdate="1">
         <!-- Settings Master Data -->
-        <!-- This file contains settings master records for projects -->
-        <!-- Users can create their own settings master records through the UI -->
-        <!-- Or uncomment and modify the example below to create one via data file -->
-        
-        <!-- Example: Settings Master for Ring Road Raigarh Project -->
-        <!-- Uncomment and modify as needed -->
-        <!--
-        <record id="settings_master_ring_road_raigarh" model="bhuarjan.settings.master">
-            <field name="project_id" ref="project_ring_road_raigarh"/>
-            <field name="active" eval="True"/>
-        </record>
-        -->
+        <!-- Only one Bhuarjan Settings record is allowed - created in sample_sequence_settings.xml -->
+        <!-- This file is kept for reference but the actual settings master is created in sample_sequence_settings.xml -->
         
     </data>
 </odoo>

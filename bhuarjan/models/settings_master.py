@@ -24,14 +24,13 @@ class BhuarjanSequenceSettings(models.Model):
     prefix = fields.Char(string='Prefix', required=True, help='Prefix for sequence number (e.g., SC_{%PROJ_CODE%}_ or SC_{bhu.project.code}_{bhu.village.code}_)')
     initial_sequence = fields.Integer(string='Initial Sequence', default=1, help='Starting number for sequence')
     padding = fields.Integer(string='Padding', default=4, help='Number of digits for sequence (e.g., 4 for 0001)')
-    project_id = fields.Many2one('bhu.project', string='Project', compute='_compute_project_id', store=True)
     settings_master_id = fields.Many2one('bhuarjan.settings.master', string='Settings Master', required=True)
     active = fields.Boolean(string='Active', default=True)
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
     
     _sql_constraints = [
-        ('unique_process_project', 'unique(process_name, project_id)', 
-         'Sequence settings must be unique per process and project!')
+        ('unique_process', 'unique(process_name)', 
+         'Sequence settings must be unique per process!')
     ]
     
     @api.constrains('prefix')
@@ -65,23 +64,12 @@ class BhuarjanSequenceSettings(models.Model):
                         if placeholder not in valid_placeholders:
                             raise ValidationError(f"Invalid template placeholder '{placeholder}'. Valid placeholders are: {', '.join(valid_placeholders)}")
     
-    @api.depends('settings_master_id', 'settings_master_id.project_id')
-    def _compute_project_id(self):
-        for record in self:
-            if record.settings_master_id:
-                record.project_id = record.settings_master_id.project_id
-            else:
-                record.project_id = False
-    
-    @api.depends('process_name', 'project_id')
+    @api.depends('process_name')
     def _compute_display_name(self):
         for record in self:
             if record.process_name and record.process_name in dict(record._fields['process_name'].selection):
                 process_label = dict(record._fields['process_name'].selection)[record.process_name]
-                if record.project_id:
-                    record.display_name = f"{process_label} - {record.project_id.name}"
-                else:
-                    record.display_name = process_label
+                record.display_name = process_label
             else:
                 record.display_name = "Sequence Settings"
     
@@ -100,52 +88,13 @@ class BhuarjanSequenceSettings(models.Model):
         return result
     
     def _create_sequence(self):
-        """Create or update sequence for this setting"""
-        if not self.project_id or not self.process_name:
-            return
-            
-        sequence_code = f'bhuarjan.{self.process_name}.{self.project_id.id}'
-        
-        # Prepare prefix for Odoo sequence (replace project placeholders only)
-        # Village placeholders will be replaced at runtime when sequence is used
-        project_code = self.project_id.code or self.project_id.name or 'PROJ'
-        sequence_prefix = self.prefix.replace('{%PROJ_CODE%}', project_code)
-        sequence_prefix = sequence_prefix.replace('{bhu.project.code}', project_code)
-        sequence_prefix = sequence_prefix.replace('{PROJ_CODE}', project_code)
-        # Note: {bhu.village.code} is left as-is and will be replaced at runtime
-        
-        # Check if sequence already exists
-        existing_sequence = self.env['ir.sequence'].search([
-            ('code', '=', sequence_code)
-        ])
-        
-        if existing_sequence:
-            # Update existing sequence
-            existing_sequence.write({
-                'prefix': sequence_prefix,
-                'number_next': self.initial_sequence,
-                'padding': self.padding,
-            })
-        else:
-            # Create new sequence
-            self.env['ir.sequence'].create({
-                'name': f'Bhuarjan {self.process_name.title()} Sequence - Project {self.project_id.name}',
-                'code': sequence_code,
-                'prefix': sequence_prefix,
-                'number_next': self.initial_sequence,
-                'padding': self.padding,
-                'company_id': False,
-            })
-        
-        # Also ensure the sequence is properly configured
-        sequence = self.env['ir.sequence'].search([('code', '=', sequence_code)], limit=1)
-        if sequence:
-            # Force update to ensure correct format
-            sequence.write({
-                'prefix': sequence_prefix,
-                'number_next': self.initial_sequence,
-                'padding': self.padding,
-            })
+        """Create or update sequence for this setting
+        Note: Sequences are created dynamically per project+village when get_sequence_number is called.
+        This method is kept for backward compatibility but doesn't create sequences here.
+        """
+        # Sequences are now created dynamically in get_sequence_number method
+        # No need to create sequences at settings creation time
+        pass
 
 
 class BhuarjanWorkflowSettings(models.Model):
@@ -166,7 +115,6 @@ class BhuarjanWorkflowSettings(models.Model):
         ('post_award_payment', 'Post Award Payment'),
     ], string='Process Name', required=True)
     
-    project_id = fields.Many2one('bhu.project', string='Project', compute='_compute_project_id', store=True)
     settings_master_id = fields.Many2one('bhuarjan.settings.master', string='Settings Master', required=True)
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
     
@@ -191,23 +139,12 @@ class BhuarjanWorkflowSettings(models.Model):
     
     active = fields.Boolean(string='Active', default=True)
     
-    @api.depends('settings_master_id', 'settings_master_id.project_id')
-    def _compute_project_id(self):
-        for record in self:
-            if record.settings_master_id:
-                record.project_id = record.settings_master_id.project_id
-            else:
-                record.project_id = False
-    
-    @api.depends('process_name', 'project_id')
+    @api.depends('process_name')
     def _compute_display_name(self):
         for record in self:
             if record.process_name and record.process_name in dict(record._fields['process_name'].selection):
                 process_label = dict(record._fields['process_name'].selection)[record.process_name]
-                if record.project_id:
-                    record.display_name = f"{process_label} - {record.project_id.name}"
-                else:
-                    record.display_name = process_label
+                record.display_name = process_label
             else:
                 record.display_name = "Workflow Settings"
     
@@ -218,10 +155,9 @@ class BhuarjanWorkflowSettings(models.Model):
 class BhuarjanSettingsMaster(models.Model):
     _name = 'bhuarjan.settings.master'
     _description = 'Bhuarjan Settings Master'
-    _rec_name = 'display_name'
-
-    project_id = fields.Many2one('bhu.project', string='Project', required=True, ondelete='cascade')
-    display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
+    _rec_name = 'name'
+    
+    name = fields.Char(string='Name', default='Bhuarjan Settings', required=True)
     
     # Sequence Settings
     sequence_settings_ids = fields.One2many('bhuarjan.sequence.settings', 'settings_master_id', 
@@ -250,20 +186,32 @@ class BhuarjanSettingsMaster(models.Model):
     
     active = fields.Boolean(string='Active', default=True)
     
+    @api.model
+    def create(self, vals):
+        """Ensure only one settings master exists - return existing if found"""
+        existing = self.search([], limit=1)
+        if existing:
+            # If a record already exists, return it instead of creating a new one
+            # This handles both data loading (XML import) and normal operation
+            # For data loading with noupdate="1", this allows the XML to reference the existing record
+            # For normal operation, this prevents duplicate creation
+            return existing
+        return super().create(vals)
+    
+    @api.model
+    def get_settings_master(self):
+        """Get the single Bhuarjan Settings master record, create if it doesn't exist"""
+        settings = self.search([], limit=1)
+        if not settings:
+            settings = self.create({})
+        return settings
+    
     @api.constrains('enable_static_otp', 'static_otp_value')
     def _check_static_otp_value(self):
         """Ensure static_otp_value is provided when enable_static_otp is True"""
         for record in self:
             if record.enable_static_otp and not record.static_otp_value:
                 raise ValidationError('Static OTP Value is required when Enable Static OTP is checked.')
-    
-    @api.depends('project_id')
-    def _compute_display_name(self):
-        for record in self:
-            if record.project_id:
-                record.display_name = f"Settings - {record.project_id.name}"
-            else:
-                record.display_name = "Settings Master"
     
     @api.model
     def _get_last_sequence_number(self, model_name, prefix_pattern, project_id=None, village_id=None, initial_seq=1):
@@ -317,10 +265,9 @@ class BhuarjanSettingsMaster(models.Model):
         so each village starts from the initial sequence (typically 1).
         The next number is based on the last existing sequence number for that village.
         """
-        # First, try to get sequence from settings master
+        # First, try to get sequence from settings master (global settings, no project dependency)
         sequence_setting = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', process_name),
-            ('project_id', '=', project_id),
             ('active', '=', True)
         ], limit=1)
         
@@ -440,7 +387,6 @@ class BhuarjanSettingsMaster(models.Model):
         """Manually recreate sequence for debugging"""
         sequence_setting = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', process_name),
-            ('project_id', '=', project_id),
             ('active', '=', True)
         ], limit=1)
         
@@ -454,7 +400,6 @@ class BhuarjanSettingsMaster(models.Model):
         """Fix existing sequences that might have placeholders"""
         sequence_setting = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', process_name),
-            ('project_id', '=', project_id),
             ('active', '=', True)
         ], limit=1)
         

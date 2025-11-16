@@ -255,12 +255,11 @@ class Survey(models.Model):
                     project = self.env['bhu.project'].browse(vals['project_id'])
                     project_code = project.code or project.name or 'PROJ'
                     
-                    # Check if sequence settings exist for survey process
+                    # Check if sequence settings exist for survey process (global settings, no project dependency)
                     sequence_settings = self.env['bhuarjan.sequence.settings'].search([
                         ('process_name', '=', 'survey'),
-                        ('project_id', '=', vals['project_id']),
                         ('active', '=', True)
-                    ])
+                    ], limit=1)
                     
                     if sequence_settings:
                         # Get village_id if available
@@ -328,7 +327,6 @@ class Survey(models.Model):
         # Check if sequence settings exist
         sequence_setting = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', 'survey'),
-            ('project_id', '=', project_id),
             ('active', '=', True)
         ], limit=1)
         
@@ -696,11 +694,10 @@ class SurveyLine(models.Model):
                 project_id = survey.project_id.id if survey.project_id else None
                 village_id = survey.village_id.id if survey.village_id else None
             
-            # Check if sequence settings exist for survey process
+            # Check if sequence settings exist for survey process (global settings, no project dependency)
             if project_id:
                 sequence_settings = self.env['bhuarjan.sequence.settings'].search([
                     ('process_name', '=', 'survey'),
-                    ('project_id', '=', project_id),
                     ('active', '=', True)
                 ])
                 
@@ -727,12 +724,11 @@ class SurveyLine(models.Model):
     
     @api.model
     def check_sequence_settings(self, project_id):
-        """Check if sequence settings are available for survey process"""
+        """Check if sequence settings are available for survey process (global settings, no project dependency)"""
         sequence_settings = self.env['bhuarjan.sequence.settings'].search([
             ('process_name', '=', 'survey'),
-            ('project_id', '=', project_id),
             ('active', '=', True)
-        ])
+        ], limit=1)
         
         if not sequence_settings:
             project_name = self.env['bhu.project'].browse(project_id).name

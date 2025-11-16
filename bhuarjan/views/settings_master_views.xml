@@ -11,8 +11,11 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                <field name="project_id" placeholder="Select Project..." options="{'no_create': True}"/>
+                                <field name="name"/>
                             </h1>
+                        </div>
+                        <div class="alert alert-info" role="alert" style="margin-top: 10px;">
+                            <strong>Global Settings:</strong> These settings apply to all projects in the system.
                         </div>
                         
                         <notebook>
@@ -20,7 +23,7 @@
                             <page string="Sequence Settings" name="sequence_settings">
                                 <div class="alert alert-info" role="alert">
                                     <strong>Sequence Number Configuration</strong><br/>
-                                    Configure prefix and initial sequence numbers for each process in this project.
+                                    Configure prefix and initial sequence numbers for each process. These settings apply globally to all projects.
                                 </div>
                                 
                                 <field name="sequence_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_sequence_settings_tree'}"/>
@@ -30,7 +33,7 @@
                             <page string="Workflow Settings" name="workflow_settings">
                                 <div class="alert alert-info" role="alert">
                                     <strong>Workflow Configuration</strong><br/>
-                                    Configure maker, checker, and approver for each process in this project.
+                                    Configure maker, checker, and approver for each process. These settings apply globally to all projects.
                                 </div>
                                 
                                 <field name="workflow_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_workflow_settings_tree'}"/>
@@ -99,11 +102,10 @@
             <field name="model">bhuarjan.settings.master</field>
             <field name="arch" type="xml">
                 <list string="Bhuarjan Settings Master" decoration-info="active == True" decoration-muted="active == False">
-                    <field name="project_id"/>
+                    <field name="name"/>
                     <field name="sequence_settings_ids" widget="badge" decoration-info="sequence_settings_ids"/>
                     <field name="workflow_settings_ids" widget="badge" decoration-success="workflow_settings_ids"/>
                     <field name="active" widget="boolean_toggle"/>
-                    <field name="display_name" optional="hide"/>
                 </list>
             </field>
         </record>
@@ -123,7 +125,6 @@
                         
                         <group>
                             <group>
-                                <field name="project_id" readonly="1"/>
                                 <field name="prefix" placeholder="e.g., SC_{bhu.project.code}_"/>
                                 <field name="initial_sequence"/>
                             </group>
@@ -160,7 +161,6 @@
                         
                         <group>
                             <group>
-                                <field name="project_id" readonly="1"/>
                                 <field name="maker_user_ids" widget="many2many_tags" required="1"/>
                                 <field name="checker_user_id"/>
                                 <field name="approver_user_id"/>
@@ -193,7 +193,6 @@
             <field name="arch" type="xml">
                 <list string="Sequence Settings" decoration-info="active == True" decoration-muted="active == False">
                     <field name="process_name"/>
-                    <field name="project_id"/>
                     <field name="prefix"/>
                     <field name="initial_sequence"/>
                     <field name="padding"/>
@@ -210,7 +209,6 @@
             <field name="arch" type="xml">
                 <list string="Workflow Settings" decoration-info="active == True" decoration-muted="active == False">
                     <field name="process_name"/>
-                    <field name="project_id"/>
                     <field name="maker_user_ids" widget="many2many_tags"/>
                     <field name="checker_user_id"/>
                     <field name="approver_user_id"/>
@@ -233,7 +231,7 @@
                     Create Settings Master
                 </p>
                 <p>
-                    Configure sequence numbers and workflow settings for each project.
+                    Configure global sequence numbers and workflow settings that apply to all projects. Leave Project empty for global settings.
                 </p>
             </field>
         </record>

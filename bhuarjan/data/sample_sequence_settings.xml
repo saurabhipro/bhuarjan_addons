@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
-        <!-- Sample Sequence Settings for all notification types for Ring Road Raigarh project -->
-        <!-- Using existing project PROJ01 (Ring Road Raigarh) -->
+    <data noupdate="1">
+        <!-- Global Sequence Settings for all notification types -->
+        <!-- Settings are now global and apply to all projects -->
         
-        <!-- First, create Settings Master for the project -->
-        <record id="settings_master_ring_road_raigarh" model="bhuarjan.settings.master">
-            <field name="project_id" ref="project_ring_road_raigarh"/>
+        <!-- First, create Global Settings Master (no project dependency) -->
+        <record id="settings_master_global" model="bhuarjan.settings.master">
+            <!-- No project_id - this is a global settings master -->
         </record>
         
         <!-- Section 4 Notification Sequence -->
         <record id="seq_section4_notification" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">section4_notification</field>
             <field name="prefix">NOT4_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
@@ -20,7 +20,7 @@
         
         <!-- Section 11 Notification Sequence -->
         <record id="seq_section11_notification" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">section11_notification</field>
             <field name="prefix">NOT11_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
@@ -29,7 +29,7 @@
         
         <!-- Section 19 Notification Sequence -->
         <record id="seq_section19_notification" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">section19_notification</field>
             <field name="prefix">NOT19_{bhu.project.code}</field>
             <field name="initial_sequence">1</field>
@@ -38,7 +38,7 @@
         
         <!-- Section 15 Objection Sequence -->
         <record id="seq_section15_objection" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">section15_objection</field>
             <field name="prefix">OBJ_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
@@ -47,7 +47,7 @@
         
         <!-- Draft Award Sequence -->
         <record id="seq_draft_award" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">draft_award</field>
             <field name="prefix">AWARD_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
@@ -56,7 +56,7 @@
         
         <!-- Payment File Sequence -->
         <record id="seq_payment_file" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">payment_file</field>
             <field name="prefix">PAY_{bhu.project.code}_{bhu.village.code}</field>
             <field name="initial_sequence">1</field>
@@ -65,7 +65,7 @@
         
         <!-- Payment Reconciliation Sequence -->
         <record id="seq_payment_reconciliation" model="bhuarjan.sequence.settings">
-            <field name="settings_master_id" ref="settings_master_ring_road_raigarh"/>
+            <field name="settings_master_id" ref="settings_master_global"/>
             <field name="process_name">payment_reconciliation</field>
             <field name="prefix">RECON_{bhu.project.code}</field>
             <field name="initial_sequence">1</field>
@@ -74,4 +74,3 @@
         
     </data>
 </odoo>
-

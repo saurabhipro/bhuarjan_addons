@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import uuid
 import logging
+from datetime import datetime, timezone
 
 _logger = logging.getLogger(__name__)
 
@@ -96,6 +97,51 @@ class Survey(models.Model):
         ('rejected', 'Rejected / अस्वीकृत'),
         ('locked', 'Locked / लॉक')
     ], string='Status / स्थिति', default='draft', tracking=True)
+    
+    # Track submission date
+    submitted_date = fields.Datetime(string='Submitted Date / प्रस्तुत दिनांक', readonly=True, tracking=True,
+                                     help='Date and time when the survey was submitted for approval')
+    
+    # Computed fields for list view
+    landowner_count = fields.Integer(string='Landowners Count / भूमिस्वामी संख्या', compute='_compute_landowner_count', store=True)
+    
+    pending_since = fields.Char(string='Pending Since / लंबित', compute='_compute_pending_since', store=False,
+                                help='How long the survey has been pending for approval')
+    
+    @api.depends('landowner_ids')
+    def _compute_landowner_count(self):
+        """Compute the count of landowners"""
+        for record in self:
+            record.landowner_count = len(record.landowner_ids)
+    
+    @api.depends('state', 'submitted_date', 'write_date')
+    def _compute_pending_since(self):
+        """Compute how long the survey has been pending for approval"""
+        for record in self:
+            if record.state == 'submitted' and record.submitted_date:
+                # Calculate time difference
+                # Odoo stores datetimes as naive (UTC), so we compare naive datetimes
+                now = datetime.now(timezone.utc).replace(tzinfo=None)
+                submitted = record.submitted_date
+                # Ensure submitted is naive datetime
+                if submitted.tzinfo is not None:
+                    submitted = submitted.replace(tzinfo=None)
+                
+                delta = now - submitted
+                days = delta.days
+                hours = delta.seconds // 3600
+                minutes = (delta.seconds % 3600) // 60
+                
+                if days > 0:
+                    record.pending_since = f"{days} day{'s' if days > 1 else ''} ago"
+                elif hours > 0:
+                    record.pending_since = f"{hours} hour{'s' if hours > 1 else ''} ago"
+                elif minutes > 0:
+                    record.pending_since = f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+                else:
+                    record.pending_since = "Just now"
+            else:
+                record.pending_since = ''
     
     # Notification 4 Generation
     notification4_generated = fields.Boolean(string='Notification 4 Generated / अधिसूचना 4 जेनरेट', default=False, tracking=True)
@@ -353,6 +399,8 @@ class Survey(models.Model):
             if not record.khasra_number:
                 raise ValidationError(_('Please enter khasra number before submitting.'))
             record.state = 'submitted'
+            # Store submission date (as naive datetime for Odoo compatibility)
+            record.submitted_date = datetime.now(timezone.utc).replace(tzinfo=None)
             # Log the submission
             record.message_post(
                 body=_('Survey submitted for approval by %s') % self.env.user.name,

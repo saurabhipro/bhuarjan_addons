@@ -410,6 +410,18 @@ class BhuarjanAPIController(http.Controller):
             # Parse request data
             data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
             
+            # Validate that at least one landowner is provided
+            landowner_ids = data.get('landowner_ids', [])
+            if not landowner_ids or (isinstance(landowner_ids, list) and len(landowner_ids) == 0):
+                return Response(
+                    json.dumps({
+                        'error': 'Please select at least one landowner',
+                        'message': 'At least one landowner is required to create a survey'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
             # Get default user (admin) or use provided user_id
             user_id = data.get('user_id')
             if not user_id:
@@ -465,11 +477,9 @@ class BhuarjanAPIController(http.Controller):
             # Create survey
             survey = request.env['bhu.survey'].sudo().create(survey_vals)
 
-            # Link landowners if provided
-            if data.get('landowner_ids'):
-                landowner_ids = data.get('landowner_ids', [])
-                if isinstance(landowner_ids, list):
-                    survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
+            # Link landowners (already validated above - at least one is required)
+            if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
+                survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
 
             # Return created survey details
             return Response(

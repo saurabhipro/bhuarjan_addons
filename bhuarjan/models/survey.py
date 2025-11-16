@@ -361,15 +361,31 @@ class Survey(models.Model):
 
             # Send email notification to the user
             template = self.env.ref("bhuarjan.email_bhuarjan_survey_submit_form", raise_if_not_found=False)
-            if template and record.user_id and record.user_id.partner_id:
-                # Check if partner has a valid email address
-                partner_email = record.user_id.partner_id.email
-                if partner_email and '@' in partner_email:
+            if template and record.user_id:
+                # Get email from partner or user
+                partner_email = None
+                if record.user_id.partner_id:
+                    partner_email = record.user_id.partner_id.email
+                if not partner_email:
+                    partner_email = record.user_id.email
+                
+                # Only send if we have a valid email
+                if partner_email and '@' in partner_email and partner_email.strip():
                     try:
-                        template.send_mail(record.id, force_send=True)
+                        # Render template to check email_to field
+                        rendered_values = template._render_template(template.email_to, 'bhu.survey', [record.id])
+                        email_to_value = rendered_values.get(record.id, '').strip()
+                        
+                        if email_to_value and '@' in email_to_value:
+                            template.send_mail(record.id, force_send=True)
+                            _logger.info(f"Email notification sent for survey {record.name} to {email_to_value}")
+                        else:
+                            _logger.warning(f"No valid email recipient in template for survey {record.name}")
                     except Exception as e:
                         # Log error but don't fail the submission
-                        _logger.warning(f"Failed to send email notification for survey {record.name}: {str(e)}")
+                        _logger.warning(f"Failed to send email notification for survey {record.name}: {str(e)}", exc_info=True)
+                else:
+                    _logger.info(f"Skipping email for survey {record.name}: User {record.user_id.name} does not have a valid email address")
 
                     
         wiz = self.env['bhu.survey.message.wizard'].create({

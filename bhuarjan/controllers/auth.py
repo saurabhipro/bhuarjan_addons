@@ -206,18 +206,7 @@ class JWTAuthController(http.Controller):
 
             request.env['jwt.token'].sudo().create({'user_id': user, 'token': token})
 
-            # Include channel info in response
-            response_data = {
-                'user_id': user,
-                'token': token,
-                'channel': {
-                    'id': channel.id,
-                    'name': channel.name or '',
-                    'channel_type': channel.channel_type or ''
-                }
-            }
-
-            return Response(json.dumps(response_data), status=200, content_type='application/json')
+            return Response(json.dumps({'user_id': user, 'token': token}), status=200, content_type='application/json')
 
         except json.JSONDecodeError as e:
             _logger.error(f"JSON decode error in login: {str(e)}", exc_info=True)

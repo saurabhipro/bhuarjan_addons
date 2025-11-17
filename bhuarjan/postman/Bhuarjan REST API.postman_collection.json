@@ -292,7 +292,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"project_id\": 1,\n    \"village_id\": 1,\n    \"department_id\": 1,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"survey_date\": \"2024-12-15\",\n    \"crop_type\": \"single\",\n    \"irrigation_type\": \"irrigated\",\n    \"tree_development_stage\": \"fully_developed\",\n    \"tree_count\": 25,\n    \"has_house\": \"no\",\n    \"house_type\": \"pucca\",\n    \"house_area\": 0.0,\n    \"shed_area\": 0.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"trees_description\": \"Mango and neem trees\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"draft\",\n    \"landowner_ids\": [1, 2, 3]\n}"
+							"raw": "{\n    \"project_id\": 1,\n    \"village_id\": 1,\n    \"department_id\": 1,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"transferred_land\": false,\n    \"transferred_area\": 0.0,\n    \"crop_type\": 1,\n    \"irrigation_type\": \"irrigated\",\n    \"tree_development_stage\": \"fully_developed\",\n    \"tree_count\": 25,\n    \"has_house\": \"no\",\n    \"house_type\": \"pakka\",\n    \"house_area\": 0.0,\n    \"has_shed\": \"yes\",\n    \"shed_area\": 100.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"trees_description\": \"Mango and neem trees\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"draft\",\n    \"landowner_ids\": [1, 2, 3]\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/bhuarjan/survey",
@@ -401,7 +401,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"crop_type\": \"double\",\n    \"irrigation_type\": \"irrigated\",\n    \"tree_count\": 30,\n    \"landowner_ids\": [1, 2]\n}",
+							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"transferred_land\": true,\n    \"transferred_area\": 1.5,\n    \"crop_type\": 2,\n    \"irrigation_type\": \"irrigated\",\n    \"tree_count\": 30,\n    \"landowner_ids\": [1, 2]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

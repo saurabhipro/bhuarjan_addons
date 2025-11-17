@@ -547,7 +547,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"राम कुमार सिंह\",\n    \"father_name\": \"श्याम सिंह\",\n    \"mother_name\": \"गीता देवी\",\n    \"spouse_name\": \"सीता देवी\",\n    \"age\": 45,\n    \"gender\": \"male\",\n    \"phone\": \"9876543210\",\n    \"village_id\": 1,\n    \"tehsil_id\": 1,\n    \"district_id\": 1,\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"State Bank of India\",\n    \"bank_branch\": \"Raigarh Main Branch\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"SBIN0001234\",\n    \"account_holder_name\": \"राम कुमार सिंह\"\n}"
+							"raw": "{\n    \"name\": \"राम कुमार सिंह\",\n    \"father_name\": \"श्याम सिंह\",\n    \"mother_name\": \"गीता देवी\",\n    \"spouse_name\": \"सीता देवी\",\n    \"age\": 45,\n    \"gender\": \"male\",\n    \"phone\": \"9876543210\",\n    \"village_id\": 1,\n    \"tehsil_id\": 1,\n    \"district_id\": 1,\n    \"owner_address\": \"House No. 123, Street Name, पंडरीपानी, रायगढ़, Chhattisgarh\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"State Bank of India\",\n    \"bank_branch\": \"Raigarh Main Branch\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"SBIN0001234\",\n    \"account_holder_name\": \"राम कुमार सिंह\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/bhuarjan/landowner",

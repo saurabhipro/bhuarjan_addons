@@ -59,6 +59,7 @@
                             <field name="tehsil_id" widget="selection"/>
                             <field name="district_id" widget="selection"/>
                             <field name="state" widget="char"/>
+                            <field name="owner_address" widget="text" placeholder="Enter complete address of the landowner"/>
                         </group>
                         <group string="Identity Documents">
                             <field name="aadhar_number" widget="char"/>

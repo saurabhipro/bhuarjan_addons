@@ -37,6 +37,8 @@ class BhuLandowner(models.Model):
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
     state = fields.Char(string='State / राज्य', default='Chhattisgarh', readonly=True)
+    owner_address = fields.Text(string='Owner Address / मालिक का पता', tracking=True,
+                                help='Complete address of the landowner')
     
     # Identity Documents
     aadhar_number = fields.Char(string='Aadhar Number / आधार नंबर', tracking=True)

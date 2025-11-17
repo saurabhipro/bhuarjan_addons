@@ -813,6 +813,7 @@ class BhuarjanAPIController(http.Controller):
                     'aadhar_number': lo.aadhar_number or '',
                     'pan_number': lo.pan_number or '',
                     'phone': lo.phone or '',
+                    'owner_address': lo.owner_address or '',
                 } for lo in survey.landowner_ids],
             }
 
@@ -1151,6 +1152,7 @@ class BhuarjanAPIController(http.Controller):
                 'village_id': data.get('village_id'),
                 'tehsil_id': data.get('tehsil_id'),
                 'district_id': data.get('district_id'),
+                'owner_address': data.get('owner_address'),
                 'aadhar_number': data.get('aadhar_number'),
                 'pan_number': data.get('pan_number'),
                 'bank_name': data.get('bank_name'),
@@ -1199,6 +1201,7 @@ class BhuarjanAPIController(http.Controller):
                         'phone': landowner.phone or '',
                         'village_id': landowner.village_id.id if landowner.village_id else None,
                         'village_name': landowner.village_id.name if landowner.village_id else '',
+                        'owner_address': landowner.owner_address or '',
                     }
                 }),
                 status=201,
@@ -1477,6 +1480,7 @@ class BhuarjanAPIController(http.Controller):
                     'tehsil_name': landowner.tehsil_id.name if landowner.tehsil_id else '',
                     'district_id': landowner.district_id.id if landowner.district_id else None,
                     'district_name': landowner.district_id.name if landowner.district_id else '',
+                    'owner_address': landowner.owner_address or '',
                     'aadhar_number': landowner.aadhar_number or '',
                     'pan_number': landowner.pan_number or '',
                     'bank_name': landowner.bank_name or '',

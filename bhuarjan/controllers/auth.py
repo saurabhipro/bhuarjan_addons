@@ -221,28 +221,49 @@ class JWTAuthController(http.Controller):
                     otp_record.unlink()
                     return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
 
-            user = otp_record.user_id.id
+            user_obj = otp_record.user_id
+            user_id = user_obj.id
             otp_record.unlink()
 
             # Delete old JWT tokens for the same user before creating a new one
-            old_tokens = request.env['jwt.token'].sudo().search([('user_id', '=', user)])
+            old_tokens = request.env['jwt.token'].sudo().search([('user_id', '=', user_id)])
             if old_tokens:
                 old_tokens.unlink()
 
             payload = {
-                'user_id': user,
+                'user_id': user_id,
                 'exp': datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=24)
             }
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
             # Create new JWT token with channel information
             request.env['jwt.token'].sudo().create({
-                'user_id': user,
+                'user_id': user_id,
                 'token': token,
                 'channel_id': channel_id
             })
 
-            return Response(json.dumps({'user_id': user, 'token': token}), status=200, content_type='application/json')
+            # Get user's groups/roles
+            user_groups = user_obj.groups_id
+            roles = []
+            for group in user_groups:
+                roles.append({
+                    'id': group.id,
+                    'name': group.name,
+                    'category_id': group.category_id.name if group.category_id else None
+                })
+
+            # Prepare response with user details
+            response_data = {
+                'user_id': user_id,
+                'user_name': user_obj.name or '',
+                'login': user_obj.login or '',
+                'mobile': user_obj.mobile or '',
+                'roles': roles,
+                'token': token
+            }
+
+            return Response(json.dumps(response_data), status=200, content_type='application/json')
 
         except json.JSONDecodeError as e:
             _logger.error(f"JSON decode error in login: {str(e)}", exc_info=True)

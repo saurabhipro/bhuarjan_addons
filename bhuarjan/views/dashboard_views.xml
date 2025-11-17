@@ -21,130 +21,130 @@
                     </div>
                     
                     <div class="dashboard-section-title">
-                        <i class="fa fa-database"/> MASTER DATA STATISTICS
+                        <i class="fa fa-database" title="Master Data Statistics"/> MASTER DATA STATISTICS
                     </div>
                     <div class="dashboard-grid">
                         <button name="action_open_districts" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Districts</div>
-                                <div class="kpi-icon"><i class="fa fa-map-marker"/></div>
+                                <div class="kpi-icon"><i class="fa fa-map-marker" title="Districts"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_districts" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Sub Divisions</div>
-                                <div class="kpi-icon"><i class="fa fa-sitemap"/></div>
+                                <div class="kpi-icon"><i class="fa fa-sitemap" title="Sub Divisions"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_sub_divisions" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_tehsils" type="object" class="dashboard-kpi-card kpi-card-purple">
                             <div class="kpi-header">
                                 <div class="kpi-label">Tehsils</div>
-                                <div class="kpi-icon"><i class="fa fa-building"/></div>
+                                <div class="kpi-icon"><i class="fa fa-building" title="Tehsils"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_tehsils" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_circles" type="object" class="dashboard-kpi-card kpi-card-brown">
                             <div class="kpi-header">
                                 <div class="kpi-label">Circles</div>
-                                <div class="kpi-icon"><i class="fa fa-circle-o"/></div>
+                                <div class="kpi-icon"><i class="fa fa-circle-o" title="Circles"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_circles" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_villages" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Villages</div>
-                                <div class="kpi-icon"><i class="fa fa-home"/></div>
+                                <div class="kpi-icon"><i class="fa fa-home" title="Villages"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_villages" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_projects" type="object" class="dashboard-kpi-card kpi-card-yellow">
                             <div class="kpi-header">
                                 <div class="kpi-label">Projects</div>
-                                <div class="kpi-icon"><i class="fa fa-folder-open"/></div>
+                                <div class="kpi-icon"><i class="fa fa-folder-open" title="Projects"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_projects" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_departments" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Departments</div>
-                                <div class="kpi-icon"><i class="fa fa-building-o"/></div>
+                                <div class="kpi-icon"><i class="fa fa-building-o" title="Departments"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_departments" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_landowners" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Landowners</div>
-                                <div class="kpi-icon"><i class="fa fa-users"/></div>
+                                <div class="kpi-icon"><i class="fa fa-users" title="Landowners"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_landowners" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_rate_masters" type="object" class="dashboard-kpi-card kpi-card-orange">
                             <div class="kpi-header">
                                 <div class="kpi-label">Rate Masters</div>
-                                <div class="kpi-icon"><i class="fa fa-money"/></div>
+                                <div class="kpi-icon"><i class="fa fa-money" title="Rate Masters"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_rate_masters" nolabel="1" readonly="1"/></div>
                         </button>
                         <div class="dashboard-kpi-card kpi-card-blue" style="cursor: default;">
                             <div class="kpi-header">
                                 <div class="kpi-label">Active Mobile Users</div>
-                                <div class="kpi-icon"><i class="fa fa-mobile"/></div>
+                                <div class="kpi-icon"><i class="fa fa-mobile" title="Active Mobile Users"/></div>
                             </div>
                             <div class="kpi-value"><field name="active_mobile_users" nolabel="1" readonly="1"/></div>
                         </div>
                     </div>
                     
                     <div class="dashboard-section-title">
-                        <i class="fa fa-clipboard-list"/> SURVEY STATISTICS
+                        <i class="fa fa-clipboard-list" title="Survey Statistics"/> SURVEY STATISTICS
                     </div>
                     <div class="dashboard-grid">
                         <button name="action_open_surveys" type="object" class="dashboard-kpi-card kpi-card-purple">
                             <div class="kpi-header">
                                 <div class="kpi-label">Total Surveys</div>
-                                <div class="kpi-icon"><i class="fa fa-list-alt"/></div>
+                                <div class="kpi-icon"><i class="fa fa-list-alt" title="Total Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_surveys_draft" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Draft</div>
-                                <div class="kpi-icon"><i class="fa fa-file-o"/></div>
+                                <div class="kpi-icon"><i class="fa fa-file-o" title="Draft Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="draft_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_surveys_submitted" type="object" class="dashboard-kpi-card kpi-card-yellow">
                             <div class="kpi-header">
                                 <div class="kpi-label">Submitted</div>
-                                <div class="kpi-icon"><i class="fa fa-paper-plane"/></div>
+                                <div class="kpi-icon"><i class="fa fa-paper-plane" title="Submitted Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="submitted_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_surveys_approved" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Approved</div>
-                                <div class="kpi-icon"><i class="fa fa-check-circle"/></div>
+                                <div class="kpi-icon"><i class="fa fa-check-circle" title="Approved Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="approved_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_surveys_locked" type="object" class="dashboard-kpi-card kpi-card-blue">
                             <div class="kpi-header">
                                 <div class="kpi-label">Locked</div>
-                                <div class="kpi-icon"><i class="fa fa-lock"/></div>
+                                <div class="kpi-icon"><i class="fa fa-lock" title="Locked Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="locked_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                     </div>
                     
                     <div class="dashboard-section-title">
-                        <i class="fa fa-cogs"/> PROCESS STATISTICS
+                        <i class="fa fa-cogs" title="Process Statistics"/> PROCESS STATISTICS
                     </div>
                     <div class="dashboard-grid">
                         <button name="%(action_section4_notification)d" type="action" class="process-card process-card-green">
                             <div class="process-header">
                                 <div class="kpi-label">Section 4 Notifications</div>
-                                <div class="kpi-icon"><i class="fa fa-file-text"/></div>
+                                <div class="kpi-icon"><i class="fa fa-file-text" title="Section 4 Notifications"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_section4_notifications" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
@@ -165,7 +165,7 @@
                         <button name="%(action_section11_preliminary_report)d" type="action" class="process-card process-card-brown">
                             <div class="process-header">
                                 <div class="kpi-label">Section 11 Reports</div>
-                                <div class="kpi-icon"><i class="fa fa-file-pdf"/></div>
+                                <div class="kpi-icon"><i class="fa fa-file-pdf" title="Section 11 Reports"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_section11_reports" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
@@ -186,7 +186,7 @@
                         <button name="action_open_section19" type="object" class="process-card process-card-green">
                             <div class="process-header">
                                 <div class="kpi-label">Section 19 Notifications</div>
-                                <div class="kpi-icon"><i class="fa fa-bell"/></div>
+                                <div class="kpi-icon"><i class="fa fa-bell" title="Section 19 Notifications"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_section19_notifications" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
@@ -207,21 +207,21 @@
                         <button name="action_open_expert_committee" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Expert Committee Reports</div>
-                                <div class="kpi-icon"><i class="fa fa-users"/></div>
+                                <div class="kpi-icon"><i class="fa fa-users" title="Expert Committee Reports"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_expert_committee_reports" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_section15" type="object" class="dashboard-kpi-card kpi-card-brown">
                             <div class="kpi-header">
                                 <div class="kpi-label">Section 15 Objections</div>
-                                <div class="kpi-icon"><i class="fa fa-exclamation-triangle"/></div>
+                                <div class="kpi-icon"><i class="fa fa-exclamation-triangle" title="Section 15 Objections"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_section15_objections" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_sia_teams" type="object" class="process-card process-card-blue">
                             <div class="process-header">
                                 <div class="kpi-label">SIA Teams</div>
-                                <div class="kpi-icon"><i class="fa fa-users"/></div>
+                                <div class="kpi-icon"><i class="fa fa-users" title="SIA Teams"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_sia_teams" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
@@ -246,20 +246,20 @@
                         <button name="action_open_documents" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Total Documents</div>
-                                <div class="kpi-icon"><i class="fa fa-folder"/></div>
+                                <div class="kpi-icon"><i class="fa fa-folder" title="Total Documents"/></div>
                             </div>
                             <div class="kpi-value"><field name="total_documents" nolabel="1" readonly="1"/></div>
                         </button>
                     </div>
                     
                     <div class="dashboard-section-title">
-                        <i class="fa fa-money"/> PAYMENT &amp; RECONCILIATION STATISTICS
+                        <i class="fa fa-money" title="Payment &amp; Reconciliation Statistics"/> PAYMENT &amp; RECONCILIATION STATISTICS
                     </div>
                     <div class="dashboard-grid">
                         <button name="action_open_payment_files" type="object" class="process-card process-card-green">
                             <div class="process-header">
                                 <div class="kpi-label">Payment Files</div>
-                                <div class="kpi-icon"><i class="fa fa-file-excel-o"/></div>
+                                <div class="kpi-icon"><i class="fa fa-file-excel-o" title="Payment Files"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_payment_files" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">
@@ -276,7 +276,7 @@
                         <button name="action_open_payment_reconciliations" type="object" class="process-card process-card-brown">
                             <div class="process-header">
                                 <div class="kpi-label">Payment Reconciliations</div>
-                                <div class="kpi-icon"><i class="fa fa-check-square-o"/></div>
+                                <div class="kpi-icon"><i class="fa fa-check-square-o" title="Payment Reconciliations"/></div>
                             </div>
                             <div class="kpi-value process-value"><field name="total_payment_reconciliations" nolabel="1" readonly="1"/></div>
                             <div class="process-sub-stats">

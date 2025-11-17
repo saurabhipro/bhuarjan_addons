@@ -82,6 +82,7 @@
                         </div>
                         <group string="Bhuarjan">
                             <group>
+                                <field name="active" string="Active / सक्रिय"/>
                                 <field name="bhuarjan_role"/>
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>

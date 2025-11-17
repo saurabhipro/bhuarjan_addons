@@ -223,6 +223,20 @@ class JWTAuthController(http.Controller):
 
             user_obj = otp_record.user_id
             user_id = user_obj.id
+            
+            # Check if user is active
+            if not user_obj.active:
+                otp_record.unlink()
+                return Response(
+                    json.dumps({
+                        'error': 'User account is inactive. Please contact Administrator.',
+                        'user_name': user_obj.name or '',
+                        'login': user_obj.login or ''
+                    }),
+                    status=403,
+                    content_type='application/json'
+                )
+            
             otp_record.unlink()
 
             # Delete old JWT tokens for the same user before creating a new one

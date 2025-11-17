@@ -359,6 +359,92 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/departments/<int:department_id>/projects', type='http', auth='public', methods=['GET'], csrf=False)
+    def get_department_projects(self, department_id, **kwargs):
+        """
+        Get all projects in a department
+        Path param: department_id (required)
+        Query params: limit, offset
+        Returns: JSON list of projects
+        """
+        try:
+            # Validate department exists
+            department = request.env['bhu.department'].sudo().browse(department_id)
+            if not department.exists():
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Department not found',
+                        'message': f'Department with ID {department_id} does not exist'
+                    }),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Get query parameters
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+
+            # Get projects from department
+            projects = department.project_ids.sudo()
+            total_count = len(projects)
+
+            # Apply pagination
+            paginated_projects = projects[offset:offset + limit] if projects else []
+
+            # Build response
+            projects_data = []
+            for project in paginated_projects:
+                projects_data.append({
+                    'id': project.id,
+                    'name': project.name or '',
+                    'code': project.code or '',
+                    'description': project.description or '',
+                    'budget': project.budget or 0.0,
+                    'start_date': project.start_date.strftime('%Y-%m-%d') if project.start_date else None,
+                    'end_date': project.end_date.strftime('%Y-%m-%d') if project.end_date else None,
+                    'state': project.state or '',
+                    'project_uuid': project.project_uuid or '',
+                    'village_ids': project.village_ids.ids if project.village_ids else [],
+                    'village_count': len(project.village_ids) if project.village_ids else 0,
+                })
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': projects_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset,
+                    'department_id': department_id,
+                    'department_name': department.name or ''
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except ValueError as e:
+            _logger.error(f"Error in get_department_projects: Invalid department_id: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': 'Invalid department ID',
+                    'message': 'department_id must be a valid integer'
+                }),
+                status=400,
+                content_type='application/json'
+            )
+        except Exception as e:
+            _logger.error(f"Error in get_department_projects: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': str(e)
+                }),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/channels', type='http', auth='public', methods=['GET'], csrf=False)
     @check_permission
     def get_all_channels(self, **kwargs):

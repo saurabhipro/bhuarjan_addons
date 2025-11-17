@@ -62,4 +62,6 @@ class BhuDepartment(models.Model):
     contact_number = fields.Char(string='Contact Number', tracking=True)
     email = fields.Char(string='Email', tracking=True)
     address = fields.Text(string='Address', tracking=True)
+    project_ids = fields.Many2many('bhu.project', string='Projects / परियोजनाएं', tracking=True,
+                                   help='Select multiple projects associated with this department')
 

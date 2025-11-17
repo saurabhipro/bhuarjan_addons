@@ -262,12 +262,46 @@
 								}
 							]
 						},
-						"description": "Get all departments with their details"
+					"description": "Get all departments with their details"
+				},
+				"response": []
+			},
+			{
+				"name": "Get Projects in Department",
+				"request": {
+					"method": "GET",
+					"header": [],
+					"url": {
+						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?limit=100&offset=0",
+						"host": [
+							"{{base_url}}"
+						],
+						"path": [
+							"api",
+							"bhuarjan",
+							"departments",
+							"1",
+							"projects"
+						],
+						"query": [
+							{
+								"key": "limit",
+								"value": "100",
+								"description": "Number of records to return (default: 100)"
+							},
+							{
+								"key": "offset",
+								"value": "0",
+								"description": "Number of records to skip (default: 0)"
+							}
+						]
 					},
-					"response": []
-				}
-			]
-		},
+					"description": "Get all projects associated with a specific department. Replace '1' in the URL path with the actual department ID."
+				},
+				"response": []
+			}
+		]
+	},
 		{
 			"name": "Land Types",
 			"item": [

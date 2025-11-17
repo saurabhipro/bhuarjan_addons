@@ -107,6 +107,39 @@
 						"description": "Get all users with their details including villages, tehsils, districts, and roles"
 					},
 					"response": []
+				},
+				{
+					"name": "Autocomplete Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/users/autocomplete?q=john&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"users",
+								"autocomplete"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "john",
+									"description": "Search query (minimum 3 characters required). Searches in both name and login fields."
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Maximum number of results to return (default: 20, max: 50)"
+								}
+							]
+						},
+						"description": "Autocomplete API for searching users by username or name. Returns simplified user objects suitable for autocomplete dropdowns. Requires minimum 3 characters in the search query."
+					},
+					"response": []
 				}
 			]
 		},

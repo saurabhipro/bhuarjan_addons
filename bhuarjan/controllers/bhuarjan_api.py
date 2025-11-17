@@ -229,6 +229,84 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/users/autocomplete', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def autocomplete_users(self, **kwargs):
+        """
+        Autocomplete API for users based on username/name
+        Query params: q (search query - minimum 3 characters required), limit (optional, default: 20, max: 50)
+        Returns: JSON list of matching users with id, name, login, email, mobile
+        """
+        try:
+            # Get query parameters
+            query = request.httprequest.args.get('q', '').strip()
+            limit = min(request.httprequest.args.get('limit', type=int) or 20, 50)  # Default 20, max 50
+            
+            # Validate minimum query length
+            if len(query) < 3:
+                return Response(
+                    json.dumps({
+                        'success': True,
+                        'data': [],
+                        'message': 'Please enter at least 3 characters to search',
+                        'total': 0
+                    }),
+                    status=200,
+                    content_type='application/json'
+                )
+            
+            # Build search domain - search in both name and login fields
+            domain = [
+                '|',
+                ('name', 'ilike', query),
+                ('login', 'ilike', query)
+            ]
+            
+            # Only search active users
+            domain.append(('active', '=', True))
+            
+            # Search users
+            users = request.env['res.users'].sudo().search(domain, limit=limit, order='name')
+            
+            # Build response - simplified user objects for autocomplete
+            users_data = []
+            for user in users:
+                users_data.append({
+                    'id': user.id,
+                    'name': user.name or '',
+                    'login': user.login or '',
+                    'email': user.email or '',
+                    'mobile': user.mobile or '',
+                    'display_name': f"{user.name} ({user.login})" if user.name and user.login else (user.name or user.login or ''),
+                })
+            
+            # Get total count (for pagination info, but we limit results)
+            total_count = request.env['res.users'].sudo().search_count(domain)
+            
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': users_data,
+                    'total': total_count,
+                    'limit': limit,
+                    'query': query
+                }),
+                status=200,
+                content_type='application/json'
+            )
+            
+        except Exception as e:
+            _logger.error(f"Error in autocomplete_users: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': 'Internal server error',
+                    'message': str(e)
+                }),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/departments', type='http', auth='public', methods=['GET'], csrf=False)
     def get_all_departments(self, **kwargs):
         """

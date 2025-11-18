@@ -62,25 +62,6 @@ class Survey(models.Model):
         ('unirrigated', 'Unirrigated / असिंचित'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
-    # Tree Details
-    undeveloped_tree_count = fields.Integer(string='Undeveloped Trees / अविकसित वृक्षों की संख्या', default=0, tracking=True,
-                                           help='Number of undeveloped trees')
-    semi_developed_tree_count = fields.Integer(string='Semi-developed Trees / अर्ध-विकसित वृक्षों की संख्या', default=0, tracking=True,
-                                               help='Number of semi-developed trees')
-    fully_developed_tree_count = fields.Integer(string='Fully Developed Trees / पूर्ण विकसित वृक्षों की संख्या', default=0, tracking=True,
-                                               help='Number of fully developed trees')
-    
-    # Computed total tree count for backward compatibility
-    tree_count = fields.Integer(string='Total Number of Trees / कुल वृक्षों की संख्या', compute='_compute_total_tree_count', store=True, tracking=True)
-    
-    @api.depends('undeveloped_tree_count', 'semi_developed_tree_count', 'fully_developed_tree_count')
-    def _compute_total_tree_count(self):
-        """Compute total tree count from individual counts"""
-        for record in self:
-            record.tree_count = (record.undeveloped_tree_count or 0) + \
-                               (record.semi_developed_tree_count or 0) + \
-                               (record.fully_developed_tree_count or 0)
-    
     # Tree Lines - Detailed tree information
     tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id', 
                                     string='Tree Details / वृक्ष विवरण')
@@ -124,8 +105,6 @@ class Survey(models.Model):
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),
     ], string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default='no', tracking=True)
-    trees_description = fields.Text(string='Trees Description / वृक्षों का विवरण', tracking=True, 
-                                   help='Detailed description of trees present on the land')
     has_pond = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),
@@ -650,24 +629,76 @@ class SurveyTreeLine(models.Model):
     tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, tracking=True,
                                      help='Select tree from master')
     
+    @api.onchange('tree_type')
+    def _onchange_tree_type(self):
+        """Set domain for tree_master_id based on tree_type"""
+        if self.tree_type:
+            domain = [('tree_type', '=', self.tree_type), ('active', '=', True)]
+            return {'domain': {'tree_master_id': domain}}
+        return {}
+    
     @api.onchange('tree_master_id')
     def _onchange_tree_master_id(self):
-        """Set tree_type when tree is selected"""
+        """Set tree_type when tree is selected and validate"""
         if self.tree_master_id:
+            # Get expected type from context or current tree_type
+            expected_type = self._context.get('default_tree_type') or self.tree_type
+            
+            # If tree_type is not set, set it from context
+            if not self.tree_type and expected_type:
+                self.tree_type = expected_type
+            
+            # Validate tree type matches the expected type
+            if expected_type and self.tree_master_id.tree_type != expected_type:
+                # Clear the selection and show warning
+                self.tree_master_id = False
+                return {
+                    'warning': {
+                        'title': _('Invalid Tree Type'),
+                        'message': _('This tree type does not match the section. Please select a %s tree.') % 
+                                  ('fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
+                    }
+                }
+            
+            # Set tree_type from selected tree
             self.tree_type = self.tree_master_id.tree_type
+            
             # For fruit-bearing trees, clear development_stage and girth
             if self.tree_master_id.tree_type == 'fruit_bearing':
                 self.development_stage = False
                 self.girth_cm = 0.0
+            # For non-fruit-bearing trees, ensure development_stage has a default
+            elif self.tree_master_id.tree_type == 'non_fruit_bearing' and not self.development_stage:
+                self.development_stage = self._context.get('default_development_stage', 'undeveloped')
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Set tree_type from tree_master_id when creating"""
+        """Set tree_type from tree_master_id or context when creating"""
         for vals in vals_list:
-            if 'tree_master_id' in vals and 'tree_type' not in vals:
+            # First, try to get tree_type from context (set by the section)
+            if 'tree_type' not in vals:
+                default_tree_type = self._context.get('default_tree_type')
+                if default_tree_type:
+                    vals['tree_type'] = default_tree_type
+            
+            # Then, if tree_master_id is provided, validate and set tree_type
+            if 'tree_master_id' in vals:
                 tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
                 if tree:
+                    # Validate tree type matches expected type from context
+                    expected_type = self._context.get('default_tree_type')
+                    if expected_type and tree.tree_type != expected_type:
+                        raise ValidationError(
+                            _('Invalid tree type: Selected tree "%s" is %s, but this section requires %s trees.') %
+                            (tree.name,
+                             'fruit-bearing' if tree.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
+                             'fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
+                        )
                     vals['tree_type'] = tree.tree_type
+                    # For fruit-bearing trees, clear development_stage and girth
+                    if tree.tree_type == 'fruit_bearing':
+                        vals['development_stage'] = False
+                        vals['girth_cm'] = 0.0
         return super().create(vals_list)
     
     def write(self, vals):
@@ -675,6 +706,15 @@ class SurveyTreeLine(models.Model):
         if 'tree_master_id' in vals:
             tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
             if tree:
+                # Validate tree type matches expected type from context
+                expected_type = self._context.get('default_tree_type')
+                if expected_type and tree.tree_type != expected_type:
+                    raise ValidationError(
+                        _('Invalid tree type: Selected tree "%s" is %s, but this section requires %s trees.') %
+                        (tree.name,
+                         'fruit-bearing' if tree.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
+                         'fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
+                    )
                 vals['tree_type'] = tree.tree_type
                 # For fruit-bearing trees, clear development_stage and girth
                 if tree.tree_type == 'fruit_bearing':
@@ -704,7 +744,8 @@ class SurveyTreeLine(models.Model):
         ('fruit_bearing', 'Fruit-bearing / फलदार'),
         ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
     ], string='Tree Type / वृक्ष प्रकार', store=True, tracking=True,
-       help='Automatically set based on selected tree')
+       default=lambda self: self._context.get('default_tree_type', False),
+       help='Automatically set based on selected tree or context')
 
     @api.depends('tree_master_id', 'tree_master_id.tree_type', 'tree_master_id.rate', 
                  'tree_type', 'development_stage', 'girth_cm')
@@ -729,15 +770,8 @@ class SurveyTreeLine(models.Model):
                         record.development_stage
                     )
                 else:
-                    # Fallback to old rate fields for backward compatibility
-                    if record.development_stage == 'undeveloped':
-                        record.rate = tree.undeveloped_rate or 0.0
-                    elif record.development_stage == 'semi_developed':
-                        record.rate = tree.semi_developed_rate or 0.0
-                    elif record.development_stage == 'fully_developed':
-                        record.rate = tree.fully_developed_rate or 0.0
-                    else:
-                        record.rate = 0.0
+                    # If girth or development stage is missing, rate is 0
+                    record.rate = 0.0
 
     @api.depends('quantity', 'rate')
     def _compute_total_amount(self):
@@ -745,6 +779,19 @@ class SurveyTreeLine(models.Model):
         for record in self:
             record.total_amount = (record.quantity or 0) * (record.rate or 0)
 
+    @api.constrains('tree_master_id', 'tree_type')
+    def _check_tree_type_match(self):
+        """Ensure tree type matches the selected tree master"""
+        for record in self:
+            if record.tree_master_id and record.tree_type:
+                if record.tree_master_id.tree_type != record.tree_type:
+                    raise ValidationError(
+                        _('Tree type mismatch: Selected tree "%s" is %s, but the record is marked as %s.') %
+                        (record.tree_master_id.name,
+                         'fruit-bearing' if record.tree_master_id.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
+                         'fruit-bearing' if record.tree_type == 'fruit_bearing' else 'non-fruit-bearing')
+                    )
+    
     @api.constrains('girth_cm', 'development_stage', 'tree_master_id')
     def _check_non_fruit_bearing_requirements(self):
         """Ensure non-fruit-bearing trees have girth and development stage"""
@@ -791,7 +838,6 @@ class SurveyLine(models.Model):
         ('semi_developed', 'Semi-developed / अर्द्ध विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
     ], string='Tree Development Stage / वृक्ष विकास स्तर', required=True)
-    tree_count = fields.Integer(string='Number of Trees / वृक्षों की संख्या', required=True)
     
     # Assets on Land / भूमि पर स्थित परिसंपत्तियों का विवरण
     # House Details

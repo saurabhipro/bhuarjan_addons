@@ -70,7 +70,6 @@ class Section15Objection(models.Model):
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
     ], string='Irrigation Type / सिंचाई का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
-    survey_tree_count = fields.Integer(string='Tree Count / वृक्ष संख्या', readonly=True, compute='_compute_survey_details', store=False)
     survey_tree_development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
@@ -118,7 +117,6 @@ class Section15Objection(models.Model):
                 record.survey_department_id = record.survey_id.department_id
                 record.survey_crop_type = record.survey_id.crop_type
                 record.survey_irrigation_type = record.survey_id.irrigation_type
-                record.survey_tree_count = record.survey_id.tree_count
                 record.survey_tree_development_stage = record.survey_id.tree_development_stage
                 record.survey_has_house = record.survey_id.has_house
                 record.survey_house_type = record.survey_id.house_type
@@ -139,7 +137,6 @@ class Section15Objection(models.Model):
                 record.survey_department_id = False
                 record.survey_crop_type = False
                 record.survey_irrigation_type = False
-                record.survey_tree_count = 0
                 record.survey_tree_development_stage = False
                 record.survey_has_house = False
                 record.survey_house_type = False

@@ -94,10 +94,9 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Tree Information / वृक्ष जानकारी">
-                                    <field name="survey_tree_count"/>
-                                    <field name="survey_tree_development_stage"/>
-                                </group>
+                                <field name="survey_tree_development_stage"/>
+                            </group>
+                            <group>
                                 <group string="Property Information / संपत्ति जानकारी">
                                     <field name="survey_has_house"/>
                                     <field name="survey_house_type" invisible="survey_has_house != 'yes'"/>

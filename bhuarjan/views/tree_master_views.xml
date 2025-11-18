@@ -56,14 +56,6 @@
                                     </list>
                                 </field>
                             </group>
-                            <group string="Deprecated Rates (for backward compatibility)">
-                                <field name="undeveloped_rate" string="Undeveloped Rate / अविकसित दर" 
-                                       readonly="tree_type == 'non_fruit_bearing'"/>
-                                <field name="semi_developed_rate" string="Semi-developed Rate / अर्ध-विकसित दर"
-                                       readonly="tree_type == 'non_fruit_bearing'"/>
-                                <field name="fully_developed_rate" string="Fully Developed Rate / पूर्ण विकसित दर"
-                                       readonly="tree_type == 'non_fruit_bearing'"/>
-                            </group>
                         </page>
                     </notebook>
                 </sheet>

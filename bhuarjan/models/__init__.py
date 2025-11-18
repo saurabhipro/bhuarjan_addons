@@ -33,6 +33,8 @@ from . import otp
 from . import token
 from . import channel_master
 from . import tree_master
+from . import photo_type_master
+from . import survey_photo
 
 
 

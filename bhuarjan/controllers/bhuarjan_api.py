@@ -1081,6 +1081,23 @@ class BhuarjanAPIController(http.Controller):
             # Create tree lines if any
             if tree_line_vals:
                 survey.sudo().write({'tree_line_ids': tree_line_vals})
+            
+            # Handle photos (if provided)
+            if 'photos' in data and isinstance(data['photos'], list):
+                photo_vals = []
+                for photo in data['photos']:
+                    if isinstance(photo, dict) and 's3_url' in photo and 'photo_type_id' in photo:
+                        photo_vals.append((0, 0, {
+                            'photo_type_id': photo['photo_type_id'],
+                            's3_url': photo['s3_url'],
+                            'filename': photo.get('filename', ''),
+                            'file_size': photo.get('file_size', 0),
+                            'description': photo.get('description', ''),
+                            'sequence': photo.get('sequence', 10)
+                        }))
+                
+                if photo_vals:
+                    survey.sudo().write({'photo_ids': photo_vals})
 
             # Return created survey details
             return Response(
@@ -1175,6 +1192,16 @@ class BhuarjanAPIController(http.Controller):
                     'rate': line.rate,
                     'total_amount': line.total_amount
                 } for line in survey.tree_line_ids],
+                'photos': [{
+                    'id': photo.id,
+                    'photo_type_id': photo.photo_type_id.id if photo.photo_type_id else None,
+                    'photo_type_name': photo.photo_type_id.name if photo.photo_type_id else '',
+                    's3_url': photo.s3_url or '',
+                    'filename': photo.filename or '',
+                    'file_size': photo.file_size or 0,
+                    'description': photo.description or '',
+                    'sequence': photo.sequence or 10
+                } for photo in survey.photo_ids.filtered(lambda p: p.active)],
                 'has_house': survey.has_house,
                 'house_type': survey.house_type,
                 'house_area': survey.house_area,
@@ -2103,6 +2130,23 @@ class BhuarjanAPIController(http.Controller):
                 # Replace all tree lines with new ones
                 if tree_line_vals:
                     survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
+            
+            # Handle photos (if provided - adds new photos, doesn't replace existing)
+            if 'photos' in data and isinstance(data['photos'], list):
+                photo_vals = []
+                for photo in data['photos']:
+                    if isinstance(photo, dict) and 's3_url' in photo and 'photo_type_id' in photo:
+                        photo_vals.append((0, 0, {
+                            'photo_type_id': photo['photo_type_id'],
+                            's3_url': photo['s3_url'],
+                            'filename': photo.get('filename', ''),
+                            'file_size': photo.get('file_size', 0),
+                            'description': photo.get('description', ''),
+                            'sequence': photo.get('sequence', 10)
+                        }))
+                
+                if photo_vals:
+                    survey.write({'photo_ids': photo_vals})
 
             # Return updated survey data
             survey_data = {
@@ -2141,6 +2185,16 @@ class BhuarjanAPIController(http.Controller):
                     'rate': line.rate,
                     'total_amount': line.total_amount
                 } for line in survey.tree_line_ids],
+                'photos': [{
+                    'id': photo.id,
+                    'photo_type_id': photo.photo_type_id.id if photo.photo_type_id else None,
+                    'photo_type_name': photo.photo_type_id.name if photo.photo_type_id else '',
+                    's3_url': photo.s3_url or '',
+                    'filename': photo.filename or '',
+                    'file_size': photo.file_size or 0,
+                    'description': photo.description or '',
+                    'sequence': photo.sequence or 10
+                } for photo in survey.photo_ids.filtered(lambda p: p.active)],
                 'has_house': survey.has_house or '',
                 'house_type': survey.house_type or '',
                 'house_area': survey.house_area or 0.0,
@@ -2258,6 +2312,198 @@ class BhuarjanAPIController(http.Controller):
             )
         except Exception as e:
             _logger.error(f"Error in delete_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': str(e)
+                }),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/photo-types', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def get_all_photo_types(self, **kwargs):
+        """
+        Get all photo types
+        Query params: limit, offset, active (optional filter - default True)
+        Returns: JSON list of photo types
+        """
+        try:
+            # Get query parameters
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+            active_filter = request.httprequest.args.get('active')
+            
+            # Build domain
+            domain = []
+            if active_filter is not None:
+                active_bool = active_filter.lower() in ('true', '1', 'yes')
+                domain.append(('active', '=', active_bool))
+            else:
+                # Default to active only
+                domain.append(('active', '=', True))
+
+            # Search photo types
+            photo_types = request.env['bhu.photo.type'].sudo().search(domain, limit=limit, offset=offset, order='sequence, name')
+
+            # Build response
+            photo_types_data = []
+            for photo_type in photo_types:
+                photo_types_data.append({
+                    'id': photo_type.id,
+                    'name': photo_type.name or '',
+                    'code': photo_type.code or '',
+                    'description': photo_type.description or '',
+                    'sequence': photo_type.sequence or 10,
+                    'active': photo_type.active
+                })
+
+            # Get total count
+            total_count = request.env['bhu.photo.type'].sudo().search_count(domain)
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': photo_types_data,
+                    'total': total_count,
+                    'count': len(photo_types_data),
+                    'limit': limit,
+                    'offset': offset
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_all_photo_types: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/survey/<int:survey_id>/photos', type='http', auth='public', methods=['POST'], csrf=False)
+    @check_permission
+    def add_survey_photos(self, survey_id, **kwargs):
+        """
+        Add photos to a survey
+        Path param: survey_id (required)
+        Body: JSON with photos array
+        Each photo should have: photo_type_id, s3_url, filename (optional), file_size (optional), description (optional)
+        Returns: Success message with added photos
+        """
+        try:
+            # Parse request data
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+            
+            # Validate survey exists
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Survey not found',
+                        'message': f'Survey with ID {survey_id} does not exist'
+                    }),
+                    status=404,
+                    content_type='application/json'
+                )
+            
+            # Validate photos array
+            if 'photos' not in data or not isinstance(data['photos'], list):
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Invalid request',
+                        'message': 'photos array is required in request body'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            if len(data['photos']) == 0:
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Invalid request',
+                        'message': 'At least one photo is required'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Build photo values
+            photo_vals = []
+            added_photos = []
+            for photo in data['photos']:
+                if not isinstance(photo, dict):
+                    continue
+                
+                if 's3_url' not in photo or 'photo_type_id' not in photo:
+                    continue
+                
+                # Validate photo_type_id exists
+                photo_type = request.env['bhu.photo.type'].sudo().browse(photo['photo_type_id'])
+                if not photo_type.exists():
+                    continue
+                
+                photo_vals.append((0, 0, {
+                    'photo_type_id': photo['photo_type_id'],
+                    's3_url': photo['s3_url'],
+                    'filename': photo.get('filename', ''),
+                    'file_size': photo.get('file_size', 0),
+                    'description': photo.get('description', ''),
+                    'sequence': photo.get('sequence', 10)
+                }))
+                
+                added_photos.append({
+                    'photo_type_id': photo['photo_type_id'],
+                    'photo_type_name': photo_type.name,
+                    's3_url': photo['s3_url'],
+                    'filename': photo.get('filename', '')
+                })
+            
+            if not photo_vals:
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Invalid photos',
+                        'message': 'No valid photos provided. Each photo must have photo_type_id and s3_url'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Add photos to survey
+            survey.write({'photo_ids': photo_vals})
+            
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'message': f'Successfully added {len(photo_vals)} photo(s) to survey',
+                    'data': {
+                        'survey_id': survey_id,
+                        'added_photos': added_photos,
+                        'total_photos': len(survey.photo_ids.filtered(lambda p: p.active))
+                    }
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except json.JSONDecodeError:
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': 'Invalid JSON',
+                    'message': 'Request body must be valid JSON'
+                }),
+                status=400,
+                content_type='application/json'
+            )
+        except Exception as e:
+            _logger.error(f"Error in add_survey_photos: {str(e)}", exc_info=True)
             return Response(
                 json.dumps({
                     'success': False,

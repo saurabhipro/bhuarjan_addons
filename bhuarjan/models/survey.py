@@ -84,6 +84,9 @@ class Survey(models.Model):
     # Tree Lines - Detailed tree information
     tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id', 
                                     string='Tree Details / वृक्ष विवरण')
+    photo_ids = fields.One2many('bhu.survey.photo', 'survey_id', 
+                                string='Photos / फोटो', 
+                                help='Photos uploaded for this survey with tags')
     
     # House Details
     has_house = fields.Selection([

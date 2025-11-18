@@ -137,6 +137,12 @@
                             </group>
                         </page>
                         
+                        <page string="Photos / फोटो" name="survey_photos">
+                            <group string="Survey Photos / सर्वे फोटो">
+                                <field name="photo_ids" readonly="state == 'locked'" nolabel="1"/>
+                            </group>
+                        </page>
+                        
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
                             <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
                                 <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
@@ -402,6 +408,50 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
                 <field name="rate" readonly="1" string="Rate / दर" width="150"/>
                 <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="180"/>
             </list>
+        </field>
+    </record>
+
+    <!-- Survey Photo List View -->
+    <record id="view_bhu_survey_photo_list" model="ir.ui.view">
+        <field name="name">bhu.survey.photo.list</field>
+        <field name="model">bhu.survey.photo</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Photos / फोटो" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="photo_type_id" options="{'no_create_edit': True}" required="1"/>
+                <field name="filename"/>
+                <field name="s3_url" widget="url"/>
+                <field name="file_size"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Survey Photo Form View -->
+    <record id="view_bhu_survey_photo_form" model="ir.ui.view">
+        <field name="name">bhu.survey.photo.form</field>
+        <field name="model">bhu.survey.photo</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Survey Photo / सर्वे फोटो">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="photo_type_id" options="{'no_create_edit': True}" required="1"/>
+                            <field name="sequence" widget="handle"/>
+                            <field name="filename"/>
+                            <field name="s3_url" widget="url"/>
+                            <field name="file_size"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description" placeholder="Enter description or notes about this photo"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 

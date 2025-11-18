@@ -965,6 +965,97 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Photo Types",
+			"item": [
+				{
+					"name": "Get All Photo Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/photo-types?limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"photo-types"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"description": "Filter by active status (default: true)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all photo types available for tagging survey photos. Photo types include: Land, Well, House, Shed, Tubewell, Pond, Trees, Boundary, Other."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Survey Photos",
+			"item": [
+				{
+					"name": "Add Photos to Survey",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.amazonaws.com/surveys/123/land_photo1.jpg\",\n            \"filename\": \"land_photo1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Main land area photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.amazonaws.com/surveys/123/well_photo1.jpg\",\n            \"filename\": \"well_photo1.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/survey/1/photos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"survey",
+								"1",
+								"photos"
+							],
+							"variable": [
+								{
+									"key": "survey_id",
+									"value": "1",
+									"description": "Replace with actual survey ID"
+								}
+							]
+						},
+						"description": "Add photos to a survey. First upload photos to S3 using the presigned URL API, then use this endpoint to tag and save the S3 URLs.\n\n**Workflow:**\n1. Generate presigned URLs using `/api/bhuarjan/s3/presigned-urls`\n2. Upload files to S3 using the presigned URLs (PUT request)\n3. Use this endpoint to save the S3 URLs with photo type tags\n\n**Request Body:**\n- `photos` (array): List of photo objects\n  - `photo_type_id` (required): ID from photo types master\n  - `s3_url` (required): Full S3 URL after upload\n  - `filename` (optional): Original filename\n  - `file_size` (optional): File size in bytes\n  - `description` (optional): Description or notes\n  - `sequence` (optional): Display order (default: 10)"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

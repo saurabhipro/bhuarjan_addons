@@ -9,6 +9,7 @@
     <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_land_type" name="Land Types" action="action_bhu_land_type" parent="menu_bhu_master" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_tree_master" name="Tree Master" action="action_bhu_tree_master" parent="menu_bhu_master" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="2.5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
@@ -40,22 +41,9 @@
     
     <!-- Document Vault Menu -->
     <menuitem id="menu_bhu_document_vault" name="Document Vault" parent="menu_bhu_root" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_document_vault_list" name="Documents" action="action_document_vault" parent="menu_bhu_document_vault" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    
+    <menuitem id="menu_document_vault_list" name="Documents" action="action_document_vault" parent="menu_bhu_document_vault" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>   
     <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-
     <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="jwt_token_menu_item" 
-              name="JWT Token List" 
-              parent="menu_bhu_users_maai_menu" 
-              action="jwt_token_action" 
-              />
-
-    <menuitem id="mobile_otp_menu_item" 
-              name="Mobile OTP List" 
-              parent="menu_bhu_users_maai_menu" 
-              action="mobile_otp_action" 
-              />
-    <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
-    
+    <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
+    <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" /> <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
 </odoo>

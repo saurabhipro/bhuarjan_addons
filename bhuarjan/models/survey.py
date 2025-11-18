@@ -44,11 +44,14 @@ class Survey(models.Model):
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, tracking=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     acquired_area = fields.Float(string='Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
-    transferred_land = fields.Boolean(string='Transferred Land / स्थानांतरित भूमि', default=False, tracking=True,
-                                      help='Indicates if the land has been transferred')
-    transferred_area = fields.Float(string='Transferred Area (Hectares) / स्थानांतरित क्षेत्रफल (हेक्टेयर)', 
+    has_traded_land = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Has Traded Land / व्यापारित भूमि है', default='no', tracking=True,
+                                      help='Indicates if the land has been traded')
+    traded_land_area = fields.Float(string='Traded Land Area (Hectares) / व्यापारित भूमि क्षेत्रफल (हेक्टेयर)', 
                                     digits=(10, 4), tracking=True, default=0.0,
-                                    help='Area of land that has been transferred in hectares')
+                                    help='Area of land that has been traded in hectares')
     
     # Land Details
     crop_type_id = fields.Many2one('bhu.land.type', string='Crop Type / फसल का प्रकार', tracking=True,

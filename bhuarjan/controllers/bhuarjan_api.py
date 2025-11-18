@@ -782,8 +782,8 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': data.get('khasra_number'),
                 'total_area': total_area,
                 'acquired_area': acquired_area,
-                'transferred_land': data.get('transferred_land', False),
-                'transferred_area': data.get('transferred_area', 0.0),
+                'has_traded_land': data.get('has_traded_land', 'no'),
+                'traded_land_area': data.get('traded_land_area', 0.0),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
                 'tree_development_stage': data.get('tree_development_stage'),
                 'tree_count': data.get('tree_count', 0),
@@ -913,8 +913,8 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': survey.khasra_number or '',
                 'total_area': survey.total_area,
                 'acquired_area': survey.acquired_area,
-                'transferred_land': survey.transferred_land or False,
-                'transferred_area': survey.transferred_area or 0.0,
+                'has_traded_land': survey.has_traded_land or 'no',
+                'traded_land_area': survey.traded_land_area or 0.0,
                 'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
                 'crop_type': survey.crop_type_id.id if survey.crop_type_id else None,
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
@@ -1684,12 +1684,12 @@ class BhuarjanAPIController(http.Controller):
             # List of fields that can be updated via API
             allowed_fields = [
                 'project_id', 'department_id', 'village_id', 'tehsil_id', 'survey_date',
-                'khasra_number', 'total_area', 'acquired_area', 'transferred_land', 'transferred_area',
+                'khasra_number', 'total_area', 'acquired_area', 'has_traded_land', 'traded_land_area',
                 'crop_type_id', 'irrigation_type', 'tree_development_stage', 'tree_count',
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
                 'has_well', 'well_type', 'has_tubewell', 'has_pond',
                 'trees_description', 'landowner_ids', 'survey_image', 'survey_image_filename',
-                'remarks', 'notes'
+                'remarks'
             ]
             
             # Note: 'crop_type' is handled separately above and mapped to 'crop_type_id'
@@ -1717,40 +1717,46 @@ class BhuarjanAPIController(http.Controller):
 
             # Validate area values if they are being updated
             if 'total_area' in data or 'acquired_area' in data:
-                # Get the values that will be used (from data if provided, otherwise from existing survey)
+                # Get the values that will be used after update
+                # If field is in data, use the new value; otherwise use existing value from survey
                 total_area = data.get('total_area') if 'total_area' in data else survey.total_area
                 acquired_area = data.get('acquired_area') if 'acquired_area' in data else survey.acquired_area
                 
-                # Area validation checks
-                if total_area is None or total_area <= 0:
-                    return Response(
-                        json.dumps({
-                            'error': 'Validation Error',
-                            'message': 'Total Area must be greater than 0.'
-                        }),
-                        status=400,
-                        content_type='application/json'
-                    )
+                # Validate total_area if it's being updated or if we need to check the relationship
+                if 'total_area' in data:
+                    if total_area is None or total_area <= 0:
+                        return Response(
+                            json.dumps({
+                                'error': 'Validation Error',
+                                'message': 'Total Area must be greater than 0.'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
                 
-                if acquired_area is None or acquired_area <= 0:
-                    return Response(
-                        json.dumps({
-                            'error': 'Validation Error',
-                            'message': 'Acquired Area must be greater than 0.'
-                        }),
-                        status=400,
-                        content_type='application/json'
-                    )
+                # Validate acquired_area if it's being updated or if we need to check the relationship
+                if 'acquired_area' in data:
+                    if acquired_area is None or acquired_area <= 0:
+                        return Response(
+                            json.dumps({
+                                'error': 'Validation Error',
+                                'message': 'Acquired Area must be greater than 0.'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
                 
-                if acquired_area > total_area:
-                    return Response(
-                        json.dumps({
-                            'error': 'Validation Error',
-                            'message': 'Acquired Area cannot be greater than Total Area.'
-                        }),
-                        status=400,
-                        content_type='application/json'
-                    )
+                # Validate relationship between areas (only if both values are available)
+                if total_area is not None and acquired_area is not None:
+                    if acquired_area > total_area:
+                        return Response(
+                            json.dumps({
+                                'error': 'Validation Error',
+                                'message': 'Acquired Area cannot be greater than Total Area.'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
             
             # Prepare update values
             update_vals = {}
@@ -1772,8 +1778,8 @@ class BhuarjanAPIController(http.Controller):
                             update_vals[field] = base64.b64decode(base64_data)
                         else:
                             update_vals[field] = value
-                    # Handle text fields (trees_description, remarks, notes) - allow None and empty strings
-                    elif field in ['trees_description', 'remarks', 'notes']:
+                    # Handle text fields (trees_description, remarks) - allow None and empty strings
+                    elif field in ['trees_description', 'remarks']:
                         update_vals[field] = value if value is not None else ''
                     # Handle other fields
                     else:
@@ -1808,8 +1814,8 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': survey.khasra_number or '',
                 'total_area': survey.total_area or 0.0,
                 'acquired_area': survey.acquired_area or 0.0,
-                'transferred_land': survey.transferred_land or False,
-                'transferred_area': survey.transferred_area or 0.0,
+                'has_traded_land': survey.has_traded_land or 'no',
+                'traded_land_area': survey.traded_land_area or 0.0,
                 'crop_type': survey.crop_type_id.id if survey.crop_type_id else None,
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
                 'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
@@ -1829,7 +1835,6 @@ class BhuarjanAPIController(http.Controller):
                 'landowner_ids': survey.landowner_ids.ids if survey.landowner_ids else [],
                 'state': survey.state or 'draft',
                 'remarks': survey.remarks or '',
-                'notes': survey.notes or '',
             }
 
             return Response(

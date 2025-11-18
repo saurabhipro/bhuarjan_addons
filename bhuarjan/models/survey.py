@@ -644,33 +644,56 @@ class SurveyTreeLine(models.Model):
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
-    ], string='Development Stage / विकास स्तर', required=True, tracking=True, default='undeveloped')
+    ], string='Development Stage / विकास स्तर', tracking=True, default='undeveloped',
+       help='Required for non-fruit-bearing trees. Not applicable for fruit-bearing trees.')
+    girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2), tracking=True,
+                            help='Chest girth in centimeters. Required for non-fruit-bearing trees.')
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
                              help='Number of trees of this type')
     rate = fields.Float(string='Rate per Tree / प्रति वृक्ष दर', digits=(16, 2), 
                        compute='_compute_rate', store=True, readonly=True,
-                       help='Rate based on development stage')
+                       help='Rate based on tree type, girth, and development stage')
     total_amount = fields.Float(string='Total Amount / कुल राशि', digits=(16, 2), 
                                compute='_compute_total_amount', store=True, tracking=True)
     currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
                                  related='tree_master_id.currency_id', readonly=True)
+    
+    # Related field for tree type
+    tree_type = fields.Selection(related='tree_master_id.tree_type', string='Tree Type / वृक्ष प्रकार', 
+                                readonly=True, store=False)
 
-    @api.depends('tree_master_id', 'development_stage', 'tree_master_id.undeveloped_rate', 
-                 'tree_master_id.semi_developed_rate', 'tree_master_id.fully_developed_rate')
+    @api.depends('tree_master_id', 'tree_master_id.tree_type', 'tree_master_id.rate', 
+                 'development_stage', 'girth_cm')
     def _compute_rate(self):
-        """Compute rate based on development stage"""
+        """Compute rate based on tree type, girth, and development stage"""
         for record in self:
-            if record.tree_master_id:
-                if record.development_stage == 'undeveloped':
-                    record.rate = record.tree_master_id.undeveloped_rate or 0.0
-                elif record.development_stage == 'semi_developed':
-                    record.rate = record.tree_master_id.semi_developed_rate or 0.0
-                elif record.development_stage == 'fully_developed':
-                    record.rate = record.tree_master_id.fully_developed_rate or 0.0
-                else:
-                    record.rate = 0.0
-            else:
+            if not record.tree_master_id:
                 record.rate = 0.0
+                continue
+            
+            tree = record.tree_master_id
+            if tree.tree_type == 'fruit_bearing':
+                # Fruit-bearing trees: use flat rate (no girth or development stage)
+                record.rate = tree.rate or 0.0
+            else:
+                # Non-fruit-bearing trees: lookup rate from tree_rate_master based on girth and development stage
+                if record.girth_cm and record.development_stage:
+                    rate_master = self.env['bhu.tree.rate.master']
+                    record.rate = rate_master.get_rate_for_tree(
+                        tree.id, 
+                        record.girth_cm, 
+                        record.development_stage
+                    )
+                else:
+                    # Fallback to old rate fields for backward compatibility
+                    if record.development_stage == 'undeveloped':
+                        record.rate = tree.undeveloped_rate or 0.0
+                    elif record.development_stage == 'semi_developed':
+                        record.rate = tree.semi_developed_rate or 0.0
+                    elif record.development_stage == 'fully_developed':
+                        record.rate = tree.fully_developed_rate or 0.0
+                    else:
+                        record.rate = 0.0
 
     @api.depends('quantity', 'rate')
     def _compute_total_amount(self):
@@ -678,6 +701,16 @@ class SurveyTreeLine(models.Model):
         for record in self:
             record.total_amount = (record.quantity or 0) * (record.rate or 0)
 
+    @api.constrains('girth_cm', 'development_stage', 'tree_master_id')
+    def _check_non_fruit_bearing_requirements(self):
+        """Ensure non-fruit-bearing trees have girth and development stage"""
+        for record in self:
+            if record.tree_master_id and record.tree_master_id.tree_type == 'non_fruit_bearing':
+                if not record.girth_cm or record.girth_cm <= 0:
+                    raise ValidationError('Girth (cm) is required for non-fruit-bearing trees.')
+                if not record.development_stage:
+                    raise ValidationError('Development stage is required for non-fruit-bearing trees.')
+    
     @api.constrains('quantity')
     def _check_quantity_positive(self):
         """Ensure quantity is positive"""

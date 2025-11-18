@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tree Rate Master Data for Non-fruit-bearing Trees -->
+        <!-- Based on Appendix "A" from Central Valuation Board -->
+        <!-- Girth ranges: Below 46, 46-60, 61-90, 91-120, 121-150, 151-180, Above 180 cm -->
+        <!-- Development stages: Undeveloped (Un Sound), Semi-developed (Half Sound), Fully Developed (Sound) -->
+        <!-- Note: Actual rates should be updated based on official Central Valuation Board rates -->
+        
+        <!-- Sal (साल) Tree Rates -->
+        <!-- Below 46 cm -->
+        <record id="tree_rate_sal_below46_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">0</field>
+            <field name="girth_range_max">45.99</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">500.00</field>
+        </record>
+        <record id="tree_rate_sal_below46_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">0</field>
+            <field name="girth_range_max">45.99</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">750.00</field>
+        </record>
+        <record id="tree_rate_sal_below46_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">0</field>
+            <field name="girth_range_max">45.99</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">1000.00</field>
+        </record>
+        
+        <!-- 46-60 cm -->
+        <record id="tree_rate_sal_46_60_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">46</field>
+            <field name="girth_range_max">60</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">800.00</field>
+        </record>
+        <record id="tree_rate_sal_46_60_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">46</field>
+            <field name="girth_range_max">60</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">1200.00</field>
+        </record>
+        <record id="tree_rate_sal_46_60_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">46</field>
+            <field name="girth_range_max">60</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">1600.00</field>
+        </record>
+        
+        <!-- 61-90 cm -->
+        <record id="tree_rate_sal_61_90_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">61</field>
+            <field name="girth_range_max">90</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">1200.00</field>
+        </record>
+        <record id="tree_rate_sal_61_90_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">61</field>
+            <field name="girth_range_max">90</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">1800.00</field>
+        </record>
+        <record id="tree_rate_sal_61_90_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">61</field>
+            <field name="girth_range_max">90</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">2400.00</field>
+        </record>
+        
+        <!-- 91-120 cm -->
+        <record id="tree_rate_sal_91_120_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">91</field>
+            <field name="girth_range_max">120</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">1800.00</field>
+        </record>
+        <record id="tree_rate_sal_91_120_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">91</field>
+            <field name="girth_range_max">120</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">2700.00</field>
+        </record>
+        <record id="tree_rate_sal_91_120_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">91</field>
+            <field name="girth_range_max">120</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">3600.00</field>
+        </record>
+        
+        <!-- 121-150 cm -->
+        <record id="tree_rate_sal_121_150_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">121</field>
+            <field name="girth_range_max">150</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">2500.00</field>
+        </record>
+        <record id="tree_rate_sal_121_150_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">121</field>
+            <field name="girth_range_max">150</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">3750.00</field>
+        </record>
+        <record id="tree_rate_sal_121_150_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">121</field>
+            <field name="girth_range_max">150</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">5000.00</field>
+        </record>
+        
+        <!-- 151-180 cm -->
+        <record id="tree_rate_sal_151_180_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">151</field>
+            <field name="girth_range_max">180</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">3500.00</field>
+        </record>
+        <record id="tree_rate_sal_151_180_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">151</field>
+            <field name="girth_range_max">180</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">5250.00</field>
+        </record>
+        <record id="tree_rate_sal_151_180_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">151</field>
+            <field name="girth_range_max">180</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">7000.00</field>
+        </record>
+        
+        <!-- Above 180 cm -->
+        <record id="tree_rate_sal_above180_undeveloped" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">180.01</field>
+            <field name="development_stage">undeveloped</field>
+            <field name="rate">5000.00</field>
+        </record>
+        <record id="tree_rate_sal_above180_semi" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">180.01</field>
+            <field name="development_stage">semi_developed</field>
+            <field name="rate">7500.00</field>
+        </record>
+        <record id="tree_rate_sal_above180_fully" model="bhu.tree.rate.master">
+            <field name="tree_master_id" ref="tree_master_sal"/>
+            <field name="girth_range_min">180.01</field>
+            <field name="development_stage">fully_developed</field>
+            <field name="rate">10000.00</field>
+        </record>
+        
+        <!-- Note: Similar rate structures should be created for other non-fruit-bearing trees -->
+        <!-- (Bija, Sheesham, Tinsa, Saja, Dhawra, Haldu Mundi, Khamhar, Other Mixed, Teak) -->
+        <!-- Teak has special girth ranges starting from below 31 cm -->
+        <!-- Actual rates should be updated based on official Central Valuation Board document -->
+    </data>
+</odoo>
+

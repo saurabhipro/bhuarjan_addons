@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree Rate Master List View -->
+    <record id="view_bhu_tree_rate_master_list" model="ir.ui.view">
+        <field name="name">bhu.tree.rate.master.list</field>
+        <field name="model">bhu.tree.rate.master</field>
+        <field name="arch" type="xml">
+            <list string="Tree Rate Master" decoration-muted="not active">
+                <field name="tree_master_id"/>
+                <field name="girth_range_min"/>
+                <field name="girth_range_max"/>
+                <field name="development_stage"/>
+                <field name="rate" widget="monetary"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tree Rate Master Form View -->
+    <record id="view_bhu_tree_rate_master_form" model="ir.ui.view">
+        <field name="name">bhu.tree.rate.master.form</field>
+        <field name="model">bhu.tree.rate.master</field>
+        <field name="arch" type="xml">
+            <form string="Tree Rate Master">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="tree_master_id" placeholder="Select non-fruit-bearing tree"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Tree Information / वृक्ष जानकारी">
+                            <field name="tree_master_id" options="{'no_create_edit': True}"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Girth Range / छाती सीमा">
+                            <field name="girth_range_min" string="Min Girth (cm) / न्यूनतम छाती (से.मी.)"/>
+                            <field name="girth_range_max" string="Max Girth (cm) / अधिकतम छाती (से.मी.)" 
+                                   placeholder="Leave empty for 'Above X cm'"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Rate Information / दर जानकारी">
+                            <field name="development_stage" widget="radio" options="{'horizontal': true}"/>
+                            <field name="rate" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Description / विवरण">
+                            <field name="description" widget="text" nolabel="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree Rate Master Search View -->
+    <record id="view_bhu_tree_rate_master_search" model="ir.ui.view">
+        <field name="name">bhu.tree.rate.master.search</field>
+        <field name="model">bhu.tree.rate.master</field>
+        <field name="arch" type="xml">
+            <search string="Search Tree Rate Master">
+                <field name="tree_master_id"/>
+                <field name="development_stage"/>
+                <field name="girth_range_min"/>
+                <field name="girth_range_max"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Undeveloped" name="undeveloped" domain="[('development_stage', '=', 'undeveloped')]"/>
+                <filter string="Semi-developed" name="semi_developed" domain="[('development_stage', '=', 'semi_developed')]"/>
+                <filter string="Fully Developed" name="fully_developed" domain="[('development_stage', '=', 'fully_developed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Tree" name="group_tree" context="{'group_by': 'tree_master_id'}"/>
+                    <filter string="Development Stage" name="group_stage" context="{'group_by': 'development_stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree Rate Master Action -->
+    <record id="action_bhu_tree_rate_master" model="ir.actions.act_window">
+        <field name="name">Tree Rate Master</field>
+        <field name="res_model">bhu.tree.rate.master</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhu_tree_rate_master_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Tree Rate Master record!
+            </p>
+            <p>
+                Define girth-based rates for non-fruit-bearing trees based on development stage.
+            </p>
+        </field>
+    </record>
+</odoo>
+

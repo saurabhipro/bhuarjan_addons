@@ -402,11 +402,15 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
         <field name="type">list</field>
         <field name="arch" type="xml">
             <list string="Tree Lines" editable="bottom">
-                <field name="development_stage" required="1" string="Development Stage / विकास स्तर" width="180"/>
-                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
-                <field name="quantity" required="1" string="Quantity / मात्रा" width="120"/>
-                <field name="rate" readonly="1" string="Rate / दर" width="150"/>
-                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="180"/>
+                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="200"/>
+                <field name="tree_type" invisible="1"/>
+                <field name="development_stage" string="Development Stage / विकास स्तर" width="150"
+                       invisible="tree_type == 'fruit_bearing'"/>
+                <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="120"
+                       invisible="tree_type == 'fruit_bearing'"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="100"/>
+                <field name="rate" readonly="1" string="Rate / दर" width="120"/>
+                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="150"/>
             </list>
         </field>
     </record>

@@ -272,7 +272,7 @@
 					"method": "GET",
 					"header": [],
 					"url": {
-						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?limit=100&offset=0",
+						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?user_id=1&limit=100&offset=0",
 						"host": [
 							"{{base_url}}"
 						],
@@ -285,6 +285,12 @@
 						],
 						"query": [
 							{
+								"key": "user_id",
+								"value": "1",
+								"description": "User ID (optional) - If provided, returns only villages associated with this user",
+								"disabled": false
+							},
+							{
 								"key": "limit",
 								"value": "100",
 								"description": "Number of records to return (default: 100)"
@@ -296,7 +302,7 @@
 							}
 						]
 					},
-					"description": "Get all projects associated with a specific department. Replace '1' in the URL path with the actual department ID."
+					"description": "Get all projects associated with a specific department with village objects.\n\n**Path Parameters:**\n- `department_id` (required): Replace '1' in the URL path with the actual department ID\n\n**Query Parameters:**\n- `user_id` (optional): If provided, returns only villages associated with this user. If not provided, returns all villages for each project.\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n\n**Response:**\n- Returns projects with `villages` array containing village objects (instead of `village_ids`)\n- Each village object includes: id, name, village_code, village_uuid, district_id, district_name, tehsil_id, tehsil_name, pincode\n- If `user_id` is provided, response includes `user` object with user details"
 				},
 				"response": []
 			}

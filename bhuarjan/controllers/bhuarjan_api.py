@@ -363,10 +363,10 @@ class BhuarjanAPIController(http.Controller):
     @http.route('/api/bhuarjan/departments/<int:department_id>/projects', type='http', auth='public', methods=['GET'], csrf=False)
     def get_department_projects(self, department_id, **kwargs):
         """
-        Get all projects in a department
+        Get all projects in a department with village objects
         Path param: department_id (required)
-        Query params: limit, offset
-        Returns: JSON list of projects
+        Query params: user_id (optional), limit, offset
+        Returns: JSON list of projects with village objects (filtered by user if user_id provided)
         """
         try:
             # Validate department exists
@@ -385,6 +385,30 @@ class BhuarjanAPIController(http.Controller):
             # Get query parameters
             limit = request.httprequest.args.get('limit', type=int) or 100
             offset = request.httprequest.args.get('offset', type=int) or 0
+            user_id = request.httprequest.args.get('user_id', type=int)
+
+            # Get user's villages if user_id is provided
+            user_village_ids = []
+            user_info = None
+            if user_id:
+                user = request.env['res.users'].sudo().browse(user_id)
+                if not user.exists():
+                    return Response(
+                        json.dumps({
+                            'success': False,
+                            'error': 'User not found',
+                            'message': f'User with ID {user_id} does not exist'
+                        }),
+                        status=404,
+                        content_type='application/json'
+                    )
+                user_village_ids = user.village_ids.ids if user.village_ids else []
+                user_info = {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'bhuarjan_role': user.bhuarjan_role or '',
+                }
 
             # Get projects from department
             projects = department.project_ids.sudo()
@@ -396,6 +420,29 @@ class BhuarjanAPIController(http.Controller):
             # Build response
             projects_data = []
             for project in paginated_projects:
+                # Filter villages based on user if user_id provided
+                if user_id and user_village_ids:
+                    project_villages = project.village_ids.filtered(
+                        lambda v: v.id in user_village_ids
+                    )
+                else:
+                    project_villages = project.village_ids
+                
+                # Build village objects
+                villages_data = []
+                for village in project_villages:
+                    villages_data.append({
+                        'id': village.id,
+                        'name': village.name or '',
+                        'village_code': village.village_code or '',
+                        'village_uuid': village.village_uuid or '',
+                        'district_id': village.district_id.id if village.district_id else None,
+                        'district_name': village.district_id.name if village.district_id else '',
+                        'tehsil_id': village.tehsil_id.id if village.tehsil_id else None,
+                        'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
+                        'pincode': village.pincode or '',
+                    })
+                
                 projects_data.append({
                     'id': project.id,
                     'name': project.name or '',
@@ -406,20 +453,26 @@ class BhuarjanAPIController(http.Controller):
                     'end_date': project.end_date.strftime('%Y-%m-%d') if project.end_date else None,
                     'state': project.state or '',
                     'project_uuid': project.project_uuid or '',
-                    'village_ids': project.village_ids.ids if project.village_ids else [],
-                    'village_count': len(project.village_ids) if project.village_ids else 0,
+                    'villages': villages_data,
+                    'village_count': len(villages_data),
                 })
 
+            response_data = {
+                'success': True,
+                'data': projects_data,
+                'total': total_count,
+                'limit': limit,
+                'offset': offset,
+                'department_id': department_id,
+                'department_name': department.name or ''
+            }
+            
+            # Include user info if user_id was provided
+            if user_info:
+                response_data['user'] = user_info
+
             return Response(
-                json.dumps({
-                    'success': True,
-                    'data': projects_data,
-                    'total': total_count,
-                    'limit': limit,
-                    'offset': offset,
-                    'department_id': department_id,
-                    'department_name': department.name or ''
-                }),
+                json.dumps(response_data),
                 status=200,
                 content_type='application/json'
             )

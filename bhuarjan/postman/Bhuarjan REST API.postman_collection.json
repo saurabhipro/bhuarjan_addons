@@ -788,6 +788,177 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Tree Master",
+			"item": [
+				{
+					"name": "Get All Trees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/trees?limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"trees"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "",
+									"description": "Filter by tree name (partial match, case-insensitive)",
+									"disabled": true
+								},
+								{
+									"key": "development_stage",
+									"value": "",
+									"description": "Filter by development stage: 'undeveloped', 'semi_developed', or 'fully_developed'. Returns rate for that stage.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"description": "Filter by active status (default: true)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all tree masters with optional filters by name and development stage.\n\n**Query Parameters:**\n- `name` (optional): Filter by tree name (partial match, case-insensitive)\n- `development_stage` (optional): Filter by development stage and return rate for that stage. Values: 'undeveloped', 'semi_developed', 'fully_developed'\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n- `active` (optional, default true): Filter by active status\n\n**Examples:**\n- Get all trees: `/api/bhuarjan/trees`\n- Search by name: `/api/bhuarjan/trees?name=Mango`\n- Get trees with undeveloped rate: `/api/bhuarjan/trees?development_stage=undeveloped`\n- Combined filters: `/api/bhuarjan/trees?name=Neem&development_stage=semi_developed`"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trees by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Mango&limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"trees"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Mango",
+									"description": "Filter by tree name (partial match, case-insensitive)"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								}
+							]
+						},
+						"description": "Get trees filtered by name. The name filter uses partial match (case-insensitive), so 'Mango' will match 'Mango Tree', 'Mangoes', etc."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trees by Development Stage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/trees?development_stage=undeveloped&limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"trees"
+							],
+							"query": [
+								{
+									"key": "development_stage",
+									"value": "undeveloped",
+									"description": "Filter by development stage: 'undeveloped', 'semi_developed', or 'fully_developed'. Returns rate for that stage."
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								}
+							]
+						},
+						"description": "Get trees filtered by development stage. The response will include a 'rate' field with the rate for the specified development stage.\n\n**Development Stages:**\n- `undeveloped`: Returns undeveloped_rate\n- `semi_developed`: Returns semi_developed_rate\n- `fully_developed`: Returns fully_developed_rate"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trees by Name and Development Stage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Neem&development_stage=semi_developed&limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"trees"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Neem",
+									"description": "Filter by tree name (partial match, case-insensitive)"
+								},
+								{
+									"key": "development_stage",
+									"value": "semi_developed",
+									"description": "Filter by development stage: 'undeveloped', 'semi_developed', or 'fully_developed'. Returns rate for that stage."
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								}
+							]
+						},
+						"description": "Get trees filtered by both name and development stage. This is useful when you need to find a specific tree and get its rate for a particular development stage."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

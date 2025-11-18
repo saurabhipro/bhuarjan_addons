@@ -567,17 +567,36 @@ class BhuarjanAPIController(http.Controller):
     @http.route('/api/bhuarjan/trees', type='http', auth='public', methods=['GET'], csrf=False)
     def get_all_trees(self, **kwargs):
         """
-        Get all tree masters
-        Query params: limit, offset, active (optional filter - default True)
-        Returns: JSON list of tree masters
+        Get all tree masters with optional filters by name and development stage
+        Query params: 
+            - name (optional): Filter by tree name (partial match, case-insensitive)
+            - development_stage (optional): Filter by development stage and return rate for that stage
+                Values: 'undeveloped', 'semi_developed', 'fully_developed'
+            - limit (optional, default 100)
+            - offset (optional, default 0)
+            - active (optional filter - default True)
+        Returns: JSON list of tree masters with rates
         """
         try:
             # Get query parameters
             limit = request.httprequest.args.get('limit', type=int) or 100
             offset = request.httprequest.args.get('offset', type=int) or 0
             active_filter = request.httprequest.args.get('active')
+            name_filter = request.httprequest.args.get('name', '').strip()
+            development_stage = request.httprequest.args.get('development_stage', '').strip().lower()
             
-            # Build domain - filter by active if specified
+            # Validate development_stage if provided
+            valid_stages = ['undeveloped', 'semi_developed', 'fully_developed']
+            if development_stage and development_stage not in valid_stages:
+                return Response(
+                    json.dumps({
+                        'error': f'Invalid development_stage: {development_stage}. Must be one of: {", ".join(valid_stages)}'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Build domain
             domain = []
             if active_filter is not None:
                 active_bool = active_filter.lower() in ('true', '1', 'yes')
@@ -585,6 +604,10 @@ class BhuarjanAPIController(http.Controller):
             else:
                 # Default to active only
                 domain.append(('active', '=', True))
+            
+            # Filter by name (partial match, case-insensitive)
+            if name_filter:
+                domain.append(('name', 'ilike', name_filter))
 
             # Search tree masters
             trees = request.env['bhu.tree.master'].sudo().search(domain, limit=limit, offset=offset, order='name')
@@ -592,7 +615,7 @@ class BhuarjanAPIController(http.Controller):
             # Build response
             trees_data = []
             for tree in trees:
-                trees_data.append({
+                tree_data = {
                     'id': tree.id,
                     'name': tree.name or '',
                     'code': tree.code or '',
@@ -603,13 +626,34 @@ class BhuarjanAPIController(http.Controller):
                     'currency_name': tree.currency_id.name if tree.currency_id else '',
                     'description': tree.description or '',
                     'active': tree.active
-                })
+                }
+                
+                # If development_stage is specified, add the rate for that stage
+                if development_stage:
+                    if development_stage == 'undeveloped':
+                        tree_data['rate'] = tree.undeveloped_rate or 0.0
+                    elif development_stage == 'semi_developed':
+                        tree_data['rate'] = tree.semi_developed_rate or 0.0
+                    elif development_stage == 'fully_developed':
+                        tree_data['rate'] = tree.fully_developed_rate or 0.0
+                
+                trees_data.append(tree_data)
+
+            # Get total count
+            total_count = request.env['bhu.tree.master'].sudo().search_count(domain)
 
             return Response(
                 json.dumps({
                     'success': True,
                     'data': trees_data,
-                    'count': len(trees_data)
+                    'total': total_count,
+                    'count': len(trees_data),
+                    'limit': limit,
+                    'offset': offset,
+                    'filters': {
+                        'name': name_filter if name_filter else None,
+                        'development_stage': development_stage if development_stage else None
+                    }
                 }),
                 status=200,
                 content_type='application/json'

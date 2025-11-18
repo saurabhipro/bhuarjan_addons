@@ -6,6 +6,7 @@ Public APIs - No authentication required
 """
 from odoo import http
 from odoo.http import request, Response
+from odoo.exceptions import ValidationError
 import json
 import logging
 import base64
@@ -736,6 +737,41 @@ class BhuarjanAPIController(http.Controller):
                             content_type='application/json'
                         )
             
+            # Validate area values before creating survey
+            total_area = data.get('total_area', 0.0)
+            acquired_area = data.get('acquired_area', 0.0)
+            
+            # Area validation checks
+            if total_area is None or total_area <= 0:
+                return Response(
+                    json.dumps({
+                        'error': 'Validation Error',
+                        'message': 'Total Area must be greater than 0.'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            if acquired_area is None or acquired_area <= 0:
+                return Response(
+                    json.dumps({
+                        'error': 'Validation Error',
+                        'message': 'Acquired Area must be greater than 0.'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            if acquired_area > total_area:
+                return Response(
+                    json.dumps({
+                        'error': 'Validation Error',
+                        'message': 'Acquired Area cannot be greater than Total Area.'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
             # Prepare survey values
             survey_vals = {
                 'user_id': user_id,
@@ -744,8 +780,8 @@ class BhuarjanAPIController(http.Controller):
                 'department_id': data.get('department_id'),
                 'tehsil_id': data.get('tehsil_id'),
                 'khasra_number': data.get('khasra_number'),
-                'total_area': data.get('total_area', 0.0),
-                'acquired_area': data.get('acquired_area', 0.0),
+                'total_area': total_area,
+                'acquired_area': acquired_area,
                 'transferred_land': data.get('transferred_land', False),
                 'transferred_area': data.get('transferred_area', 0.0),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
@@ -759,7 +795,6 @@ class BhuarjanAPIController(http.Controller):
                 'has_well': data.get('has_well', 'no'),
                 'has_tubewell': data.get('has_tubewell', 'no'),
                 'has_pond': data.get('has_pond', 'no'),
-                'trees_description': data.get('trees_description'),
                 'latitude': data.get('latitude'),
                 'longitude': data.get('longitude'),
                 'location_accuracy': data.get('location_accuracy'),
@@ -767,6 +802,9 @@ class BhuarjanAPIController(http.Controller):
                 'remarks': data.get('remarks'),
                 'state': data.get('state', 'draft'),
             }
+            
+            # Handle trees_description - always include it, defaulting to empty string if not provided
+            survey_vals['trees_description'] = data.get('trees_description') or ''
             
             # Set crop_type_id only if it has a valid value (not None)
             if crop_type_id:
@@ -819,6 +857,16 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+        except ValidationError as ve:
+            _logger.error(f"Validation error in create_survey: {str(ve)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'error': 'Validation Error',
+                    'message': str(ve)
+                }),
+                status=400,
+                content_type='application/json'
+            )
         except Exception as e:
             _logger.error(f"Error in create_survey: {str(e)}", exc_info=True)
             return Response(
@@ -1663,6 +1711,43 @@ class BhuarjanAPIController(http.Controller):
                 # Also support crop_type_id for backward compatibility
                 pass  # Keep it as is
 
+            # Validate area values if they are being updated
+            if 'total_area' in data or 'acquired_area' in data:
+                # Get the values that will be used (from data if provided, otherwise from existing survey)
+                total_area = data.get('total_area') if 'total_area' in data else survey.total_area
+                acquired_area = data.get('acquired_area') if 'acquired_area' in data else survey.acquired_area
+                
+                # Area validation checks
+                if total_area is None or total_area <= 0:
+                    return Response(
+                        json.dumps({
+                            'error': 'Validation Error',
+                            'message': 'Total Area must be greater than 0.'
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+                
+                if acquired_area is None or acquired_area <= 0:
+                    return Response(
+                        json.dumps({
+                            'error': 'Validation Error',
+                            'message': 'Acquired Area must be greater than 0.'
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+                
+                if acquired_area > total_area:
+                    return Response(
+                        json.dumps({
+                            'error': 'Validation Error',
+                            'message': 'Acquired Area cannot be greater than Total Area.'
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+            
             # Prepare update values
             update_vals = {}
             for field, value in data.items():
@@ -1683,6 +1768,9 @@ class BhuarjanAPIController(http.Controller):
                             update_vals[field] = base64.b64decode(base64_data)
                         else:
                             update_vals[field] = value
+                    # Handle text fields (trees_description, remarks, notes) - allow None and empty strings
+                    elif field in ['trees_description', 'remarks', 'notes']:
+                        update_vals[field] = value if value is not None else ''
                     # Handle other fields
                     else:
                         update_vals[field] = value
@@ -1754,6 +1842,16 @@ class BhuarjanAPIController(http.Controller):
             _logger.error(f"JSON decode error in update_survey: {str(e)}", exc_info=True)
             return Response(
                 json.dumps({'error': 'Invalid JSON in request body', 'details': str(e)}),
+                status=400,
+                content_type='application/json'
+            )
+        except ValidationError as ve:
+            _logger.error(f"Validation error in update_survey: {str(ve)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'error': 'Validation Error',
+                    'message': str(ve)
+                }),
                 status=400,
                 content_type='application/json'
             )

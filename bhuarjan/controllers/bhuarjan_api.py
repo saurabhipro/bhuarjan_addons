@@ -913,6 +913,8 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number': survey.khasra_number or '',
                 'total_area': survey.total_area,
                 'acquired_area': survey.acquired_area,
+                'transferred_land': survey.transferred_land or False,
+                'transferred_area': survey.transferred_area or 0.0,
                 'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
                 'crop_type': survey.crop_type_id.id if survey.crop_type_id else None,
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
@@ -1011,6 +1013,8 @@ class BhuarjanAPIController(http.Controller):
                     'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
                     'total_area': survey.total_area,
                     'acquired_area': survey.acquired_area,
+                    'transferred_land': survey.transferred_land or False,
+                    'transferred_area': survey.transferred_area or 0.0,
                     'state': survey.state,
                     'notification4_generated': survey.notification4_generated,
                 })

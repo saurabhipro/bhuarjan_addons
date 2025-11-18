@@ -1013,8 +1013,8 @@ class BhuarjanAPIController(http.Controller):
                     'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
                     'total_area': survey.total_area,
                     'acquired_area': survey.acquired_area,
-                    'transferred_land': survey.transferred_land or False,
-                    'transferred_area': survey.transferred_area or 0.0,
+                    'has_traded_land': survey.has_traded_land or 'no',
+                    'traded_land_area': survey.traded_land_area or 0.0,
                     'state': survey.state,
                     'notification4_generated': survey.notification4_generated,
                 })

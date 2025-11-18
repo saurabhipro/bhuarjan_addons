@@ -84,6 +84,15 @@ class Survey(models.Model):
     # Tree Lines - Detailed tree information
     tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id', 
                                     string='Tree Details / वृक्ष विवरण')
+    
+    # Separated tree lines by type
+    fruit_bearing_tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id',
+                                                   string='Fruit-bearing Trees / फलदार वृक्ष',
+                                                   domain="[('tree_type', '=', 'fruit_bearing')]")
+    non_fruit_bearing_tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id',
+                                                       string='Non-fruit-bearing Trees / गैर-फलदार वृक्ष',
+                                                       domain="[('tree_type', '=', 'non_fruit_bearing')]")
+    
     photo_ids = fields.One2many('bhu.survey.photo', 'survey_id', 
                                 string='Photos / फोटो', 
                                 help='Photos uploaded for this survey with tags')
@@ -640,6 +649,38 @@ class SurveyTreeLine(models.Model):
     survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', required=True, ondelete='cascade')
     tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, tracking=True,
                                      help='Select tree from master')
+    
+    @api.onchange('tree_master_id')
+    def _onchange_tree_master_id(self):
+        """Set tree_type when tree is selected"""
+        if self.tree_master_id:
+            self.tree_type = self.tree_master_id.tree_type
+            # For fruit-bearing trees, clear development_stage and girth
+            if self.tree_master_id.tree_type == 'fruit_bearing':
+                self.development_stage = False
+                self.girth_cm = 0.0
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Set tree_type from tree_master_id when creating"""
+        for vals in vals_list:
+            if 'tree_master_id' in vals and 'tree_type' not in vals:
+                tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
+                if tree:
+                    vals['tree_type'] = tree.tree_type
+        return super().create(vals_list)
+    
+    def write(self, vals):
+        """Set tree_type from tree_master_id when updating"""
+        if 'tree_master_id' in vals:
+            tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
+            if tree:
+                vals['tree_type'] = tree.tree_type
+                # For fruit-bearing trees, clear development_stage and girth
+                if tree.tree_type == 'fruit_bearing':
+                    vals['development_stage'] = False
+                    vals['girth_cm'] = 0.0
+        return super().write(vals)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
@@ -647,7 +688,7 @@ class SurveyTreeLine(models.Model):
     ], string='Development Stage / विकास स्तर', tracking=True, default='undeveloped',
        help='Required for non-fruit-bearing trees. Not applicable for fruit-bearing trees.')
     girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2), tracking=True,
-                            help='Chest girth in centimeters. Required for non-fruit-bearing trees.')
+                            help='Tree trunk girth (circumference) in centimeters. Required for non-fruit-bearing trees. Rate will be auto-computed based on this value and development stage.')
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
                              help='Number of trees of this type')
     rate = fields.Float(string='Rate per Tree / प्रति वृक्ष दर', digits=(16, 2), 
@@ -658,12 +699,15 @@ class SurveyTreeLine(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
                                  related='tree_master_id.currency_id', readonly=True)
     
-    # Related field for tree type
-    tree_type = fields.Selection(related='tree_master_id.tree_type', string='Tree Type / वृक्ष प्रकार', 
-                                readonly=True, store=False)
+    # Tree type - stored for domain filtering
+    tree_type = fields.Selection([
+        ('fruit_bearing', 'Fruit-bearing / फलदार'),
+        ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
+    ], string='Tree Type / वृक्ष प्रकार', store=True, tracking=True,
+       help='Automatically set based on selected tree')
 
     @api.depends('tree_master_id', 'tree_master_id.tree_type', 'tree_master_id.rate', 
-                 'development_stage', 'girth_cm')
+                 'tree_type', 'development_stage', 'girth_cm')
     def _compute_rate(self):
         """Compute rate based on tree type, girth, and development stage"""
         for record in self:

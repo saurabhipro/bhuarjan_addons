@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Survey Tree Line List View for Fruit-bearing Trees -->
+    <record id="view_bhu_survey_tree_line_fruit_bearing" model="ir.ui.view">
+        <field name="name">bhu.survey.tree.line.fruit.bearing</field>
+        <field name="model">bhu.survey.tree.line</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Fruit-bearing Trees" editable="bottom">
+                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="300"
+                       domain="[('tree_type', '=', 'fruit_bearing'), ('active', '=', True)]"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="150"/>
+                <field name="rate" readonly="1" string="Rate / दर" width="150"/>
+                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="180"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Survey Tree Line List View for Non-fruit-bearing Trees -->
+    <record id="view_bhu_survey_tree_line_non_fruit_bearing" model="ir.ui.view">
+        <field name="name">bhu.survey.tree.line.non.fruit.bearing</field>
+        <field name="model">bhu.survey.tree.line</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Non-fruit-bearing Trees" editable="bottom">
+                <field name="development_stage" string="Development Stage / विकास स्तर" width="200" required="1"/>
+                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="200"
+                       domain="[('tree_type', '=', 'non_fruit_bearing'), ('active', '=', True)]"/>
+                <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="160" required="1"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="120"/>
+                <field name="rate" readonly="1" string="Rate / दर" width="120"/>
+                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="150"/>
+            </list>
+        </field>
+    </record>
+</odoo>
+

@@ -55,6 +55,7 @@
         'views/master_views.xml',
         'views/landowner_views.xml',
         'views/survey_views.xml',
+        'views/survey_tree_line_views.xml',
         'views/survey_bulk_approval_wizard_views.xml',
         'views/document_vault_views.xml',
         'views/sia_team_views.xml',

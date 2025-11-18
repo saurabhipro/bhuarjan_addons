@@ -132,8 +132,15 @@
                         </page>
                         
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
-                            <group string="Tree Details / वृक्ष विवरण">
-                                <field name="tree_line_ids" readonly="state == 'locked'" nolabel="1"/>
+                            <group string="Fruit-bearing Trees / फलदार वृक्ष">
+                                <field name="fruit_bearing_tree_line_ids" readonly="state == 'locked'" nolabel="1" 
+                                       context="{'default_tree_type': 'fruit_bearing'}"
+                                       view_ref="view_bhu_survey_tree_line_fruit_bearing"/>
+                            </group>
+                            <group string="Non-fruit-bearing Trees / गैर-फलदार वृक्ष">
+                                <field name="non_fruit_bearing_tree_line_ids" readonly="state == 'locked'" nolabel="1"
+                                       context="{'default_tree_type': 'non_fruit_bearing'}"
+                                       view_ref="view_bhu_survey_tree_line_non_fruit_bearing"/>
                             </group>
                         </page>
                         

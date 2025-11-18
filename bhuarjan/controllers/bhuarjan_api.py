@@ -620,11 +620,12 @@ class BhuarjanAPIController(http.Controller):
     @http.route('/api/bhuarjan/trees', type='http', auth='public', methods=['GET'], csrf=False)
     def get_all_trees(self, **kwargs):
         """
-        Get all tree masters with optional filters by name and development stage
+        Get all tree masters with optional filters by name, development stage, and girth
         Query params: 
             - name (optional): Filter by tree name (partial match, case-insensitive)
-            - development_stage (optional): Filter by development stage and return rate for that stage
+            - development_stage (optional): For non-fruit-bearing trees, filter by development stage
                 Values: 'undeveloped', 'semi_developed', 'fully_developed'
+            - girth_cm (optional): For non-fruit-bearing trees, girth in cm to lookup rate
             - limit (optional, default 100)
             - offset (optional, default 0)
             - active (optional filter - default True)
@@ -637,6 +638,7 @@ class BhuarjanAPIController(http.Controller):
             active_filter = request.httprequest.args.get('active')
             name_filter = request.httprequest.args.get('name', '').strip()
             development_stage = request.httprequest.args.get('development_stage', '').strip().lower()
+            girth_cm = request.httprequest.args.get('girth_cm', type=float)
             
             # Validate development_stage if provided
             valid_stages = ['undeveloped', 'semi_developed', 'fully_developed']
@@ -672,23 +674,23 @@ class BhuarjanAPIController(http.Controller):
                     'id': tree.id,
                     'name': tree.name or '',
                     'code': tree.code or '',
-                    'undeveloped_rate': tree.undeveloped_rate or 0.0,
-                    'semi_developed_rate': tree.semi_developed_rate or 0.0,
-                    'fully_developed_rate': tree.fully_developed_rate or 0.0,
+                    'tree_type': tree.tree_type,
+                    'rate': tree.rate or 0.0 if tree.tree_type == 'fruit_bearing' else None,
                     'currency_id': tree.currency_id.id if tree.currency_id else None,
                     'currency_name': tree.currency_id.name if tree.currency_id else '',
                     'description': tree.description or '',
                     'active': tree.active
                 }
                 
-                # If development_stage is specified, add the rate for that stage
-                if development_stage:
-                    if development_stage == 'undeveloped':
-                        tree_data['rate'] = tree.undeveloped_rate or 0.0
-                    elif development_stage == 'semi_developed':
-                        tree_data['rate'] = tree.semi_developed_rate or 0.0
-                    elif development_stage == 'fully_developed':
-                        tree_data['rate'] = tree.fully_developed_rate or 0.0
+                # For non-fruit-bearing trees, if development_stage and girth are specified, 
+                # lookup rate from tree_rate_master
+                if tree.tree_type == 'non_fruit_bearing' and development_stage and girth_cm:
+                    rate_master = request.env['bhu.tree.rate.master']
+                    tree_data['rate'] = rate_master.get_rate_for_tree(
+                        tree.id,
+                        girth_cm,
+                        development_stage
+                    )
                 
                 trees_data.append(tree_data)
 
@@ -941,9 +943,6 @@ class BhuarjanAPIController(http.Controller):
                 'has_traded_land': data.get('has_traded_land', 'no'),
                 'traded_land_area': data.get('traded_land_area', 0.0),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
-                'undeveloped_tree_count': data.get('undeveloped_tree_count', 0),
-                'semi_developed_tree_count': data.get('semi_developed_tree_count', 0),
-                'fully_developed_tree_count': data.get('fully_developed_tree_count', 0),
                 'has_house': data.get('has_house', 'no'),
                 'house_type': data.get('house_type'),
                 'house_area': data.get('house_area', 0.0),
@@ -959,9 +958,6 @@ class BhuarjanAPIController(http.Controller):
                 'remarks': data.get('remarks'),
                 'state': data.get('state', 'draft'),
             }
-            
-            # Handle trees_description - always include it, defaulting to empty string if not provided
-            survey_vals['trees_description'] = data.get('trees_description') or ''
             
             # Set crop_type_id only if it has a valid value (not None)
             if crop_type_id:
@@ -1178,10 +1174,6 @@ class BhuarjanAPIController(http.Controller):
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
                 'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type,
-                'undeveloped_tree_count': survey.undeveloped_tree_count or 0,
-                'semi_developed_tree_count': survey.semi_developed_tree_count or 0,
-                'fully_developed_tree_count': survey.fully_developed_tree_count or 0,
-                'tree_count': survey.tree_count or 0,
                 'tree_lines': [{
                     'id': line.id,
                     'development_stage': line.development_stage,
@@ -1211,7 +1203,6 @@ class BhuarjanAPIController(http.Controller):
                 'well_type': survey.well_type,
                 'has_tubewell': survey.has_tubewell,
                 'has_pond': survey.has_pond,
-                'trees_description': survey.trees_description or '',
                 'latitude': survey.latitude,
                 'longitude': survey.longitude,
                 'location_accuracy': survey.location_accuracy,
@@ -1965,10 +1956,10 @@ class BhuarjanAPIController(http.Controller):
             allowed_fields = [
                 'project_id', 'department_id', 'village_id', 'tehsil_id', 'survey_date',
                 'khasra_number', 'total_area', 'acquired_area', 'has_traded_land', 'traded_land_area',
-                'crop_type_id', 'irrigation_type', 'undeveloped_tree_count', 'semi_developed_tree_count', 'fully_developed_tree_count',
+                'crop_type_id', 'irrigation_type',
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
                 'has_well', 'well_type', 'has_tubewell', 'has_pond',
-                'trees_description', 'landowner_ids', 'survey_image', 'survey_image_filename',
+                'landowner_ids', 'survey_image', 'survey_image_filename',
                 'remarks'
             ]
             
@@ -2058,8 +2049,8 @@ class BhuarjanAPIController(http.Controller):
                             update_vals[field] = base64.b64decode(base64_data)
                         else:
                             update_vals[field] = value
-                    # Handle text fields (trees_description, remarks) - allow None and empty strings
-                    elif field in ['trees_description', 'remarks']:
+                    # Handle text fields (remarks) - allow None and empty strings
+                    elif field in ['remarks']:
                         update_vals[field] = value if value is not None else ''
                     # Handle other fields
                     else:
@@ -2171,10 +2162,6 @@ class BhuarjanAPIController(http.Controller):
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
                 'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type or '',
-                'undeveloped_tree_count': survey.undeveloped_tree_count or 0,
-                'semi_developed_tree_count': survey.semi_developed_tree_count or 0,
-                'fully_developed_tree_count': survey.fully_developed_tree_count or 0,
-                'tree_count': survey.tree_count or 0,
                 'tree_lines': [{
                     'id': line.id,
                     'development_stage': line.development_stage,
@@ -2204,7 +2191,6 @@ class BhuarjanAPIController(http.Controller):
                 'well_type': survey.well_type or '',
                 'has_tubewell': survey.has_tubewell or '',
                 'has_pond': survey.has_pond or '',
-                'trees_description': survey.trees_description or '',
                 'landowner_ids': survey.landowner_ids.ids if survey.landowner_ids else [],
                 'state': survey.state or 'draft',
                 'remarks': survey.remarks or '',

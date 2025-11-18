@@ -92,8 +92,14 @@
                             
                             <group>
                                 <group string="Tree Information / वृक्ष की जानकारी" class="survey-icon-tree">
-                                    <field name="tree_development_stage" widget="selection" readonly="state == 'locked'"/>
-                                    <field name="tree_count" widget="integer" readonly="state == 'locked'"/>
+                                    <field name="undeveloped_tree_count" widget="integer" readonly="state == 'locked'" 
+                                           string="Undeveloped Trees Count / अविकसित वृक्षों की संख्या" invisible="1"/>
+                                    <field name="semi_developed_tree_count" widget="integer" readonly="state == 'locked'" 
+                                           string="Semi-developed Trees Count / अर्ध-विकसित वृक्षों की संख्या" invisible="1"/>
+                                    <field name="fully_developed_tree_count" widget="integer" readonly="state == 'locked'" 
+                                           string="Fully Developed Trees Count / पूर्ण विकसित वृक्षों की संख्या" invisible="1"/>
+                                    <field name="tree_count" widget="integer" readonly="1" 
+                                           string="Total Trees / कुल वृक्षों की संख्या"/>
                                     <field name="trees_description" widget="text" readonly="state == 'locked'" 
                                            placeholder="Enter detailed description of trees present on the land"/>
                                 </group>
@@ -123,8 +129,12 @@
                                 </group>
                             </group>
                             
-                            
-                            
+                        </page>
+                        
+                        <page string="Tree Details / वृक्ष विवरण" name="tree_details">
+                            <group string="Tree Details / वृक्ष विवरण">
+                                <field name="tree_line_ids" readonly="state == 'locked'" nolabel="1"/>
+                            </group>
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
@@ -378,4 +388,21 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
             }
         </script>
     </template>
+
+    <!-- Survey Tree Line List View -->
+    <record id="view_bhu_survey_tree_line_tree" model="ir.ui.view">
+        <field name="name">bhu.survey.tree.line.tree</field>
+        <field name="model">bhu.survey.tree.line</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Tree Lines" editable="bottom">
+                <field name="development_stage" required="1" string="Development Stage / विकास स्तर" width="180"/>
+                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="120"/>
+                <field name="rate" readonly="1" string="Rate / दर" width="150"/>
+                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="180"/>
+            </list>
+        </field>
+    </record>
+
 </odoo>

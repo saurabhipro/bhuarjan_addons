@@ -12,6 +12,8 @@ access_bhu_survey_admin,bhu.survey.model_access_admin,model_bhu_survey,bhuarjan.
 access_bhu_survey_line_user,bhu.survey.line.model_access,model_bhu_survey_line,base.group_user,1,1,1,1
 access_bhu_landowner_user,bhu.landowner.model_access,model_bhu_landowner,base.group_user,1,1,1,1
 access_bhu_land_type,access_bhu_land_type,model_bhu_land_type,base.group_user,1,1,1,1
+access_bhu_tree_master,access_bhu_tree_master,model_bhu_tree_master,base.group_user,1,1,1,1
+access_bhu_survey_tree_line,access_bhu_survey_tree_line,model_bhu_survey_tree_line,base.group_user,1,1,1,1
 access_bhu_rate_master,access_bhu_rate_master,model_bhu_rate_master,base.group_user,1,1,1,1
 access_bhuarjan_settings_master,access_bhuarjan_settings_master,model_bhuarjan_settings_master,base.group_user,1,1,1,1
 access_bhuarjan_sequence_settings,access_bhuarjan_sequence_settings,model_bhuarjan_sequence_settings,base.group_user,1,1,1,1

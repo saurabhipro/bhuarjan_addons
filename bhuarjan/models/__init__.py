@@ -32,6 +32,7 @@ from . import dashboard
 from . import otp
 from . import token
 from . import channel_master
+from . import tree_master
 
 
 

@@ -63,12 +63,27 @@ class Survey(models.Model):
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
     # Tree Details
-    tree_development_stage = fields.Selection([
-        ('undeveloped', 'Undeveloped / अविकसित'),
-        ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
-        ('fully_developed', 'Fully developed / पूर्ण विकसित')
-    ], string='Tree Development Stage / वृक्ष विकास स्तर', tracking=True)
-    tree_count = fields.Integer(string='Number of Trees / वृक्षों की संख्या', default=0, tracking=True)
+    undeveloped_tree_count = fields.Integer(string='Undeveloped Trees / अविकसित वृक्षों की संख्या', default=0, tracking=True,
+                                           help='Number of undeveloped trees')
+    semi_developed_tree_count = fields.Integer(string='Semi-developed Trees / अर्ध-विकसित वृक्षों की संख्या', default=0, tracking=True,
+                                               help='Number of semi-developed trees')
+    fully_developed_tree_count = fields.Integer(string='Fully Developed Trees / पूर्ण विकसित वृक्षों की संख्या', default=0, tracking=True,
+                                               help='Number of fully developed trees')
+    
+    # Computed total tree count for backward compatibility
+    tree_count = fields.Integer(string='Total Number of Trees / कुल वृक्षों की संख्या', compute='_compute_total_tree_count', store=True, tracking=True)
+    
+    @api.depends('undeveloped_tree_count', 'semi_developed_tree_count', 'fully_developed_tree_count')
+    def _compute_total_tree_count(self):
+        """Compute total tree count from individual counts"""
+        for record in self:
+            record.tree_count = (record.undeveloped_tree_count or 0) + \
+                               (record.semi_developed_tree_count or 0) + \
+                               (record.fully_developed_tree_count or 0)
+    
+    # Tree Lines - Detailed tree information
+    tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id', 
+                                    string='Tree Details / वृक्ष विवरण')
     
     # House Details
     has_house = fields.Selection([
@@ -612,6 +627,60 @@ class Survey(models.Model):
                 rec.landowner_aadhar_numbers = ', '.join(aadhar_numbers)
             else:
                 rec.landowner_aadhar_numbers = ''
+
+
+class SurveyTreeLine(models.Model):
+    _name = 'bhu.survey.tree.line'
+    _description = 'Survey Tree Line / सर्वे वृक्ष लाइन'
+    _order = 'development_stage, tree_master_id'
+
+    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', required=True, ondelete='cascade')
+    tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, tracking=True,
+                                     help='Select tree from master')
+    development_stage = fields.Selection([
+        ('undeveloped', 'Undeveloped / अविकसित'),
+        ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
+        ('fully_developed', 'Fully Developed / पूर्ण विकसित')
+    ], string='Development Stage / विकास स्तर', required=True, tracking=True, default='undeveloped')
+    quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
+                             help='Number of trees of this type')
+    rate = fields.Float(string='Rate per Tree / प्रति वृक्ष दर', digits=(16, 2), 
+                       compute='_compute_rate', store=True, readonly=True,
+                       help='Rate based on development stage')
+    total_amount = fields.Float(string='Total Amount / कुल राशि', digits=(16, 2), 
+                               compute='_compute_total_amount', store=True, tracking=True)
+    currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
+                                 related='tree_master_id.currency_id', readonly=True)
+
+    @api.depends('tree_master_id', 'development_stage', 'tree_master_id.undeveloped_rate', 
+                 'tree_master_id.semi_developed_rate', 'tree_master_id.fully_developed_rate')
+    def _compute_rate(self):
+        """Compute rate based on development stage"""
+        for record in self:
+            if record.tree_master_id:
+                if record.development_stage == 'undeveloped':
+                    record.rate = record.tree_master_id.undeveloped_rate or 0.0
+                elif record.development_stage == 'semi_developed':
+                    record.rate = record.tree_master_id.semi_developed_rate or 0.0
+                elif record.development_stage == 'fully_developed':
+                    record.rate = record.tree_master_id.fully_developed_rate or 0.0
+                else:
+                    record.rate = 0.0
+            else:
+                record.rate = 0.0
+
+    @api.depends('quantity', 'rate')
+    def _compute_total_amount(self):
+        """Compute total amount based on quantity and rate"""
+        for record in self:
+            record.total_amount = (record.quantity or 0) * (record.rate or 0)
+
+    @api.constrains('quantity')
+    def _check_quantity_positive(self):
+        """Ensure quantity is positive"""
+        for record in self:
+            if record.quantity and record.quantity <= 0:
+                raise ValidationError(_('Tree quantity must be greater than 0.'))
 
 
 class SurveyLine(models.Model):

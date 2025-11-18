@@ -564,6 +564,65 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/trees', type='http', auth='public', methods=['GET'], csrf=False)
+    def get_all_trees(self, **kwargs):
+        """
+        Get all tree masters
+        Query params: limit, offset, active (optional filter - default True)
+        Returns: JSON list of tree masters
+        """
+        try:
+            # Get query parameters
+            limit = request.httprequest.args.get('limit', type=int) or 100
+            offset = request.httprequest.args.get('offset', type=int) or 0
+            active_filter = request.httprequest.args.get('active')
+            
+            # Build domain - filter by active if specified
+            domain = []
+            if active_filter is not None:
+                active_bool = active_filter.lower() in ('true', '1', 'yes')
+                domain.append(('active', '=', active_bool))
+            else:
+                # Default to active only
+                domain.append(('active', '=', True))
+
+            # Search tree masters
+            trees = request.env['bhu.tree.master'].sudo().search(domain, limit=limit, offset=offset, order='name')
+
+            # Build response
+            trees_data = []
+            for tree in trees:
+                trees_data.append({
+                    'id': tree.id,
+                    'name': tree.name or '',
+                    'code': tree.code or '',
+                    'undeveloped_rate': tree.undeveloped_rate or 0.0,
+                    'semi_developed_rate': tree.semi_developed_rate or 0.0,
+                    'fully_developed_rate': tree.fully_developed_rate or 0.0,
+                    'currency_id': tree.currency_id.id if tree.currency_id else None,
+                    'currency_name': tree.currency_id.name if tree.currency_id else '',
+                    'description': tree.description or '',
+                    'active': tree.active
+                })
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'data': trees_data,
+                    'count': len(trees_data)
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in get_all_trees: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/survey', type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
     def create_survey(self, **kwargs):
@@ -785,8 +844,9 @@ class BhuarjanAPIController(http.Controller):
                 'has_traded_land': data.get('has_traded_land', 'no'),
                 'traded_land_area': data.get('traded_land_area', 0.0),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
-                'tree_development_stage': data.get('tree_development_stage'),
-                'tree_count': data.get('tree_count', 0),
+                'undeveloped_tree_count': data.get('undeveloped_tree_count', 0),
+                'semi_developed_tree_count': data.get('semi_developed_tree_count', 0),
+                'fully_developed_tree_count': data.get('fully_developed_tree_count', 0),
                 'has_house': data.get('has_house', 'no'),
                 'house_type': data.get('house_type'),
                 'house_area': data.get('house_area', 0.0),
@@ -840,6 +900,90 @@ class BhuarjanAPIController(http.Controller):
             # Link landowners (already validated above - at least one is required)
             if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
                 survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
+            
+            # Handle tree lines (merged structure - single array with development_stage)
+            tree_line_vals = []
+            
+            # Support new format: tree_lines array with development_stage
+            if 'tree_lines' in data and isinstance(data['tree_lines'], list):
+                for tree_line in data['tree_lines']:
+                    if isinstance(tree_line, dict) and 'development_stage' in tree_line:
+                        # Support both tree_master_id (integer) and tree_name (string) for tree selection
+                        tree_master_id = None
+                        if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
+                            tree_master_id = tree_line['tree_master_id']
+                        elif 'tree_name' in tree_line and tree_line['tree_name']:
+                            # Look up tree by name
+                            tree_master = request.env['bhu.tree.master'].sudo().search([
+                                ('name', '=', tree_line['tree_name'])
+                            ], limit=1)
+                            if tree_master:
+                                tree_master_id = tree_master.id
+                            else:
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                        else:
+                            return Response(
+                                json.dumps({
+                                    'error': 'Either tree_master_id or tree_name must be provided for each tree line'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Validate development_stage
+                        development_stage = tree_line.get('development_stage')
+                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                            return Response(
+                                json.dumps({
+                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        tree_line_vals.append((0, 0, {
+                            'tree_master_id': tree_master_id,
+                            'development_stage': development_stage,
+                            'quantity': tree_line.get('quantity', 1)
+                        }))
+            
+            # Backward compatibility: support old format with separate arrays
+            if 'undeveloped_tree_lines' in data and isinstance(data['undeveloped_tree_lines'], list):
+                for tree_line in data['undeveloped_tree_lines']:
+                    if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        tree_line_vals.append((0, 0, {
+                            'tree_master_id': tree_line['tree_master_id'],
+                            'development_stage': 'undeveloped',
+                            'quantity': tree_line.get('quantity', 1)
+                        }))
+            
+            if 'semi_developed_tree_lines' in data and isinstance(data['semi_developed_tree_lines'], list):
+                for tree_line in data['semi_developed_tree_lines']:
+                    if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        tree_line_vals.append((0, 0, {
+                            'tree_master_id': tree_line['tree_master_id'],
+                            'development_stage': 'semi_developed',
+                            'quantity': tree_line.get('quantity', 1)
+                        }))
+            
+            if 'fully_developed_tree_lines' in data and isinstance(data['fully_developed_tree_lines'], list):
+                for tree_line in data['fully_developed_tree_lines']:
+                    if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        tree_line_vals.append((0, 0, {
+                            'tree_master_id': tree_line['tree_master_id'],
+                            'development_stage': 'fully_developed',
+                            'quantity': tree_line.get('quantity', 1)
+                        }))
+            
+            # Create tree lines if any
+            if tree_line_vals:
+                survey.sudo().write({'tree_line_ids': tree_line_vals})
 
             # Return created survey details
             return Response(
@@ -920,8 +1064,20 @@ class BhuarjanAPIController(http.Controller):
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
                 'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type,
-                'tree_development_stage': survey.tree_development_stage,
-                'tree_count': survey.tree_count,
+                'undeveloped_tree_count': survey.undeveloped_tree_count or 0,
+                'semi_developed_tree_count': survey.semi_developed_tree_count or 0,
+                'fully_developed_tree_count': survey.fully_developed_tree_count or 0,
+                'tree_count': survey.tree_count or 0,
+                'tree_lines': [{
+                    'id': line.id,
+                    'development_stage': line.development_stage,
+                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, ''),
+                    'tree_master_id': line.tree_master_id.id,
+                    'tree_name': line.tree_master_id.name,
+                    'quantity': line.quantity,
+                    'rate': line.rate,
+                    'total_amount': line.total_amount
+                } for line in survey.tree_line_ids],
                 'has_house': survey.has_house,
                 'house_type': survey.house_type,
                 'house_area': survey.house_area,
@@ -1685,7 +1841,7 @@ class BhuarjanAPIController(http.Controller):
             allowed_fields = [
                 'project_id', 'department_id', 'village_id', 'tehsil_id', 'survey_date',
                 'khasra_number', 'total_area', 'acquired_area', 'has_traded_land', 'traded_land_area',
-                'crop_type_id', 'irrigation_type', 'tree_development_stage', 'tree_count',
+                'crop_type_id', 'irrigation_type', 'undeveloped_tree_count', 'semi_developed_tree_count', 'fully_developed_tree_count',
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
                 'has_well', 'well_type', 'has_tubewell', 'has_pond',
                 'trees_description', 'landowner_ids', 'survey_image', 'survey_image_filename',
@@ -1796,6 +1952,60 @@ class BhuarjanAPIController(http.Controller):
 
             # Update the survey
             survey.write(update_vals)
+            
+            # Handle tree lines (if provided)
+            if 'tree_lines' in data and isinstance(data['tree_lines'], list):
+                tree_line_vals = []
+                for tree_line in data['tree_lines']:
+                    if isinstance(tree_line, dict) and 'development_stage' in tree_line:
+                        # Support both tree_master_id (integer) and tree_name (string) for tree selection
+                        tree_master_id = None
+                        if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
+                            tree_master_id = tree_line['tree_master_id']
+                        elif 'tree_name' in tree_line and tree_line['tree_name']:
+                            # Look up tree by name
+                            tree_master = request.env['bhu.tree.master'].sudo().search([
+                                ('name', '=', tree_line['tree_name'])
+                            ], limit=1)
+                            if tree_master:
+                                tree_master_id = tree_master.id
+                            else:
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                        else:
+                            return Response(
+                                json.dumps({
+                                    'error': 'Either tree_master_id or tree_name must be provided for each tree line'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Validate development_stage
+                        development_stage = tree_line.get('development_stage')
+                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                            return Response(
+                                json.dumps({
+                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        tree_line_vals.append((0, 0, {
+                            'tree_master_id': tree_master_id,
+                            'development_stage': development_stage,
+                            'quantity': tree_line.get('quantity', 1)
+                        }))
+                
+                # Replace all tree lines with new ones
+                if tree_line_vals:
+                    survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
 
             # Return updated survey data
             survey_data = {
@@ -1820,8 +2030,20 @@ class BhuarjanAPIController(http.Controller):
                 'crop_type_name': survey.crop_type_id.name if survey.crop_type_id else '',
                 'crop_type_code': survey.crop_type_id.code if survey.crop_type_id else '',
                 'irrigation_type': survey.irrigation_type or '',
-                'tree_development_stage': survey.tree_development_stage or '',
+                'undeveloped_tree_count': survey.undeveloped_tree_count or 0,
+                'semi_developed_tree_count': survey.semi_developed_tree_count or 0,
+                'fully_developed_tree_count': survey.fully_developed_tree_count or 0,
                 'tree_count': survey.tree_count or 0,
+                'tree_lines': [{
+                    'id': line.id,
+                    'development_stage': line.development_stage,
+                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, ''),
+                    'tree_master_id': line.tree_master_id.id,
+                    'tree_name': line.tree_master_id.name,
+                    'quantity': line.quantity,
+                    'rate': line.rate,
+                    'total_amount': line.total_amount
+                } for line in survey.tree_line_ids],
                 'has_house': survey.has_house or '',
                 'house_type': survey.house_type or '',
                 'house_area': survey.house_area or 0.0,
@@ -1868,6 +2090,82 @@ class BhuarjanAPIController(http.Controller):
             _logger.error(f"Error in update_survey: {str(e)}", exc_info=True)
             return Response(
                 json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['DELETE'], csrf=False)
+    @check_permission
+    def delete_survey(self, survey_id, **kwargs):
+        """
+        Delete a survey
+        Only allowed if survey is in 'draft' or 'submitted' state
+        Returns: Success message
+        """
+        try:
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Survey not found',
+                        'message': f'Survey with ID {survey_id} does not exist'
+                    }),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Check if survey can be deleted (only draft and submitted states allow deletion)
+            if survey.state not in ('draft', 'submitted'):
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Survey cannot be deleted',
+                        'message': f'Survey cannot be deleted. Current state: {survey.state}. Only surveys in draft or submitted state can be deleted.'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Store survey details for response
+            survey_name = survey.name
+            survey_khasra = survey.khasra_number
+
+            # Delete the survey
+            survey.unlink()
+
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'message': 'Survey deleted successfully',
+                    'data': {
+                        'id': survey_id,
+                        'name': survey_name,
+                        'khasra_number': survey_khasra
+                    }
+                }),
+                status=200,
+                content_type='application/json'
+            )
+
+        except ValidationError as ve:
+            _logger.error(f"Validation error in delete_survey: {str(ve)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': 'Validation Error',
+                    'message': str(ve)
+                }),
+                status=400,
+                content_type='application/json'
+            )
+        except Exception as e:
+            _logger.error(f"Error in delete_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': str(e)
+                }),
                 status=500,
                 content_type='application/json'
             )

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Common Tree Types for Tree Master with rates for each development stage -->
+        <!-- Rates: Undeveloped (lowest), Semi-developed (medium), Fully Developed (highest) -->
+        <record id="tree_master_mango" model="bhu.tree.master">
+            <field name="name">Mango / आम</field>
+            <field name="undeveloped_rate">2000.00</field>
+            <field name="semi_developed_rate">3500.00</field>
+            <field name="fully_developed_rate">5000.00</field>
+            <field name="description">Mango tree - Common fruit tree</field>
+        </record>
+
+        <record id="tree_master_neem" model="bhu.tree.master">
+            <field name="name">Neem / नीम</field>
+            <field name="undeveloped_rate">1000.00</field>
+            <field name="semi_developed_rate">2000.00</field>
+            <field name="fully_developed_rate">3000.00</field>
+            <field name="description">Neem tree - Medicinal tree</field>
+        </record>
+
+        <record id="tree_master_banyan" model="bhu.tree.master">
+            <field name="name">Banyan / बरगद</field>
+            <field name="undeveloped_rate">4000.00</field>
+            <field name="semi_developed_rate">7000.00</field>
+            <field name="fully_developed_rate">10000.00</field>
+            <field name="description">Banyan tree - Large shade tree</field>
+        </record>
+
+        <record id="tree_master_peepal" model="bhu.tree.master">
+            <field name="name">Peepal / पीपल</field>
+            <field name="undeveloped_rate">3000.00</field>
+            <field name="semi_developed_rate">5500.00</field>
+            <field name="fully_developed_rate">8000.00</field>
+            <field name="description">Peepal tree - Sacred tree</field>
+        </record>
+
+        <record id="tree_master_guava" model="bhu.tree.master">
+            <field name="name">Guava / अमरूद</field>
+            <field name="undeveloped_rate">1500.00</field>
+            <field name="semi_developed_rate">2750.00</field>
+            <field name="fully_developed_rate">4000.00</field>
+            <field name="description">Guava tree - Fruit tree</field>
+        </record>
+
+        <record id="tree_master_coconut" model="bhu.tree.master">
+            <field name="name">Coconut / नारियल</field>
+            <field name="undeveloped_rate">2500.00</field>
+            <field name="semi_developed_rate">4250.00</field>
+            <field name="fully_developed_rate">6000.00</field>
+            <field name="description">Coconut tree - Palm tree</field>
+        </record>
+
+        <record id="tree_master_jamun" model="bhu.tree.master">
+            <field name="name">Jamun / जामुन</field>
+            <field name="undeveloped_rate">1400.00</field>
+            <field name="semi_developed_rate">2450.00</field>
+            <field name="fully_developed_rate">3500.00</field>
+            <field name="description">Jamun tree - Fruit tree</field>
+        </record>
+
+        <record id="tree_master_tamarind" model="bhu.tree.master">
+            <field name="name">Tamarind / इमली</field>
+            <field name="undeveloped_rate">1800.00</field>
+            <field name="semi_developed_rate">3150.00</field>
+            <field name="fully_developed_rate">4500.00</field>
+            <field name="description">Tamarind tree - Fruit tree</field>
+        </record>
+
+        <record id="tree_master_amla" model="bhu.tree.master">
+            <field name="name">Amla / आंवला</field>
+            <field name="undeveloped_rate">1000.00</field>
+            <field name="semi_developed_rate">1750.00</field>
+            <field name="fully_developed_rate">2500.00</field>
+            <field name="description">Amla tree - Medicinal fruit tree</field>
+        </record>
+
+        <record id="tree_master_bamboo" model="bhu.tree.master">
+            <field name="name">Bamboo / बांस</field>
+            <field name="undeveloped_rate">800.00</field>
+            <field name="semi_developed_rate">1400.00</field>
+            <field name="fully_developed_rate">2000.00</field>
+            <field name="description">Bamboo - Fast growing plant</field>
+        </record>
+    </data>
+</odoo>
+

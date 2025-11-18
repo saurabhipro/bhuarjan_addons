@@ -994,13 +994,13 @@ class BhuarjanAPIController(http.Controller):
             if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
                 survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
             
-            # Handle tree lines (merged structure - single array with development_stage)
+            # Handle tree lines (new format: supports fruit-bearing and non-fruit-bearing trees)
             tree_line_vals = []
             
-            # Support new format: tree_lines array with development_stage
+            # Support new format: tree_lines array with tree_type
             if 'tree_lines' in data and isinstance(data['tree_lines'], list):
                 for tree_line in data['tree_lines']:
-                    if isinstance(tree_line, dict) and 'development_stage' in tree_line:
+                    if isinstance(tree_line, dict):
                         # Support both tree_master_id (integer) and tree_name (string) for tree selection
                         tree_master_id = None
                         if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
@@ -1029,22 +1029,83 @@ class BhuarjanAPIController(http.Controller):
                                 content_type='application/json'
                             )
                         
-                        # Validate development_stage
-                        development_stage = tree_line.get('development_stage')
-                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                        # Get tree master to determine tree_type
+                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
+                        if not tree_master.exists():
                             return Response(
                                 json.dumps({
-                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    'error': f'Tree master with ID {tree_master_id} not found'
                                 }),
                                 status=400,
                                 content_type='application/json'
                             )
                         
-                        tree_line_vals.append((0, 0, {
+                        # Get tree_type from tree_master or from request
+                        tree_type = tree_line.get('tree_type') or tree_master.tree_type
+                        if not tree_type:
+                            return Response(
+                                json.dumps({
+                                    'error': 'tree_type must be provided or tree_master must have a tree_type'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Validate tree_type matches tree_master
+                        if tree_master.tree_type != tree_type:
+                            return Response(
+                                json.dumps({
+                                    'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Prepare tree line values
+                        tree_line_data = {
                             'tree_master_id': tree_master_id,
-                            'development_stage': development_stage,
+                            'tree_type': tree_type,
                             'quantity': tree_line.get('quantity', 1)
-                        }))
+                        }
+                        
+                        # For non-fruit-bearing trees, require development_stage and girth_cm
+                        if tree_type == 'non_fruit_bearing':
+                            development_stage = tree_line.get('development_stage')
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            girth_cm = tree_line.get('girth_cm')
+                            if not girth_cm or girth_cm <= 0:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'girth_cm is required and must be greater than 0 for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            tree_line_data['development_stage'] = development_stage
+                            tree_line_data['girth_cm'] = girth_cm
+                        else:
+                            # For fruit-bearing trees, clear development_stage and girth_cm
+                            tree_line_data['development_stage'] = False
+                            tree_line_data['girth_cm'] = 0.0
+                        
+                        tree_line_vals.append((0, 0, tree_line_data))
             
             # Backward compatibility: support old format with separate arrays
             if 'undeveloped_tree_lines' in data and isinstance(data['undeveloped_tree_lines'], list):
@@ -1176,10 +1237,13 @@ class BhuarjanAPIController(http.Controller):
                 'irrigation_type': survey.irrigation_type,
                 'tree_lines': [{
                     'id': line.id,
-                    'development_stage': line.development_stage,
-                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, ''),
+                    'tree_type': line.tree_type,
+                    'tree_type_name': dict(line._fields['tree_type'].selection).get(line.tree_type, '') if line.tree_type else '',
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
+                    'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
+                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
+                    'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
                     'quantity': line.quantity,
                     'rate': line.rate,
                     'total_amount': line.total_amount
@@ -2068,11 +2132,11 @@ class BhuarjanAPIController(http.Controller):
             # Update the survey
             survey.write(update_vals)
             
-            # Handle tree lines (if provided)
+            # Handle tree lines (if provided - new format: supports fruit-bearing and non-fruit-bearing trees)
             if 'tree_lines' in data and isinstance(data['tree_lines'], list):
                 tree_line_vals = []
                 for tree_line in data['tree_lines']:
-                    if isinstance(tree_line, dict) and 'development_stage' in tree_line:
+                    if isinstance(tree_line, dict):
                         # Support both tree_master_id (integer) and tree_name (string) for tree selection
                         tree_master_id = None
                         if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
@@ -2101,22 +2165,83 @@ class BhuarjanAPIController(http.Controller):
                                 content_type='application/json'
                             )
                         
-                        # Validate development_stage
-                        development_stage = tree_line.get('development_stage')
-                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                        # Get tree master to determine tree_type
+                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
+                        if not tree_master.exists():
                             return Response(
                                 json.dumps({
-                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    'error': f'Tree master with ID {tree_master_id} not found'
                                 }),
                                 status=400,
                                 content_type='application/json'
                             )
                         
-                        tree_line_vals.append((0, 0, {
+                        # Get tree_type from tree_master or from request
+                        tree_type = tree_line.get('tree_type') or tree_master.tree_type
+                        if not tree_type:
+                            return Response(
+                                json.dumps({
+                                    'error': 'tree_type must be provided or tree_master must have a tree_type'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Validate tree_type matches tree_master
+                        if tree_master.tree_type != tree_type:
+                            return Response(
+                                json.dumps({
+                                    'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        
+                        # Prepare tree line values
+                        tree_line_data = {
                             'tree_master_id': tree_master_id,
-                            'development_stage': development_stage,
+                            'tree_type': tree_type,
                             'quantity': tree_line.get('quantity', 1)
-                        }))
+                        }
+                        
+                        # For non-fruit-bearing trees, require development_stage and girth_cm
+                        if tree_type == 'non_fruit_bearing':
+                            development_stage = tree_line.get('development_stage')
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            girth_cm = tree_line.get('girth_cm')
+                            if not girth_cm or girth_cm <= 0:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'girth_cm is required and must be greater than 0 for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            tree_line_data['development_stage'] = development_stage
+                            tree_line_data['girth_cm'] = girth_cm
+                        else:
+                            # For fruit-bearing trees, clear development_stage and girth_cm
+                            tree_line_data['development_stage'] = False
+                            tree_line_data['girth_cm'] = 0.0
+                        
+                        tree_line_vals.append((0, 0, tree_line_data))
                 
                 # Replace all tree lines with new ones
                 if tree_line_vals:
@@ -2164,10 +2289,13 @@ class BhuarjanAPIController(http.Controller):
                 'irrigation_type': survey.irrigation_type or '',
                 'tree_lines': [{
                     'id': line.id,
-                    'development_stage': line.development_stage,
-                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, ''),
+                    'tree_type': line.tree_type,
+                    'tree_type_name': dict(line._fields['tree_type'].selection).get(line.tree_type, '') if line.tree_type else '',
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
+                    'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
+                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
+                    'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
                     'quantity': line.quantity,
                     'rate': line.rate,
                     'total_amount': line.total_amount

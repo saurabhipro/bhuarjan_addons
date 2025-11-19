@@ -648,7 +648,7 @@ class DraftAwardCompensationLine(models.Model):
     landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=False, ondelete='set null')
     landowner_name = fields.Char(string='Landowner Name / भूमिस्वामी का नाम', related='landowner_id.name', store=True, readonly=True)
     father_husband_name = fields.Char(string='Father/Husband Name / पिता/पति का नाम', compute='_compute_father_husband_name', store=True)
-    caste = fields.Char(string='Caste / जाति', tracking=True, help='Enter caste information')
+    caste = fields.Char(string='Caste / जाति', help='Enter caste information')
     
     @api.depends('landowner_id')
     def _compute_father_husband_name(self):

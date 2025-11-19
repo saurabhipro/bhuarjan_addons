@@ -32,7 +32,7 @@ class TreeRateMaster(models.Model):
     
     # Rate
     rate = fields.Monetary(string='Rate / दर', currency_field='currency_id', 
-                           digits=(16, 2), required=True, tracking=True,
+                           required=True, tracking=True,
                            help='Compensation rate for this girth range and development stage')
     currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
                                  default=lambda self: self.env.company.currency_id)

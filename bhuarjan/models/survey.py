@@ -654,7 +654,7 @@ class SurveyTreeLine(models.Model):
     _order = 'development_stage, tree_master_id'
 
     survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', required=True, ondelete='cascade')
-    tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, tracking=True,
+    tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True,
                                      help='Select tree from master')
     
     @api.onchange('tree_type')
@@ -702,11 +702,11 @@ class SurveyTreeLine(models.Model):
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
-    ], string='Development Stage / विकास स्तर', tracking=True, default='undeveloped',
+    ], string='Development Stage / विकास स्तर', default='undeveloped',
        help='Development stage of the tree. Optional for all tree types.')
-    girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2), tracking=True,
+    girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2),
                             help='Tree trunk girth (circumference) in centimeters. Optional for non-fruit-bearing trees.')
-    quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
+    quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1,
                              help='Number of trees of this type')
     
     # Tree type - stored for domain filtering

@@ -142,10 +142,11 @@ import base64
 
 def _upload_image_field_to_s3(self, field_name, s3_filename):
     # Direct upload using AWS credentials
-    AWS_ACCESS_KEY = 'YOUR_AWS_ACCESS_KEY'  # Get from bhuarjan.settings.master'
-    AWS_SECRET_KEY = 'YOUR_AWS_SECRET_KEY'  # Get from bhuarjan.settings.master'
-    AWS_REGION = 'ap-south-1'
-    S3_BUCKET_NAME = 'bhuarjan'
+    # IMPORTANT: Replace these with your actual AWS credentials from settings
+    AWS_ACCESS_KEY = 'YOUR_AWS_ACCESS_KEY'  # Get from bhuarjan.settings.master
+    AWS_SECRET_KEY = 'YOUR_AWS_SECRET_KEY'  # Get from bhuarjan.settings.master
+    AWS_REGION = 'ap-south-1'  # Get from bhuarjan.settings.master
+    S3_BUCKET_NAME = 'bhuarjan'  # Get from bhuarjan.settings.master
     
     s3_client = boto3.client(
         's3',

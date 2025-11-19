@@ -773,18 +773,22 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"// This script helps you set up the upload request",
-									"// Step 1: Call 'Generate S3 Presigned URLs' API first",
-									"// Step 2: Copy the 'presigned_url' from the response",
-									"// Step 3: Paste it in the URL field below (replace the example URL)",
-									"// Step 4: Update the Content-Type header to match the 'content_type' from API response",
-									"// Step 5: Select your file in the Body tab (binary mode)",
+									"// Quick Setup: Paste your presigned URL in the URL field below",
+									"// For JPEG files, Content-Type is already set to 'image/jpeg'",
+									"// Just select your file in the Body tab and click Send!",
 									"",
-									"console.log('Ready to upload. Make sure you have:');",
-									"console.log('1. Presigned URL from Generate S3 Presigned URLs API');",
-									"console.log('2. Content-Type header matches the API response');",
-									"console.log('3. File selected in Body tab (binary mode)');",
-									"console.log('4. Auth is set to No Auth');"
+									"// If using environment variable, it will auto-populate",
+									"if (pm.environment.get('presigned_url')) {",
+									"    console.log('✅ Using presigned_url from environment:', pm.environment.get('presigned_url').substring(0, 80) + '...');",
+									"} else {",
+									"    console.log('📝 Paste your presigned URL in the URL field');",
+									"}",
+									"",
+									"console.log('✅ Ready to upload!');",
+									"console.log('1. URL: Paste presigned URL (or use {{presigned_url}} variable)');",
+									"console.log('2. Content-Type: image/jpeg (already set for JPEG files)');",
+									"console.log('3. Body: Select your JPEG file in binary mode');",
+									"console.log('4. Auth: No Auth (already set)');"
 								]
 							}
 						}
@@ -798,23 +802,57 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "{{content_type}}",
-								"description": "⚠️ CRITICAL: This automatically uses the 'content_type' from Generate Presigned URL API response.\n\nIf you're not using environment variables, manually set this to the EXACT 'content_type' from the API response:\n- .jpg/.jpeg files: 'image/jpeg'\n- .png files: 'image/png'\n- .pdf files: 'application/pdf'\n- .gif files: 'image/gif'\n\nIf Content-Type doesn't match, you'll get SignatureDoesNotMatch error!"
+								"value": "image/jpeg",
+								"description": "⚠️ CRITICAL: Must match the content type used when generating the presigned URL.\n\nFor JPEG files: 'image/jpeg' (already set)\nFor PNG files: Change to 'image/png'\nFor PDF files: Change to 'application/pdf'\n\nIf Content-Type doesn't match, you'll get SignatureDoesNotMatch error!"
 							}
 						],
 						"body": {
 							"mode": "binary",
-							"binary": {
-								"type": "image/jpeg"
-							}
+							"binary": {}
 						},
 						"url": {
-							"raw": "{{presigned_url}}",
+							"raw": "https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAX3YCG3CXYFUT4LOZ%2F20251119%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20251119T135854Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=53608521563e3a2cda93cb39412c0bab13e5ef16d922209319f6ec3f54d43024",
+							"protocol": "https",
 							"host": [
-								"{{presigned_url}}"
+								"bhuarjan",
+								"s3",
+								"ap-south-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"surveys",
+								"257",
+								"image1.jpg"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "AKIAX3YCG3CXYFUT4LOZ/20251119/ap-south-1/s3/aws4_request"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20251119T135854Z"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "3600"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "content-type;host"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "53608521563e3a2cda93cb39412c0bab13e5ef16d922209319f6ec3f54d43024"
+								}
 							]
 						},
-						"description": "# 📤 Upload File to S3 Using Presigned URL\n\n## ✅ Complete Step-by-Step Guide\n\n### Step 1: Generate Presigned URL\n1. Go to **'Generate S3 Presigned URLs'** request\n2. Set request body:\n   ```json\n   {\n       \"survey_id\": 257,\n       \"file_names\": [\"image1.jpg\"]\n   }\n   ```\n3. **Send** the request\n4. **Copy** the `presigned_url` from response (it's a long URL starting with `https://bhuarjan.s3.ap-south-1.amazonaws.com/...`)\n5. **Copy** the `content_type` value (e.g., `image/jpeg`)\n\n### Step 2: Configure This Upload Request\n\n1. **URL Field:**\n   - Replace `{{presigned_url}}` with the actual presigned URL you copied\n   - Or create a Postman variable `presigned_url` and paste the URL there\n   - **IMPORTANT:** Use the ENTIRE URL exactly as returned (don't modify it!)\n\n2. **Method:**\n   - ✅ MUST be **PUT** (already set)\n   - ❌ NOT GET or POST\n\n3. **Auth Tab:**\n   - ✅ MUST be **No Auth** (already set)\n   - ❌ Do NOT use Bearer token or any authorization\n\n4. **Headers Tab:**\n   - Update `Content-Type` to match the `content_type` from Step 1\n   - For `.jpg` files: `image/jpeg`\n   - For `.png` files: `image/png`\n   - For `.pdf` files: `application/pdf`\n   - **This must match exactly or you'll get SignatureDoesNotMatch error!**\n\n5. **Body Tab:**\n   - Select **binary** mode (already set)\n   - Click **Select File** and choose your image file\n   - The file will be uploaded as binary data\n\n### Step 3: Send Request\n- Click **Send**\n- You should get **200 OK** response if successful\n- The file is now uploaded to S3!\n\n---\n\n## ⚠️ CRITICAL REQUIREMENTS\n\n### ✅ MUST DO:\n- ✅ Use **PUT** method\n- ✅ Set Auth to **No Auth**\n- ✅ Use **exact Content-Type** from API response\n- ✅ Use **complete presigned_url** as-is (don't modify)\n- ✅ Select file in **Body tab (binary mode)**\n\n### ❌ DO NOT:\n- ❌ Include any Authorization header (Bearer token)\n- ❌ Use GET or POST method\n- ❌ Change Content-Type to something different\n- ❌ Modify the presigned URL (use it exactly as returned)\n- ❌ Add or remove any query parameters from the URL\n\n---\n\n## 🐛 Common Errors & Solutions\n\n### Error: `SignatureDoesNotMatch`\n**Causes:**\n- Wrong HTTP method (must be PUT)\n- Wrong Content-Type header (must match API response exactly)\n- Modified presigned URL\n- Missing or extra query parameters\n\n**Solution:**\n- Verify method is PUT\n- Check Content-Type matches the `content_type` from Generate Presigned URL API\n- Use the presigned URL exactly as returned (don't modify it)\n\n### Error: `Only one auth mechanism allowed`\n**Cause:** You're sending an Authorization header\n\n**Solution:**\n- Go to **Auth** tab\n- Select **No Auth**\n- Remove any Authorization headers\n\n### Error: `AccessDenied`\n**Cause:** AWS IAM permissions issue\n\n**Solution:**\n- Check AWS IAM user has `s3:PutObject` permission\n- Verify bucket name is correct\n- Check AWS credentials in settings\n\n### Error: `403 Forbidden`\n**Cause:** Usually a signature mismatch or permission issue\n\n**Solution:**\n- Follow all steps above carefully\n- Ensure Content-Type matches exactly\n- Verify presigned URL is not expired (valid for 1 hour)\n\n---\n\n## 📝 Example Presigned URL Format\n\n```\nhttps://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAX3YCG3CXYFUT4LOZ%2F20251119%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20251119T122907Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=8f4f3548f51f062e5d1107b89e53f04a00b52e46486e0d58a9ccc0b7ea0156c\n```\n\n**Note:** The URL includes the region (`ap-south-1`) in the hostname, which is correct!\n\n---\n\n## ✅ Success Response\n\nAfter successful upload, you'll get:\n- **Status:** `200 OK`\n- **Body:** Empty (this is normal)\n\nThe file is now available at:\n`https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/{survey_id}/{filename}`\n\n---\n\n## 💡 Pro Tips\n\n1. **Use Postman Variables:** Create a variable `presigned_url` and set it from the Generate Presigned URL response using a test script\n2. **Use Postman Variables for Content-Type:** Create a variable `content_type` and set it from the API response\n3. **Test Script Example:** In Generate Presigned URL request, add this to Tests tab:\n   ```javascript\n   var jsonData = pm.response.json();\n   pm.environment.set(\"presigned_url\", jsonData.data.presigned_url);\n   pm.environment.set(\"content_type\", jsonData.data.content_type);\n   ```\n4. **Then in this request:** Use `{{presigned_url}}` in URL and `{{content_type}}` in Content-Type header"
+						"description": "# 📤 Upload Binary JPEG File to S3\n\n## 🚀 Quick Start (3 Steps)\n\n1. **Paste Your Presigned URL:**\n   - Replace the example URL in the URL field with your actual presigned URL\n   - Or use `{{presigned_url}}` if you've set it as an environment variable\n\n2. **Select Your File:**\n   - Go to **Body** tab\n   - Make sure **binary** mode is selected (already set)\n   - Click **Select File** and choose your JPEG image\n\n3. **Send:**\n   - Click **Send** button\n   - You should get **200 OK** if successful!\n\n---\n\n## ✅ Pre-Configured Settings\n\n- ✅ **Method:** PUT (correct for S3 upload)\n- ✅ **Auth:** No Auth (no Bearer token needed)\n- ✅ **Content-Type:** image/jpeg (for JPEG files)\n- ✅ **Body Mode:** Binary (ready for file upload)\n\n**For other file types, update Content-Type:**\n- PNG files: Change to `image/png`\n- PDF files: Change to `application/pdf`\n- GIF files: Change to `image/gif`\n\n---\n\n## 📝 Example Presigned URL (Pre-filled)\n\nThe URL field contains an example presigned URL. **Replace it with your actual presigned URL** from the Generate Presigned URL API response.\n\n**Example format:**\n```\nhttps://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...&X-Amz-Date=...&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=...\n```\n\n---\n\n## ⚠️ CRITICAL REQUIREMENTS\n\n### ✅ MUST DO:\n- ✅ Use **PUT** method (already set)\n- ✅ Set Auth to **No Auth** (already set)\n- ✅ Use **exact Content-Type** (`image/jpeg` for JPEG files - already set)\n- ✅ Use **complete presigned_url** as-is (don't modify it!)\n- ✅ Select file in **Body tab (binary mode)**\n\n### ❌ DO NOT:\n- ❌ Include any Authorization header (Bearer token)\n- ❌ Use GET or POST method\n- ❌ Change Content-Type to something different (unless uploading different file type)\n- ❌ Modify the presigned URL (use it exactly as returned)\n- ❌ Add or remove any query parameters from the URL\n\n---\n\n## 🐛 Common Errors & Solutions\n\n### Error: `SignatureDoesNotMatch`\n**Causes:**\n- Wrong HTTP method (must be PUT) ✅ Already set\n- Wrong Content-Type header (must be `image/jpeg` for JPEG) ✅ Already set\n- Modified presigned URL\n- Missing or extra query parameters\n\n**Solution:**\n- Verify method is PUT ✅\n- Check Content-Type is `image/jpeg` ✅\n- Use the presigned URL exactly as returned (don't modify it)\n\n### Error: `Only one auth mechanism allowed`\n**Cause:** You're sending an Authorization header\n\n**Solution:**\n- Go to **Auth** tab\n- Select **No Auth** ✅ Already set\n- Remove any Authorization headers\n\n### Error: `AccessDenied`\n**Cause:** AWS IAM permissions issue\n\n**Solution:**\n- Check AWS IAM user has `s3:PutObject` permission\n- Verify bucket name is correct\n- Check AWS credentials in settings\n\n### Error: `403 Forbidden` or `ExpiredToken`\n**Cause:** Presigned URL expired (valid for 1 hour only)\n\n**Solution:**\n- Generate a new presigned URL\n- Use it immediately (within 1 hour)\n\n---\n\n## ✅ Success Response\n\nAfter successful upload:\n- **Status:** `200 OK`\n- **Body:** Empty (this is normal - S3 doesn't return a body)\n\nThe file is now available at the S3 URL:\n`https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/{survey_id}/{filename}`\n\n---\n\n## 💡 Pro Tips\n\n1. **Auto-Fill from API:** If you use the \"Generate S3 Presigned URLs\" request, it automatically saves the URL to `{{presigned_url}}` variable\n2. **Quick Test:** Use the example URL provided, just replace it with your actual presigned URL\n3. **File Size:** Large files may take longer to upload\n4. **Network:** Ensure stable internet connection for large file uploads"
 					},
 					"response": []
 				},
@@ -1140,7 +1178,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.amazonaws.com/surveys/123/land_photo1.jpg\",\n            \"filename\": \"land_photo1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Main land area photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.amazonaws.com/surveys/123/well_photo1.jpg\",\n            \"filename\": \"well_photo1.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}",
+							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Land photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1148,7 +1186,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1/photos",
+							"raw": "{{base_url}}/api/bhuarjan/survey/photos?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1156,18 +1194,17 @@
 								"api",
 								"bhuarjan",
 								"survey",
-								"1",
 								"photos"
 							],
-							"variable": [
+							"query": [
 								{
 									"key": "survey_id",
-									"value": "1",
-									"description": "Replace with actual survey ID"
+									"value": "257",
+									"description": "Survey ID (required)"
 								}
 							]
 						},
-						"description": "Add photos to a survey. First upload photos to S3 using the presigned URL API, then use this endpoint to tag and save the S3 URLs.\n\n**Workflow:**\n1. Generate presigned URLs using `/api/bhuarjan/s3/presigned-urls`\n2. Upload files to S3 using the presigned URLs (PUT request)\n3. Use this endpoint to save the S3 URLs with photo type tags\n\n**Request Body:**\n- `photos` (array): List of photo objects\n  - `photo_type_id` (required): ID from photo types master\n  - `s3_url` (required): Full S3 URL after upload\n  - `filename` (optional): Original filename\n  - `file_size` (optional): File size in bytes\n  - `description` (optional): Description or notes\n  - `sequence` (optional): Display order (default: 10)"
+						"description": "# 📸 Add Photos to Survey After Creation\n\nUse this dedicated API to link images to a survey after the survey has been created. This is the **recommended way** to add photos separately from survey creation.\n\n## 🔄 Complete Workflow\n\n### Step 1: Create Survey\n- Use `POST /api/bhuarjan/survey` to create the survey\n- Get the `survey_id` from the response\n\n### Step 2: Upload Images to S3\n1. Call `POST /api/bhuarjan/s3/presigned-urls` with:\n   ```json\n   {\n       \"survey_id\": 257,\n       \"file_names\": [\"image1.jpg\", \"well_photo.jpg\"]\n   }\n   ```\n2. Upload each file to S3 using the presigned URLs (PUT request)\n3. Copy the S3 URLs from the upload responses\n\n### Step 3: Link Photos to Survey\n- Use this API (`POST /api/bhuarjan/survey/photos`) to link the S3 URLs to the survey\n\n## 📝 Request\n\n**Query Parameter:**\n- `survey_id` (required): Survey ID\n\n**Request Body:**\n```json\n{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Land photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}\n```\n\n**Photo Object Fields:**\n- `photo_type_id` (required): Photo type ID from photo types master (e.g., 1=Land, 2=Well, 3=House)\n- `s3_url` (required): Full S3 URL after upload (e.g., `https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg`)\n- `filename` (optional): Original filename\n- `file_size` (optional): File size in bytes\n- `description` (optional): Description or notes\n- `sequence` (optional): Display order (default: 10)\n\n## 📤 Response\n\n```json\n{\n    \"success\": true,\n    \"message\": \"Successfully added 2 photo(s) to survey\",\n    \"data\": {\n        \"survey_id\": 257,\n        \"added_photos\": [\n            {\n                \"photo_type_id\": 1,\n                \"photo_type_name\": \"Land\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n                \"filename\": \"image1.jpg\"\n            },\n            {\n                \"photo_type_id\": 2,\n                \"photo_type_name\": \"Well\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n                \"filename\": \"well_photo.jpg\"\n            }\n        ],\n        \"total_photos\": 2\n    }\n}\n```\n\n## ✅ Alternative: Use PATCH API\n\nYou can also add photos using the PATCH API when updating a survey:\n\n```\nPATCH /api/bhuarjan/survey/257\n```\n\n**Request Body:**\n```json\n{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\"\n        }\n    ]\n}\n```\n\n**Note:** PATCH API adds photos to existing ones (doesn't replace).\n\n## ⚠️ Important Notes\n\n- ✅ This API **adds** photos (doesn't replace existing photos)\n- ✅ You can call this API multiple times to add more photos\n- ✅ Each photo must have a valid `photo_type_id` and `s3_url`\n- ✅ Photos are linked to the survey and can be retrieved using `GET /api/bhuarjan/survey/images?survey_id=257`\n- ⚠️ Make sure the S3 URLs are accessible and valid\n- ⚠️ `photo_type_id` must exist in the photo types master"
 					},
 					"response": []
 				}

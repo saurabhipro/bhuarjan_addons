@@ -19,6 +19,24 @@ _logger = logging.getLogger(__name__)
 
 class BhuarjanAPIController(http.Controller):
     """REST API Controller for Bhuarjan mobile app"""
+    
+    def _get_selection_label(self, record, field_name, value):
+        """Get the label for a selection field value"""
+        if not value:
+            return ''
+        try:
+            field = record._fields.get(field_name)
+            if not field:
+                return ''
+            selection = field.selection
+            # Handle callable selection (dynamic selection)
+            if callable(selection):
+                selection = selection(record)
+            # Convert to dict and get label
+            selection_dict = dict(selection) if selection else {}
+            return selection_dict.get(value, '')
+        except Exception:
+            return ''
 
     @http.route('/api/bhuarjan/user/projects', type='http', auth='public', methods=['GET'], csrf=False)
     @check_permission
@@ -1311,11 +1329,11 @@ class BhuarjanAPIController(http.Controller):
                 'tree_lines': [{
                     'id': line.id,
                     'tree_type': line.tree_type,
-                    'tree_type_name': dict(line._fields['tree_type'].selection).get(line.tree_type, '') if line.tree_type else '',
+                    'tree_type_name': self._get_selection_label(line, 'tree_type', line.tree_type) if line.tree_type else '',
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
                     'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
-                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
+                    'development_stage_name': self._get_selection_label(line, 'development_stage', line.development_stage) if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
                     'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
                     'quantity': line.quantity
                 } for line in survey.tree_line_ids],

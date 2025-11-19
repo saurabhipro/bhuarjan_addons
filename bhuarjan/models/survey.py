@@ -692,21 +692,16 @@ class SurveyTreeLine(models.Model):
                              help='Number of trees of this type')
     
     # Tree type - automatically comes from tree master
-    tree_type = fields.Selection([
-        ('fruit_bearing', 'Fruit-bearing / फलदार'),
-        ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
-    ], string='Tree Type / वृक्ष प्रकार', 
-       compute='_compute_tree_type', store=True, readonly=True,
-       help='Automatically set from selected tree')
+    tree_type = fields.Selection(related="tree_master_id.tree_type", string="Tree Type", store=True)
     
-    @api.depends('tree_master_id.tree_type')
-    def _compute_tree_type(self):
-        """Compute tree_type from tree_master_id"""
-        for record in self:
-            if record.tree_master_id:
-                record.tree_type = record.tree_master_id.tree_type
-            else:
-                record.tree_type = False
+    # @api.depends('tree_master_id.tree_type')
+    # def _compute_tree_type(self):
+    #     """Compute tree_type from tree_master_id"""
+    #     for record in self:
+    #         if record.tree_master_id:
+    #             record.tree_type = record.tree_master_id.tree_type
+    #         else:
+    #             record.tree_type = False
 
     @api.constrains('tree_master_id')
     def _check_tree_master(self):

@@ -281,3 +281,124 @@ class FileUploadAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/survey/images', type='http', auth='public', methods=['GET'], csrf=False)
+    def get_survey_images(self, **kwargs):
+        """
+        Get all images from S3 for a specific survey
+        
+        Query Parameters:
+        - survey_id (required): Survey ID
+        - photo_type_id (optional): Filter by photo type ID
+        - active_only (optional, default=true): Return only active photos
+        
+        Returns: List of images with metadata
+        
+        Example Response:
+        {
+            "success": true,
+            "data": {
+                "survey_id": 257,
+                "total_images": 3,
+                "images": [
+                    {
+                        "id": 1,
+                        "photo_type_id": 1,
+                        "photo_type_name": "Land",
+                        "s3_url": "https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg",
+                        "filename": "image1.jpg",
+                        "file_size": 245678,
+                        "sequence": 10,
+                        "description": "Land photo",
+                        "active": true
+                    }
+                ]
+            }
+        }
+        """
+        try:
+            # Get survey_id from query parameters
+            survey_id = kwargs.get('survey_id')
+            if not survey_id:
+                return Response(
+                    json.dumps({'error': 'survey_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            try:
+                survey_id = int(survey_id)
+            except ValueError:
+                return Response(
+                    json.dumps({'error': 'survey_id must be an integer'}),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Validate survey exists
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                return Response(
+                    json.dumps({'error': f'Survey with ID {survey_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+            
+            # Get query parameters
+            photo_type_id = kwargs.get('photo_type_id')
+            active_only = kwargs.get('active_only', 'true').lower() == 'true'
+            
+            # Build domain
+            domain = [('survey_id', '=', survey_id)]
+            if photo_type_id:
+                try:
+                    domain.append(('photo_type_id', '=', int(photo_type_id)))
+                except ValueError:
+                    return Response(
+                        json.dumps({'error': 'Invalid photo_type_id. Must be an integer.'}),
+                        status=400,
+                        content_type='application/json'
+                    )
+            if active_only:
+                domain.append(('active', '=', True))
+            
+            # Get photos
+            photos = request.env['bhu.survey.photo'].sudo().search(domain, order='sequence, create_date desc')
+            
+            # Format response
+            images = []
+            for photo in photos:
+                images.append({
+                    'id': photo.id,
+                    'photo_type_id': photo.photo_type_id.id if photo.photo_type_id else None,
+                    'photo_type_name': photo.photo_type_id.name if photo.photo_type_id else None,
+                    's3_url': photo.s3_url,
+                    'filename': photo.filename or '',
+                    'file_size': photo.file_size or 0,
+                    'sequence': photo.sequence,
+                    'description': photo.description or '',
+                    'active': photo.active
+                })
+            
+            response_data = {
+                'success': True,
+                'data': {
+                    'survey_id': survey_id,
+                    'total_images': len(images),
+                    'images': images
+                }
+            }
+            
+            return Response(
+                json.dumps(response_data),
+                status=200,
+                content_type='application/json'
+            )
+            
+        except Exception as e:
+            self._logger.error(f"Error in get_survey_images: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+

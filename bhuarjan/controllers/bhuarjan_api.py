@@ -663,8 +663,8 @@ class BhuarjanAPIController(http.Controller):
             if name_filter:
                 domain.append(('name', 'ilike', name_filter))
 
-            # Search tree masters
-            trees = request.env['bhu.tree.master'].sudo().search(domain, limit=limit, offset=offset, order='name')
+            # Search tree masters - sort by tree_type first, then by name
+            trees = request.env['bhu.tree.master'].sudo().search(domain, limit=limit, offset=offset, order='tree_type, name')
 
             # Build response
             trees_data = []

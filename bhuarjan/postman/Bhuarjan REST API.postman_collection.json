@@ -702,6 +702,36 @@
 			"item": [
 				{
 					"name": "Generate S3 Presigned URLs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Automatically save presigned_url and content_type to environment variables",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data) {",
+									"        // For single file response",
+									"        if (jsonData.data.presigned_url) {",
+									"            pm.environment.set(\"presigned_url\", jsonData.data.presigned_url);",
+									"            pm.environment.set(\"content_type\", jsonData.data.content_type);",
+									"            console.log('✅ Presigned URL saved to environment variable');",
+									"            console.log('✅ Content-Type saved:', jsonData.data.content_type);",
+									"        }",
+									"        // For multiple files response",
+									"        if (jsonData.data.presigned_urls && jsonData.data.presigned_urls.length > 0) {",
+									"            pm.environment.set(\"presigned_url\", jsonData.data.presigned_urls[0].presigned_url);",
+									"            pm.environment.set(\"content_type\", jsonData.data.presigned_urls[0].content_type);",
+									"            console.log('✅ First presigned URL saved to environment variable');",
+									"            console.log('✅ Content-Type saved:', jsonData.data.presigned_urls[0].content_type);",
+									"        }",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -712,7 +742,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"survey_id\": 1,\n    \"file_names\": [\"image1.jpg\", \"document1.pdf\"]\n}",
+							"raw": "{\n    \"survey_id\": 257,\n    \"file_names\": [\"image1.jpg\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -731,12 +761,34 @@
 								"presigned-urls"
 							]
 						},
-						"description": "Generate S3 presigned URLs for file upload. Supports single file (file_name) or multiple files (file_names array). The presigned URLs are valid for 1 hour.\n\n**Request Body:**\n- `survey_id` (required): Survey ID\n- `file_names` (array, optional): List of filenames, e.g., `[\"image1.jpg\", \"document1.pdf\"]`\n- `file_name` (string, optional): Single filename (alternative to file_names)\n\n**Response:**\n- `presigned_url`: Full URL with region (e.g., `https://bhuarjan.s3.ap-south-1.amazonaws.com/...`)\n- `content_type`: Content type to use in upload request (e.g., 'image/jpeg')\n- `s3_key`: S3 object key/path\n- `region`: AWS region (e.g., 'ap-south-1')\n- `expires_in`: Validity in seconds (3600 = 1 hour)\n\n**Next Step:**\nAfter getting the presigned URL, use the 'Upload File to S3 (using presigned URL)' request to upload your file.\n\n**IMPORTANT:**\n- Include Authorization header (Bearer token) when calling THIS API\n- Do NOT include Authorization header when uploading to the presigned URL"
+						"description": "# 🔗 Generate S3 Presigned URLs\n\nGenerate presigned URLs for uploading files to S3. The URLs are valid for 1 hour.\n\n## 📝 Request Body\n\n**Single File:**\n```json\n{\n    \"survey_id\": 257,\n    \"file_name\": \"image1.jpg\"\n}\n```\n\n**Multiple Files:**\n```json\n{\n    \"survey_id\": 257,\n    \"file_names\": [\"image1.jpg\", \"document1.pdf\", \"photo.png\"]\n}\n```\n\n**Parameters:**\n- `survey_id` (required): Survey ID\n- `file_names` (array, optional): List of filenames\n- `file_name` (string, optional): Single filename (alternative to file_names)\n\n## 📤 Response\n\n**Single File Response:**\n```json\n{\n    \"success\": true,\n    \"data\": {\n        \"file_name\": \"image1.jpg\",\n        \"presigned_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=...\",\n        \"content_type\": \"image/jpeg\",\n        \"s3_key\": \"surveys/257/image1.jpg\",\n        \"bucket_name\": \"bhuarjan\",\n        \"region\": \"ap-south-1\",\n        \"expires_in\": 3600,\n        \"expires_at\": \"2025-11-19T12:00:00+00:00\"\n    }\n}\n```\n\n**Multiple Files Response:**\n```json\n{\n    \"success\": true,\n    \"data\": {\n        \"presigned_urls\": [\n            {\n                \"file_name\": \"image1.jpg\",\n                \"presigned_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=...\",\n                \"content_type\": \"image/jpeg\",\n                \"s3_key\": \"surveys/257/image1.jpg\",\n                \"bucket_name\": \"bhuarjan\",\n                \"region\": \"ap-south-1\",\n                \"expires_in\": 3600,\n                \"expires_at\": \"2025-11-19T12:00:00+00:00\"\n            }\n        ],\n        \"total_files\": 1,\n        \"successful\": 1,\n        \"failed\": 0,\n        \"survey_id\": 257\n    }\n}\n```\n\n## ✅ Next Steps\n\n1. **Copy the `presigned_url`** from the response\n2. **Note the `content_type`** value (e.g., `image/jpeg`)\n3. **Go to 'Upload File to S3' request** and:\n   - Paste the `presigned_url` in the URL field\n   - Set Content-Type header to the `content_type` value\n   - Select your file in Body tab (binary mode)\n   - Send the request\n\n## 💡 Auto-Save Feature\n\nThis request automatically saves `presigned_url` and `content_type` to Postman environment variables:\n- `{{presigned_url}}` - Use this in the Upload request URL\n- `{{content_type}}` - Use this in the Upload request Content-Type header\n\n## ⚠️ IMPORTANT\n\n- ✅ **Include Authorization header (Bearer token)** when calling THIS API\n- ❌ **Do NOT include Authorization header** when uploading to the presigned URL\n- ⏰ Presigned URLs expire after **1 hour** (3600 seconds)\n- 🌍 URLs include the region (`ap-south-1`) in the hostname - this is correct!"
 					},
 					"response": []
 				},
 				{
 					"name": "Upload File to S3 (using presigned URL)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// This script helps you set up the upload request",
+									"// Step 1: Call 'Generate S3 Presigned URLs' API first",
+									"// Step 2: Copy the 'presigned_url' from the response",
+									"// Step 3: Paste it in the URL field below (replace the example URL)",
+									"// Step 4: Update the Content-Type header to match the 'content_type' from API response",
+									"// Step 5: Select your file in the Body tab (binary mode)",
+									"",
+									"console.log('Ready to upload. Make sure you have:');",
+									"console.log('1. Presigned URL from Generate S3 Presigned URLs API');",
+									"console.log('2. Content-Type header matches the API response');",
+									"console.log('3. File selected in Body tab (binary mode)');",
+									"console.log('4. Auth is set to No Auth');"
+								]
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth",
@@ -746,43 +798,23 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "image/jpeg",
-								"description": "IMPORTANT: Use the exact 'content_type' from the API response. For images: 'image/jpeg' for .jpg files, 'image/png' for .png files. For PDFs: 'application/pdf'"
+								"value": "{{content_type}}",
+								"description": "⚠️ CRITICAL: This automatically uses the 'content_type' from Generate Presigned URL API response.\n\nIf you're not using environment variables, manually set this to the EXACT 'content_type' from the API response:\n- .jpg/.jpeg files: 'image/jpeg'\n- .png files: 'image/png'\n- .pdf files: 'application/pdf'\n- .gif files: 'image/gif'\n\nIf Content-Type doesn't match, you'll get SignatureDoesNotMatch error!"
 							}
 						],
 						"body": {
-							"mode": "file",
-							"file": {
-								"src": ""
-							},
-							"options": {
-								"raw": {}
+							"mode": "binary",
+							"binary": {
+								"type": "image/jpeg"
 							}
 						},
 						"url": {
-							"raw": "https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...",
-							"protocol": "https",
+							"raw": "{{presigned_url}}",
 							"host": [
-								"bhuarjan",
-								"s3",
-								"ap-south-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"surveys",
-								"257",
-								"image1.jpg"
-							],
-							"query": [
-								{
-									"key": "X-Amz-Algorithm",
-									"value": "AWS4-HMAC-SHA256",
-									"description": "Replace entire URL with presigned_url from API response"
-								}
+								"{{presigned_url}}"
 							]
 						},
-						"description": "Upload a file to S3 using the presigned URL obtained from 'Generate S3 Presigned URLs' API.\n\n**STEP-BY-STEP INSTRUCTIONS:**\n\n1. **Get Presigned URL:**\n   - Call 'Generate S3 Presigned URLs' API first\n   - Copy the 'presigned_url' from the response\n   - Note the 'content_type' value (e.g., 'image/jpeg')\n\n2. **Configure This Request:**\n   - **Method:** MUST be PUT (not GET or POST)\n   - **URL:** Paste the entire 'presigned_url' from step 1\n     - Format: `https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/{survey_id}/{filename}?X-Amz-Algorithm=...`\n   - **Auth Tab:** Select 'No Auth' (CRITICAL - do not use Bearer token!)\n   - **Headers:** Set 'Content-Type' to the exact value from API response\n     - For .jpg files: 'image/jpeg'\n     - For .png files: 'image/png'\n     - For .pdf files: 'application/pdf'\n   - **Body Tab:** Select 'binary' mode and choose your file\n\n3. **Send Request**\n\n**CRITICAL REQUIREMENTS:**\n\n❌ **DO NOT:**\n- Include any Authorization header (Bearer token)\n- Use GET or POST method\n- Change the Content-Type to something different\n- Modify the presigned URL (use it exactly as returned)\n\n✅ **MUST:**\n- Use PUT method\n- Set Auth to 'No Auth'\n- Use exact Content-Type from API response\n- Use the complete presigned_url as-is\n\n**Common Errors:**\n\n- **'Only one auth mechanism allowed'**: You're sending an Authorization header. Remove it! Set Auth to 'No Auth'.\n- **'SignatureDoesNotMatch'**: Wrong HTTP method (use PUT) or wrong Content-Type header\n- **'AccessDenied'**: Check AWS IAM permissions for s3:PutObject\n- **'InvalidArgument'**: Content-Type mismatch or missing required headers\n\n**Example Presigned URL Format:**\n`https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...&X-Amz-Date=...&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=...`\n\n**After Successful Upload:**\nThe file will be available at: `https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/{survey_id}/{filename}`"
+						"description": "# 📤 Upload File to S3 Using Presigned URL\n\n## ✅ Complete Step-by-Step Guide\n\n### Step 1: Generate Presigned URL\n1. Go to **'Generate S3 Presigned URLs'** request\n2. Set request body:\n   ```json\n   {\n       \"survey_id\": 257,\n       \"file_names\": [\"image1.jpg\"]\n   }\n   ```\n3. **Send** the request\n4. **Copy** the `presigned_url` from response (it's a long URL starting with `https://bhuarjan.s3.ap-south-1.amazonaws.com/...`)\n5. **Copy** the `content_type` value (e.g., `image/jpeg`)\n\n### Step 2: Configure This Upload Request\n\n1. **URL Field:**\n   - Replace `{{presigned_url}}` with the actual presigned URL you copied\n   - Or create a Postman variable `presigned_url` and paste the URL there\n   - **IMPORTANT:** Use the ENTIRE URL exactly as returned (don't modify it!)\n\n2. **Method:**\n   - ✅ MUST be **PUT** (already set)\n   - ❌ NOT GET or POST\n\n3. **Auth Tab:**\n   - ✅ MUST be **No Auth** (already set)\n   - ❌ Do NOT use Bearer token or any authorization\n\n4. **Headers Tab:**\n   - Update `Content-Type` to match the `content_type` from Step 1\n   - For `.jpg` files: `image/jpeg`\n   - For `.png` files: `image/png`\n   - For `.pdf` files: `application/pdf`\n   - **This must match exactly or you'll get SignatureDoesNotMatch error!**\n\n5. **Body Tab:**\n   - Select **binary** mode (already set)\n   - Click **Select File** and choose your image file\n   - The file will be uploaded as binary data\n\n### Step 3: Send Request\n- Click **Send**\n- You should get **200 OK** response if successful\n- The file is now uploaded to S3!\n\n---\n\n## ⚠️ CRITICAL REQUIREMENTS\n\n### ✅ MUST DO:\n- ✅ Use **PUT** method\n- ✅ Set Auth to **No Auth**\n- ✅ Use **exact Content-Type** from API response\n- ✅ Use **complete presigned_url** as-is (don't modify)\n- ✅ Select file in **Body tab (binary mode)**\n\n### ❌ DO NOT:\n- ❌ Include any Authorization header (Bearer token)\n- ❌ Use GET or POST method\n- ❌ Change Content-Type to something different\n- ❌ Modify the presigned URL (use it exactly as returned)\n- ❌ Add or remove any query parameters from the URL\n\n---\n\n## 🐛 Common Errors & Solutions\n\n### Error: `SignatureDoesNotMatch`\n**Causes:**\n- Wrong HTTP method (must be PUT)\n- Wrong Content-Type header (must match API response exactly)\n- Modified presigned URL\n- Missing or extra query parameters\n\n**Solution:**\n- Verify method is PUT\n- Check Content-Type matches the `content_type` from Generate Presigned URL API\n- Use the presigned URL exactly as returned (don't modify it)\n\n### Error: `Only one auth mechanism allowed`\n**Cause:** You're sending an Authorization header\n\n**Solution:**\n- Go to **Auth** tab\n- Select **No Auth**\n- Remove any Authorization headers\n\n### Error: `AccessDenied`\n**Cause:** AWS IAM permissions issue\n\n**Solution:**\n- Check AWS IAM user has `s3:PutObject` permission\n- Verify bucket name is correct\n- Check AWS credentials in settings\n\n### Error: `403 Forbidden`\n**Cause:** Usually a signature mismatch or permission issue\n\n**Solution:**\n- Follow all steps above carefully\n- Ensure Content-Type matches exactly\n- Verify presigned URL is not expired (valid for 1 hour)\n\n---\n\n## 📝 Example Presigned URL Format\n\n```\nhttps://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAX3YCG3CXYFUT4LOZ%2F20251119%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20251119T122907Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=8f4f3548f51f062e5d1107b89e53f04a00b52e46486e0d58a9ccc0b7ea0156c\n```\n\n**Note:** The URL includes the region (`ap-south-1`) in the hostname, which is correct!\n\n---\n\n## ✅ Success Response\n\nAfter successful upload, you'll get:\n- **Status:** `200 OK`\n- **Body:** Empty (this is normal)\n\nThe file is now available at:\n`https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/{survey_id}/{filename}`\n\n---\n\n## 💡 Pro Tips\n\n1. **Use Postman Variables:** Create a variable `presigned_url` and set it from the Generate Presigned URL response using a test script\n2. **Use Postman Variables for Content-Type:** Create a variable `content_type` and set it from the API response\n3. **Test Script Example:** In Generate Presigned URL request, add this to Tests tab:\n   ```javascript\n   var jsonData = pm.response.json();\n   pm.environment.set(\"presigned_url\", jsonData.data.presigned_url);\n   pm.environment.set(\"content_type\", jsonData.data.content_type);\n   ```\n4. **Then in this request:** Use `{{presigned_url}}` in URL and `{{content_type}}` in Content-Type header"
 					},
 					"response": []
 				},

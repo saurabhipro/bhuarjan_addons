@@ -2497,6 +2497,7 @@ class BhuarjanAPIController(http.Controller):
                 
                 # Build photo values - only include photo_type_id if it's valid
                 photo_data = {
+                    'survey_id': survey_id,  # Required field
                     's3_url': photo['s3_url'],
                     'filename': photo.get('filename', ''),
                     'file_size': photo.get('file_size', 0),
@@ -2529,7 +2530,22 @@ class BhuarjanAPIController(http.Controller):
                 )
             
             # Add photos to survey
-            survey.write({'photo_ids': photo_vals})
+            try:
+                survey.write({'photo_ids': photo_vals})
+            except Exception as write_error:
+                _logger.error(f"Error writing photos to survey {survey_id}: {str(write_error)}", exc_info=True)
+                # Check if it's a unique constraint violation
+                if 'unique' in str(write_error).lower() or 'duplicate' in str(write_error).lower():
+                    return Response(
+                        json.dumps({
+                            'success': False,
+                            'error': 'Duplicate S3 URL',
+                            'message': 'One or more S3 URLs already exist. Each photo must have a unique S3 URL.'
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+                raise
             
             return Response(
                 json.dumps({

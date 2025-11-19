@@ -117,7 +117,9 @@ class Section15Objection(models.Model):
                 record.survey_department_id = record.survey_id.department_id
                 record.survey_crop_type = record.survey_id.crop_type
                 record.survey_irrigation_type = record.survey_id.irrigation_type
-                record.survey_tree_development_stage = record.survey_id.tree_development_stage
+                # tree_development_stage field removed - set to False or compute from tree_line_ids if needed
+                # For now, set to False as tree details are now in tree_line_ids
+                record.survey_tree_development_stage = False
                 record.survey_has_house = record.survey_id.has_house
                 record.survey_house_type = record.survey_id.house_type
                 record.survey_house_area = record.survey_id.house_area

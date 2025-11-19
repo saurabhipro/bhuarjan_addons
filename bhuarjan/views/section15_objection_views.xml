@@ -94,7 +94,7 @@
                                 </group>
                             </group>
                             <group>
-                                <field name="survey_tree_development_stage"/>
+                                <!-- survey_tree_development_stage field removed - tree details are now in tree_line_ids -->
                             </group>
                             <group>
                                 <group string="Property Information / संपत्ति जानकारी">

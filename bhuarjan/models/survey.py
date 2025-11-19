@@ -209,14 +209,16 @@ class Survey(models.Model):
             semi_developed_count = 0
             fully_developed_count = 0
             
-            for line in record.tree_line_ids:
-                if line.tree_type == 'non_fruit_bearing':
-                    if line.development_stage == 'undeveloped':
-                        undeveloped_count += line.quantity or 0
-                    elif line.development_stage == 'semi_developed':
-                        semi_developed_count += line.quantity or 0
-                    elif line.development_stage == 'fully_developed':
-                        fully_developed_count += line.quantity or 0
+            # Ensure tree_line_ids are loaded
+            if record.tree_line_ids:
+                for line in record.tree_line_ids:
+                    if line.tree_type == 'non_fruit_bearing':
+                        if line.development_stage == 'undeveloped':
+                            undeveloped_count += line.quantity or 0
+                        elif line.development_stage == 'semi_developed':
+                            semi_developed_count += line.quantity or 0
+                        elif line.development_stage == 'fully_developed':
+                            fully_developed_count += line.quantity or 0
             
             record.undeveloped_tree_count = undeveloped_count
             record.semi_developed_tree_count = semi_developed_count
@@ -876,11 +878,8 @@ class SurveyLine(models.Model):
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated')
     
     # Trees on Land / भूमि पर स्थित वृक्ष की संख्या
-    tree_development_stage = fields.Selection([
-        ('undeveloped', 'Undeveloped / अविकसित'),
-        ('semi_developed', 'Semi-developed / अर्द्ध विकसित'),
-        ('fully_developed', 'Fully Developed / पूर्ण विकसित')
-    ], string='Tree Development Stage / वृक्ष विकास स्तर', required=True)
+    # Note: tree_development_stage and tree_count have been removed
+    # Use tree_line_ids to access tree details with development_stage
     
     # Assets on Land / भूमि पर स्थित परिसंपत्तियों का विवरण
     # House Details

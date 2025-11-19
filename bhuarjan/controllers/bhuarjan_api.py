@@ -622,6 +622,7 @@ class BhuarjanAPIController(http.Controller):
         """
         Get all tree masters with optional filters by name, development stage, and girth
         Query params: 
+            - type (optional): Filter by tree type. Values: 'fruit_bearing' or 'non_fruit_bearing'
             - name (optional): Filter by tree name (partial match, case-insensitive)
             - development_stage (optional): For non-fruit-bearing trees, filter by development stage
                 Values: 'undeveloped', 'semi_developed', 'fully_developed'
@@ -637,8 +638,20 @@ class BhuarjanAPIController(http.Controller):
             offset = request.httprequest.args.get('offset', type=int) or 0
             active_filter = request.httprequest.args.get('active')
             name_filter = request.httprequest.args.get('name', '').strip()
+            tree_type_filter = request.httprequest.args.get('type', '').strip().lower()
             development_stage = request.httprequest.args.get('development_stage', '').strip().lower()
             girth_cm = request.httprequest.args.get('girth_cm', type=float)
+            
+            # Validate tree_type if provided
+            valid_tree_types = ['fruit_bearing', 'non_fruit_bearing']
+            if tree_type_filter and tree_type_filter not in valid_tree_types:
+                return Response(
+                    json.dumps({
+                        'error': f'Invalid type: {tree_type_filter}. Must be one of: {", ".join(valid_tree_types)}'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
             
             # Validate development_stage if provided
             valid_stages = ['undeveloped', 'semi_developed', 'fully_developed']
@@ -659,6 +672,10 @@ class BhuarjanAPIController(http.Controller):
             else:
                 # Default to active only
                 domain.append(('active', '=', True))
+            
+            # Filter by tree_type
+            if tree_type_filter:
+                domain.append(('tree_type', '=', tree_type_filter))
             
             # Filter by name (partial match, case-insensitive)
             if name_filter:
@@ -706,6 +723,7 @@ class BhuarjanAPIController(http.Controller):
                     'limit': limit,
                     'offset': offset,
                     'filters': {
+                        'type': tree_type_filter if tree_type_filter else None,
                         'name': name_filter if name_filter else None,
                         'development_stage': development_stage if development_stage else None
                     }

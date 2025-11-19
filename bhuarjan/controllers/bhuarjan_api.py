@@ -1102,17 +1102,32 @@ class BhuarjanAPIController(http.Controller):
                             
                             girth_cm = tree_line.get('girth_cm')
                             # girth_cm is optional - if provided, it must be > 0
-                            if girth_cm is not None and girth_cm <= 0:
-                                return Response(
-                                    json.dumps({
-                                        'error': 'girth_cm must be greater than 0 if provided'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
+                            # Check if girth_cm is explicitly provided (not None and not empty string)
+                            if girth_cm is not None and girth_cm != '':
+                                try:
+                                    girth_cm_float = float(girth_cm)
+                                    if girth_cm_float <= 0:
+                                        return Response(
+                                            json.dumps({
+                                                'error': 'girth_cm must be greater than 0 if provided'
+                                            }),
+                                            status=400,
+                                            content_type='application/json'
+                                        )
+                                    tree_line_data['girth_cm'] = girth_cm_float
+                                except (ValueError, TypeError):
+                                    return Response(
+                                        json.dumps({
+                                            'error': 'girth_cm must be a valid number if provided'
+                                        }),
+                                        status=400,
+                                        content_type='application/json'
+                                    )
+                            else:
+                                # Don't set girth_cm if not provided (use False to indicate not set)
+                                tree_line_data['girth_cm'] = False
                             
                             tree_line_data['development_stage'] = development_stage
-                            tree_line_data['girth_cm'] = girth_cm if girth_cm is not None else 0.0
                         else:
                             # For fruit-bearing trees, clear development_stage and girth_cm
                             tree_line_data['development_stage'] = False
@@ -2306,17 +2321,32 @@ class BhuarjanAPIController(http.Controller):
                             
                             girth_cm = tree_line.get('girth_cm')
                             # girth_cm is optional - if provided, it must be > 0
-                            if girth_cm is not None and girth_cm <= 0:
-                                return Response(
-                                    json.dumps({
-                                        'error': 'girth_cm must be greater than 0 if provided'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
+                            # Check if girth_cm is explicitly provided (not None and not empty string)
+                            if girth_cm is not None and girth_cm != '':
+                                try:
+                                    girth_cm_float = float(girth_cm)
+                                    if girth_cm_float <= 0:
+                                        return Response(
+                                            json.dumps({
+                                                'error': 'girth_cm must be greater than 0 if provided'
+                                            }),
+                                            status=400,
+                                            content_type='application/json'
+                                        )
+                                    tree_line_data['girth_cm'] = girth_cm_float
+                                except (ValueError, TypeError):
+                                    return Response(
+                                        json.dumps({
+                                            'error': 'girth_cm must be a valid number if provided'
+                                        }),
+                                        status=400,
+                                        content_type='application/json'
+                                    )
+                            else:
+                                # Don't set girth_cm if not provided (use False to indicate not set)
+                                tree_line_data['girth_cm'] = False
                             
                             tree_line_data['development_stage'] = development_stage
-                            tree_line_data['girth_cm'] = girth_cm if girth_cm is not None else 0.0
                         else:
                             # For fruit-bearing trees, clear development_stage and girth_cm
                             tree_line_data['development_stage'] = False

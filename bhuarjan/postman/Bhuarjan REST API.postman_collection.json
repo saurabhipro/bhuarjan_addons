@@ -7,6 +7,16 @@
 		"_exporter_id": "19928031",
 		"_collection_link": "https://solardesk.postman.co/workspace/24b88f13-f075-4ab9-9223-1d8667a7eab6/collection/19928031-10ca4a24-20ae-4b5d-a56a-246d9311b389?action=share&source=collection_link&creator=19928031"
 	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
 	"item": [
 		{
 			"name": "Users",

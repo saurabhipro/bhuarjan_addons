@@ -665,20 +665,30 @@ class SurveyTreeLine(models.Model):
     
     @api.onchange('tree_master_id')
     def _onchange_tree_master_id(self):
-        """Set default development_stage when tree is selected"""
+        """Set tree_type and default development_stage when tree is selected"""
         if self.tree_master_id:
-            # tree_type is now a related field, so it updates automatically
+            # Set tree_type from selected tree
+            self.tree_type = self.tree_master_id.tree_type
             # Set default development_stage if not already set
             if not self.development_stage:
                 self.development_stage = self._context.get('default_development_stage', 'undeveloped')
     
     @api.model_create_multi
     def create(self, vals_list):
-        """tree_type is now a related field, so it's automatically set from tree_master_id"""
+        """Set tree_type from tree_master_id when creating"""
+        for vals in vals_list:
+            if 'tree_master_id' in vals and vals['tree_master_id']:
+                tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
+                if tree:
+                    vals['tree_type'] = tree.tree_type
         return super().create(vals_list)
     
     def write(self, vals):
-        """tree_type is now a related field, so it's automatically updated from tree_master_id"""
+        """Set tree_type from tree_master_id when updating"""
+        if 'tree_master_id' in vals and vals['tree_master_id']:
+            tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
+            if tree:
+                vals['tree_type'] = tree.tree_type
         return super().write(vals)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
@@ -695,8 +705,7 @@ class SurveyTreeLine(models.Model):
     tree_type = fields.Selection([
         ('fruit_bearing', 'Fruit-bearing / फलदार'),
         ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
-    ], string='Tree Type / वृक्ष प्रकार', related='tree_master_id.tree_type', 
-       readonly=True, store=True,
+    ], string='Tree Type / वृक्ष प्रकार', store=True,
        help='Automatically set from selected tree')
 
     @api.constrains('tree_master_id')

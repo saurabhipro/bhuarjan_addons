@@ -1387,9 +1387,16 @@ class BhuarjanAPIController(http.Controller):
             )
 
         except Exception as e:
-            _logger.error(f"Error in get_survey_details: {str(e)}", exc_info=True)
+            _logger.error(f"Error in get_survey_details for survey_id {survey_id}: {str(e)}", exc_info=True)
+            import traceback
+            error_trace = traceback.format_exc()
+            _logger.error(f"Traceback: {error_trace}")
             return Response(
-                json.dumps({'error': str(e)}),
+                json.dumps({
+                    'error': str(e),
+                    'message': f'Error retrieving survey details: {str(e)}',
+                    'survey_id': survey_id
+                }),
                 status=500,
                 content_type='application/json'
             )
@@ -2424,24 +2431,55 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
-    @http.route('/api/bhuarjan/survey/<int:survey_id>/photos', type='http', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/bhuarjan/survey/photos', type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
-    def add_survey_photos(self, survey_id, **kwargs):
+    def add_survey_photos(self, **kwargs):
         """
         Add photos to a survey
-        Path param: survey_id (required)
+        Query param: survey_id (required)
         Body: JSON with photos array
         Each photo must have: s3_url (required)
         Optional fields: photo_type_id, filename, file_size, description, sequence
         Returns: Success message with added photos
         """
         try:
+            # Get survey_id from query parameters
+            survey_id = request.httprequest.args.get('survey_id')
+            if not survey_id:
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Missing survey_id',
+                        'message': 'survey_id query parameter is required'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
+            # Log the received survey_id for debugging
+            _logger.info(f"add_survey_photos: Received survey_id={survey_id}, type={type(survey_id)}")
+            
+            # Ensure survey_id is an integer
+            try:
+                survey_id = int(survey_id)
+            except (ValueError, TypeError):
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Invalid survey_id',
+                        'message': f'survey_id must be an integer, got: {survey_id}'
+                    }),
+                    status=400,
+                    content_type='application/json'
+                )
+            
             # Parse request data
             data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
             
             # Validate survey exists
             survey = request.env['bhu.survey'].sudo().browse(survey_id)
             if not survey.exists():
+                _logger.warning(f"add_survey_photos: Survey {survey_id} not found")
                 return Response(
                     json.dumps({
                         'success': False,
@@ -2451,6 +2489,8 @@ class BhuarjanAPIController(http.Controller):
                     status=404,
                     content_type='application/json'
                 )
+            
+            _logger.info(f"add_survey_photos: Survey {survey_id} found, name: {survey.name}")
             
             # Validate photos array
             if 'photos' not in data or not isinstance(data['photos'], list):

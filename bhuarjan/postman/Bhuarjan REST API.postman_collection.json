@@ -857,16 +857,10 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
-								},
-								{
-									"key": "active",
-									"value": "true",
-									"description": "Filter by active status (default: true)",
-									"disabled": true
 								}
 							]
 						},
-						"description": "Get all tree masters with optional filters by type, name, development stage, and girth.\n\n**Query Parameters:**\n- `type` (optional): Filter by tree type. Values: 'fruit_bearing' or 'non_fruit_bearing'\n- `name` (optional): Filter by tree name (partial match, case-insensitive)\n- `development_stage` (optional): For non-fruit-bearing trees only. Values: 'undeveloped', 'semi_developed', 'fully_developed'. Requires girth_cm to get rate.\n- `girth_cm` (optional): For non-fruit-bearing trees only. Girth in cm. Required with development_stage to lookup rate from tree_rate_master.\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n- `active` (optional, default true): Filter by active status\n\n**Response Fields:**\n- `tree_type`: 'fruit_bearing' or 'non_fruit_bearing'\n- `rate`: For fruit-bearing trees, flat rate. For non-fruit-bearing trees, rate from tree_rate_master (if girth_cm and development_stage provided)\n\n**Examples:**\n- Get all trees: `/api/bhuarjan/trees`\n- Get fruit-bearing trees: `/api/bhuarjan/trees?type=fruit_bearing`\n- Get non-fruit-bearing trees: `/api/bhuarjan/trees?type=non_fruit_bearing`\n- Search by name: `/api/bhuarjan/trees?name=Mango`\n- Get non-fruit-bearing tree rate: `/api/bhuarjan/trees?type=non_fruit_bearing&name=Neem&development_stage=undeveloped&girth_cm=50`\n- Combined filters: `/api/bhuarjan/trees?type=non_fruit_bearing&name=Sal&development_stage=semi_developed&girth_cm=75`"
+						"description": "Get all tree masters with optional filters by type, name, development stage, and girth.\n\n**Query Parameters:**\n- `type` (optional): Filter by tree type. Values: 'fruit_bearing' or 'non_fruit_bearing'\n- `name` (optional): Filter by tree name (partial match, case-insensitive)\n- `development_stage` (optional): For non-fruit-bearing trees only. Values: 'undeveloped', 'semi_developed', 'fully_developed'. Requires girth_cm to get rate.\n- `girth_cm` (optional): For non-fruit-bearing trees only. Girth in cm. Required with development_stage to lookup rate from tree_rate_master.\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n\n**Response Fields:**\n- `id`: Tree master ID\n- `name`: Tree name\n- `tree_type`: 'fruit_bearing' or 'non_fruit_bearing'\n- `rate`: For fruit-bearing trees, flat rate. For non-fruit-bearing trees, rate from tree_rate_master (if girth_cm and development_stage provided)\n\n**Examples:**\n- Get all trees: `/api/bhuarjan/trees`\n- Get fruit-bearing trees: `/api/bhuarjan/trees?type=fruit_bearing`\n- Get non-fruit-bearing trees: `/api/bhuarjan/trees?type=non_fruit_bearing`\n- Search by name: `/api/bhuarjan/trees?name=Mango`\n- Get non-fruit-bearing tree rate: `/api/bhuarjan/trees?type=non_fruit_bearing&name=Neem&development_stage=undeveloped&girth_cm=50`\n- Combined filters: `/api/bhuarjan/trees?type=non_fruit_bearing&name=Sal&development_stage=semi_developed&girth_cm=75`"
 					},
 					"response": []
 				},

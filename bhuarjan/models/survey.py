@@ -661,7 +661,7 @@ class SurveyTreeLine(models.Model):
     def _onchange_tree_type(self):
         """Set domain for tree_master_id based on tree_type"""
         if self.tree_type:
-            domain = [('tree_type', '=', self.tree_type), ('active', '=', True)]
+            domain = [('tree_type', '=', self.tree_type)]
             return {'domain': {'tree_master_id': domain}}
         return {}
     
@@ -764,8 +764,6 @@ class SurveyTreeLine(models.Model):
                        help='Rate based on tree type, girth, and development stage')
     total_amount = fields.Float(string='Total Amount / कुल राशि', digits=(16, 2), 
                                compute='_compute_total_amount', store=True, tracking=True)
-    currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
-                                 related='tree_master_id.currency_id', readonly=True)
     
     # Tree type - stored for domain filtering
     tree_type = fields.Selection([

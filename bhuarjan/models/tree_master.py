@@ -12,8 +12,6 @@ class TreeMaster(models.Model):
 
     name = fields.Char(string='Tree Name / वृक्ष का नाम', required=True, tracking=True,
                       help='Name of the tree species (e.g., Mango, Neem, Banyan)')
-    code = fields.Char(string='Tree Code / वृक्ष कोड', tracking=True,
-                      help='Unique code for the tree')
     
     # Tree Type
     tree_type = fields.Selection([
@@ -23,18 +21,13 @@ class TreeMaster(models.Model):
        help='Fruit-bearing trees have flat rates. Non-fruit-bearing trees have rates based on girth and development stage.')
     
     # Rate for fruit-bearing trees (flat rate, no girth or development stage dependency)
-    rate = fields.Monetary(string='Rate / दर', currency_field='currency_id', digits=(16, 2), tracking=True,
+    rate = fields.Float(string='Rate / दर', digits=(16, 2), tracking=True,
                           help='Flat rate for fruit-bearing trees (not applicable for non-fruit-bearing trees)')
     
     # One2many for non-fruit-bearing tree rates
     tree_rate_ids = fields.One2many('bhu.tree.rate.master', 'tree_master_id', 
                                     string='Tree Rates / वृक्ष दरें',
                                     help='Girth-based rates for non-fruit-bearing trees')
-    
-    currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
-                                 default=lambda self: self.env.company.currency_id)
-    description = fields.Text(string='Description / विवरण', tracking=True)
-    active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
 
     _sql_constraints = [
         ('name_unique', 'unique(name)', 'Tree name must be unique!')

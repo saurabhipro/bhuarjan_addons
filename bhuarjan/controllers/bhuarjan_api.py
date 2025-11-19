@@ -629,14 +629,12 @@ class BhuarjanAPIController(http.Controller):
             - girth_cm (optional): For non-fruit-bearing trees, girth in cm to lookup rate
             - limit (optional, default 100)
             - offset (optional, default 0)
-            - active (optional filter - default True)
         Returns: JSON list of tree masters with rates
         """
         try:
             # Get query parameters
             limit = request.httprequest.args.get('limit', type=int) or 100
             offset = request.httprequest.args.get('offset', type=int) or 0
-            active_filter = request.httprequest.args.get('active')
             name_filter = request.httprequest.args.get('name', '').strip()
             tree_type_filter = request.httprequest.args.get('type', '').strip().lower()
             development_stage = request.httprequest.args.get('development_stage', '').strip().lower()
@@ -666,13 +664,6 @@ class BhuarjanAPIController(http.Controller):
             
             # Build domain
             domain = []
-            if active_filter is not None:
-                active_bool = active_filter.lower() in ('true', '1', 'yes')
-                domain.append(('active', '=', active_bool))
-            else:
-                # Default to active only
-                domain.append(('active', '=', True))
-            
             # Filter by tree_type
             if tree_type_filter:
                 domain.append(('tree_type', '=', tree_type_filter))
@@ -690,13 +681,8 @@ class BhuarjanAPIController(http.Controller):
                 tree_data = {
                     'id': tree.id,
                     'name': tree.name or '',
-                    'code': tree.code or '',
                     'tree_type': tree.tree_type,
-                    'rate': tree.rate or 0.0 if tree.tree_type == 'fruit_bearing' else None,
-                    'currency_id': tree.currency_id.id if tree.currency_id else None,
-                    'currency_name': tree.currency_id.name if tree.currency_id else '',
-                    'description': tree.description or '',
-                    'active': tree.active
+                    'rate': tree.rate or 0.0 if tree.tree_type == 'fruit_bearing' else None
                 }
                 
                 # For non-fruit-bearing trees, if development_stage and girth are specified, 

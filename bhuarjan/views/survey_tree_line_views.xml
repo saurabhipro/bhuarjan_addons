@@ -8,7 +8,6 @@
         <field name="arch" type="xml">
             <list string="Fruit-bearing Trees" editable="bottom">
                 <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="300"
-                       domain="[('active', '=', True)]"
                        context="{'default_tree_type': 'fruit_bearing'}"/>
                 <field name="quantity" required="1" string="Quantity / मात्रा" width="150"/>
                 <field name="rate" readonly="1" string="Rate / दर" width="150"/>
@@ -26,7 +25,6 @@
             <list string="Non-fruit-bearing Trees" editable="bottom">
                 <field name="development_stage" string="Development Stage / विकास स्तर" width="200" required="1"/>
                 <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="200"
-                       domain="[('active', '=', True)]"
                        context="{'default_tree_type': 'non_fruit_bearing'}"/>
                 <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="160" required="1"/>
                 <field name="quantity" required="1" string="Quantity / मात्रा" width="120"/>

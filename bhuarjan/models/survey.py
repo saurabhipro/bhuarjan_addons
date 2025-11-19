@@ -177,6 +177,11 @@ class Survey(models.Model):
     is_irrigated = fields.Boolean(string='Is Irrigated', compute='_compute_irrigation_fields', store=False)
     is_unirrigated = fields.Boolean(string='Is Unirrigated', compute='_compute_irrigation_fields', store=False)
     
+    # Tree counts by development stage (for PDF reports)
+    undeveloped_tree_count = fields.Integer(string='Undeveloped Tree Count', compute='_compute_tree_counts_by_stage', store=False)
+    semi_developed_tree_count = fields.Integer(string='Semi-developed Tree Count', compute='_compute_tree_counts_by_stage', store=False)
+    fully_developed_tree_count = fields.Integer(string='Fully Developed Tree Count', compute='_compute_tree_counts_by_stage', store=False)
+    
     @api.depends('crop_type_id')
     def _compute_crop_fields(self):
         for record in self:
@@ -195,6 +200,27 @@ class Survey(models.Model):
         for record in self:
             record.is_irrigated = record.irrigation_type == 'irrigated'
             record.is_unirrigated = record.irrigation_type == 'unirrigated'
+    
+    @api.depends('tree_line_ids', 'tree_line_ids.tree_type', 'tree_line_ids.development_stage', 'tree_line_ids.quantity')
+    def _compute_tree_counts_by_stage(self):
+        """Compute tree counts by development stage for non-fruit-bearing trees"""
+        for record in self:
+            undeveloped_count = 0
+            semi_developed_count = 0
+            fully_developed_count = 0
+            
+            for line in record.tree_line_ids:
+                if line.tree_type == 'non_fruit_bearing':
+                    if line.development_stage == 'undeveloped':
+                        undeveloped_count += line.quantity or 0
+                    elif line.development_stage == 'semi_developed':
+                        semi_developed_count += line.quantity or 0
+                    elif line.development_stage == 'fully_developed':
+                        fully_developed_count += line.quantity or 0
+            
+            record.undeveloped_tree_count = undeveloped_count
+            record.semi_developed_tree_count = semi_developed_count
+            record.fully_developed_tree_count = fully_developed_count
     
     def get_qr_code_data(self):
         """Generate QR code data for the survey"""

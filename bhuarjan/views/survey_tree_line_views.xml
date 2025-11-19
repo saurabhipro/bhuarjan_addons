@@ -8,9 +8,9 @@
         <field name="arch" type="xml">
             <list string="Trees / वृक्ष" editable="bottom">
                 <field name="development_stage" string="Development Stage / विकास स्तर" width="200"/>
-                <field name="tree_type" string="Tree Type / वृक्ष प्रकार" width="180" required="1"/>
-                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="300"/>
-                <field name="quantity" required="1" string="Quantity / मात्रा" width="150"/>
+                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
+                <field name="tree_type" string="Tree Type / वृक्ष प्रकार" width="200" readonly="1"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="200"/>
             </list>
         </field>
     </record>

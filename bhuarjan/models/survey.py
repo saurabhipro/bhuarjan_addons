@@ -665,38 +665,20 @@ class SurveyTreeLine(models.Model):
     
     @api.onchange('tree_master_id')
     def _onchange_tree_master_id(self):
-        """Set tree_type when tree is selected"""
+        """Set default development_stage when tree is selected"""
         if self.tree_master_id:
-            # Set tree_type from selected tree
-            self.tree_type = self.tree_master_id.tree_type
-            
+            # tree_type is now a related field, so it updates automatically
             # Set default development_stage if not already set
             if not self.development_stage:
                 self.development_stage = self._context.get('default_development_stage', 'undeveloped')
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Set tree_type from tree_master_id or context when creating"""
-        for vals in vals_list:
-            # First, try to get tree_type from context (set by the section)
-            if 'tree_type' not in vals:
-                default_tree_type = self._context.get('default_tree_type')
-                if default_tree_type:
-                    vals['tree_type'] = default_tree_type
-            
-            # Then, if tree_master_id is provided, set tree_type
-            if 'tree_master_id' in vals:
-                tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
-                if tree:
-                    vals['tree_type'] = tree.tree_type
+        """tree_type is now a related field, so it's automatically set from tree_master_id"""
         return super().create(vals_list)
     
     def write(self, vals):
-        """Set tree_type from tree_master_id when updating"""
-        if 'tree_master_id' in vals:
-            tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
-            if tree:
-                vals['tree_type'] = tree.tree_type
+        """tree_type is now a related field, so it's automatically updated from tree_master_id"""
         return super().write(vals)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
@@ -709,26 +691,20 @@ class SurveyTreeLine(models.Model):
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1,
                              help='Number of trees of this type')
     
-    # Tree type - stored for domain filtering
+    # Tree type - automatically comes from tree master
     tree_type = fields.Selection([
         ('fruit_bearing', 'Fruit-bearing / फलदार'),
         ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
-    ], string='Tree Type / वृक्ष प्रकार', store=True, tracking=True,
-       default=lambda self: self._context.get('default_tree_type', False),
-       help='Automatically set based on selected tree or context')
+    ], string='Tree Type / वृक्ष प्रकार', related='tree_master_id.tree_type', 
+       readonly=True, store=True,
+       help='Automatically set from selected tree')
 
-    @api.constrains('tree_master_id', 'tree_type')
-    def _check_tree_type_match(self):
-        """Ensure tree type matches the selected tree master"""
+    @api.constrains('tree_master_id')
+    def _check_tree_master(self):
+        """Ensure tree master is selected"""
         for record in self:
-            if record.tree_master_id and record.tree_type:
-                if record.tree_master_id.tree_type != record.tree_type:
-                    raise ValidationError(
-                        _('Tree type mismatch: Selected tree "%s" is %s, but the record is marked as %s.') %
-                        (record.tree_master_id.name,
-                         'fruit-bearing' if record.tree_master_id.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
-                         'fruit-bearing' if record.tree_type == 'fruit_bearing' else 'non-fruit-bearing')
-                    )
+            if not record.tree_master_id:
+                raise ValidationError(_('Tree must be selected'))
     
     @api.constrains('girth_cm')
     def _check_girth_positive(self):

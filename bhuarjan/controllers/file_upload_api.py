@@ -12,6 +12,7 @@ from odoo.http import request, Response
 try:
     import boto3
     from botocore.exceptions import ClientError
+    from botocore.config import Config
     HAS_BOTO3 = True
 except ImportError:
     HAS_BOTO3 = False
@@ -142,12 +143,18 @@ class FileUploadAPIController(http.Controller):
             # Get AWS region (default to ap-south-1 if not set)
             aws_region = settings_master.aws_region or 'ap-south-1'
             
-            # Create S3 client
+            # Create S3 client with proper region configuration
+            # This ensures the presigned URL includes the region in the hostname
+            s3_config = Config(
+                region_name=aws_region,
+                signature_version='s3v4'
+            )
             s3_client = boto3.client(
                 's3',
                 aws_access_key_id=settings_master.aws_access_key,
                 aws_secret_access_key=settings_master.aws_secret_key,
-                region_name=aws_region
+                region_name=aws_region,
+                config=s3_config
             )
             
             # Generate presigned URL (valid for 1 hour)
@@ -192,13 +199,24 @@ class FileUploadAPIController(http.Controller):
                     )
                     
                     # Ensure the presigned URL includes the region in the format
-                    # If boto3 doesn't include region, construct it manually
+                    # Handle different URL formats that boto3 might generate
                     if f'.s3.{aws_region}.amazonaws.com' not in presigned_url:
-                        # Replace s3.amazonaws.com with s3.region.amazonaws.com
-                        presigned_url = presigned_url.replace(
-                            f'{settings_master.s3_bucket_name}.s3.amazonaws.com',
-                            f'{settings_master.s3_bucket_name}.s3.{aws_region}.amazonaws.com'
-                        )
+                        # Try multiple replacement patterns
+                        replacements = [
+                            # Pattern 1: bucket.s3.amazonaws.com -> bucket.s3.region.amazonaws.com
+                            (f'{settings_master.s3_bucket_name}.s3.amazonaws.com',
+                             f'{settings_master.s3_bucket_name}.s3.{aws_region}.amazonaws.com'),
+                            # Pattern 2: s3.amazonaws.com/bucket -> s3.region.amazonaws.com/bucket
+                            (f's3.amazonaws.com/{settings_master.s3_bucket_name}',
+                             f's3.{aws_region}.amazonaws.com/{settings_master.s3_bucket_name}'),
+                            # Pattern 3: s3.amazonaws.com -> s3.region.amazonaws.com
+                            ('s3.amazonaws.com', f's3.{aws_region}.amazonaws.com'),
+                        ]
+                        
+                        for old_pattern, new_pattern in replacements:
+                            if old_pattern in presigned_url:
+                                presigned_url = presigned_url.replace(old_pattern, new_pattern)
+                                break
                     
                     presigned_urls.append({
                         'file_name': file_name,

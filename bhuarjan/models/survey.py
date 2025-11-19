@@ -659,44 +659,19 @@ class SurveyTreeLine(models.Model):
     
     @api.onchange('tree_type')
     def _onchange_tree_type(self):
-        """Set domain for tree_master_id based on tree_type"""
-        if self.tree_type:
-            domain = [('tree_type', '=', self.tree_type)]
-            return {'domain': {'tree_master_id': domain}}
+        """Update tree_master_id when tree_type changes"""
+        # Allow any tree to be selected - no domain restriction
         return {}
     
     @api.onchange('tree_master_id')
     def _onchange_tree_master_id(self):
-        """Set tree_type when tree is selected and validate"""
+        """Set tree_type when tree is selected"""
         if self.tree_master_id:
-            # Get expected type from context or current tree_type
-            expected_type = self._context.get('default_tree_type') or self.tree_type
-            
-            # If tree_type is not set, set it from context
-            if not self.tree_type and expected_type:
-                self.tree_type = expected_type
-            
-            # Validate tree type matches the expected type
-            if expected_type and self.tree_master_id.tree_type != expected_type:
-                # Clear the selection and show warning
-                self.tree_master_id = False
-                return {
-                    'warning': {
-                        'title': _('Invalid Tree Type'),
-                        'message': _('This tree type does not match the section. Please select a %s tree.') % 
-                                  ('fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
-                    }
-                }
-            
             # Set tree_type from selected tree
             self.tree_type = self.tree_master_id.tree_type
             
-            # For fruit-bearing trees, clear development_stage and girth
-            if self.tree_master_id.tree_type == 'fruit_bearing':
-                self.development_stage = False
-                self.girth_cm = 0.0
-            # For non-fruit-bearing trees, ensure development_stage has a default
-            elif self.tree_master_id.tree_type == 'non_fruit_bearing' and not self.development_stage:
+            # Set default development_stage if not already set
+            if not self.development_stage:
                 self.development_stage = self._context.get('default_development_stage', 'undeveloped')
     
     @api.model_create_multi
@@ -709,24 +684,11 @@ class SurveyTreeLine(models.Model):
                 if default_tree_type:
                     vals['tree_type'] = default_tree_type
             
-            # Then, if tree_master_id is provided, validate and set tree_type
+            # Then, if tree_master_id is provided, set tree_type
             if 'tree_master_id' in vals:
                 tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
                 if tree:
-                    # Validate tree type matches expected type from context
-                    expected_type = self._context.get('default_tree_type')
-                    if expected_type and tree.tree_type != expected_type:
-                        raise ValidationError(
-                            _('Invalid tree type: Selected tree "%s" is %s, but this section requires %s trees.') %
-                            (tree.name,
-                             'fruit-bearing' if tree.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
-                             'fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
-                        )
                     vals['tree_type'] = tree.tree_type
-                    # For fruit-bearing trees, clear development_stage and girth
-                    if tree.tree_type == 'fruit_bearing':
-                        vals['development_stage'] = False
-                        vals['girth_cm'] = 0.0
         return super().create(vals_list)
     
     def write(self, vals):
@@ -734,36 +696,18 @@ class SurveyTreeLine(models.Model):
         if 'tree_master_id' in vals:
             tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
             if tree:
-                # Validate tree type matches expected type from context
-                expected_type = self._context.get('default_tree_type')
-                if expected_type and tree.tree_type != expected_type:
-                    raise ValidationError(
-                        _('Invalid tree type: Selected tree "%s" is %s, but this section requires %s trees.') %
-                        (tree.name,
-                         'fruit-bearing' if tree.tree_type == 'fruit_bearing' else 'non-fruit-bearing',
-                         'fruit-bearing' if expected_type == 'fruit_bearing' else 'non-fruit-bearing')
-                    )
                 vals['tree_type'] = tree.tree_type
-                # For fruit-bearing trees, clear development_stage and girth
-                if tree.tree_type == 'fruit_bearing':
-                    vals['development_stage'] = False
-                    vals['girth_cm'] = 0.0
         return super().write(vals)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
     ], string='Development Stage / विकास स्तर', tracking=True, default='undeveloped',
-       help='Required for non-fruit-bearing trees. Not applicable for fruit-bearing trees.')
+       help='Development stage of the tree. Optional for all tree types.')
     girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2), tracking=True,
-                            help='Tree trunk girth (circumference) in centimeters. Optional for non-fruit-bearing trees. Rate will be auto-computed based on this value and development stage if provided.')
+                            help='Tree trunk girth (circumference) in centimeters. Optional for non-fruit-bearing trees.')
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
                              help='Number of trees of this type')
-    rate = fields.Float(string='Rate per Tree / प्रति वृक्ष दर', digits=(16, 2), 
-                       compute='_compute_rate', store=True, readonly=True,
-                       help='Rate based on tree type, girth, and development stage')
-    total_amount = fields.Float(string='Total Amount / कुल राशि', digits=(16, 2), 
-                               compute='_compute_total_amount', store=True, tracking=True)
     
     # Tree type - stored for domain filtering
     tree_type = fields.Selection([
@@ -772,38 +716,6 @@ class SurveyTreeLine(models.Model):
     ], string='Tree Type / वृक्ष प्रकार', store=True, tracking=True,
        default=lambda self: self._context.get('default_tree_type', False),
        help='Automatically set based on selected tree or context')
-
-    @api.depends('tree_master_id', 'tree_master_id.tree_type', 'tree_master_id.rate', 
-                 'tree_type', 'development_stage', 'girth_cm')
-    def _compute_rate(self):
-        """Compute rate based on tree type, girth, and development stage"""
-        for record in self:
-            if not record.tree_master_id:
-                record.rate = 0.0
-                continue
-            
-            tree = record.tree_master_id
-            if tree.tree_type == 'fruit_bearing':
-                # Fruit-bearing trees: use flat rate (no girth or development stage)
-                record.rate = tree.rate or 0.0
-            else:
-                # Non-fruit-bearing trees: lookup rate from tree_rate_master based on girth and development stage
-                if record.girth_cm and record.development_stage:
-                    rate_master = self.env['bhu.tree.rate.master']
-                    record.rate = rate_master.get_rate_for_tree(
-                        tree.id, 
-                        record.girth_cm, 
-                        record.development_stage
-                    )
-                else:
-                    # If girth or development stage is missing, rate is 0
-                    record.rate = 0.0
-
-    @api.depends('quantity', 'rate')
-    def _compute_total_amount(self):
-        """Compute total amount based on quantity and rate"""
-        for record in self:
-            record.total_amount = (record.quantity or 0) * (record.rate or 0)
 
     @api.constrains('tree_master_id', 'tree_type')
     def _check_tree_type_match(self):
@@ -818,32 +730,28 @@ class SurveyTreeLine(models.Model):
                          'fruit-bearing' if record.tree_type == 'fruit_bearing' else 'non-fruit-bearing')
                     )
     
-    @api.constrains('girth_cm', 'development_stage', 'tree_master_id')
-    def _check_non_fruit_bearing_requirements(self):
-        """Ensure non-fruit-bearing trees have development stage (girth_cm is optional)"""
+    @api.constrains('girth_cm')
+    def _check_girth_positive(self):
+        """Ensure girth is positive if provided"""
         for record in self:
-            if record.tree_master_id and record.tree_master_id.tree_type == 'non_fruit_bearing':
-                # girth_cm is optional - only validate if it's actually a positive number
-                # Skip validation if girth_cm is False, None, or 0.0 (means "not set")
-                girth_value = record.girth_cm
-                if girth_value is False or girth_value is None:
-                    # Not set - that's fine, it's optional
-                    pass
-                elif girth_value == 0.0:
-                    # 0.0 means not set for optional fields - that's fine
-                    pass
-                else:
-                    # girth_cm is provided - validate it's a positive number
-                    try:
-                        girth_float = float(girth_value)
-                        if girth_float <= 0:
-                            raise ValidationError('Girth (cm) must be greater than 0 if provided.')
-                    except (ValueError, TypeError):
-                        # If it's not a valid number, that's an error
-                        raise ValidationError('Girth (cm) must be a valid number if provided.')
-                # girth_cm is optional, so no error if it's False/None/0.0
-                if not record.development_stage:
-                    raise ValidationError('Development stage is required for non-fruit-bearing trees.')
+            # girth_cm is optional - only validate if it's actually a positive number
+            # Skip validation if girth_cm is False, None, or 0.0 (means "not set")
+            girth_value = record.girth_cm
+            if girth_value is False or girth_value is None:
+                # Not set - that's fine, it's optional
+                pass
+            elif girth_value == 0.0:
+                # 0.0 means not set for optional fields - that's fine
+                pass
+            else:
+                # girth_cm is provided - validate it's a positive number
+                try:
+                    girth_float = float(girth_value)
+                    if girth_float <= 0:
+                        raise ValidationError('Girth (cm) must be greater than 0 if provided.')
+                except (ValueError, TypeError):
+                    # If it's not a valid number, that's an error
+                    raise ValidationError('Girth (cm) must be a valid number if provided.')
     
     @api.constrains('quantity')
     def _check_quantity_positive(self):

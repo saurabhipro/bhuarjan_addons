@@ -120,17 +120,10 @@
                         </page>
                         
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
-                            <group string="Fruit-bearing Trees / फलदार वृक्ष">
-                                <field name="fruit_bearing_tree_line_ids" readonly="state == 'locked'" nolabel="1" 
-                                       context="{'default_tree_type': 'fruit_bearing'}"
-                                       domain="[('tree_type', '=', 'fruit_bearing')]"
-                                       view_ref="view_bhu_survey_tree_line_fruit_bearing"/>
-                            </group>
-                            <group string="Non-fruit-bearing Trees / गैर-फलदार वृक्ष">
-                                <field name="non_fruit_bearing_tree_line_ids" readonly="state == 'locked'" nolabel="1"
-                                       context="{'default_tree_type': 'non_fruit_bearing', 'default_development_stage': 'undeveloped'}"
-                                       domain="[('tree_type', '=', 'non_fruit_bearing')]"
-                                       view_ref="view_bhu_survey_tree_line_non_fruit_bearing"/>
+                            <group string="Trees / वृक्ष">
+                                <field name="tree_line_ids" readonly="state == 'locked'" nolabel="1" 
+                                       context="{'default_development_stage': 'undeveloped'}"
+                                       view_ref="view_bhu_survey_tree_line_unified"/>
                             </group>
                         </page>
                         
@@ -405,9 +398,7 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
                        invisible="tree_type == 'fruit_bearing'"/>
                 <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="120"
                        invisible="tree_type == 'fruit_bearing'"/>
-                <field name="quantity" required="1" string="Quantity / मात्रा" width="100"/>
-                <field name="rate" readonly="1" string="Rate / दर" width="120"/>
-                <field name="total_amount" readonly="1" string="Total Amount / कुल राशि" width="150"/>
+                <field name="quantity" required="1" string="Quantity / मात्रा" width="150"/>
             </list>
         </field>
     </record>

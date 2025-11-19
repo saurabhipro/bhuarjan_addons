@@ -9,8 +9,7 @@
     <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_land_type" name="Land Types" action="action_bhu_land_type" parent="menu_bhu_master" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_tree_master" name="Tree Master" action="action_bhu_tree_master" parent="menu_bhu_master" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_tree_rate_master" name="Tree Rate Master" action="action_bhu_tree_rate_master" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

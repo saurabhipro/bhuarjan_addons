@@ -8,7 +8,6 @@
             <list string="Tree Master">
                 <field name="name"/>
                 <field name="tree_type"/>
-                <field name="rate" string="Rate (Fruit-bearing)"/>
             </list>
         </field>
     </record>
@@ -22,36 +21,35 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Enter tree name (e.g., Mango, Neem)"/>
+                            <field name="name" placeholder="Enter tree name (e.g., Mango, Neem, Sal)"/>
                         </h1>
                     </div>
                     
                     <group>
-                        <group string="Basic Information / मूल जानकारी">
+                        <group string="Tree Information / वृक्ष जानकारी">
                             <field name="tree_type" widget="radio" options="{'horizontal': true}"/>
                         </group>
                     </group>
                     
-                    <notebook>
-                        <page string="Fruit-bearing Rate / फलदार दर" invisible="tree_type != 'fruit_bearing'">
-                            <group>
-                                <field name="rate"/>
-                            </group>
-                        </page>
-                        <page string="Non-fruit-bearing Rates / गैर-फलदार दरें" invisible="tree_type != 'non_fruit_bearing'">
-                            <group>
-                                <field name="tree_rate_ids" nolabel="1" context="{'default_tree_master_id': id}">
-                                    <list string="Girth-based Rates" editable="bottom">
-                                        <field name="girth_range_min"/>
-                                        <field name="girth_range_max"/>
-                                        <field name="development_stage"/>
-                                        <field name="rate" widget="monetary"/>
-                                        <field name="active"/>
-                                    </list>
-                                </field>
-                            </group>
-                        </page>
-                    </notebook>
+                    <!-- Rate Variants - Same for both fruit and non-fruit bearing trees -->
+                    <group string="Rate Variants / दर वेरिएंट">
+                        <group>
+                            <field name="tree_rate_ids" nolabel="1" context="{'default_tree_master_id': id}">
+                                <list string="Rate Variants by Development Stage and Girth Range" editable="bottom">
+                                    <field name="development_stage" string="Development Stage / विकास स्तर" 
+                                           required="1" width="200"/>
+                                    <field name="girth_range_min" string="Min Girth (cm) / न्यूनतम छाती (से.मी.)" 
+                                           required="1" width="180"/>
+                                    <field name="girth_range_max" string="Max Girth (cm) / अधिकतम छाती (से.मी.)" 
+                                           width="180" 
+                                           placeholder="Leave empty for 'Above X cm'"/>
+                                    <field name="rate" string="Rate / दर" widget="monetary" 
+                                           required="1" width="150"/>
+                                    <field name="active" string="Active / सक्रिय" width="100"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
             </form>

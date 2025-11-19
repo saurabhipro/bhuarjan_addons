@@ -6,14 +6,13 @@ from odoo.exceptions import ValidationError
 
 class TreeRateMaster(models.Model):
     _name = 'bhu.tree.rate.master'
-    _description = 'Tree Rate Master - Girth-based Rates for Non-fruit-bearing Trees'
+    _description = 'Tree Rate Master - Rate Variants by Development Stage and Girth Range'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'tree_master_id, girth_range_min, development_stage'
 
     tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, 
-                                     domain="[('tree_type', '=', 'non_fruit_bearing')]", 
                                      tracking=True, ondelete='cascade',
-                                     help='Select non-fruit-bearing tree from master')
+                                     help='Select tree from master')
     
     # Girth Range (in cm)
     girth_range_min = fields.Float(string='Min Girth (cm) / न्यूनतम छाती (से.मी.)', digits=(10, 2), 

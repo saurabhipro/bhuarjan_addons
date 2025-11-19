@@ -624,12 +624,12 @@ class BhuarjanAPIController(http.Controller):
         Query params: 
             - type (optional): Filter by tree type. Values: 'fruit_bearing' or 'non_fruit_bearing'
             - name (optional): Filter by tree name (partial match, case-insensitive)
-            - development_stage (optional): For non-fruit-bearing trees, filter by development stage
+            - development_stage (optional): Filter by development stage (for rate lookup)
                 Values: 'undeveloped', 'semi_developed', 'fully_developed'
-            - girth_cm (optional): For non-fruit-bearing trees, girth in cm to lookup rate
+            - girth_cm (optional): Girth in cm to lookup rate (requires development_stage)
             - limit (optional, default 100)
             - offset (optional, default 0)
-        Returns: JSON list of tree masters with rates
+        Returns: JSON list of tree masters with rates (rate populated if development_stage and girth_cm provided)
         """
         try:
             # Get query parameters
@@ -682,12 +682,12 @@ class BhuarjanAPIController(http.Controller):
                     'id': tree.id,
                     'name': tree.name or '',
                     'tree_type': tree.tree_type,
-                    'rate': tree.rate or 0.0 if tree.tree_type == 'fruit_bearing' else None
+                    'rate': None  # Rate will be determined from tree_rate_ids
                 }
                 
-                # For non-fruit-bearing trees, if development_stage and girth are specified, 
-                # lookup rate from tree_rate_master
-                if tree.tree_type == 'non_fruit_bearing' and development_stage and girth_cm:
+                # If development_stage and girth are specified, lookup rate from tree_rate_master
+                # This works for both fruit-bearing and non-fruit-bearing trees now
+                if development_stage and girth_cm:
                     rate_master = request.env['bhu.tree.rate.master']
                     tree_data['rate'] = rate_master.get_rate_for_tree(
                         tree.id,
@@ -1326,9 +1326,7 @@ class BhuarjanAPIController(http.Controller):
                     'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
                     'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
                     'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
-                    'quantity': line.quantity,
-                    'rate': line.rate,
-                    'total_amount': line.total_amount
+                    'quantity': line.quantity
                 } for line in survey.tree_line_ids],
                 'photos': [{
                     'id': photo.id,
@@ -2395,9 +2393,7 @@ class BhuarjanAPIController(http.Controller):
                     'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
                     'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
                     'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
-                    'quantity': line.quantity,
-                    'rate': line.rate,
-                    'total_amount': line.total_amount
+                    'quantity': line.quantity
                 } for line in survey.tree_line_ids],
                 'photos': [{
                     'id': photo.id,

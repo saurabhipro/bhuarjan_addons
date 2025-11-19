@@ -728,7 +728,7 @@ class SurveyTreeLine(models.Model):
     ], string='Development Stage / विकास स्तर', tracking=True, default='undeveloped',
        help='Required for non-fruit-bearing trees. Not applicable for fruit-bearing trees.')
     girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2), tracking=True,
-                            help='Tree trunk girth (circumference) in centimeters. Required for non-fruit-bearing trees. Rate will be auto-computed based on this value and development stage.')
+                            help='Tree trunk girth (circumference) in centimeters. Optional for non-fruit-bearing trees. Rate will be auto-computed based on this value and development stage if provided.')
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1, tracking=True,
                              help='Number of trees of this type')
     rate = fields.Float(string='Rate per Tree / प्रति वृक्ष दर', digits=(16, 2), 
@@ -794,11 +794,12 @@ class SurveyTreeLine(models.Model):
     
     @api.constrains('girth_cm', 'development_stage', 'tree_master_id')
     def _check_non_fruit_bearing_requirements(self):
-        """Ensure non-fruit-bearing trees have girth and development stage"""
+        """Ensure non-fruit-bearing trees have development stage (girth_cm is optional)"""
         for record in self:
             if record.tree_master_id and record.tree_master_id.tree_type == 'non_fruit_bearing':
-                if not record.girth_cm or record.girth_cm <= 0:
-                    raise ValidationError('Girth (cm) is required for non-fruit-bearing trees.')
+                # girth_cm is optional, but if provided, it must be > 0
+                if record.girth_cm is not None and record.girth_cm <= 0:
+                    raise ValidationError('Girth (cm) must be greater than 0 if provided.')
                 if not record.development_stage:
                     raise ValidationError('Development stage is required for non-fruit-bearing trees.')
     

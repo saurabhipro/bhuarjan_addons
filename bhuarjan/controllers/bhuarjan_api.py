@@ -1107,17 +1107,18 @@ class BhuarjanAPIController(http.Controller):
                                 )
                             
                             girth_cm = tree_line.get('girth_cm')
-                            if not girth_cm or girth_cm <= 0:
+                            # girth_cm is optional - if provided, it must be > 0
+                            if girth_cm is not None and girth_cm <= 0:
                                 return Response(
                                     json.dumps({
-                                        'error': 'girth_cm is required and must be greater than 0 for non-fruit-bearing trees'
+                                        'error': 'girth_cm must be greater than 0 if provided'
                                     }),
                                     status=400,
                                     content_type='application/json'
                                 )
                             
                             tree_line_data['development_stage'] = development_stage
-                            tree_line_data['girth_cm'] = girth_cm
+                            tree_line_data['girth_cm'] = girth_cm if girth_cm is not None else 0.0
                         else:
                             # For fruit-bearing trees, clear development_stage and girth_cm
                             tree_line_data['development_stage'] = False
@@ -2243,17 +2244,18 @@ class BhuarjanAPIController(http.Controller):
                                 )
                             
                             girth_cm = tree_line.get('girth_cm')
-                            if not girth_cm or girth_cm <= 0:
+                            # girth_cm is optional - if provided, it must be > 0
+                            if girth_cm is not None and girth_cm <= 0:
                                 return Response(
                                     json.dumps({
-                                        'error': 'girth_cm is required and must be greater than 0 for non-fruit-bearing trees'
+                                        'error': 'girth_cm must be greater than 0 if provided'
                                     }),
                                     status=400,
                                     content_type='application/json'
                                 )
                             
                             tree_line_data['development_stage'] = development_stage
-                            tree_line_data['girth_cm'] = girth_cm
+                            tree_line_data['girth_cm'] = girth_cm if girth_cm is not None else 0.0
                         else:
                             # For fruit-bearing trees, clear development_stage and girth_cm
                             tree_line_data['development_stage'] = False

@@ -1005,13 +1005,7 @@ class BhuarjanAPIController(http.Controller):
                 except Exception as e:
                     _logger.warning(f"Error processing survey image: {str(e)}")
 
-            # Create survey
-            survey = request.env['bhu.survey'].sudo().create(survey_vals)
-
-            # Link landowners (already validated above - at least one is required)
-            if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
-                survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
-            
+            # VALIDATE ALL TREE LINES BEFORE CREATING SURVEY
             # Handle tree lines (new format: supports fruit-bearing and non-fruit-bearing trees)
             tree_line_vals = []
             
@@ -1130,6 +1124,16 @@ class BhuarjanAPIController(http.Controller):
             if 'undeveloped_tree_lines' in data and isinstance(data['undeveloped_tree_lines'], list):
                 for tree_line in data['undeveloped_tree_lines']:
                     if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        # Validate tree_master_id exists
+                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_line['tree_master_id'])
+                        if not tree_master.exists():
+                            return Response(
+                                json.dumps({
+                                    'error': f'Tree master with ID {tree_line["tree_master_id"]} not found'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
                         tree_line_vals.append((0, 0, {
                             'tree_master_id': tree_line['tree_master_id'],
                             'development_stage': 'undeveloped',
@@ -1139,6 +1143,16 @@ class BhuarjanAPIController(http.Controller):
             if 'semi_developed_tree_lines' in data and isinstance(data['semi_developed_tree_lines'], list):
                 for tree_line in data['semi_developed_tree_lines']:
                     if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        # Validate tree_master_id exists
+                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_line['tree_master_id'])
+                        if not tree_master.exists():
+                            return Response(
+                                json.dumps({
+                                    'error': f'Tree master with ID {tree_line["tree_master_id"]} not found'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
                         tree_line_vals.append((0, 0, {
                             'tree_master_id': tree_line['tree_master_id'],
                             'development_stage': 'semi_developed',
@@ -1148,21 +1162,45 @@ class BhuarjanAPIController(http.Controller):
             if 'fully_developed_tree_lines' in data and isinstance(data['fully_developed_tree_lines'], list):
                 for tree_line in data['fully_developed_tree_lines']:
                     if isinstance(tree_line, dict) and 'tree_master_id' in tree_line:
+                        # Validate tree_master_id exists
+                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_line['tree_master_id'])
+                        if not tree_master.exists():
+                            return Response(
+                                json.dumps({
+                                    'error': f'Tree master with ID {tree_line["tree_master_id"]} not found'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
                         tree_line_vals.append((0, 0, {
                             'tree_master_id': tree_line['tree_master_id'],
                             'development_stage': 'fully_developed',
                             'quantity': tree_line.get('quantity', 1)
                         }))
             
-            # Create tree lines if any
-            if tree_line_vals:
-                survey.sudo().write({'tree_line_ids': tree_line_vals})
-            
-            # Handle photos (if provided)
+            # VALIDATE PHOTOS BEFORE CREATING SURVEY
+            photo_vals = []
             if 'photos' in data and isinstance(data['photos'], list):
-                photo_vals = []
                 for photo in data['photos']:
-                    if isinstance(photo, dict) and 's3_url' in photo and 'photo_type_id' in photo:
+                    if isinstance(photo, dict):
+                        if 's3_url' not in photo or 'photo_type_id' not in photo:
+                            return Response(
+                                json.dumps({
+                                    'error': 'Each photo must have both s3_url and photo_type_id'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
+                        # Validate photo_type_id exists
+                        photo_type = request.env['bhu.photo.type'].sudo().browse(photo['photo_type_id'])
+                        if not photo_type.exists():
+                            return Response(
+                                json.dumps({
+                                    'error': f'Photo type with ID {photo["photo_type_id"]} not found'
+                                }),
+                                status=400,
+                                content_type='application/json'
+                            )
                         photo_vals.append((0, 0, {
                             'photo_type_id': photo['photo_type_id'],
                             's3_url': photo['s3_url'],
@@ -1171,9 +1209,22 @@ class BhuarjanAPIController(http.Controller):
                             'description': photo.get('description', ''),
                             'sequence': photo.get('sequence', 10)
                         }))
-                
-                if photo_vals:
-                    survey.sudo().write({'photo_ids': photo_vals})
+            
+            # ALL VALIDATIONS PASSED - NOW CREATE SURVEY
+            # Create survey
+            survey = request.env['bhu.survey'].sudo().create(survey_vals)
+
+            # Link landowners (already validated above - at least one is required)
+            if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
+                survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
+            
+            # Create tree lines if any (already validated above)
+            if tree_line_vals:
+                survey.sudo().write({'tree_line_ids': tree_line_vals})
+            
+            # Create photos if any (already validated above)
+            if photo_vals:
+                survey.sudo().write({'photo_ids': photo_vals})
 
             # Return created survey details
             return Response(
@@ -1193,6 +1244,11 @@ class BhuarjanAPIController(http.Controller):
 
         except ValidationError as ve:
             _logger.error(f"Validation error in create_survey: {str(ve)}", exc_info=True)
+            # Rollback any database changes if survey was created
+            try:
+                request.env.cr.rollback()
+            except:
+                pass
             return Response(
                 json.dumps({
                     'error': 'Validation Error',
@@ -1203,6 +1259,11 @@ class BhuarjanAPIController(http.Controller):
             )
         except Exception as e:
             _logger.error(f"Error in create_survey: {str(e)}", exc_info=True)
+            # Rollback any database changes if survey was created
+            try:
+                request.env.cr.rollback()
+            except:
+                pass
             return Response(
                 json.dumps({'error': str(e)}),
                 status=500,

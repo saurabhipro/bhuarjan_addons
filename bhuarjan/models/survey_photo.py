@@ -16,8 +16,8 @@ class SurveyPhoto(models.Model):
     survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', required=True, 
                                ondelete='cascade', tracking=True)
     photo_type_id = fields.Many2one('bhu.photo.type', string='Photo Type / फोटो प्रकार', 
-                                    required=True, tracking=True,
-                                    help='Type of photo (e.g., Land, Well, House)')
+                                    required=False, tracking=True,
+                                    help='Type of photo (e.g., Land, Well, House). Optional.')
     photo_type_name = fields.Char(related='photo_type_id.name', string='Photo Type Name', 
                                  readonly=True, store=True)
     s3_url = fields.Char(string='S3 URL / S3 यूआरएल', required=True, tracking=True,

@@ -144,16 +144,22 @@ class FileUploadAPIController(http.Controller):
             aws_region = settings_master.aws_region or 'ap-south-1'
             
             # Create S3 client with proper region configuration
-            # This ensures the presigned URL includes the region in the hostname
+            # Use endpoint_url to ensure the region is included in the hostname
+            # This ensures the presigned URL signature is calculated correctly
+            endpoint_url = f'https://s3.{aws_region}.amazonaws.com'
             s3_config = Config(
                 region_name=aws_region,
-                signature_version='s3v4'
+                signature_version='s3v4',
+                s3={
+                    'addressing_style': 'virtual'
+                }
             )
             s3_client = boto3.client(
                 's3',
                 aws_access_key_id=settings_master.aws_access_key,
                 aws_secret_access_key=settings_master.aws_secret_key,
                 region_name=aws_region,
+                endpoint_url=endpoint_url,
                 config=s3_config
             )
             
@@ -188,6 +194,8 @@ class FileUploadAPIController(http.Controller):
                         content_type = content_type_map[file_ext]
                     
                     # Generate presigned URL for PUT operation
+                    # The endpoint_url and config ensure the region is included in the hostname
+                    # and the signature is calculated correctly
                     presigned_url = s3_client.generate_presigned_url(
                         'put_object',
                         Params={
@@ -198,25 +206,13 @@ class FileUploadAPIController(http.Controller):
                         ExpiresIn=int(expiration.total_seconds())
                     )
                     
-                    # Ensure the presigned URL includes the region in the format
-                    # Handle different URL formats that boto3 might generate
+                    # Verify the URL includes the region (it should with endpoint_url set)
+                    # If it doesn't, log a warning but don't modify the URL (would break signature)
                     if f'.s3.{aws_region}.amazonaws.com' not in presigned_url:
-                        # Try multiple replacement patterns
-                        replacements = [
-                            # Pattern 1: bucket.s3.amazonaws.com -> bucket.s3.region.amazonaws.com
-                            (f'{settings_master.s3_bucket_name}.s3.amazonaws.com',
-                             f'{settings_master.s3_bucket_name}.s3.{aws_region}.amazonaws.com'),
-                            # Pattern 2: s3.amazonaws.com/bucket -> s3.region.amazonaws.com/bucket
-                            (f's3.amazonaws.com/{settings_master.s3_bucket_name}',
-                             f's3.{aws_region}.amazonaws.com/{settings_master.s3_bucket_name}'),
-                            # Pattern 3: s3.amazonaws.com -> s3.region.amazonaws.com
-                            ('s3.amazonaws.com', f's3.{aws_region}.amazonaws.com'),
-                        ]
-                        
-                        for old_pattern, new_pattern in replacements:
-                            if old_pattern in presigned_url:
-                                presigned_url = presigned_url.replace(old_pattern, new_pattern)
-                                break
+                        self._logger.warning(
+                            f"Presigned URL does not include region {aws_region}. "
+                            f"URL: {presigned_url[:100]}..."
+                        )
                     
                     presigned_urls.append({
                         'file_name': file_name,

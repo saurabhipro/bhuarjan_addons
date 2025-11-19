@@ -278,16 +278,16 @@
                                                 </td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.house_type">
-                                                        <span t-if="s.house_type == 'kachcha'">कच्चा</span>
+                                                        <span t-if="s.house_type == 'kaccha'">कच्चा</span>
                                                         <span t-if="s.house_type == 'pakka'">पक्का</span>
-                                                        <span t-if="s.house_type != 'kachcha' and s.house_type != 'pakka'"><t t-esc="s.house_type"/></span>
+                                                        <span t-if="s.house_type != 'kaccha' and s.house_type != 'pakka'"><t t-esc="s.house_type"/></span>
                                                         / <span t-esc="s.house_area"/>
                                                     </span>
                                                     <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                                 <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kaccha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
                                                     <span t-if="s.has_well != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>

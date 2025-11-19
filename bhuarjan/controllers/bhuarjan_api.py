@@ -1124,8 +1124,9 @@ class BhuarjanAPIController(http.Controller):
                                         content_type='application/json'
                                     )
                             else:
-                                # Don't set girth_cm if not provided (use False to indicate not set)
-                                tree_line_data['girth_cm'] = False
+                                # Don't set girth_cm at all if not provided - Odoo will use default/False
+                                # Don't include it in tree_line_data to avoid any validation issues
+                                pass
                             
                             tree_line_data['development_stage'] = development_stage
                         else:
@@ -2343,8 +2344,9 @@ class BhuarjanAPIController(http.Controller):
                                         content_type='application/json'
                                     )
                             else:
-                                # Don't set girth_cm if not provided (use False to indicate not set)
-                                tree_line_data['girth_cm'] = False
+                                # Don't set girth_cm at all if not provided - Odoo will use default/False
+                                # Don't include it in tree_line_data to avoid any validation issues
+                                pass
                             
                             tree_line_data['development_stage'] = development_stage
                         else:

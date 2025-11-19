@@ -797,16 +797,25 @@ class SurveyTreeLine(models.Model):
         """Ensure non-fruit-bearing trees have development stage (girth_cm is optional)"""
         for record in self:
             if record.tree_master_id and record.tree_master_id.tree_type == 'non_fruit_bearing':
-                # girth_cm is optional, but if provided, it must be > 0
-                # Check if girth_cm is explicitly set (not False/None) and is a valid number
-                if record.girth_cm is not False and record.girth_cm is not None:
+                # girth_cm is optional - only validate if it's actually a positive number
+                # Skip validation if girth_cm is False, None, or 0.0 (means "not set")
+                girth_value = record.girth_cm
+                if girth_value is False or girth_value is None:
+                    # Not set - that's fine, it's optional
+                    pass
+                elif girth_value == 0.0:
+                    # 0.0 means not set for optional fields - that's fine
+                    pass
+                else:
+                    # girth_cm is provided - validate it's a positive number
                     try:
-                        girth_value = float(record.girth_cm)
-                        if girth_value <= 0:
+                        girth_float = float(girth_value)
+                        if girth_float <= 0:
                             raise ValidationError('Girth (cm) must be greater than 0 if provided.')
                     except (ValueError, TypeError):
-                        # If it's not a valid number, that's also an error
+                        # If it's not a valid number, that's an error
                         raise ValidationError('Girth (cm) must be a valid number if provided.')
+                # girth_cm is optional, so no error if it's False/None/0.0
                 if not record.development_stage:
                     raise ValidationError('Development stage is required for non-fruit-bearing trees.')
     

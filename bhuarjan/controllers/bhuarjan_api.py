@@ -1697,6 +1697,180 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+    @http.route('/api/bhuarjan/form10/survey/download', type='http', auth='public', methods=['GET'], csrf=False)
+    # @check_permission
+    def download_form10_by_survey(self, **kwargs):
+        """
+        Download Form 10 (Bulk Table Report) PDF for a specific survey
+        Query params: survey_id (required)
+        Returns: PDF file
+        """
+        try:
+            _logger.info("Form 10 download by survey API called")
+            
+            # Get query parameters
+            survey_id = request.httprequest.args.get('survey_id', type=int)
+
+            if not survey_id:
+                _logger.warning("Form 10 download by survey: survey_id is missing")
+                return Response(
+                    json.dumps({'error': 'survey_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            _logger.info(f"Form 10 download by survey: survey_id={survey_id}")
+
+            # Verify survey exists
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                _logger.warning(f"Form 10 download by survey: Survey {survey_id} not found")
+                return Response(
+                    json.dumps({'error': 'Survey not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Get the Form 10 bulk table report
+            _logger.info("Form 10 download by survey: Getting report action")
+            try:
+                # Use sudo() to bypass access rights when getting the report action
+                report_action = request.env['ir.actions.report'].sudo().search([
+                    ('report_name', '=', 'bhuarjan.form10_bulk_table_report')
+                ], limit=1)
+                
+                if not report_action:
+                    # Fallback: try using ir.model.data
+                    _logger.info("Form 10 download by survey: Report not found by name, trying ir.model.data")
+                    try:
+                        report_data = request.env['ir.model.data'].sudo().search([
+                            ('module', '=', 'bhuarjan'),
+                            ('name', '=', 'action_report_form10_bulk_table')
+                        ], limit=1)
+                        if report_data and report_data.res_id:
+                            report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
+                    except Exception as e:
+                        _logger.error(f"Form 10 download by survey: Error in fallback: {str(e)}", exc_info=True)
+                
+                if not report_action or not report_action.exists():
+                    _logger.error("Form 10 download by survey: Report action not found")
+                    return Response(
+                        json.dumps({'error': 'Form 10 report not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                
+                _logger.info(f"Form 10 download by survey: Report action found: {report_action.id}, report_name: {report_action.report_name}")
+            except Exception as e:
+                _logger.error(f"Form 10 download by survey: Error getting report action: {str(e)}", exc_info=True)
+                return Response(
+                    json.dumps({'error': f'Error accessing report: {str(e)}'}),
+                    status=500,
+                    content_type='application/json'
+                )
+
+            # Use single survey ID for PDF rendering
+            res_ids = [survey_id]
+            
+            _logger.info(f"Form 10 download by survey: Rendering PDF for survey ID: {survey_id}")
+
+            # Generate PDF with error handling
+            report_name = report_action.report_name
+            _logger.info(f"Form 10 download by survey: Starting PDF generation with report_name: {report_name} for survey {survey_id}")
+            
+            try:
+                # Use with_context to ensure clean environment
+                pdf_result = report_action.sudo().with_context(
+                    lang='en_US',
+                    tz='UTC'
+                )._render_qweb_pdf(report_name, res_ids, data={})
+                _logger.info(f"Form 10 download by survey: PDF generation completed, result type: {type(pdf_result)}")
+            except MemoryError as mem_error:
+                _logger.error(f"Form 10 download by survey: Memory error during PDF generation: {str(mem_error)}")
+                return Response(
+                    json.dumps({'error': 'PDF generation failed due to memory constraints. Please contact administrator.'}),
+                    status=500,
+                    content_type='application/json'
+                )
+            except Exception as render_error:
+                _logger.error(f"Form 10 download by survey: PDF rendering failed: {str(render_error)}", exc_info=True)
+                return Response(
+                    json.dumps({'error': f'Error generating PDF: {str(render_error)}'}),
+                    status=500,
+                    content_type='application/json'
+                )
+
+            if not pdf_result:
+                return Response(
+                    json.dumps({'error': 'Error generating PDF'}),
+                    status=500,
+                    content_type='application/json'
+                )
+
+            # Extract PDF bytes
+            _logger.info("Form 10 download by survey: Extracting PDF bytes from result")
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+
+            if not isinstance(pdf_data, bytes):
+                _logger.error(f"Form 10 download by survey: Invalid PDF data type: {type(pdf_data)}")
+                return Response(
+                    json.dumps({'error': 'Invalid PDF data'}),
+                    status=500,
+                    content_type='application/json'
+                )
+
+            _logger.info(f"Form 10 download by survey: PDF data extracted, size: {len(pdf_data)} bytes")
+
+            # Generate filename - sanitize to ASCII only for HTTP headers
+            def sanitize_filename(name):
+                """Remove non-ASCII characters and sanitize for HTTP headers"""
+                if not name:
+                    return 'Unknown'
+                # Convert to string and encode to ASCII, ignoring non-ASCII characters
+                try:
+                    # First, try to encode to ASCII and ignore errors
+                    name = name.encode('ascii', 'ignore').decode('ascii')
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    # If encoding fails, remove all non-ASCII characters manually
+                    name = ''.join(char for char in name if ord(char) < 128)
+                
+                # Remove any remaining non-alphanumeric characters except underscores and hyphens
+                name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
+                # Replace multiple underscores/hyphens with single underscore
+                name = re.sub(r'[_\-\s]+', '_', name)
+                # Remove leading/trailing underscores
+                name = name.strip('_')
+                return name[:50] if name else 'Unknown'
+            
+            # Generate filename with survey name or ID
+            survey_name_ascii = sanitize_filename(survey.name if survey.name else f"Survey_{survey_id}")
+            filename = f"Form10_{survey_name_ascii}.pdf"
+
+            _logger.info(f"Form 10 download by survey: Returning PDF response with filename: {filename}")
+
+            # Return PDF
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data)))
+                ]
+            )
+            _logger.info("Form 10 download by survey: PDF response created successfully")
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error in download_form10_by_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
     @http.route('/api/bhuarjan/landowner', type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
     def create_landowner(self, **kwargs):

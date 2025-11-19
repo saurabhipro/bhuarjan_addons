@@ -618,6 +618,35 @@
 						"description": "Download Form 10 (Bulk Table Report) PDF based on village_id and project_id. Returns surveys for the specified village and project only."
 					},
 					"response": []
+				},
+				{
+					"name": "Download Form 10 PDF (by survey ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/form10/survey/download?survey_id=257",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"form10",
+								"survey",
+								"download"
+							],
+							"query": [
+								{
+									"key": "survey_id",
+									"value": "257",
+									"description": "Survey ID (required)"
+								}
+							]
+						},
+						"description": "Download Form 10 (Bulk Table Report) PDF for a specific survey. Returns the Form 10 PDF for the specified survey_id only."
+					},
+					"response": []
 				}
 			]
 		},

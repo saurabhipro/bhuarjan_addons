@@ -1685,6 +1685,28 @@ class BhuarjanAPIController(http.Controller):
             data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
 
             # Prepare landowner values
+            # Convert string IDs to integers if provided as strings
+            village_id = data.get('village_id')
+            if village_id:
+                try:
+                    village_id = int(village_id) if isinstance(village_id, str) else village_id
+                except (ValueError, TypeError):
+                    village_id = None
+            
+            tehsil_id = data.get('tehsil_id')
+            if tehsil_id:
+                try:
+                    tehsil_id = int(tehsil_id) if isinstance(tehsil_id, str) else tehsil_id
+                except (ValueError, TypeError):
+                    tehsil_id = None
+            
+            district_id = data.get('district_id')
+            if district_id:
+                try:
+                    district_id = int(district_id) if isinstance(district_id, str) else district_id
+                except (ValueError, TypeError):
+                    district_id = None
+            
             landowner_vals = {
                 'name': data.get('name'),
                 'father_name': data.get('father_name'),
@@ -1693,9 +1715,9 @@ class BhuarjanAPIController(http.Controller):
                 'age': data.get('age'),
                 'gender': data.get('gender'),
                 'phone': data.get('phone'),
-                'village_id': data.get('village_id'),
-                'tehsil_id': data.get('tehsil_id'),
-                'district_id': data.get('district_id'),
+                'village_id': village_id,
+                'tehsil_id': tehsil_id,
+                'district_id': district_id,
                 'owner_address': data.get('owner_address'),
                 'aadhar_number': data.get('aadhar_number'),
                 'pan_number': data.get('pan_number'),
@@ -1705,6 +1727,11 @@ class BhuarjanAPIController(http.Controller):
                 'ifsc_code': data.get('ifsc_code'),
                 'account_holder_name': data.get('account_holder_name'),
             }
+            
+            # Remove None values for ID fields only (to avoid invalid references)
+            # Keep all text fields even if empty string or None (Odoo will handle None as not setting the field)
+            landowner_vals = {k: v for k, v in landowner_vals.items() 
+                            if v is not None or k not in ['village_id', 'tehsil_id', 'district_id', 'age']}
 
             # Handle document uploads if provided (base64 encoded)
             if data.get('aadhar_card'):
@@ -1738,6 +1765,8 @@ class BhuarjanAPIController(http.Controller):
                         'id': landowner.id,
                         'name': landowner.name,
                         'father_name': landowner.father_name or '',
+                        'mother_name': landowner.mother_name or '',
+                        'spouse_name': landowner.spouse_name or '',
                         'gender': landowner.gender,
                         'age': landowner.age,
                         'aadhar_number': landowner.aadhar_number or '',

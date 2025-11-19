@@ -665,30 +665,20 @@ class SurveyTreeLine(models.Model):
     
     @api.onchange('tree_master_id')
     def _onchange_tree_master_id(self):
-        """Set tree_type and default development_stage when tree is selected"""
+        """Set default development_stage when tree is selected"""
         if self.tree_master_id:
-            # Set tree_type from selected tree
-            self.tree_type = self.tree_master_id.tree_type
+            # tree_type is computed, so it will update automatically
             # Set default development_stage if not already set
             if not self.development_stage:
                 self.development_stage = self._context.get('default_development_stage', 'undeveloped')
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Set tree_type from tree_master_id when creating"""
-        for vals in vals_list:
-            if 'tree_master_id' in vals and vals['tree_master_id']:
-                tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
-                if tree:
-                    vals['tree_type'] = tree.tree_type
+        """tree_type is computed, so it will be set automatically"""
         return super().create(vals_list)
     
     def write(self, vals):
-        """Set tree_type from tree_master_id when updating"""
-        if 'tree_master_id' in vals and vals['tree_master_id']:
-            tree = self.env['bhu.tree.master'].browse(vals['tree_master_id'])
-            if tree:
-                vals['tree_type'] = tree.tree_type
+        """tree_type is computed, so it will be updated automatically"""
         return super().write(vals)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
@@ -705,8 +695,18 @@ class SurveyTreeLine(models.Model):
     tree_type = fields.Selection([
         ('fruit_bearing', 'Fruit-bearing / फलदार'),
         ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
-    ], string='Tree Type / वृक्ष प्रकार', store=True,
+    ], string='Tree Type / वृक्ष प्रकार', 
+       compute='_compute_tree_type', store=True, readonly=True,
        help='Automatically set from selected tree')
+    
+    @api.depends('tree_master_id.tree_type')
+    def _compute_tree_type(self):
+        """Compute tree_type from tree_master_id"""
+        for record in self:
+            if record.tree_master_id:
+                record.tree_type = record.tree_master_id.tree_type
+            else:
+                record.tree_type = False
 
     @api.constrains('tree_master_id')
     def _check_tree_master(self):

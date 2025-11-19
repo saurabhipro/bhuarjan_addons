@@ -110,11 +110,6 @@
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">
                                     <field name="remarks" placeholder="Enter any additional notes"/>
                                 </group>
-                                <group string="Survey Image / सर्वे छवि" col="1">
-                                    <label for="survey_image" string="Survey Image / सर्वे छवि"/>
-                                    <field name="survey_image" widget="capture_image" class="oe_avatar" nolabel="1"/>
-                                    <field name="survey_image_filename" invisible="1"/>
-                                </group>
                             </group>
                             
                         </page>

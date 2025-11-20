@@ -281,11 +281,11 @@
                                                         <span t-if="s.house_type == 'kaccha'">कच्चा</span>
                                                         <span t-if="s.house_type == 'pakka'">पक्का</span>
                                                         <span t-if="s.house_type != 'kaccha' and s.house_type != 'pakka'"><t t-esc="s.house_type"/></span>
-                                                        / <span t-esc="s.house_area"/>
+                                                        / <span t-esc="s.house_area"/> वर्गफुट
                                                     </span>
                                                     <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/> वर्गफुट</span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'kaccha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
@@ -294,20 +294,22 @@
                                                 <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td>
-                                                    <t t-set="remark_parts" t-value="[]"/>
+                                                    <t t-set="has_remarks" t-value="False"/>
                                                     <t t-if="s.has_traded_land == 'yes'">
-                                                        <t t-set="remark_parts" t-value="remark_parts + ['विवर्टेड']"/>
+                                                        <t t-set="has_remarks" t-value="True"/>
+                                                        <div>
+                                                            व्यपवर्तित-<t t-esc="s.traded_land_area or 0.0"/> हेक्टेयर
+                                                        </div>
                                                     </t>
                                                     <t t-if="s.crop_type_id and (s.crop_type_id.code == 'FALLOW' or 'पड़ती' in (s.crop_type_id.name or ''))">
-                                                        <t t-set="remark_parts" t-value="remark_parts + ['पड़ती']"/>
+                                                        <t t-set="has_remarks" t-value="True"/>
+                                                        <div>पड़ती भूमि</div>
                                                     </t>
                                                     <t t-if="s.remarks">
-                                                        <t t-set="remark_parts" t-value="remark_parts + [s.remarks]"/>
+                                                        <t t-set="has_remarks" t-value="True"/>
+                                                        <div><t t-esc="s.remarks"/></div>
                                                     </t>
-                                                    <t t-if="remark_parts">
-                                                        <t t-esc="', '.join(remark_parts)"/>
-                                                    </t>
-                                                    <span t-if="not remark_parts" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                    <span t-if="not has_remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                             </tr>
                                 </t>

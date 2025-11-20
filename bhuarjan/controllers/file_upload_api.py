@@ -289,7 +289,6 @@ class FileUploadAPIController(http.Controller):
         Query Parameters:
         - survey_id (required): Survey ID
         - photo_type_id (optional): Filter by photo type ID
-        - active_only (optional, default=true): Return only active photos
         
         Returns: List of images with metadata
         
@@ -307,9 +306,7 @@ class FileUploadAPIController(http.Controller):
                         "s3_url": "https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg",
                         "filename": "image1.jpg",
                         "file_size": 245678,
-                        "sequence": 10,
-                        "description": "Land photo",
-                        "active": true
+                        "sequence": 10
                     }
                 ]
             }
@@ -374,9 +371,7 @@ class FileUploadAPIController(http.Controller):
                     's3_url': photo.s3_url,
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
-                    'sequence': photo.sequence,
-                    'description': photo.description or '',
-                    'active': photo.active
+                    'sequence': photo.sequence
                 })
             
             response_data = {

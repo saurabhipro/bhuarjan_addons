@@ -1241,7 +1241,6 @@ class BhuarjanAPIController(http.Controller):
                             's3_url': photo['s3_url'],
                             'filename': photo.get('filename', ''),
                             'file_size': photo.get('file_size', 0),
-                            'description': photo.get('description', ''),
                             'sequence': photo.get('sequence', 10)
                         }))
             
@@ -1404,9 +1403,8 @@ class BhuarjanAPIController(http.Controller):
                     's3_url': photo.s3_url or '',
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
-                    'description': photo.description or '',
                     'sequence': photo.sequence or 10
-                } for photo in survey.photo_ids.filtered(lambda p: p.active)],
+                } for photo in survey.photo_ids],
                 'has_house': survey.has_house,
                 'house_type': survey.house_type,
                 'house_area': survey.house_area,
@@ -2427,7 +2425,6 @@ class BhuarjanAPIController(http.Controller):
                             's3_url': photo['s3_url'],
                             'filename': photo.get('filename', ''),
                             'file_size': photo.get('file_size', 0),
-                            'description': photo.get('description', ''),
                             'sequence': photo.get('sequence', 10)
                         }))
                 
@@ -2475,9 +2472,8 @@ class BhuarjanAPIController(http.Controller):
                     's3_url': photo.s3_url or '',
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
-                    'description': photo.description or '',
                     'sequence': photo.sequence or 10
-                } for photo in survey.photo_ids.filtered(lambda p: p.active)],
+                } for photo in survey.photo_ids],
                 'has_house': survey.has_house or '',
                 'house_type': survey.house_type or '',
                 'house_area': survey.house_area or 0.0,
@@ -2505,24 +2501,60 @@ class BhuarjanAPIController(http.Controller):
         except json.JSONDecodeError as e:
             _logger.error(f"JSON decode error in update_survey: {str(e)}", exc_info=True)
             return Response(
-                json.dumps({'error': 'Invalid JSON in request body', 'details': str(e)}),
+                json.dumps({
+                    'success': False,
+                    'error': 'VALIDATION_ERROR',
+                    'error_code': 'INVALID_JSON',
+                    'message': 'Invalid JSON in request body. Please check your request format.'
+                }),
                 status=400,
                 content_type='application/json'
             )
         except ValidationError as ve:
             _logger.error(f"Validation error in update_survey: {str(ve)}", exc_info=True)
+            # Extract clear error message from ValidationError
+            error_message = str(ve)
+            if hasattr(ve, 'name') and ve.name:
+                error_message = ve.name
+            elif isinstance(ve.args, tuple) and len(ve.args) > 0:
+                if isinstance(ve.args[0], (list, tuple)):
+                    error_message = '; '.join(str(msg) for msg in ve.args[0])
+                else:
+                    error_message = str(ve.args[0])
+            
             return Response(
                 json.dumps({
-                    'error': 'Validation Error',
-                    'message': str(ve)
+                    'success': False,
+                    'error': 'VALIDATION_ERROR',
+                    'error_code': 'MODEL_VALIDATION_FAILED',
+                    'message': error_message
                 }),
                 status=400,
                 content_type='application/json'
             )
         except Exception as e:
             _logger.error(f"Error in update_survey: {str(e)}", exc_info=True)
+            error_message = str(e)
+            error_type = type(e).__name__
+            
+            # Provide more descriptive messages for common errors
+            if 'unique constraint' in error_message.lower() or 'duplicate' in error_message.lower():
+                if 'khasra' in error_message.lower():
+                    error_message = 'Khasra number already exists in this village for another survey.'
+                else:
+                    error_message = 'A record with these values already exists. Please check for duplicates.'
+            elif 'foreign key' in error_message.lower():
+                error_message = 'Invalid reference: One or more related records do not exist.'
+            elif 'not null' in error_message.lower() or 'required' in error_message.lower():
+                error_message = 'Required field is missing. Please check all required fields are provided.'
+            
             return Response(
-                json.dumps({'error': str(e)}),
+                json.dumps({
+                    'success': False,
+                    'error': 'SERVER_ERROR',
+                    'error_code': error_type.upper().replace(' ', '_'),
+                    'message': error_message
+                }),
                 status=500,
                 content_type='application/json'
             )
@@ -2673,7 +2705,7 @@ class BhuarjanAPIController(http.Controller):
         Query param: survey_id (required)
         Body: JSON with photos array
         Each photo must have: s3_url (required)
-        Optional fields: photo_type_id, filename, file_size, description, sequence
+        Optional fields: photo_type_id, filename, file_size, sequence
         Returns: Success message with added photos
         """
         try:
@@ -2775,7 +2807,6 @@ class BhuarjanAPIController(http.Controller):
                     's3_url': photo['s3_url'],
                     'filename': photo.get('filename', ''),
                     'file_size': photo.get('file_size', 0),
-                    'description': photo.get('description', ''),
                     'sequence': photo.get('sequence', 10)
                 }
                 
@@ -2828,7 +2859,7 @@ class BhuarjanAPIController(http.Controller):
                     'data': {
                         'survey_id': survey_id,
                         'added_photos': added_photos,
-                        'total_photos': len(survey.photo_ids.filtered(lambda p: p.active))
+                        'total_photos': len(survey.photo_ids)
                     }
                 }),
                 status=200,
@@ -2839,8 +2870,9 @@ class BhuarjanAPIController(http.Controller):
             return Response(
                 json.dumps({
                     'success': False,
-                    'error': 'Invalid JSON',
-                    'message': 'Request body must be valid JSON'
+                    'error': 'VALIDATION_ERROR',
+                    'error_code': 'INVALID_JSON',
+                    'message': 'Request body must be valid JSON. Please check your request format.'
                 }),
                 status=400,
                 content_type='application/json'

@@ -43,11 +43,13 @@
                     </td>
                     <td style="width: 40%;">
                         <strong>परियोजना का नाम :</strong>
-                        <span t-if="first" t-field="first.project_id.name"/>
+                        <span t-if="first and first.project_id and first.project_id.name" t-esc="first.project_id.name"/>
+                        <span t-if="not (first and first.project_id and first.project_id.name)" style="color: #999;">................</span>
                     </td>
                     <td style="width: 40%;">
                         <strong>विभाग का नाम</strong>
-                        <span t-if="first" t-field="first.department_id.name"/>
+                        <span t-if="first and first.department_id and first.department_id.name" t-esc="first.department_id.name"/>
+                        <span t-if="not (first and first.department_id and first.department_id.name)" style="color: #999;">................</span>
                     </td>
                     <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
                         <!-- QR Code -->
@@ -78,17 +80,21 @@
                 <tr>
                     <td style="width: 40%;">
                         <strong>ग्राम का नाम</strong>
-                        <span t-if="first" t-field="first.village_id.name"/>
+                        <span t-if="first and first.village_id and first.village_id.name" t-esc="first.village_id.name"/>
+                        <span t-if="not (first and first.village_id and first.village_id.name)" style="color: #999;">................</span>
                     </td>
                     <td style="width: 40%;">
                         <strong>तहसील का नाम</strong>
-                        <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
+                        <span t-if="first and first.tehsil_id and first.tehsil_id.name" t-esc="first.tehsil_id.name"/>
+                        <span t-if="not (first and first.tehsil_id and first.tehsil_id.name)" style="color: #999;">................</span>
+                        <strong> जिला-रायगढ़ (छ.ग.)</strong>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
                         <strong>सर्वे दिनाँक</strong>
-                        <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                        <span t-if="first and first.survey_date" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                        <span t-if="not (first and first.survey_date)" style="color: #999;">................</span>
                     </td>
                 </tr>
             </table>
@@ -354,5 +360,3 @@
         </t>
     </template>
 </odoo>
-
-

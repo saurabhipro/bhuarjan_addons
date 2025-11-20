@@ -68,12 +68,6 @@ class BhuLandowner(models.Model):
                 if not re.match(r'^\d{12}$', record.aadhar_number):
                     raise ValidationError('Aadhar number must be exactly 12 digits.')
     
-    @api.constrains('pan_number')
-    def _check_pan(self):
-        for record in self:
-            if record.pan_number:
-                if not re.match(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$', record.pan_number.upper()):
-                    raise ValidationError('PAN number must be in format: ABCDE1234F')
     
     @api.constrains('account_number')
     def _check_account_number(self):

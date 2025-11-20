@@ -82,12 +82,6 @@ class BhuLandowner(models.Model):
                 if not re.match(r'^\d{9,18}$', record.account_number):
                     raise ValidationError('Account number must be between 9-18 digits.')
     
-    @api.constrains('ifsc_code')
-    def _check_ifsc(self):
-        for record in self:
-            if record.ifsc_code:
-                if not re.match(r'^[A-Z]{4}0[A-Z0-9]{6}$', record.ifsc_code.upper()):
-                    raise ValidationError('IFSC code must be in format: ABCD0123456')
     
     @api.constrains('age')
     def _check_age(self):

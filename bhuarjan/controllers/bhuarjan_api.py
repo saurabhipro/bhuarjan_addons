@@ -1242,20 +1242,23 @@ class BhuarjanAPIController(http.Controller):
                         photo_vals.append((0, 0, photo_data))
             
             # ALL VALIDATIONS PASSED - NOW CREATE SURVEY
-            # Create survey
-            survey = request.env['bhu.survey'].sudo().create(survey_vals)
-
-            # Link landowners (already validated above - at least one is required)
+            # Include all related data in survey_vals for atomic creation
+            # This ensures if any validation fails, nothing gets saved
+            
+            # Add landowners to survey_vals
             if isinstance(landowner_ids, list) and len(landowner_ids) > 0:
-                survey.sudo().write({'landowner_ids': [(6, 0, landowner_ids)]})
+                survey_vals['landowner_ids'] = [(6, 0, landowner_ids)]
             
-            # Create tree lines if any (already validated above)
+            # Add tree lines to survey_vals
             if tree_line_vals:
-                survey.sudo().write({'tree_line_ids': tree_line_vals})
+                survey_vals['tree_line_ids'] = tree_line_vals
             
-            # Create photos if any (already validated above)
+            # Add photos to survey_vals
             if photo_vals:
-                survey.sudo().write({'photo_ids': photo_vals})
+                survey_vals['photo_ids'] = photo_vals
+            
+            # Create survey with all related data atomically
+            survey = request.env['bhu.survey'].sudo().create(survey_vals)
 
             # Return created survey details
             return Response(
@@ -1275,11 +1278,11 @@ class BhuarjanAPIController(http.Controller):
 
         except ValidationError as ve:
             _logger.error(f"Validation error in create_survey: {str(ve)}", exc_info=True)
-            # Rollback any database changes if survey was created
+            # CRITICAL: Rollback transaction to ensure survey is NOT saved
             try:
                 request.env.cr.rollback()
-            except:
-                pass
+            except Exception as rollback_error:
+                _logger.error(f"Error during rollback: {str(rollback_error)}", exc_info=True)
             
             # Extract clear error message from ValidationError
             error_message = str(ve)
@@ -1293,23 +1296,34 @@ class BhuarjanAPIController(http.Controller):
                 else:
                     error_message = str(ve.args[0])
             
+            # Try to identify which fields caused the validation error
+            fields_list = []
+            error_lower = error_message.lower()
+            if 'khasra' in error_lower:
+                fields_list.append('khasra_number')
+            if 'area' in error_lower or 'acquired' in error_lower:
+                fields_list.extend(['total_area', 'acquired_area'])
+            if 'landowner' in error_lower:
+                fields_list.append('landowner_ids')
+            
             return Response(
                 json.dumps({
                     'success': False,
                     'error': 'VALIDATION_ERROR',
                     'error_code': 'MODEL_VALIDATION_FAILED',
-                    'message': error_message
+                    'message': error_message,
+                    'fields': fields_list if fields_list else []
                 }),
                 status=400,
                 content_type='application/json'
             )
         except Exception as e:
             _logger.error(f"Error in create_survey: {str(e)}", exc_info=True)
-            # Rollback any database changes if survey was created
+            # CRITICAL: Rollback transaction to ensure survey is NOT saved
             try:
                 request.env.cr.rollback()
-            except:
-                pass
+            except Exception as rollback_error:
+                _logger.error(f"Error during rollback: {str(rollback_error)}", exc_info=True)
             
             # Try to extract meaningful error message from generic exceptions
             error_message = str(e)

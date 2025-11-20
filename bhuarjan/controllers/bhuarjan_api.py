@@ -1099,17 +1099,10 @@ class BhuarjanAPIController(http.Controller):
                             'quantity': tree_line.get('quantity', 1)
                         }
                         
-                        # For non-fruit-bearing trees, require development_stage and girth_cm
-                        if tree_type == 'non_fruit_bearing':
-                            development_stage = tree_line.get('development_stage')
-                            if not development_stage:
-                                return Response(
-                                    json.dumps({
-                                        'error': 'development_stage is required for non-fruit-bearing trees'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
+                        # Handle development_stage - allow for all tree types if provided
+                        development_stage = tree_line.get('development_stage')
+                        if development_stage:
+                            # Validate development_stage if provided
                             if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
                                 return Response(
                                     json.dumps({
@@ -1118,7 +1111,20 @@ class BhuarjanAPIController(http.Controller):
                                     status=400,
                                     content_type='application/json'
                                 )
+                            tree_line_data['development_stage'] = development_stage
+                        
+                        # For non-fruit-bearing trees, require development_stage
+                        if tree_type == 'non_fruit_bearing':
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
                             
+                            # Handle girth_cm for non-fruit-bearing trees
                             girth_cm = tree_line.get('girth_cm')
                             # girth_cm is optional - if provided, it must be > 0
                             # Check if girth_cm is explicitly provided (not None and not empty string)
@@ -1142,16 +1148,7 @@ class BhuarjanAPIController(http.Controller):
                                         status=400,
                                         content_type='application/json'
                                     )
-                            else:
-                                # Don't set girth_cm at all if not provided - Odoo will use default/False
-                                # Don't include it in tree_line_data to avoid any validation issues
-                                pass
-                            
-                            tree_line_data['development_stage'] = development_stage
-                        else:
-                            # For fruit-bearing trees, clear development_stage and girth_cm
-                            tree_line_data['development_stage'] = False
-                            tree_line_data['girth_cm'] = 0.0
+                            # Don't set girth_cm if not provided - Odoo will use default/False
                         
                         tree_line_vals.append((0, 0, tree_line_data))
             
@@ -2637,17 +2634,10 @@ class BhuarjanAPIController(http.Controller):
                             'quantity': tree_line.get('quantity', 1)
                         }
                         
-                        # For non-fruit-bearing trees, require development_stage and girth_cm
-                        if tree_type == 'non_fruit_bearing':
-                            development_stage = tree_line.get('development_stage')
-                            if not development_stage:
-                                return Response(
-                                    json.dumps({
-                                        'error': 'development_stage is required for non-fruit-bearing trees'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
+                        # Handle development_stage - allow for all tree types if provided
+                        development_stage = tree_line.get('development_stage')
+                        if development_stage:
+                            # Validate development_stage if provided
                             if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
                                 return Response(
                                     json.dumps({
@@ -2656,7 +2646,20 @@ class BhuarjanAPIController(http.Controller):
                                     status=400,
                                     content_type='application/json'
                                 )
+                            tree_line_data['development_stage'] = development_stage
+                        
+                        # For non-fruit-bearing trees, require development_stage
+                        if tree_type == 'non_fruit_bearing':
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for non-fruit-bearing trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
                             
+                            # Handle girth_cm for non-fruit-bearing trees
                             girth_cm = tree_line.get('girth_cm')
                             # girth_cm is optional - if provided, it must be > 0
                             # Check if girth_cm is explicitly provided (not None and not empty string)
@@ -2680,16 +2683,7 @@ class BhuarjanAPIController(http.Controller):
                                         status=400,
                                         content_type='application/json'
                                     )
-                            else:
-                                # Don't set girth_cm at all if not provided - Odoo will use default/False
-                                # Don't include it in tree_line_data to avoid any validation issues
-                                pass
-                            
-                            tree_line_data['development_stage'] = development_stage
-                        else:
-                            # For fruit-bearing trees, clear development_stage and girth_cm
-                            tree_line_data['development_stage'] = False
-                            tree_line_data['girth_cm'] = 0.0
+                            # Don't set girth_cm if not provided - Odoo will use default/False
                         
                         tree_line_vals.append((0, 0, tree_line_data))
                 

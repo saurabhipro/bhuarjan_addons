@@ -752,8 +752,11 @@ class BhuarjanAPIController(http.Controller):
             if not landowner_ids or (isinstance(landowner_ids, list) and len(landowner_ids) == 0):
                 return Response(
                     json.dumps({
-                        'error': 'Please select at least one landowner',
-                        'message': 'At least one landowner is required to create a survey'
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'MISSING_LANDOWNERS',
+                        'message': 'At least one landowner is required to create a survey',
+                        'fields': ['landowner_ids']
                     }),
                     status=400,
                     content_type='application/json'
@@ -776,10 +779,11 @@ class BhuarjanAPIController(http.Controller):
                 if invalid_ids:
                     return Response(
                         json.dumps({
-                            'error': 'Invalid landowner ID(s)',
-                            'message': f'The following landowner ID(s) do not exist or are invalid: {", ".join(invalid_ids)}',
-                            'invalid_ids': invalid_ids,
-                            'valid_ids': valid_ids
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'INVALID_LANDOWNER_IDS',
+                        'message': f'The following landowner ID(s) do not exist or are invalid: {", ".join(invalid_ids)}',
+                        'fields': ['landowner_ids']
                         }),
                         status=400,
                         content_type='application/json'
@@ -799,17 +803,21 @@ class BhuarjanAPIController(http.Controller):
                 'acquired_area': 'Acquired Area'
             }
             
-            missing_fields = []
+            missing_field_names = []
+            missing_field_labels = []
             for field, label in required_fields.items():
                 if field not in data or data.get(field) is None or data.get(field) == '':
-                    missing_fields.append(label)
+                    missing_field_names.append(field)
+                    missing_field_labels.append(label)
             
-            if missing_fields:
+            if missing_field_names:
                 return Response(
                     json.dumps({
-                        'error': 'Missing required fields',
-                        'message': f'The following required fields are missing: {", ".join(missing_fields)}',
-                        'missing_fields': missing_fields
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'MISSING_REQUIRED_FIELDS',
+                        'message': f'The following required fields are missing: {", ".join(missing_field_labels)}',
+                        'fields': missing_field_names
                     }),
                     status=400,
                     content_type='application/json'
@@ -817,37 +825,44 @@ class BhuarjanAPIController(http.Controller):
             
             # Validate that referenced IDs exist
             validation_errors = []
+            invalid_fields = []
             
             # Validate project_id
             if data.get('project_id'):
                 project = request.env['bhu.project'].sudo().browse(data['project_id'])
                 if not project.exists():
                     validation_errors.append(f'Project ID {data["project_id"]} does not exist')
+                    invalid_fields.append('project_id')
             
             # Validate village_id
             if data.get('village_id'):
                 village = request.env['bhu.village'].sudo().browse(data['village_id'])
                 if not village.exists():
                     validation_errors.append(f'Village ID {data["village_id"]} does not exist')
+                    invalid_fields.append('village_id')
             
             # Validate department_id
             if data.get('department_id'):
                 department = request.env['bhu.department'].sudo().browse(data['department_id'])
                 if not department.exists():
                     validation_errors.append(f'Department ID {data["department_id"]} does not exist')
+                    invalid_fields.append('department_id')
             
             # Validate tehsil_id
             if data.get('tehsil_id'):
                 tehsil = request.env['bhu.tehsil'].sudo().browse(data['tehsil_id'])
                 if not tehsil.exists():
                     validation_errors.append(f'Tehsil ID {data["tehsil_id"]} does not exist')
+                    invalid_fields.append('tehsil_id')
             
             if validation_errors:
                 return Response(
                     json.dumps({
-                        'error': 'Invalid reference ID(s)',
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'INVALID_REFERENCE_IDS',
                         'message': '; '.join(validation_errors),
-                        'details': validation_errors
+                        'fields': invalid_fields
                     }),
                     status=400,
                     content_type='application/json'
@@ -912,12 +927,15 @@ class BhuarjanAPIController(http.Controller):
             total_area = data.get('total_area', 0.0)
             acquired_area = data.get('acquired_area', 0.0)
             
-            # Area validation checks
+            # Area validation checks with clear error messages
             if total_area is None or total_area <= 0:
                 return Response(
                     json.dumps({
-                        'error': 'Validation Error',
-                        'message': 'Total Area must be greater than 0.'
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'INVALID_TOTAL_AREA',
+                        'message': f'Total Area must be greater than 0. Provided value: {total_area}',
+                        'fields': ['total_area']
                     }),
                     status=400,
                     content_type='application/json'
@@ -926,8 +944,11 @@ class BhuarjanAPIController(http.Controller):
             if acquired_area is None or acquired_area <= 0:
                 return Response(
                     json.dumps({
-                        'error': 'Validation Error',
-                        'message': 'Acquired Area must be greater than 0.'
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'INVALID_ACQUIRED_AREA',
+                        'message': f'Acquired Area must be greater than 0. Provided value: {acquired_area}',
+                        'fields': ['acquired_area']
                     }),
                     status=400,
                     content_type='application/json'
@@ -936,8 +957,11 @@ class BhuarjanAPIController(http.Controller):
             if acquired_area > total_area:
                 return Response(
                     json.dumps({
-                        'error': 'Validation Error',
-                        'message': 'Acquired Area cannot be greater than Total Area.'
+                        'success': False,
+                        'error': 'VALIDATION_ERROR',
+                        'error_code': 'ACQUIRED_AREA_EXCEEDS_TOTAL',
+                        'message': f'Acquired Area ({acquired_area} hectares) cannot be greater than Total Area ({total_area} hectares).',
+                        'fields': ['acquired_area', 'total_area']
                     }),
                     status=400,
                     content_type='application/json'
@@ -1260,10 +1284,25 @@ class BhuarjanAPIController(http.Controller):
                 request.env.cr.rollback()
             except:
                 pass
+            
+            # Extract clear error message from ValidationError
+            error_message = str(ve)
+            # If ValidationError has a name attribute (translated message), use it
+            if hasattr(ve, 'name') and ve.name:
+                error_message = ve.name
+            # If it's a list of messages, join them
+            elif isinstance(ve.args, tuple) and len(ve.args) > 0:
+                if isinstance(ve.args[0], (list, tuple)):
+                    error_message = '; '.join(str(msg) for msg in ve.args[0])
+                else:
+                    error_message = str(ve.args[0])
+            
             return Response(
                 json.dumps({
-                    'error': 'Validation Error',
-                    'message': str(ve)
+                    'success': False,
+                    'error': 'VALIDATION_ERROR',
+                    'error_code': 'MODEL_VALIDATION_FAILED',
+                    'message': error_message
                 }),
                 status=400,
                 content_type='application/json'
@@ -1275,8 +1314,29 @@ class BhuarjanAPIController(http.Controller):
                 request.env.cr.rollback()
             except:
                 pass
+            
+            # Try to extract meaningful error message from generic exceptions
+            error_message = str(e)
+            error_type = type(e).__name__
+            
+            # Provide more descriptive messages for common errors
+            if 'unique constraint' in error_message.lower() or 'duplicate' in error_message.lower():
+                if 'khasra' in error_message.lower():
+                    error_message = 'Khasra number already exists in this village for another survey.'
+                else:
+                    error_message = 'A record with these values already exists. Please check for duplicates.'
+            elif 'foreign key' in error_message.lower():
+                error_message = 'Invalid reference: One or more related records do not exist.'
+            elif 'not null' in error_message.lower() or 'required' in error_message.lower():
+                error_message = 'Required field is missing. Please check all required fields are provided.'
+            
             return Response(
-                json.dumps({'error': str(e)}),
+                json.dumps({
+                    'success': False,
+                    'error': 'SERVER_ERROR',
+                    'error_code': error_type.upper().replace(' ', '_'),
+                    'message': error_message
+                }),
                 status=500,
                 content_type='application/json'
             )

@@ -926,7 +926,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257&active_only=true",
+							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -948,12 +948,6 @@
 									"description": "Filter by photo type ID (optional)",
 									"disabled": true
 								},
-								{
-									"key": "active_only",
-									"value": "true",
-									"description": "Return only active photos (default: true)",
-									"disabled": false
-								}
 							]
 						},
 						"description": "# 📸 Get Survey Images from S3\n\nRetrieve all images uploaded to S3 for a specific survey.\n\n## 📝 Query Parameters\n\n- `survey_id` (required): Survey ID\n- `photo_type_id` (optional): Filter by photo type ID (e.g., 1 for Land, 2 for Well)\n- `active_only` (optional, default: true): Return only active photos. Set to `false` to include inactive photos.\n\n## 📤 Response\n\n```json\n{\n    \"success\": true,\n    \"data\": {\n        \"survey_id\": 257,\n        \"total_images\": 3,\n        \"images\": [\n            {\n                \"id\": 1,\n                \"photo_type_id\": 1,\n                \"photo_type_name\": \"Land\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n                \"filename\": \"image1.jpg\",\n                \"file_size\": 245678,\n                \"sequence\": 10,\n                \"description\": \"Land photo\",\n                \"active\": true\n            },\n            {\n                \"id\": 2,\n                \"photo_type_id\": 2,\n                \"photo_type_name\": \"Well\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_image.jpg\",\n                \"filename\": \"well_image.jpg\",\n                \"file_size\": 189234,\n                \"sequence\": 20,\n                \"description\": \"Well photo\",\n                \"active\": true\n            }\n        ]\n    }\n}\n```\n\n## 📋 Response Fields\n\n- `survey_id`: Survey ID\n- `total_images`: Total number of images found\n- `images`: Array of image objects with:\n  - `id`: Photo record ID\n  - `photo_type_id`: Photo type ID (e.g., 1, 2, 3)\n  - `photo_type_name`: Photo type name (e.g., \"Land\", \"Well\", \"House\")\n  - `s3_url`: Full S3 URL of the image (can be used directly in `<img>` tags)\n  - `filename`: Original filename\n  - `file_size`: File size in bytes\n  - `sequence`: Display order\n  - `description`: Description or notes\n  - `active`: Whether the photo is active\n\n## 🔍 Filtering Examples\n\n**Get all images for survey 257:**\n```\nGET /api/bhuarjan/survey/images?survey_id=257\n```\n\n**Get only Land photos for survey 257:**\n```\nGET /api/bhuarjan/survey/images?survey_id=257&photo_type_id=1\n```\n\n**Get all photos (including inactive):**\n```\nGET /api/bhuarjan/survey/images?survey_id=257&active_only=false\n```\n\n## ✅ Use Cases\n\n- Display all survey images in a gallery\n- Filter images by photo type (Land, Well, House, etc.)\n- Get image URLs for mobile app display\n- Show image metadata (filename, size, description)\n\n## ⚠️ Notes\n\n- Images are ordered by `sequence` and `create_date` (newest first)\n- Only active photos are returned by default\n- S3 URLs are public and can be used directly in image tags\n- If no images are found, `total_images` will be 0 and `images` will be an empty array"
@@ -1207,7 +1201,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Land photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}",
+							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

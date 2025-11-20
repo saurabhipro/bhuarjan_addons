@@ -1218,31 +1218,31 @@ class BhuarjanAPIController(http.Controller):
             if 'photos' in data and isinstance(data['photos'], list):
                 for photo in data['photos']:
                     if isinstance(photo, dict):
-                        if 's3_url' not in photo or 'photo_type_id' not in photo:
-                            return Response(
-                                json.dumps({
-                                    'error': 'Each photo must have both s3_url and photo_type_id'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        # Validate photo_type_id exists
-                        photo_type = request.env['bhu.photo.type'].sudo().browse(photo['photo_type_id'])
-                        if not photo_type.exists():
-                            return Response(
-                                json.dumps({
-                                    'error': f'Photo type with ID {photo["photo_type_id"]} not found'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        photo_vals.append((0, 0, {
-                            'photo_type_id': photo['photo_type_id'],
+                        # s3_url is mandatory
+                        if 's3_url' not in photo or not photo['s3_url']:
+                            continue
+                        
+                        # Validate photo_type_id if provided
+                        photo_type_id = photo.get('photo_type_id')
+                        photo_type = None
+                        if photo_type_id:
+                            photo_type = request.env['bhu.photo.type'].sudo().browse(photo_type_id)
+                            if not photo_type.exists():
+                                # Skip this photo if photo_type_id is invalid
+                                continue
+                        
+                        # Build photo values
+                        photo_data = {
                             's3_url': photo['s3_url'],
                             'filename': photo.get('filename', ''),
-                            'file_size': photo.get('file_size', 0),
-                            'sequence': photo.get('sequence', 10)
-                        }))
+                            'file_size': photo.get('file_size', 0)
+                        }
+                        
+                        # Only add photo_type_id if it was provided and is valid
+                        if photo_type_id and photo_type:
+                            photo_data['photo_type_id'] = photo_type_id
+                        
+                        photo_vals.append((0, 0, photo_data))
             
             # ALL VALIDATIONS PASSED - NOW CREATE SURVEY
             # Create survey
@@ -2419,14 +2419,30 @@ class BhuarjanAPIController(http.Controller):
             if 'photos' in data and isinstance(data['photos'], list):
                 photo_vals = []
                 for photo in data['photos']:
-                    if isinstance(photo, dict) and 's3_url' in photo and 'photo_type_id' in photo:
-                        photo_vals.append((0, 0, {
-                            'photo_type_id': photo['photo_type_id'],
-                            's3_url': photo['s3_url'],
-                            'filename': photo.get('filename', ''),
-                            'file_size': photo.get('file_size', 0),
-                            'sequence': photo.get('sequence', 10)
-                        }))
+                    if not isinstance(photo, dict) or 's3_url' not in photo or not photo['s3_url']:
+                        continue
+                    
+                    # Validate photo_type_id if provided
+                    photo_type_id = photo.get('photo_type_id')
+                    photo_type = None
+                    if photo_type_id:
+                        photo_type = request.env['bhu.photo.type'].sudo().browse(photo_type_id)
+                        if not photo_type.exists():
+                            # Skip this photo if photo_type_id is invalid
+                            continue
+                    
+                    # Build photo values
+                    photo_data = {
+                        's3_url': photo['s3_url'],
+                        'filename': photo.get('filename', ''),
+                        'file_size': photo.get('file_size', 0)
+                    }
+                    
+                    # Only add photo_type_id if it was provided and is valid
+                    if photo_type_id and photo_type:
+                        photo_data['photo_type_id'] = photo_type_id
+                    
+                    photo_vals.append((0, 0, photo_data))
                 
                 if photo_vals:
                     survey.write({'photo_ids': photo_vals})
@@ -2515,6 +2531,8 @@ class BhuarjanAPIController(http.Controller):
             # Extract clear error message from ValidationError
             error_message = str(ve)
             if hasattr(ve, 'name') and ve.name:
+
+
                 error_message = ve.name
             elif isinstance(ve.args, tuple) and len(ve.args) > 0:
                 if isinstance(ve.args[0], (list, tuple)):
@@ -2705,7 +2723,7 @@ class BhuarjanAPIController(http.Controller):
         Query param: survey_id (required)
         Body: JSON with photos array
         Each photo must have: s3_url (required)
-        Optional fields: photo_type_id, filename, file_size, sequence
+        Optional fields: photo_type_id, filename, file_size
         Returns: Success message with added photos
         """
         try:
@@ -2806,8 +2824,7 @@ class BhuarjanAPIController(http.Controller):
                     'survey_id': survey_id,  # Required field
                     's3_url': photo['s3_url'],
                     'filename': photo.get('filename', ''),
-                    'file_size': photo.get('file_size', 0),
-                    'sequence': photo.get('sequence', 10)
+                    'file_size': photo.get('file_size', 0)
                 }
                 
                 # Only add photo_type_id if it was provided and is valid

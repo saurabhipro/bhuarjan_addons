@@ -723,6 +723,41 @@
 						"description": "Get landowners based on survey_id and/or village_id (both optional). If both are provided, returns landowners that match both criteria."
 					},
 					"response": []
+				},
+				{
+					"name": "Update Landowner (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"father_name\": \"Updated Father Name\",\n    \"phone\": \"9876543210\",\n    \"age\": 35,\n    \"gender\": \"male\",\n    \"owner_address\": \"Updated address\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"Updated Bank\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"ABCD0123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/landowner/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"landowner",
+								"1"
+							]
+						},
+						"description": "# 👤 Update Landowner\n\nUpdate an existing landowner. Only include the fields you want to update.\n\n## 📝 Path Parameter\n\n- `landowner_id` (required): Replace '1' in the URL path with the actual landowner ID\n\n## 📝 Request Body\n\nInclude only the fields you want to update. All fields are optional.\n\n**Example Request:**\n```json\n{\n    \"name\": \"Updated Name\",\n    \"father_name\": \"Updated Father Name\",\n    \"mother_name\": \"Updated Mother Name\",\n    \"spouse_name\": \"Updated Spouse Name\",\n    \"age\": 35,\n    \"gender\": \"male\",\n    \"phone\": \"9876543210\",\n    \"village_id\": 1,\n    \"tehsil_id\": 1,\n    \"district_id\": 1,\n    \"owner_address\": \"Updated complete address\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"Updated Bank Name\",\n    \"bank_branch\": \"Updated Branch\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"ABCD0123456\",\n    \"account_holder_name\": \"Updated Account Holder Name\"\n}\n```\n\n**Available Fields:**\n- `name` (string): Full name\n- `father_name` (string): Father's name\n- `mother_name` (string): Mother's name\n- `spouse_name` (string): Spouse's name\n- `age` (integer): Age (0-120)\n- `gender` (string): \"male\", \"female\", or \"other\"\n- `phone` (string): Phone number\n- `village_id` (integer): Village ID (must exist)\n- `tehsil_id` (integer): Tehsil ID (must exist)\n- `district_id` (integer): District ID (must exist)\n- `owner_address` (string): Complete address\n- `aadhar_number` (string): 12-digit Aadhar number\n- `pan_number` (string): PAN number (format: ABCDE1234F)\n- `bank_name` (string): Bank name\n- `bank_branch` (string): Bank branch\n- `account_number` (string): Account number (9-18 digits)\n- `ifsc_code` (string): IFSC code (format: ABCD0123456)\n- `account_holder_name` (string): Account holder name\n- `aadhar_card` (string): Base64 encoded Aadhar card image (optional)\n- `pan_card` (string): Base64 encoded PAN card image (optional)\n\n## 📤 Success Response (200)\n\n```json\n{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Updated Name\",\n        \"father_name\": \"Updated Father Name\",\n        \"mother_name\": \"Updated Mother Name\",\n        \"spouse_name\": \"Updated Spouse Name\",\n        \"gender\": \"male\",\n        \"age\": 35,\n        \"aadhar_number\": \"123456789012\",\n        \"pan_number\": \"ABCDE1234F\",\n        \"phone\": \"9876543210\",\n        \"village_id\": 1,\n        \"village_name\": \"Village Name\",\n        \"tehsil_id\": 1,\n        \"tehsil_name\": \"Tehsil Name\",\n        \"district_id\": 1,\n        \"district_name\": \"District Name\",\n        \"owner_address\": \"Updated complete address\",\n        \"bank_name\": \"Updated Bank Name\",\n        \"bank_branch\": \"Updated Branch\",\n        \"account_number\": \"1234567890123456\",\n        \"ifsc_code\": \"ABCD0123456\",\n        \"account_holder_name\": \"Updated Account Holder Name\"\n    }\n}\n```\n\n## ❌ Error Responses\n\n**404 - Landowner Not Found:**\n```json\n{\n    \"success\": false,\n    \"error\": \"NOT_FOUND\",\n    \"error_code\": \"LANDOWNER_NOT_FOUND\",\n    \"message\": \"Landowner with ID 999 not found\",\n    \"fields\": [\"landowner_id\"]\n}\n```\n\n**400 - Validation Error:**\n```json\n{\n    \"success\": false,\n    \"error\": \"VALIDATION_ERROR\",\n    \"error_code\": \"INVALID_VILLAGE_ID\",\n    \"message\": \"Village with ID 999 not found\",\n    \"fields\": [\"village_id\"]\n}\n```\n\n**400 - No Fields to Update:**\n```json\n{\n    \"success\": false,\n    \"error\": \"VALIDATION_ERROR\",\n    \"error_code\": \"NO_FIELDS_TO_UPDATE\",\n    \"message\": \"No valid fields provided for update\",\n    \"fields\": []\n}\n```\n\n## ⚠️ Important Notes\n\n- ✅ Only include fields you want to update\n- ✅ All fields are optional\n- ✅ Validation rules apply (Aadhar must be 12 digits, PAN format, etc.)\n- ✅ If `village_id`, `tehsil_id`, or `district_id` are provided, they must exist\n- ✅ Document uploads (`aadhar_card`, `pan_card`) should be base64 encoded\n- ✅ Empty strings are allowed for text fields (will clear the field)\n- ⚠️ At least one field must be provided for update"
+					},
+					"response": []
 				}
 			]
 		},
@@ -947,7 +982,7 @@
 									"value": "",
 									"description": "Filter by photo type ID (optional)",
 									"disabled": true
-								},
+								}
 							]
 						},
 						"description": "# 📸 Get Survey Images from S3\n\nRetrieve all images uploaded to S3 for a specific survey.\n\n## 📝 Query Parameters\n\n- `survey_id` (required): Survey ID\n- `photo_type_id` (optional): Filter by photo type ID (e.g., 1 for Land, 2 for Well)\n- `active_only` (optional, default: true): Return only active photos. Set to `false` to include inactive photos.\n\n## 📤 Response\n\n```json\n{\n    \"success\": true,\n    \"data\": {\n        \"survey_id\": 257,\n        \"total_images\": 3,\n        \"images\": [\n            {\n                \"id\": 1,\n                \"photo_type_id\": 1,\n                \"photo_type_name\": \"Land\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n                \"filename\": \"image1.jpg\",\n                \"file_size\": 245678,\n                \"sequence\": 10,\n                \"description\": \"Land photo\",\n                \"active\": true\n            },\n            {\n                \"id\": 2,\n                \"photo_type_id\": 2,\n                \"photo_type_name\": \"Well\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_image.jpg\",\n                \"filename\": \"well_image.jpg\",\n                \"file_size\": 189234,\n                \"sequence\": 20,\n                \"description\": \"Well photo\",\n                \"active\": true\n            }\n        ]\n    }\n}\n```\n\n## 📋 Response Fields\n\n- `survey_id`: Survey ID\n- `total_images`: Total number of images found\n- `images`: Array of image objects with:\n  - `id`: Photo record ID\n  - `photo_type_id`: Photo type ID (e.g., 1, 2, 3)\n  - `photo_type_name`: Photo type name (e.g., \"Land\", \"Well\", \"House\")\n  - `s3_url`: Full S3 URL of the image (can be used directly in `<img>` tags)\n  - `filename`: Original filename\n  - `file_size`: File size in bytes\n  - `sequence`: Display order\n  - `description`: Description or notes\n  - `active`: Whether the photo is active\n\n## 🔍 Filtering Examples\n\n**Get all images for survey 257:**\n```\nGET /api/bhuarjan/survey/images?survey_id=257\n```\n\n**Get only Land photos for survey 257:**\n```\nGET /api/bhuarjan/survey/images?survey_id=257&photo_type_id=1\n```\n\n**Get all photos (including inactive):**\n```\nGET /api/bhuarjan/survey/images?survey_id=257&active_only=false\n```\n\n## ✅ Use Cases\n\n- Display all survey images in a gallery\n- Filter images by photo type (Land, Well, House, etc.)\n- Get image URLs for mobile app display\n- Show image metadata (filename, size, description)\n\n## ⚠️ Notes\n\n- Images are ordered by `sequence` and `create_date` (newest first)\n- Only active photos are returned by default\n- S3 URLs are public and can be used directly in image tags\n- If no images are found, `total_images` will be 0 and `images` will be an empty array"

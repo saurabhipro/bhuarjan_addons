@@ -2444,18 +2444,53 @@ class BhuarjanAPIController(http.Controller):
                     content_type='application/json'
                 )
 
+            # Parse request data
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+            
             # Check if survey can be edited (only draft and submitted states allow editing)
-            if survey.state not in ('draft', 'submitted'):
+            # Exception: allow state updates regardless of current state
+            is_state_update = 'state' in data
+            has_other_fields = any(key != 'state' for key in data.keys())
+            
+            if has_other_fields and survey.state not in ('draft', 'submitted'):
                 return Response(
                     json.dumps({
-                        'error': f'Survey cannot be edited. Current state: {survey.state}. Only surveys in draft or submitted state can be edited.'
+                        'error': f'Survey cannot be edited. Current state: {survey.state}. Only surveys in draft or submitted state can be edited. State updates are allowed regardless of current state.'
                     }),
                     status=400,
                     content_type='application/json'
                 )
 
-            # Parse request data
-            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+            # Handle state updates - validate and set submitted_date if needed
+            if 'state' in data:
+                new_state = data.get('state')
+                valid_states = ['draft', 'submitted', 'approved', 'rejected', 'locked']
+                if new_state not in valid_states:
+                    return Response(
+                        json.dumps({
+                            'error': 'Validation Error',
+                            'message': f'Invalid state value. Valid states are: {", ".join(valid_states)}'
+                        }),
+                        status=400,
+                        content_type='application/json'
+                    )
+                
+                # Special handling for state = 'submitted'
+                if new_state == 'submitted':
+                    # Validate khasra_number is present (required for submission)
+                    if not survey.khasra_number:
+                        return Response(
+                            json.dumps({
+                                'error': 'Validation Error',
+                                'message': 'Khasra number is required before submitting the survey.'
+                            }),
+                            status=400,
+                            content_type='application/json'
+                        )
+                    # Set submitted_date if not already set
+                    if not survey.submitted_date:
+                        from datetime import datetime, timezone
+                        data['submitted_date'] = datetime.now(timezone.utc).replace(tzinfo=None)
 
             # List of fields that can be updated via API
             allowed_fields = [
@@ -2465,7 +2500,7 @@ class BhuarjanAPIController(http.Controller):
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
                 'has_well', 'well_type', 'has_tubewell', 'has_pond',
                 'landowner_ids', 'survey_image', 'survey_image_filename',
-                'remarks'
+                'remarks', 'state', 'submitted_date'
             ]
             
             # Note: 'crop_type' is handled separately above and mapped to 'crop_type_id'

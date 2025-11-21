@@ -1398,11 +1398,9 @@ class BhuarjanAPIController(http.Controller):
                 'tree_lines': [{
                     'id': line.id,
                     'tree_type': line.tree_type,
-                    'tree_type_name': self._get_selection_label(line, 'tree_type', line.tree_type) if line.tree_type else '',
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
-                    'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
-                    'development_stage_name': self._get_selection_label(line, 'development_stage', line.development_stage) if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
+                    'development_stage': line.development_stage,
                     'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
                     'quantity': line.quantity
                 } for line in survey.tree_line_ids],
@@ -2761,11 +2759,9 @@ class BhuarjanAPIController(http.Controller):
                 'tree_lines': [{
                     'id': line.id,
                     'tree_type': line.tree_type,
-                    'tree_type_name': dict(line._fields['tree_type'].selection).get(line.tree_type, '') if line.tree_type else '',
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
-                    'development_stage': line.development_stage if line.tree_type == 'non_fruit_bearing' else None,
-                    'development_stage_name': dict(line._fields['development_stage'].selection).get(line.development_stage, '') if line.tree_type == 'non_fruit_bearing' and line.development_stage else '',
+                    'development_stage': line.development_stage,
                     'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
                     'quantity': line.quantity
                 } for line in survey.tree_line_ids],

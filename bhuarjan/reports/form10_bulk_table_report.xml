@@ -31,7 +31,7 @@
                 .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 2px solid #000; margin-bottom: 0; }
                 .header-info-table td { border: 1px solid #000; padding: 6px; }
             </style>
-            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;"><strong>भू अर्जन प्रारंभिक सर्वे प्रपत्र</strong></h2>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
 
             <table class="header-info-table table1" >
                 <tr>
@@ -231,85 +231,28 @@
                                                 <td style="text-align:center"><span t-if="s.is_double_crop" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_double_crop" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center"><span t-if="s.is_irrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_irrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center"><span t-if="s.is_unirrigated" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.is_unirrigated" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                                <td style="text-align:center">
-                                                    <t t-if="s.tree_line_ids">
-                                                        <t t-set="has_undeveloped" t-value="False"/>
-                                                        <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'undeveloped'">
-                                                                <t t-set="has_undeveloped" t-value="True"/>
-                                                                <div>
-                                                                    <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
-                                                                </div>
-                                                            </t>
-                                                        </t>
-                                                        <span t-if="not has_undeveloped" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                    </t>
-                                                    <span t-if="not s.tree_line_ids" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                </td>
-                                                <td style="text-align:center">
-                                                    <t t-if="s.tree_line_ids">
-                                                        <t t-set="has_semi_developed" t-value="False"/>
-                                                        <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'semi_developed'">
-                                                                <t t-set="has_semi_developed" t-value="True"/>
-                                                                <div>
-                                                                    <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
-                                                                </div>
-                                                            </t>
-                                                        </t>
-                                                        <span t-if="not has_semi_developed" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                    </t>
-                                                    <span t-if="not s.tree_line_ids" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                </td>
-                                                <td style="text-align:center">
-                                                    <t t-if="s.tree_line_ids">
-                                                        <t t-set="has_fully_developed" t-value="False"/>
-                                                        <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'fully_developed'">
-                                                                <t t-set="has_fully_developed" t-value="True"/>
-                                                                <div>
-                                                                    <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
-                                                                </div>
-                                                            </t>
-                                                        </t>
-                                                        <span t-if="not has_fully_developed" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                    </t>
-                                                    <span t-if="not s.tree_line_ids" style="color:#dc3545;font-weight:bold">नहीं</span>
-                                                </td>
+                                                <td style="text-align:center"><span t-if="s.undeveloped_tree_count &gt; 0"><span t-esc="s.undeveloped_tree_count"/></span><span t-if="s.undeveloped_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center"><span t-if="s.semi_developed_tree_count &gt; 0"><span t-esc="s.semi_developed_tree_count"/></span><span t-if="s.semi_developed_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center"><span t-if="s.fully_developed_tree_count &gt; 0"><span t-esc="s.fully_developed_tree_count"/></span><span t-if="s.fully_developed_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.house_type">
-                                                        <span t-if="s.house_type == 'kaccha'">कच्चा</span>
-                                                        <span t-if="s.house_type == 'pakka'">पक्का</span>
-                                                        <span t-if="s.house_type != 'kaccha' and s.house_type != 'pakka'"><t t-esc="s.house_type"/></span>
-                                                        / <span t-esc="s.house_area"/> वर्गफुट
+                                                        <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/>
                                                     </span>
                                                     <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/> वर्गफुट</span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kaccha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
                                                     <span t-if="s.has_well != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                                 <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td>
-                                                    <t t-set="has_remarks" t-value="False"/>
-                                                    <t t-if="s.has_traded_land == 'yes'">
-                                                        <t t-set="has_remarks" t-value="True"/>
-                                                        <div>
-                                                            व्यपवर्तित-<t t-esc="s.traded_land_area or 0.0"/> हेक्टेयर
-                                                        </div>
-                                                    </t>
-                                                    <t t-if="s.crop_type_id and (s.crop_type_id.code == 'FALLOW' or 'पड़ती' in (s.crop_type_id.name or ''))">
-                                                        <t t-set="has_remarks" t-value="True"/>
-                                                        <div>पड़ती भूमि</div>
-                                                    </t>
                                                     <t t-if="s.remarks">
-                                                        <t t-set="has_remarks" t-value="True"/>
-                                                        <div><t t-esc="s.remarks"/></div>
+                                                        <t t-esc="s.remarks"/>
                                                     </t>
-                                                    <span t-if="not has_remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                    <span t-if="not s.remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                             </tr>
                                 </t>

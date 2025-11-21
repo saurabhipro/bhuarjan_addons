@@ -205,10 +205,12 @@
                         .bulk-form10-table tbody td {
                             page-break-inside: avoid;
                         }
-                        /* Prevent header overlap when content spans pages */
+                        /* Page settings */
                         @page {
-                            margin-top: 1.5cm;
-                            margin-bottom: 1.5cm;
+                            margin-top: 0.5cm;
+                            margin-bottom: 2cm;
+                            margin-left: 1cm;
+                            margin-right: 1cm;
                         }
                     </style>
                     <div class="content-wrapper">

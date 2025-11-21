@@ -25,11 +25,38 @@
         <t t-if="not o or not 'company_id' in o">
             <t t-set="company" t-value="res_company"></t>
         </t>
+        <!-- Set first survey - check multiple possible variable names -->
+        <t t-if="not first">
+            <t t-if="surveys and len(surveys) &gt; 0">
+                <t t-set="first" t-value="surveys[0]"/>
+            </t>
+            <t t-elif="docs and len(docs) &gt; 0">
+                <t t-set="first" t-value="docs[0]"/>
+            </t>
+            <t t-elif="doc">
+                <t t-set="first" t-value="doc"/>
+            </t>
+        </t>
         <!-- Custom Header -->
-        <div class="header">
+        <div class="header" style="width: 100%; margin-bottom: 20px;">
             <style>
-                .header-info-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 2px solid #000; margin-bottom: 0; }
-                .header-info-table td { border: 1px solid #000; padding: 6px; }
+                .header-info-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 14px; 
+                    border: 2px solid #000; 
+                    margin-bottom: 0; 
+                    table-layout: fixed;
+                }
+                .header-info-table td { 
+                    border: 1px solid #000; 
+                    padding: 6px; 
+                    vertical-align: middle;
+                }
+                .header h2 {
+                    margin: 0 0 12px 0;
+                    text-align: center;
+                }
             </style>
             <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
 
@@ -141,10 +168,10 @@
 
 
     <template id="form10_bulk_table_report">
+        <t t-set="surveys" t-value="docs"/>
+        <t t-set="first" t-value="surveys and surveys[0] or False"/>
         <t t-call="web.html_container">
-            <t t-call="bhuarjan.report_custom_external_layout">
-                <t t-set="surveys" t-value="docs"/>
-                <t t-set="first" t-value="surveys and surveys[0] or False"/>  
+            <t t-call="bhuarjan.report_custom_external_layout">  
                 <div class="page">
                     <style>
                         .bulk-form10-table {
@@ -241,11 +268,11 @@
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
                                                             <div style="margin-bottom: 2px;">
                                                                 <t t-esc="counter"/>. <t t-esc="lo.name"/>
-                                                                <t t-if="lo.gender == 'female' and lo.spouse_name">
-                                                                    &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
-                                                                </t>
-                                                                <t t-elif="lo.father_name">
+                                                                <t t-if="lo.father_name">
                                                                     &#160;पिता&#160;<t t-esc="lo.father_name"/>
+                                                                </t>
+                                                                <t t-if="lo.spouse_name">
+                                                                    &#160;पत्नी&#160;<t t-esc="lo.spouse_name"/>
                                                                 </t>
                                                             </div>
                                                             <t t-set="counter" t-value="counter + 1"/>
@@ -302,9 +329,6 @@
                                                     </t>
                                                     <span t-if="not s.tree_line_ids" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                               <td style="text-align:center"><span t-if="s.undeveloped_tree_count &gt; 0"><span t-esc="s.undeveloped_tree_count"/></span><span t-if="s.undeveloped_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                                <td style="text-align:center"><span t-if="s.semi_developed_tree_count &gt; 0"><span t-esc="s.semi_developed_tree_count"/></span><span t-if="s.semi_developed_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                                <td style="text-align:center"><span t-if="s.fully_developed_tree_count &gt; 0"><span t-esc="s.fully_developed_tree_count"/></span><span t-if="s.fully_developed_tree_count == 0" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.house_type">
                                                         <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/>
@@ -334,13 +358,8 @@
                                                     <t t-if="s.remarks">
                                                         <t t-set="has_remarks" t-value="True"/>
                                                         <div style="margin-bottom: 2px;"><t t-esc="s.remarks"/></div>
-                                                <td style="text-align:center"><span t-if="s.has_tubewell" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_tubewell" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                                <td style="text-align:center"><span t-if="s.has_pond" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="not s.has_pond" style="color:#dc3545;font-weight:bold">नहीं</span></td>
-                                                <td>
-                                                    <t t-if="s.remarks">
-                                                        <t t-esc="s.remarks"/>
                                                     </t>
-                                                    <span t-if="not s.remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                    <span t-if="not has_remarks" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                             </tr>
                                 </t>

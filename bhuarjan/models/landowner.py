@@ -59,29 +59,7 @@ class BhuLandowner(models.Model):
     survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 
                                  'landowner_id', 'survey_id', string='Related Surveys / संबंधित सर्वे')
     
-    # Validation Methods
-    
-    @api.constrains('aadhar_number')
-    def _check_aadhar(self):
-        for record in self:
-            if record.aadhar_number:
-                if not re.match(r'^\d{12}$', record.aadhar_number):
-                    raise ValidationError('Aadhar number must be exactly 12 digits.')
-    
-    
-    @api.constrains('account_number')
-    def _check_account_number(self):
-        for record in self:
-            if record.account_number:
-                if not re.match(r'^\d{9,18}$', record.account_number):
-                    raise ValidationError('Account number must be between 9-18 digits.')
-    
-    
-    @api.constrains('age')
-    def _check_age(self):
-        for record in self:
-            if record.age and (record.age < 0 or record.age > 120):
-                raise ValidationError('Age must be between 0 and 120 years.')
+    # Validation Methods removed - no validations for aadhar, pan, account_number, age
     
     # Auto-fill methods
     @api.onchange('village_id')

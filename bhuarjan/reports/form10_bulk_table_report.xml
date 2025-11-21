@@ -38,7 +38,7 @@
             </t>
         </t>
         <!-- Custom Header -->
-        <div class="header" style="width: 100%; margin-bottom: 20px;">
+        <div class="header o_clearfix" style="width: 100%; margin-bottom: 20px;">
             <style>
                 .header-info-table { 
                     width: 100%; 
@@ -207,7 +207,7 @@
                         }
                         /* Page settings */
                         @page {
-                            margin-top: 0.5cm;
+                            margin-top: 8cm;
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;

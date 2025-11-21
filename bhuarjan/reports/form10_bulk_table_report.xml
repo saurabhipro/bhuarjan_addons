@@ -58,7 +58,7 @@
                     text-align: center;
                 }
             </style>
-            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;"><strong>भू-अर्जन फार्म-10 (प्रारंभिक सर्वे प्रपत्र)</strong></h2>
+            <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;"><strong>भू अर्जन प्रारंभिक सर्वे प्रपत्र</strong></h2>
 
             <table class="header-info-table table1" >
                 <tr>
@@ -331,11 +331,11 @@
                                                 </td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.house_type">
-                                                        <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/>
+                                                        <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/> वर्गफुट
                                                     </span>
                                                     <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/></span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/> वर्गफुट</span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>

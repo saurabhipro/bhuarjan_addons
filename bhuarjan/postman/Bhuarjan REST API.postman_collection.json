@@ -515,7 +515,58 @@
 								}
 							]
 						},
-						"description": "Update a survey. Only surveys in 'draft' or 'submitted' state can be edited. Once approved or locked, surveys cannot be edited. Include only the fields you want to update in the request body.\n\n## Request Body\n\nInclude only the fields you want to update. All validation rules from Create Survey apply.\n\n**Tree Lines:**\n- Use `tree_lines` array to update tree details (replaces all existing tree lines)\n- Each tree line requires:\n  - `tree_type`: \"fruit_bearing\" or \"non_fruit_bearing\"\n  - Either `tree_master_id` (integer) OR `tree_name` (string) to identify the tree\n  - `quantity`: number of trees (default: 1)\n  - `development_stage`: \"undeveloped\", \"semi_developed\", or \"fully_developed\" (REQUIRED for ALL trees)\n  - For **non-fruit-bearing trees only**:\n    - `girth_cm`: tree girth in centimeters (OPTIONAL, must be > 0 if provided)\n\n## Success Response (200)\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Survey updated successfully\",\n  \"data\": {\n    \"id\": 257,\n    \"name\": \"SC_001_0001\",\n    \"survey_uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"tree_lines\": [\n      {\n        \"id\": 1,\n        \"tree_type\": \"fruit_bearing\",\n        \"tree_master_id\": 1,\n        \"tree_name\": \"Mango\",\n        \"development_stage\": \"fully_developed\",\n        \"quantity\": 5\n      },\n      {\n        \"id\": 2,\n        \"tree_type\": \"non_fruit_bearing\",\n        \"tree_master_id\": 2,\n        \"tree_name\": \"Neem\",\n        \"development_stage\": \"semi_developed\",\n        \"girth_cm\": 40.0,\n        \"quantity\": 10\n      }\n    ],\n    \"state\": \"draft\"\n  }\n}\n```\n\n## Error Response (400)\n\nSame error format as Create Survey API. All validation errors follow:\n\n```json\n{\n  \"success\": false,\n  \"error\": \"VALIDATION_ERROR\",\n  \"error_code\": \"SPECIFIC_ERROR_CODE\",\n  \"message\": \"Clear, user-friendly error message\",\n  \"fields\": [\"field_name1\", \"field_name2\"]\n}\n```\n\nSee Create Survey API documentation for all error codes and examples.\n\n## Examples\n\nFruit-bearing tree:\n```json\n{\n  \"tree_type\": \"fruit_bearing\",\n  \"tree_master_id\": 1,\n  \"development_stage\": \"fully_developed\",\n  \"quantity\": 5\n}\n```\n\nNon-fruit-bearing tree (with girth):\n```json\n{\n  \"tree_type\": \"non_fruit_bearing\",\n  \"tree_master_id\": 2,\n  \"development_stage\": \"fully_developed\",\n  \"girth_cm\": 50.5,\n  \"quantity\": 10\n}\n```\n\nNon-fruit-bearing tree (without girth - optional):\n```json\n{\n  \"tree_type\": \"non_fruit_bearing\",\n  \"tree_master_id\": 2,\n  \"development_stage\": \"fully_developed\",\n  \"quantity\": 10\n}\n```"
+						"description": "Update a survey. Only surveys in 'draft' or 'submitted' state can be edited (except for state updates). State updates are allowed regardless of current state. Include only the fields you want to update in the request body.\n\n## Request Body\n\nInclude only the fields you want to update. All validation rules from Create Survey apply.\n\n**State Updates:**\n- You can update the `state` field regardless of the current survey state\n- Valid state values: `draft`, `submitted`, `approved`, `rejected`, `locked`\n- When setting state to `submitted`:\n  - The survey must have a `khasra_number` (required for submission)\n  - The `submitted_date` will be automatically set if not already set\n\n**Example - Update State Only:**\n```json\n{\n    \"state\": \"submitted\"\n}\n```\n\n**Example - Update State with Other Fields:**\n```json\n{\n    \"state\": \"submitted\",\n    \"remarks\": \"Ready for review\"\n}\n```\n\n**Tree Lines:**\n- Use `tree_lines` array to update tree details (replaces all existing tree lines)\n- Each tree line requires:\n  - `tree_type`: \"fruit_bearing\" or \"non_fruit_bearing\"\n  - Either `tree_master_id` (integer) OR `tree_name` (string) to identify the tree\n  - `quantity`: number of trees (default: 1)\n  - `development_stage`: \"undeveloped\", \"semi_developed\", or \"fully_developed\" (REQUIRED for ALL trees)\n  - For **non-fruit-bearing trees only**:\n    - `girth_cm`: tree girth in centimeters (OPTIONAL, must be > 0 if provided)\n\n## Success Response (200)\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Survey updated successfully\",\n  \"data\": {\n    \"id\": 257,\n    \"name\": \"SC_001_0001\",\n    \"survey_uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"tree_lines\": [\n      {\n        \"id\": 1,\n        \"tree_type\": \"fruit_bearing\",\n        \"tree_master_id\": 1,\n        \"tree_name\": \"Mango\",\n        \"development_stage\": \"fully_developed\",\n        \"quantity\": 5\n      },\n      {\n        \"id\": 2,\n        \"tree_type\": \"non_fruit_bearing\",\n        \"tree_master_id\": 2,\n        \"tree_name\": \"Neem\",\n        \"development_stage\": \"semi_developed\",\n        \"girth_cm\": 40.0,\n        \"quantity\": 10\n      }\n    ],\n    \"state\": \"submitted\",\n    \"submitted_date\": \"2024-12-15T10:30:00\"\n  }\n}\n```\n\n## Error Response (400)\n\nSame error format as Create Survey API. All validation errors follow:\n\n```json\n{\n  \"success\": false,\n  \"error\": \"VALIDATION_ERROR\",\n  \"error_code\": \"SPECIFIC_ERROR_CODE\",\n  \"message\": \"Clear, user-friendly error message\",\n  \"fields\": [\"field_name1\", \"field_name2\"]\n}\n```\n\n**State Update Errors:**\n\n**Invalid State Value:**\n```json\n{\n  \"success\": false,\n  \"error\": \"Validation Error\",\n  \"message\": \"Invalid state value. Valid states are: draft, submitted, approved, rejected, locked\"\n}\n```\n\n**Missing Khasra Number (when submitting):**\n```json\n{\n  \"success\": false,\n  \"error\": \"Validation Error\",\n  \"message\": \"Khasra number is required before submitting the survey.\"\n}\n```\n\nSee Create Survey API documentation for all other error codes and examples.\n\n## Examples\n\n**Update State to Submitted:**\n```json\n{\n    \"state\": \"submitted\"\n}\n```\n\n**Update State to Approved:**\n```json\n{\n    \"state\": \"approved\"\n}\n```\n\n**Update State to Rejected:**\n```json\n{\n    \"state\": \"rejected\"\n}\n```\n\n**Update State with Remarks:**\n```json\n{\n    \"state\": \"submitted\",\n    \"remarks\": \"Survey completed and ready for review\"\n}\n```\n\nFruit-bearing tree:\n```json\n{\n  \"tree_type\": \"fruit_bearing\",\n  \"tree_master_id\": 1,\n  \"development_stage\": \"fully_developed\",\n  \"quantity\": 5\n}\n```\n\nNon-fruit-bearing tree (with girth):\n```json\n{\n  \"tree_type\": \"non_fruit_bearing\",\n  \"tree_master_id\": 2,\n  \"development_stage\": \"fully_developed\",\n  \"girth_cm\": 50.5,\n  \"quantity\": 10\n}\n```\n\nNon-fruit-bearing tree (without girth - optional):\n```json\n{\n  \"tree_type\": \"non_fruit_bearing\",\n  \"tree_master_id\": 2,\n  \"development_stage\": \"fully_developed\",\n  \"quantity\": 10\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Survey State (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "JWT token from login API"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"state\": \"submitted\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/survey/316",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"survey",
+								"316"
+							],
+							"variable": [
+								{
+									"key": "survey_id",
+									"value": "316",
+									"description": "Replace with actual survey ID"
+								}
+							]
+						},
+						"description": "# 📝 Update Survey State\n\nUpdate the state of a survey. State updates are allowed regardless of the current survey state.\n\n## ✅ Valid State Values\n\n- `draft` - Draft / प्रारूप\n- `submitted` - Submitted / प्रस्तुत\n- `approved` - Approved / अनुमोदित\n- `rejected` - Rejected / अस्वीकृत\n- `locked` - Locked / लॉक\n\n## 📝 Request Body\n\n**Minimal Request (State Only):**\n```json\n{\n    \"state\": \"submitted\"\n}\n```\n\n**With Additional Fields:**\n```json\n{\n    \"state\": \"submitted\",\n    \"remarks\": \"Ready for review\"\n}\n```\n\n## ⚠️ Important Notes\n\n### When Setting State to `submitted`:\n- ✅ The survey **must have a `khasra_number`** (required for submission)\n- ✅ The `submitted_date` will be **automatically set** if not already set\n- ✅ This matches the behavior of the `action_submit()` method in the backend\n\n### State Update Rules:\n- ✅ State updates are **allowed regardless** of current survey state\n- ✅ Other field updates are **only allowed** if survey is in `draft` or `submitted` state\n- ✅ You can update state even if the survey is `approved`, `rejected`, or `locked`\n\n## 📤 Success Response (200)\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Survey updated successfully\",\n  \"data\": {\n    \"id\": 316,\n    \"name\": \"SC_001_0001\",\n    \"survey_uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"khasra_number\": \"103/90\",\n    \"state\": \"submitted\",\n    \"submitted_date\": \"2024-12-15T10:30:00\",\n    \"project_id\": 3,\n    \"village_id\": 1,\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0\n  }\n}\n```\n\n## ❌ Error Responses\n\n### 404 - Survey Not Found\n```json\n{\n  \"error\": \"Survey with ID 999 not found\"\n}\n```\n\n### 400 - Invalid State Value\n```json\n{\n  \"error\": \"Validation Error\",\n  \"message\": \"Invalid state value. Valid states are: draft, submitted, approved, rejected, locked\"\n}\n```\n\n### 400 - Missing Khasra Number (when submitting)\n```json\n{\n  \"error\": \"Validation Error\",\n  \"message\": \"Khasra number is required before submitting the survey.\"\n}\n```\n\n### 400 - Cannot Edit Other Fields\n```json\n{\n  \"error\": \"Survey cannot be edited. Current state: approved. Only surveys in draft or submitted state can be edited. State updates are allowed regardless of current state.\"\n}\n```\n\n## 💡 Usage Examples\n\n### Submit a Survey\n```bash\ncurl --location --request PATCH 'https://bhuarjan.com/api/bhuarjan/survey/316' \\\n--header 'Accept: application/json' \\\n--header 'Content-Type: application/json' \\\n--header 'Authorization: Bearer YOUR_TOKEN' \\\n--data '{\"state\":\"submitted\"}'\n```\n\n### Approve a Survey\n```json\n{\n    \"state\": \"approved\"\n}\n```\n\n### Reject a Survey\n```json\n{\n    \"state\": \"rejected\"\n}\n```\n\n### Reset to Draft\n```json\n{\n    \"state\": \"draft\"\n}\n```\n\n## 🔄 State Transition Flow\n\nTypical workflow:\n1. **Create** survey → `state: \"draft\"`\n2. **Submit** survey → `state: \"submitted\"` (requires khasra_number)\n3. **Approve** survey → `state: \"approved\"`\n4. **Reject** survey → `state: \"rejected\"` (can reset to draft and resubmit)\n5. **Lock** survey → `state: \"locked\"` (final state, typically after approval)"
 					},
 					"response": []
 				},

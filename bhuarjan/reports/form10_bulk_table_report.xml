@@ -119,6 +119,36 @@
                     </td>
                 </tr>
             </table>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="text-align:center"><strong>क्र.</strong></th>
+                        <th rowspan="2" style="text-align:center"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                        <th rowspan="2" style="text-align:center"><strong>कुल रकबा (हे.में.)</strong></th>
+                        <th rowspan="2" style="text-align:center"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                        <th rowspan="2" style="text-align:center"><strong>भूमिस्वामी का नाम</strong></th>
+                        <th colspan="4" style="text-align:center"><strong>भूमि का प्रकार</strong></th>
+                        <th colspan="3" style="text-align:center"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                        <th colspan="6" style="text-align:center"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center"><strong>एक फसली</strong></th>
+                        <th style="text-align:center"><strong>दो फसली</strong></th>
+                        <th style="text-align:center"><strong>सिंचित</strong></th>
+                        <th style="text-align:center"><strong>असिंचित</strong></th>
+                        <th style="text-align:center"><strong>अविकसित</strong></th>
+                        <th style="text-align:center"><strong>अर्द्ध विकसित</strong></th>
+                        <th style="text-align:center"><strong>पूर्ण विकसित</strong></th>
+                        <th style="text-align:center"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
+                        <th style="text-align:center"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
+                        <th style="text-align:center"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center"><strong>तालाब (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center"><strong>रिमार्क</strong></th>
+                    </tr>
+                </thead>
+            </table>
         </div>
         <!-- Custom Footer -->
         <div class="footer o_standard_footer" style="position: relative;">
@@ -225,33 +255,7 @@
                     </style>
                     <div class="content-wrapper">
                         <table class="bulk-form10-table" style="margin-top: 0; border: 2px solid #000;">
-                            <thead>
-                                <tr>
-                                    <th rowspan="2" style="text-align:center"><strong>क्र.</strong></th>
-                                    <th rowspan="2" style="text-align:center"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                                    <th rowspan="2" style="text-align:center"><strong>कुल रकबा (हे.में.)</strong></th>
-                                    <th rowspan="2" style="text-align:center"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
-                                    <th rowspan="2" style="text-align:center"><strong>भूमिस्वामी का नाम</strong></th>
-                                    <th colspan="4" style="text-align:center"><strong>भूमि का प्रकार</strong></th>
-                                    <th colspan="3" style="text-align:center"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
-                                    <th colspan="6" style="text-align:center"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
-                                </tr>
-                                <tr>
-                                    <th style="text-align:center"><strong>एक फसली</strong></th>
-                                    <th style="text-align:center"><strong>दो फसली</strong></th>
-                                    <th style="text-align:center"><strong>सिंचित</strong></th>
-                                    <th style="text-align:center"><strong>असिंचित</strong></th>
-                                    <th style="text-align:center"><strong>अविकसित</strong></th>
-                                    <th style="text-align:center"><strong>अर्द्ध विकसित</strong></th>
-                                    <th style="text-align:center"><strong>पूर्ण विकसित</strong></th>
-                                    <th style="text-align:center"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
-                                    <th style="text-align:center"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
-                                    <th style="text-align:center"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
-                                    <th style="text-align:center"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
-                                    <th style="text-align:center"><strong>तालाब (हाँ/नहीं)</strong></th>
-                                    <th style="text-align:center"><strong>रिमार्क</strong></th>
-                                </tr>
-                            </thead>
+                            
                             <tbody>
                                 <t t-foreach="surveys" t-as="s">
                                     <tr style="page-break-inside: avoid; page-break-after: auto;">

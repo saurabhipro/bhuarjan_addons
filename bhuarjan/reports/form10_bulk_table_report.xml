@@ -160,7 +160,8 @@
         <div class="article o_report_layout_standard"
          t-att-data-oe-model="o and o._name"
          t-att-data-oe-id="o and o.id"
-         t-att-data-oe-lang="o and o.env.context.get('lang')">
+         t-att-data-oe-lang="o and o.env.context.get('lang')"
+         style="margin-top: 0;">
         <t t-raw="0"/>
     </div>
         
@@ -189,11 +190,17 @@
                         }
                         .bulk-form10-table thead {
                             display: table-header-group;
+                            -fs-table-paginate: paginate;
+                        }
+                        .bulk-form10-table thead tr {
+                            page-break-inside: avoid;
+                            page-break-after: avoid;
                         }
                         .bulk-form10-table thead th {
                             background-color: #f0f0f0;
                             font-weight: bold;
                             position: relative;
+                            page-break-inside: avoid;
                         }
                         .bulk-form10-table tbody {
                             display: table-row-group;
@@ -211,6 +218,9 @@
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
+                        }
+                        .content-wrapper {
+                            margin-top: 0;
                         }
                     </style>
                     <div class="content-wrapper">

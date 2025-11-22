@@ -262,17 +262,21 @@
                         }
                         /* Page settings */
                         @page {
-                            margin-top: 9cm;
+                            margin-top: 9.5cm;
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
                         }
                         .content-wrapper {
                             margin-top: 0;
+                            padding-top: 15px;
+                        }
+                        .bulk-form10-table {
+                            margin-top: 10px;
                         }
                     </style>
                     <div class="content-wrapper">
-                        <table class="bulk-form10-table" style="margin-top: 0; border: 2px solid #000;">
+                        <table class="bulk-form10-table" style="border: 2px solid #000;">
                             
                             <tbody>
                                 <t t-foreach="surveys" t-as="s">

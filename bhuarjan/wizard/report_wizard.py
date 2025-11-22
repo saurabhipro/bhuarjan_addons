@@ -265,10 +265,10 @@ class ReportWizard(models.TransientModel):
                 counter = 1
                 for lo in survey.landowner_ids:
                     name = lo.name
-                    if lo.gender == 'female' and lo.spouse_name:
-                        name += f" पत्नी {lo.spouse_name}"
-                    elif lo.father_name:
+                    if lo.father_name:
                         name += f" पिता {lo.father_name}"
+                    elif lo.spouse_name:
+                        name += f" पति {lo.spouse_name}"
                     owner_names.append(f"{counter}. {name}")
                     counter += 1
                 owner_str = "\n".join(owner_names) if owner_names else "नहीं"
@@ -423,10 +423,10 @@ class ReportWizard(models.TransientModel):
                 counter = 1
                 for lo in survey.landowner_ids:
                     name = lo.name
-                    if lo.gender == 'female' and lo.spouse_name:
-                        name += f" पत्नी {lo.spouse_name}"
-                    elif lo.father_name:
+                    if lo.father_name:
                         name += f" पिता {lo.father_name}"
+                    elif lo.spouse_name:
+                        name += f" पति {lo.spouse_name}"
                     owner_names.append(f"{counter}. {name}")
                     counter += 1
                 owner_str = ", ".join(owner_names) if owner_names else "नहीं"

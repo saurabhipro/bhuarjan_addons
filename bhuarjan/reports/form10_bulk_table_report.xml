@@ -287,7 +287,7 @@
                                                                 <t t-if="lo.father_name">
                                                                     &#160;पिता&#160;<t t-esc="lo.father_name"/>
                                                                 </t>
-                                                                <t t-if="lo.spouse_name">
+                                                                <t t-elif="lo.spouse_name">
                                                                     &#160;पति&#160;<t t-esc="lo.spouse_name"/>
                                                                 </t>
                                                             </div>

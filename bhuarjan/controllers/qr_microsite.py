@@ -55,7 +55,7 @@ class Form10PDFController(http.Controller):
             
             # Generate PDF report using Odoo's standard rendering
             try:
-                report_action = request.env.ref('bhuarjan.action_report_form10_bulk_table')
+                report_action = request.env.ref('bhuarjan.action_report_form10_bulk_table').sudo()
             except ValueError:
                 return request.not_found("Report not found")
             

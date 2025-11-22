@@ -68,29 +68,18 @@ class Form10ExportUtils(models.AbstractModel):
         if not surveys:
             raise UserError("No surveys found.")
         
-        # Get the Form 10 bulk table report
+        # Get the Form 10 bulk table report using env.ref (bypasses permission checks)
         try:
-            report_action = self.env['ir.actions.report'].sudo().search([
-                ('report_name', '=', 'bhuarjan.form10_bulk_table_report')
-            ], limit=1)
-            
-            if not report_action:
-                # Fallback: try using ir.model.data
-                _logger.info("Form 10 PDF: Report not found by name, trying ir.model.data")
-                try:
-                    report_data = self.env['ir.model.data'].sudo().search([
-                        ('module', '=', 'bhuarjan'),
-                        ('name', '=', 'action_report_form10_bulk_table')
-                    ], limit=1)
-                    if report_data and report_data.res_id:
-                        report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
-                except Exception as e:
-                    _logger.error(f"Form 10 PDF: Error in fallback: {str(e)}", exc_info=True)
+            report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table').sudo()
             
             if not report_action or not report_action.exists():
                 raise UserError("Form 10 report not found. Please contact administrator.")
             
             _logger.info(f"Form 10 PDF: Report action found: {report_action.id}, report_name: {report_action.report_name}")
+        except ValueError as ve:
+            # env.ref raises ValueError if XML ID not found
+            _logger.error(f"Form 10 PDF: Report XML ID not found: {str(ve)}", exc_info=True)
+            raise UserError("Form 10 report not found. Please ensure the report is properly installed.")
         except Exception as e:
             _logger.error(f"Form 10 PDF: Error getting report action: {str(e)}", exc_info=True)
             raise UserError(f"Error accessing report: {str(e)}")

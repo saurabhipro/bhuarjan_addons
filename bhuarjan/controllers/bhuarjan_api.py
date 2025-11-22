@@ -3724,8 +3724,6 @@ class BhuarjanAPIController(http.Controller):
             approved_count = len(all_surveys.filtered(lambda s: s.state == 'approved'))
             rejected_count = len(all_surveys.filtered(lambda s: s.state == 'rejected'))
             
-            # Total Surveys Done = Approved + Rejected
-            total_surveys_done = approved_count + rejected_count
             # Pending = Submitted + Rejected (as per user requirement)
             pending_count = submitted_count + rejected_count
 
@@ -3736,7 +3734,6 @@ class BhuarjanAPIController(http.Controller):
                 'village_code': village.village_code or '',
                 'statistics': {
                     'total_surveys': total_surveys,
-                    'total_surveys_done': total_surveys_done,
                     'draft': draft_count,
                     'submitted': submitted_count,
                     'approved': approved_count,

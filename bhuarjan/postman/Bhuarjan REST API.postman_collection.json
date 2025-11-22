@@ -235,7 +235,7 @@
 								}
 							]
 						},
-						"description": "Get survey statistics dashboard for a village. Returns total surveys, total surveys done, approved, rejected, pending (submitted + rejected), and counts by state (draft, submitted, approved, rejected) with percentages."
+						"description": "Get survey statistics dashboard for a village. Returns total surveys, approved, rejected, pending (submitted + rejected), and counts by state (draft, submitted, approved, rejected)."
 					},
 					"response": []
 				}

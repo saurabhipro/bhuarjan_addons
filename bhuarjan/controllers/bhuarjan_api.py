@@ -1542,19 +1542,21 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
-    @http.route('/api/bhuarjan/form10/download', type='http', auth='public', methods=['GET'], csrf=False)
-    # @check_permission
-    def download_form10(self, **kwargs):
+    # Form 10 PDF and Excel export endpoints have been moved to separate controllers:
+    # - form10_pdf_api.py for PDF exports
+    # - form10_excel_api.py for Excel exports
+
+    @http.route('/api/bhuarjan/landowner', type='http', auth='public', methods=['POST'], csrf=False)
+    @check_permission
+    def create_landowner(self, **kwargs):
         """
-        Download Form 10 (Bulk Table Report) PDF based on village_id
-        Query params: village_id (required), project_id (optional), limit (optional, max 100)
-        Returns: PDF file
+        Create a new landowner
+        Accepts: JSON data with landowner fields
+        Returns: Created landowner details
         """
         try:
-            _logger.info("Form 10 download API called")
-            
-            # Get query parameters
-            village_id = request.httprequest.args.get('village_id', type=int)
+            # Parse request data
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
             project_id = request.httprequest.args.get('project_id', type=int)
             limit = min(request.httprequest.args.get('limit', type=int, default=20), 50)  # Default 20, max 50
 
@@ -1934,6 +1936,464 @@ class BhuarjanAPIController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Error in download_form10_by_survey: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
+    def _generate_form10_excel(self, surveys):
+        """Helper function to generate Excel file for Form 10 (without logo and QR code)"""
+        if not HAS_XLSXWRITER:
+            raise Exception("xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter")
+        
+        if not surveys:
+            raise Exception("No surveys found.")
+        
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('Form 10')
+        
+        # Define formats
+        title_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 18
+        })
+        
+        header_info_format = workbook.add_format({
+            'bold': True,
+            'align': 'left',
+            'valign': 'vcenter',
+            'border': 1,
+            'font_size': 12
+        })
+        
+        header_info_value_format = workbook.add_format({
+            'align': 'left',
+            'valign': 'vcenter',
+            'border': 1,
+            'font_size': 12
+        })
+        
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D3D3D3',
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 2,
+            'text_wrap': True,
+            'font_size': 11
+        })
+        
+        cell_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'text_wrap': True,
+            'font_size': 11
+        })
+        
+        signature_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 12
+        })
+        
+        first = surveys[0]
+        current_row = 0
+        
+        # Title
+        worksheet.merge_range(current_row, 0, current_row, 17, 'भू अर्जन प्रारंभिक सर्वे प्रपत्र', title_format)
+        current_row += 1
+        current_row += 1  # Spacing
+        
+        # Header info table (3 rows) - WITHOUT logo and QR code columns
+        # Row 1: Project and Department
+        worksheet.write(current_row, 0, 'परियोजना का नाम :', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 8, first.project_id.name or '', header_info_value_format)
+        worksheet.write(current_row, 9, 'विभाग का नाम', header_info_format)
+        worksheet.merge_range(current_row, 10, current_row, 17, first.department_id.name or '', header_info_value_format)
+        current_row += 1
+        
+        # Row 2: Village and Tehsil
+        worksheet.write(current_row, 0, 'ग्राम का नाम', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 8, first.village_id.name or '', header_info_value_format)
+        worksheet.write(current_row, 9, 'तहसील का नाम', header_info_format)
+        worksheet.merge_range(current_row, 10, current_row, 16, f"{first.tehsil_id.name or ''} जिला-रायगढ़ (छ.ग.)", header_info_value_format)
+        current_row += 1
+        
+        # Row 3: Survey Date
+        survey_date_str = first.survey_date.strftime('%d/%m/%Y') if first.survey_date else ''
+        worksheet.write(current_row, 0, 'सर्वे दिनाँक', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 17, survey_date_str, header_info_value_format)
+        current_row += 1
+        current_row += 1  # Spacing
+        
+        # Table headers (2 rows - matching PDF structure)
+        # First header row
+        worksheet.write(current_row, 0, 'क्र.', header_format)
+        worksheet.write(current_row, 1, 'प्रभावित खसरा क्रमांक', header_format)
+        worksheet.write(current_row, 2, 'कुल रकबा (हे.में.)', header_format)
+        worksheet.write(current_row, 3, 'अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', header_format)
+        worksheet.write(current_row, 4, 'भूमिस्वामी का नाम', header_format)
+        worksheet.merge_range(current_row, 5, current_row, 8, 'भूमि का प्रकार', header_format)
+        worksheet.merge_range(current_row, 9, current_row, 11, 'भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)', header_format)
+        worksheet.merge_range(current_row, 12, current_row, 17, 'भूमि पर स्थित परिसंपत्तियों का विवरण', header_format)
+        current_row += 1
+        
+        # Second header row
+        worksheet.write(current_row, 0, '', header_format)  # Skip first 4 columns (merged above)
+        worksheet.write(current_row, 1, '', header_format)
+        worksheet.write(current_row, 2, '', header_format)
+        worksheet.write(current_row, 3, '', header_format)
+        worksheet.write(current_row, 4, '', header_format)
+        worksheet.write(current_row, 5, 'एक फसली', header_format)
+        worksheet.write(current_row, 6, 'दो फसली', header_format)
+        worksheet.write(current_row, 7, 'सिंचित', header_format)
+        worksheet.write(current_row, 8, 'असिंचित', header_format)
+        worksheet.write(current_row, 9, 'अविकसित', header_format)
+        worksheet.write(current_row, 10, 'अर्द्ध विकसित', header_format)
+        worksheet.write(current_row, 11, 'पूर्ण विकसित', header_format)
+        worksheet.write(current_row, 12, 'मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में', header_format)
+        worksheet.write(current_row, 13, 'शेड (क्षेत्रफल वर्गफुट में)', header_format)
+        worksheet.write(current_row, 14, 'कुँआ (कच्चा/पक्का) (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 15, 'ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 16, 'तालाब (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 17, 'रिमार्क', header_format)
+        current_row += 1
+        
+        # Data rows
+        for idx, survey in enumerate(surveys):
+            serial_num = idx + 1
+            
+            # Get landowner names
+            owner_names = []
+            counter = 1
+            for lo in survey.landowner_ids:
+                name = lo.name or ''
+                if lo.father_name:
+                    name += f" पिता {lo.father_name}"
+                elif lo.spouse_name:
+                    name += f" पति {lo.spouse_name}"
+                owner_names.append(f"{counter}. {name}")
+                counter += 1
+            owner_str = "\n".join(owner_names) if owner_names else "नहीं"
+            
+            # Well type
+            well_str = "नहीं"
+            if survey.has_well == 'yes':
+                if survey.well_type == 'kachcha':
+                    well_str = "हाँ-कच्चा"
+                elif survey.well_type == 'pakka':
+                    well_str = "हाँ-पक्का"
+            
+            # House type
+            house_str = "नहीं"
+            if survey.house_type and survey.house_area:
+                house_type_str = "पक्का" if survey.house_type == 'pakka' else ("कच्चा" if survey.house_type == 'kaccha' else survey.house_type)
+                house_str = f"{house_type_str} / {survey.house_area} वर्गफुट"
+            
+            # Tree details by development stage (matching PDF structure)
+            undeveloped_trees = []
+            semi_developed_trees = []
+            fully_developed_trees = []
+            
+            if survey.tree_line_ids:
+                for tree_line in survey.tree_line_ids:
+                    if tree_line.tree_type == 'non_fruit_bearing':
+                        tree_name = tree_line.tree_master_id.name if tree_line.tree_master_id else ''
+                        quantity = tree_line.quantity or 0
+                        if tree_line.development_stage == 'undeveloped' and quantity > 0:
+                            undeveloped_trees.append(f"{tree_name} - {quantity}")
+                        elif tree_line.development_stage == 'semi_developed' and quantity > 0:
+                            semi_developed_trees.append(f"{tree_name} - {quantity}")
+                        elif tree_line.development_stage == 'fully_developed' and quantity > 0:
+                            fully_developed_trees.append(f"{tree_name} - {quantity}")
+            
+            undeveloped_str = "\n".join(undeveloped_trees) if undeveloped_trees else "नहीं"
+            semi_developed_str = "\n".join(semi_developed_trees) if semi_developed_trees else "नहीं"
+            fully_developed_str = "\n".join(fully_developed_trees) if fully_developed_trees else "नहीं"
+            
+            # Remarks
+            remarks_parts = []
+            if survey.has_traded_land == 'yes' and survey.traded_land_area:
+                remarks_parts.append(f"व्यपवर्तित-{survey.traded_land_area} हेक्टेयर")
+            if survey.crop_type_id and (survey.crop_type_id.code == 'FALLOW' or 'पड़ती' in (survey.crop_type_id.name or '')):
+                remarks_parts.append("पड़ती भूमि")
+            if survey.remarks:
+                remarks_parts.append(survey.remarks)
+            remarks_str = "\n".join(remarks_parts) if remarks_parts else "नहीं"
+            
+            data = [
+                serial_num,
+                survey.khasra_number or "नहीं",
+                survey.total_area or 0,
+                survey.acquired_area or 0,
+                owner_str,
+                "हाँ" if survey.is_single_crop else "नहीं",
+                "हाँ" if survey.is_double_crop else "नहीं",
+                "हाँ" if survey.is_irrigated else "नहीं",
+                "हाँ" if survey.is_unirrigated else "नहीं",
+                undeveloped_str,
+                semi_developed_str,
+                fully_developed_str,
+                house_str,
+                f"{survey.shed_area} वर्गफुट" if survey.shed_area else "नहीं",
+                well_str,
+                "हाँ" if survey.has_tubewell == 'yes' else "नहीं",
+                "हाँ" if survey.has_pond == 'yes' else "नहीं",
+                remarks_str
+            ]
+            
+            for col, value in enumerate(data):
+                worksheet.write(current_row, col, value, cell_format)
+            current_row += 1
+        
+        # Signature section at the end
+        current_row += 1  # Spacing
+        signature_start_row = current_row
+        
+        # Signature headers
+        worksheet.write(current_row, 0, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 1, current_row, 4, 'अपेक्षक निकाय के अधिकृत प्रतिनिधि', signature_format)
+        worksheet.write(current_row, 5, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 6, current_row, 9, 'तहसीलदार', signature_format)
+        worksheet.write(current_row, 10, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 11, current_row, 14, 'नायब तहसीलदार', signature_format)
+        worksheet.write(current_row, 15, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 16, current_row, 17, 'राजस्व निरीक्षक', signature_format)
+        current_row += 1
+        
+        # Signature details
+        worksheet.merge_range(current_row, 0, current_row, 4, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 5, current_row, 5, 'पदनाम', signature_format)
+        worksheet.merge_range(current_row, 6, current_row, 9, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 10, current_row, 14, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 15, current_row, 16, 'नाम-', signature_format)
+        worksheet.write(current_row, 17, 'रा.नि.मं.', signature_format)
+        current_row += 1
+        
+        # Set column widths
+        worksheet.set_column(0, 0, 5)   # Serial
+        worksheet.set_column(1, 1, 20)  # Khasra
+        worksheet.set_column(2, 3, 15)  # Areas
+        worksheet.set_column(4, 4, 30)  # Landowners
+        worksheet.set_column(5, 8, 12)  # Land type columns
+        worksheet.set_column(9, 11, 15)  # Tree columns
+        worksheet.set_column(12, 17, 15)  # Asset columns
+        
+        workbook.close()
+        output.seek(0)
+        return output.read()
+
+    @http.route('/api/bhuarjan/form10/excel/download', type='http', auth='public', methods=['GET'], csrf=False)
+    # @check_permission
+    def download_form10_excel(self, **kwargs):
+        """
+        Download Form 10 (Bulk Table Report) Excel based on village_id
+        Query params: village_id (required), project_id (optional), limit (optional, max 100)
+        Returns: Excel file (without logo and QR code)
+        """
+        try:
+            _logger.info("Form 10 Excel download API called")
+            
+            if not HAS_XLSXWRITER:
+                return Response(
+                    json.dumps({'error': 'xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter'}),
+                    status=500,
+                    content_type='application/json'
+                )
+            
+            # Get query parameters
+            village_id = request.httprequest.args.get('village_id', type=int)
+            project_id = request.httprequest.args.get('project_id', type=int)
+            limit = min(request.httprequest.args.get('limit', type=int, default=100), 100)  # Default 100, max 100
+
+            if not village_id:
+                _logger.warning("Form 10 Excel download: village_id is missing")
+                return Response(
+                    json.dumps({'error': 'village_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            _logger.info(f"Form 10 Excel download: village_id={village_id}, project_id={project_id}, limit={limit}")
+
+            # Verify village exists
+            village = request.env['bhu.village'].sudo().browse(village_id)
+            if not village.exists():
+                _logger.warning(f"Form 10 Excel download: Village {village_id} not found")
+                return Response(
+                    json.dumps({'error': 'Village not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Build domain to get surveys for the village
+            domain = [('village_id', '=', village_id)]
+            
+            # If project_id is provided, filter by project as well
+            if project_id:
+                # Verify project exists
+                project = request.env['bhu.project'].sudo().browse(project_id)
+                if not project.exists():
+                    _logger.warning(f"Form 10 Excel download: Project {project_id} not found")
+                    return Response(
+                        json.dumps({'error': 'Project not found'}),
+                        status=404,
+                        content_type='application/json'
+                    )
+                domain.append(('project_id', '=', project_id))
+                project_name = project.name
+            else:
+                project_name = 'All'
+
+            _logger.info(f"Form 10 Excel download: Searching surveys with domain {domain}")
+
+            # Get all surveys for the village (and project if specified)
+            surveys = request.env['bhu.survey'].sudo().with_context(
+                active_test=False,
+                bhuarjan_current_project_id=False
+            ).search(domain, order='id', limit=limit)
+
+            _logger.info(f"Form 10 Excel download: Found {len(surveys)} surveys")
+
+            if not surveys:
+                _logger.warning(f"Form 10 Excel download: No surveys found for village_id={village_id}")
+                return Response(
+                    json.dumps({'error': f'No surveys found for village_id={village_id}' + (f' and project_id={project_id}' if project_id else '')}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Generate Excel file
+            _logger.info("Form 10 Excel download: Generating Excel file")
+            excel_data = self._generate_form10_excel(surveys)
+
+            # Generate filename - sanitize to ASCII only for HTTP headers
+            def sanitize_filename(name):
+                """Remove non-ASCII characters and sanitize for HTTP headers"""
+                if not name:
+                    return 'Unknown'
+                try:
+                    name = name.encode('ascii', 'ignore').decode('ascii')
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    name = ''.join(char for char in name if ord(char) < 128)
+                name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
+                name = re.sub(r'[_\-\s]+', '_', name)
+                name = name.strip('_')
+                return name[:50] if name else 'Unknown'
+            
+            village_name_ascii = sanitize_filename(village.name if village.name else 'Village')
+            filename = f"Form10_{village_name_ascii}.xlsx"
+            if project_id:
+                project_name_ascii = sanitize_filename(project_name if project_name else 'Project')
+                filename = f"Form10_{project_name_ascii}_{village_name_ascii}.xlsx"
+
+            _logger.info(f"Form 10 Excel download: Returning Excel response with filename: {filename}")
+
+            # Return Excel file
+            response = request.make_response(
+                excel_data,
+                headers=[
+                    ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(excel_data)))
+                ]
+            )
+            _logger.info("Form 10 Excel download: Excel response created successfully")
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error in download_form10_excel: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({'error': str(e)}),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/form10/excel/survey/download', type='http', auth='public', methods=['GET'], csrf=False)
+    # @check_permission
+    def download_form10_excel_by_survey(self, **kwargs):
+        """
+        Download Form 10 (Bulk Table Report) Excel for a specific survey
+        Query params: survey_id (required)
+        Returns: Excel file (without logo and QR code)
+        """
+        try:
+            _logger.info("Form 10 Excel download by survey API called")
+            
+            if not HAS_XLSXWRITER:
+                return Response(
+                    json.dumps({'error': 'xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter'}),
+                    status=500,
+                    content_type='application/json'
+                )
+            
+            # Get query parameters
+            survey_id = request.httprequest.args.get('survey_id', type=int)
+
+            if not survey_id:
+                _logger.warning("Form 10 Excel download by survey: survey_id is missing")
+                return Response(
+                    json.dumps({'error': 'survey_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            _logger.info(f"Form 10 Excel download by survey: survey_id={survey_id}")
+
+            # Verify survey exists
+            survey = request.env['bhu.survey'].sudo().browse(survey_id)
+            if not survey.exists():
+                _logger.warning(f"Form 10 Excel download by survey: Survey {survey_id} not found")
+                return Response(
+                    json.dumps({'error': 'Survey not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            # Generate Excel file for single survey
+            _logger.info("Form 10 Excel download by survey: Generating Excel file")
+            excel_data = self._generate_form10_excel(survey)
+
+            # Generate filename - sanitize to ASCII only for HTTP headers
+            def sanitize_filename(name):
+                """Remove non-ASCII characters and sanitize for HTTP headers"""
+                if not name:
+                    return 'Unknown'
+                try:
+                    name = name.encode('ascii', 'ignore').decode('ascii')
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    name = ''.join(char for char in name if ord(char) < 128)
+                name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
+                name = re.sub(r'[_\-\s]+', '_', name)
+                name = name.strip('_')
+                return name[:50] if name else 'Unknown'
+            
+            # Generate filename with survey name or ID
+            survey_name_ascii = sanitize_filename(survey.name if survey.name else f"Survey_{survey_id}")
+            filename = f"Form10_{survey_name_ascii}.xlsx"
+
+            _logger.info(f"Form 10 Excel download by survey: Returning Excel response with filename: {filename}")
+
+            # Return Excel file
+            response = request.make_response(
+                excel_data,
+                headers=[
+                    ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(excel_data)))
+                ]
+            )
+            _logger.info("Form 10 Excel download by survey: Excel response created successfully")
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error in download_form10_excel_by_survey: {str(e)}", exc_info=True)
             return Response(
                 json.dumps({'error': str(e)}),
                 status=500,

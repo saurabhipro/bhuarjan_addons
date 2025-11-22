@@ -698,6 +698,114 @@
 						"description": "Download Form 10 (Bulk Table Report) PDF for a specific survey. Returns the Form 10 PDF for the specified survey_id only."
 					},
 					"response": []
+				},
+				{
+					"name": "Download Form 10 Excel (by village)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"form10",
+								"excel",
+								"download"
+							],
+							"query": [
+								{
+									"key": "village_id",
+									"value": "1",
+									"description": "Village ID (required)"
+								},
+								{
+									"key": "project_id",
+									"value": "1",
+									"description": "Project ID (optional)"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of surveys to export (optional, default: 100, max: 100)"
+								}
+							]
+						},
+						"description": "Download Form 10 (Bulk Table Report) Excel based on village_id. Returns all surveys for the specified village across all projects (or filtered by project_id if provided). Excel file does NOT include logo and QR code. Export is survey-wise and village-wise as in PDF."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Form 10 Excel (by village and project)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&project_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"form10",
+								"excel",
+								"download"
+							],
+							"query": [
+								{
+									"key": "village_id",
+									"value": "1",
+									"description": "Village ID (required)"
+								},
+								{
+									"key": "project_id",
+									"value": "1",
+									"description": "Project ID (optional)"
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Maximum number of surveys to export (optional, default: 100, max: 100)"
+								}
+							]
+						},
+						"description": "Download Form 10 (Bulk Table Report) Excel based on village_id and project_id. Returns surveys for the specified village and project only. Excel file does NOT include logo and QR code. Export is survey-wise and village-wise as in PDF."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Form 10 Excel (by survey ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/survey/download?survey_id=257",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"form10",
+								"excel",
+								"survey",
+								"download"
+							],
+							"query": [
+								{
+									"key": "survey_id",
+									"value": "257",
+									"description": "Survey ID (required)"
+								}
+							]
+						},
+						"description": "Download Form 10 (Bulk Table Report) Excel for a specific survey. Returns the Form 10 Excel for the specified survey_id only. Excel file does NOT include logo and QR code."
+					},
+					"response": []
 				}
 			]
 		},

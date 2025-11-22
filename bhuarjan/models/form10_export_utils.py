@@ -1,0 +1,492 @@
+# -*- coding: utf-8 -*-
+"""
+Form 10 Export Utility Functions
+Common utilities for PDF and Excel generation that can be used by both web interface and API
+"""
+from odoo import models, api
+from odoo.exceptions import UserError
+import io
+import re
+import logging
+
+_logger = logging.getLogger(__name__)
+
+try:
+    import xlsxwriter
+    HAS_XLSXWRITER = True
+except ImportError:
+    HAS_XLSXWRITER = False
+    _logger.warning("xlsxwriter library not found. Excel export will not be available.")
+
+
+class Form10ExportUtils(models.AbstractModel):
+    """Utility class for Form 10 PDF and Excel export"""
+    _name = 'form10.export.utils'
+    _description = 'Form 10 Export Utilities'
+
+    @api.model
+    def get_surveys_for_export(self, village_id=None, project_id=None, survey_id=None, limit=None):
+        """
+        Get surveys for export based on filters
+        Args:
+            village_id: Village ID (optional)
+            project_id: Project ID (optional)
+            survey_id: Survey ID (optional, takes precedence)
+            limit: Maximum number of surveys to return (optional)
+        Returns:
+            Recordset of surveys
+        """
+        domain = []
+        
+        if survey_id:
+            # If survey_id is provided, return only that survey
+            domain = [('id', '=', survey_id)]
+        else:
+            # Build domain based on village_id and project_id
+            if village_id:
+                domain.append(('village_id', '=', village_id))
+            if project_id:
+                domain.append(('project_id', '=', project_id))
+        
+        # Search with context to avoid mixin filters
+        surveys = self.env['bhu.survey'].sudo().with_context(
+            active_test=False,
+            bhuarjan_current_project_id=False
+        ).search(domain, order='id', limit=limit)
+        
+        return surveys
+
+    @api.model
+    def generate_form10_pdf(self, surveys):
+        """
+        Generate Form 10 PDF using Odoo's report system
+        Args:
+            surveys: Recordset of surveys
+        Returns:
+            bytes: PDF data
+        """
+        if not surveys:
+            raise UserError("No surveys found.")
+        
+        # Get the Form 10 bulk table report
+        try:
+            report_action = self.env['ir.actions.report'].sudo().search([
+                ('report_name', '=', 'bhuarjan.form10_bulk_table_report')
+            ], limit=1)
+            
+            if not report_action:
+                # Fallback: try using ir.model.data
+                _logger.info("Form 10 PDF: Report not found by name, trying ir.model.data")
+                try:
+                    report_data = self.env['ir.model.data'].sudo().search([
+                        ('module', '=', 'bhuarjan'),
+                        ('name', '=', 'action_report_form10_bulk_table')
+                    ], limit=1)
+                    if report_data and report_data.res_id:
+                        report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
+                except Exception as e:
+                    _logger.error(f"Form 10 PDF: Error in fallback: {str(e)}", exc_info=True)
+            
+            if not report_action or not report_action.exists():
+                raise UserError("Form 10 report not found. Please contact administrator.")
+            
+            _logger.info(f"Form 10 PDF: Report action found: {report_action.id}, report_name: {report_action.report_name}")
+        except Exception as e:
+            _logger.error(f"Form 10 PDF: Error getting report action: {str(e)}", exc_info=True)
+            raise UserError(f"Error accessing report: {str(e)}")
+
+        # Convert surveys to list of IDs for PDF rendering
+        res_ids = [int(sid) for sid in surveys.ids]
+        
+        if not res_ids:
+            raise UserError("No survey IDs found.")
+        
+        _logger.info(f"Form 10 PDF: Rendering PDF for {len(res_ids)} surveys")
+
+        # Generate PDF with error handling
+        report_name = report_action.report_name
+        try:
+            pdf_result = report_action.sudo().with_context(
+                lang='en_US',
+                tz='UTC'
+            )._render_qweb_pdf(report_name, res_ids, data={})
+        except MemoryError as mem_error:
+            _logger.error(f"Form 10 PDF: Memory error during PDF generation: {str(mem_error)}")
+            raise UserError("PDF generation failed due to memory constraints. Please reduce the number of surveys or contact administrator.")
+        except Exception as render_error:
+            _logger.error(f"Form 10 PDF: PDF rendering failed: {str(render_error)}", exc_info=True)
+            raise UserError(f"Error generating PDF: {str(render_error)}")
+
+        if not pdf_result:
+            raise UserError("Error generating PDF")
+
+        # Extract PDF bytes
+        if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+            pdf_data = pdf_result[0]
+        else:
+            pdf_data = pdf_result
+
+        if not isinstance(pdf_data, bytes):
+            _logger.error(f"Form 10 PDF: Invalid PDF data type: {type(pdf_data)}")
+            raise UserError("Invalid PDF data")
+
+        return pdf_data
+
+    @api.model
+    def generate_form10_excel(self, surveys):
+        """
+        Generate Form 10 Excel file (without logo and QR code)
+        Args:
+            surveys: Recordset of surveys
+        Returns:
+            bytes: Excel file data
+        """
+        if not HAS_XLSXWRITER:
+            raise UserError("xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter")
+        
+        if not surveys:
+            raise UserError("No surveys found.")
+        
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('Form 10')
+        
+        # Define formats
+        title_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 18
+        })
+        
+        header_info_format = workbook.add_format({
+            'bold': True,
+            'align': 'left',
+            'valign': 'vcenter',
+            'border': 1,
+            'font_size': 12
+        })
+        
+        header_info_value_format = workbook.add_format({
+            'align': 'left',
+            'valign': 'vcenter',
+            'border': 1,
+            'font_size': 12
+        })
+        
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D3D3D3',
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 2,
+            'text_wrap': True,
+            'font_size': 11
+        })
+        
+        cell_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'text_wrap': True,
+            'font_size': 11
+        })
+        
+        # Formats for yes/no values
+        cell_format_yes = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'text_wrap': True,
+            'font_size': 11,
+            'font_color': '#00AA00'  # Green color
+        })
+        
+        cell_format_no = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'text_wrap': True,
+            'font_size': 11,
+            'font_color': '#FF0000'  # Red color
+        })
+        
+        signature_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_size': 12
+        })
+        
+        first = surveys[0]
+        current_row = 0
+        
+        # Title
+        worksheet.merge_range(current_row, 0, current_row, 17, 'भू अर्जन प्रारंभिक सर्वे प्रपत्र', title_format)
+        current_row += 1
+        current_row += 1  # Spacing
+        
+        # Header info table (3 rows) - WITHOUT logo and QR code columns
+        # Row 1: Project and Department
+        worksheet.write(current_row, 0, 'परियोजना का नाम :', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 8, first.project_id.name or '', header_info_value_format)
+        worksheet.write(current_row, 9, 'विभाग का नाम', header_info_format)
+        worksheet.merge_range(current_row, 10, current_row, 17, first.department_id.name or '', header_info_value_format)
+        current_row += 1
+        
+        # Row 2: Village and Tehsil
+        worksheet.write(current_row, 0, 'ग्राम का नाम', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 8, first.village_id.name or '', header_info_value_format)
+        worksheet.write(current_row, 9, 'तहसील का नाम', header_info_format)
+        worksheet.merge_range(current_row, 10, current_row, 16, f"{first.tehsil_id.name or ''} जिला-रायगढ़ (छ.ग.)", header_info_value_format)
+        current_row += 1
+        
+        # Row 3: Survey Date
+        survey_date_str = first.survey_date.strftime('%d/%m/%Y') if first.survey_date else ''
+        worksheet.write(current_row, 0, 'सर्वे दिनाँक', header_info_format)
+        worksheet.merge_range(current_row, 1, current_row, 17, survey_date_str, header_info_value_format)
+        current_row += 1
+        current_row += 1  # Spacing
+        
+        # Table headers (2 rows - matching PDF structure)
+        # First header row
+        worksheet.write(current_row, 0, 'क्र.', header_format)
+        worksheet.write(current_row, 1, 'प्रभावित खसरा क्रमांक', header_format)
+        worksheet.write(current_row, 2, 'कुल रकबा (हे.में.)', header_format)
+        worksheet.write(current_row, 3, 'अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', header_format)
+        worksheet.write(current_row, 4, 'भूमिस्वामी का नाम', header_format)
+        worksheet.merge_range(current_row, 5, current_row, 8, 'भूमि का प्रकार', header_format)
+        worksheet.merge_range(current_row, 9, current_row, 11, 'भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)', header_format)
+        worksheet.merge_range(current_row, 12, current_row, 17, 'भूमि पर स्थित परिसंपत्तियों का विवरण', header_format)
+        current_row += 1
+        
+        # Second header row
+        worksheet.write(current_row, 0, '', header_format)  # Skip first 4 columns (merged above)
+        worksheet.write(current_row, 1, '', header_format)
+        worksheet.write(current_row, 2, '', header_format)
+        worksheet.write(current_row, 3, '', header_format)
+        worksheet.write(current_row, 4, '', header_format)
+        worksheet.write(current_row, 5, 'एक फसली', header_format)
+        worksheet.write(current_row, 6, 'दो फसली', header_format)
+        worksheet.write(current_row, 7, 'सिंचित', header_format)
+        worksheet.write(current_row, 8, 'असिंचित', header_format)
+        worksheet.write(current_row, 9, 'अविकसित', header_format)
+        worksheet.write(current_row, 10, 'अर्द्ध विकसित', header_format)
+        worksheet.write(current_row, 11, 'पूर्ण विकसित', header_format)
+        worksheet.write(current_row, 12, 'मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में', header_format)
+        worksheet.write(current_row, 13, 'शेड (क्षेत्रफल वर्गफुट में)', header_format)
+        worksheet.write(current_row, 14, 'कुँआ (कच्चा/पक्का) (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 15, 'ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 16, 'तालाब (हाँ/नहीं)', header_format)
+        worksheet.write(current_row, 17, 'रिमार्क', header_format)
+        current_row += 1
+        
+        # Data rows
+        for idx, survey in enumerate(surveys):
+            serial_num = idx + 1
+            
+            # Get landowner names
+            owner_names = []
+            counter = 1
+            for lo in survey.landowner_ids:
+                name = lo.name or ''
+                if lo.father_name:
+                    name += f" पिता {lo.father_name}"
+                elif lo.spouse_name:
+                    name += f" पति {lo.spouse_name}"
+                owner_names.append(f"{counter}. {name}")
+                counter += 1
+            owner_str = "\n".join(owner_names) if owner_names else "नहीं"
+            
+            # Well type
+            well_str = "नहीं"
+            if survey.has_well == 'yes':
+                if survey.well_type == 'kachcha':
+                    well_str = "हाँ-कच्चा"
+                elif survey.well_type == 'pakka':
+                    well_str = "हाँ-पक्का"
+            
+            # House type
+            house_str = "नहीं"
+            if survey.house_type and survey.house_area:
+                house_type_str = "पक्का" if survey.house_type == 'pakka' else ("कच्चा" if survey.house_type == 'kaccha' else survey.house_type)
+                house_str = f"{house_type_str} / {survey.house_area} वर्गफुट"
+            
+            # Tree details by development stage (matching PDF structure)
+            undeveloped_trees = []
+            semi_developed_trees = []
+            fully_developed_trees = []
+            
+            if survey.tree_line_ids:
+                for tree_line in survey.tree_line_ids:
+                    if tree_line.tree_type == 'non_fruit_bearing':
+                        tree_name = tree_line.tree_master_id.name if tree_line.tree_master_id else ''
+                        quantity = tree_line.quantity or 0
+                        if tree_line.development_stage == 'undeveloped' and quantity > 0:
+                            undeveloped_trees.append(f"{tree_name} - {quantity}")
+                        elif tree_line.development_stage == 'semi_developed' and quantity > 0:
+                            semi_developed_trees.append(f"{tree_name} - {quantity}")
+                        elif tree_line.development_stage == 'fully_developed' and quantity > 0:
+                            fully_developed_trees.append(f"{tree_name} - {quantity}")
+            
+            undeveloped_str = "\n".join(undeveloped_trees) if undeveloped_trees else "नहीं"
+            semi_developed_str = "\n".join(semi_developed_trees) if semi_developed_trees else "नहीं"
+            fully_developed_str = "\n".join(fully_developed_trees) if fully_developed_trees else "नहीं"
+            
+            # Remarks
+            remarks_parts = []
+            if survey.has_traded_land == 'yes' and survey.traded_land_area:
+                remarks_parts.append(f"व्यपवर्तित-{survey.traded_land_area} हेक्टेयर")
+            if survey.crop_type_id and (survey.crop_type_id.code == 'FALLOW' or 'पड़ती' in (survey.crop_type_id.name or '')):
+                remarks_parts.append("पड़ती भूमि")
+            if survey.remarks:
+                remarks_parts.append(survey.remarks)
+            remarks_str = "\n".join(remarks_parts) if remarks_parts else "नहीं"
+            
+            data = [
+                serial_num,
+                survey.khasra_number or "नहीं",
+                survey.total_area or 0,
+                survey.acquired_area or 0,
+                owner_str,
+                "हाँ" if survey.is_single_crop else "नहीं",
+                "हाँ" if survey.is_double_crop else "नहीं",
+                "हाँ" if survey.is_irrigated else "नहीं",
+                "हाँ" if survey.is_unirrigated else "नहीं",
+                undeveloped_str,
+                semi_developed_str,
+                fully_developed_str,
+                house_str,
+                f"{survey.shed_area} वर्गफुट" if survey.shed_area else "नहीं",
+                well_str,
+                "हाँ" if survey.has_tubewell == 'yes' else "नहीं",
+                "हाँ" if survey.has_pond == 'yes' else "नहीं",
+                remarks_str
+            ]
+            
+            # Write data with conditional formatting for yes/no values
+            for col, value in enumerate(data):
+                # Determine format based on value
+                if isinstance(value, str):
+                    value_stripped = value.strip()
+                    # Check if value is exactly "हाँ" or starts with "हाँ" (for values like "हाँ-कच्चा")
+                    if value_stripped == "हाँ" or value_stripped.startswith("हाँ"):
+                        # Yes value - use green
+                        format_to_use = cell_format_yes
+                    elif value_stripped == "नहीं" or "नहीं" in value_stripped:
+                        # No value - use red
+                        format_to_use = cell_format_no
+                    else:
+                        # Default format for other values
+                        format_to_use = cell_format
+                else:
+                    # Non-string values (numbers) use default format
+                    format_to_use = cell_format
+                
+                worksheet.write(current_row, col, value, format_to_use)
+            current_row += 1
+        
+        # Signature section at the end
+        current_row += 1  # Spacing
+        
+        # Signature headers
+        worksheet.write(current_row, 0, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 1, current_row, 4, 'अपेक्षक निकाय के अधिकृत प्रतिनिधि', signature_format)
+        worksheet.write(current_row, 5, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 6, current_row, 9, 'तहसीलदार', signature_format)
+        worksheet.write(current_row, 10, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 11, current_row, 14, 'नायब तहसीलदार', signature_format)
+        worksheet.write(current_row, 15, '(हस्ताक्षर)', signature_format)
+        worksheet.merge_range(current_row, 16, current_row, 17, 'राजस्व निरीक्षक', signature_format)
+        current_row += 1
+        
+        # Signature details
+        worksheet.merge_range(current_row, 0, current_row, 4, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 5, current_row, 5, 'पदनाम', signature_format)
+        worksheet.merge_range(current_row, 6, current_row, 9, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 10, current_row, 14, 'नाम -', signature_format)
+        worksheet.merge_range(current_row, 15, current_row, 16, 'नाम-', signature_format)
+        worksheet.write(current_row, 17, 'रा.नि.मं.', signature_format)
+        current_row += 1
+        
+        # Set column widths
+        worksheet.set_column(0, 0, 5)   # Serial
+        worksheet.set_column(1, 1, 20)  # Khasra
+        worksheet.set_column(2, 3, 15)  # Areas
+        worksheet.set_column(4, 4, 30)  # Landowners
+        worksheet.set_column(5, 8, 12)  # Land type columns
+        worksheet.set_column(9, 11, 15)  # Tree columns
+        worksheet.set_column(12, 17, 15)  # Asset columns
+        
+        workbook.close()
+        output.seek(0)
+        return output.read()
+
+    @api.model
+    def sanitize_filename(self, name, max_length=50):
+        """
+        Remove non-ASCII characters and sanitize for HTTP headers
+        Args:
+            name: Original filename
+            max_length: Maximum length of sanitized filename
+        Returns:
+            str: Sanitized filename
+        """
+        if not name:
+            return 'Unknown'
+        # Convert to string and encode to ASCII, ignoring non-ASCII characters
+        try:
+            # First, try to encode to ASCII and ignore errors
+            name = name.encode('ascii', 'ignore').decode('ascii')
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            # If encoding fails, remove all non-ASCII characters manually
+            name = ''.join(char for char in name if ord(char) < 128)
+        
+        # Remove any remaining non-alphanumeric characters except underscores and hyphens
+        name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
+        # Replace multiple underscores/hyphens with single underscore
+        name = re.sub(r'[_\-\s]+', '_', name)
+        # Remove leading/trailing underscores
+        name = name.strip('_')
+        return name[:max_length] if name else 'Unknown'
+
+    @api.model
+    def generate_form10_filename(self, surveys, file_extension='pdf', project_name=None, village_name=None):
+        """
+        Generate filename for Form 10 export
+        Args:
+            surveys: Recordset of surveys
+            file_extension: File extension (pdf or xlsx)
+            project_name: Optional project name override
+            village_name: Optional village name override
+        Returns:
+            str: Sanitized filename
+        """
+        if not surveys:
+            return f"Form10_Unknown.{file_extension}"
+        
+        first_survey = surveys[0]
+        
+        # Use provided names or get from first survey
+        if village_name is None:
+            village_name = first_survey.village_id.name if first_survey.village_id else 'Village'
+        if project_name is None:
+            project_name = first_survey.project_id.name if first_survey.project_id else None
+        
+        village_name_ascii = self.sanitize_filename(village_name)
+        
+        if project_name and len(surveys) > 1:
+            # Multiple surveys - include project name
+            project_name_ascii = self.sanitize_filename(project_name)
+            filename = f"Form10_{project_name_ascii}_{village_name_ascii}.{file_extension}"
+        elif len(surveys) == 1:
+            # Single survey - use survey name or ID
+            survey_name = first_survey.name or f"Survey_{first_survey.id}"
+            survey_name_ascii = self.sanitize_filename(survey_name)
+            filename = f"Form10_{survey_name_ascii}.{file_extension}"
+        else:
+            # Multiple surveys, no project
+            filename = f"Form10_{village_name_ascii}.{file_extension}"
+        
+        return filename
+

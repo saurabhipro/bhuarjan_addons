@@ -3742,13 +3742,6 @@ class BhuarjanAPIController(http.Controller):
                     'approved': approved_count,
                     'rejected': rejected_count,
                     'pending': pending_count
-                },
-                'breakdown': {
-                    'draft_percentage': round((draft_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
-                    'submitted_percentage': round((submitted_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
-                    'approved_percentage': round((approved_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
-                    'rejected_percentage': round((rejected_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
-                    'pending_percentage': round((pending_count / total_surveys * 100) if total_surveys > 0 else 0, 2)
                 }
             }
 

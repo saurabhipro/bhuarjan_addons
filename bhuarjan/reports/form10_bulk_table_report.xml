@@ -283,9 +283,9 @@
                             min-width: 3%;
                             max-width: 4%;
                         }
-                        /* Page settings */
+                        /* Page settings - increased top margin to prevent header overlap */
                         @page {
-                            margin-top: 9.5cm;
+                            margin-top: 10cm;
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
@@ -297,19 +297,78 @@
                         .bulk-form10-table {
                             margin-top: 10px;
                         }
+                        /* Ensure proper spacing for table body */
+                        .bulk-form10-table tbody {
+                            display: table-row-group;
+                        }
+                        /* Add spacing before first row to prevent hiding under header */
+                        .bulk-form10-table tbody tr:first-child td {
+                            padding-top: 30px;
+                        }
+                        /* Add top margin to first data row after page break */
+                        .spacer-row {
+                            height: 30px;
+                            border: none !important;
+                            page-break-after: avoid;
+                        }
+                        .spacer-row td {
+                            border: none !important;
+                            padding: 0 !important;
+                            height: 30px;
+                        }
                         .bulk-form10-table tbody tr.survey-row {
                             page-break-inside: avoid !important;
+                            margin-top: 5px;
+                        }
+                        /* Add extra spacing for first survey row after page break */
+                        .bulk-form10-table tbody tr.survey-row:first-of-type {
+                            margin-top: 20px;
                         }
                         .bulk-form10-table tbody tr.survey-row td:nth-child(5) {
                             page-break-inside: avoid !important;
                             page-break-after: avoid !important;
                             page-break-before: avoid !important;
                         }
+                        /* Ensure thead has proper spacing from tbody on each page */
+                        .bulk-form10-table thead {
+                            margin-bottom: 15px;
+                        }
                     </style>
                     <div class="content-wrapper">
                         <table class="bulk-form10-table" style="border: 2px solid #000;">
-                            
+                            <thead>
+                                <!-- Repeat headers on each page -->
+                                <tr>
+                                    <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 2%; font-size: 14px;"><strong>क्र.</strong></th>
+                                    <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 14px;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                                    <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 3%; font-size: 14px;"><strong>कुल रकबा (हे.में.)</strong></th>
+                                    <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 14px;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                                    <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 10%; font-size: 14px;"><strong>भूमिस्वामी का नाम</strong></th>
+                                    <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि का प्रकार</strong></th>
+                                    <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                                    <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>एक फसली</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>दो फसली</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>सिंचित</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>असिंचित</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>अविकसित</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>अर्द्ध विकसित</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>पूर्ण विकसित</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>तालाब (हाँ/नहीं)</strong></th>
+                                    <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 13px;"><strong>रिमार्क</strong></th>
+                                </tr>
+                            </thead>
                             <tbody>
+                                <!-- Spacer row to prevent first record from hiding under header -->
+                                <tr class="spacer-row">
+                                    <td colspan="18" style="height: 30px; border: none; padding: 0;"></td>
+                                </tr>
                                 <t t-foreach="surveys" t-as="s">
                                     <tr class="survey-row" style="page-break-inside: avoid !important; page-break-after: auto; page-break-before: auto;">
                                         <td style="text-align:center"><t t-esc="s_index + 1"/></td>

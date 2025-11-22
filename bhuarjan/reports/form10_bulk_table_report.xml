@@ -123,29 +123,29 @@
             <table class="bulk-form10-table" style="border-collapse: collapse; width: 100%; border: 2px solid #000; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 2%;"><strong>क्र.</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 5%;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 4%;"><strong>कुल रकबा (हे.में.)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 5%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 8%;"><strong>भूमिस्वामी का नाम</strong></th>
-                        <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि का प्रकार</strong></th>
-                        <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
-                        <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 2%; font-size: 11px;"><strong>क्र.</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 5%; font-size: 11px;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 11px;"><strong>कुल रकबा (हे.में.)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 5%; font-size: 11px;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 6%; font-size: 11px;"><strong>भूमिस्वामी का नाम</strong></th>
+                        <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 11px;"><strong>भूमि का प्रकार</strong></th>
+                        <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 11px;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                        <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 11px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                     </tr>
                     <tr>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>एक फसली</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>दो फसली</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>सिंचित</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>असिंचित</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>अविकसित</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>अर्द्ध विकसित</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>पूर्ण विकसित</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>तालाब (हाँ/नहीं)</strong></th>
-                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>रिमार्क</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>एक फसली</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>दो फसली</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>सिंचित</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>असिंचित</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>अविकसित</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>अर्द्ध विकसित</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>पूर्ण विकसित</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>तालाब (हाँ/नहीं)</strong></th>
+                        <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 10px;"><strong>रिमार्क</strong></th>
                     </tr>
                 </thead>
             </table>
@@ -214,7 +214,8 @@
                         .bulk-form10-table thead th:nth-child(2) { width: 5%; }
                         .bulk-form10-table thead th:nth-child(3) { width: 4%; }
                         .bulk-form10-table thead th:nth-child(4) { width: 5%; }
-                        .bulk-form10-table thead th:nth-child(5) { width: 8%; }
+                        .bulk-form10-table thead th:nth-child(5) { width: 6%; }
+                        .bulk-form10-table tbody td:nth-child(5) { width: 6%; }
                         .bulk-form10-table tbody td:nth-child(1) { width: 2%; }
                         .bulk-form10-table tbody td:nth-child(2) { width: 5%; }
                         .bulk-form10-table tbody td:nth-child(3) { width: 4%; }
@@ -243,7 +244,9 @@
                             position: relative;
                             page-break-inside: avoid;
                             border: 2px solid #000;
-                            padding: 8px;
+                            padding: 6px;
+                            font-size: 11px;
+                            line-height: 1.2;
                         }
                         .bulk-form10-table tbody {
                             display: table-row-group;
@@ -257,7 +260,7 @@
                         }
                         /* Page settings */
                         @page {
-                            margin-top: 8cm;
+                            margin-top: 9cm;
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
@@ -360,7 +363,9 @@
                                                 </td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.house_type">
-                                                        <span t-esc="s.house_type"/> / <span t-esc="s.house_area"/> वर्गफुट
+                                                        <t t-if="s.house_type == 'pakka'">पक्का</t>
+                                                        <t t-if="s.house_type == 'kaccha'">कच्चा</t>
+                                                        <t t-if="s.house_type != 'pakka' and s.house_type != 'kaccha'"><span t-esc="s.house_type"/></t> / <span t-esc="s.house_area or 0.0"/> वर्गफुट
                                                     </span>
                                                     <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>

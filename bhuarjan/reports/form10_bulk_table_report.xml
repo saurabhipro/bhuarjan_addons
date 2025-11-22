@@ -123,14 +123,14 @@
             <table class="bulk-form10-table" style="border-collapse: collapse; width: 100%; border: 2px solid #000; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 3%;"><strong>क्र.</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 8%;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 6%;"><strong>कुल रकबा (हे.में.)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 8%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 12%;"><strong>भूमिस्वामी का नाम</strong></th>
-                        <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 20%;"><strong>भूमि का प्रकार</strong></th>
-                        <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 15%;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
-                        <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 28%;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 2%;"><strong>क्र.</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 5%;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 4%;"><strong>कुल रकबा (हे.में.)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 5%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px; width: 8%;"><strong>भूमिस्वामी का नाम</strong></th>
+                        <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि का प्रकार</strong></th>
+                        <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                        <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                     </tr>
                     <tr>
                         <th style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 8px;"><strong>एक फसली</strong></th>
@@ -210,16 +210,16 @@
                             width: 100%;
                             table-layout: fixed;
                         }
-                        .bulk-form10-table thead th:nth-child(1) { width: 3%; }
-                        .bulk-form10-table thead th:nth-child(2) { width: 8%; }
-                        .bulk-form10-table thead th:nth-child(3) { width: 6%; }
-                        .bulk-form10-table thead th:nth-child(4) { width: 8%; }
-                        .bulk-form10-table thead th:nth-child(5) { width: 12%; }
-                        .bulk-form10-table tbody td:nth-child(1) { width: 3%; }
-                        .bulk-form10-table tbody td:nth-child(2) { width: 8%; }
-                        .bulk-form10-table tbody td:nth-child(3) { width: 6%; }
-                        .bulk-form10-table tbody td:nth-child(4) { width: 8%; }
-                        .bulk-form10-table tbody td:nth-child(5) { width: 12%; }
+                        .bulk-form10-table thead th:nth-child(1) { width: 2%; }
+                        .bulk-form10-table thead th:nth-child(2) { width: 5%; }
+                        .bulk-form10-table thead th:nth-child(3) { width: 4%; }
+                        .bulk-form10-table thead th:nth-child(4) { width: 5%; }
+                        .bulk-form10-table thead th:nth-child(5) { width: 8%; }
+                        .bulk-form10-table tbody td:nth-child(1) { width: 2%; }
+                        .bulk-form10-table tbody td:nth-child(2) { width: 5%; }
+                        .bulk-form10-table tbody td:nth-child(3) { width: 4%; }
+                        .bulk-form10-table tbody td:nth-child(4) { width: 5%; }
+                        .bulk-form10-table tbody td:nth-child(5) { width: 8%; }
                         .bulk-form10-table td, th {
                             border: 1px solid #000; 
                             font-size: 14px;

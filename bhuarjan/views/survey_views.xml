@@ -114,20 +114,6 @@
                             
                         </page>
                         
-                        <page string="Tree Details / वृक्ष विवरण" name="tree_details">
-                            <group string="Trees / वृक्ष">
-                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1" 
-                                       context="{'default_development_stage': 'undeveloped'}"
-                                       view_ref="view_bhu_survey_tree_line_unified"/>
-                            </group>
-                        </page>
-                        
-                        <page string="Photos / फोटो" name="survey_photos">
-                            <group string="Survey Photos / सर्वे फोटो">
-                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1"/>
-                            </group>
-                        </page>
-                        
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
                             <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
                                 <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
@@ -150,6 +136,20 @@
                                         <field name="account_number" string="Account / खाता"/>
                                     </list>
                                 </field>
+                            </group>
+                        </page>
+                        
+                        <page string="Tree Details / वृक्ष विवरण" name="tree_details">
+                            <group string="Trees / वृक्ष">
+                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1" 
+                                       context="{'default_development_stage': 'undeveloped'}"
+                                       view_ref="view_bhu_survey_tree_line_unified"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Photos / फोटो" name="survey_photos">
+                            <group string="Survey Photos / सर्वे फोटो">
+                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>

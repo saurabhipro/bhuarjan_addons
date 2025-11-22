@@ -17,14 +17,6 @@ class BhuLandowner(models.Model):
     mother_name = fields.Char(string="Mother's Name / माता का नाम", tracking=True)
     spouse_name = fields.Char(string="Spouse's Name / पति/पत्नी का नाम", tracking=True)
     
-    # Personal Details
-    age = fields.Integer(string='Age / आयु', tracking=True)
-    gender = fields.Selection([
-        ('male', 'Male / पुरुष'),
-        ('female', 'Female / महिला'),
-        ('other', 'Other / अन्य')
-    ], string='Gender / लिंग', tracking=True)
-    
     # Contact Information
     phone = fields.Char(string='Phone Number / फोन नंबर', tracking=True)
     
@@ -59,7 +51,7 @@ class BhuLandowner(models.Model):
     survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 
                                  'landowner_id', 'survey_id', string='Related Surveys / संबंधित सर्वे')
     
-    # Validation Methods removed - no validations for aadhar, pan, account_number, age
+    # Validation Methods removed - no validations for aadhar, pan, account_number
     
     # Auto-fill methods
     @api.onchange('village_id')

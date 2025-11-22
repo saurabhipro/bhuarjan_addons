@@ -125,8 +125,7 @@
                                     <list string="Landowner Details / भूमिस्वामी विवरण">
                                         <field name="name" string="Name / नाम"/>
                                         <field name="father_name" string="Father's Name / पिता का नाम"/>
-                                        <field name="age" string="Age / आयु"/>
-                                        <field name="gender" string="Gender / लिंग"/>
+                                        <field name="spouse_name" string="Spouse's Name / पति/पत्नी का नाम"/>
                                         <field name="village_id" string="Village / ग्राम"/>
                                         <field name="tehsil_id" string="Tehsil / तहसील"/>
                                         <field name="district_id" string="District / जिला"/>

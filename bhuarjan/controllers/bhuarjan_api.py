@@ -1435,8 +1435,7 @@ class BhuarjanAPIController(http.Controller):
                     'id': lo.id,
                     'name': lo.name,
                     'father_name': lo.father_name or '',
-                    'gender': lo.gender,
-                    'age': lo.age,
+                    'spouse_name': lo.spouse_name or '',
                     'aadhar_number': lo.aadhar_number or '',
                     'pan_number': lo.pan_number or '',
                     'phone': lo.phone or '',
@@ -1991,8 +1990,6 @@ class BhuarjanAPIController(http.Controller):
                 'father_name': data.get('father_name'),
                 'mother_name': data.get('mother_name'),
                 'spouse_name': data.get('spouse_name'),
-                'age': data.get('age'),
-                'gender': data.get('gender'),
                 'phone': data.get('phone'),
                 'village_id': village_id,
                 'tehsil_id': tehsil_id,
@@ -2010,7 +2007,7 @@ class BhuarjanAPIController(http.Controller):
             # Remove None values for ID fields only (to avoid invalid references)
             # Keep all text fields even if empty string or None (Odoo will handle None as not setting the field)
             landowner_vals = {k: v for k, v in landowner_vals.items() 
-                            if v is not None or k not in ['village_id', 'tehsil_id', 'district_id', 'age']}
+                            if v is not None or k not in ['village_id', 'tehsil_id', 'district_id']}
 
             # Handle document uploads if provided (base64 encoded)
             if data.get('aadhar_card'):
@@ -2046,8 +2043,6 @@ class BhuarjanAPIController(http.Controller):
                         'father_name': landowner.father_name or '',
                         'mother_name': landowner.mother_name or '',
                         'spouse_name': landowner.spouse_name or '',
-                        'gender': landowner.gender,
-                        'age': landowner.age,
                         'aadhar_number': landowner.aadhar_number or '',
                         'pan_number': landowner.pan_number or '',
                         'phone': landowner.phone or '',
@@ -2117,8 +2112,6 @@ class BhuarjanAPIController(http.Controller):
                     'father_name': landowner.father_name or '',
                     'mother_name': landowner.mother_name or '',
                     'spouse_name': landowner.spouse_name or '',
-                    'age': landowner.age or 0,
-                    'gender': landowner.gender or '',
                     'phone': landowner.phone or '',
                     'village_id': landowner.village_id.id if landowner.village_id else None,
                     'village_name': landowner.village_id.name if landowner.village_id else '',
@@ -2241,11 +2234,7 @@ class BhuarjanAPIController(http.Controller):
             if 'account_holder_name' in data:
                 landowner_vals['account_holder_name'] = data.get('account_holder_name')
             
-            # Integer and selection fields
-            if 'age' in data:
-                landowner_vals['age'] = data.get('age')
-            if 'gender' in data:
-                landowner_vals['gender'] = data.get('gender')
+            # Integer and selection fields - age and gender removed
             
             # ID fields - only include if provided and valid
             if village_id is not None:
@@ -2354,8 +2343,7 @@ class BhuarjanAPIController(http.Controller):
                     fields_list.append('account_number')
                 elif 'ifsc' in error_msg.lower():
                     fields_list.append('ifsc_code')
-                elif 'age' in error_msg.lower():
-                    fields_list.append('age')
+                # Age and gender fields removed
                 
                 return Response(
                     json.dumps({
@@ -2392,8 +2380,6 @@ class BhuarjanAPIController(http.Controller):
                         'father_name': landowner.father_name or '',
                         'mother_name': landowner.mother_name or '',
                         'spouse_name': landowner.spouse_name or '',
-                        'gender': landowner.gender or '',
-                        'age': landowner.age or 0,
                         'aadhar_number': landowner.aadhar_number or '',
                         'pan_number': landowner.pan_number or '',
                         'phone': landowner.phone or '',

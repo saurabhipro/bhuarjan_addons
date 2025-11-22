@@ -253,9 +253,9 @@
                             min-width: 3%;
                             max-width: 4%;
                         }
-                        /* Page settings - increased top margin to prevent header overlap */
+                        /* Page settings */
                         @page {
-                            margin-top: 10cm;
+                            margin-top: 9.5cm;
                             margin-bottom: 2cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
@@ -266,42 +266,6 @@
                         }
                         .bulk-form10-table {
                             margin-top: 10px;
-                        }
-                        /* Ensure proper spacing for table body */
-                        .bulk-form10-table tbody {
-                            display: table-row-group;
-                        }
-                        /* Add spacing before first row to prevent hiding under header */
-                        .bulk-form10-table tbody tr:first-child td {
-                            padding-top: 30px;
-                        }
-                        /* Add top margin to first data row after page break */
-                        .spacer-row {
-                            height: 30px;
-                            border: none !important;
-                            page-break-after: avoid;
-                        }
-                        .spacer-row td {
-                            border: none !important;
-                            padding: 0 !important;
-                            height: 30px;
-                        }
-                        .bulk-form10-table tbody tr.survey-row {
-                            page-break-inside: avoid !important;
-                            margin-top: 5px;
-                        }
-                        /* Add extra spacing for first survey row after page break */
-                        .bulk-form10-table tbody tr.survey-row:first-of-type {
-                            margin-top: 20px;
-                        }
-                        .bulk-form10-table tbody tr.survey-row td:nth-child(5) {
-                            page-break-inside: avoid !important;
-                            page-break-after: avoid !important;
-                            page-break-before: avoid !important;
-                        }
-                        /* Ensure thead has proper spacing from tbody on each page */
-                        .bulk-form10-table thead {
-                            margin-bottom: 15px;
                         }
                     </style>
                     <div class="content-wrapper">
@@ -335,10 +299,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Spacer row to prevent first record from hiding under header -->
-                                <tr class="spacer-row">
-                                    <td colspan="18" style="height: 30px; border: none; padding: 0;"></td>
-                                </tr>
                                 <t t-foreach="surveys" t-as="s">
                                     <tr class="survey-row" style="page-break-inside: avoid !important; page-break-after: auto; page-break-before: auto;">
                                         <td style="text-align:center"><t t-esc="s_index + 1"/></td>

@@ -1491,7 +1491,11 @@ class BhuarjanAPIController(http.Controller):
             if village_id:
                 domain.append(('village_id', '=', village_id))
             if state:
-                domain.append(('state', '=', state))
+                # Handle special case: 'pending' means all surveys that are NOT approved
+                if state.lower() == 'pending':
+                    domain.append(('state', '!=', 'approved'))
+                else:
+                    domain.append(('state', '=', state))
 
             # Search surveys
             surveys = request.env['bhu.survey'].sudo().search(domain, limit=limit, offset=offset, order='create_date desc')

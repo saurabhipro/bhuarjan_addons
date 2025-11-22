@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "10ca4a24-20ae-4b5d-a56a-246d9311b389",
 		"name": "Bhuarjan REST API",
-		"description": "REST API collection for Bhuarjan mobile app integration. All APIs are public (no authentication required).",
+		"description": "REST API collection for Bhuarjan mobile app integration. Default authentication: Bearer Token (use {{token}} variable). Public endpoints (get_otp, login) use No Auth.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19928031",
 		"_collection_link": "https://solardesk.postman.co/workspace/24b88f13-f075-4ab9-9223-1d8667a7eab6/collection/19928031-10ca4a24-20ae-4b5d-a56a-246d9311b389?action=share&source=collection_link&creator=19928031"
@@ -84,6 +84,16 @@
 				{
 					"name": "Get All Users",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -366,6 +376,16 @@
 				{
 					"name": "Create Survey",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -400,6 +420,16 @@
 				{
 					"name": "Get Survey Details",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -428,6 +458,16 @@
 				{
 					"name": "List Surveys",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {

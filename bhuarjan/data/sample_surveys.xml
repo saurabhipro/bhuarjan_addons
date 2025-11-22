@@ -4,7 +4,7 @@
         <!-- Sample Surveys (10 records) -->
         <!-- Using existing project, existing villages, and existing departments -->
         <!-- Survey names follow pattern: SC_{project_code}_{village_code} -->
-        <!-- All surveys are imported in draft state -->
+        <!-- All surveys are imported in draft state (for web UI testing) -->
         <record id="survey_sample_1" model="bhu.survey">
             <field name="name">SC_RRR-001_JR</field>
             <field name="project_id" ref="project_ring_road_raigarh"/>

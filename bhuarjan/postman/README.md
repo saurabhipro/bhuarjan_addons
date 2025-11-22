@@ -78,7 +78,7 @@ This Postman collection contains all the REST API endpoints for the Bhuarjan mob
 - **Query Parameters (all optional):**
   - `project_id` (integer) - Filter by project
   - `village_id` (integer) - Filter by village
-  - `state` (string) - Filter by state: `draft`, `submitted`, `approved`, `rejected`, `locked`
+  - `state` (string) - Filter by state: `draft`, `submitted`, `approved`, `rejected`
   - `limit` (integer) - Number of records (default: 100)
   - `offset` (integer) - Skip records (default: 0)
 

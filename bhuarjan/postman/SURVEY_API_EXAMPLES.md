@@ -40,7 +40,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
   "location_accuracy": 10.5,
   "location_timestamp": "2024-12-15 10:30:00",
   "remarks": "Survey completed successfully",
-  "state": "draft",
+  "state": "submitted",
   "landowner_ids": [126]
 }
 ```
@@ -150,7 +150,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 - `location_accuracy` (float): Location accuracy in meters
 - `location_timestamp` (string): Timestamp in format "YYYY-MM-DD HH:MM:SS"
 - `remarks` (string): Additional remarks
-- `state` (string): "draft" (default), "submitted", "approved", "locked"
+- `state` (string): "submitted" (default for API), "draft", "approved", "rejected"
 - `survey_date` (string, optional): Date in format "YYYY-MM-DD" (auto-computed if not provided)
 - `survey_image` (string): Base64 encoded image (with data URL prefix)
 - `survey_image_filename` (string): Filename for the survey image
@@ -238,7 +238,7 @@ Then use the `id` value in your `crop_type` field:
     "location_accuracy": 10.5,
     "location_timestamp": "2024-12-15 10:30:00",
     "remarks": "Survey completed successfully",
-    "state": "draft",
+    "state": "submitted",
     "landowner_ids": [126],
     "landowner_count": 1
   }

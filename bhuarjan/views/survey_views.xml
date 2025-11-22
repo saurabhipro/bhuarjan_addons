@@ -5,7 +5,7 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" decoration-muted="state == 'locked'" multi_edit="1" default_order="create_date desc">
+            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" default_order="create_date desc">
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="project_id"/>
@@ -21,8 +21,8 @@
                        decoration-success="state == 'approved'"
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'submitted'"
-                       decoration-danger="state == 'rejected'"
-                       decoration-muted="state == 'locked'"/>
+                       decoration-danger="state == 'rejected'"/>
+                <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1"/>
                 
             </list>
         </field>
@@ -35,12 +35,12 @@
         <field name="arch" type="xml">
             <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form">
                 <header>
-                    
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Are you sure you want to submit this survey?"/>
                     <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
-                    <button name="action_reset_to_draft" string="Reset to Draft / प्रारूप में रीसेट" type="object" invisible="state != 'rejected'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,locked"/>
+                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
+                    <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Notification 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>
                 <sheet>
                     <!-- <div class="oe_title" style="margin-bottom: 10px;">
@@ -49,24 +49,24 @@
                         </h1>
                     </div>
                      -->
-                    <!-- Locked Survey Warning -->
-                    <div class="alert alert-warning" role="alert" invisible="state != 'locked'" style="margin-bottom: 15px;">
-                        <strong>Survey Locked / सर्वे लॉक:</strong> This survey has been used to generate Notification 4 and is now locked. No further modifications are allowed.
+                    <!-- Notification 4 Generated Warning -->
+                    <div class="alert alert-info" role="alert" invisible="not is_notification_4_generated" style="margin-bottom: 15px;">
+                        <strong>Notification 4 Generated / अधिसूचना 4 जेनरेट:</strong> This survey has been used to generate Notification 4. No further modifications are allowed.
                         <br/>
-                        <strong>सर्वे लॉक:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है और अब यह लॉक है। कोई और संशोधन की अनुमति नहीं है।
+                        <strong>अधिसूचना 4 जेनरेट:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है। कोई और संशोधन की अनुमति नहीं है।
                     </div>
                     
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
-                            <field name="project_id" widget="selection" readonly="state == 'locked'" required="1" string="Project * / परियोजना *"/>
-                            <field name="department_id" widget="selection" readonly="state == 'locked'" required="1" string="Department * / विभाग *"/>
-                            <field name="survey_date" widget="date" readonly="state == 'locked'" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
+                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Project * / परियोजना *"/>
+                            <field name="department_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Department * / विभाग *"/>
+                            <field name="survey_date" widget="date" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी" class="survey-icon-location">
-                            <field name="company_id" readonly="state == 'locked'" required="1" string="District"/>
-                            <field name="village_id" widget="selection" readonly="state == 'locked'" required="1" string="Village * / ग्राम का नाम *"/>
-                            <field name="tehsil_id" widget="selection" readonly="state == 'locked'" required="1" string="Tehsil * / तहसील *"/>
-                            <field name="district_name" readonly="state == 'locked'"/>
+                            <field name="company_id" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="District"/>
+                            <field name="village_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Village * / ग्राम का नाम *"/>
+                            <field name="tehsil_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Tehsil * / तहसील *"/>
+                            <field name="district_name" readonly="is_notification_4_generated or state == 'submitted'"/>
                             <field name="user_id"/>
                         </group>
                     </group>
@@ -77,35 +77,35 @@
                         <page string="Survey / सर्वे" name="survey_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी" class="survey-icon-land">
-                                    <field name="khasra_number" widget="char" readonly="state == 'locked'" required="1" string="Khasra Number * / खसरा नंबर *"/>
-                                    <field name="total_area" widget="float" readonly="state == 'locked'"/>
-                                    <field name="acquired_area" widget="float" readonly="state == 'locked'" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
-                                    <field name="has_traded_land" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
-                                    <field name="traded_land_area" widget="float" readonly="state == 'locked'" 
+                                    <field name="khasra_number" widget="char" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Khasra Number * / खसरा नंबर *"/>
+                                    <field name="total_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="acquired_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
+                                    <field name="has_traded_land" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="traded_land_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'" 
                                            invisible="has_traded_land != 'yes'" required="has_traded_land == 'yes'"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी" class="survey-icon-crop">
-                                    <field name="crop_type_id" widget="selection" readonly="state == 'locked'" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
-                                    <field name="irrigation_type" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="crop_type_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
+                                    <field name="irrigation_type" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="House Information / घर की जानकारी" class="survey-icon-house">
-                                    <field name="has_house" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
-                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="state == 'locked'"/>
-                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="state == 'locked'"/>
-                                    <field name="has_shed" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
-                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="state == 'locked'"/>
+                                    <field name="has_house" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="has_shed" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं" class="survey-icon-infrastructure">
-                                    <field name="has_well" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
-                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="state == 'locked'"/>
-                                    <field name="has_tubewell" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
-                                    <field name="has_pond" widget="radio" readonly="state == 'locked'" options="{'horizontal': true}"/>
+                                    <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">
                                     <field name="remarks" placeholder="Enter any additional notes"/>
@@ -116,7 +116,7 @@
                         
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
                             <group string="Trees / वृक्ष">
-                                <field name="tree_line_ids" readonly="state == 'locked'" nolabel="1" 
+                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1" 
                                        context="{'default_development_stage': 'undeveloped'}"
                                        view_ref="view_bhu_survey_tree_line_unified"/>
                             </group>
@@ -124,7 +124,7 @@
                         
                         <page string="Photos / फोटो" name="survey_photos">
                             <group string="Survey Photos / सर्वे फोटो">
-                                <field name="photo_ids" readonly="state == 'locked'" nolabel="1"/>
+                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1"/>
                             </group>
                         </page>
                         
@@ -181,7 +181,6 @@
                 <field name="landowner_aadhar_numbers" string="Aadhar Number"/>
             
                 <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
-
                 <filter string="Submitted / प्रस्तुत" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved / अनुमोदित" name="approved" domain="[('state', '=', 'approved')]"/>
                 <filter string="Rejected / अस्वीकृत" name="rejected" domain="[('state', '=', 'rejected')]"/>
@@ -320,23 +319,14 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
 
                                 <!-- Compact Footer -->
                                 <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                    <t t-if="record.state.raw_value == 'draft'">
-                                        <button type="edit" class="btn btn-success px-3 py-2 text-uppercase small font-weight-bold" style="background: #28a745; color: #ffffff; border: 1px solid #218838; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3); cursor: pointer; border-radius: 4px;">
-                                            <i class="fa fa-pencil-alt mr-1" style="font-size: 0.8rem;" title="Edit"></i>
-                                            Edit / संपादन
-                                        </button>
-                                    </t>
-                                    <t t-if="record.state.raw_value != 'draft'">
-                                        <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                            t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
-                                            or record.state.raw_value == 'locked' and 'background: #6b7280; color: #ffffff; border: 1px solid #4b5563; box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);' 
-                                            or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
-                                            or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
+                                    <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                        t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
+                                        or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
+                                        or record.state.raw_value == 'draft' and 'background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;' 
+                                        or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
 
-                                            <i t-if="record.state.raw_value == 'locked'" class="fa fa-lock mr-1" style="font-size: 0.8rem;" title="Locked"></i>
-                                            <field name="state"/>
-                                        </span>
-                                    </t>
+                                        <field name="state"/>
+                                    </span>
                                     <div class="d-flex align-items-center text-muted">
                                         <span class="small">Survey</span>
                                     </div>

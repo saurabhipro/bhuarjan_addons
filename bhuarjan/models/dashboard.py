@@ -24,7 +24,9 @@ class BhuarjanDashboard(models.TransientModel):
     draft_surveys = fields.Integer(string='Draft Surveys', readonly=True, default=0)
     submitted_surveys = fields.Integer(string='Submitted Surveys', readonly=True, default=0)
     approved_surveys = fields.Integer(string='Approved Surveys', readonly=True, default=0)
-    locked_surveys = fields.Integer(string='Locked Surveys', readonly=True, default=0)
+    rejected_surveys = fields.Integer(string='Rejected Surveys', readonly=True, default=0)
+    total_surveys_done = fields.Integer(string='Total Surveys Done', readonly=True, default=0)
+    pending_surveys = fields.Integer(string='Pending Surveys', readonly=True, default=0)
     
     # Process Counts
     total_section4_notifications = fields.Integer(string='Section 4 Notifications', readonly=True, default=0)
@@ -90,7 +92,11 @@ class BhuarjanDashboard(models.TransientModel):
             record.draft_surveys = self.env['bhu.survey'].search_count([('state', '=', 'draft')])
             record.submitted_surveys = self.env['bhu.survey'].search_count([('state', '=', 'submitted')])
             record.approved_surveys = self.env['bhu.survey'].search_count([('state', '=', 'approved')])
-            record.locked_surveys = self.env['bhu.survey'].search_count([('state', '=', 'locked')])
+            record.rejected_surveys = self.env['bhu.survey'].search_count([('state', '=', 'rejected')])
+            # Total Surveys Done = Approved + Rejected
+            record.total_surveys_done = record.approved_surveys + record.rejected_surveys
+            # Pending = Submitted + Rejected
+            record.pending_surveys = record.submitted_surveys + record.rejected_surveys
             
             # Section 4 Notifications
             record.total_section4_notifications = self.env['bhu.section4.notification'].search_count([])
@@ -192,7 +198,9 @@ class BhuarjanDashboard(models.TransientModel):
             'draft_surveys': self.env['bhu.survey'].search_count([('state', '=', 'draft')]),
             'submitted_surveys': self.env['bhu.survey'].search_count([('state', '=', 'submitted')]),
             'approved_surveys': self.env['bhu.survey'].search_count([('state', '=', 'approved')]),
-            'locked_surveys': self.env['bhu.survey'].search_count([('state', '=', 'locked')]),
+            'rejected_surveys': self.env['bhu.survey'].search_count([('state', '=', 'rejected')]),
+            'total_surveys_done': self.env['bhu.survey'].search_count([('state', 'in', ['approved', 'rejected'])]),
+            'pending_surveys': self.env['bhu.survey'].search_count([('state', 'in', ['submitted', 'rejected'])]),
             
             # Section 4 Notifications
             'total_section4_notifications': self.env['bhu.section4.notification'].search_count([]),
@@ -343,6 +351,11 @@ class BhuarjanDashboard(models.TransientModel):
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    def action_open_surveys_rejected(self):
+        action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
+        action['domain'] = [('state', '=', 'rejected')]
+        return action
+    
     def action_open_surveys_submitted(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', '=', 'submitted')]
@@ -353,9 +366,14 @@ class BhuarjanDashboard(models.TransientModel):
         action['domain'] = [('state', '=', 'approved')]
         return action
     
-    def action_open_surveys_locked(self):
+    def action_open_surveys_pending(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
-        action['domain'] = [('state', '=', 'locked')]
+        action['domain'] = [('state', 'in', ['submitted', 'rejected'])]
+        return action
+    
+    def action_open_surveys_done(self):
+        action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
+        action['domain'] = [('state', 'in', ['approved', 'rejected'])]
         return action
     
     def action_open_expert_committee(self):

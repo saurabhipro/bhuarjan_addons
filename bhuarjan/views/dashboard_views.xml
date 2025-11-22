@@ -107,19 +107,19 @@
                             </div>
                             <div class="kpi-value"><field name="total_surveys" nolabel="1" readonly="1"/></div>
                         </button>
+                        <button name="action_open_surveys_done" type="object" class="dashboard-kpi-card kpi-card-green">
+                            <div class="kpi-header">
+                                <div class="kpi-label">Total Surveys Done</div>
+                                <div class="kpi-icon"><i class="fa fa-check-square" title="Total Surveys Done"/></div>
+                            </div>
+                            <div class="kpi-value"><field name="total_surveys_done" nolabel="1" readonly="1"/></div>
+                        </button>
                         <button name="action_open_surveys_draft" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Draft</div>
                                 <div class="kpi-icon"><i class="fa fa-file-o" title="Draft Surveys"/></div>
                             </div>
                             <div class="kpi-value"><field name="draft_surveys" nolabel="1" readonly="1"/></div>
-                        </button>
-                        <button name="action_open_surveys_submitted" type="object" class="dashboard-kpi-card kpi-card-yellow">
-                            <div class="kpi-header">
-                                <div class="kpi-label">Submitted</div>
-                                <div class="kpi-icon"><i class="fa fa-paper-plane" title="Submitted Surveys"/></div>
-                            </div>
-                            <div class="kpi-value"><field name="submitted_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                         <button name="action_open_surveys_approved" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
@@ -128,12 +128,26 @@
                             </div>
                             <div class="kpi-value"><field name="approved_surveys" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_surveys_locked" type="object" class="dashboard-kpi-card kpi-card-blue">
+                        <button name="action_open_surveys_rejected" type="object" class="dashboard-kpi-card kpi-card-red">
                             <div class="kpi-header">
-                                <div class="kpi-label">Locked</div>
-                                <div class="kpi-icon"><i class="fa fa-lock" title="Locked Surveys"/></div>
+                                <div class="kpi-label">Rejected</div>
+                                <div class="kpi-icon"><i class="fa fa-times-circle" title="Rejected Surveys"/></div>
                             </div>
-                            <div class="kpi-value"><field name="locked_surveys" nolabel="1" readonly="1"/></div>
+                            <div class="kpi-value"><field name="rejected_surveys" nolabel="1" readonly="1"/></div>
+                        </button>
+                        <button name="action_open_surveys_pending" type="object" class="dashboard-kpi-card kpi-card-yellow">
+                            <div class="kpi-header">
+                                <div class="kpi-label">Pending</div>
+                                <div class="kpi-icon"><i class="fa fa-clock-o" title="Pending Surveys (Submitted + Rejected)"/></div>
+                            </div>
+                            <div class="kpi-value"><field name="pending_surveys" nolabel="1" readonly="1"/></div>
+                        </button>
+                        <button name="action_open_surveys_submitted" type="object" class="dashboard-kpi-card kpi-card-yellow">
+                            <div class="kpi-header">
+                                <div class="kpi-label">Submitted</div>
+                                <div class="kpi-icon"><i class="fa fa-paper-plane" title="Submitted Surveys"/></div>
+                            </div>
+                            <div class="kpi-value"><field name="submitted_surveys" nolabel="1" readonly="1"/></div>
                         </button>
                     </div>
                     

@@ -993,7 +993,8 @@ class BhuarjanAPIController(http.Controller):
                 'location_accuracy': data.get('location_accuracy'),
                 'location_timestamp': data.get('location_timestamp'),
                 'remarks': data.get('remarks'),
-                'state': data.get('state', 'draft'),
+                # API creates surveys in 'submitted' state by default (unless explicitly set)
+                'state': data.get('state', 'submitted'),
             }
             
             # Set crop_type_id only if it has a valid value (not None)
@@ -1428,7 +1429,7 @@ class BhuarjanAPIController(http.Controller):
                 'location_timestamp': survey.location_timestamp.strftime('%Y-%m-%d %H:%M:%S') if survey.location_timestamp else None,
                 'remarks': survey.remarks or '',
                 'state': survey.state,
-                'notification4_generated': survey.notification4_generated,
+                'is_notification_4_generated': survey.is_notification_4_generated,
                 'survey_image': survey_image,
                 'landowner_ids': [{
                     'id': lo.id,
@@ -1513,7 +1514,9 @@ class BhuarjanAPIController(http.Controller):
                     'has_traded_land': survey.has_traded_land or 'no',
                     'traded_land_area': survey.traded_land_area or 0.0,
                     'state': survey.state,
-                    'notification4_generated': survey.notification4_generated,
+                    'is_notification_4_generated': survey.is_notification_4_generated,
+                    'surveyor_id': survey.user_id.id if survey.user_id else None,
+                    'surveyor_name': survey.user_id.name if survey.user_id else '',
                 })
 
             # Get total count
@@ -2464,7 +2467,7 @@ class BhuarjanAPIController(http.Controller):
             # Handle state updates - validate and set submitted_date if needed
             if 'state' in data:
                 new_state = data.get('state')
-                valid_states = ['draft', 'submitted', 'approved', 'rejected', 'locked']
+                valid_states = ['draft', 'submitted', 'approved', 'rejected']
                 if new_state not in valid_states:
                     return Response(
                         json.dumps({
@@ -2819,7 +2822,7 @@ class BhuarjanAPIController(http.Controller):
                 'has_tubewell': survey.has_tubewell or '',
                 'has_pond': survey.has_pond or '',
                 'landowner_ids': survey.landowner_ids.ids if survey.landowner_ids else [],
-                'state': survey.state or 'draft',
+                'state': survey.state or 'submitted',
                 'remarks': survey.remarks or '',
             }
 
@@ -3230,7 +3233,7 @@ class BhuarjanAPIController(http.Controller):
         """
         Get survey statistics dashboard for a village
         Query params: village_id (required)
-        Returns: JSON with survey counts by state (total, draft, submitted, approved, rejected, locked)
+        Returns: JSON with survey counts by state (total, submitted, approved, rejected) and statistics
         """
         try:
             village_id = request.httprequest.args.get('village_id', type=int)
@@ -3260,7 +3263,11 @@ class BhuarjanAPIController(http.Controller):
             submitted_count = len(all_surveys.filtered(lambda s: s.state == 'submitted'))
             approved_count = len(all_surveys.filtered(lambda s: s.state == 'approved'))
             rejected_count = len(all_surveys.filtered(lambda s: s.state == 'rejected'))
-            locked_count = len(all_surveys.filtered(lambda s: s.state == 'locked'))
+            
+            # Total Surveys Done = Approved + Rejected
+            total_surveys_done = approved_count + rejected_count
+            # Pending = Submitted + Rejected (as per user requirement)
+            pending_count = submitted_count + rejected_count
 
             # Build response
             dashboard_data = {
@@ -3269,18 +3276,19 @@ class BhuarjanAPIController(http.Controller):
                 'village_code': village.village_code or '',
                 'statistics': {
                     'total_surveys': total_surveys,
+                    'total_surveys_done': total_surveys_done,
                     'draft': draft_count,
                     'submitted': submitted_count,
                     'approved': approved_count,
                     'rejected': rejected_count,
-                    'locked': locked_count
+                    'pending': pending_count
                 },
                 'breakdown': {
                     'draft_percentage': round((draft_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
                     'submitted_percentage': round((submitted_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
                     'approved_percentage': round((approved_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
                     'rejected_percentage': round((rejected_count / total_surveys * 100) if total_surveys > 0 else 0, 2),
-                    'locked_percentage': round((locked_count / total_surveys * 100) if total_surveys > 0 else 0, 2)
+                    'pending_percentage': round((pending_count / total_surveys * 100) if total_surveys > 0 else 0, 2)
                 }
             }
 

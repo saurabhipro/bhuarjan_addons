@@ -119,8 +119,7 @@ class Survey(models.Model):
         ('draft', 'Draft / प्रारूप'),
         ('submitted', 'Submitted / प्रस्तुत'),
         ('approved', 'Approved / अनुमोदित'),
-        ('rejected', 'Rejected / अस्वीकृत'),
-        ('locked', 'Locked / लॉक')
+        ('rejected', 'Rejected / अस्वीकृत')
     ], string='Status / स्थिति', default='draft', tracking=True)
     
     # Track submission date
@@ -168,8 +167,8 @@ class Survey(models.Model):
             else:
                 record.pending_since = ''
     
-    # Notification 4 Generation
-    notification4_generated = fields.Boolean(string='Notification 4 Generated / अधिसूचना 4 जेनरेट', default=False, tracking=True)
+    # Notification 4 Generation - Read-only, controlled from Notification 4 process
+    is_notification_4_generated = fields.Boolean(string='Is Notification 4 Generated / अधिसूचना 4 जेनरेट है', default=False, tracking=True, readonly=True, help='This field is automatically set when Notification 4 is generated. It cannot be manually edited.')
     
     # Computed fields for Form 10 report
     is_single_crop = fields.Boolean(string='Is Single Crop', compute='_compute_crop_fields', store=False)
@@ -309,6 +308,12 @@ class Survey(models.Model):
     def create(self, vals_list):
         """Generate automatic survey numbers using bhuarjan settings master"""
         for vals in vals_list:
+            # If state is explicitly set to 'submitted' (e.g., from API), set submitted_date
+            # Otherwise, default to 'draft' for web UI
+            if vals.get('state') == 'submitted' and 'submitted_date' not in vals:
+                from datetime import datetime, timezone
+                vals['submitted_date'] = datetime.now(timezone.utc).replace(tzinfo=None)
+            
             if vals.get('name', 'New') == 'New':
                 # Check if project_id is available
                 if vals.get('project_id'):
@@ -456,9 +461,11 @@ class Survey(models.Model):
         for record in self:
             if not record.khasra_number:
                 raise ValidationError(_('Please enter khasra number before submitting.'))
-            record.state = 'submitted'
-            # Store submission date (as naive datetime for Odoo compatibility)
-            record.submitted_date = datetime.now(timezone.utc).replace(tzinfo=None)
+            if record.state != 'submitted':
+                record.state = 'submitted'
+            # Store submission date (as naive datetime for Odoo compatibility) if not already set
+            if not record.submitted_date:
+                record.submitted_date = datetime.now(timezone.utc).replace(tzinfo=None)
             # Log the submission
             record.message_post(
                 body=_('Survey submitted for approval by %s') % self.env.user.name,
@@ -526,15 +533,16 @@ class Survey(models.Model):
                 message_type='notification'
             )
 
-    def action_reset_to_draft(self):
-        """Reset survey to draft"""
+    def action_reset_to_submitted(self):
+        """Reset survey to submitted (from rejected state)"""
         for record in self:
-            record.state = 'draft'
-            # Log the reset
-            record.message_post(
-                body=_('Survey reset to draft by %s') % self.env.user.name,
-                message_type='notification'
-            )
+            if record.state == 'rejected':
+                record.state = 'submitted'
+                # Log the reset
+                record.message_post(
+                    body=_('Survey reset to submitted by %s') % self.env.user.name,
+                    message_type='notification'
+                )
 
     def action_download_form10(self):
         """Download Form-10 as PDF"""

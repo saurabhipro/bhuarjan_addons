@@ -40,7 +40,7 @@
                     <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
                     <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
-                    <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Notification 4 Generated / अधिसूचना 4 जेनरेट"/>
+                    <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>
                 <sheet>
                     <!-- <div class="oe_title" style="margin-bottom: 10px;">

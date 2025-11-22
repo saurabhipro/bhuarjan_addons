@@ -168,7 +168,7 @@ class Survey(models.Model):
                 record.pending_since = ''
     
     # Notification 4 Generation - Read-only, controlled from Notification 4 process
-    is_notification_4_generated = fields.Boolean(string='Is Notification 4 Generated / अधिसूचना 4 जेनरेट है', default=False, tracking=True, readonly=True, help='This field is automatically set when Notification 4 is generated. It cannot be manually edited.')
+    is_notification_4_generated = fields.Boolean(string='Is Noti 4 Generated / अधिसूचना 4 जेनरेट है', default=False, tracking=True, readonly=True, help='This field is automatically set when Notification 4 is generated. It cannot be manually edited.')
     
     # Computed fields for Form 10 report
     is_single_crop = fields.Boolean(string='Is Single Crop', compute='_compute_crop_fields', store=False)

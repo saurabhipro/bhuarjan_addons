@@ -256,9 +256,18 @@
                         .bulk-form10-table tbody tr {
                             page-break-inside: avoid;
                             page-break-after: auto;
+                            page-break-before: auto;
                         }
                         .bulk-form10-table tbody td {
                             page-break-inside: avoid;
+                            orphans: 3;
+                            widows: 3;
+                        }
+                        .bulk-form10-table tbody td:nth-child(5) {
+                            page-break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            orphans: 2;
+                            widows: 2;
                         }
                         /* Page settings */
                         @page {
@@ -280,7 +289,7 @@
                             
                             <tbody>
                                 <t t-foreach="surveys" t-as="s">
-                                    <tr style="page-break-inside: avoid; page-break-after: auto;">
+                                    <tr style="page-break-inside: avoid !important; page-break-after: auto; page-break-before: auto;">
                                         <td style="text-align:center"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center">
                                                     <t t-if="s.khasra_number">
@@ -300,11 +309,11 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="page-break-inside: avoid; page-break-after: avoid;">
+                                                <td style="page-break-inside: avoid !important; page-break-after: avoid !important; page-break-before: avoid !important; orphans: 2; widows: 2;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
-                                                            <div style="margin-bottom: 2px; page-break-inside: avoid; orphans: 2; widows: 2;">
+                                                            <div style="margin-bottom: 2px; page-break-inside: avoid !important; orphans: 2; widows: 2; display: inline-block; width: 100%;">
                                                                 <t t-esc="counter"/>. <t t-esc="lo.name"/>
                                                                 <t t-if="lo.father_name">
                                                                     &#160;पिता&#160;<t t-esc="lo.father_name"/>

@@ -124,10 +124,10 @@
                 <thead>
                     <tr>
                         <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 2%; font-size: 14px;"><strong>क्र.</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 5%; font-size: 14px;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 14px;"><strong>कुल रकबा (हे.में.)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 5%; font-size: 14px;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
-                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 6%; font-size: 14px;"><strong>भूमिस्वामी का नाम</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 14px;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 3%; font-size: 14px;"><strong>कुल रकबा (हे.में.)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 4%; font-size: 14px;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                        <th rowspan="2" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; width: 10%; font-size: 14px;"><strong>भूमिस्वामी का नाम</strong></th>
                         <th colspan="4" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि का प्रकार</strong></th>
                         <th colspan="3" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
                         <th colspan="6" style="text-align:center; border: 2px solid #000; background-color: #D3D3D3; color: #000000; padding: 6px; font-size: 14px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
@@ -216,13 +216,13 @@
                         .bulk-form10-table thead th:nth-child(1),
                         .bulk-form10-table tbody td:nth-child(1) { width: 2%; }
                         .bulk-form10-table thead th:nth-child(2),
-                        .bulk-form10-table tbody td:nth-child(2) { width: 5%; }
+                        .bulk-form10-table tbody td:nth-child(2) { width: 4%; }
                         .bulk-form10-table thead th:nth-child(3),
-                        .bulk-form10-table tbody td:nth-child(3) { width: 4%; }
+                        .bulk-form10-table tbody td:nth-child(3) { width: 3%; }
                         .bulk-form10-table thead th:nth-child(4),
-                        .bulk-form10-table tbody td:nth-child(4) { width: 5%; }
+                        .bulk-form10-table tbody td:nth-child(4) { width: 4%; }
                         .bulk-form10-table thead th:nth-child(5),
-                        .bulk-form10-table tbody td:nth-child(5) { width: 6%; }
+                        .bulk-form10-table tbody td:nth-child(5) { width: 10%; }
                         .bulk-form10-table td, th {
                             border: 1px solid #000; 
                             font-size: 14px;
@@ -254,7 +254,7 @@
                             display: table-row-group;
                         }
                         .bulk-form10-table tbody tr {
-                            page-break-inside: avoid;
+                            page-break-inside: avoid !important;
                             page-break-after: auto;
                             page-break-before: auto;
                         }
@@ -266,8 +266,22 @@
                         .bulk-form10-table tbody td:nth-child(5) {
                             page-break-inside: avoid !important;
                             page-break-after: avoid !important;
+                            page-break-before: avoid !important;
                             orphans: 2;
                             widows: 2;
+                        }
+                        /* Reduce yes/no column widths by 20% */
+                        .bulk-form10-table thead th:nth-child(6),
+                        .bulk-form10-table tbody td:nth-child(6),
+                        .bulk-form10-table thead th:nth-child(7),
+                        .bulk-form10-table tbody td:nth-child(7),
+                        .bulk-form10-table thead th:nth-child(8),
+                        .bulk-form10-table tbody td:nth-child(8),
+                        .bulk-form10-table thead th:nth-child(9),
+                        .bulk-form10-table tbody td:nth-child(9) {
+                            width: auto;
+                            min-width: 3%;
+                            max-width: 4%;
                         }
                         /* Page settings */
                         @page {
@@ -283,13 +297,21 @@
                         .bulk-form10-table {
                             margin-top: 10px;
                         }
+                        .bulk-form10-table tbody tr.survey-row {
+                            page-break-inside: avoid !important;
+                        }
+                        .bulk-form10-table tbody tr.survey-row td:nth-child(5) {
+                            page-break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            page-break-before: avoid !important;
+                        }
                     </style>
                     <div class="content-wrapper">
                         <table class="bulk-form10-table" style="border: 2px solid #000;">
                             
                             <tbody>
                                 <t t-foreach="surveys" t-as="s">
-                                    <tr style="page-break-inside: avoid !important; page-break-after: auto; page-break-before: auto;">
+                                    <tr class="survey-row" style="page-break-inside: avoid !important; page-break-after: auto; page-break-before: auto;">
                                         <td style="text-align:center"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center">
                                                     <t t-if="s.khasra_number">
@@ -420,5 +442,3 @@
         </t>
     </template>
 </odoo>
-
-

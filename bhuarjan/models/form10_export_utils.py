@@ -302,20 +302,28 @@ class Form10ExportUtils(models.AbstractModel):
                 house_str = f"{house_type_str} / {survey.house_area} वर्गफुट"
             
             # Tree details by development stage (matching PDF structure)
+            # Non-fruit-bearing trees go to their respective development stage columns
+            # Fruit-bearing trees go to the fully developed column
             undeveloped_trees = []
             semi_developed_trees = []
             fully_developed_trees = []
             
             if survey.tree_line_ids:
                 for tree_line in survey.tree_line_ids:
-                    if tree_line.tree_type == 'non_fruit_bearing':
-                        tree_name = tree_line.tree_master_id.name if tree_line.tree_master_id else ''
-                        quantity = tree_line.quantity or 0
-                        if tree_line.development_stage == 'undeveloped' and quantity > 0:
-                            undeveloped_trees.append(f"{tree_name} - {quantity}")
-                        elif tree_line.development_stage == 'semi_developed' and quantity > 0:
-                            semi_developed_trees.append(f"{tree_name} - {quantity}")
-                        elif tree_line.development_stage == 'fully_developed' and quantity > 0:
+                    tree_name = tree_line.tree_master_id.name if tree_line.tree_master_id else ''
+                    quantity = tree_line.quantity or 0
+                    
+                    if quantity > 0:
+                        if tree_line.tree_type == 'non_fruit_bearing':
+                            # Non-fruit-bearing trees go to their development stage column
+                            if tree_line.development_stage == 'undeveloped':
+                                undeveloped_trees.append(f"{tree_name} - {quantity}")
+                            elif tree_line.development_stage == 'semi_developed':
+                                semi_developed_trees.append(f"{tree_name} - {quantity}")
+                            elif tree_line.development_stage == 'fully_developed':
+                                fully_developed_trees.append(f"{tree_name} - {quantity}")
+                        elif tree_line.tree_type == 'fruit_bearing':
+                            # Fruit-bearing trees go to fully developed column
                             fully_developed_trees.append(f"{tree_name} - {quantity}")
             
             undeveloped_str = "\n".join(undeveloped_trees) if undeveloped_trees else "नहीं"

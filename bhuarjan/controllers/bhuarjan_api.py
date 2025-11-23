@@ -3230,7 +3230,8 @@ class BhuarjanAPIController(http.Controller):
         """
         Get survey statistics dashboard for a village
         Query params: village_id (required)
-        Returns: JSON with survey counts by state (total, submitted, approved, rejected) and statistics
+        Returns: JSON with survey counts by state (total_surveys, approved, rejected, pending)
+        Note: pending includes only submitted surveys (not rejected)
         """
         try:
             village_id = request.httprequest.args.get('village_id', type=int)
@@ -3256,13 +3257,12 @@ class BhuarjanAPIController(http.Controller):
             
             # Count surveys by state
             total_surveys = len(all_surveys)
-            draft_count = len(all_surveys.filtered(lambda s: s.state == 'draft'))
             submitted_count = len(all_surveys.filtered(lambda s: s.state == 'submitted'))
             approved_count = len(all_surveys.filtered(lambda s: s.state == 'approved'))
             rejected_count = len(all_surveys.filtered(lambda s: s.state == 'rejected'))
             
-            # Pending = Submitted + Rejected (as per user requirement)
-            pending_count = submitted_count + rejected_count
+            # Pending = Only Submitted surveys (not rejected)
+            pending_count = submitted_count
 
             # Build response
             dashboard_data = {
@@ -3271,8 +3271,6 @@ class BhuarjanAPIController(http.Controller):
                 'village_code': village.village_code or '',
                 'statistics': {
                     'total_surveys': total_surveys,
-                    'draft': draft_count,
-                    'submitted': submitted_count,
                     'approved': approved_count,
                     'rejected': rejected_count,
                     'pending': pending_count

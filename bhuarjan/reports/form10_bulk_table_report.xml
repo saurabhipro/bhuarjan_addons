@@ -429,9 +429,9 @@
                                                     <t t-if="s.tree_line_ids">
                                                         <t t-set="has_undeveloped" t-value="False"/>
                                                         <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'undeveloped'">
+                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'undeveloped' and tree_line.quantity and tree_line.quantity > 0">
                                                                 <t t-set="has_undeveloped" t-value="True"/>
-                                                                <div style="margin-bottom: 2px;">
+                                                                <div style="margin-bottom: 2px; white-space: pre-line;">
                                                                     <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
                                                                 </div>
                                                             </t>
@@ -444,9 +444,9 @@
                                                     <t t-if="s.tree_line_ids">
                                                         <t t-set="has_semi_developed" t-value="False"/>
                                                         <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'semi_developed'">
+                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'semi_developed' and tree_line.quantity and tree_line.quantity > 0">
                                                                 <t t-set="has_semi_developed" t-value="True"/>
-                                                                <div style="margin-bottom: 2px;">
+                                                                <div style="margin-bottom: 2px; white-space: pre-line;">
                                                                     <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
                                                                 </div>
                                                             </t>
@@ -459,9 +459,9 @@
                                                     <t t-if="s.tree_line_ids">
                                                         <t t-set="has_fully_developed" t-value="False"/>
                                                         <t t-foreach="s.tree_line_ids" t-as="tree_line">
-                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'fully_developed'">
+                                                            <t t-if="tree_line.tree_type == 'non_fruit_bearing' and tree_line.development_stage == 'fully_developed' and tree_line.quantity and tree_line.quantity > 0">
                                                                 <t t-set="has_fully_developed" t-value="True"/>
-                                                                <div style="margin-bottom: 2px;">
+                                                                <div style="margin-bottom: 2px; white-space: pre-line;">
                                                                     <t t-esc="tree_line.tree_master_id.name if tree_line.tree_master_id else ''"/> - <t t-esc="tree_line.quantity or 0"/>
                                                                 </div>
                                                             </t>

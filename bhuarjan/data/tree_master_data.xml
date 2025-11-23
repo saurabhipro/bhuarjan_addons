@@ -6,43 +6,36 @@
         <record id="tree_master_mango" model="bhu.tree.master">
             <field name="name">Mango / आम</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Mango tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_mahua" model="bhu.tree.master">
             <field name="name">Mahua / महुआ</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Mahua tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_tamarind" model="bhu.tree.master">
             <field name="name">Tamarind / इमली</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Tamarind tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_jamun" model="bhu.tree.master">
             <field name="name">Jamun / जामुन</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Jamun tree - Fruit-bearing tree (जामुन, कटहल category)</field>
         </record>
 
         <record id="tree_master_jackfruit" model="bhu.tree.master">
             <field name="name">Jackfruit / कटहल</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Jackfruit tree - Fruit-bearing tree (जामुन, कटहल category)</field>
         </record>
 
         <record id="tree_master_cashew" model="bhu.tree.master">
             <field name="name">Cashew / काजू</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Cashew tree - Fruit-bearing tree (काजू, बादाम category)</field>
         </record>
 
         <record id="tree_master_almond" model="bhu.tree.master">
             <field name="name">Almond / बादाम</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="description">Almond tree - Fruit-bearing tree (काजू, बादाम category)</field>
         </record>
 
         <!-- Non-fruit-bearing Trees (गैर-फलदार वृक्ष) - Rates based on girth and development stage -->
@@ -50,86 +43,72 @@
         <record id="tree_master_sal" model="bhu.tree.master">
             <field name="name">Sal / साल</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Sal tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_bija" model="bhu.tree.master">
             <field name="name">Bija / बीजा</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Bija tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_sheesham" model="bhu.tree.master">
             <field name="name">Sheesham / शीशम</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Sheesham tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_tinsa" model="bhu.tree.master">
             <field name="name">Tinsa / तिन्सा</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Tinsa tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_saja" model="bhu.tree.master">
             <field name="name">Saja / साजा</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Saja tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_dhawra" model="bhu.tree.master">
             <field name="name">Dhawra / धावड़ा</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Dhawra tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_haldu_mundi" model="bhu.tree.master">
             <field name="name">Haldu Mundi / हल्दू मुण्डी</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Haldu Mundi tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_khamhar" model="bhu.tree.master">
             <field name="name">Khamhar / खम्हार</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Khamhar tree - Non-fruit-bearing timber tree</field>
         </record>
 
         <record id="tree_master_other_mixed" model="bhu.tree.master">
             <field name="name">Other Mixed / अन्य मिश्रित</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Other mixed non-fruit-bearing trees</field>
         </record>
 
         <record id="tree_master_teak" model="bhu.tree.master">
             <field name="name">Teak / सागौन</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Teak tree - Non-fruit-bearing timber tree (special rates)</field>
         </record>
 
         <!-- Common trees for backward compatibility -->
         <record id="tree_master_neem" model="bhu.tree.master">
             <field name="name">Neem / नीम</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Neem tree - Medicinal tree</field>
         </record>
 
         <record id="tree_master_banyan" model="bhu.tree.master">
             <field name="name">Banyan / बरगद</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Banyan tree - Large shade tree</field>
         </record>
 
         <record id="tree_master_peepal" model="bhu.tree.master">
             <field name="name">Peepal / पीपल</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Peepal tree - Sacred tree</field>
         </record>
 
         <record id="tree_master_bamboo" model="bhu.tree.master">
             <field name="name">Bamboo / बांस</field>
             <field name="tree_type">non_fruit_bearing</field>
-            <field name="description">Bamboo - Fast growing plant</field>
         </record>
     </data>
 </odoo>

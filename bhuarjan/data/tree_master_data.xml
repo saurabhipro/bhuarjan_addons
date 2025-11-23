@@ -6,49 +6,42 @@
         <record id="tree_master_mango" model="bhu.tree.master">
             <field name="name">Mango / आम</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">6000.00</field>
             <field name="description">Mango tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_mahua" model="bhu.tree.master">
             <field name="name">Mahua / महुआ</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">6000.00</field>
             <field name="description">Mahua tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_tamarind" model="bhu.tree.master">
             <field name="name">Tamarind / इमली</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">6000.00</field>
             <field name="description">Tamarind tree - Fruit-bearing tree (आम, महुआ, इमली category)</field>
         </record>
 
         <record id="tree_master_jamun" model="bhu.tree.master">
             <field name="name">Jamun / जामुन</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">2000.00</field>
             <field name="description">Jamun tree - Fruit-bearing tree (जामुन, कटहल category)</field>
         </record>
 
         <record id="tree_master_jackfruit" model="bhu.tree.master">
             <field name="name">Jackfruit / कटहल</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">2000.00</field>
             <field name="description">Jackfruit tree - Fruit-bearing tree (जामुन, कटहल category)</field>
         </record>
 
         <record id="tree_master_cashew" model="bhu.tree.master">
             <field name="name">Cashew / काजू</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">500.00</field>
             <field name="description">Cashew tree - Fruit-bearing tree (काजू, बादाम category)</field>
         </record>
 
         <record id="tree_master_almond" model="bhu.tree.master">
             <field name="name">Almond / बादाम</field>
             <field name="tree_type">fruit_bearing</field>
-            <field name="rate">500.00</field>
             <field name="description">Almond tree - Fruit-bearing tree (काजू, बादाम category)</field>
         </record>
 

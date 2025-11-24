@@ -474,14 +474,19 @@
                                                     <span t-if="not s.tree_line_ids" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                                 <td style="text-align:center">
-                                                    <span t-if="s.house_type">
+                                                    <span t-if="s.has_house == 'yes' and s.house_type and s.house_area">
                                                         <t t-if="s.house_type == 'pakka'">पक्का</t>
                                                         <t t-if="s.house_type == 'kaccha'">कच्चा</t>
                                                         <t t-if="s.house_type != 'pakka' and s.house_type != 'kaccha'"><span t-esc="s.house_type"/></t> / <span t-esc="s.house_area or 0.0"/> वर्गफुट
                                                     </span>
-                                                    <span t-if="not s.house_type" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                    <span t-if="s.has_house != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="text-align:center"><span t-if="s.shed_area"><span t-esc="s.shed_area"/> वर्गफुट</span><span t-if="not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center">
+                                                    <span t-if="s.has_shed == 'yes' and s.shed_area">
+                                                        <span t-esc="s.shed_area"/> वर्गफुट
+                                                    </span>
+                                                    <span t-if="s.has_shed != 'yes' or not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                </td>
                                                 <td style="text-align:center">
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                     <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>

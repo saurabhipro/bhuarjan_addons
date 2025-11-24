@@ -295,9 +295,9 @@ class Form10ExportUtils(models.AbstractModel):
                 elif survey.well_type == 'pakka':
                     well_str = "हाँ-पक्का"
             
-            # House type
+            # House type - check has_house first
             house_str = "नहीं"
-            if survey.house_type and survey.house_area:
+            if survey.has_house == 'yes' and survey.house_type and survey.house_area:
                 house_type_str = "पक्का" if survey.house_type == 'pakka' else ("कच्चा" if survey.house_type == 'kaccha' else survey.house_type)
                 house_str = f"{house_type_str} / {survey.house_area} वर्गफुट"
             
@@ -350,7 +350,7 @@ class Form10ExportUtils(models.AbstractModel):
                 semi_developed_str,
                 fully_developed_str,
                 house_str,
-                f"{survey.shed_area} वर्गफुट" if survey.shed_area else "नहीं",
+                f"{survey.shed_area} वर्गफुट" if (survey.has_shed == 'yes' and survey.shed_area) else "नहीं",
                 well_str,
                 "हाँ" if survey.has_tubewell == 'yes' else "नहीं",
                 "हाँ" if survey.has_pond == 'yes' else "नहीं",

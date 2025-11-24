@@ -55,37 +55,60 @@ def check_app_version(func):
             app_version_code_str = None
             headers = request.httprequest.headers
             
-            # Debug: Log all headers (only in development)
-            # _logger.debug(f"All headers: {dict(headers)}")
+            # Debug: Log all headers to see what we're receiving
+            all_headers_dict = dict(headers)
+            _logger.error(f"=== APP VERSION CHECK DEBUG === Path: {request.httprequest.path}")
+            _logger.error(f"All headers received: {list(all_headers_dict.keys())}")
+            _logger.error(f"All headers dict: {all_headers_dict}")
+            _logger.error(f"Request method: {request.httprequest.method}")
             
-            # Try different header name variations (case-insensitive)
-            # Note: Some HTTP servers/proxies strip headers with underscores, so we check both formats
-            # Prefer hyphenated format (App-Version-Code) as it's more standard
-            header_names = [
-                'App-Version-Code',      # Hyphenated (preferred, standard HTTP header format)
-                'app-version-code',      # Lowercase hyphenated
-                'APP-VERSION-CODE',      # Uppercase hyphenated
-                'app_version_code',      # Underscore format (may be stripped by some servers)
-                'App_Version_Code',      # Mixed
-                'X-App-Version-Code',    # With X- prefix (hyphenated)
-                'X-App_Version_Code',    # With X- prefix (underscore)
-                'APP_VERSION_CODE',      # Uppercase underscore
-            ]
+            # Also check raw environment for HTTP_ prefixed headers (some servers add HTTP_ prefix)
+            # In WSGI, custom headers are stored as HTTP_HEADER_NAME (uppercase, hyphens become underscores)
+            environ = request.httprequest.environ
+            _logger.info(f"Checking environ for HTTP_APP_VERSION_CODE: {environ.get('HTTP_APP_VERSION_CODE')}")
+            _logger.info(f"Checking environ for HTTP_APP_VERSION_CODE (lowercase): {environ.get('HTTP_APP_VERSION_CODE'.lower())}")
             
-            for header_name in header_names:
-                app_version_code_str = headers.get(header_name)
-                if app_version_code_str:
-                    _logger.debug(f"Found app_version_code in header '{header_name}': {app_version_code_str}")
-                    break
+            # Check raw environment variables (headers are prefixed with HTTP_ and hyphens become underscores)
+            # For "App-Version-Code" header, it becomes "HTTP_APP_VERSION_CODE" in environ
+            for env_key, env_value in environ.items():
+                if env_key.startswith('HTTP_'):
+                    # Remove HTTP_ prefix and normalize
+                    normalized_env_key = env_key.replace('HTTP_', '').lower().replace('-', '_')
+                    _logger.error(f"Checking environ key: '{env_key}' (normalized: '{normalized_env_key}') = '{env_value}'")
+                    if normalized_env_key == 'app_version_code':
+                        app_version_code_str = env_value
+                        _logger.error(f"✓ Found app_version_code in environ '{env_key}': {app_version_code_str}")
+                        break
             
-            # If still not found, iterate through all headers (case-insensitive search)
+            # First, try to find by iterating through all headers (most reliable method)
+            # This handles case-insensitivity and any normalization that might have occurred
             if not app_version_code_str:
                 for key, value in headers.items():
                     # Normalize header name (lowercase, replace hyphens with underscores)
-                    normalized_key = key.lower().replace('-', '_')
+                    normalized_key = key.lower().replace('-', '_').replace(' ', '_')
+                    _logger.error(f"Checking header: '{key}' (normalized: '{normalized_key}') = '{value}'")
                     if normalized_key == 'app_version_code':
                         app_version_code_str = value
-                        _logger.debug(f"Found app_version_code in header '{key}' (normalized): {app_version_code_str}")
+                        _logger.error(f"✓ Found app_version_code in header '{key}' (normalized): {app_version_code_str}")
+                        break
+            
+            # If still not found, try direct header name lookups (case-insensitive)
+            if not app_version_code_str:
+                header_names = [
+                    'App-Version-Code',      # Hyphenated (preferred, standard HTTP header format)
+                    'app-version-code',      # Lowercase hyphenated
+                    'APP-VERSION-CODE',      # Uppercase hyphenated
+                    'app_version_code',      # Underscore format (may be stripped by some servers)
+                    'App_Version_Code',      # Mixed
+                    'X-App-Version-Code',    # With X- prefix (hyphenated)
+                    'X-App_Version_Code',    # With X- prefix (underscore)
+                    'APP_VERSION_CODE',      # Uppercase underscore
+                ]
+                
+                for header_name in header_names:
+                    app_version_code_str = headers.get(header_name)
+                    if app_version_code_str:
+                        _logger.error(f"✓ Found app_version_code in header '{header_name}': {app_version_code_str}")
                         break
             
             app_version_code = None

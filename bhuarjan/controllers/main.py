@@ -51,13 +51,49 @@ def check_app_version(func):
     def wrapper(*args, **kwargs):
         try:
             # Get app_version_code ONLY from headers (for all HTTP methods: GET, POST, PUT, PATCH, DELETE)
-            app_version_code_str = request.httprequest.headers.get('app_version_code') or request.httprequest.headers.get('App-Version-Code') or request.httprequest.headers.get('X-App-Version-Code')
-            app_version_code = None
+            # HTTP headers are case-insensitive, check multiple variations
+            app_version_code_str = None
+            headers = request.httprequest.headers
             
+            # Debug: Log all headers (only in development)
+            # _logger.debug(f"All headers: {dict(headers)}")
+            
+            # Try different header name variations (case-insensitive)
+            # Note: Some HTTP servers/proxies strip headers with underscores, so we check both formats
+            # Prefer hyphenated format (App-Version-Code) as it's more standard
+            header_names = [
+                'App-Version-Code',      # Hyphenated (preferred, standard HTTP header format)
+                'app-version-code',      # Lowercase hyphenated
+                'APP-VERSION-CODE',      # Uppercase hyphenated
+                'app_version_code',      # Underscore format (may be stripped by some servers)
+                'App_Version_Code',      # Mixed
+                'X-App-Version-Code',    # With X- prefix (hyphenated)
+                'X-App_Version_Code',    # With X- prefix (underscore)
+                'APP_VERSION_CODE',      # Uppercase underscore
+            ]
+            
+            for header_name in header_names:
+                app_version_code_str = headers.get(header_name)
+                if app_version_code_str:
+                    _logger.debug(f"Found app_version_code in header '{header_name}': {app_version_code_str}")
+                    break
+            
+            # If still not found, iterate through all headers (case-insensitive search)
+            if not app_version_code_str:
+                for key, value in headers.items():
+                    # Normalize header name (lowercase, replace hyphens with underscores)
+                    normalized_key = key.lower().replace('-', '_')
+                    if normalized_key == 'app_version_code':
+                        app_version_code_str = value
+                        _logger.debug(f"Found app_version_code in header '{key}' (normalized): {app_version_code_str}")
+                        break
+            
+            app_version_code = None
             if app_version_code_str:
                 try:
                     app_version_code = int(app_version_code_str)
                 except (ValueError, TypeError):
+                    _logger.warning(f"Invalid app_version_code value: {app_version_code_str}")
                     app_version_code = None
             
             # app_version_code is MANDATORY - return error if missing

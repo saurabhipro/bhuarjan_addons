@@ -30,7 +30,7 @@
 						"method": "POST",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -64,7 +64,7 @@
 						"method": "POST",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -109,7 +109,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -152,7 +152,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -196,7 +196,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -223,7 +223,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -262,7 +262,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -302,7 +302,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -340,7 +340,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -391,7 +391,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -453,7 +453,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -498,7 +498,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -542,7 +542,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -604,7 +604,7 @@
 								"description": "JWT token from login API"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -660,7 +660,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -708,7 +708,7 @@
 								"description": "JWT token from login API"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -747,7 +747,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -781,7 +781,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -820,7 +820,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -855,7 +855,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -900,7 +900,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -945,7 +945,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -990,7 +990,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1020,7 +1020,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1072,7 +1072,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1147,7 +1147,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1218,7 +1218,7 @@
 								"description": "⚠️ CRITICAL: Must match the content type used when generating the presigned URL.\n\nFor JPEG files: 'image/jpeg' (already set)\nFor PNG files: Change to 'image/png'\nFor PDF files: Change to 'application/pdf'\n\nIf Content-Type doesn't match, you'll get SignatureDoesNotMatch error!"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1283,7 +1283,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1319,7 +1319,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1364,7 +1364,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1426,7 +1426,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1469,7 +1469,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1517,7 +1517,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1575,7 +1575,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1628,7 +1628,7 @@
 								"value": "application/json"
 							},
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1679,7 +1679,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1717,7 +1717,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
@@ -1755,7 +1755,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "app_version_code",
+								"key": "App-Version-Code",
 								"value": "1",
 								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}

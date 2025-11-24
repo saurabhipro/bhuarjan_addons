@@ -28,10 +28,16 @@
 							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"mobile\": \"9990649990\",\n    \"app_version_code\": 1\n}",
+							"raw": "{\n    \"mobile\": \"9990649990\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -56,10 +62,16 @@
 					"name": "login",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1,\n  \"app_version_code\": 1\n}",
+							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -77,7 +89,7 @@
 								"login"
 							]
 						},
-						"description": "Login with mobile and OTP. channel_id is REQUIRED. app_version_code (optional) - If provided and version check is enforced in settings, validates the app version. If version is disabled, returns 403 error with latest version information. If version check is not enforced in settings, this parameter is ignored."
+						"description": "Login with mobile and OTP. channel_id is REQUIRED. app_version_code is MANDATORY - If missing, returns 400 error. If provided and version check is enforced in settings, validates the app version. If version is disabled, returns 403 error with latest version information. If version check is not enforced in settings, the version is still validated but all versions are allowed."
 					},
 					"response": []
 				},
@@ -95,9 +107,15 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/users?limit=100&offset=0&role=&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/users?limit=100&offset=0&role=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -121,11 +139,6 @@
 									"key": "role",
 									"value": "",
 									"description": "Filter by bhuarjan_role: patwari, revenue_inspector, nayab_tahsildar, tahsildar, sdm, additional_collector, collector, administrator (optional)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -137,9 +150,15 @@
 					"name": "Autocomplete Users",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/users/autocomplete?q=john&limit=20&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/users/autocomplete?q=john&limit=20",
 							"host": [
 								"{{base_url}}"
 							],
@@ -159,11 +178,6 @@
 									"key": "limit",
 									"value": "20",
 									"description": "Maximum number of results to return (default: 20, max: 50)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -180,9 +194,15 @@
 					"name": "Get All Projects and Villages",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/user/projects?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/user/projects",
 							"host": [
 								"{{base_url}}"
 							],
@@ -191,13 +211,6 @@
 								"bhuarjan",
 								"user",
 								"projects"
-							],
-							"query": [
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
-								}
 							]
 						},
 						"description": "Get all projects and their associated villages (no filter)"
@@ -208,9 +221,15 @@
 					"name": "Get Projects and Villages by User ID",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/user/projects?user_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/user/projects?user_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -225,11 +244,6 @@
 									"key": "user_id",
 									"value": "1",
 									"description": "User ID to filter projects and villages (optional - if not provided, returns all)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -246,9 +260,15 @@
 					"name": "Get Village Dashboard",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/dashboard/village?village_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/dashboard/village?village_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -264,11 +284,6 @@
 									"value": "1",
 									"description": "Village ID (required)",
 									"disabled": false
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -285,9 +300,15 @@
 					"name": "Get All Departments",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/departments?limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/departments?limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -306,65 +327,61 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
-					"description": "Get all departments with their details"
+						"description": "Get all departments with their details"
+					},
+					"response": []
 				},
-				"response": []
-			},
-			{
-				"name": "Get Projects in Department",
-				"request": {
-					"method": "GET",
-					"header": [],
-					"url": {
-						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?user_id=1&limit=100&offset=0&app_version_code=1",
-						"host": [
-							"{{base_url}}"
-						],
-						"path": [
-							"api",
-							"bhuarjan",
-							"departments",
-							"1",
-							"projects"
-						],
-						"query": [
-							{
-								"key": "user_id",
-								"value": "1",
-								"description": "User ID (optional) - If provided, returns only villages associated with this user",
-								"disabled": false
-							},
-							{
-								"key": "limit",
-								"value": "100",
-								"description": "Number of records to return (default: 100)"
-							},
-							{
-								"key": "offset",
-								"value": "0",
-								"description": "Number of records to skip (default: 0)"
-							},
+				{
+					"name": "Get Projects in Department",
+					"request": {
+						"method": "GET",
+						"header": [
 							{
 								"key": "app_version_code",
 								"value": "1",
-								"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
-						]
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?user_id=1&limit=100&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"departments",
+								"1",
+								"projects"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "User ID (optional) - If provided, returns only villages associated with this user",
+									"disabled": false
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"description": "Number of records to return (default: 100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of records to skip (default: 0)"
+								}
+							]
+						},
+						"description": "Get all projects associated with a specific department with village objects.\n\n**Path Parameters:**\n- `department_id` (required): Replace '1' in the URL path with the actual department ID\n\n**Query Parameters:**\n- `user_id` (optional): If provided, returns only villages associated with this user. If not provided, returns all villages for each project.\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n\n**Response:**\n- Returns projects with `villages` array containing village objects (instead of `village_ids`)\n- Each village object includes: id, name, village_code, village_uuid, district_id, district_name, tehsil_id, tehsil_name, pincode\n- If `user_id` is provided, response includes `user` object with user details"
 					},
-					"description": "Get all projects associated with a specific department with village objects.\n\n**Path Parameters:**\n- `department_id` (required): Replace '1' in the URL path with the actual department ID\n\n**Query Parameters:**\n- `user_id` (optional): If provided, returns only villages associated with this user. If not provided, returns all villages for each project.\n- `limit` (optional, default 100): Number of records to return\n- `offset` (optional, default 0): Number of records to skip\n\n**Response:**\n- Returns projects with `villages` array containing village objects (instead of `village_ids`)\n- Each village object includes: id, name, village_code, village_uuid, district_id, district_name, tehsil_id, tehsil_name, pincode\n- If `user_id` is provided, response includes `user` object with user details"
-				},
-				"response": []
-			}
-		]
-	},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Land Types",
 			"item": [
@@ -372,7 +389,13 @@
 					"name": "Get All Land Types",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/bhuarjan/land-types?limit=100&offset=0&active=true",
 							"host": [
@@ -398,11 +421,6 @@
 									"key": "active",
 									"value": "true",
 									"description": "Filter by active status: true/false/1/0/yes (optional, default: true - returns only active land types)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -433,11 +451,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"project_id\": 3,\n    \"village_id\": 1,\n    \"department_id\": 2,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103/90\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"has_traded_land\": \"no\",\n    \"traded_land_area\": 0.0,\n    \"crop_type\": 11,\n    \"irrigation_type\": \"irrigated\",\n    \"has_house\": \"no\",\n    \"house_type\": \"pakka\",\n    \"house_area\": 0.0,\n    \"has_shed\": \"yes\",\n    \"shed_area\": 100.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"submitted\",\n    \"landowner_ids\": [379],\n    \"tree_lines\": [\n        {\n            \"development_stage\": \"undeveloped\",\n            \"tree_master_id\": 1,\n            \"quantity\": 5\n        }\n    ],\n    \"app_version_code\": 1\n}",
+							"raw": "{\n    \"project_id\": 3,\n    \"village_id\": 1,\n    \"department_id\": 2,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103/90\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"has_traded_land\": \"no\",\n    \"traded_land_area\": 0.0,\n    \"crop_type\": 11,\n    \"irrigation_type\": \"irrigated\",\n    \"has_house\": \"no\",\n    \"house_type\": \"pakka\",\n    \"house_area\": 0.0,\n    \"has_shed\": \"yes\",\n    \"shed_area\": 100.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"submitted\",\n    \"landowner_ids\": [379],\n    \"tree_lines\": [\n        {\n            \"development_stage\": \"undeveloped\",\n            \"tree_master_id\": 1,\n            \"quantity\": 5\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -473,9 +496,15 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -511,9 +540,15 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/surveys?project_id=1&village_id=1&state=submitted&limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/surveys?project_id=1&village_id=1&state=submitted&limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -547,11 +582,6 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -572,11 +602,16 @@
 								"key": "Authorization",
 								"value": "Bearer {{token}}",
 								"description": "JWT token from login API"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"has_traded_land\": \"yes\",\n    \"traded_land_area\": 1.5,\n    \"crop_type\": 2,\n    \"irrigation_type\": \"irrigated\",\n    \"landowner_ids\": [1, 2],\n    \"tree_lines\": [\n        {\n            \"tree_type\": \"fruit_bearing\",\n            \"tree_master_id\": 1,\n            \"development_stage\": \"fully_developed\",\n            \"quantity\": 5\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_name\": \"Neem\",\n            \"development_stage\": \"semi_developed\",\n            \"girth_cm\": 40.0,\n            \"quantity\": 10\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_master_id\": 2,\n            \"development_stage\": \"fully_developed\",\n            \"girth_cm\": 60.5,\n            \"quantity\": 20\n        }\n    ],\n    \"app_version_code\": 1\n}",
+							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"has_traded_land\": \"yes\",\n    \"traded_land_area\": 1.5,\n    \"crop_type\": 2,\n    \"irrigation_type\": \"irrigated\",\n    \"landowner_ids\": [1, 2],\n    \"tree_lines\": [\n        {\n            \"tree_type\": \"fruit_bearing\",\n            \"tree_master_id\": 1,\n            \"development_stage\": \"fully_developed\",\n            \"quantity\": 5\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_name\": \"Neem\",\n            \"development_stage\": \"semi_developed\",\n            \"girth_cm\": 40.0,\n            \"quantity\": 10\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_master_id\": 2,\n            \"development_stage\": \"fully_developed\",\n            \"girth_cm\": 60.5,\n            \"quantity\": 20\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -584,7 +619,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -623,11 +658,16 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"state\": \"submitted\",\n    \"app_version_code\": 1\n}",
+							"raw": "{\n    \"state\": \"submitted\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -666,10 +706,15 @@
 								"key": "Authorization",
 								"value": "Bearer {{token}}",
 								"description": "JWT token from login API"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -700,9 +745,15 @@
 					"name": "Download Form 10 PDF (by village)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -728,9 +779,15 @@
 					"name": "Download Form 10 PDF (by village and project)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&project_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&project_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -761,9 +818,15 @@
 					"name": "Download Form 10 PDF (by survey ID)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/survey/download?survey_id=257&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/survey/download?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -790,9 +853,15 @@
 					"name": "Download Form 10 Excel (by village)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -829,9 +898,15 @@
 					"name": "Download Form 10 Excel (by village and project)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&project_id=1&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&project_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -868,9 +943,15 @@
 					"name": "Download Form 10 Excel (by survey ID)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/survey/download?survey_id=257&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/survey/download?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -907,6 +988,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -932,9 +1018,15 @@
 					"name": "Get Landowners",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/landowners?survey_id=&village_id=&limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/landowners?survey_id=&village_id=&limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -963,11 +1055,6 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -983,6 +1070,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -995,7 +1087,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/landowner/1?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/landowner/1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1053,6 +1145,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -1065,7 +1162,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1119,6 +1216,11 @@
 								"key": "Content-Type",
 								"value": "image/jpeg",
 								"description": "⚠️ CRITICAL: Must match the content type used when generating the presigned URL.\n\nFor JPEG files: 'image/jpeg' (already set)\nFor PNG files: Change to 'image/png'\nFor PDF files: Change to 'application/pdf'\n\nIf Content-Type doesn't match, you'll get SignatureDoesNotMatch error!"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -1179,6 +1281,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -1191,7 +1298,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1210,9 +1317,15 @@
 					"name": "Get Survey Images",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1249,9 +1362,15 @@
 					"name": "Get All Trees",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/trees?limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1305,9 +1424,15 @@
 					"name": "Get Trees by Name",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?name=Mango&limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Mango&limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1342,9 +1467,15 @@
 					"name": "Get Trees by Development Stage",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?development_stage=undeveloped&girth_cm=50&limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/trees?development_stage=undeveloped&girth_cm=50&limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1384,9 +1515,15 @@
 					"name": "Get Trees by Name and Development Stage",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?name=Neem&development_stage=semi_developed&girth_cm=75&limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Neem&development_stage=semi_developed&girth_cm=75&limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1436,9 +1573,15 @@
 					"name": "Get All Photo Types",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/photo-types?limit=100&offset=0&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/photo-types?limit=100&offset=0",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1483,6 +1626,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
 							}
 						],
 						"body": {
@@ -1495,7 +1643,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/photos?survey_id=257&app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/photos?survey_id=257",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1529,7 +1677,13 @@
 							"type": "noauth"
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/api/bhuarjan/app/version/check?version_code=1",
 							"host": [
@@ -1547,11 +1701,6 @@
 									"key": "version_code",
 									"value": "1",
 									"description": "App version code (integer, required)"
-								},
-								{
-									"key": "app_version_code",
-									"value": "1",
-									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -1566,9 +1715,15 @@
 							"type": "noauth"
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/app/version/latest?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/app/version/latest",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1598,9 +1753,15 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version."
+							}
+						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/app/version/list?app_version_code=1",
+							"raw": "{{base_url}}/api/bhuarjan/app/version/list",
 							"host": [
 								"{{base_url}}"
 							],

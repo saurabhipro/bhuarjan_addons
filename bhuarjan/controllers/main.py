@@ -50,6 +50,18 @@ def check_app_version(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
+            # First, check if version check is enforced in settings
+            settings_master = request.env['bhuarjan.settings.master'].sudo().search([
+                ('active', '=', True),
+                ('enforce_app_version_check', '=', True)
+            ], limit=1)
+            
+            # If version check is NOT enforced, skip the check entirely
+            if not settings_master:
+                # Version check is disabled - allow request to proceed without checking
+                return func(*args, **kwargs)
+            
+            # Version check IS enforced - now we need to get and validate app_version_code
             # Get app_version_code ONLY from headers (for all HTTP methods: GET, POST, PUT, PATCH, DELETE)
             # HTTP headers are case-insensitive, check multiple variations
             app_version_code_str = None
@@ -119,12 +131,12 @@ def check_app_version(func):
                     _logger.warning(f"Invalid app_version_code value: {app_version_code_str}")
                     app_version_code = None
             
-            # app_version_code is MANDATORY - return error if missing
+            # app_version_code is MANDATORY only if version check is enforced
             if not app_version_code:
                 # For auth endpoints, include version_error flag for backward compatibility
                 is_auth_endpoint = '/api/auth/' in request.httprequest.path
                 error_response = {
-                    'error': 'app_version_code parameter is required',
+                    'error': 'app_version_code parameter is required when version check is enforced',
                     'error_code': 'MISSING_APP_VERSION_CODE',
                 }
                 if is_auth_endpoint:
@@ -138,39 +150,31 @@ def check_app_version(func):
                     content_type='application/json'
                 )
             
-            # Check if version check is enforced in settings
-            settings_master = request.env['bhuarjan.settings.master'].sudo().search([
-                ('active', '=', True),
-                ('enforce_app_version_check', '=', True)
-            ], limit=1)
+            # Version check is enforced - validate the version
+            version_status = request.env['bhu.app.version'].sudo().check_version_status(app_version_code)
             
-            if settings_master:
-                # Version check is enforced - validate the version
-                version_status = request.env['bhu.app.version'].sudo().check_version_status(app_version_code)
+            if not version_status.get('allowed', False):
+                # Version is not allowed - return error
+                latest_version = version_status.get('latest_version', {})
+                error_message = version_status.get('message', 'App version is old. Please update to the latest version.')
                 
-                if not version_status.get('allowed', False):
-                    # Version is not allowed - return error
-                    latest_version = version_status.get('latest_version', {})
-                    error_message = version_status.get('message', 'App version is old. Please update to the latest version.')
-                    
-                    # For auth endpoints, include version_error flag for backward compatibility
-                    is_auth_endpoint = '/api/auth/' in request.httprequest.path
-                    error_response = {
-                        'error': error_message,
-                        'error_code': 'APP_VERSION_OUTDATED',
-                        'latest_version': latest_version
-                    }
-                    if is_auth_endpoint:
-                        error_response['version_error'] = True
-                    else:
-                        error_response['success'] = False
-                    
-                    return Response(
-                        json.dumps(error_response),
-                        status=403,
-                        content_type='application/json'
-                    )
-            # If version check is not enforced, allow all versions
+                # For auth endpoints, include version_error flag for backward compatibility
+                is_auth_endpoint = '/api/auth/' in request.httprequest.path
+                error_response = {
+                    'error': error_message,
+                    'error_code': 'APP_VERSION_OUTDATED',
+                    'latest_version': latest_version
+                }
+                if is_auth_endpoint:
+                    error_response['version_error'] = True
+                else:
+                    error_response['success'] = False
+                
+                return Response(
+                    json.dumps(error_response),
+                    status=403,
+                    content_type='application/json'
+                )
             
             # Version check passed - proceed with the request
             return func(*args, **kwargs)

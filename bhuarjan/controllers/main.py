@@ -133,11 +133,27 @@ def check_app_version(func):
             
             # app_version_code is MANDATORY only if version check is enforced
             if not app_version_code:
+                # Get latest version info to include in error response
+                latest_version_obj = request.env['bhu.app.version'].sudo().get_latest_version()
+                latest_version_info = None
+                if latest_version_obj:
+                    latest_version_info = {
+                        'name': latest_version_obj.name,
+                        'version_code': latest_version_obj.version_code,
+                        'force_update': latest_version_obj.force_update,
+                        'description': latest_version_obj.description or ''
+                    }
+                
                 # For auth endpoints, include version_error flag for backward compatibility
                 is_auth_endpoint = '/api/auth/' in request.httprequest.path
+                error_message = 'app_version_code parameter is required when version check is enforced'
+                if latest_version_info:
+                    error_message += f". Please install the latest version: {latest_version_info.get('name', 'N/A')} (version code: {latest_version_info.get('version_code', 'N/A')})"
+                
                 error_response = {
-                    'error': 'app_version_code parameter is required when version check is enforced',
+                    'error': error_message,
                     'error_code': 'MISSING_APP_VERSION_CODE',
+                    'latest_version': latest_version_info
                 }
                 if is_auth_endpoint:
                     error_response['version_error'] = True
@@ -154,16 +170,44 @@ def check_app_version(func):
             version_status = request.env['bhu.app.version'].sudo().check_version_status(app_version_code)
             
             if not version_status.get('allowed', False):
-                # Version is not allowed - return error
+                # Version is not allowed - return error with latest version info
                 latest_version = version_status.get('latest_version', {})
                 error_message = version_status.get('message', 'App version is old. Please update to the latest version.')
+                
+                # Enhance error message with latest version details if available
+                if latest_version and latest_version.get('name'):
+                    version_name = latest_version.get('name', 'N/A')
+                    version_code = latest_version.get('version_code', 'N/A')
+                    if version_name != 'N/A' and version_code != 'N/A':
+                        error_message = f'App version is old. Please install the latest version: {version_name} (version code: {version_code})'
+                
+                # Ensure latest_version includes all necessary fields
+                if latest_version:
+                    latest_version_info = {
+                        'name': latest_version.get('name'),
+                        'version_code': latest_version.get('version_code'),
+                        'force_update': latest_version.get('force_update', False),
+                        'description': latest_version.get('description', '')
+                    }
+                else:
+                    # Fallback: get latest version directly if not in status
+                    latest_version_obj = request.env['bhu.app.version'].sudo().get_latest_version()
+                    if latest_version_obj:
+                        latest_version_info = {
+                            'name': latest_version_obj.name,
+                            'version_code': latest_version_obj.version_code,
+                            'force_update': latest_version_obj.force_update,
+                            'description': latest_version_obj.description or ''
+                        }
+                    else:
+                        latest_version_info = None
                 
                 # For auth endpoints, include version_error flag for backward compatibility
                 is_auth_endpoint = '/api/auth/' in request.httprequest.path
                 error_response = {
                     'error': error_message,
                     'error_code': 'APP_VERSION_OUTDATED',
-                    'latest_version': latest_version
+                    'latest_version': latest_version_info
                 }
                 if is_auth_endpoint:
                     error_response['version_error'] = True

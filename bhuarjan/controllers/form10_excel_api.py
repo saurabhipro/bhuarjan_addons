@@ -5,6 +5,7 @@ Handles Excel export endpoints for Form 10 (Bulk Table Report)
 """
 from odoo import http
 from odoo.http import request, Response
+from .main import check_app_version
 import json
 import logging
 
@@ -15,6 +16,7 @@ class Form10ExcelAPIController(http.Controller):
     """Controller for Form 10 Excel export APIs"""
 
     @http.route('/api/bhuarjan/form10/excel/download', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_app_version
     # @check_permission
     def download_form10_excel(self, **kwargs):
         """
@@ -124,6 +126,7 @@ class Form10ExcelAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/form10/excel/survey/download', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_app_version
     # @check_permission
     def download_form10_excel_by_survey(self, **kwargs):
         """

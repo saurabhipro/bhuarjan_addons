@@ -31,7 +31,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"mobile\": \"9990649990\"\n}",
+							"raw": "{\n    \"mobile\": \"9990649990\",\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -97,7 +97,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/users?limit=100&offset=0&role=",
+							"raw": "{{base_url}}/api/bhuarjan/users?limit=100&offset=0&role=&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -121,6 +121,11 @@
 									"key": "role",
 									"value": "",
 									"description": "Filter by bhuarjan_role: patwari, revenue_inspector, nayab_tahsildar, tahsildar, sdm, additional_collector, collector, administrator (optional)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -134,7 +139,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/users/autocomplete?q=john&limit=20",
+							"raw": "{{base_url}}/api/bhuarjan/users/autocomplete?q=john&limit=20&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -154,6 +159,11 @@
 									"key": "limit",
 									"value": "20",
 									"description": "Maximum number of results to return (default: 20, max: 50)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -172,7 +182,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/user/projects",
+							"raw": "{{base_url}}/api/bhuarjan/user/projects?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -181,6 +191,13 @@
 								"bhuarjan",
 								"user",
 								"projects"
+							],
+							"query": [
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
+								}
 							]
 						},
 						"description": "Get all projects and their associated villages (no filter)"
@@ -193,7 +210,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/user/projects?user_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/user/projects?user_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -208,6 +225,11 @@
 									"key": "user_id",
 									"value": "1",
 									"description": "User ID to filter projects and villages (optional - if not provided, returns all)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -226,7 +248,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/dashboard/village?village_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/dashboard/village?village_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -242,6 +264,11 @@
 									"value": "1",
 									"description": "Village ID (required)",
 									"disabled": false
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -260,7 +287,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/departments?limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/departments?limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -279,6 +306,11 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -292,7 +324,7 @@
 					"method": "GET",
 					"header": [],
 					"url": {
-						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?user_id=1&limit=100&offset=0",
+						"raw": "{{base_url}}/api/bhuarjan/departments/1/projects?user_id=1&limit=100&offset=0&app_version_code=1",
 						"host": [
 							"{{base_url}}"
 						],
@@ -319,6 +351,11 @@
 								"key": "offset",
 								"value": "0",
 								"description": "Number of records to skip (default: 0)"
+							},
+							{
+								"key": "app_version_code",
+								"value": "1",
+								"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 							}
 						]
 					},
@@ -361,6 +398,11 @@
 									"key": "active",
 									"value": "true",
 									"description": "Filter by active status: true/false/1/0/yes (optional, default: true - returns only active land types)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -395,7 +437,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"project_id\": 3,\n    \"village_id\": 1,\n    \"department_id\": 2,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103/90\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"has_traded_land\": \"no\",\n    \"traded_land_area\": 0.0,\n    \"crop_type\": 11,\n    \"irrigation_type\": \"irrigated\",\n    \"has_house\": \"no\",\n    \"house_type\": \"pakka\",\n    \"house_area\": 0.0,\n    \"has_shed\": \"yes\",\n    \"shed_area\": 100.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"submitted\",\n    \"landowner_ids\": [379],\n    \"tree_lines\": [\n        {\n            \"development_stage\": \"undeveloped\",\n            \"tree_master_id\": 1,\n            \"quantity\": 5\n        }\n    ]\n}",
+							"raw": "{\n    \"project_id\": 3,\n    \"village_id\": 1,\n    \"department_id\": 2,\n    \"tehsil_id\": 1,\n    \"khasra_number\": \"103/90\",\n    \"total_area\": 2.5,\n    \"acquired_area\": 2.0,\n    \"has_traded_land\": \"no\",\n    \"traded_land_area\": 0.0,\n    \"crop_type\": 11,\n    \"irrigation_type\": \"irrigated\",\n    \"has_house\": \"no\",\n    \"house_type\": \"pakka\",\n    \"house_area\": 0.0,\n    \"has_shed\": \"yes\",\n    \"shed_area\": 100.0,\n    \"has_well\": \"yes\",\n    \"well_type\": \"pakka\",\n    \"has_tubewell\": \"no\",\n    \"has_pond\": \"no\",\n    \"latitude\": 21.8974,\n    \"longitude\": 83.3960,\n    \"location_accuracy\": 10.5,\n    \"location_timestamp\": \"2024-12-15 10:30:00\",\n    \"remarks\": \"Survey completed successfully\",\n    \"state\": \"submitted\",\n    \"landowner_ids\": [379],\n    \"tree_lines\": [\n        {\n            \"development_stage\": \"undeveloped\",\n            \"tree_master_id\": 1,\n            \"quantity\": 5\n        }\n    ],\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -433,7 +475,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -471,7 +513,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/surveys?project_id=1&village_id=1&state=submitted&limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/surveys?project_id=1&village_id=1&state=submitted&limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -505,6 +547,11 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -529,7 +576,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"has_traded_land\": \"yes\",\n    \"traded_land_area\": 1.5,\n    \"crop_type\": 2,\n    \"irrigation_type\": \"irrigated\",\n    \"landowner_ids\": [1, 2],\n    \"tree_lines\": [\n        {\n            \"tree_type\": \"fruit_bearing\",\n            \"tree_master_id\": 1,\n            \"development_stage\": \"fully_developed\",\n            \"quantity\": 5\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_name\": \"Neem\",\n            \"development_stage\": \"semi_developed\",\n            \"girth_cm\": 40.0,\n            \"quantity\": 10\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_master_id\": 2,\n            \"development_stage\": \"fully_developed\",\n            \"girth_cm\": 60.5,\n            \"quantity\": 20\n        }\n    ]\n}",
+							"raw": "{\n    \"khasra_number\": \"104\",\n    \"total_area\": 3.0,\n    \"acquired_area\": 2.5,\n    \"has_traded_land\": \"yes\",\n    \"traded_land_area\": 1.5,\n    \"crop_type\": 2,\n    \"irrigation_type\": \"irrigated\",\n    \"landowner_ids\": [1, 2],\n    \"tree_lines\": [\n        {\n            \"tree_type\": \"fruit_bearing\",\n            \"tree_master_id\": 1,\n            \"development_stage\": \"fully_developed\",\n            \"quantity\": 5\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_name\": \"Neem\",\n            \"development_stage\": \"semi_developed\",\n            \"girth_cm\": 40.0,\n            \"quantity\": 10\n        },\n        {\n            \"tree_type\": \"non_fruit_bearing\",\n            \"tree_master_id\": 2,\n            \"development_stage\": \"fully_developed\",\n            \"girth_cm\": 60.5,\n            \"quantity\": 20\n        }\n    ],\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -537,7 +584,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -580,7 +627,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"state\": \"submitted\"\n}",
+							"raw": "{\n    \"state\": \"submitted\",\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -622,7 +669,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/1",
+							"raw": "{{base_url}}/api/bhuarjan/survey/1?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -655,7 +702,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -683,7 +730,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&project_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/download?village_id=1&project_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -716,7 +763,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/survey/download?survey_id=257",
+							"raw": "{{base_url}}/api/bhuarjan/form10/survey/download?survey_id=257&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -745,7 +792,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -784,7 +831,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&project_id=1",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/download?village_id=1&project_id=1&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -823,7 +870,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/form10/excel/survey/download?survey_id=257",
+							"raw": "{{base_url}}/api/bhuarjan/form10/excel/survey/download?survey_id=257&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -864,7 +911,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"राम कुमार सिंह\",\n    \"father_name\": \"श्याम सिंह\",\n    \"mother_name\": \"गीता देवी\",\n    \"spouse_name\": \"सीता देवी\",\n    \"phone\": \"9876543210\",\n    \"village_id\": 1,\n    \"tehsil_id\": 1,\n    \"district_id\": 1,\n    \"owner_address\": \"House No. 123, Street Name, पंडरीपानी, रायगढ़, Chhattisgarh\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"State Bank of India\",\n    \"bank_branch\": \"Raigarh Main Branch\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"SBIN0001234\",\n    \"account_holder_name\": \"राम कुमार सिंह\"\n}"
+							"raw": "{\n    \"name\": \"राम कुमार सिंह\",\n    \"father_name\": \"श्याम सिंह\",\n    \"mother_name\": \"गीता देवी\",\n    \"spouse_name\": \"सीता देवी\",\n    \"phone\": \"9876543210\",\n    \"village_id\": 1,\n    \"tehsil_id\": 1,\n    \"district_id\": 1,\n    \"owner_address\": \"House No. 123, Street Name, पंडरीपानी, रायगढ़, Chhattisgarh\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"State Bank of India\",\n    \"bank_branch\": \"Raigarh Main Branch\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"SBIN0001234\",\n    \"account_holder_name\": \"राम कुमार सिंह\",\n    \"app_version_code\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/bhuarjan/landowner",
@@ -887,7 +934,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/landowners?survey_id=&village_id=&limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/landowners?survey_id=&village_id=&limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -916,6 +963,11 @@
 									"key": "offset",
 									"value": "0",
 									"description": "Number of records to skip (default: 0)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -935,7 +987,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Name\",\n    \"father_name\": \"Updated Father Name\",\n    \"spouse_name\": \"Updated Spouse Name\",\n    \"phone\": \"9876543210\",\n    \"owner_address\": \"Updated address\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"Updated Bank\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"ABCD0123456\"\n}",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"father_name\": \"Updated Father Name\",\n    \"spouse_name\": \"Updated Spouse Name\",\n    \"phone\": \"9876543210\",\n    \"owner_address\": \"Updated address\",\n    \"aadhar_number\": \"123456789012\",\n    \"pan_number\": \"ABCDE1234F\",\n    \"bank_name\": \"Updated Bank\",\n    \"account_number\": \"1234567890123456\",\n    \"ifsc_code\": \"ABCD0123456\",\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -943,7 +995,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/landowner/1",
+							"raw": "{{base_url}}/api/bhuarjan/landowner/1?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1005,7 +1057,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"survey_id\": 257,\n    \"file_names\": [\"image1.jpg\"]\n}",
+							"raw": "{\n    \"survey_id\": 257,\n    \"file_names\": [\"image1.jpg\"],\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1013,7 +1065,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1131,7 +1183,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"survey_id\": 1,\n    \"file_name\": \"image1.jpg\"\n}",
+							"raw": "{\n    \"survey_id\": 1,\n    \"file_name\": \"image1.jpg\",\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1139,7 +1191,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls",
+							"raw": "{{base_url}}/api/bhuarjan/s3/presigned-urls?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1160,7 +1212,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257",
+							"raw": "{{base_url}}/api/bhuarjan/survey/images?survey_id=257&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1199,7 +1251,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/trees?limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1255,7 +1307,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?name=Mango&limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Mango&limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1292,7 +1344,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?development_stage=undeveloped&girth_cm=50&limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/trees?development_stage=undeveloped&girth_cm=50&limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1334,7 +1386,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/trees?name=Neem&development_stage=semi_developed&girth_cm=75&limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/trees?name=Neem&development_stage=semi_developed&girth_cm=75&limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1386,7 +1438,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/photo-types?limit=100&offset=0",
+							"raw": "{{base_url}}/api/bhuarjan/photo-types?limit=100&offset=0&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1435,7 +1487,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234\n        }\n    ]\n}",
+							"raw": "{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234\n        }\n    ],\n    \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1443,7 +1495,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/survey/photos?survey_id=257",
+							"raw": "{{base_url}}/api/bhuarjan/survey/photos?survey_id=257&app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1495,6 +1547,11 @@
 									"key": "version_code",
 									"value": "1",
 									"description": "App version code (integer, required)"
+								},
+								{
+									"key": "app_version_code",
+									"value": "1",
+									"description": "App version code (optional) - If provided and version check is enforced, validates the app version"
 								}
 							]
 						},
@@ -1511,7 +1568,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/app/version/latest",
+							"raw": "{{base_url}}/api/bhuarjan/app/version/latest?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1543,7 +1600,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/app/version/list",
+							"raw": "{{base_url}}/api/bhuarjan/app/version/list?app_version_code=1",
 							"host": [
 								"{{base_url}}"
 							],

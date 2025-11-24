@@ -5,6 +5,7 @@ Handles PDF export endpoints for Form 10 (Bulk Table Report)
 """
 from odoo import http
 from odoo.http import request, Response
+from .main import check_app_version
 import json
 import logging
 
@@ -15,6 +16,7 @@ class Form10PDFAPIController(http.Controller):
     """Controller for Form 10 PDF export APIs"""
 
     @http.route('/api/bhuarjan/form10/download', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_app_version
     # @check_permission
     def download_form10(self, **kwargs):
         """
@@ -127,6 +129,7 @@ class Form10PDFAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/form10/survey/download', type='http', auth='public', methods=['GET'], csrf=False)
+    @check_app_version
     # @check_permission
     def download_form10_by_survey(self, **kwargs):
         """

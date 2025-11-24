@@ -165,7 +165,13 @@ class JWTAuthController(http.Controller):
             mobile = data.get('mobile')
             otp_input = data.get('otp_input')
             channel_id = data.get('channel_id')
-            app_version_code = data.get('app_version_code', type=int)  # Get app version from request
+            # Get app version from request and convert to int if provided
+            app_version_code = None
+            if 'app_version_code' in data:
+                try:
+                    app_version_code = int(data.get('app_version_code'))
+                except (ValueError, TypeError):
+                    app_version_code = None
 
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')

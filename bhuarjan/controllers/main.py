@@ -146,9 +146,13 @@ def check_app_version(func):
                 
                 # For auth endpoints, include version_error flag for backward compatibility
                 is_auth_endpoint = '/api/auth/' in request.httprequest.path
-                error_message = 'app_version_code parameter is required when version check is enforced'
-                if latest_version_info:
-                    error_message += f". Please install the latest version: {latest_version_info.get('name', 'N/A')} (version code: {latest_version_info.get('version_code', 'N/A')})"
+                
+                # Create clear error message with version name
+                if latest_version_info and latest_version_info.get('name'):
+                    version_name = latest_version_info.get('name')
+                    error_message = f'app_version_code parameter is required. Please install the latest version: {version_name}'
+                else:
+                    error_message = 'app_version_code parameter is required when version check is enforced'
                 
                 error_response = {
                     'error': error_message,
@@ -172,16 +176,8 @@ def check_app_version(func):
             if not version_status.get('allowed', False):
                 # Version is not allowed - return error with latest version info
                 latest_version = version_status.get('latest_version', {})
-                error_message = version_status.get('message', 'App version is old. Please update to the latest version.')
                 
-                # Enhance error message with latest version details if available
-                if latest_version and latest_version.get('name'):
-                    version_name = latest_version.get('name', 'N/A')
-                    version_code = latest_version.get('version_code', 'N/A')
-                    if version_name != 'N/A' and version_code != 'N/A':
-                        error_message = f'App version is old. Please install the latest version: {version_name} (version code: {version_code})'
-                
-                # Ensure latest_version includes all necessary fields
+                # Get latest version info with all fields
                 if latest_version:
                     latest_version_info = {
                         'name': latest_version.get('name'),
@@ -202,6 +198,13 @@ def check_app_version(func):
                     else:
                         latest_version_info = None
                 
+                # Create clear error message with version name prominently displayed
+                if latest_version_info and latest_version_info.get('name'):
+                    version_name = latest_version_info.get('name')
+                    error_message = f'App version is old. Please install the latest version: {version_name}'
+                else:
+                    error_message = version_status.get('message', 'App version is old. Please update to the latest version.')
+                
                 # For auth endpoints, include version_error flag for backward compatibility
                 is_auth_endpoint = '/api/auth/' in request.httprequest.path
                 error_response = {
@@ -216,7 +219,7 @@ def check_app_version(func):
                 
                 return Response(
                     json.dumps(error_response),
-                    status=403,
+                    status=401,
                     content_type='application/json'
                 )
             

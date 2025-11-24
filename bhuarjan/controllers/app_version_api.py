@@ -89,7 +89,7 @@ class AppVersionAPIController(http.Controller):
                         'error': version_status.get('message', 'Version not allowed'),
                         'data': version_status
                     }),
-                    status=403,
+                    status=401,
                     content_type='application/json'
                 )
             

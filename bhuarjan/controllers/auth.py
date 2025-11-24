@@ -165,9 +165,39 @@ class JWTAuthController(http.Controller):
             mobile = data.get('mobile')
             otp_input = data.get('otp_input')
             channel_id = data.get('channel_id')
+            app_version_code = data.get('app_version_code', type=int)  # Get app version from request
 
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
+            
+            # Check app version if provided and version check is enforced
+            if app_version_code:
+                # Check if version check is enforced in settings
+                settings_master = request.env['bhuarjan.settings.master'].sudo().search([
+                    ('active', '=', True),
+                    ('enforce_app_version_check', '=', True)
+                ], limit=1)
+                
+                if settings_master:
+                    # Version check is enforced - check the version
+                    version_status = request.env['bhu.app.version'].sudo().check_version_status(app_version_code)
+                    if not version_status.get('allowed', False):
+                        # Version is not allowed - return error with latest version info
+                        latest_version = version_status.get('latest_version', {})
+                        error_message = version_status.get('message', 'This version is no longer supported.')
+                        if latest_version:
+                            error_message += f" Please install version {latest_version.get('name', 'N/A')}."
+                        
+                        return Response(
+                            json.dumps({
+                                'error': error_message,
+                                'version_error': True,
+                                'latest_version': latest_version
+                            }),
+                            status=403,
+                            content_type='application/json'
+                        )
+                # If version check is not enforced, bypass the check
 
             # Channel ID is required
             if not channel_id:

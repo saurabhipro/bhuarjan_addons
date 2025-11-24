@@ -52,6 +52,8 @@ access_bhu_payment_reconciliation_bank_line,access_bhu_payment_reconciliation_ba
 access_mobile_otp,mobile.otp,model_mobile_otp,base.group_user,1,1,1,1
 access_jwt_token,jwt.token,model_jwt_token,base.group_user,1,1,1,1
 access_bhu_channel_master,access_bhu_channel_master,model_bhu_channel_master,base.group_user,1,1,1,1
+access_bhu_app_version,access_bhu_app_version,model_bhu_app_version,base.group_user,1,1,1,1
+access_bhu_app_version_admin,access_bhu_app_version_admin,model_bhu_app_version,bhuarjan.group_bhuarjan_admin,1,1,1,1
 
 
 

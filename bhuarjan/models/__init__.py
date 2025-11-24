@@ -37,6 +37,7 @@ from . import tree_rate_master
 from . import photo_type_master
 from . import survey_photo
 from . import form10_export_utils
+from . import app_version
 
 
 

@@ -59,7 +59,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1\n}",
+							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1,\n  \"app_version_code\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -77,7 +77,7 @@
 								"login"
 							]
 						},
-						"description": "Login with mobile and OTP. channel_id is REQUIRED. Validates that the channel exists and is active. If channel is inactive, returns error: 'Channel is inactive. Please contact Administrator.'"
+						"description": "Login with mobile and OTP. channel_id is REQUIRED. app_version_code (optional) - If provided and version check is enforced in settings, validates the app version. If version is disabled, returns 403 error with latest version information. If version check is not enforced in settings, this parameter is ignored."
 					},
 					"response": []
 				},
@@ -1462,6 +1462,100 @@
 							]
 						},
 						"description": "# 📸 Add Photos to Survey After Creation\n\nUse this dedicated API to link images to a survey after the survey has been created. This is the **recommended way** to add photos separately from survey creation.\n\n## 🔄 Complete Workflow\n\n### Step 1: Create Survey\n- Use `POST /api/bhuarjan/survey` to create the survey\n- Get the `survey_id` from the response\n\n### Step 2: Upload Images to S3\n1. Call `POST /api/bhuarjan/s3/presigned-urls` with:\n   ```json\n   {\n       \"survey_id\": 257,\n       \"file_names\": [\"image1.jpg\", \"well_photo.jpg\"]\n   }\n   ```\n2. Upload each file to S3 using the presigned URLs (PUT request)\n3. Copy the S3 URLs from the upload responses\n\n### Step 3: Link Photos to Survey\n- Use this API (`POST /api/bhuarjan/survey/photos`) to link the S3 URLs to the survey\n\n## 📝 Request\n\n**Query Parameter:**\n- `survey_id` (required): Survey ID\n\n**Request Body:**\n```json\n{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\",\n            \"file_size\": 245678,\n            \"description\": \"Land photo\",\n            \"sequence\": 10\n        },\n        {\n            \"photo_type_id\": 2,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n            \"filename\": \"well_photo.jpg\",\n            \"file_size\": 189234,\n            \"description\": \"Well on the property\",\n            \"sequence\": 20\n        }\n    ]\n}\n```\n\n**Photo Object Fields:**\n- `photo_type_id` (required): Photo type ID from photo types master (e.g., 1=Land, 2=Well, 3=House)\n- `s3_url` (required): Full S3 URL after upload (e.g., `https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg`)\n- `filename` (optional): Original filename\n- `file_size` (optional): File size in bytes\n- `description` (optional): Description or notes\n- `sequence` (optional): Display order (default: 10)\n\n## 📤 Response\n\n```json\n{\n    \"success\": true,\n    \"message\": \"Successfully added 2 photo(s) to survey\",\n    \"data\": {\n        \"survey_id\": 257,\n        \"added_photos\": [\n            {\n                \"photo_type_id\": 1,\n                \"photo_type_name\": \"Land\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n                \"filename\": \"image1.jpg\"\n            },\n            {\n                \"photo_type_id\": 2,\n                \"photo_type_name\": \"Well\",\n                \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/well_photo.jpg\",\n                \"filename\": \"well_photo.jpg\"\n            }\n        ],\n        \"total_photos\": 2\n    }\n}\n```\n\n## ✅ Alternative: Use PATCH API\n\nYou can also add photos using the PATCH API when updating a survey:\n\n```\nPATCH /api/bhuarjan/survey/257\n```\n\n**Request Body:**\n```json\n{\n    \"photos\": [\n        {\n            \"photo_type_id\": 1,\n            \"s3_url\": \"https://bhuarjan.s3.ap-south-1.amazonaws.com/surveys/257/image1.jpg\",\n            \"filename\": \"image1.jpg\"\n        }\n    ]\n}\n```\n\n**Note:** PATCH API adds photos to existing ones (doesn't replace).\n\n## ⚠️ Important Notes\n\n- ✅ This API **adds** photos (doesn't replace existing photos)\n- ✅ You can call this API multiple times to add more photos\n- ✅ Each photo must have a valid `photo_type_id` and `s3_url`\n- ✅ Photos are linked to the survey and can be retrieved using `GET /api/bhuarjan/survey/images?survey_id=257`\n- ⚠️ Make sure the S3 URLs are accessible and valid\n- ⚠️ `photo_type_id` must exist in the photo types master"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "App Version",
+			"item": [
+				{
+					"name": "Check App Version",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/app/version/check?version_code=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"app",
+								"version",
+								"check"
+							],
+							"query": [
+								{
+									"key": "version_code",
+									"value": "1",
+									"description": "App version code (integer, required)"
+								}
+							]
+						},
+						"description": "Check if the app version is allowed to be used. Returns version status and latest version information. If version check is not enforced in settings, returns success with version_check_enforced: false. If version check is enforced and version is disabled, returns 403 error."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Latest App Version",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/app/version/latest",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"app",
+								"version",
+								"latest"
+							]
+						},
+						"description": "Get the latest active app version information including version name, code, force_update flag, and description."
+					},
+					"response": []
+				},
+				{
+					"name": "List All App Versions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/app/version/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"app",
+								"version",
+								"list"
+							]
+						},
+						"description": "List all app versions (requires authentication). Returns all versions with their status, activation dates, and other details."
 					},
 					"response": []
 				}

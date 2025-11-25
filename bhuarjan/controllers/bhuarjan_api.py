@@ -71,21 +71,13 @@ class BhuarjanAPIController(http.Controller):
                     'bhuarjan_role': user.bhuarjan_role or '',
                 }
 
-            # Get all projects - we'll filter villages based on user's villages
+            # Always get all projects - show all villages for each project
             projects = request.env['bhu.project'].sudo().search([])
 
             result = []
             for project in projects:
-                # If user_id provided and user has villages, show only matching villages
-                # Otherwise, show all villages for the project
-                if user_id and user_village_ids:
-                    # Filter villages to show only those assigned to the user
-                    project_villages = project.village_ids.filtered(
-                        lambda v: v.id in user_village_ids
-                    )
-                else:
-                    # Show all villages for the project
-                    project_villages = project.village_ids
+                # Always show ALL villages for the project (not filtered by user's villages)
+                project_villages = project.village_ids
                 
                 villages_data = []
                 for village in project_villages:
@@ -101,8 +93,7 @@ class BhuarjanAPIController(http.Controller):
                         'pincode': village.pincode or '',
                     })
                 
-                # Always include all projects, but filter villages based on user's assigned villages
-                # This ensures users can see all projects, but only see villages they have access to
+                # Include project with all its villages
                 result.append({
                     'id': project.id,
                     'name': project.name,

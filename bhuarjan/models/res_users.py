@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
@@ -13,6 +14,22 @@ class ResUsers(models.Model):
         return [('id', 'in', state_ids)]
 
     mobile = fields.Char(string="Mobile")
+
+    @api.constrains('mobile')
+    def _check_mobile_unique(self):
+        """Ensure mobile number is unique across all users"""
+        for record in self:
+            if record.mobile:  # Only validate if mobile is provided
+                # Search for other users with the same mobile number
+                duplicate = self.env['res.users'].search([
+                    ('mobile', '=', record.mobile),
+                    ('id', '!=', record.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(
+                        f'Mobile number {record.mobile} is already assigned to user "{duplicate.name}". '
+                        f'Each user must have a unique mobile number.'
+                    )
     state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain())
     district_id = fields.Many2one('bhu.district', string='District / जिला')
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')

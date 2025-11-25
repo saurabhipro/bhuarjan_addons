@@ -261,9 +261,9 @@ t-att-style="'background-color:' + (record.department_color.raw_value or '#69202
                 <xpath expr="//field[@name='name']" position="after">
                     <field name="mobile" string="Mobile"/>
                 </xpath>
-                <!-- Add mobile filter -->
-                <xpath expr="//filter[@name='active']" position="after">
-                    <filter string="Mobile" name="mobile" domain="[('mobile', '!=', False)]"/>
+                <!-- Add mobile filter - add inside search element after fields -->
+                <xpath expr="//search" position="inside">
+                    <filter string="Has Mobile" name="has_mobile" domain="[('mobile', '!=', False)]"/>
                 </xpath>
             </field>
         </record>

@@ -104,7 +104,9 @@
                                 <group string="Infrastructure / बुनियादी सुविधाएं" class="survey-icon-infrastructure">
                                     <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                     <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
                                     <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
                                     <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">

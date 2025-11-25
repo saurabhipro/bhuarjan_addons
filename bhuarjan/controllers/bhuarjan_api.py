@@ -993,7 +993,9 @@ class BhuarjanAPIController(http.Controller):
                 'has_shed': data.get('has_shed', 'no'),
                 'shed_area': data.get('shed_area', 0.0),
                 'has_well': data.get('has_well', 'no'),
+                'well_count': data.get('well_count', 1) if data.get('has_well') == 'yes' else 0,
                 'has_tubewell': data.get('has_tubewell', 'no'),
+                'tubewell_count': data.get('tubewell_count', 1) if data.get('has_tubewell') == 'yes' else 0,
                 'has_pond': data.get('has_pond', 'no'),
                 'latitude': data.get('latitude'),
                 'longitude': data.get('longitude'),
@@ -1429,7 +1431,9 @@ class BhuarjanAPIController(http.Controller):
                 'shed_area': survey.shed_area,
                 'has_well': survey.has_well,
                 'well_type': survey.well_type,
+                'well_count': survey.well_count or 0,
                 'has_tubewell': survey.has_tubewell,
+                'tubewell_count': survey.tubewell_count or 0,
                 'has_pond': survey.has_pond,
                 'latitude': survey.latitude,
                 'longitude': survey.longitude,
@@ -2513,7 +2517,7 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number', 'total_area', 'acquired_area', 'has_traded_land', 'traded_land_area',
                 'crop_type_id', 'irrigation_type',
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
-                'has_well', 'well_type', 'has_tubewell', 'has_pond',
+                'has_well', 'well_type', 'well_count', 'has_tubewell', 'tubewell_count', 'has_pond',
                 'landowner_ids', 'survey_image', 'survey_image_filename',
                 'remarks', 'state', 'submitted_date'
             ]
@@ -2612,6 +2616,23 @@ class BhuarjanAPIController(http.Controller):
                         update_vals[field] = value
                 else:
                     _logger.warning(f"Field '{field}' is not allowed to be updated via API")
+            
+            # Handle well_count and tubewell_count based on has_well and has_tubewell
+            # If has_well is being set to 'no', reset well_count to 0
+            if 'has_well' in update_vals:
+                if update_vals['has_well'] == 'no':
+                    update_vals['well_count'] = 0
+                elif update_vals['has_well'] == 'yes' and 'well_count' not in update_vals:
+                    # If well is set to yes but count not provided, default to 1
+                    update_vals['well_count'] = 1
+            
+            # If has_tubewell is being set to 'no', reset tubewell_count to 0
+            if 'has_tubewell' in update_vals:
+                if update_vals['has_tubewell'] == 'no':
+                    update_vals['tubewell_count'] = 0
+                elif update_vals['has_tubewell'] == 'yes' and 'tubewell_count' not in update_vals:
+                    # If tubewell is set to yes but count not provided, default to 1
+                    update_vals['tubewell_count'] = 1
 
             if not update_vals:
                 return Response(

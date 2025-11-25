@@ -71,29 +71,20 @@ class BhuarjanAPIController(http.Controller):
                     'bhuarjan_role': user.bhuarjan_role or '',
                 }
 
-            # Get projects
-            if user_id and user_village_ids:
-                # Find all projects that have any village matching user's villages
-                # Use domain search for better performance instead of loading all projects
-                projects = request.env['bhu.project'].sudo().search([
-                    ('village_ids', 'in', user_village_ids)
-                ])
-            elif user_id:
-                # If user_id provided but user has no villages, return all projects
-                projects = request.env['bhu.project'].sudo().search([])
-            else:
-                # Get all projects if no user_id provided
-                projects = request.env['bhu.project'].sudo().search([])
+            # Get all projects - we'll filter villages based on user's villages
+            projects = request.env['bhu.project'].sudo().search([])
 
             result = []
             for project in projects:
                 # If user_id provided and user has villages, show only matching villages
                 # Otherwise, show all villages for the project
                 if user_id and user_village_ids:
+                    # Filter villages to show only those assigned to the user
                     project_villages = project.village_ids.filtered(
                         lambda v: v.id in user_village_ids
                     )
                 else:
+                    # Show all villages for the project
                     project_villages = project.village_ids
                 
                 villages_data = []
@@ -110,8 +101,8 @@ class BhuarjanAPIController(http.Controller):
                         'pincode': village.pincode or '',
                     })
                 
-                # Include project even if it has no matching villages (when user_id provided)
-                # This ensures all projects found are returned
+                # Always include all projects, but filter villages based on user's assigned villages
+                # This ensures users can see all projects, but only see villages they have access to
                 result.append({
                     'id': project.id,
                     'name': project.name,

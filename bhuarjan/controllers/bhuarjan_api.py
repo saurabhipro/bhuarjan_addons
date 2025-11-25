@@ -76,12 +76,21 @@ class BhuarjanAPIController(http.Controller):
 
             result = []
             for project in projects:
-                # Always show ALL villages for the project (not filtered by user's villages)
-                project_villages = project.village_ids
-                
-                villages_data = []
-                for village in project_villages:
-                    villages_data.append({
+                # Get all departments linked to project
+                departments = request.env['bhu.department'].sudo().search([
+                    ('project_ids', 'in', project.id)
+                ])
+
+                # List of department dicts
+                departments_data = [
+                    {'id': d.id, 'name': d.name}
+                    for d in departments
+                ]
+
+                # All villages for this project
+                villages = []
+                for village in project.village_ids:
+                    villages.append({
                         'id': village.id,
                         'name': village.name,
                         'village_code': village.village_code or '',
@@ -92,8 +101,6 @@ class BhuarjanAPIController(http.Controller):
                         'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
                         'pincode': village.pincode or '',
                     })
-                
-                # Include project with all its villages
                 result.append({
                     'id': project.id,
                     'name': project.name,
@@ -101,7 +108,10 @@ class BhuarjanAPIController(http.Controller):
                     'project_uuid': project.project_uuid or '',
                     'description': project.description or '',
                     'state': project.state,
-                    'villages': villages_data
+                    'project_id': project.id,
+                    'project_name': project.name,
+                    'departments': departments_data,
+                    'villages': villages,
                 })
 
             response_data = {

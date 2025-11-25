@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- User Report Wizard Form View -->
+        <record id="view_user_report_wizard_form" model="ir.ui.view">
+            <field name="name">user.report.wizard.form</field>
+            <field name="model">user.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Export Users Report">
+                    <sheet>
+                        <group>
+                            <div class="alert alert-info" role="alert">
+                                <p>This will export all users with their details to Excel format.</p>
+                                <p><strong>Report includes:</strong></p>
+                                <ul>
+                                    <li>Sr No</li>
+                                    <li>Patwari Name</li>
+                                    <li>Mobile No</li>
+                                    <li>Department</li>
+                                    <li>Projects</li>
+                                    <li>Tehsil</li>
+                                    <li>Subdivision</li>
+                                    <li>Village</li>
+                                </ul>
+                                <p>Multiple values will be displayed in separate lines within the same cell.</p>
+                            </div>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_export_excel" string="Export to Excel" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- User Report Wizard Window Action -->
+        <record id="action_user_report_wizard_window" model="ir.actions.act_window">
+            <field name="name">Export Users Report</field>
+            <field name="res_model">user.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- User Report Wizard Server Action (for binding to list view) -->
+        <record id="action_user_report_wizard_server" model="ir.actions.server">
+            <field name="name">Export Users Report</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="binding_model_id" ref="base.model_res_users"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+action = env.ref('bhuarjan.action_user_report_wizard_window').read()[0]
+            </field>
+        </record>
+    </data>
+</odoo>
+

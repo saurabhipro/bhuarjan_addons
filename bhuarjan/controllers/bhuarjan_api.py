@@ -73,17 +73,22 @@ class BhuarjanAPIController(http.Controller):
 
             # Get projects
             if user_id and user_village_ids:
-                # Filter projects that have villages mapped to this user
+                # Find all projects that have any village matching user's villages
+                # Use domain search for better performance instead of loading all projects
                 projects = request.env['bhu.project'].sudo().search([
                     ('village_ids', 'in', user_village_ids)
                 ])
+            elif user_id:
+                # If user_id provided but user has no villages, return all projects
+                projects = request.env['bhu.project'].sudo().search([])
             else:
                 # Get all projects if no user_id provided
                 projects = request.env['bhu.project'].sudo().search([])
 
             result = []
             for project in projects:
-                # Filter villages based on user if user_id provided
+                # If user_id provided and user has villages, show only matching villages
+                # Otherwise, show all villages for the project
                 if user_id and user_village_ids:
                     project_villages = project.village_ids.filtered(
                         lambda v: v.id in user_village_ids
@@ -105,17 +110,17 @@ class BhuarjanAPIController(http.Controller):
                         'pincode': village.pincode or '',
                     })
                 
-                # Only include project if it has villages (after filtering)
-                if villages_data:
-                    result.append({
-                        'id': project.id,
-                        'name': project.name,
-                        'code': project.code or '',
-                        'project_uuid': project.project_uuid or '',
-                        'description': project.description or '',
-                        'state': project.state,
-                        'villages': villages_data
-                    })
+                # Include project even if it has no matching villages (when user_id provided)
+                # This ensures all projects found are returned
+                result.append({
+                    'id': project.id,
+                    'name': project.name,
+                    'code': project.code or '',
+                    'project_uuid': project.project_uuid or '',
+                    'description': project.description or '',
+                    'state': project.state,
+                    'villages': villages_data
+                })
 
             response_data = {
                 'success': True,

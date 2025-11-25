@@ -32,7 +32,7 @@
             <field name="inherit_id" ref="base.view_users_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='login']" position="after">
-
+                    <field name="mobile"/>
                     <field name="parent_id"/>
                     <field name="state_id"/>
                     <field name="district_id"/>
@@ -251,7 +251,24 @@ t-att-style="'background-color:' + (record.department_color.raw_value or '#69202
     </record>
 
 
-    <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
+        <!-- Inherit search view to add mobile field -->
+        <record id="view_users_search_inherit" model="ir.ui.view">
+            <field name="name">res.users.search.inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_search"/>
+            <field name="arch" type="xml">
+                <!-- Add mobile field to search -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="mobile" string="Mobile"/>
+                </xpath>
+                <!-- Add mobile filter -->
+                <xpath expr="//filter[@name='active']" position="after">
+                    <filter string="Mobile" name="mobile" domain="[('mobile', '!=', False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_accres_users_bhuarjan_view_form_action" model="ir.actions.act_window">
             <field name="name">Users</field>
             <field name="res_model">res.users</field>
             <field name="view_mode">list,form,hierarchy,kanban</field>

@@ -17,12 +17,14 @@
         'data/tree_master_data.xml',
         'data/tree_rate_master_data.xml',
         'data/photo_type_master_data.xml',
-        'data/chhattisgarh_districts_data.xml',
-        'data/raigarh_sub_division_data.xml',
-        'data/raipur_sub_division_data.xml',
+        # District and Sub-Division data - commented out to prevent import
+        # 'data/chhattisgarh_districts_data.xml',
+        # 'data/raigarh_sub_division_data.xml',
+        # 'data/raipur_sub_division_data.xml',
         'data/tehsil_data.xml',
         'data/raigarh_circle_data.xml',
-        'data/raigarh_village_data.xml',
+        # Village data - commented out to prevent import
+        # 'data/raigarh_village_data.xml',
         'data/department_data.xml',
         'data/settings_master_data.xml',
         # Process-related sample data - commented out to prevent default import

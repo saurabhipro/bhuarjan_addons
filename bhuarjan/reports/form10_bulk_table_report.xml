@@ -488,11 +488,29 @@
                                                     <span t-if="s.has_shed != 'yes' or not s.shed_area" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
                                                 <td style="text-align:center">
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'" style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'" style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
+                                                    <t t-set="well_count" t-value="s.well_count or 1"/>
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'">
+                                                        <span style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
+                                                        <span t-if="well_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="well_count"/>)</span>
+                                                    </span>
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'pakka'">
+                                                        <span style="color:#28a745;font-weight:bold">हाँ-पक्का</span>
+                                                        <span t-if="well_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="well_count"/>)</span>
+                                                    </span>
+                                                    <span t-if="s.has_well == 'yes' and not s.well_type">
+                                                        <span style="color:#28a745;font-weight:bold">हाँ</span>
+                                                        <span t-if="well_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="well_count"/>)</span>
+                                                    </span>
                                                     <span t-if="s.has_well != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="text-align:center"><span t-if="s.has_tubewell == 'yes'" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="s.has_tubewell != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
+                                                <td style="text-align:center">
+                                                    <t t-set="tubewell_count" t-value="s.tubewell_count or 1"/>
+                                                    <span t-if="s.has_tubewell == 'yes'">
+                                                        <span style="color:#28a745;font-weight:bold">हाँ</span>
+                                                        <span t-if="tubewell_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="tubewell_count"/>)</span>
+                                                    </span>
+                                                    <span t-if="s.has_tubewell != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span>
+                                                </td>
                                                 <td style="text-align:center"><span t-if="s.has_pond == 'yes'" style="color:#28a745;font-weight:bold">हाँ</span><span t-if="s.has_pond != 'yes'" style="color:#dc3545;font-weight:bold">नहीं</span></td>
                                                 <td style="page-break-inside: avoid;">
                                                     <t t-set="has_remarks" t-value="False"/>

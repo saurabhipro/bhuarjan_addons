@@ -44,53 +44,95 @@ class BhuarjanAPIController(http.Controller):
     @check_permission
     def get_user_projects(self, **kwargs):
         """
-        Get projects and villages mapped to a specific user
-        Query params: user_id (optional - if not provided, returns all projects and villages)
-        Returns: JSON with projects and their associated villages (filtered by user if user_id provided)
+        Get departments, projects, and villages mapped to a specific user
+        Structure: Departments -> Projects -> Villages (only user's villages)
+        Query params: user_id (required)
+        Returns: JSON with departments, their projects, and villages (filtered by user's villages)
         """
         try:
             # Get query parameters
             user_id = request.httprequest.args.get('user_id', type=int)
 
-            # Get user's villages if user_id is provided
-            user_village_ids = []
-            user_info = None
-            if user_id:
-                user = request.env['res.users'].sudo().browse(user_id)
-                if not user.exists():
-                    return Response(
-                        json.dumps({'error': f'User with ID {user_id} not found'}),
-                        status=404,
-                        content_type='application/json'
-                    )
-                user_village_ids = user.village_ids.ids if user.village_ids else []
-                user_info = {
-                    'id': user.id,
-                    'name': user.name,
-                    'login': user.login,
-                    'bhuarjan_role': user.bhuarjan_role or '',
+            if not user_id:
+                return Response(
+                    json.dumps({'error': 'user_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Get user and their villages
+            user = request.env['res.users'].sudo().browse(user_id)
+            if not user.exists():
+                return Response(
+                    json.dumps({'error': f'User with ID {user_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            user_village_ids = user.village_ids.ids if user.village_ids else []
+            user_info = {
+                'id': user.id,
+                'name': user.name,
+                'login': user.login,
+                'bhuarjan_role': user.bhuarjan_role or '',
+            }
+
+            # If user has no villages, return empty structure
+            if not user_village_ids:
+                response_data = {
+                    'success': True,
+                    'data': [],
+                    'user': user_info
                 }
+                return Response(
+                    json.dumps(response_data),
+                    status=200,
+                    content_type='application/json'
+                )
 
-            # Always get all projects - show all villages for each project
-            projects = request.env['bhu.project'].sudo().search([])
+            # Get all projects that contain user's villages
+            projects_with_user_villages = request.env['bhu.project'].sudo().search([
+                ('village_ids', 'in', user_village_ids)
+            ])
 
-            result = []
-            for project in projects:
-                # Get all departments linked to project
+            # Get all departments that are linked to these projects
+            department_ids = set()
+            project_department_map = {}  # Map project_id -> list of department_ids
+            
+            for project in projects_with_user_villages:
+                # Get departments linked to this project
                 departments = request.env['bhu.department'].sudo().search([
                     ('project_ids', 'in', project.id)
                 ])
+                dept_ids = departments.ids
+                project_department_map[project.id] = dept_ids
+                department_ids.update(dept_ids)
 
-                # List of department dicts
-                departments_data = [
-                    {'id': d.id, 'name': d.name}
-                    for d in departments
-                ]
+            # Build department -> projects -> villages structure
+            departments_dict = {}  # department_id -> department data with projects
+            
+            for dept_id in department_ids:
+                dept = request.env['bhu.department'].sudo().browse(dept_id)
+                if dept.exists():
+                    departments_dict[dept_id] = {
+                        'id': dept.id,
+                        'name': dept.name,
+                        'code': dept.code or '',
+                        'projects': []
+                    }
 
-                # All villages for this project
-                villages = []
-                for village in project.village_ids:
-                    villages.append({
+            # Add projects to their departments
+            for project in projects_with_user_villages:
+                # Get user's villages that are in this project
+                project_villages = project.village_ids.filtered(lambda v: v.id in user_village_ids)
+                
+                if not project_villages:
+                    continue  # Skip if no user villages in this project
+
+                # Build villages data
+                villages_data = []
+                for village in project_villages:
+                    villages_data.append({
                         'id': village.id,
                         'name': village.name,
                         'village_code': village.village_code or '',
@@ -101,27 +143,39 @@ class BhuarjanAPIController(http.Controller):
                         'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
                         'pincode': village.pincode or '',
                     })
-                result.append({
+
+                # Project data
+                project_data = {
                     'id': project.id,
                     'name': project.name,
                     'code': project.code or '',
                     'project_uuid': project.project_uuid or '',
                     'description': project.description or '',
                     'state': project.state,
-                    'project_id': project.id,
-                    'project_name': project.name,
-                    'departments': departments_data,
-                    'villages': villages,
-                })
+                    'villages': villages_data,
+                }
+
+                # Add project to all its departments
+                dept_ids = project_department_map.get(project.id, [])
+                for dept_id in dept_ids:
+                    if dept_id in departments_dict:
+                        # Check if project already exists in this department (avoid duplicates)
+                        existing_project_ids = [p['id'] for p in departments_dict[dept_id]['projects']]
+                        if project.id not in existing_project_ids:
+                            departments_dict[dept_id]['projects'].append(project_data)
+
+            # Convert to list and sort by department name
+            result = sorted(departments_dict.values(), key=lambda x: x['name'])
+
+            # Sort projects within each department by name
+            for dept in result:
+                dept['projects'].sort(key=lambda x: x['name'])
 
             response_data = {
                 'success': True,
-                'data': result
+                'data': result,
+                'user': user_info
             }
-            
-            # Include user info if user_id was provided
-            if user_info:
-                response_data['user'] = user_info
 
             return Response(
                 json.dumps(response_data),

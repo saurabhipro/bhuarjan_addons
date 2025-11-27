@@ -207,7 +207,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/bhuarjan/user/projects",
+							"raw": "{{base_url}}/api/bhuarjan/user/projects?user_id=1",
 							"host": [
 								"{{base_url}}"
 							],
@@ -216,9 +216,16 @@
 								"bhuarjan",
 								"user",
 								"projects"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "User ID (required) - Returns departments, projects, and villages mapped to this user"
+								}
 							]
 						},
-						"description": "Get all projects and their associated villages (no filter)"
+						"description": "Get departments, projects, and villages mapped to a user.\n\n**Query Parameters:**\n- `user_id` (required): User ID to filter departments, projects, and villages\n\n**Response Structure:**\n- **First Level:** Departments\n- **Second Level:** Projects (within each department)\n- **Third Level:** Villages (within each project, only villages mapped to the user)\n\n**Response Example:**\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 2,\n      \"name\": \"PWD\",\n      \"code\": \"PWD\",\n      \"projects\": [\n        {\n          \"id\": 3,\n          \"name\": \"रिंग रोड रायगढ़\",\n          \"code\": \"RRR\",\n          \"project_uuid\": \"...\",\n          \"description\": \"...\",\n          \"state\": \"active\",\n          \"villages\": [\n            {\n              \"id\": 30,\n              \"name\": \"मिड़मिडा\",\n              \"village_code\": \"...\",\n              \"village_uuid\": \"...\",\n              \"district_id\": 1,\n              \"district_name\": \"...\",\n              \"tehsil_id\": 1,\n              \"tehsil_name\": \"...\",\n              \"pincode\": \"...\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"user\": {\n    \"id\": 21,\n    \"name\": \"...\",\n    \"login\": \"...\",\n    \"bhuarjan_role\": \"...\"\n  }\n}\n```\n\n**Note:** Only shows departments, projects, and villages that are related to the user's assigned villages."
 					},
 					"response": []
 				},
@@ -249,11 +256,11 @@
 								{
 									"key": "user_id",
 									"value": "1",
-									"description": "User ID to filter projects and villages (optional - if not provided, returns all)"
+									"description": "User ID (required) - Returns departments, projects, and villages mapped to this user"
 								}
 							]
 						},
-						"description": "Get projects and villages mapped to a specific user. Only returns villages that are assigned to the user."
+						"description": "Get departments, projects, and villages mapped to a specific user.\n\n**Query Parameters:**\n- `user_id` (required): User ID to filter departments, projects, and villages\n\n**Response Structure:**\n- **First Level:** Departments\n- **Second Level:** Projects (within each department)\n- **Third Level:** Villages (within each project, only villages mapped to the user)\n\n**Note:** Only shows departments, projects, and villages that are related to the user's assigned villages. If user has no villages assigned, returns empty array."
 					},
 					"response": []
 				}

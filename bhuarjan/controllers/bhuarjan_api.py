@@ -77,8 +77,12 @@ class BhuarjanAPIController(http.Controller):
                 'bhuarjan_role': user.bhuarjan_role or '',
             }
 
+            # Debug logging
+            _logger.info(f"get_user_projects: User {user_id} has {len(user_village_ids)} villages: {user_village_ids}")
+
             # If user has no villages, return empty structure
             if not user_village_ids:
+                _logger.warning(f"get_user_projects: User {user_id} has no villages assigned")
                 response_data = {
                     'success': True,
                     'data': [],
@@ -90,86 +94,166 @@ class BhuarjanAPIController(http.Controller):
                     content_type='application/json'
                 )
 
-            # Get all projects that contain user's villages
-            projects_with_user_villages = request.env['bhu.project'].sudo().search([
-                ('village_ids', 'in', user_village_ids)
-            ])
-
-            # Get all departments that are linked to these projects
-            department_ids = set()
-            project_department_map = {}  # Map project_id -> list of department_ids
+            # Start from user's villages and build the hierarchy: Village -> Project -> Department
+            # Structure: Department -> Projects -> Villages
             
-            for project in projects_with_user_villages:
-                # Get departments linked to this project
-                departments = request.env['bhu.department'].sudo().search([
-                    ('project_ids', 'in', project.id)
-                ])
-                dept_ids = departments.ids
-                project_department_map[project.id] = dept_ids
-                department_ids.update(dept_ids)
-
+            # Get all projects to search through
+            all_projects = request.env['bhu.project'].sudo().search([])
+            
+            # Map: village_id -> list of projects that contain it
+            village_project_map = {}  # {village_id: [project1, project2, ...]}
+            
+            # Map: project_id -> set of departments
+            project_department_map = {}  # {project_id: [dept1, dept2, ...]}
+            
+            # For each user village, find projects that contain it
+            for village_id in user_village_ids:
+                village = request.env['bhu.village'].sudo().browse(village_id)
+                if not village.exists():
+                    _logger.warning(f"get_user_projects: Village {village_id} does not exist")
+                    continue
+                
+                # Find projects that contain this village
+                projects_for_village = all_projects.filtered(
+                    lambda p: village_id in p.village_ids.ids
+                )
+                
+                village_project_map[village_id] = projects_for_village
+                _logger.info(f"get_user_projects: Village {village_id} ({village.name}) is in {len(projects_for_village)} projects: {projects_for_village.ids}")
+                
+                # For each project, get its departments
+                for project in projects_for_village:
+                    if project.id not in project_department_map:
+                        # Get departments linked to this project
+                        departments = request.env['bhu.department'].sudo().search([
+                            ('project_ids', 'in', project.id)
+                        ])
+                        project_department_map[project.id] = departments.ids
+                        _logger.info(f"get_user_projects: Project {project.id} ({project.name}) has {len(departments)} departments: {departments.ids}")
+            
+            # If no projects found for any village
+            all_found_projects = set()
+            for projects in village_project_map.values():
+                all_found_projects.update(projects.ids)
+            
+            if not all_found_projects:
+                _logger.warning(f"get_user_projects: No projects found for any of user's villages. User villages: {user_village_ids}")
+                response_data = {
+                    'success': True,
+                    'data': [],
+                    'user': user_info,
+                    'debug': {
+                        'user_village_ids': user_village_ids,
+                        'message': 'No projects found containing user\'s villages. Please ensure villages are mapped to projects.'
+                    }
+                }
+                return Response(
+                    json.dumps(response_data),
+                    status=200,
+                    content_type='application/json'
+                )
+            
             # Build department -> projects -> villages structure
             departments_dict = {}  # department_id -> department data with projects
+            projects_without_dept = {}  # project_id -> project data (for projects without departments)
             
-            for dept_id in department_ids:
+            # Get all unique departments
+            all_department_ids = set()
+            for dept_ids in project_department_map.values():
+                all_department_ids.update(dept_ids)
+            
+            # Initialize department entries
+            for dept_id in all_department_ids:
                 dept = request.env['bhu.department'].sudo().browse(dept_id)
                 if dept.exists():
                     departments_dict[dept_id] = {
                         'id': dept.id,
                         'name': dept.name,
                         'code': dept.code or '',
-                        'projects': []
+                        'projects': {}
                     }
-
-            # Add projects to their departments
-            for project in projects_with_user_villages:
-                # Get user's villages that are in this project
-                project_villages = project.village_ids.filtered(lambda v: v.id in user_village_ids)
+            
+            # Build the structure: for each village, add it to its projects, and projects to departments
+            for village_id in user_village_ids:
+                village = request.env['bhu.village'].sudo().browse(village_id)
+                if not village.exists():
+                    continue
                 
-                if not project_villages:
-                    continue  # Skip if no user villages in this project
-
-                # Build villages data
-                villages_data = []
-                for village in project_villages:
-                    villages_data.append({
-                        'id': village.id,
-                        'name': village.name,
-                        'village_code': village.village_code or '',
-                        'village_uuid': village.village_uuid or '',
-                        'district_id': village.district_id.id if village.district_id else None,
-                        'district_name': village.district_id.name if village.district_id else '',
-                        'tehsil_id': village.tehsil_id.id if village.tehsil_id else None,
-                        'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
-                        'pincode': village.pincode or '',
-                    })
-
-                # Project data
-                project_data = {
-                    'id': project.id,
-                    'name': project.name,
-                    'code': project.code or '',
-                    'project_uuid': project.project_uuid or '',
-                    'description': project.description or '',
-                    'state': project.state,
-                    'villages': villages_data,
+                # Build village data
+                village_data = {
+                    'id': village.id,
+                    'name': village.name,
+                    'village_code': village.village_code or '',
+                    'village_uuid': village.village_uuid or '',
+                    'district_id': village.district_id.id if village.district_id else None,
+                    'district_name': village.district_id.name if village.district_id else '',
+                    'tehsil_id': village.tehsil_id.id if village.tehsil_id else None,
+                    'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
+                    'pincode': village.pincode or '',
+                }
+                
+                # Get projects for this village
+                projects_for_village = village_project_map.get(village_id, [])
+                
+                for project in projects_for_village:
+                    # Get departments for this project
+                    dept_ids = project_department_map.get(project.id, [])
+                    
+                    if dept_ids:
+                        # Add to departments
+                        for dept_id in dept_ids:
+                            if dept_id in departments_dict:
+                                # Initialize project in department if not exists
+                                if project.id not in departments_dict[dept_id]['projects']:
+                                    departments_dict[dept_id]['projects'][project.id] = {
+                                        'id': project.id,
+                                        'name': project.name,
+                                        'code': project.code or '',
+                                        'project_uuid': project.project_uuid or '',
+                                        'description': project.description or '',
+                                        'state': project.state,
+                                        'villages': []
+                                    }
+                                # Add village to project
+                                departments_dict[dept_id]['projects'][project.id]['villages'].append(village_data)
+                    else:
+                        # Project has no departments - add to "No Department" list
+                        if project.id not in projects_without_dept:
+                            projects_without_dept[project.id] = {
+                                'id': project.id,
+                                'name': project.name,
+                                'code': project.code or '',
+                                'project_uuid': project.project_uuid or '',
+                                'description': project.description or '',
+                                'state': project.state,
+                                'villages': []
+                            }
+                        projects_without_dept[project.id]['villages'].append(village_data)
+            
+            # Convert projects dict to list in each department
+            for dept_id in departments_dict:
+                departments_dict[dept_id]['projects'] = list(departments_dict[dept_id]['projects'].values())
+            
+            # Add "No Department" entry if needed
+            if projects_without_dept:
+                departments_dict[0] = {
+                    'id': 0,
+                    'name': 'No Department / कोई विभाग नहीं',
+                    'code': 'NO_DEPT',
+                    'projects': list(projects_without_dept.values())
                 }
 
-                # Add project to all its departments
-                dept_ids = project_department_map.get(project.id, [])
-                for dept_id in dept_ids:
-                    if dept_id in departments_dict:
-                        # Check if project already exists in this department (avoid duplicates)
-                        existing_project_ids = [p['id'] for p in departments_dict[dept_id]['projects']]
-                        if project.id not in existing_project_ids:
-                            departments_dict[dept_id]['projects'].append(project_data)
-
-            # Convert to list and sort by department name
-            result = sorted(departments_dict.values(), key=lambda x: x['name'])
+            # Convert to list and sort by department name (put "No Department" at the end)
+            result = sorted(
+                departments_dict.values(), 
+                key=lambda x: (x['id'] == 0, x['name'])  # No Department (id=0) goes last
+            )
 
             # Sort projects within each department by name
             for dept in result:
                 dept['projects'].sort(key=lambda x: x['name'])
+            
+            _logger.info(f"get_user_projects: Returning {len(result)} departments with projects")
 
             response_data = {
                 'success': True,

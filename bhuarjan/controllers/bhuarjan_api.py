@@ -2785,130 +2785,136 @@ class BhuarjanAPIController(http.Controller):
             # Handle tree lines (if provided - new format: supports fruit-bearing and non-fruit-bearing trees)
             if 'tree_lines' in data and isinstance(data['tree_lines'], list):
                 tree_line_vals = []
-                for tree_line in data['tree_lines']:
-                    if isinstance(tree_line, dict):
-                        # Support both tree_master_id (integer) and tree_name (string) for tree selection
-                        tree_master_id = None
-                        if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
-                            tree_master_id = tree_line['tree_master_id']
-                        elif 'tree_name' in tree_line and tree_line['tree_name']:
-                            # Look up tree by name
-                            tree_master = request.env['bhu.tree.master'].sudo().search([
-                                ('name', '=', tree_line['tree_name'])
-                            ], limit=1)
-                            if tree_master:
-                                tree_master_id = tree_master.id
-                            else:
-                                return Response(
-                                    json.dumps({
-                                        'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
-                        else:
-                            return Response(
-                                json.dumps({
-                                    'error': 'Either tree_master_id or tree_name must be provided for each tree line'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Get tree master to determine tree_type
-                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
-                        if not tree_master.exists():
-                            return Response(
-                                json.dumps({
-                                    'error': f'Tree master with ID {tree_master_id} not found'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Get tree_type from tree_master or from request
-                        tree_type = tree_line.get('tree_type') or tree_master.tree_type
-                        if not tree_type:
-                            return Response(
-                                json.dumps({
-                                    'error': 'tree_type must be provided or tree_master must have a tree_type'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Validate tree_type matches tree_master
-                        if tree_master.tree_type != tree_type:
-                            return Response(
-                                json.dumps({
-                                    'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Prepare tree line values
-                        tree_line_data = {
-                            'tree_master_id': tree_master_id,
-                            'tree_type': tree_type,
-                            'quantity': tree_line.get('quantity', 1)
-                        }
-                        
-                        # Handle development_stage - required for all tree types
-                        development_stage = tree_line.get('development_stage')
-                        if not development_stage:
-                            return Response(
-                                json.dumps({
-                                    'error': 'development_stage is required for all trees'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Validate development_stage
-                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
-                            return Response(
-                                json.dumps({
-                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        tree_line_data['development_stage'] = development_stage
-                        
-                        # For non-fruit-bearing trees, handle girth_cm
-                        if tree_type == 'non_fruit_bearing':
-                            # Handle girth_cm for non-fruit-bearing trees
-                            girth_cm = tree_line.get('girth_cm')
-                            # girth_cm is optional - if provided, it must be > 0
-                            # Check if girth_cm is explicitly provided (not None and not empty string)
-                            if girth_cm is not None and girth_cm != '':
-                                try:
-                                    girth_cm_float = float(girth_cm)
-                                    if girth_cm_float <= 0:
-                                        return Response(
-                                            json.dumps({
-                                                'error': 'girth_cm must be greater than 0 if provided'
-                                            }),
-                                            status=400,
-                                            content_type='application/json'
-                                        )
-                                    tree_line_data['girth_cm'] = girth_cm_float
-                                except (ValueError, TypeError):
+                
+                # If empty array is passed, delete all existing trees
+                if len(data['tree_lines']) == 0:
+                    survey.write({'tree_line_ids': [(5, 0, 0)]})  # Delete all trees
+                else:
+                    # Process tree lines
+                    for tree_line in data['tree_lines']:
+                        if isinstance(tree_line, dict):
+                            # Support both tree_master_id (integer) and tree_name (string) for tree selection
+                            tree_master_id = None
+                            if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
+                                tree_master_id = tree_line['tree_master_id']
+                            elif 'tree_name' in tree_line and tree_line['tree_name']:
+                                # Look up tree by name
+                                tree_master = request.env['bhu.tree.master'].sudo().search([
+                                    ('name', '=', tree_line['tree_name'])
+                                ], limit=1)
+                                if tree_master:
+                                    tree_master_id = tree_master.id
+                                else:
                                     return Response(
                                         json.dumps({
-                                            'error': 'girth_cm must be a valid number if provided'
+                                            'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
                                         }),
                                         status=400,
                                         content_type='application/json'
                                     )
-                            # Don't set girth_cm if not provided - Odoo will use default/False
-                        
-                        tree_line_vals.append((0, 0, tree_line_data))
-                
-                # Replace all tree lines with new ones
-                if tree_line_vals:
-                    survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
+                            else:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'Either tree_master_id or tree_name must be provided for each tree line'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Get tree master to determine tree_type
+                            tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
+                            if not tree_master.exists():
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree master with ID {tree_master_id} not found'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Get tree_type from tree_master or from request
+                            tree_type = tree_line.get('tree_type') or tree_master.tree_type
+                            if not tree_type:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'tree_type must be provided or tree_master must have a tree_type'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Validate tree_type matches tree_master
+                            if tree_master.tree_type != tree_type:
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Prepare tree line values
+                            tree_line_data = {
+                                'tree_master_id': tree_master_id,
+                                'tree_type': tree_type,
+                                'quantity': tree_line.get('quantity', 1)
+                            }
+                            
+                            # Handle development_stage - required for all tree types
+                            development_stage = tree_line.get('development_stage')
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for all trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Validate development_stage
+                            if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            tree_line_data['development_stage'] = development_stage
+                            
+                            # For non-fruit-bearing trees, handle girth_cm
+                            if tree_type == 'non_fruit_bearing':
+                                # Handle girth_cm for non-fruit-bearing trees
+                                girth_cm = tree_line.get('girth_cm')
+                                # girth_cm is optional - if provided, it must be > 0
+                                # Check if girth_cm is explicitly provided (not None and not empty string)
+                                if girth_cm is not None and girth_cm != '':
+                                    try:
+                                        girth_cm_float = float(girth_cm)
+                                        if girth_cm_float <= 0:
+                                            return Response(
+                                                json.dumps({
+                                                    'error': 'girth_cm must be greater than 0 if provided'
+                                                }),
+                                                status=400,
+                                                content_type='application/json'
+                                            )
+                                        tree_line_data['girth_cm'] = girth_cm_float
+                                    except (ValueError, TypeError):
+                                        return Response(
+                                            json.dumps({
+                                                'error': 'girth_cm must be a valid number if provided'
+                                            }),
+                                            status=400,
+                                            content_type='application/json'
+                                        )
+                                # Don't set girth_cm if not provided - Odoo will use default/False
+                            
+                            tree_line_vals.append((0, 0, tree_line_data))
+                    
+                    # Replace all tree lines with new ones
+                    if tree_line_vals:
+                        survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
             
             # Handle photos (if provided - adds new photos, doesn't replace existing)
             if 'photos' in data and isinstance(data['photos'], list):

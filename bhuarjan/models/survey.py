@@ -693,7 +693,7 @@ class SurveyTreeLine(models.Model):
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
     ], string='Development Stage / विकास स्तर', default='undeveloped',
-       help='Development stage of the tree. Optional for all tree types.')
+       help='Development stage of the tree. Optional for all tree types.')       
     girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2),
                             help='Tree trunk girth (circumference) in centimeters. Optional for non-fruit-bearing trees.')
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1,

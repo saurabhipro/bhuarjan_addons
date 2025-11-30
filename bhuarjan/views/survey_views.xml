@@ -141,8 +141,16 @@
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
                             <group string="Trees / वृक्ष">
                                 <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1" 
-                                       context="{'default_development_stage': 'undeveloped'}"
-                                       view_ref="view_bhu_survey_tree_line_unified"/>
+                                       context="{'default_development_stage': 'undeveloped'}">
+                                        <list string="Trees / वृक्ष" editable="bottom">
+                                            <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
+                                            <field name="tree_type" string="Tree Type / वृक्ष प्रकार" width="200" readonly="1"/>
+                                            <field name="development_stage" string="Development Stage / विकास स्तर" width="200"/>
+                                            <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="150" 
+                                                invisible="tree_type == 'fruit_bearing'"/>
+                                            <field name="quantity" required="1" string="Quantity / मात्रा" width="200"/>
+                                        </list>
+                                </field>
                             </group>
                         </page>
                         

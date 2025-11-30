@@ -33,5 +33,16 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
         </record>
+        
+        <!-- Allow users to read action window records (needed for dashboard and menu items) -->
+        <record id="access_ir_actions_act_window_user" model="ir.model.access">
+            <field name="name">ir.actions.act_window.user.access</field>
+            <field name="model_id" ref="base.model_ir_actions_act_window"/>
+            <field name="group_id" ref="base.group_user"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
     </data>
 </odoo>

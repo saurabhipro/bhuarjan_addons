@@ -21,6 +21,12 @@
     <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector"/>
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector"/>
     <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="menu_bhu_master" sequence="15" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector"/>
+    <menuitem id="menu_app_version"
+                  name="App Versions"
+                  parent="menu_bhu_master"
+                  action="action_app_version"
+                  sequence="16"
+                  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
     <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     

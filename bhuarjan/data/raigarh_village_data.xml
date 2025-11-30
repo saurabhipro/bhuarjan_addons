@@ -6,7 +6,6 @@
             <field name="name">जुर्दा</field>
             <field name="district_id" ref="district_raigarh"/>
             <field name="sub_division_id" ref="raigarh_sub_division"/>
-            <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
             <field name="village_code">JR</field>
@@ -17,7 +16,6 @@
             <field name="name">पंडरीपानी</field>
             <field name="district_id" ref="district_raigarh"/>
             <field name="sub_division_id" ref="raigarh_sub_division"/>
-            <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
             <field name="village_code">PP</field>
@@ -28,7 +26,6 @@
             <field name="name">गोपालपुर</field>
             <field name="district_id" ref="district_raigarh"/>
             <field name="sub_division_id" ref="raigarh_sub_division"/>
-            <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
             <field name="village_code">GL</field>
@@ -39,7 +36,6 @@
             <field name="name">भिखारीमल</field>
             <field name="district_id" ref="district_raigarh"/>
             <field name="sub_division_id" ref="raigarh_sub_division"/>
-            <field name="circle_id" ref="muahapali_circle"/>
             <field name="tehsil_id" ref="raigarh_tehsil"/>
             <field name="state_id" ref="base.state_in_cg"/>
             <field name="village_code">BM</field>

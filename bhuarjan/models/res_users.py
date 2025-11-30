@@ -34,7 +34,6 @@ class ResUsers(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला')
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
-    circle_ids = fields.Many2many('bhu.circle', string='Circle / circle')
     village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),

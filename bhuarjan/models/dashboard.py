@@ -12,7 +12,6 @@ class BhuarjanDashboard(models.TransientModel):
     total_districts = fields.Integer(string='Total Districts', readonly=True, default=0)
     total_sub_divisions = fields.Integer(string='Total Sub Divisions', readonly=True, default=0)
     total_tehsils = fields.Integer(string='Total Tehsils', readonly=True, default=0)
-    total_circles = fields.Integer(string='Total Circles', readonly=True, default=0)
     total_villages = fields.Integer(string='Total Villages', readonly=True, default=0)
     total_projects = fields.Integer(string='Total Projects', readonly=True, default=0)
     total_departments = fields.Integer(string='Total Departments', readonly=True, default=0)
@@ -80,7 +79,6 @@ class BhuarjanDashboard(models.TransientModel):
             record.total_districts = self.env['bhu.district'].search_count([])
             record.total_sub_divisions = self.env['bhu.sub.division'].search_count([])
             record.total_tehsils = self.env['bhu.tehsil'].search_count([])
-            record.total_circles = self.env['bhu.circle'].search_count([])
             record.total_villages = self.env['bhu.village'].search_count([])
             record.total_projects = self.env['bhu.project'].search_count([])
             record.total_departments = self.env['bhu.department'].search_count([])
@@ -186,7 +184,6 @@ class BhuarjanDashboard(models.TransientModel):
             'total_districts': self.env['bhu.district'].search_count([]),
             'total_sub_divisions': self.env['bhu.sub.division'].search_count([]),
             'total_tehsils': self.env['bhu.tehsil'].search_count([]),
-            'total_circles': self.env['bhu.circle'].search_count([]),
             'total_villages': self.env['bhu.village'].search_count([]),
             'total_projects': self.env['bhu.project'].search_count([]),
             'total_departments': self.env['bhu.department'].search_count([]),
@@ -317,9 +314,6 @@ class BhuarjanDashboard(models.TransientModel):
     
     def action_open_tehsils(self):
         return self.env.ref('bhuarjan.action_bhu_tehsil').read()[0]
-    
-    def action_open_circles(self):
-        return self.env.ref('bhuarjan.action_bhu_circle').read()[0]
     
     def action_open_villages(self):
         return self.env.ref('bhuarjan.action_bhu_village').read()[0]

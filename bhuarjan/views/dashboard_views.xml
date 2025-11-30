@@ -45,13 +45,6 @@
                             </div>
                             <div class="kpi-value"><field name="total_tehsils" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_circles" type="object" class="dashboard-kpi-card kpi-card-brown">
-                            <div class="kpi-header">
-                                <div class="kpi-label">Circles</div>
-                                <div class="kpi-icon"><i class="fa fa-circle-o" title="Circles"/></div>
-                            </div>
-                            <div class="kpi-value"><field name="total_circles" nolabel="1" readonly="1"/></div>
-                        </button>
                         <button name="action_open_villages" type="object" class="dashboard-kpi-card kpi-card-pink">
                             <div class="kpi-header">
                                 <div class="kpi-label">Villages</div>

@@ -20,7 +20,6 @@ class OrgChartController(http.Controller):
                 'avatar': u.avatar_128.decode('utf-8') if u.avatar_128 else None,
                 'subordinates_count': len(u.child_ids),
                 'villages': [v.name for v in u.village_ids] if u.village_ids else [],
-                'circles': [c.name for c in u.circle_ids] if u.circle_ids else [],
                 'tehsils': [t.name for t in u.tehsil_ids] if u.tehsil_ids else [],
                 'sub_divisions': [s.name for s in u.sub_division_ids] if u.sub_division_ids else [],
             })

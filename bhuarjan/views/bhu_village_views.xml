@@ -12,7 +12,6 @@
                 <field name="district_id" string="District"/>
                 <field name="sub_division_id" string="Sub Division"/>
                 <field name="tehsil_id" string="Tehsil"/>
-                <field name="circle_id" string="Circle"/>
                 <field name="pincode" string="Pincode"/>
                 <field name="population" string="Population"/>
                 <field name="is_tribal_area" string="Tribal Area"/>
@@ -42,7 +41,6 @@
                             <field name="district_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="tehsil_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="circle_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="village_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link"/>
                             <field name="pincode"/>

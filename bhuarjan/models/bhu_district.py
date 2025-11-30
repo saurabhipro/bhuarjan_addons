@@ -15,7 +15,6 @@ class BhuDistrict(models.Model):
     # Related Records
     sub_division_ids = fields.One2many('bhu.sub.division', 'district_id', string='Sub Divisions / उपभाग')
     tehsil_ids = fields.One2many('bhu.tehsil', 'district_id', string='Tehsils / तहसील')
-    circle_ids = fields.One2many('bhu.circle', 'district_id', string='Circles / सर्कल')
     village_ids = fields.One2many('bhu.village', 'district_id', string='Villages / ग्राम')
     
     # Computed Fields

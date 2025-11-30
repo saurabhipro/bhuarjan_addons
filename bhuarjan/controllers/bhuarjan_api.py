@@ -326,14 +326,6 @@ class BhuarjanAPIController(http.Controller):
                         'name': sub_div.name,
                     })
 
-                # Get circle IDs and names
-                circles_data = []
-                for circle in user.circle_ids:
-                    circles_data.append({
-                        'id': circle.id,
-                        'name': circle.name,
-                    })
-
                 users_data.append({
                     'id': user.id,
                     'name': user.name,
@@ -350,7 +342,6 @@ class BhuarjanAPIController(http.Controller):
                     'villages': villages_data,
                     'tehsils': tehsils_data,
                     'sub_divisions': sub_divisions_data,
-                    'circles': circles_data,
                     'active': user.active,
                 })
 

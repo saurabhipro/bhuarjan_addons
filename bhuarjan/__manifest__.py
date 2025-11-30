@@ -21,7 +21,6 @@
         # 'data/raigarh_sub_division_data.xml',
         # 'data/raipur_sub_division_data.xml',
         'data/tehsil_data.xml',
-        'data/raigarh_circle_data.xml',
         # Village data - commented out to prevent import
         # 'data/raigarh_village_data.xml',
         'data/department_data.xml',
@@ -49,7 +48,6 @@
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',
-        'views/bhu_circle_views.xml',
         'views/bhu_village_views.xml',
         'views/res_users_views.xml',
         'views/project_views.xml',

@@ -44,84 +44,222 @@ class BhuarjanAPIController(http.Controller):
     @check_permission
     def get_user_projects(self, **kwargs):
         """
-        Get projects and villages mapped to a specific user
-        Query params: user_id (optional - if not provided, returns all projects and villages)
-        Returns: JSON with projects and their associated villages (filtered by user if user_id provided)
+        Get departments, projects, and villages mapped to a specific user
+        Structure: Departments -> Projects -> Villages (only user's villages)
+        Query params: user_id (required)
+        Returns: JSON with departments, their projects, and villages (filtered by user's villages)
         """
         try:
             # Get query parameters
             user_id = request.httprequest.args.get('user_id', type=int)
 
-            # Get user's villages if user_id is provided
-            user_village_ids = []
-            user_info = None
-            if user_id:
-                user = request.env['res.users'].sudo().browse(user_id)
-                if not user.exists():
-                    return Response(
-                        json.dumps({'error': f'User with ID {user_id} not found'}),
-                        status=404,
-                        content_type='application/json'
-                    )
-                user_village_ids = user.village_ids.ids if user.village_ids else []
-                user_info = {
-                    'id': user.id,
-                    'name': user.name,
-                    'login': user.login,
-                    'bhuarjan_role': user.bhuarjan_role or '',
+            if not user_id:
+                return Response(
+                    json.dumps({'error': 'user_id is required'}),
+                    status=400,
+                    content_type='application/json'
+                )
+
+            # Get user and their villages
+            user = request.env['res.users'].sudo().browse(user_id)
+            if not user.exists():
+                return Response(
+                    json.dumps({'error': f'User with ID {user_id} not found'}),
+                    status=404,
+                    content_type='application/json'
+                )
+
+            user_village_ids = user.village_ids.ids if user.village_ids else []
+            user_info = {
+                'id': user.id,
+                'name': user.name,
+                'login': user.login,
+                'bhuarjan_role': user.bhuarjan_role or '',
+            }
+
+            # Debug logging
+            _logger.info(f"get_user_projects: User {user_id} has {len(user_village_ids)} villages: {user_village_ids}")
+
+            # If user has no villages, return empty structure
+            if not user_village_ids:
+                _logger.warning(f"get_user_projects: User {user_id} has no villages assigned")
+                response_data = {
+                    'success': True,
+                    'data': [],
+                    'user': user_info
+                }
+                return Response(
+                    json.dumps(response_data),
+                    status=200,
+                    content_type='application/json'
+                )
+
+            # Start from user's villages and build the hierarchy: Village -> Project -> Department
+            # Structure: Department -> Projects -> Villages
+            
+            # Get all projects to search through
+            all_projects = request.env['bhu.project'].sudo().search([])
+            
+            # Map: village_id -> list of projects that contain it
+            village_project_map = {}  # {village_id: [project1, project2, ...]}
+            
+            # Map: project_id -> set of departments
+            project_department_map = {}  # {project_id: [dept1, dept2, ...]}
+            
+            # For each user village, find projects that contain it
+            for village_id in user_village_ids:
+                village = request.env['bhu.village'].sudo().browse(village_id)
+                if not village.exists():
+                    _logger.warning(f"get_user_projects: Village {village_id} does not exist")
+                    continue
+                
+                # Find projects that contain this village
+                projects_for_village = all_projects.filtered(
+                    lambda p: village_id in p.village_ids.ids
+                )
+                
+                village_project_map[village_id] = projects_for_village
+                _logger.info(f"get_user_projects: Village {village_id} ({village.name}) is in {len(projects_for_village)} projects: {projects_for_village.ids}")
+                
+                # For each project, get its departments
+                for project in projects_for_village:
+                    if project.id not in project_department_map:
+                        # Get departments linked to this project
+                        departments = request.env['bhu.department'].sudo().search([
+                            ('project_ids', 'in', project.id)
+                        ])
+                        project_department_map[project.id] = departments.ids
+                        _logger.info(f"get_user_projects: Project {project.id} ({project.name}) has {len(departments)} departments: {departments.ids}")
+            
+            # If no projects found for any village
+            all_found_projects = set()
+            for projects in village_project_map.values():
+                all_found_projects.update(projects.ids)
+            
+            if not all_found_projects:
+                _logger.warning(f"get_user_projects: No projects found for any of user's villages. User villages: {user_village_ids}")
+                response_data = {
+                    'success': True,
+                    'data': [],
+                    'user': user_info,
+                    'debug': {
+                        'user_village_ids': user_village_ids,
+                        'message': 'No projects found containing user\'s villages. Please ensure villages are mapped to projects.'
+                    }
+                }
+                return Response(
+                    json.dumps(response_data),
+                    status=200,
+                    content_type='application/json'
+                )
+            
+            # Build department -> projects -> villages structure
+            departments_dict = {}  # department_id -> department data with projects
+            projects_without_dept = {}  # project_id -> project data (for projects without departments)
+            
+            # Get all unique departments
+            all_department_ids = set()
+            for dept_ids in project_department_map.values():
+                all_department_ids.update(dept_ids)
+            
+            # Initialize department entries
+            for dept_id in all_department_ids:
+                dept = request.env['bhu.department'].sudo().browse(dept_id)
+                if dept.exists():
+                    departments_dict[dept_id] = {
+                        'id': dept.id,
+                        'name': dept.name,
+                        'code': dept.code or '',
+                        'projects': {}
+                    }
+            
+            # Build the structure: for each village, add it to its projects, and projects to departments
+            for village_id in user_village_ids:
+                village = request.env['bhu.village'].sudo().browse(village_id)
+                if not village.exists():
+                    continue
+                
+                # Build village data
+                village_data = {
+                    'id': village.id,
+                    'name': village.name,
+                    'village_code': village.village_code or '',
+                    'village_uuid': village.village_uuid or '',
+                    'district_id': village.district_id.id if village.district_id else None,
+                    'district_name': village.district_id.name if village.district_id else '',
+                    'tehsil_id': village.tehsil_id.id if village.tehsil_id else None,
+                    'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
+                    'pincode': village.pincode or '',
+                }
+                
+                # Get projects for this village
+                projects_for_village = village_project_map.get(village_id, [])
+                
+                for project in projects_for_village:
+                    # Get departments for this project
+                    dept_ids = project_department_map.get(project.id, [])
+                    
+                    if dept_ids:
+                        # Add to departments
+                        for dept_id in dept_ids:
+                            if dept_id in departments_dict:
+                                # Initialize project in department if not exists
+                                if project.id not in departments_dict[dept_id]['projects']:
+                                    departments_dict[dept_id]['projects'][project.id] = {
+                                        'id': project.id,
+                                        'name': project.name,
+                                        'code': project.code or '',
+                                        'project_uuid': project.project_uuid or '',
+                                        'description': project.description or '',
+                                        'state': project.state,
+                                        'villages': []
+                                    }
+                                # Add village to project
+                                departments_dict[dept_id]['projects'][project.id]['villages'].append(village_data)
+                    else:
+                        # Project has no departments - add to "No Department" list
+                        if project.id not in projects_without_dept:
+                            projects_without_dept[project.id] = {
+                                'id': project.id,
+                                'name': project.name,
+                                'code': project.code or '',
+                                'project_uuid': project.project_uuid or '',
+                                'description': project.description or '',
+                                'state': project.state,
+                                'villages': []
+                            }
+                        projects_without_dept[project.id]['villages'].append(village_data)
+            
+            # Convert projects dict to list in each department
+            for dept_id in departments_dict:
+                departments_dict[dept_id]['projects'] = list(departments_dict[dept_id]['projects'].values())
+            
+            # Add "No Department" entry if needed
+            if projects_without_dept:
+                departments_dict[0] = {
+                    'id': 0,
+                    'name': 'No Department / कोई विभाग नहीं',
+                    'code': 'NO_DEPT',
+                    'projects': list(projects_without_dept.values())
                 }
 
-            # Always get all projects - show all villages for each project
-            projects = request.env['bhu.project'].sudo().search([])
+            # Convert to list and sort by department name (put "No Department" at the end)
+            result = sorted(
+                departments_dict.values(), 
+                key=lambda x: (x['id'] == 0, x['name'])  # No Department (id=0) goes last
+            )
 
-            result = []
-            for project in projects:
-                # Get all departments linked to project
-                departments = request.env['bhu.department'].sudo().search([
-                    ('project_ids', 'in', project.id)
-                ])
-
-                # List of department dicts
-                departments_data = [
-                    {'id': d.id, 'name': d.name}
-                    for d in departments
-                ]
-
-                # All villages for this project
-                villages = []
-                for village in project.village_ids:
-                    villages.append({
-                        'id': village.id,
-                        'name': village.name,
-                        'village_code': village.village_code or '',
-                        'village_uuid': village.village_uuid or '',
-                        'district_id': village.district_id.id if village.district_id else None,
-                        'district_name': village.district_id.name if village.district_id else '',
-                        'tehsil_id': village.tehsil_id.id if village.tehsil_id else None,
-                        'tehsil_name': village.tehsil_id.name if village.tehsil_id else '',
-                        'pincode': village.pincode or '',
-                    })
-                result.append({
-                    'id': project.id,
-                    'name': project.name,
-                    'code': project.code or '',
-                    'project_uuid': project.project_uuid or '',
-                    'description': project.description or '',
-                    'state': project.state,
-                    'project_id': project.id,
-                    'project_name': project.name,
-                    'departments': departments_data,
-                    'villages': villages,
-                })
+            # Sort projects within each department by name
+            for dept in result:
+                dept['projects'].sort(key=lambda x: x['name'])
+            
+            _logger.info(f"get_user_projects: Returning {len(result)} departments with projects")
 
             response_data = {
                 'success': True,
-                'data': result
+                'data': result,
+                'user': user_info
             }
-            
-            # Include user info if user_id was provided
-            if user_info:
-                response_data['user'] = user_info
 
             return Response(
                 json.dumps(response_data),
@@ -993,7 +1131,9 @@ class BhuarjanAPIController(http.Controller):
                 'has_shed': data.get('has_shed', 'no'),
                 'shed_area': data.get('shed_area', 0.0),
                 'has_well': data.get('has_well', 'no'),
+                'well_count': data.get('well_count', 1) if data.get('has_well') == 'yes' else 0,
                 'has_tubewell': data.get('has_tubewell', 'no'),
+                'tubewell_count': data.get('tubewell_count', 1) if data.get('has_tubewell') == 'yes' else 0,
                 'has_pond': data.get('has_pond', 'no'),
                 'latitude': data.get('latitude'),
                 'longitude': data.get('longitude'),
@@ -1429,7 +1569,9 @@ class BhuarjanAPIController(http.Controller):
                 'shed_area': survey.shed_area,
                 'has_well': survey.has_well,
                 'well_type': survey.well_type,
+                'well_count': survey.well_count or 0,
                 'has_tubewell': survey.has_tubewell,
+                'tubewell_count': survey.tubewell_count or 0,
                 'has_pond': survey.has_pond,
                 'latitude': survey.latitude,
                 'longitude': survey.longitude,
@@ -2513,7 +2655,7 @@ class BhuarjanAPIController(http.Controller):
                 'khasra_number', 'total_area', 'acquired_area', 'has_traded_land', 'traded_land_area',
                 'crop_type_id', 'irrigation_type',
                 'has_house', 'house_type', 'house_area', 'has_shed', 'shed_area',
-                'has_well', 'well_type', 'has_tubewell', 'has_pond',
+                'has_well', 'well_type', 'well_count', 'has_tubewell', 'tubewell_count', 'has_pond',
                 'landowner_ids', 'survey_image', 'survey_image_filename',
                 'remarks', 'state', 'submitted_date'
             ]
@@ -2612,6 +2754,23 @@ class BhuarjanAPIController(http.Controller):
                         update_vals[field] = value
                 else:
                     _logger.warning(f"Field '{field}' is not allowed to be updated via API")
+            
+            # Handle well_count and tubewell_count based on has_well and has_tubewell
+            # If has_well is being set to 'no', reset well_count to 0
+            if 'has_well' in update_vals:
+                if update_vals['has_well'] == 'no':
+                    update_vals['well_count'] = 0
+                elif update_vals['has_well'] == 'yes' and 'well_count' not in update_vals:
+                    # If well is set to yes but count not provided, default to 1
+                    update_vals['well_count'] = 1
+            
+            # If has_tubewell is being set to 'no', reset tubewell_count to 0
+            if 'has_tubewell' in update_vals:
+                if update_vals['has_tubewell'] == 'no':
+                    update_vals['tubewell_count'] = 0
+                elif update_vals['has_tubewell'] == 'yes' and 'tubewell_count' not in update_vals:
+                    # If tubewell is set to yes but count not provided, default to 1
+                    update_vals['tubewell_count'] = 1
 
             if not update_vals:
                 return Response(
@@ -2626,130 +2785,136 @@ class BhuarjanAPIController(http.Controller):
             # Handle tree lines (if provided - new format: supports fruit-bearing and non-fruit-bearing trees)
             if 'tree_lines' in data and isinstance(data['tree_lines'], list):
                 tree_line_vals = []
-                for tree_line in data['tree_lines']:
-                    if isinstance(tree_line, dict):
-                        # Support both tree_master_id (integer) and tree_name (string) for tree selection
-                        tree_master_id = None
-                        if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
-                            tree_master_id = tree_line['tree_master_id']
-                        elif 'tree_name' in tree_line and tree_line['tree_name']:
-                            # Look up tree by name
-                            tree_master = request.env['bhu.tree.master'].sudo().search([
-                                ('name', '=', tree_line['tree_name'])
-                            ], limit=1)
-                            if tree_master:
-                                tree_master_id = tree_master.id
-                            else:
-                                return Response(
-                                    json.dumps({
-                                        'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
-                                    }),
-                                    status=400,
-                                    content_type='application/json'
-                                )
-                        else:
-                            return Response(
-                                json.dumps({
-                                    'error': 'Either tree_master_id or tree_name must be provided for each tree line'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Get tree master to determine tree_type
-                        tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
-                        if not tree_master.exists():
-                            return Response(
-                                json.dumps({
-                                    'error': f'Tree master with ID {tree_master_id} not found'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Get tree_type from tree_master or from request
-                        tree_type = tree_line.get('tree_type') or tree_master.tree_type
-                        if not tree_type:
-                            return Response(
-                                json.dumps({
-                                    'error': 'tree_type must be provided or tree_master must have a tree_type'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Validate tree_type matches tree_master
-                        if tree_master.tree_type != tree_type:
-                            return Response(
-                                json.dumps({
-                                    'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Prepare tree line values
-                        tree_line_data = {
-                            'tree_master_id': tree_master_id,
-                            'tree_type': tree_type,
-                            'quantity': tree_line.get('quantity', 1)
-                        }
-                        
-                        # Handle development_stage - required for all tree types
-                        development_stage = tree_line.get('development_stage')
-                        if not development_stage:
-                            return Response(
-                                json.dumps({
-                                    'error': 'development_stage is required for all trees'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        
-                        # Validate development_stage
-                        if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
-                            return Response(
-                                json.dumps({
-                                    'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
-                                }),
-                                status=400,
-                                content_type='application/json'
-                            )
-                        tree_line_data['development_stage'] = development_stage
-                        
-                        # For non-fruit-bearing trees, handle girth_cm
-                        if tree_type == 'non_fruit_bearing':
-                            # Handle girth_cm for non-fruit-bearing trees
-                            girth_cm = tree_line.get('girth_cm')
-                            # girth_cm is optional - if provided, it must be > 0
-                            # Check if girth_cm is explicitly provided (not None and not empty string)
-                            if girth_cm is not None and girth_cm != '':
-                                try:
-                                    girth_cm_float = float(girth_cm)
-                                    if girth_cm_float <= 0:
-                                        return Response(
-                                            json.dumps({
-                                                'error': 'girth_cm must be greater than 0 if provided'
-                                            }),
-                                            status=400,
-                                            content_type='application/json'
-                                        )
-                                    tree_line_data['girth_cm'] = girth_cm_float
-                                except (ValueError, TypeError):
+                
+                # If empty array is passed, delete all existing trees
+                if len(data['tree_lines']) == 0:
+                    survey.write({'tree_line_ids': [(5, 0, 0)]})  # Delete all trees
+                else:
+                    # Process tree lines
+                    for tree_line in data['tree_lines']:
+                        if isinstance(tree_line, dict):
+                            # Support both tree_master_id (integer) and tree_name (string) for tree selection
+                            tree_master_id = None
+                            if 'tree_master_id' in tree_line and tree_line['tree_master_id']:
+                                tree_master_id = tree_line['tree_master_id']
+                            elif 'tree_name' in tree_line and tree_line['tree_name']:
+                                # Look up tree by name
+                                tree_master = request.env['bhu.tree.master'].sudo().search([
+                                    ('name', '=', tree_line['tree_name'])
+                                ], limit=1)
+                                if tree_master:
+                                    tree_master_id = tree_master.id
+                                else:
                                     return Response(
                                         json.dumps({
-                                            'error': 'girth_cm must be a valid number if provided'
+                                            'error': f'Tree with name "{tree_line["tree_name"]}" not found in tree master'
                                         }),
                                         status=400,
                                         content_type='application/json'
                                     )
-                            # Don't set girth_cm if not provided - Odoo will use default/False
-                        
-                        tree_line_vals.append((0, 0, tree_line_data))
-                
-                # Replace all tree lines with new ones
-                if tree_line_vals:
-                    survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
+                            else:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'Either tree_master_id or tree_name must be provided for each tree line'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Get tree master to determine tree_type
+                            tree_master = request.env['bhu.tree.master'].sudo().browse(tree_master_id)
+                            if not tree_master.exists():
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree master with ID {tree_master_id} not found'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Get tree_type from tree_master or from request
+                            tree_type = tree_line.get('tree_type') or tree_master.tree_type
+                            if not tree_type:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'tree_type must be provided or tree_master must have a tree_type'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Validate tree_type matches tree_master
+                            if tree_master.tree_type != tree_type:
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Tree type mismatch: tree_master "{tree_master.name}" is {tree_master.tree_type}, but provided tree_type is {tree_type}'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Prepare tree line values
+                            tree_line_data = {
+                                'tree_master_id': tree_master_id,
+                                'tree_type': tree_type,
+                                'quantity': tree_line.get('quantity', 1)
+                            }
+                            
+                            # Handle development_stage - required for all tree types
+                            development_stage = tree_line.get('development_stage')
+                            if not development_stage:
+                                return Response(
+                                    json.dumps({
+                                        'error': 'development_stage is required for all trees'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            
+                            # Validate development_stage
+                            if development_stage not in ('undeveloped', 'semi_developed', 'fully_developed'):
+                                return Response(
+                                    json.dumps({
+                                        'error': f'Invalid development_stage: {development_stage}. Must be one of: undeveloped, semi_developed, fully_developed'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                            tree_line_data['development_stage'] = development_stage
+                            
+                            # For non-fruit-bearing trees, handle girth_cm
+                            if tree_type == 'non_fruit_bearing':
+                                # Handle girth_cm for non-fruit-bearing trees
+                                girth_cm = tree_line.get('girth_cm')
+                                # girth_cm is optional - if provided, it must be > 0
+                                # Check if girth_cm is explicitly provided (not None and not empty string)
+                                if girth_cm is not None and girth_cm != '':
+                                    try:
+                                        girth_cm_float = float(girth_cm)
+                                        if girth_cm_float <= 0:
+                                            return Response(
+                                                json.dumps({
+                                                    'error': 'girth_cm must be greater than 0 if provided'
+                                                }),
+                                                status=400,
+                                                content_type='application/json'
+                                            )
+                                        tree_line_data['girth_cm'] = girth_cm_float
+                                    except (ValueError, TypeError):
+                                        return Response(
+                                            json.dumps({
+                                                'error': 'girth_cm must be a valid number if provided'
+                                            }),
+                                            status=400,
+                                            content_type='application/json'
+                                        )
+                                # Don't set girth_cm if not provided - Odoo will use default/False
+                            
+                            tree_line_vals.append((0, 0, tree_line_data))
+                    
+                    # Replace all tree lines with new ones
+                    if tree_line_vals:
+                        survey.write({'tree_line_ids': [(5, 0, 0)] + tree_line_vals})
             
             # Handle photos (if provided - adds new photos, doesn't replace existing)
             if 'photos' in data and isinstance(data['photos'], list):

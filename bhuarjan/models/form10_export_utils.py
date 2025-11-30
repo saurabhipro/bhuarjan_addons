@@ -287,13 +287,16 @@ class Form10ExportUtils(models.AbstractModel):
                 counter += 1
             owner_str = "\n".join(owner_names) if owner_names else "नहीं"
             
-            # Well type
+            # Well type with count
             well_str = "नहीं"
             if survey.has_well == 'yes':
+                well_count = survey.well_count or 1
                 if survey.well_type == 'kachcha':
-                    well_str = "हाँ-कच्चा"
+                    well_str = f"हाँ-कच्चा ({well_count})" if well_count > 1 else "हाँ-कच्चा"
                 elif survey.well_type == 'pakka':
-                    well_str = "हाँ-पक्का"
+                    well_str = f"हाँ-पक्का ({well_count})" if well_count > 1 else "हाँ-पक्का"
+                else:
+                    well_str = f"हाँ ({well_count})" if well_count > 1 else "हाँ"
             
             # House type - check has_house first
             house_str = "नहीं"
@@ -352,7 +355,7 @@ class Form10ExportUtils(models.AbstractModel):
                 house_str,
                 f"{survey.shed_area} वर्गफुट" if (survey.has_shed == 'yes' and survey.shed_area) else "नहीं",
                 well_str,
-                "हाँ" if survey.has_tubewell == 'yes' else "नहीं",
+                f"हाँ ({survey.tubewell_count or 1})" if (survey.has_tubewell == 'yes' and (survey.tubewell_count or 1) > 1) else ("हाँ" if survey.has_tubewell == 'yes' else "नहीं"),
                 "हाँ" if survey.has_pond == 'yes' else "नहीं",
                 remarks_str
             ]

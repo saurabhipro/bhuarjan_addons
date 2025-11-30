@@ -101,10 +101,12 @@ class Survey(models.Model):
         ('kaccha', 'कच्चा'),
         ('pakka', 'पक्का')
     ], string='Well Type / कुएं का प्रकार', default='kaccha', required=False, tracking=True)
+    well_count = fields.Integer(string='Well Count / कुओं की संख्या', default=1, tracking=True, help='Number of wells')
     has_tubewell = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),
     ], string='Has Tubewell/Submersible Pump / ट्यूबवेल/सम्बमर्शिबल पम्प', default='no', tracking=True)
+    tubewell_count = fields.Integer(string='Tubewell Count / ट्यूबवेल की संख्या', default=1, tracking=True, help='Number of tubewells/submersible pumps')
     has_pond = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),

@@ -104,7 +104,9 @@
                                 <group string="Infrastructure / बुनियादी सुविधाएं" class="survey-icon-infrastructure">
                                     <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                     <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
                                     <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
                                     <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">
@@ -326,12 +328,28 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
 
                                 <!-- Compact Footer -->
                                 <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                    <span t-attf-class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                        t-attf-style="#{record.state.raw_value == 'approved' and 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 2px solid #047857; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);' 
-                                        or record.state.raw_value == 'submitted' and 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;' 
-                                        or record.state.raw_value == 'draft' and 'background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;' 
-                                        or 'background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;'">
-
+                                    <!-- Approved - Green -->
+                                    <span t-if="record.state.raw_value == 'approved'" 
+                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                          style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: #ffffff !important; border: 2px solid #047857 !important; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;">
+                                        <field name="state"/>
+                                    </span>
+                                    <!-- Submitted - Yellow -->
+                                    <span t-if="record.state.raw_value == 'submitted'" 
+                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                          style="background: #fbbf24 !important; color: #78350f !important; border: 2px solid #f59e0b !important; box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3) !important;">
+                                        <field name="state"/>
+                                    </span>
+                                    <!-- Rejected - Red -->
+                                    <span t-if="record.state.raw_value == 'rejected'" 
+                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                          style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; color: #ffffff !important; border: 2px solid #b91c1c !important; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;">
+                                        <field name="state"/>
+                                    </span>
+                                    <!-- Draft - Blue -->
+                                    <span t-if="record.state.raw_value == 'draft'" 
+                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
+                                          style="background: #dbeafe !important; color: #1e40af !important; border: 1px solid #93c5fd !important;">
                                         <field name="state"/>
                                     </span>
                                     <div class="d-flex align-items-center text-muted">

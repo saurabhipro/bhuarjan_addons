@@ -83,7 +83,7 @@
                                                 <p style="margin: 3px 0;">
                                                     <span t-esc="counter"/>.
                                                     <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.email">, <span t-esc="member.email"/></t>
+                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
                                                 </p>
                                             </t>
                                         </t>
@@ -106,7 +106,7 @@
                                                 <p style="margin: 3px 0;">
                                                     <span t-esc="counter"/>.
                                                     <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.email">, <span t-esc="member.email"/></t>
+                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
                                                 </p>
                                             </t>
                                         </t>
@@ -129,7 +129,7 @@
                                                 <p style="margin: 3px 0;">
                                                     <span t-esc="counter"/>.
                                                     <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.email">, <span t-esc="member.email"/></t>
+                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
                                                 </p>
                                             </t>
                                         </t>
@@ -152,7 +152,7 @@
                                                 <p style="margin: 3px 0;">
                                                     <span t-esc="counter"/>.
                                                     <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.email">, <span t-esc="member.email"/></t>
+                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
                                                 </p>
                                             </t>
                                         </t>
@@ -171,7 +171,7 @@
                                         <t t-if="sia_team.tehsildar_id">
                                             <p style="margin: 3px 0;">
                                                 <span t-esc="sia_team.tehsildar_id.name or ''"/> (संयोजक)
-                                                <t t-if="sia_team.tehsildar_id.email">, <span t-esc="sia_team.tehsildar_id.email"/></t>
+                                                <t t-if="sia_team.tehsildar_id.department_id">, <span t-esc="sia_team.tehsildar_id.department_id.name"/></t>
                                             </p>
                                         </t>
                                         <t t-if="not sia_team.tehsildar_id">

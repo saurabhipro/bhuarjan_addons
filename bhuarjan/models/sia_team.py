@@ -29,41 +29,36 @@ class SiaTeam(models.Model):
     
     # SIA Team Members - 5 Sections
     # (क) Non-Government Social Scientist
-    non_govt_social_scientist_ids = fields.Many2many('res.users', 
+    non_govt_social_scientist_ids = fields.Many2many('bhu.sia.team.member', 
                                                      'sia_team_non_govt_social_scientist_rel',
-                                                     'sia_team_id', 'user_id',
+                                                     'sia_team_id', 'member_id',
                                                      string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
-                                                     domain="[('bhuarjan_role', '=', 'sia_team_member')]",
                                                      tracking=True)
     
     # (ख) Representatives of Local Bodies
-    local_bodies_representative_ids = fields.Many2many('res.users',
+    local_bodies_representative_ids = fields.Many2many('bhu.sia.team.member',
                                                        'sia_team_local_bodies_rep_rel',
-                                                       'sia_team_id', 'user_id',
+                                                       'sia_team_id', 'member_id',
                                                        string='Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि',
-                                                       domain="[('bhuarjan_role', '=', 'sia_team_member')]",
                                                        tracking=True)
     
     # (ग) Resettlement Expert
-    resettlement_expert_ids = fields.Many2many('res.users',
+    resettlement_expert_ids = fields.Many2many('bhu.sia.team.member',
                                                 'sia_team_resettlement_expert_rel',
-                                                'sia_team_id', 'user_id',
+                                                'sia_team_id', 'member_id',
                                                 string='Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ',
-                                                domain="[('bhuarjan_role', '=', 'sia_team_member')]",
                                                 tracking=True)
     
     # (घ) Technical Expert on Project Related Subject
-    technical_expert_ids = fields.Many2many('res.users',
+    technical_expert_ids = fields.Many2many('bhu.sia.team.member',
                                             'sia_team_technical_expert_rel',
-                                            'sia_team_id', 'user_id',
+                                            'sia_team_id', 'member_id',
                                             string='Technical Expert / तकनीकी विशेषज्ञ',
-                                            domain="[('bhuarjan_role', '=', 'sia_team_member')]",
                                             tracking=True)
     
     # (ड.) Tehsildar of Affected Area (Convener)
-    tehsildar_id = fields.Many2one('res.users',
+    tehsildar_id = fields.Many2one('bhu.sia.team.member',
                                    string='Tehsildar (Convener) / तहसीलदार (संयोजक)',
-                                   domain="[('bhuarjan_role', '=', 'sia_team_member')]",
                                    tracking=True,
                                    help='Tehsildar of the affected area who will be the convener')
     
@@ -74,7 +69,7 @@ class SiaTeam(models.Model):
     sia_report_filename = fields.Char(string='SIA Report Filename')
     
     # Legacy fields (kept for backward compatibility)
-    team_member_ids = fields.Many2many('res.users', string='Team Members / टीम सदस्य', 
+    team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
                                       compute='_compute_team_members', store=False)
     description = fields.Text(string='Description / विवरण', tracking=True)
     active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)

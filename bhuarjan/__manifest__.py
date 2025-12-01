@@ -1,6 +1,6 @@
 {
     'name' : 'Bhuarjan',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'summary': 'BhoomiArjan — Land Acquisition Management System.',
     'sequence':'-1',
     'description':'To digitize and streamline the end-to-end workflow for land acquisition under RFCTLARR Act, 2013, from Form-10 initiation to Section 19 declaration, ensuring transparency, traceability, and accountability at each level.',
@@ -57,6 +57,7 @@
         'views/survey_bulk_approval_wizard_views.xml',
         'views/document_vault_views.xml',
         'views/sia_team_views.xml',
+        'views/sia_team_member_views.xml',
         'views/section15_objection_views.xml',
         'views/process_stub_views.xml',
         'views/process_views.xml',

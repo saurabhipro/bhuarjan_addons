@@ -16,12 +16,19 @@ class Section4Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
-    name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
+    name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
+                                       help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    area_captured_from_form10 = fields.Float(string='Area Captured from Form 10 (Hectares) / फॉर्म 10 से कैप्चर किया गया क्षेत्रफल (हेक्टेयर)',
+                                             compute='_compute_area_captured', store=False, digits=(16, 4), readonly=True)
+    total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)',
+                              compute='_compute_area_captured', store=False, digits=(16, 4), readonly=True)
     
     _sql_constraints = [
         ('unique_village_project', 'UNIQUE(village_id, project_id)', 
@@ -52,8 +59,14 @@ class Section4Notification(models.Model):
     q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', tracking=True)
     q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', tracking=True)
     q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True)
-    q6_minimal_acquisition = fields.Char(string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', tracking=True)
-    q7_alternatives_considered = fields.Text(string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', tracking=True)
+    q6_minimal_acquisition = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='no', tracking=True)
+    q7_alternatives_considered = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='no', tracking=True)
     q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True)
     q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True)
     q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', tracking=True)
@@ -89,6 +102,31 @@ class Section4Notification(models.Model):
             self.state = 'signed'
             if not self.signed_date:
                 self.signed_date = fields.Date.today()
+    
+    @api.depends('village_id')
+    def _compute_tehsil(self):
+        """Compute tehsil from village"""
+        for record in self:
+            if record.village_id and record.village_id.tehsil_id:
+                record.tehsil_id = record.village_id.tehsil_id
+            else:
+                record.tehsil_id = False
+    
+    @api.depends('project_id', 'village_id')
+    def _compute_area_captured(self):
+        """Compute total area and area captured from Form 10 surveys"""
+        for record in self:
+            if record.project_id and record.village_id:
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id),
+                    ('state', 'in', ('approved', 'locked'))
+                ])
+                record.area_captured_from_form10 = sum(surveys.mapped('acquired_area'))
+                record.total_area = sum(surveys.mapped('total_area'))
+            else:
+                record.area_captured_from_form10 = 0.0
+                record.total_area = 0.0
     
     @api.depends('project_id', 'village_id')
     def _compute_survey_ids(self):
@@ -167,30 +205,24 @@ class Section4Notification(models.Model):
                     existing_records.append(existing)
                     continue
             
-            # Generate sequence number for both name and notification_seq_number
+            # Generate sequence number for notification_seq_number
             sequence_number = None
-            if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                # Try to use sequence settings from settings master
-                if project_id:
-                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'section4_notification', project_id, village_id=village_id
-                    )
-                    if sequence_number:
-                        vals['name'] = sequence_number
-                    else:
-                        # Fallback to ir.sequence
-                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
-                        sequence_number = vals['name']
-                else:
-                    # No project_id, use fallback
-                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
-                    sequence_number = vals['name']
+            # Try to use sequence settings from settings master
+            if project_id:
+                sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                    'section4_notification', project_id, village_id=village_id
+                )
+                if not sequence_number:
+                    # Fallback to ir.sequence
+                    sequence_number = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
             else:
-                # If name is provided, use it as sequence number
-                sequence_number = vals.get('name')
+                # No project_id, use fallback
+                sequence_number = self.env['ir.sequence'].next_by_code('bhu.section4.notification') or 'New'
             
-            # Auto-generate notification sequence number if not provided (use same as name)
-            if not vals.get('notification_seq_number') and sequence_number:
+            # Set name and notification_seq_number
+            if not vals.get('name'):
+                vals['name'] = sequence_number
+            if not vals.get('notification_seq_number'):
                 vals['notification_seq_number'] = sequence_number
             
             if not vals.get('notification_uuid'):
@@ -429,8 +461,14 @@ class Section4NotificationWizard(models.TransientModel):
     q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
     q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
     q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
-    q6_minimal_acquisition = fields.Char(string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?')
-    q7_alternatives_considered = fields.Text(string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?')
+    q6_minimal_acquisition = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='no')
+    q7_alternatives_considered = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='no')
     q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
     q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
     q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure')

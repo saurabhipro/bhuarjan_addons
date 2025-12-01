@@ -365,17 +365,20 @@
                         
                         <div class="question-item">
                             <div class="question-label">(छः) क्या प्रस्तावित अर्जन न्यूनतम है ?</div>
-                            <div class="question-answer"><t t-esc="wizard.q6_minimal_acquisition or '........................'"/></div>
+                            <div class="question-answer">
+                                <t t-if="wizard.q6_minimal_acquisition == 'yes'">हाँ / Yes</t>
+                                <t t-if="wizard.q6_minimal_acquisition == 'no'">नहीं / No</t>
+                                <t t-if="not wizard.q6_minimal_acquisition">........................</t>
+                            </div>
                         </div>
                         
                         <div class="question-item">
                             <div class="question-label">(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</div>
-                            <t t-if="wizard.q7_alternatives_considered">
-                                <div class="question-answer"><t t-raw="wizard.q7_alternatives_considered"/></div>
-                            </t>
-                            <t t-if="not wizard.q7_alternatives_considered">
-                                <div class="question-answer">........................</div>
-                            </t>
+                            <div class="question-answer">
+                                <t t-if="wizard.q7_alternatives_considered == 'yes'">हाँ / Yes</t>
+                                <t t-if="wizard.q7_alternatives_considered == 'no'">नहीं / No</t>
+                                <t t-if="not wizard.q7_alternatives_considered">........................</t>
+                            </div>
                         </div>
                         
                         <div class="question-item">

@@ -7,8 +7,11 @@
         <field name="arch" type="xml">
             <list string="Section 4 Notifications" delete="1">
                 <field name="notification_seq_number" string="Notification Sequence Number"/>
+                <field name="requiring_body_id"/>
                 <field name="project_id"/>
+                <field name="tehsil_id"/>
                 <field name="village_id"/>
+                <field name="area_captured_from_form10" string="Area from Form 10"/>
                 <field name="public_hearing_date"/>
                 <field name="state" widget="badge" decoration-success="state in ('signed', 'notification_11')" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
@@ -42,12 +45,18 @@
                 <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
                     <group>
                         <group>
-                            <field name="name" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
-                            <field name="project_id" required="1" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 
-                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="requiring_body_id" required="1" 
+                                   readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <field name="tehsil_id" readonly="1"/>
                             <field name="village_id" required="1" 
                                    options="{'no_create_edit': True}"
                                    readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <field name="area_captured_from_form10" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="project_id" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="total_area" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -117,13 +126,17 @@
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                                 <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है?">
-                                    <field name="q6_minimal_acquisition" nolabel="1"
+                                    <field name="q6_minimal_acquisition" widget="radio" nolabel="1"
+                                           options="{'horizontal': true}"
                                            readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                                 </group>
                             </group>
-                            <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है?">
-                                <field name="q7_alternatives_considered" widget="html" nolabel="1"
-                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <group>
+                                <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है?">
+                                    <field name="q7_alternatives_considered" widget="radio" nolabel="1"
+                                           options="{'horizontal': true}"
+                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                </group>
                             </group>
                             <group>
                                 <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
@@ -166,8 +179,10 @@
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
             <search string="Section 4 Notifications">
-                <field name="name"/>
+                <field name="notification_seq_number"/>
+                <field name="requiring_body_id"/>
                 <field name="project_id"/>
+                <field name="tehsil_id"/>
                 <field name="village_id"/>
                 <field name="public_hearing_date"/>
                 <field name="public_hearing_place"/>

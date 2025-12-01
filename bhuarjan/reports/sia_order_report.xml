@@ -40,7 +40,7 @@
                         </p>
                         <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
                             अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ द्वारा समाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव प्रस्तुत किया गया है। 
-                            यह प्रस्ताव <span t-esc="sia_team.requiring_body or ''"/> द्वारा <span t-esc="sia_team.project_id.name or ''"/> परियोजना के अंतर्गत 
+                            यह प्रस्ताव <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> द्वारा <span t-esc="sia_team.project_id.name or ''"/> परियोजना के अंतर्गत 
                             <t t-if="sia_team.project_id and sia_team.project_id.village_ids">
                                 <t t-foreach="sia_team.project_id.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>
@@ -224,7 +224,7 @@
                                 3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ (जानकारी हेतु एवं समिति द्वारा SIA रिपोर्ट प्रस्तुत करने हेतु आवश्यक कार्यवाही सुनिश्चित करने हेतु)।
                             </p>
                             <p style="margin: 3px 0; font-size: 14px;">
-                                4. <span t-esc="sia_team.requiring_body or ''"/> (जानकारी एवं आवश्यक कार्यवाही हेतु)।
+                                4. <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> (जानकारी एवं आवश्यक कार्यवाही हेतु)।
                             </p>
                             <p style="margin: 3px 0; font-size: 14px;">
                                 5. समिति के सभी संबंधित अधिकारी (जानकारी एवं आवश्यक कार्यवाही हेतु)।

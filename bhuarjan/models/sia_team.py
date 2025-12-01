@@ -13,9 +13,9 @@ class SiaTeam(models.Model):
     name = fields.Char(string='Team Name / टीम का नाम', compute='_compute_name', store=True, readonly=True)
     
     # New fields
-    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=True, tracking=True)
-    requiring_body = fields.Char(string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
-                                help='Name of the requiring body/department')
+    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=False, tracking=True)
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
+                                       help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
     
@@ -63,22 +63,48 @@ class SiaTeam(models.Model):
                                    help='Tehsildar of the affected area who will be the convener')
     
     # Documents
-    sia_order_file = fields.Binary(string='SIA Order File / SIA आदेश फ़ाइल')
-    sia_order_filename = fields.Char(string='SIA Order Filename')
-    sia_report_file = fields.Binary(string='SIA Report File / SIA रिपोर्ट फ़ाइल')
-    sia_report_filename = fields.Char(string='SIA Report Filename')
+    sia_file = fields.Binary(string='SIA File / SIA फ़ाइल')
+    sia_filename = fields.Char(string='SIA Filename')
     
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
                                       compute='_compute_team_members', store=False)
     description = fields.Text(string='Description / विवरण', tracking=True)
-    active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
     
-    @api.depends('project_id', 'sub_division_id')
-    def _compute_name(self):
-        """Generate team name from project and subdivision"""
+    # Computed fields from Form 10 surveys
+    total_khasras_count = fields.Integer(string='Total Khasras Count / कुल खसरा संख्या',
+                                         compute='_compute_project_statistics', store=False)
+    total_area_acquired = fields.Float(string='Total Area Acquired (Hectares) / कुल अर्जित क्षेत्रफल (हेक्टेयर)',
+                                       compute='_compute_project_statistics', store=False,
+                                       digits=(16, 4))
+    
+    @api.depends('project_id', 'project_id.village_ids')
+    def _compute_project_statistics(self):
+        """Compute total khasras count and total area acquired from Form 10 surveys"""
         for record in self:
-            if record.project_id and record.sub_division_id:
+            if record.project_id and record.project_id.village_ids:
+                # Get all surveys for villages in this project
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', 'in', record.project_id.village_ids.ids),
+                    ('khasra_number', '!=', False),
+                ])
+                
+                # Count unique khasra numbers
+                unique_khasras = set(surveys.mapped('khasra_number'))
+                record.total_khasras_count = len(unique_khasras)
+                
+                # Sum acquired area
+                record.total_area_acquired = sum(surveys.mapped('acquired_area'))
+            else:
+                record.total_khasras_count = 0
+                record.total_area_acquired = 0.0
+    
+    @api.depends('project_id')
+    def _compute_name(self):
+        """Generate team name from project"""
+        for record in self:
+            if record.project_id:
                 sequence = self.env['ir.sequence'].next_by_code('bhu.sia.team') or 'New'
                 record.name = f'SIA-{sequence}'
             else:
@@ -119,9 +145,24 @@ class SiaTeam(models.Model):
         self.state = 'draft'
     
     # Document Actions
-    def action_download_sia_order(self):
-        """Download SIA Order PDF"""
+    def action_download_sia_file(self):
+        """Download SIA File"""
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
+        if not self.sia_file:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Error'),
+                    'message': _('No file uploaded to download.'),
+                    'type': 'danger',
+                    'sticky': False,
+                }
+            }
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/bhu.sia.team/%s/sia_file/%s?download=true' % (self.id, self.sia_filename or 'sia_file'),
+            'target': 'self',
+        }
     
 

@@ -34,13 +34,13 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed,notification_11"/>
                 </header>
                 <div class="alert alert-info" role="alert" invisible="state != 'draft' or not project_id or not village_id" 
-                     style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                    <strong>ℹ Information:</strong> You are about to generate Notification 4 for <strong><field name="project_id" readonly="1" nolabel="1" invisible="not project_id"/></strong> project and <strong><field name="village_id" readonly="1" nolabel="1" invisible="not village_id"/></strong> village. This notification will be generated for approved surveys only.
+                     style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
+                    <strong style="color: #dc3545; font-weight: bold;">ℹ Information:</strong> <span style="color: #dc3545; font-weight: bold;">You are about to generate Notification 4 for <strong><field name="project_id" readonly="1" nolabel="1" invisible="not project_id"/></strong> project and <strong><field name="village_id" readonly="1" nolabel="1" invisible="not village_id"/></strong> village. This notification will be generated for approved surveys only.</span>
                 </div>
                 <div class="alert alert-warning" role="alert" invisible="all_surveys_approved or survey_count == 0 or state != 'draft'" 
-                     style="margin: 10px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
-                    <strong>⚠ Warning:</strong> Cannot generate Section 4 Notification. Some surveys are not approved yet. 
-                    Please approve all surveys for the selected villages before generating the notification.
+                     style="margin: 10px; padding: 10px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
+                    <strong style="color: #dc3545; font-weight: bold;">⚠ Warning:</strong> <span style="color: #dc3545; font-weight: bold;">Cannot generate Section 4 Notification. Some surveys are not approved yet. 
+                    Please approve all surveys for the selected villages before generating the notification.</span>
                 </div>
                 <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
                     <group>

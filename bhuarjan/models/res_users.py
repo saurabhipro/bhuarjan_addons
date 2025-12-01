@@ -44,6 +44,7 @@ class ResUsers(models.Model):
         ('additional_collector', 'Additional Collector'),
         ('collector', 'Collector'),
         ('administrator', 'Administrator'),
+        ('sia_team_member', 'SIA Team Member'),
     ], string="Bhuarjan Role", default=False)
 
 
@@ -60,6 +61,7 @@ class ResUsers(models.Model):
             self.env.ref('bhuarjan.group_bhuarjan_additional_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_admin').id,
+            self.env.ref('bhuarjan.group_bhuarjan_sia_team_member').id,
         ]
         if self.groups_id:
             self.groups_id = [(3, gid) for gid in all_custom_group_ids if gid in self.groups_id.ids]
@@ -74,6 +76,7 @@ class ResUsers(models.Model):
             'additional_collector': 'bhuarjan.group_bhuarjan_additional_collector',
             'collector': 'bhuarjan.group_bhuarjan_collector',
             'administrator': 'bhuarjan.group_bhuarjan_admin',
+            'sia_team_member': 'bhuarjan.group_bhuarjan_sia_team_member',
         }
 
         group_ref = group_map.get(self.bhuarjan_role)

@@ -141,7 +141,7 @@
 								{
 									"key": "role",
 									"value": "",
-									"description": "Filter by bhuarjan_role: patwari, revenue_inspector, nayab_tahsildar, tahsildar, sdm, additional_collector, collector, administrator (optional)"
+									"description": "Filter by bhuarjan_role: patwari, revenue_inspector, nayab_tahsildar, tahsildar, sdm, additional_collector, collector, administrator, sia_team_member (optional)"
 								}
 							]
 						},

@@ -63,6 +63,13 @@
         <field name="comment">The user will be able to approve document created by employees.</field>
     </record>
 
+    <record id="group_bhuarjan_sia_team_member" model="res.groups">
+        <field name="name">SIA Team Member</field>
+        <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="comment">The user will be able to access SIA team member features.</field>
+    </record>
+
     
     <!-- Survey access rule for Patwari -->
     <data noupdate="0">

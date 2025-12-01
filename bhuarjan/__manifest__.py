@@ -11,7 +11,7 @@
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
         'security/secrurity.xml',
-        # 'security/ir.model.access.csv',  # Temporarily commented out to avoid transaction error - will be re-enabled after upgrade
+        'security/ir.model.access.csv',
         'data/land_type_data.xml',
         'data/tree_master_data.xml',
         'data/tree_rate_master_data.xml',

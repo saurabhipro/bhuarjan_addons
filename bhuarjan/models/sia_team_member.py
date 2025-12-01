@@ -11,5 +11,4 @@ class SiaTeamMember(models.Model):
 
     name = fields.Char(string='Name / नाम', required=True, tracking=True)
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True)
-    active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
 

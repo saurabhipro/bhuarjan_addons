@@ -8,7 +8,6 @@
             <list string="SIA Team Members / SIA टीम सदस्य">
                 <field name="name"/>
                 <field name="department_id"/>
-                <field name="active" widget="boolean_toggle"/>
             </list>
         </field>
     </record>
@@ -21,13 +20,8 @@
             <form string="SIA Team Member / SIA टीम सदस्य">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name" required="1"/>
-                            <field name="department_id"/>
-                        </group>
-                        <group>
-                            <field name="active"/>
-                        </group>
+                        <field name="name" required="1"/>
+                        <field name="department_id"/>
                     </group>
                 </sheet>
                 <chatter/>
@@ -43,8 +37,6 @@
             <search string="Search SIA Team Members">
                 <field name="name"/>
                 <field name="department_id"/>
-                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
-                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Group By">
                     <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
                 </group>

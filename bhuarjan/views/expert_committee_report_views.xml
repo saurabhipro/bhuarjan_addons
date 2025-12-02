@@ -110,18 +110,6 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
-                            <group string="Signed Report / हस्ताक्षरित रिपोर्ट">
-                                <field name="has_signed_document" readonly="1"/>
-                                <field name="signed_document_file" filename="signed_document_filename"/>
-                                <field name="signed_document_filename" invisible="1"/>
-                                <field name="signed_date"/>
-                            </group>
-                            <group string="Signatory Information / हस्ताक्षरकर्ता जानकारी">
-                                <field name="signatory_name"/>
-                                <field name="signatory_designation"/>
-                            </group>
-                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>

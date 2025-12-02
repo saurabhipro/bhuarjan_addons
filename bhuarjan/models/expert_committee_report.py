@@ -66,11 +66,15 @@ class ExpertCommitteeReport(models.Model):
         ('project_unique', 'UNIQUE(project_id)', 'Only one Expert Committee Report is allowed per project.')
     ]
     
-    @api.depends('project_id', 'project_id.village_ids')
+    @api.depends('project_id', 'project_id.village_ids', 'village_ids')
     def _compute_project_villages(self):
-        """Compute villages from the selected project"""
+        """Compute villages - show selected villages if any, otherwise show all project villages"""
         for record in self:
-            if record.project_id and record.project_id.village_ids:
+            if record.village_ids:
+                # Show only selected villages
+                record.project_village_ids = record.village_ids
+            elif record.project_id and record.project_id.village_ids:
+                # If no villages selected, show all project villages
                 record.project_village_ids = record.project_id.village_ids
             else:
                 record.project_village_ids = False
@@ -106,15 +110,19 @@ class ExpertCommitteeReport(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Filter villages based on project and reset villages if not in project"""
-        if self.project_id:
-            # Reset villages that are not in the project
-            if self.village_ids:
-                valid_villages = self.village_ids.filtered(lambda v: v in self.project_id.village_ids)
-                self.village_ids = valid_villages
+        """Auto-populate villages and filter domain based on project selection"""
+        # Auto-populate villages with all project villages when project is selected
+        if self.project_id and self.project_id.village_ids:
+            # Always populate with project villages when project is selected
+            self.village_ids = self.project_id.village_ids
+        else:
+            self.village_ids = False
+        
+        # Set domain to only show project villages
+        if self.project_id and self.project_id.village_ids:
             return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
-            return {'domain': {'village_ids': []}}
+            return {'domain': {'village_ids': [('id', '=', False)]}}
     
     @api.model
     def _default_project_id(self):

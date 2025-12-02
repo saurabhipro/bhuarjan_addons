@@ -18,6 +18,8 @@ class SiaTeam(models.Model):
                                        help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
+    village_ids = fields.Many2many('bhu.village', string='Affected Villages / प्रभावित ग्राम', tracking=True,
+                                   help='Select affected villages for this SIA Team (defaults to all project villages)')
     
     # Workflow
     state = fields.Selection([
@@ -84,42 +86,62 @@ class SiaTeam(models.Model):
                                            store=False,
                                            help='Villages mapped to the selected project (read-only for reference)')
     
-    @api.depends('project_id', 'project_id.village_ids')
+    @api.depends('project_id', 'project_id.village_ids', 'village_ids')
     def _compute_project_villages(self):
-        """Compute villages from the selected project"""
+        """Compute villages - show selected villages if any, otherwise show all project villages"""
         for record in self:
-            if record.project_id and record.project_id.village_ids:
+            if record.village_ids:
+                # Show only selected villages
+                record.project_village_ids = record.village_ids
+            elif record.project_id and record.project_id.village_ids:
+                # If no villages selected, show all project villages
                 record.project_village_ids = record.project_id.village_ids
             else:
                 record.project_village_ids = False
     
-    @api.depends('project_id', 'project_id.village_ids')
+    @api.depends('project_id', 'project_id.village_ids', 'village_ids')
     def _compute_project_statistics(self):
         """Compute total khasras count and total area acquired from Form 10 surveys"""
         for record in self:
-            if record.project_id and record.project_id.village_ids:
-                # Get all surveys for villages in this project
-                surveys = self.env['bhu.survey'].search([
-                    ('project_id', '=', record.project_id.id),
-                    ('village_id', 'in', record.project_id.village_ids.ids),
-                    ('khasra_number', '!=', False),
-                ])
+            if record.project_id:
+                # If specific villages are selected, use those; otherwise use all project villages
+                village_ids = record.village_ids.ids if record.village_ids else record.project_id.village_ids.ids
                 
-                # Count unique khasra numbers
-                unique_khasras = set(surveys.mapped('khasra_number'))
-                record.total_khasras_count = len(unique_khasras)
-                
-                # Sum acquired area
-                record.total_area_acquired = sum(surveys.mapped('acquired_area'))
+                if village_ids:
+                    # Get all surveys for selected villages in this project
+                    surveys = self.env['bhu.survey'].search([
+                        ('project_id', '=', record.project_id.id),
+                        ('village_id', 'in', village_ids),
+                        ('khasra_number', '!=', False),
+                    ])
+                    
+                    # Count unique khasra numbers
+                    unique_khasras = set(surveys.mapped('khasra_number'))
+                    record.total_khasras_count = len(unique_khasras)
+                    
+                    # Sum acquired area
+                    record.total_area_acquired = sum(surveys.mapped('acquired_area'))
+                else:
+                    record.total_khasras_count = 0
+                    record.total_area_acquired = 0.0
             else:
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Auto-set tehsildar based on project selection and filter domain"""
+        """Auto-set tehsildar and villages based on project selection"""
         # Reset tehsildar when project changes
         self.tehsildar_id = False
+        
+        # Auto-populate villages with all project villages only on new records or when project changes
+        if not self._origin or (self._origin and self._origin.project_id != self.project_id):
+            if self.project_id and self.project_id.village_ids:
+                self.village_ids = self.project_id.village_ids
+            else:
+                self.village_ids = False
+        
+        domain_updates = {}
         
         if self.project_id and self.project_id.tehsildar_ids:
             # Get Tehsildar user IDs from the project
@@ -138,10 +160,33 @@ class SiaTeam(models.Model):
                 self.tehsildar_id = sia_team_members[0]
             
             # Set domain to only show SIA Team Members linked to project's Tehsildars
-            return {'domain': {'tehsildar_id': [('user_id', 'in', tehsildar_user_ids)]}}
+            domain_updates['tehsildar_id'] = [('user_id', 'in', tehsildar_user_ids)]
         else:
             # If no project or no Tehsildars, restrict to empty (user must select project first)
-            return {'domain': {'tehsildar_id': [('id', '=', False)]}}
+            domain_updates['tehsildar_id'] = [('id', '=', False)]
+        
+        # Set domain for villages to only show project villages
+        if self.project_id and self.project_id.village_ids:
+            village_ids = self.project_id.village_ids.ids
+            domain_updates['village_ids'] = [('id', 'in', village_ids)]
+        else:
+            domain_updates['village_ids'] = [('id', '=', False)]
+        
+        return {'domain': domain_updates}
+    
+    @api.constrains('village_ids', 'project_id')
+    def _check_villages_belong_to_project(self):
+        """Ensure selected villages belong to the project"""
+        for record in self:
+            if record.village_ids and record.project_id:
+                invalid_villages = record.village_ids.filtered(
+                    lambda v: v not in record.project_id.village_ids
+                )
+                if invalid_villages:
+                    raise ValidationError(
+                        _('The following villages do not belong to the selected project: %s') %
+                        ', '.join(invalid_villages.mapped('name'))
+                    )
     
     @api.depends('project_id')
     def _compute_name(self):

@@ -43,10 +43,10 @@
                             invisible="state != 'draft'"/>
                     <button name="action_approve" string="Approve / अनुमोदित करें" 
                             type="object" class="btn-success" icon="fa-check"
-                            invisible="state not in ['draft', 'submitted']"/>
+                            invisible="state != 'submitted'"/>
                     <button name="action_reject" string="Reject / अस्वीकृत करें" 
                             type="object" class="btn-danger" icon="fa-times"
-                            invisible="state not in ['draft', 'submitted']"/>
+                            invisible="state != 'submitted'"/>
                     <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" 
                             type="object" class="btn-primary" icon="fa-file-text"/>
                     <button name="action_mark_signed" string="Mark as Signed / हस्ताक्षरित के रूप में चिह्नित करें" 
@@ -55,18 +55,60 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,signed"/>
                 </header>
                 <sheet>
-                    <group>
+                    <group col="2">
                         <group>
-                            <field name="name"/>
                             <field name="project_id" required="1" options="{'no_create_edit': True}"/>
+                            <field name="requiring_body_id" required="1"/>
+                            <field name="village_ids" widget="many2many_tags" 
+                                   placeholder="Select affected villages..."
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="total_khasras_count" readonly="1"/>
+                            <field name="total_area_acquired" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Report Information / रिपोर्ट जानकारी">
+                            <group col="2">
+                                <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
+                                    <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
+                                           placeholder="Select non-government social scientist..."
+                                           options="{'no_quick_create': True}"/>
+                                </group>
+                                <group string="(ख) Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि">
+                                    <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
+                                           placeholder="Select representatives of local bodies..."
+                                           options="{'no_quick_create': True}"/>
+                                </group>
+                                <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ">
+                                    <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
+                                           placeholder="Select resettlement expert..."
+                                           options="{'no_quick_create': True}"/>
+                                </group>
+                                <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
+                                    <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
+                                           placeholder="Select technical expert..."
+                                           options="{'no_quick_create': True}"/>
+                                </group>
+                            </group>
                             <group string="Original Report / मूल रिपोर्ट">
                                 <field name="report_file" filename="report_filename"/>
                                 <field name="report_filename" invisible="1"/>
                             </group>
+                        </page>
+                        <page string="Project Villages / परियोजना ग्राम" invisible="not project_id">
+                            <field name="project_village_ids" nolabel="1" readonly="1"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_open': True}">
+                                <list>
+                                    <field name="village_code" string="Village Code / ग्राम कोड"/>
+                                    <field name="name" string="Village Name / ग्राम का नाम"/>
+                                    <field name="district_id" string="District / जिला"/>
+                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
+                                    <field name="total_khasras_count" string="Total Khasras / कुल खसरा"/>
+                                    <field name="total_captured_area" string="Total Captured Area (Hectares) / कुल कैप्चर क्षेत्रफल (हेक्टेयर)"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
                             <group string="Signed Report / हस्ताक्षरित रिपोर्ट">

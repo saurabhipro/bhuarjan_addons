@@ -14,10 +14,107 @@ class ExpertCommitteeReport(models.Model):
     name = fields.Char(string='Report Name / रिपोर्ट का नाम', required=True, default='New', tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True)
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
+                                       help='Select the requiring body/department')
+    village_ids = fields.Many2many('bhu.village', string='Affected Villages / प्रभावित ग्राम', tracking=True,
+                                   help='Select affected villages for this report')
+    
+    # Computed fields from Form 10 surveys
+    total_khasras_count = fields.Integer(string='Total Khasras Count / कुल खसरा संख्या',
+                                         compute='_compute_project_statistics', store=False)
+    total_area_acquired = fields.Float(string='Total Area Acquired (Hectares) / कुल अर्जित क्षेत्रफल (हेक्टेयर)',
+                                       compute='_compute_project_statistics', store=False,
+                                       digits=(16, 4))
+    
+    # Project villages for reference (read-only)
+    project_village_ids = fields.Many2many('bhu.village', 
+                                           string='Project Villages / परियोजना ग्राम',
+                                           compute='_compute_project_villages', 
+                                           store=False,
+                                           help='Villages mapped to the selected project (read-only for reference)')
+    
+    # Expert Committee Team Members - 4 Sections
+    # (क) Non-Government Social Scientist
+    non_govt_social_scientist_ids = fields.Many2many('bhu.sia.team.member', 
+                                                     'expert_committee_non_govt_social_scientist_rel',
+                                                     'expert_committee_id', 'member_id',
+                                                     string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
+                                                     tracking=True)
+    
+    # (ख) Representatives of Local Bodies
+    local_bodies_representative_ids = fields.Many2many('bhu.sia.team.member',
+                                                       'expert_committee_local_bodies_rep_rel',
+                                                       'expert_committee_id', 'member_id',
+                                                       string='Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि',
+                                                       tracking=True)
+    
+    # (ग) Resettlement Expert
+    resettlement_expert_ids = fields.Many2many('bhu.sia.team.member',
+                                                'expert_committee_resettlement_expert_rel',
+                                                'expert_committee_id', 'member_id',
+                                                string='Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ',
+                                                tracking=True)
+    
+    # (घ) Technical Expert on Project Related Subject
+    technical_expert_ids = fields.Many2many('bhu.sia.team.member',
+                                            'expert_committee_technical_expert_rel',
+                                            'expert_committee_id', 'member_id',
+                                            string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
+                                            tracking=True)
     
     _sql_constraints = [
         ('project_unique', 'UNIQUE(project_id)', 'Only one Expert Committee Report is allowed per project.')
     ]
+    
+    @api.depends('project_id', 'project_id.village_ids')
+    def _compute_project_villages(self):
+        """Compute villages from the selected project"""
+        for record in self:
+            if record.project_id and record.project_id.village_ids:
+                record.project_village_ids = record.project_id.village_ids
+            else:
+                record.project_village_ids = False
+    
+    @api.depends('project_id', 'village_ids')
+    def _compute_project_statistics(self):
+        """Compute total khasras count and total area acquired from Form 10 surveys"""
+        for record in self:
+            if record.project_id:
+                # If specific villages are selected, use those; otherwise use all project villages
+                village_ids = record.village_ids.ids if record.village_ids else record.project_id.village_ids.ids
+                
+                if village_ids:
+                    # Get all surveys for selected villages in this project
+                    surveys = self.env['bhu.survey'].search([
+                        ('project_id', '=', record.project_id.id),
+                        ('village_id', 'in', village_ids),
+                        ('khasra_number', '!=', False),
+                    ])
+                    
+                    # Count unique khasra numbers
+                    unique_khasras = set(surveys.mapped('khasra_number'))
+                    record.total_khasras_count = len(unique_khasras)
+                    
+                    # Sum acquired area
+                    record.total_area_acquired = sum(surveys.mapped('acquired_area'))
+                else:
+                    record.total_khasras_count = 0
+                    record.total_area_acquired = 0.0
+            else:
+                record.total_khasras_count = 0
+                record.total_area_acquired = 0.0
+    
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Filter villages based on project and reset villages if not in project"""
+        if self.project_id:
+            # Reset villages that are not in the project
+            if self.village_ids:
+                valid_villages = self.village_ids.filtered(lambda v: v in self.project_id.village_ids)
+                self.village_ids = valid_villages
+            return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
+        else:
+            return {'domain': {'village_ids': []}}
     
     @api.model
     def _default_project_id(self):

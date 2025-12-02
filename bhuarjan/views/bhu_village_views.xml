@@ -13,9 +13,6 @@
                 <field name="sub_division_id" string="Sub Division"/>
                 <field name="tehsil_id" string="Tehsil"/>
                 <field name="pincode" string="Pincode"/>
-                <field name="population" string="Population"/>
-                <field name="is_tribal_area" string="Tribal Area"/>
-                <field name="is_forest_area" string="Forest Area"/>
             </list>
         </field>
     </record>
@@ -39,18 +36,16 @@
                             <field name="name"/>
                             <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="district_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="tehsil_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="village_uuid" readonly="1" placeholder="UUID will be generated automatically"/>
-                            <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link"/>
-                            <field name="pincode"/>
                         </group>
                         <group>
-                            <field name="population"/>
-                            <field name="area_hectares"/>
-                            <field name="is_tribal_area"/>
-                            <field name="is_forest_area"/>
+                            <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="tehsil_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="pincode"/>
                         </group>
+                    </group>
+                    <group>
+                        <field name="village_uuid" readonly="1" invisible="1"/>
+                        <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
                     </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
@@ -69,9 +64,6 @@
                 <field name="district_id"/>
                 <field name="tehsil_id"/>
                 <field name="pincode"/>
-                
-                <filter string="Tribal Areas / आदिवासी क्षेत्र" name="tribal" domain="[('is_tribal_area', '=', True)]"/>
-                <filter string="Forest Areas / वन क्षेत्र" name="forest" domain="[('is_forest_area', '=', True)]"/>
                 
                 <group expand="0" string="Group By / समूह बनाएं">
                     <filter string="District / जिला" name="group_district" context="{'group_by': 'district_id'}"/>

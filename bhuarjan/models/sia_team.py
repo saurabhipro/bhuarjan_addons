@@ -101,10 +101,23 @@ class SiaTeam(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset tehsildar when project changes and set domain"""
+        """Auto-set tehsildar based on project selection"""
         self.tehsildar_id = False
         if self.project_id and self.project_id.tehsildar_ids:
-            return {'domain': {'tehsildar_id': [('user_id', 'in', self.project_id.tehsildar_ids.ids)]}}
+            # Find SIA Team Members that are linked to the project's Tehsildars
+            tehsildar_user_ids = self.project_id.tehsildar_ids.ids
+            sia_team_members = self.env['bhu.sia.team.member'].search([
+                ('user_id', 'in', tehsildar_user_ids)
+            ])
+            
+            # Auto-set if exactly one match, otherwise let user choose from filtered list
+            if len(sia_team_members) == 1:
+                self.tehsildar_id = sia_team_members[0]
+            elif len(sia_team_members) > 1:
+                # If multiple matches, set the first one (user can change if needed)
+                self.tehsildar_id = sia_team_members[0]
+            
+            return {'domain': {'tehsildar_id': [('user_id', 'in', tehsildar_user_ids)]}}
         return {'domain': {'tehsildar_id': []}}
     
     @api.depends('project_id')

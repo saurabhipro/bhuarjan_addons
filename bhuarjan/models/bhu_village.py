@@ -110,10 +110,6 @@ class BhuVillage(models.Model):
     name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
     village_code = fields.Char(string='Village Code / ग्राम कोड', required=True, tracking=True, copy=False, help='Unique code for the village')
     pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
-    population = fields.Integer(string='Population / जनसंख्या', tracking=True)
-    area_hectares = fields.Float(string='Area (Hectares) / क्षेत्रफल (हेक्टेयर)', digits=(10, 4))
-    is_tribal_area = fields.Boolean(string='Tribal Area / आदिवासी क्षेत्र', tracking=True)
-    is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र', tracking=True)
     
     # Related records counts
     section4_notification_count = fields.Integer(string='Section 4 Notifications', compute='_compute_notification_counts', store=False)

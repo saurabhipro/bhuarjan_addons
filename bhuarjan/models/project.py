@@ -41,6 +41,26 @@ class BhuProject(models.Model):
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
+    
+    def action_set_draft(self):
+        """Set project status to Draft"""
+        self.write({'state': 'draft'})
+        return True
+    
+    def action_set_active(self):
+        """Set project status to Active"""
+        self.write({'state': 'active'})
+        return True
+    
+    def action_set_completed(self):
+        """Set project status to Completed"""
+        self.write({'state': 'completed'})
+        return True
+    
+    def action_set_cancelled(self):
+        """Set project status to Cancelled"""
+        self.write({'state': 'cancelled'})
+        return True
     village_ids = fields.Many2many('bhu.village', string="Villages", tracking=True)
     sdm_ids = fields.Many2many('res.users', 'bhu_project_sdm_rel', 'project_id', 'user_id',
                                string="SDM / उप-विभागीय मजिस्ट्रेट", 

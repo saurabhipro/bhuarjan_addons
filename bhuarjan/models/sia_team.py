@@ -53,12 +53,12 @@ class SiaTeam(models.Model):
     technical_expert_ids = fields.Many2many('bhu.sia.team.member',
                                             'sia_team_technical_expert_rel',
                                             'sia_team_id', 'member_id',
-                                            string='Technical Expert / तकनीकी विशेषज्ञ',
+                                            string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
                                             tracking=True)
     
     # (ड.) Tehsildar of Affected Area (Convener)
     tehsildar_id = fields.Many2one('bhu.sia.team.member',
-                                   string='Tehsildar (Convener) / तहसीलदार (संयोजक)',
+                                   string='Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार',
                                    tracking=True,
                                    help='Tehsildar of the affected area who will be the convener')
     
@@ -69,7 +69,6 @@ class SiaTeam(models.Model):
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
                                       compute='_compute_team_members', store=False)
-    description = fields.Text(string='Description / विवरण', tracking=True)
     
     # Computed fields from Form 10 surveys
     total_khasras_count = fields.Integer(string='Total Khasras Count / कुल खसरा संख्या',
@@ -99,6 +98,14 @@ class SiaTeam(models.Model):
             else:
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
+    
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset tehsildar when project changes and set domain"""
+        self.tehsildar_id = False
+        if self.project_id and self.project_id.tehsildar_ids:
+            return {'domain': {'tehsildar_id': [('user_id', 'in', self.project_id.tehsildar_ids.ids)]}}
+        return {'domain': {'tehsildar_id': []}}
     
     @api.depends('project_id')
     def _compute_name(self):

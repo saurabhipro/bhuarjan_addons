@@ -42,6 +42,14 @@ class BhuProject(models.Model):
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
     village_ids = fields.Many2many('bhu.village', string="Villages", tracking=True)
+    sdm_ids = fields.Many2many('res.users', 'bhu_project_sdm_rel', 'project_id', 'user_id',
+                               string="SDM / उप-विभागीय मजिस्ट्रेट", 
+                               domain="[('bhuarjan_role', '=', 'sdm')]", tracking=True,
+                               help="Select Sub-Divisional Magistrates for this project")
+    tehsildar_ids = fields.Many2many('res.users', 'bhu_project_tehsildar_rel', 'project_id', 'user_id',
+                                     string="Tehsildar / तहसीलदार", 
+                                     domain="[('bhuarjan_role', '=', 'tahsildar')]", tracking=True,
+                                     help="Select Tehsildars for this project")
     
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 

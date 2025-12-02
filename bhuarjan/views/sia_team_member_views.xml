@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <list string="SIA Team Members / SIA टीम सदस्य">
                 <field name="name"/>
-                <field name="department_id"/>
+                <field name="address"/>
             </list>
         </field>
     </record>
@@ -21,7 +21,7 @@
                 <sheet>
                     <group>
                         <field name="name" required="1"/>
-                        <field name="department_id"/>
+                        <field name="address" placeholder="Enter address..."/>
                     </group>
                 </sheet>
                 <chatter/>
@@ -36,10 +36,7 @@
         <field name="arch" type="xml">
             <search string="Search SIA Team Members">
                 <field name="name"/>
-                <field name="department_id"/>
-                <group expand="0" string="Group By">
-                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
-                </group>
+                <field name="address"/>
             </search>
         </field>
     </record>
@@ -55,7 +52,7 @@
                 Create your first SIA Team Member!
             </p>
             <p>
-                SIA Team Members are used in SIA Teams. They only require a name and department.
+                SIA Team Members are used in SIA Teams. They require a name and address.
             </p>
         </field>
     </record>

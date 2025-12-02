@@ -68,19 +68,16 @@
                                            placeholder="Select resettlement expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
-                                <group string="(घ) Technical Expert / तकनीकी विशेषज्ञ">
+                                <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
                                     <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
                                            placeholder="Select technical expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                             </group>
-                            <group string="(ड.) Tehsildar (Convener) / तहसीलदार (संयोजक)">
+                            <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">
                                 <field name="tehsildar_id" nolabel="1"
                                        placeholder="Select Tehsildar (Convener)..."
                                        options="{'no_quick_create': True}"/>
-                            </group>
-                            <group string="Description / विवरण">
-                                <field name="description" nolabel="1" placeholder="Enter team description..."/>
                             </group>
                         </page>
                         <page string="Signed Documents / हस्ताक्षरित दस्तावेज़">

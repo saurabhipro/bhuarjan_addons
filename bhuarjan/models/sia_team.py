@@ -77,6 +77,22 @@ class SiaTeam(models.Model):
                                        compute='_compute_project_statistics', store=False,
                                        digits=(16, 4))
     
+    # Project villages for reference (read-only)
+    project_village_ids = fields.Many2many('bhu.village', 
+                                           string='Project Villages / परियोजना ग्राम',
+                                           compute='_compute_project_villages', 
+                                           store=False,
+                                           help='Villages mapped to the selected project (read-only for reference)')
+    
+    @api.depends('project_id', 'project_id.village_ids')
+    def _compute_project_villages(self):
+        """Compute villages from the selected project"""
+        for record in self:
+            if record.project_id and record.project_id.village_ids:
+                record.project_village_ids = record.project_id.village_ids
+            else:
+                record.project_village_ids = False
+    
     @api.depends('project_id', 'project_id.village_ids')
     def _compute_project_statistics(self):
         """Compute total khasras count and total area acquired from Form 10 surveys"""
@@ -101,13 +117,15 @@ class SiaTeam(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Auto-set tehsildar based on project selection"""
+        """Auto-set tehsildar based on project selection and filter domain"""
         # Reset tehsildar when project changes
         self.tehsildar_id = False
         
         if self.project_id and self.project_id.tehsildar_ids:
-            # Find SIA Team Members that are linked to the project's Tehsildars
+            # Get Tehsildar user IDs from the project
             tehsildar_user_ids = self.project_id.tehsildar_ids.ids
+            
+            # Find SIA Team Members that are linked to the project's Tehsildars
             sia_team_members = self.env['bhu.sia.team.member'].search([
                 ('user_id', 'in', tehsildar_user_ids)
             ])
@@ -119,9 +137,11 @@ class SiaTeam(models.Model):
                 # If multiple matches, set the first one (user can change if needed)
                 self.tehsildar_id = sia_team_members[0]
             
-            # Don't set domain restriction - let user see all SIA Team Members
-            # Auto-population will handle the selection when there's a match
-            # This ensures dropdown is never empty
+            # Set domain to only show SIA Team Members linked to project's Tehsildars
+            return {'domain': {'tehsildar_id': [('user_id', 'in', tehsildar_user_ids)]}}
+        else:
+            # If no project or no Tehsildars, restrict to empty (user must select project first)
+            return {'domain': {'tehsildar_id': [('id', '=', False)]}}
     
     @api.depends('project_id')
     def _compute_name(self):

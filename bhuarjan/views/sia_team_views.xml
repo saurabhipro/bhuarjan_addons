@@ -81,6 +81,20 @@
                         <field name="sia_file" filename="sia_filename" 
                                string="Upload SIA File / SIA फ़ाइल अपलोड करें"/>
                     </group>
+                    <notebook>
+                        <page string="Project Villages / परियोजना ग्राम" invisible="not project_id">
+                            <field name="project_village_ids" nolabel="1" readonly="1"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_open': True}">
+                                <list>
+                                    <field name="village_code" string="Village Code / ग्राम कोड"/>
+                                    <field name="name" string="Village Name / ग्राम का नाम"/>
+                                    <field name="district_id" string="District / जिला"/>
+                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
+                                    <field name="pincode" string="Pincode / पिनकोड"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter/>
             </form>

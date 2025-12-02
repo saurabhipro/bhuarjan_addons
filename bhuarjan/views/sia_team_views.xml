@@ -50,43 +50,37 @@
                         </group>
                     </group>
                     
-                    <notebook>
-                        <page string="Team Members / टीम सदस्य">
-                            <group col="2">
-                                <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
-                                    <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
-                                           placeholder="Select non-government social scientist..."
-                                           options="{'no_quick_create': True}"/>
-                                </group>
-                                <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
-                                    <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
-                                           placeholder="Select representatives of local bodies..."
-                                           options="{'no_quick_create': True}"/>
-                                </group>
-                                <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
-                                    <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
-                                           placeholder="Select resettlement expert..."
-                                           options="{'no_quick_create': True}"/>
-                                </group>
-                                <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
-                                    <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
-                                           placeholder="Select technical expert..."
-                                           options="{'no_quick_create': True}"/>
-                                </group>
-                            </group>
-                            <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">
-                                <field name="tehsildar_id" nolabel="1"
-                                       placeholder="Select Tehsildar (Convener)..."
-                                       options="{'no_quick_create': True}"/>
-                            </group>
-                        </page>
-                        <page string="Signed Documents / हस्ताक्षरित दस्तावेज़">
-                            <group>
-                                <field name="sia_file" filename="sia_filename" 
-                                       string="Upload SIA File / SIA फ़ाइल अपलोड करें"/>
-                            </group>
-                        </page>
-                    </notebook>
+                    <group col="2">
+                        <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
+                            <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
+                                   placeholder="Select non-government social scientist..."
+                                   options="{'no_quick_create': True}"/>
+                        </group>
+                        <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
+                            <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
+                                   placeholder="Select representatives of local bodies..."
+                                   options="{'no_quick_create': True}"/>
+                        </group>
+                        <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
+                            <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
+                                   placeholder="Select resettlement expert..."
+                                   options="{'no_quick_create': True}"/>
+                        </group>
+                        <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
+                            <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
+                                   placeholder="Select technical expert..."
+                                   options="{'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">
+                        <field name="tehsildar_id" nolabel="1"
+                               placeholder="Select Tehsildar (Convener)..."
+                               options="{'no_quick_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="sia_file" filename="sia_filename" 
+                               string="Upload SIA File / SIA फ़ाइल अपलोड करें"/>
+                    </group>
                 </sheet>
                 <chatter/>
             </form>

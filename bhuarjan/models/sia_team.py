@@ -102,7 +102,9 @@ class SiaTeam(models.Model):
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-set tehsildar based on project selection"""
+        # Reset tehsildar when project changes
         self.tehsildar_id = False
+        
         if self.project_id and self.project_id.tehsildar_ids:
             # Find SIA Team Members that are linked to the project's Tehsildars
             tehsildar_user_ids = self.project_id.tehsildar_ids.ids
@@ -110,15 +112,16 @@ class SiaTeam(models.Model):
                 ('user_id', 'in', tehsildar_user_ids)
             ])
             
-            # Auto-set if exactly one match, otherwise let user choose from filtered list
+            # Auto-set if matches found
             if len(sia_team_members) == 1:
                 self.tehsildar_id = sia_team_members[0]
             elif len(sia_team_members) > 1:
                 # If multiple matches, set the first one (user can change if needed)
                 self.tehsildar_id = sia_team_members[0]
             
-            return {'domain': {'tehsildar_id': [('user_id', 'in', tehsildar_user_ids)]}}
-        return {'domain': {'tehsildar_id': []}}
+            # Don't set domain restriction - let user see all SIA Team Members
+            # Auto-population will handle the selection when there's a match
+            # This ensures dropdown is never empty
     
     @api.depends('project_id')
     def _compute_name(self):

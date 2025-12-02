@@ -114,6 +114,33 @@ class BhuVillage(models.Model):
     # Related records counts
     section4_notification_count = fields.Integer(string='Section 4 Notifications', compute='_compute_notification_counts', store=False)
     
+    # Survey statistics (computed per village)
+    total_khasras_count = fields.Integer(string='Total Khasras / कुल खसरा', 
+                                         compute='_compute_village_survey_statistics', 
+                                         store=False,
+                                         help='Total unique khasra numbers in surveys for this village')
+    total_captured_area = fields.Float(string='Total Captured Area (Hectares) / कुल कैप्चर क्षेत्रफल (हेक्टेयर)',
+                                       compute='_compute_village_survey_statistics',
+                                       store=False,
+                                       digits=(16, 4),
+                                       help='Total acquired area from surveys for this village')
+    
+    def _compute_village_survey_statistics(self):
+        """Compute total khasras count and total captured area from surveys for this village"""
+        for village in self:
+            # Get all surveys for this village
+            surveys = self.env['bhu.survey'].search([
+                ('village_id', '=', village.id),
+                ('khasra_number', '!=', False),
+            ])
+            
+            # Count unique khasra numbers
+            unique_khasras = set(surveys.mapped('khasra_number'))
+            village.total_khasras_count = len(unique_khasras)
+            
+            # Sum acquired area
+            village.total_captured_area = sum(surveys.mapped('acquired_area'))
+    
     def _compute_notification_counts(self):
         """Compute counts of related notifications"""
         for village in self:

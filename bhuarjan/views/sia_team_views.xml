@@ -79,9 +79,11 @@
                                 </group>
                             </group>
                             <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">
+                                <field name="tehsildar_domain" invisible="1"/>
+                                
                                 <field name="tehsildar_id" nolabel="1"
                                        placeholder="Select Tehsildar (Convener)..."
-                                       options="{'no_quick_create': True}"/>
+                                       options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
                             <group>
                                 <field name="sia_file" filename="sia_filename" 

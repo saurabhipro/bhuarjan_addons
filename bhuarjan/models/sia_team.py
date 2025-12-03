@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-
+import json
 
 class SiaTeam(models.Model):
     _name = 'bhu.sia.team'
@@ -59,7 +59,7 @@ class SiaTeam(models.Model):
                                             tracking=True)
     
     # (ड.) Tehsildar of Affected Area (Convener)
-    tehsildar_id = fields.Many2one('bhu.sia.team.member',
+    tehsildar_id = fields.Many2one('res.users',
                                    string='Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार',
                                    tracking=True,
                                    help='Tehsildar of the affected area who will be the convener')
@@ -127,12 +127,22 @@ class SiaTeam(models.Model):
             else:
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
-    
+    tehsildar_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-set tehsildar and villages based on project selection"""
         # Reset tehsildar when project changes
+        for rec in self:
+            if rec.project_id:
+                rec.tehsildar_id = rec.project_id.tehsildar_ids[:1].id or False
+                rec.tehsildar_domain = json.dumps([('id', 'in', rec.project_id.tehsildar_ids.ids)])
+                
+            else:
+                rec.tehsildar_id = False
+                rec.tehsildar_domain = False
         self.tehsildar_id = False
+
+        
         
         # Auto-populate villages with all project villages only on new records or when project changes
         if not self._origin or (self._origin and self._origin.project_id != self.project_id):

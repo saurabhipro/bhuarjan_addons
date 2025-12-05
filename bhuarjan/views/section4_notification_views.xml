@@ -33,16 +33,15 @@
                             invisible="state not in ('generated', 'signed', 'notification_11')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed,notification_11"/>
                 </header>
-                <div class="alert alert-info" role="alert" invisible="state != 'draft' or not project_id or not village_id" 
+                <div class="alert alert-danger" role="alert" invisible="not has_pending_surveys or not project_id or not village_id or state != 'draft'" 
                      style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
-                    <strong style="color: #dc3545; font-weight: bold;">ℹ Information:</strong> <span style="color: #dc3545; font-weight: bold;">You are about to generate Notification 4 for <strong><field name="project_id" readonly="1" nolabel="1" invisible="not project_id"/></strong> project and <strong><field name="village_id" readonly="1" nolabel="1" invisible="not village_id"/></strong> village. This notification will be generated for approved surveys only.</span>
+                    <strong style="color: #dc3545; font-weight: bold;">⚠ Error:</strong> <span style="color: #dc3545; font-weight: bold;">Cannot create Notification 4 for this village as it has some pending surveys that are in (Draft or Submitted stage).</span>
                 </div>
-                <div class="alert alert-warning" role="alert" invisible="all_surveys_approved or survey_count == 0 or state != 'draft'" 
-                     style="margin: 10px; padding: 10px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
-                    <strong style="color: #dc3545; font-weight: bold;">⚠ Warning:</strong> <span style="color: #dc3545; font-weight: bold;">Cannot generate Section 4 Notification. Some surveys are not approved yet. 
-                    Please approve all surveys for the selected villages before generating the notification.</span>
+                <div class="alert alert-danger" role="alert" invisible="not has_no_surveys or not project_id or not village_id or state != 'draft'" 
+                     style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
+                    <strong style="color: #dc3545; font-weight: bold;">⚠ Error:</strong> <span style="color: #dc3545; font-weight: bold;">No surveys in this village, so no notification can be created.</span>
                 </div>
-                <sheet readonly="has_section11 or state in ('signed', 'notification_11')">
+                <sheet readonly="has_section11 or state in ('signed', 'notification_11') or (has_pending_surveys and state == 'draft' and project_id and village_id) or (has_no_surveys and state == 'draft' and project_id and village_id) or (not village_id and state == 'draft')">
                     <group>
                         <group>
                             <field name="project_id" required="1" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 

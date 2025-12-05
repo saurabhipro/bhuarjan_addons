@@ -5,7 +5,7 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" default_order="create_date desc">
+            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc">
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="project_id"/>

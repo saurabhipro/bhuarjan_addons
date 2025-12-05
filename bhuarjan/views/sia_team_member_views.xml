@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list string="SIA Team Members / SIA टीम सदस्य">
                 <field name="name"/>
+                <field name="post"/>
                 <field name="address"/>
             </list>
         </field>
@@ -21,6 +22,7 @@
                 <sheet>
                     <group>
                         <field name="name" required="1"/>
+                        <field name="post" placeholder="Enter post..."/>
                         <field name="address" placeholder="Enter address..."/>
                     </group>
                 </sheet>
@@ -36,6 +38,7 @@
         <field name="arch" type="xml">
             <search string="Search SIA Team Members">
                 <field name="name"/>
+                <field name="post"/>
                 <field name="address"/>
             </search>
         </field>

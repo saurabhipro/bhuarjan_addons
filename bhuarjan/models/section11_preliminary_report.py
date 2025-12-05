@@ -11,53 +11,45 @@ class Section11PreliminaryReport(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
-    _sql_constraints = [
-        ('unique_project', 'UNIQUE(project_id)', 
-         'Only one Section 11 Preliminary Report can be created per project! / प्रति परियोजना केवल एक धारा 11 प्रारंभिक रिपोर्ट बनाई जा सकती है!')
-    ]
+    # Note: Removed unique project constraint to allow one Section 11 per village per project
 
     name = fields.Char(string='Report Name', required=True, default='New', tracking=True, readonly=True)
     project_id = fields.Many2one('bhu.project', string='Project', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
-    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
-    @api.constrains('project_id')
-    def _check_unique_project(self):
-        """Ensure only one Section 11 Preliminary Report per project"""
+    @api.constrains('project_id', 'village_id')
+    def _check_unique_village_per_project(self):
+        """Ensure only one Section 11 Preliminary Report per village per project"""
         for record in self:
-            if record.project_id:
+            if record.project_id and record.village_id:
                 existing = self.search([
                     ('id', '!=', record.id),
-                    ('project_id', '=', record.project_id.id)
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id)
                 ], limit=1)
                 if existing:
                     raise ValidationError(
-                        _('A Section 11 Preliminary Report already exists for project "%s". Only one Section 11 Preliminary Report can be created per project.') %
-                        record.project_id.name
+                        _('A Section 11 Preliminary Report already exists for village "%s" in project "%s". Only one Section 11 Preliminary Report can be created per village per project.') %
+                        (record.village_id.name, record.project_id.name)
                     )
-
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Auto-populate villages when project is selected"""
-        # Auto-populate villages with all project villages when project is selected
+        """Reset village when project changes and set domain to only show project villages"""
+        self.village_id = False
         if self.project_id and self.project_id.village_ids:
-            # Always populate with project villages when project is selected
-            self.village_ids = self.project_id.village_ids
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
-            self.village_ids = False
-        
-        # Set domain to only show project villages
-        if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
-        else:
-            return {'domain': {'village_ids': [('id', '=', False)]}}
+            return {'domain': {'village_id': [('id', '=', False)]}}
     
     # Section 4 Notification reference
     section4_notification_id = fields.Many2one('bhu.section4.notification', string='Section 4 Notification',
                                                tracking=True, help='Select Section 4 Notification to auto-populate survey details')
     
     # Notification Details
-    notification_number = fields.Char(string='Notification Number', tracking=True)
+    notification_number = fields.Char(string='Notification Number', readonly=True, tracking=True,
+                                      help='Auto-generated notification number')
     publication_date = fields.Date(string='Publication Date', tracking=True)
     
     # Computed fields from Form 10 surveys
@@ -77,31 +69,24 @@ class Section11PreliminaryReport(models.Model):
     survey_numbers = fields.Char(string='Survey Numbers', compute='_compute_survey_info', store=False)
     survey_date = fields.Date(string='Survey Date', compute='_compute_survey_info', store=False)
     
-    @api.depends('project_id', 'village_ids')
+    @api.depends('project_id', 'village_id')
     def _compute_project_statistics(self):
         """Compute total khasras count and total area acquired from Form 10 surveys"""
         for record in self:
-            if record.project_id:
-                # If specific villages are selected, use those; otherwise use all project villages
-                village_ids = record.village_ids.ids if record.village_ids else record.project_id.village_ids.ids
+            if record.project_id and record.village_id:
+                # Get all surveys for selected village in this project
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id),
+                    ('khasra_number', '!=', False),
+                ])
                 
-                if village_ids:
-                    # Get all surveys for selected villages in this project
-                    surveys = self.env['bhu.survey'].search([
-                        ('project_id', '=', record.project_id.id),
-                        ('village_id', 'in', village_ids),
-                        ('khasra_number', '!=', False),
-                    ])
-                    
-                    # Count unique khasra numbers
-                    unique_khasras = set(surveys.mapped('khasra_number'))
-                    record.total_khasras_count = len(unique_khasras)
-                    
-                    # Sum acquired area
-                    record.total_area_acquired = sum(surveys.mapped('acquired_area'))
-                else:
-                    record.total_khasras_count = 0
-                    record.total_area_acquired = 0.0
+                # Count unique khasra numbers
+                unique_khasras = set(surveys.mapped('khasra_number'))
+                record.total_khasras_count = len(unique_khasras)
+                
+                # Sum acquired area
+                record.total_area_acquired = sum(surveys.mapped('acquired_area'))
             else:
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
@@ -118,14 +103,13 @@ class Section11PreliminaryReport(models.Model):
                 record.khasra_numbers = ''
                 record.khasra_count = 0
     
-    @api.depends('village_ids', 'project_id')
+    @api.depends('village_id', 'project_id')
     def _compute_survey_info(self):
         """Compute survey numbers and date from related surveys"""
         for record in self:
-            if record.village_ids and record.project_id:
-                village_ids = record.village_ids.ids
+            if record.village_id and record.project_id:
                 surveys = self.env['bhu.survey'].search([
-                    ('village_id', 'in', village_ids),
+                    ('village_id', '=', record.village_id.id),
                     ('project_id', '=', record.project_id.id),
                     ('state', '=', 'locked')
                 ], order='survey_date desc', limit=10)
@@ -216,24 +200,23 @@ class Section11PreliminaryReport(models.Model):
             if not self.signed_date:
                 self.signed_date = fields.Date.today()
     
-    @api.onchange('village_ids', 'project_id')
+    @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_surveys(self):
-        """Auto-populate land parcels when villages or project changes"""
-        # Auto-populate surveys when villages or project changes
-        if self.village_ids and self.project_id:
+        """Auto-populate land parcels when village or project changes"""
+        # Auto-populate surveys when village or project changes
+        if self.village_id and self.project_id:
             self._populate_land_parcels_from_surveys()
     
     def _populate_land_parcels_from_surveys(self):
         """Helper method to populate land parcels from locked surveys"""
         self.ensure_one()
-        if not self.village_ids or not self.project_id:
+        if not self.village_id or not self.project_id:
             return
         
-        village_ids = self.village_ids.ids
-        # Always search directly for locked surveys for the selected villages and project
+        # Always search directly for locked surveys for the selected village and project
         # This ensures we get the surveys even if Section 4's computed survey_ids is not ready
         locked_surveys = self.env['bhu.survey'].search([
-            ('village_id', 'in', village_ids),
+            ('village_id', '=', self.village_id.id),
             ('project_id', '=', self.project_id.id),
             ('state', '=', 'locked')
         ], order='khasra_number')
@@ -241,7 +224,7 @@ class Section11PreliminaryReport(models.Model):
         # If no locked surveys found, also check for approved surveys
         if not locked_surveys:
             locked_surveys = self.env['bhu.survey'].search([
-                ('village_id', 'in', village_ids),
+                ('village_id', '=', self.village_id.id),
                 ('project_id', '=', self.project_id.id),
                 ('state', '=', 'approved')
             ], order='khasra_number')
@@ -307,83 +290,56 @@ class Section11PreliminaryReport(models.Model):
                     # Set project_id from Section 4 if not already set
                     if not vals.get('project_id') and section4_notif.project_id:
                         vals['project_id'] = section4_notif.project_id.id
-                    # Set village_ids from Section 4 if not already set
-                    if not vals.get('village_ids') and section4_notif.village_id:
-                        vals['village_ids'] = [(6, 0, [section4_notif.village_id.id])]
-                    # Set notification_number from Section 4 if not already set (for reference only)
-                    if not vals.get('notification_number') and section4_notif.notification_seq_number:
-                        vals['notification_number'] = section4_notif.notification_seq_number
-                    # Don't use Section 4's name - generate new sequence number using sequence master
-                    # The name will be generated below using the sequence master for section11_notification
+                    # Set village_id from Section 4 if not already set
+                    if not vals.get('village_id') and section4_notif.village_id:
+                        vals['village_id'] = section4_notif.village_id.id
+                    # Don't use Section 4's notification number - generate new one using sequence master
+                    # The notification_number will be generated below using the sequence master for section11_notification
             
             project_id = vals.get('project_id')
-            village_ids = vals.get('village_ids')
+            village_id = vals.get('village_id')
             
             # Ensure required fields are set
-            if not village_ids:
+            if not village_id and project_id:
                 # Try to get from default if available
-                if not project_id:
-                    project_id = self._default_project_id()
-                    if project_id:
-                        vals['project_id'] = project_id
-                        # Auto-populate villages from project
-                        project = self.env['bhu.project'].browse(project_id)
-                        if project and project.village_ids:
-                            vals['village_ids'] = [(6, 0, project.village_ids.ids)]
+                project = self.env['bhu.project'].browse(project_id)
+                if project and project.village_ids and len(project.village_ids) == 1:
+                    # Auto-populate village if project has only one village
+                    vals['village_id'] = project.village_ids[0].id
             
-            # Note: Since we now support multiple villages, we don't check for existing records
-            # based on village_id anymore. Each report can have multiple villages.
-            
-            # Generate name if needed
-            if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                # Try to use sequence settings from settings master
-                if project_id:
-                    # Use first village if multiple villages selected
-                    village_ids_list = vals.get('village_ids', [])
-                    first_village_id = None
-                    
-                    # Extract village IDs from Many2many command format: [(6, 0, [id1, id2, ...])]
-                    if village_ids_list:
-                        if isinstance(village_ids_list, list) and len(village_ids_list) > 0:
-                            if isinstance(village_ids_list[0], (list, tuple)) and len(village_ids_list[0]) >= 3:
-                                # Format: [(6, 0, [id1, id2, ...])]
-                                village_ids = village_ids_list[0][2]
-                                if isinstance(village_ids, list) and len(village_ids) > 0:
-                                    # Get first village ID from the list
-                                    first_village_id = int(village_ids[0]) if village_ids[0] else None
-                                elif isinstance(village_ids, int):
-                                    first_village_id = int(village_ids)
-                            elif isinstance(village_ids_list[0], int):
-                                # Format: [id1, id2, ...]
-                                first_village_id = int(village_ids_list[0])
-                    
-                    # Only pass village_id if we have a single village ID (integer)
-                    # Ensure it's an integer, not a list or recordset
-                    if first_village_id:
-                        try:
-                            first_village_id = int(first_village_id)
-                            sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                                'section11_notification', project_id, village_id=first_village_id
-                            )
-                        except (ValueError, TypeError):
-                            # If conversion fails, don't pass village_id
-                            sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                                'section11_notification', project_id, village_id=None
-                            )
-                    else:
-                        # No village or multiple villages - don't pass village_id
+            # Generate sequence number for both name and notification_number
+            sequence_number = None
+            if project_id:
+                village_id = vals.get('village_id')
+                if village_id:
+                    try:
+                        village_id = int(village_id)
+                        sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                            'section11_notification', project_id, village_id=village_id
+                        )
+                    except (ValueError, TypeError):
+                        # If conversion fails, don't pass village_id
                         sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
                             'section11_notification', project_id, village_id=None
                         )
-                    
-                    if sequence_number:
-                        vals['name'] = sequence_number
-                    else:
-                        # Fallback to ir.sequence
-                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
                 else:
-                    # No project_id, use fallback
-                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
+                    # No village - don't pass village_id
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section11_notification', project_id, village_id=None
+                    )
+                
+                if not sequence_number:
+                    # Fallback to ir.sequence
+                    sequence_number = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
+            else:
+                # No project_id, use fallback
+                sequence_number = self.env['ir.sequence'].next_by_code('bhu.section11.preliminary.report') or 'New'
+            
+            # Set name and notification_number to the same sequence number
+            if vals.get('name', 'New') == 'New' or not vals.get('name'):
+                vals['name'] = sequence_number
+            if not vals.get('notification_number'):
+                vals['notification_number'] = sequence_number
             # Generate UUID if not provided
             if not vals.get('report_uuid'):
                 vals['report_uuid'] = str(uuid.uuid4())
@@ -396,10 +352,10 @@ class Section11PreliminaryReport(models.Model):
         if existing_records:
             records = records | self.env['bhu.section11.preliminary.report'].browse([r.id for r in existing_records])
         
-        # Auto-populate land parcels after creation if villages and project are set
+        # Auto-populate land parcels after creation if village and project are set
         # Also update Section 4 Notification status to 'notification_11'
         for record in records:
-            if record.village_ids and record.project_id:
+            if record.village_id and record.project_id:
                 record._populate_land_parcels_from_surveys()
             # Update Section 4 Notification status to 'notification_11' when Section 11 is created
             if record.section4_notification_id and record.section4_notification_id.state != 'notification_11':
@@ -447,8 +403,8 @@ class Section11PreliminaryReport(models.Model):
     def action_populate_from_surveys(self):
         """Manually populate land parcels from surveys"""
         self.ensure_one()
-        if not self.village_ids or not self.project_id:
-            raise ValidationError(_('Please select Villages and Project first.'))
+        if not self.village_id or not self.project_id:
+            raise ValidationError(_('Please select Village and Project first.'))
         self._populate_land_parcels_from_surveys()
         return {
             'type': 'ir.actions.client',
@@ -461,15 +417,100 @@ class Section11PreliminaryReport(models.Model):
             }
         }
     
+    def _validate_required_fields(self):
+        """Validate that all required fields in Questions tab are filled"""
+        missing_fields = []
+        
+        # Required fields
+        if not self.paragraph_2_claims_info:
+            missing_fields.append(_('Paragraph 2: Claims/Objections Information'))
+        
+        if not self.paragraph_3_map_inspection_location:
+            missing_fields.append(_('Paragraph 3: Land Map Inspection Location'))
+        
+        if not self.question_6_authorized_officer:
+            missing_fields.append(_('Question 6: Officer authorized by Section 12'))
+        
+        if not self.question_7_public_purpose:
+            missing_fields.append(_('Question 7: Description of public purpose'))
+        
+        if not self.paragraph_6_rehab_admin_name:
+            missing_fields.append(_('Question 10: Rehabilitation Administrator'))
+        
+        # Conditional required fields
+        if self.paragraph_4_is_displacement and not self.paragraph_4_affected_families_count:
+            missing_fields.append(_('Question 8: Affected Families Count (required when displacement is involved)'))
+        
+        if self.paragraph_5_is_exemption:
+            if not self.paragraph_5_exemption_details:
+                missing_fields.append(_('Question 9: Exemption Details (required when exemption is granted)'))
+        else:
+            if not self.paragraph_5_sia_justification:
+                missing_fields.append(_('Question 9: SIA Justification (required when exemption is not granted)'))
+        
+        if missing_fields:
+            raise ValidationError(
+                _('Please fill in all required fields in the Questions tab:\n\n%s') %
+                '\n'.join(['- ' + field for field in missing_fields])
+            )
+    
     def action_generate_pdf(self):
-        """Generate Section 11 Preliminary Report PDF"""
+        """Generate Section 11 Preliminary Report PDF - Creates separate notifications for each village with approved surveys"""
         self.ensure_one()
-        self.state = 'generated'
-        # Update Section 4 Notification status to 'notification_11' when Section 11 is generated
-        if self.section4_notification_id and self.section4_notification_id.state != 'notification_11':
-            self.section4_notification_id.write({'state': 'notification_11'})
-        report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
-        return report_action.report_action(self.ids)
+        
+        # Validate required fields
+        self._validate_required_fields()
+        
+        if not self.project_id:
+            raise ValidationError(_('Please select a project first.'))
+        
+        if not self.village_id:
+            raise ValidationError(_('Please select a village first.'))
+        
+        # Check if approved surveys exist for this village
+        approved_surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+            ('state', '=', 'approved')
+        ], limit=1)
+        
+        if not approved_surveys:
+            raise ValidationError(
+                _('No approved surveys found for the selected village. Please ensure the village has approved surveys.')
+            )
+        
+        # Check if Section 11 already exists for this project and village
+        existing = self.env['bhu.section11.preliminary.report'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id)
+        ], limit=1)
+        
+        if existing:
+            raise ValidationError(
+                _('A Section 11 Preliminary Report already exists for village "%s" in project "%s".') %
+                (self.village_id.name, self.project_id.name)
+            )
+        
+        # Update current record state to 'generated'
+        self.write({'state': 'generated'})
+        
+        # Populate land parcels from approved surveys
+        self._populate_land_parcels_from_surveys()
+        
+        # Add message to current record
+        self.message_post(body=_('Section 11 Preliminary Report generated successfully for village %s.') % self.village_id.name)
+        
+        # Return to form view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Section 11 Preliminary Report generated successfully.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def action_download_pdf(self):
         """Download Section 11 Preliminary Report PDF (for generated/signed notifications)"""
@@ -560,15 +601,9 @@ class Section19Notification(models.Model):
         """Create Section 11 Preliminary Report record"""
         self.ensure_one()
         
-        # Auto-populate villages from project
-        village_ids = []
-        if self.project_id and self.project_id.village_ids:
-            village_ids = [(6, 0, self.project_id.village_ids.ids)]
-        
-        # Create the report record
+        # Create the report record (village will be selected by user)
         report = self.env['bhu.section11.preliminary.report'].create({
             'project_id': self.project_id.id,
-            'village_ids': village_ids,
         })
         
         # Open the form view

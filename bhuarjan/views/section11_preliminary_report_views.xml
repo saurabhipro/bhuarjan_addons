@@ -11,7 +11,7 @@
                             class="oe_highlight" title="Generate new Section 11 Preliminary Report"/>
                 </header>
                 <field name="project_id"/>
-                <field name="village_ids" widget="many2many_tags"/>
+                <field name="village_id"/>
                 <field name="notification_number"/>
                 <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
@@ -38,11 +38,11 @@
                         <group>
                             <field name="project_id" required="1" 
                                    options="{'no_create_edit': True}"/>
-                            <field name="village_ids" widget="many2many_tags" required="1"
-                                   placeholder="Select villages..."
-                                   options="{'no_create_edit': True}"
-                                   context="{'default_project_id': project_id}"/>
-                            <field name="notification_number"/>
+                            <field name="village_id" required="1"
+                                   options="{'no_create_edit': True, 'no_quick_create': True}"
+                                   context="{'default_project_id': project_id}"
+                                   placeholder="Select one village..."/>
+                            <field name="notification_number" readonly="1"/>
                         </group>
                         <group>
                             <field name="total_khasras_count" readonly="1"/>
@@ -130,7 +130,7 @@
         <field name="arch" type="xml">
             <search string="Section 11 Preliminary Reports">
                 <field name="project_id"/>
-                <field name="village_ids"/>
+                <field name="village_id"/>
                 <field name="notification_number"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
@@ -141,7 +141,7 @@
                 <filter string="All Reports" name="all" domain="[]"/>
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
-                    <filter string="Village" name="group_by_village" context="{'group_by': 'village_ids'}"/>
+                    <filter string="Village" name="group_by_village" context="{'group_by': 'village_id'}"/>
                     <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
                 </group>
             </search>

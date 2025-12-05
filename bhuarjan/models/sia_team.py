@@ -14,7 +14,7 @@ class SiaTeam(models.Model):
     
     # New fields
     sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=False, tracking=True)
-    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)

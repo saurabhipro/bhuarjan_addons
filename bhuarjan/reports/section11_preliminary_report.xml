@@ -50,8 +50,8 @@
                     <td style="width: 40%; font-size: 14px;">
                         <strong>विभाग का नाम :</strong>
                         <t t-set="department_name" t-value="''"/>
-                        <t t-if="report and report.project_id and report.village_id">
-                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', '=', report.village_id.id)], limit=1)"/>
+                        <t t-if="report and report.project_id and report.village_ids and len(report.village_ids) > 0">
+                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', 'in', report.village_ids.ids)], limit=1)"/>
                             <t t-if="first_survey and first_survey.department_id">
                                 <t t-set="department_name" t-value="first_survey.department_id.name"/>
                             </t>
@@ -87,24 +87,33 @@
                 <tr>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>ग्राम का नाम :</strong>
-                        <span t-if="report and report.village_id" t-esc="report.village_id.name"/>
-                        <span t-if="not report or not report.village_id">........................</span>
+                        <t t-if="report and report.village_ids and len(report.village_ids) > 0">
+                            <t t-foreach="report.village_ids" t-as="village" t-first="first">
+                                <t t-if="not first">, </t>
+                                <t t-esc="village.name"/>
+                            </t>
+                        </t>
+                        <span t-if="not report or not report.village_ids or len(report.village_ids) == 0">........................</span>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>तहसील का नाम :</strong>
-                        <span t-if="report and report.village_id and report.village_id.tehsil_id">
-                            <t t-esc="report.village_id.tehsil_id.name"/>
-                            <t t-if="report.district_id"> जिला-<t t-esc="report.district_id.name"/> (छ.ग.)</t>
-                        </span>
-                        <span t-if="not report or not report.village_id or not report.village_id.tehsil_id">रायगढ़ जिला-रायगढ़ (छ.ग.)</span>
+                        <t t-if="report and report.village_ids and len(report.village_ids) > 0">
+                            <t t-set="first_village" t-value="report.village_ids[0]"/>
+                            <t t-if="first_village and first_village.tehsil_id">
+                                <t t-esc="first_village.tehsil_id.name"/>
+                                <t t-if="first_village.district_id"> जिला-<t t-esc="first_village.district_id.name"/> (छ.ग.)</t>
+                            </t>
+                            <t t-if="not first_village or not first_village.tehsil_id">रायगढ़ जिला-रायगढ़ (छ.ग.)</t>
+                        </t>
+                        <span t-if="not report or not report.village_ids or len(report.village_ids) == 0">रायगढ़ जिला-रायगढ़ (छ.ग.)</span>
                     </td>
                 </tr>
                 <tr>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>सर्वे दिनाँक :</strong>
                         <t t-set="survey_date" t-value="''"/>
-                        <t t-if="report and report.project_id and report.village_id">
-                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', '=', report.village_id.id)], limit=1, order='survey_date desc')"/>
+                        <t t-if="report and report.project_id and report.village_ids and len(report.village_ids) > 0">
+                            <t t-set="first_survey" t-value="report.env['bhu.survey'].search([('project_id', '=', report.project_id.id), ('village_id', 'in', report.village_ids.ids)], limit=1, order='survey_date desc')"/>
                             <t t-if="first_survey and first_survey.survey_date">
                                 <t t-set="survey_date" t-value="first_survey.survey_date.strftime('%d/%m/%Y')"/>
                             </t>
@@ -206,9 +215,9 @@
                                     <t t-if="report.land_parcel_ids and len(report.land_parcel_ids) > 0">
                                         <t t-foreach="report.land_parcel_ids" t-as="parcel">
                                             <tr>
-                                                <td t-esc="report.district_id.name if report.district_id else '........................'"/>
-                                                <td t-esc="report.tehsil_id.name if report.tehsil_id else '........................'"/>
-                                                <td t-esc="report.village_id.name if report.village_id else '........................'"/>
+                                                <td t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
+                                                <td t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
+                                                <td t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
                                                 <td t-esc="parcel.khasra_number or '........................'"/>
                                                 <td style="text-align: right;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
                                                 <td t-esc="parcel.authorized_officer or '........................'"/>

@@ -71,7 +71,7 @@
         <field name="name">SDM Dashboard</field>
         <field name="tag">bhuarjan.sdm_dashboard_tag</field>
     </record>
-    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="SDM Dashboard" action="sdm_dashboard_action" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="SDM Dashboard" action="sdm_dashboard_action" sequence="1" groups="base.group_system,bhuarjan.group_bhuarjan_sdm"/>
 
 
 </odoo>

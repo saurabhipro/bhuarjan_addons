@@ -166,7 +166,7 @@ class Section4Notification(models.Model):
             if record.project_id and record.village_id:
                 section11_reports = self.env['bhu.section11.preliminary.report'].search([
                     ('project_id', '=', record.project_id.id),
-                    ('village_ids', 'in', [record.village_id.id])
+                    ('village_id', '=', record.village_id.id)
                 ], limit=1)
                 record.has_section11 = bool(section11_reports)
             else:

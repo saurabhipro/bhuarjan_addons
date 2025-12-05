@@ -200,7 +200,7 @@ class ExpertCommitteeReport(models.Model):
         self.state = 'approved'
     
     def action_create_section11_notification(self):
-        """Create Section 11 Preliminary Report from this Expert Committee Report"""
+        """Create Section 11 Preliminary Report from this Expert Committee Report - Creates one per village"""
         self.ensure_one()
         
         if not self.project_id:
@@ -209,43 +209,68 @@ class ExpertCommitteeReport(models.Model):
         if not self.village_ids:
             raise ValidationError(_('Please select at least one village first.'))
         
-        # Check if Section 11 already exists for this project
-        existing = self.env['bhu.section11.preliminary.report'].search([
-            ('project_id', '=', self.project_id.id)
-        ], limit=1)
+        # Create a separate Section 11 notification for each village
+        created_notifications = []
+        skipped_villages = []
         
-        if existing:
-            # Open existing Section 11 report
+        for village in self.village_ids:
+            # Check if Section 11 already exists for this project and village
+            existing = self.env['bhu.section11.preliminary.report'].search([
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', village.id)
+            ], limit=1)
+            
+            if existing:
+                skipped_villages.append(village.name)
+                continue
+            
+            # Create new Section 11 Preliminary Report for this village
+            section11 = self.env['bhu.section11.preliminary.report'].create({
+                'project_id': self.project_id.id,
+                'village_id': village.id,
+            })
+            created_notifications.append(section11)
+        
+        if not created_notifications:
+            # All villages already have Section 11 notifications
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Warning'),
+                    'message': _('Section 11 notifications already exist for all selected villages. Skipped: %s') % ', '.join(skipped_villages),
+                    'type': 'warning',
+                    'sticky': True,
+                }
+            }
+        
+        # Add message to Expert Committee Report
+        message = _('Created %d Section 11 Preliminary Report(s) from this Expert Committee Report.') % len(created_notifications)
+        if skipped_villages:
+            message += _(' Skipped: %s') % ', '.join(skipped_villages)
+        self.message_post(body=message)
+        
+        # Open the created Section 11 reports
+        if len(created_notifications) == 1:
+            # Open single notification in form view
             return {
                 'type': 'ir.actions.act_window',
                 'name': _('Section 11 Preliminary Report'),
                 'res_model': 'bhu.section11.preliminary.report',
-                'res_id': existing.id,
+                'res_id': created_notifications[0].id,
                 'view_mode': 'form',
                 'target': 'current',
             }
-        
-        # Create new Section 11 Preliminary Report
-        section11 = self.env['bhu.section11.preliminary.report'].create({
-            'project_id': self.project_id.id,
-            'village_ids': [(6, 0, self.village_ids.ids)],
-        })
-        
-        # Add message to Expert Committee Report
-        self.message_post(
-            body=_('Section 11 Preliminary Report created from this Expert Committee Report.')
-        )
-        
-        # Open the created Section 11 report
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Section 11 Preliminary Report'),
-            'res_model': 'bhu.section11.preliminary.report',
-            'res_id': section11.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-        return True
+        else:
+            # Open multiple notifications in list view
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Section 11 Preliminary Reports'),
+                'res_model': 'bhu.section11.preliminary.report',
+                'view_mode': 'list,form',
+                'domain': [('id', 'in', [n.id for n in created_notifications])],
+                'target': 'current',
+            }
     
     def action_reject(self):
         """Reject the Expert Committee Report"""

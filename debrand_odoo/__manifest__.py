@@ -32,6 +32,7 @@
                                 # '/debrand_odoo/static/src/js/dialog.js',
                                 # '/debrand_odoo/static/src/js/my_widget.js',
                                 '/debrand_odoo/static/src/js/user_menu.js',
+                                '/debrand_odoo/static/src/xml/web.xml',
                                 # '/debrand_odoo/static/src/js/mail_dialog.js'
                             ],
                             # 'web.assets_qweb': [

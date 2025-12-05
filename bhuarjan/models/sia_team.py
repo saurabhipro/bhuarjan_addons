@@ -24,7 +24,9 @@ class SiaTeam(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
     village_ids = fields.Many2many('bhu.village', string='Affected Villages / प्रभावित ग्राम', tracking=True,
-                                   help='Select affected villages for this SIA Team (defaults to all project villages)')
+                                   help='Affected villages for this SIA Team (auto-populated from project)')
+    tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil_ids', store=False, readonly=True,
+                                  help='Tehsils from the selected villages')
     
     # Workflow
     state = fields.Selection([
@@ -86,10 +88,20 @@ class SiaTeam(models.Model):
     
     # Project villages for reference (read-only)
     project_village_ids = fields.Many2many('bhu.village', 
-                                           string='Project Villages / परियोजना ग्राम',
+                                           string='Project Villages / परियोजना ग्राम', 
                                            compute='_compute_project_villages', 
                                            store=False,
                                            help='Villages mapped to the selected project (read-only for reference)')
+    
+    @api.depends('village_ids', 'village_ids.tehsil_id')
+    def _compute_tehsil_ids(self):
+        """Compute tehsils from selected villages"""
+        for record in self:
+            if record.village_ids:
+                tehsils = record.village_ids.mapped('tehsil_id').filtered(lambda t: t)
+                record.tehsil_ids = tehsils
+            else:
+                record.tehsil_ids = False
     
     @api.depends('project_id', 'project_id.village_ids', 'village_ids')
     def _compute_project_villages(self):

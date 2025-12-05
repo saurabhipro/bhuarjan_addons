@@ -11,11 +11,31 @@ class Section11PreliminaryReport(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
     _order = 'create_date desc'
 
+    _sql_constraints = [
+        ('unique_project', 'UNIQUE(project_id)', 
+         'Only one Section 11 Preliminary Report can be created per project! / प्रति परियोजना केवल एक धारा 11 प्रारंभिक रिपोर्ट बनाई जा सकती है!')
+    ]
+
     name = fields.Char(string='Report Name', required=True, default='New', tracking=True, readonly=True)
     project_id = fields.Many2one('bhu.project', string='Project', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, tracking=True)
     
+    @api.constrains('project_id')
+    def _check_unique_project(self):
+        """Ensure only one Section 11 Preliminary Report per project"""
+        for record in self:
+            if record.project_id:
+                existing = self.search([
+                    ('id', '!=', record.id),
+                    ('project_id', '=', record.project_id.id)
+                ], limit=1)
+                if existing:
+                    raise ValidationError(
+                        _('A Section 11 Preliminary Report already exists for project "%s". Only one Section 11 Preliminary Report can be created per project.') %
+                        record.project_id.name
+                    )
+
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-populate villages when project is selected"""
@@ -321,14 +341,41 @@ class Section11PreliminaryReport(models.Model):
                     # Use first village if multiple villages selected
                     village_ids_list = vals.get('village_ids', [])
                     first_village_id = None
-                    if village_ids_list and isinstance(village_ids_list[0], (list, tuple)) and len(village_ids_list[0]) > 2:
-                        first_village_id = village_ids_list[0][2] if len(village_ids_list[0]) > 2 else None
-                    elif isinstance(village_ids_list, list) and village_ids_list:
-                        first_village_id = village_ids_list[0] if isinstance(village_ids_list[0], int) else None
                     
-                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'section11_notification', project_id, village_id=first_village_id
-                    )
+                    # Extract village IDs from Many2many command format: [(6, 0, [id1, id2, ...])]
+                    if village_ids_list:
+                        if isinstance(village_ids_list, list) and len(village_ids_list) > 0:
+                            if isinstance(village_ids_list[0], (list, tuple)) and len(village_ids_list[0]) >= 3:
+                                # Format: [(6, 0, [id1, id2, ...])]
+                                village_ids = village_ids_list[0][2]
+                                if isinstance(village_ids, list) and len(village_ids) > 0:
+                                    # Get first village ID from the list
+                                    first_village_id = int(village_ids[0]) if village_ids[0] else None
+                                elif isinstance(village_ids, int):
+                                    first_village_id = int(village_ids)
+                            elif isinstance(village_ids_list[0], int):
+                                # Format: [id1, id2, ...]
+                                first_village_id = int(village_ids_list[0])
+                    
+                    # Only pass village_id if we have a single village ID (integer)
+                    # Ensure it's an integer, not a list or recordset
+                    if first_village_id:
+                        try:
+                            first_village_id = int(first_village_id)
+                            sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                                'section11_notification', project_id, village_id=first_village_id
+                            )
+                        except (ValueError, TypeError):
+                            # If conversion fails, don't pass village_id
+                            sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                                'section11_notification', project_id, village_id=None
+                            )
+                    else:
+                        # No village or multiple villages - don't pass village_id
+                        sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                            'section11_notification', project_id, village_id=None
+                        )
+                    
                     if sequence_number:
                         vals['name'] = sequence_number
                     else:

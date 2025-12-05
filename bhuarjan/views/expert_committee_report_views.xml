@@ -49,6 +49,10 @@
                             invisible="state != 'submitted'"/>
                     <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" 
                             type="object" class="btn-primary" icon="fa-file-text"/>
+                    <button name="action_create_section11_notification" string="Create Section 11 Notification" 
+                            type="object" class="btn-primary" icon="fa-file-text"
+                            invisible="state != 'approved'"
+                            help="Create Section 11 Preliminary Report from this Expert Committee Report"/>
                     <button name="action_mark_signed" string="Mark as Signed / हस्ताक्षरित के रूप में चिह्नित करें" 
                             type="object" class="btn-success" 
                             invisible="state == 'signed' or not has_signed_document"/>

@@ -296,8 +296,16 @@ class BhuarjanSettingsMaster(models.Model):
             # Get village code for substitution if village_id is provided
             village_code = ''
             if village_id:
-                village = self.env['bhu.village'].browse(village_id)
-                village_code = village.village_code if village.exists() else ''
+                # Ensure village_id is a single integer, not a list or recordset
+                if isinstance(village_id, (list, tuple)):
+                    village_id = village_id[0] if village_id else None
+                elif hasattr(village_id, '__iter__') and not isinstance(village_id, (str, int)):
+                    # It's a recordset or iterable, get first ID
+                    village_id = village_id[0].id if len(village_id) > 0 else None
+                
+                if village_id:
+                    village = self.env['bhu.village'].browse(village_id)
+                    village_code = village.village_code if village.exists() else ''
             
             # Prepare prefix with all placeholders replaced
             sequence_prefix = sequence_setting.prefix.replace('{%PROJ_CODE%}', project_code)

@@ -198,6 +198,53 @@ class ExpertCommitteeReport(models.Model):
         if self.state not in ['draft', 'submitted']:
             raise ValidationError(_('Only draft or submitted reports can be approved.'))
         self.state = 'approved'
+    
+    def action_create_section11_notification(self):
+        """Create Section 11 Preliminary Report from this Expert Committee Report"""
+        self.ensure_one()
+        
+        if not self.project_id:
+            raise ValidationError(_('Please select a project first.'))
+        
+        if not self.village_ids:
+            raise ValidationError(_('Please select at least one village first.'))
+        
+        # Check if Section 11 already exists for this project
+        existing = self.env['bhu.section11.preliminary.report'].search([
+            ('project_id', '=', self.project_id.id)
+        ], limit=1)
+        
+        if existing:
+            # Open existing Section 11 report
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Section 11 Preliminary Report'),
+                'res_model': 'bhu.section11.preliminary.report',
+                'res_id': existing.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+        
+        # Create new Section 11 Preliminary Report
+        section11 = self.env['bhu.section11.preliminary.report'].create({
+            'project_id': self.project_id.id,
+            'village_ids': [(6, 0, self.village_ids.ids)],
+        })
+        
+        # Add message to Expert Committee Report
+        self.message_post(
+            body=_('Section 11 Preliminary Report created from this Expert Committee Report.')
+        )
+        
+        # Open the created Section 11 report
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Section 11 Preliminary Report'),
+            'res_model': 'bhu.section11.preliminary.report',
+            'res_id': section11.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
         return True
     
     def action_reject(self):

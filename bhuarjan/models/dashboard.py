@@ -1,11 +1,44 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from datetime import datetime
 
 
 class BhuarjanDashboard(models.TransientModel):
     _name = 'bhuarjan.dashboard'
     _description = 'Bhuarjan Dashboard'
+
+    current_datetime = fields.Char(string='Current Date & Time', compute='_compute_current_datetime', store=False)
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values including current datetime"""
+        res = super().default_get(fields_list)
+        
+        return res
+    
+    @api.depends()
+    def _compute_current_datetime(self):
+        """Compute current date and time as formatted string"""
+        from datetime import datetime
+        for record in self:
+            now = datetime.now()
+            record.current_datetime = now.strftime('%Y-%m-%d %H:%M:%S') or 'Loading...'
+
+    is_admin = fields.Boolean(string='Is Admin', compute='_compute_is_admin', store=False)
+    
+    @api.depends()
+    def _compute_is_admin(self):
+        """Check if current user is admin"""
+        for record in self:
+            try:
+                record.is_admin = self.env.user.has_group('bhuarjan.group_bhuarjan_admin') or self.env.user.has_group('base.group_system')
+            except:
+                record.is_admin = False
+    
+
+    
+
     
 
     # Master Data Counts
@@ -157,6 +190,10 @@ class BhuarjanDashboard(models.TransientModel):
             vals.update(counts)
         
         records = super().create(vals_list)
+        # Ensure computed fields are computed
+        for record in records:
+            record._compute_current_datetime()
+            record._compute_is_admin()
         return records
     
     def read(self, fields=None, load='_classic_read'):
@@ -173,6 +210,13 @@ class BhuarjanDashboard(models.TransientModel):
                 # Re-read to get updated values
                 result = super().read(fields=fields, load=load)
                 break
+        
+        
+        # Ensure computed fields are computed
+        for record_data in result:
+            record = self.browse(record_data['id'])
+            record._compute_current_datetime()
+            record._compute_is_admin()
         
         return result
     
@@ -277,6 +321,13 @@ class BhuarjanDashboard(models.TransientModel):
         if not dashboard:
             # Create new dashboard with pre-computed values
             dashboard = self.create({})
+            # Ensure computed fields are computed
+            dashboard._compute_current_datetime()
+            dashboard._compute_is_admin()
+            # Force recompute
+            dashboard.invalidate_recordset(['current_datetime', 'is_admin'])
+            dashboard._compute_current_datetime()
+            dashboard._compute_is_admin()
         else:
             # Always refresh values to ensure they're up-to-date, but do it efficiently
             # Check if any key field is 0, which might indicate stale data

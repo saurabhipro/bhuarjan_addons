@@ -6,7 +6,20 @@
         <field name="model">bhuarjan.dashboard</field>
         <field name="arch" type="xml">
             <form string="Bhuarjan Dashboard" create="0" delete="0">
-                <sheet>
+                <!-- Welcome message for non-admin users -->
+                <div invisible="is_admin" 
+                     style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div style="background: white; padding: 60px 80px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 600px;">
+                        <h1 style="color: #667eea; font-size: 48px; font-weight: bold; margin: 0 0 20px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+                            Welcome to Bhuarjan
+                        </h1>
+                        <div style="color: #333; font-size: 24px; margin-top: 30px; font-weight: 500;">
+                            <field name="current_datetime" nolabel="1" readonly="1"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dashboard content for admin users -->
+                <sheet invisible="not is_admin">
                     <div class="oe_button_box" name="button_box">
                         <button name="action_refresh" string="Refresh" type="object" class="oe_stat_button" icon="fa-refresh"/>
                         <button name="%(action_bhu_survey)d" string="Surveys" type="action" class="oe_stat_button" icon="fa-list-alt" context="{}">

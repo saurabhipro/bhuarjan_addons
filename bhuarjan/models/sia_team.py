@@ -9,6 +9,11 @@ class SiaTeam(models.Model):
     _description = 'SIA Team'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
+    
+    _sql_constraints = [
+        ('unique_project', 'UNIQUE(project_id)', 
+         'Only one SIA Team can be created per project! / प्रति परियोजना केवल एक SIA टीम बनाई जा सकती है!')
+    ]
 
     name = fields.Char(string='Team Name / टीम का नाम', compute='_compute_name', store=True, readonly=True)
     
@@ -184,6 +189,21 @@ class SiaTeam(models.Model):
         
         return {'domain': domain_updates}
     
+    @api.constrains('project_id')
+    def _check_unique_project(self):
+        """Ensure only one SIA Team per project"""
+        for record in self:
+            if record.project_id:
+                existing = self.search([
+                    ('id', '!=', record.id),
+                    ('project_id', '=', record.project_id.id)
+                ], limit=1)
+                if existing:
+                    raise ValidationError(
+                        _('A SIA Team already exists for project "%s". Only one SIA Team can be created per project.') %
+                        record.project_id.name
+                    )
+    
     @api.constrains('village_ids', 'project_id')
     def _check_villages_belong_to_project(self):
         """Ensure selected villages belong to the project"""
@@ -244,23 +264,93 @@ class SiaTeam(models.Model):
     
     # Document Actions
     def action_download_sia_file(self):
-        """Download SIA File"""
+        """Generate and download SIA Order Report PDF"""
         self.ensure_one()
-        if not self.sia_file:
+        return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
+    
+    def action_create_section4_notification(self):
+        """Create Section 4 Notifications for all villages in this SIA Team"""
+        self.ensure_one()
+        
+        if not self.project_id:
+            raise ValidationError(_('Please select a project first.'))
+        
+        if not self.requiring_body_id:
+            raise ValidationError(_('Please select a requiring body first.'))
+        
+        if not self.village_ids:
+            raise ValidationError(_('Please select at least one village first.'))
+        
+        # Create Section 4 Notifications for each village
+        created_notifications = []
+        skipped_villages = []
+        
+        for village in self.village_ids:
+            # Check if notification already exists for this village and project
+            existing = self.env['bhu.section4.notification'].search([
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', village.id)
+            ], limit=1)
+            
+            if existing:
+                skipped_villages.append(village.name)
+                continue
+            
+            # Check if surveys exist for this village
+            surveys = self.env['bhu.survey'].search([
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', village.id)
+            ])
+            
+            if not surveys:
+                skipped_villages.append(f"{village.name} (no surveys)")
+                continue
+            
+            # Create notification
+            notification = self.env['bhu.section4.notification'].create({
+                'project_id': self.project_id.id,
+                'village_id': village.id,
+                'requiring_body_id': self.requiring_body_id.id,
+            })
+            created_notifications.append(notification)
+        
+        if created_notifications:
+            # Add message to SIA Team record about created notifications
+            if skipped_villages:
+                message = _('Created %d Section 4 Notification(s) from this SIA Team. Skipped villages: %s') % (
+                    len(created_notifications),
+                    ', '.join(skipped_villages)
+                )
+            else:
+                message = _('Created %d Section 4 Notification(s) from this SIA Team.') % len(created_notifications)
+            
+            self.message_post(body=message)
+            
+            # Open the first created notification in form view
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Section 4 Notifications'),
+                'res_model': 'bhu.section4.notification',
+                'res_id': created_notifications[0].id if len(created_notifications) == 1 else False,
+                'view_mode': 'form' if len(created_notifications) == 1 else 'list,form',
+                'domain': [('id', 'in', [n.id for n in created_notifications])] if len(created_notifications) > 1 else [],
+                'target': 'current',
+                'context': {
+                    'default_project_id': self.project_id.id,
+                    'default_requiring_body_id': self.requiring_body_id.id,
+                }
+            }
+        else:
+            # Show error if no notifications were created
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Error'),
-                    'message': _('No file uploaded to download.'),
-                    'type': 'danger',
-                    'sticky': False,
+                    'title': _('Warning'),
+                    'message': _('No notifications were created. All villages either already have notifications or have no surveys.'),
+                    'type': 'warning',
+                    'sticky': True,
                 }
             }
-        return {
-            'type': 'ir.actions.act_url',
-            'url': '/web/content/bhu.sia.team/%s/sia_file/%s?download=true' % (self.id, self.sia_filename or 'sia_file'),
-            'target': 'self',
-        }
     
 

@@ -33,9 +33,13 @@
                             invisible="state not in ('submitted', 'approved')"/>
                     <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
                             invisible="state == 'draft'"/>
-                    <button name="action_download_sia_file" string="Download SIA File" type="object" 
+                    <button name="action_download_sia_file" string="Download SIA Report" type="object" 
                             class="btn-primary" icon="fa-download"
-                            invisible="state not in ('submitted', 'approved') or not sia_file"/>
+                            invisible="state == 'draft'"/>
+                    <button name="action_create_section4_notification" string="Create Section 4 Notification" 
+                            type="object" class="btn-primary" icon="fa-file-text"
+                            invisible="state != 'approved'"
+                            help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>
                 <sheet>

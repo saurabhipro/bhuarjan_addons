@@ -7,6 +7,14 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
+                <field name="code" string="Project Code"/>
+                <field name="sdm_ids" widget="many2many_tags" string="SDM / उप-विभागीय मजिस्ट्रेट" options="{'no_create_edit': True}"/>
+                <field name="tehsildar_ids" widget="many2many_tags" string="Tehsildar / तहसीलदार" options="{'no_create_edit': True}"/>
+                <field name="state" string="Status / स्थिति" widget="badge" 
+                       decoration-success="state == 'active'"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'completed'"
+                       decoration-danger="state == 'cancelled'"/>
                 <field name="budget"/>
             </list>
         </field>

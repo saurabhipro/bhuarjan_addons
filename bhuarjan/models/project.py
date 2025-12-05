@@ -31,6 +31,8 @@ class BhuProject(models.Model):
             }
         }
     code = fields.Char(string='Project Code', tracking=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True,
+                                    help='Select the department for this project')
     description = fields.Text(string='Description', tracking=True)
     budget = fields.Float(string='Budget', tracking=True)
     start_date = fields.Date(string='Start Date', tracking=True)

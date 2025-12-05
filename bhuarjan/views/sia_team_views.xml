@@ -47,10 +47,13 @@
                         <group>
                             <field name="project_id" required="1"/>
                             <field name="requiring_body_id" required="1"/>
-                            <field name="village_ids" widget="many2many_tags" 
-                                   placeholder="Select affected villages..."
+                            <field name="village_ids" widget="many2many_tags" readonly="1"
+                                   placeholder="Affected villages (auto-populated from project)..."
                                    options="{'no_create_edit': True}"
                                    context="{'default_project_id': project_id}"/>
+                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
+                                   placeholder="Tehsils (from selected villages)..."
+                                   options="{'no_create_edit': True}"/>
                         </group>
                         <group>
                             <field name="total_khasras_count" readonly="1"/>

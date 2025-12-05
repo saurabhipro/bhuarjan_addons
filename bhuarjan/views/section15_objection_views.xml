@@ -61,7 +61,7 @@
                         <group>
                             <field name="name" required="1"/>
                             <field name="project_id" required="1"/>
-                            <field name="village_id" required="1"/>
+                            <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"/>
                             <field name="filtered_landowner_ids" invisible="1"/>
                             <field name="landowner_id" required="1" 
                                    domain="[('id', 'in', filtered_landowner_ids)]"/>

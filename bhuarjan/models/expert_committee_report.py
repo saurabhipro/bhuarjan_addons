@@ -15,7 +15,7 @@ class ExpertCommitteeReport(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True)
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
-                                       help='Select the requiring body/department')
+                                       help='Select the requiring body/department', related="project_id.department_id")
     village_ids = fields.Many2many('bhu.village', string='Affected Villages / प्रभावित ग्राम', tracking=True,
                                    help='Select affected villages for this report')
     

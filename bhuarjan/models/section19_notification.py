@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 import uuid
 
+import json
 
 class Section19Notification(models.Model):
     _name = 'bhu.section19.notification'
@@ -200,12 +201,32 @@ class Section19Notification(models.Model):
         if parcel_vals:
             self.land_parcel_ids = parcel_vals
     
+    village_domain = fields.Char()
     @api.onchange('village_ids', 'project_id')
     def _onchange_village_populate_surveys(self):
         """Auto-populate land parcels from Section 11 approved khasras (excluding objections) when villages are selected"""
         # Only populate if section11_report_id is not set
         if not self.section11_report_id:
             self._populate_land_parcels_from_surveys()
+
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])   # empty domain
+                rec.village_id = False
+
+
+    @api.depends('project_id', 'project_id.village_ids', 'village_ids')
+    def _compute_project_villages(self):
+        """Compute villages - show selected villages if any, otherwise show all project villages"""
+        for record in self:
+         
+            if record.project_id and record.project_id.village_ids:
+                # If no villages selected, show all project villages
+                record.village_ids = record.project_id.village_ids
+            else:
+                record.village_ids = False
     
     def _populate_land_parcels_from_surveys(self):
         """Helper method to populate land parcels from Section 11 approved khasras, excluding those with objections"""
@@ -427,7 +448,7 @@ class Section19NotificationWizard(models.TransientModel):
     _description = 'Section 19 Notification Wizard'
 
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
-    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True)
+    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम', required=True, compute="_compute_project_villages")
     
     def action_generate_notification(self):
         """Create Section 19 Notification record and generate PDF"""

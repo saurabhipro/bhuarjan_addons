@@ -41,7 +41,8 @@
                             <field name="village_id" required="1"
                                    options="{'no_create_edit': True, 'no_quick_create': True}"
                                    context="{'default_project_id': project_id}"
-                                   placeholder="Select one village..."/>
+                                   placeholder="Select one village..."
+                                   domain="village_domain"/>
                             <field name="notification_number" readonly="1"/>
                         </group>
                         <group>

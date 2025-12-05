@@ -46,11 +46,11 @@
                         <group>
                             <field name="project_id" required="1" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 
                                    options="{'no_create': True, 'no_open': True}"/>
-                            <field name="requiring_body_id" required="1" 
-                                   readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <field name="requiring_body_id" required="1"/>
                             <field name="tehsil_id" readonly="1"/>
                             <field name="village_id" required="1" 
-                                   options="{'no_create_edit': True}"
+                                    domain="village_domain"
+                                   options="{'no_create_edit': True,'no_create':True,'no_open':True}"
                                    readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                         </group>
                         <group>

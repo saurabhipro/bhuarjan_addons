@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 import uuid
+import json
 
 class DraftAward(models.Model):
     _name = 'bhu.draft.award'
@@ -168,9 +169,19 @@ class DraftAward(models.Model):
                 record.section11_report_id = False
     
     
+    village_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Clear Section 19 selection when project changes"""
+
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])   # empty domain
+                rec.village_id = False
+
+
         if self.project_id:
             # Keep section19_notification_id if it matches the project
             if self.section19_notification_id and self.section19_notification_id.project_id != self.project_id:

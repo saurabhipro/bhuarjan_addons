@@ -49,7 +49,7 @@
                                    help="Select Section 19 Notification to auto-populate all land parcels from survey tables"
                                    domain="[('project_id', '=', project_id)]"/>
                             <field name="village_id" required="1" readonly="section19_notification_id"
-                                   options="{'no_create': True, 'no_open': True}"/>
+                                   options="{'no_create': True, 'no_open': True}" domain="village_domain"/>
                             <field name="case_number"/>
                             <field name="patwari_halka_number"/>
                         </group>

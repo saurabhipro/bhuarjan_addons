@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from . import utils
 import uuid
-
+import json
 
 # Stub models for Process menu items - to be implemented later
 # These are minimal models to allow the module to load
@@ -19,10 +19,10 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
-    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
-                                       help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
+                                       help='Select the requiring body/department', related="project_id.department_id")
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     area_captured_from_form10 = fields.Float(string='Area Captured from Form 10 (Hectares) / फॉर्म 10 से कैप्चर किया गया क्षेत्रफल (हेक्टेयर)',
@@ -172,13 +172,18 @@ class Section4Notification(models.Model):
             else:
                 record.has_section11 = False
     
+    village_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
-        self.village_id = False
-        if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
-        return {'domain': {'village_id': []}}
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])   # empty domain
+                rec.village_id = False
+
+
     
     @api.model
     def _default_project_id(self):

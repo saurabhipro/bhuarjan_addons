@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import date
-
+import json
 
 class Section15Objection(models.Model):
     _name = 'bhu.section15.objection'
@@ -225,15 +225,18 @@ class Section15Objection(models.Model):
                     vals['name'] = f'OBJ-{sequence}'
         return super().create(vals_list)
 
+    
+
+    village_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
-        self.village_id = False
-        self.landowner_id = False
-        self.survey_id = False
-        if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
-        return {'domain': {'village_id': []}}
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])   # empty domain
+                rec.village_id = False
     
     @api.onchange('village_id')
     def _onchange_village_id(self):

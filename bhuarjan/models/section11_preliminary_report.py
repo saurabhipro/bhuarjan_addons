@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 import uuid
+import json
 
 class Section11PreliminaryReport(models.Model):
     _name = 'bhu.section11.preliminary.report'
@@ -33,15 +34,20 @@ class Section11PreliminaryReport(models.Model):
                         _('A Section 11 Preliminary Report already exists for village "%s" in project "%s". Only one Section 11 Preliminary Report can be created per village per project.') %
                         (record.village_id.name, record.project_id.name)
                     )
-    
+
+
+    village_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset village when project changes and set domain to only show project villages"""
-        self.village_id = False
-        if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
-        else:
-            return {'domain': {'village_id': [('id', '=', False)]}}
+        """Reset village when project changes and set domain"""
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])   # empty domain
+                rec.village_id = False
+
+
     
     # Section 4 Notification reference
     section4_notification_id = fields.Many2one('bhu.section4.notification', string='Section 4 Notification',

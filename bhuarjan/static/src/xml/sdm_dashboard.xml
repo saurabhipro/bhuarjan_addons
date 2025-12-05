@@ -1,0 +1,17 @@
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.SDMTemplate" owl="1">
+        <div class="vh-100 overflow-auto bg-light d-flex flex-column align-items-center justify-content-center pb-5">
+            
+            <div class="card shadow-lg border-0" style="max-width: 50%; width: 100%;">
+                <div class="card-body text-center">
+                    <h1 class="card-title mb-3 text-primary" style="font-weight: 700;
+    font-size: xxx-large;">Welcome to Bhuarjan</h1>
+                    <p class="card-text text-muted" style="font-size: 15px;">
+                        Manage your SDM operations smoothly and efficiently.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

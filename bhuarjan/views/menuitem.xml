@@ -2,7 +2,7 @@
 <odoo>
     <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1" web_icon="bhuarjan,static/description/icon.png" action="action_bhuarjan_dashboard_window"/>
     
-    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" />
+    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
     <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2"/>
 
@@ -41,7 +41,7 @@
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="menu_bhu_master" sequence="15" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
-    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
     <!-- Process Menu -->
     <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
@@ -67,6 +67,11 @@
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" /> <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
 
+    <record id="sdm_dashboard_action" model="ir.actions.client">
+        <field name="name">SDM Dashboard</field>
+        <field name="tag">bhuarjan.sdm_dashboard_tag</field>
+    </record>
+    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="SDM Dashboard" action="sdm_dashboard_action" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm"/>
 
 
 </odoo>

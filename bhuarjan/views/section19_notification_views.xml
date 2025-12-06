@@ -27,7 +27,7 @@
                 <header>
                     <button name="action_generate_pdf" string="Generate PDF" type="object" class="btn-primary" icon="fa-file-pdf"
                             invisible="state == 'signed'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <group>

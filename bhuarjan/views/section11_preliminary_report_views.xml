@@ -31,7 +31,7 @@
                             invisible="state in ('generated', 'signed')"/>
                     <button name="action_download_pdf" string="Download Notification 11" type="object" class="btn-primary" icon="fa-download"
                             invisible="state not in ('generated', 'signed')"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <group col="2">

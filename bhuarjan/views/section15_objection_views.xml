@@ -35,12 +35,11 @@
                 <field name="objection_type"/>
                 <field name="objection_date"/>
                 <field name="age_days"/>
-                <field name="status" widget="badge" 
-                       decoration-danger="status == 'rejected'"
-                       decoration-warning="status == 'under_review'"
-                       decoration-info="status == 'received'"
-                       decoration-success="status == 'resolved'"
-                       decoration-muted="status == 'draft'"/>
+                <field name="state" widget="badge" 
+                       decoration-danger="state == 'send_back'"
+                       decoration-warning="state == 'draft'"
+                       decoration-info="state == 'submitted'"
+                       decoration-success="state == 'approved'"/>
             </list>
         </field>
     </record>
@@ -53,8 +52,8 @@
             <form string="Objection / आपत्ति">
                 <header>
                     <button name="action_resolve" string="Resolve / हल करें" type="object" class="btn-success" 
-                            invisible="status == 'resolved'" icon="fa-check"/>
-                    <field name="status" widget="statusbar" statusbar_visible="draft,received,under_review,resolved"/>
+                            invisible="state == 'approved'" icon="fa-check"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <group>
@@ -193,15 +192,16 @@
                 <field name="village_id"/>
                 <field name="landowner_id"/>
                 <field name="objection_type"/>
-                <filter string="Draft" name="draft" domain="[('status', '=', 'draft')]"/>
-                <filter string="Under Review" name="under_review" domain="[('status', '=', 'under_review')]"/>
-                <filter string="Resolved" name="resolved" domain="[('status', '=', 'resolved')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Sent Back" name="send_back" domain="[('state', '=', 'send_back')]"/>
                 <filter string="Area Increase" name="area_increase" domain="[('objection_type', '=', 'area_increase')]"/>
                 <filter string="Rate Increase" name="rate_increase" domain="[('objection_type', '=', 'rate_increase')]"/>
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
-                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'state'}"/>
                     <filter string="Objection Type" name="group_objection_type" context="{'group_by': 'objection_type'}"/>
                 </group>
             </search>

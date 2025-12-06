@@ -52,7 +52,7 @@
                             type="object" class="btn-primary" icon="fa-file-text"
                             invisible="state != 'approved'"
                             help="Create Section 11 Preliminary Report from this Expert Committee Report"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,signed"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <group col="2">

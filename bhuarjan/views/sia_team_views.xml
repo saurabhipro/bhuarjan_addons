@@ -97,7 +97,7 @@
                     <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
                             groups="bhuarjan.group_bhuarjan_sdm"
                             invisible="state != 'send_back'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <group col="2">

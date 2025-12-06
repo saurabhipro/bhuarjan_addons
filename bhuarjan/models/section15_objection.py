@@ -8,7 +8,7 @@ import json
 class Section15Objection(models.Model):
     _name = 'bhu.section15.objection'
     _description = 'Section 15 Objections'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Objection Reference / आपत्ति संदर्भ', required=True, tracking=True, default='New')
@@ -176,13 +176,7 @@ class Section15Objection(models.Model):
     # Single attachment file
     objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज़')
     objection_document_filename = fields.Char(string='Document Filename / दस्तावेज़ फ़ाइल नाम')
-    status = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('received', 'Received / प्राप्त'),
-        ('under_review', 'Under Review / समीक्षा के अधीन'),
-        ('resolved', 'Resolved / हल'),
-        ('rejected', 'Rejected / अस्वीकृत'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+    # State field is inherited from bhu.process.workflow.mixin
     
     resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
@@ -263,15 +257,15 @@ class Section15Objection(models.Model):
 
 
     def action_resolve(self):
-        """Mark objection as resolved"""
+        """Mark objection as resolved (approved)"""
         for record in self:
             # Check if resolution_details is empty or only whitespace
             if not record.resolution_details or not record.resolution_details.strip():
                 raise ValidationError(_('Please enter resolution details in the "Resolution / समाधान" tab before resolving.'))
-            record.status = 'resolved'
+            record.state = 'approved'
             record.resolved_date = fields.Date.today()
             record.message_post(
-                body=_('Objection resolved by %s') % self.env.user.name,
+                body=_('Objection resolved (approved) by %s') % self.env.user.name,
                 message_type='notification'
             )
 

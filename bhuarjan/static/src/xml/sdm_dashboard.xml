@@ -1,17 +1,136 @@
 <templates xml:space="preserve">
     <t t-name="bhuarjan.SDMTemplate" owl="1">
-        <div class="vh-100 overflow-auto bg-light d-flex flex-column align-items-center justify-content-center pb-5">
-            
-            <div class="card shadow-lg border-0" style="max-width: 50%; width: 100%;">
-                <div class="card-body text-center">
-                    <h1 class="card-title mb-3 text-primary" style="font-weight: 700;
-                    font-size: xxx-large;">Welcome to Bhuarjan</h1>
-                    <p class="card-text text-muted" style="font-size: 15px;">
-                        Manage your Land Aquisition District Administration Raigarh CG.
-                    </p>
-                </div>
-            </div>
+<div class="container py-5">
 
+    <!-- Header Card -->
+    <div class="d-flex justify-content-center mb-5">
+        <div class="card-body text-center">
+            <h1 class="card-title mb-3 text-primary" style="font-weight: 700; font-size: xxx-large;">
+                Welcome to Bhuarjan
+            </h1>
+            <p class="card-text text-muted" style="font-size: 15px;">
+                Manage your Land Acquisition – District Administration Raigarh, CG.
+            </p>
         </div>
+    </div>
+
+    <!-- Project -->
+    <div class="table-responsive">
+        <select class="form-select" t-on-change="_onProjectChange">
+            <option value="">Select Project</option>
+            <t t-foreach="projects.list" t-as="p" t-key="p.id">
+                <option t-att-value="p.id">
+                    <t t-esc="p.name" />
+                </option>
+            </t>
+        </select>
+    </div>
+
+
+    <!-- Table Style Section -->
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center shadow-sm">
+            <thead class="bg-secondary text-white">
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Action Name</th>
+                    <th style="width: 120px;">Create</th>
+                    <th style="width: 120px;">Edit</th>
+                    <th style="width: 120px;">Delete</th>
+                    <th style="width: 120px;">Upload</th>
+                    <th style="width: 150px;">Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <!-- Row Template Function -->
+                <tr>
+                    <td>1</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of SIA Team
+                    </td>
+                    <td><button class="btn btn-success w-100" t-on-click="_onClickSiaTeamFormNew">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100" t-on-click="_onClickSiaTeam">View</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of Expert Committee
+                    </td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of Section 4 Notification
+                    </td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>4</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of Section 11 Notification
+                    </td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>5</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of Section 19 Notification
+                    </td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>6</td>
+                    <td class="text-start fw-semibold">
+                        Make a Proposal of Section 21 Notice
+                    </td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+                <tr>
+                    <td>7</td>
+                    <td class="text-start fw-semibold">Make Compensation</td>
+                    <td><button class="btn btn-success w-100">CREATE</button></td>
+                    <td><button class="btn btn-primary w-100">EDIT</button></td>
+                    <td><button class="btn btn-danger w-100">DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
     </t>
 </templates>

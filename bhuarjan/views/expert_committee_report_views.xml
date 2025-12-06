@@ -37,21 +37,71 @@
         <field name="arch" type="xml">
             <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट">
                 <header>
-                    <button name="action_submit" string="Submit / प्रस्तुत करें" 
-                            type="object" class="btn-primary" icon="fa-paper-plane"
-                            invisible="state != 'draft'"/>
-                    <button name="action_approve" string="Approve / अनुमोदित करें" 
-                            type="object" class="btn-success" icon="fa-check"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_send_back" string="Send Back / वापस भेजें" 
-                            type="object" class="btn-danger" icon="fa-times"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" 
-                            type="object" class="btn-primary" icon="fa-file-text"/>
-                    <button name="action_create_section11_notification" string="Create Section 11 Notification" 
-                            type="object" class="btn-primary" icon="fa-file-text"
-                            invisible="state != 'approved'"
-                            help="Create Section 11 Preliminary Report from this Expert Committee Report"/>
+                    <!-- File Upload Section for SDM -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Signed Expert Committee Report"/>
+                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
+                                icon="fa-paper-plane"
+                                invisible="not sdm_signed_file"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'submitted'">                        
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Expert Committee Approval Letter"/>
+                    </group>
+                    
+                    <!-- Download Button Group for SDM (visible only in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
+                        <div class="btn-group" role="group">
+                            <button name="action_download_unsigned_file" string="Download Expert Committee Report" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    title="Download Expert Committee Report (Unsigned)"/>
+                            <button name="action_download_sdm_signed_file" string="SDM Signed Report" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    invisible="not sdm_signed_file"
+                                    title="Download SDM Signed Report"/>
+                        </div>
+                    </group>
+                    
+                    <!-- Download Button for Collector (visible when submitted) -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'submitted'">
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Report" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                invisible="not sdm_signed_file"
+                                title="Download SDM Signed Report"/>
+                    </group>
+                    
+                    <!-- Action Buttons Row: Approve, Send Back, Create Section 11 -->
+                    <group>
+                        <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                                icon="fa-check"
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted' or not collector_signed_file"/>
+                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                                icon="fa-arrow-left"
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted'"/>
+                        <button name="action_create_section11_notification" string="Create Section 11 Notification" 
+                                type="object" class="btn-primary" icon="fa-file-text"
+                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'approved'"
+                                help="Create Section 11 Preliminary Report from this Expert Committee Report"/>
+                    </group>
+                    
+                    <!-- Resubmit button (for sent back records) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            groups="bhuarjan.group_bhuarjan_sdm"
+                            invisible="state != 'send_back'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>

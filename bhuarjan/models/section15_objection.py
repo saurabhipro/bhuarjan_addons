@@ -268,4 +268,16 @@ class Section15Objection(models.Model):
                 body=_('Objection resolved (approved) by %s') % self.env.user.name,
                 message_type='notification'
             )
+    
+    def action_download_unsigned_file(self):
+        """Download objection document if available"""
+        self.ensure_one()
+        if not self.objection_document:
+            raise ValidationError(_('No objection document available to download.'))
+        filename = self.objection_document_filename or f'objection_{self.name}.pdf'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self._name}/{self.id}/objection_document/{filename}?download=true',
+            'target': 'self',
+        }
 

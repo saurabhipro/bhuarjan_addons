@@ -230,6 +230,32 @@ class SiaTeam(models.Model):
                         ', '.join(invalid_villages.mapped('name'))
                     )
     
+    @api.constrains('non_govt_social_scientist_ids', 'local_bodies_representative_ids', 
+                    'resettlement_expert_ids', 'technical_expert_ids', 'tehsildar_id')
+    def _check_all_team_members_filled(self):
+        """Validate that all team member sections are filled"""
+        for record in self:
+            missing_fields = []
+            
+            if not record.non_govt_social_scientist_ids:
+                missing_fields.append(_('Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक'))
+            
+            if not record.local_bodies_representative_ids:
+                missing_fields.append(_('Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि'))
+            
+            if not record.resettlement_expert_ids:
+                missing_fields.append(_('Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ'))
+            
+            if not record.technical_expert_ids:
+                missing_fields.append(_('Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ'))
+            
+            if not record.tehsildar_id:
+                missing_fields.append(_('Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार'))
+            
+            if missing_fields:
+                error_message = _('Please fill in all team member sections:\n\n%s') % '\n'.join(['- ' + field for field in missing_fields])
+                raise ValidationError(error_message)
+    
     @api.depends('project_id')
     def _compute_name(self):
         """Generate team name from project"""

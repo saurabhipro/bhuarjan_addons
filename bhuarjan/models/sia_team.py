@@ -356,9 +356,33 @@ class SiaTeam(models.Model):
     
     # Document Actions
     def action_download_sia_file(self):
-        """Generate and download SIA Order Report PDF"""
+        """Generate and download SIA Order Report PDF (unsigned)"""
         self.ensure_one()
         return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
+    
+    def action_download_sdm_signed_file(self):
+        """Download SDM signed SIA report"""
+        self.ensure_one()
+        if not self.sdm_signed_file:
+            raise ValidationError(_('SDM signed SIA report is not available.'))
+        filename = self.sdm_signed_filename or 'sdm_signed_sia_report.pdf'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.sia.team/{self.id}/sdm_signed_file/{filename}?download=true',
+            'target': 'self',
+        }
+    
+    def action_download_collector_signed_file(self):
+        """Download Collector signed SIA report"""
+        self.ensure_one()
+        if not self.collector_signed_file:
+            raise ValidationError(_('Collector signed SIA report is not available.'))
+        filename = self.collector_signed_filename or 'collector_signed_sia_report.pdf'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.sia.team/{self.id}/collector_signed_file/{filename}?download=true',
+            'target': 'self',
+        }
     
     def action_create_section4_notification(self):
         """Create Section 4 Notifications for all villages in this SIA Team"""

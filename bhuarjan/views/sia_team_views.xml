@@ -53,12 +53,30 @@
                     <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
                             invisible="state != 'rejected'"/>
                     
-                    <!-- Download and Create Section 4 buttons -->
-                    <button name="action_download_sia_file" string="Download SIA Report" type="object" 
-                            class="btn-primary" icon="fa-download"
-                            invisible="state == 'draft'"/>
+                    <!-- Download SIA Report (common for all users) -->
+                    <button name="action_download_sia_file" string="SIA Report" type="object" 
+                            class="btn-primary" icon="fa-file-pdf"
+                            invisible="state == 'draft'"
+                            title="Download unsigned SIA Report PDF"/>
+                    
+                    <!-- Download SDM Signed (SDM only) -->
+                    <button name="action_download_sdm_signed_file" string="SDM Signed" type="object" 
+                            class="btn-primary" icon="fa-file-pdf"
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="state == 'draft' or not sdm_signed_file"
+                            title="Download SDM signed SIA Report"/>
+                    
+                    <!-- Download Collector Signed (Collector only) -->
+                    <button name="action_download_collector_signed_file" string="Collector Signed" type="object" 
+                            class="btn-primary" icon="fa-file-pdf"
+                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                            invisible="state == 'draft' or not collector_signed_file"
+                            title="Download Collector signed SIA Report"/>
+                    
+                    <!-- Create Section 4 Notification (SDM only) -->
                     <button name="action_create_section4_notification" string="Create Section 4 Notification" 
                             type="object" class="btn-primary" icon="fa-file-text"
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                             invisible="state != 'approved'"
                             help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>

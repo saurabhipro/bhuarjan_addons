@@ -29,8 +29,9 @@
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               string="Upload SDM Signed SIA Report / SDM हस्ताक्षरित SIA रिपोर्ट अपलोड करें"
-                               widget="binary"/>
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Signed SIA Proposal"/>
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
                                 invisible="not sdm_signed_file"/>
@@ -40,45 +41,57 @@
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'submitted'">
                         <field name="collector_signed_file" filename="collector_signed_filename" 
-                               string="Upload Collector Signed SIA Report / कलेक्टर हस्ताक्षरित SIA रिपोर्ट अपलोड करें"
-                               widget="binary"/>
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Signed SIA Proposal"/>
+                    </group>
+                    
+                    <!-- Download Button Group (always visible for all users) -->
+                    <group>
+                        <div class="btn-group" role="group">
+                            <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    title="Download SIA Proposal (Unsigned)"/>
+                            <!-- SDM Signed Download (SDM/Admin users only, when file exists) -->
+                            <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                    invisible="not sdm_signed_file"
+                                    title="Download SDM Signed Proposal"/>
+                            <!-- Collector Signed Download (Collector/Admin users only, when file exists) -->
+                            <button name="action_download_collector_signed_file" string="Collector Signed Proposal" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                    invisible="not collector_signed_file"
+                                    title="Download Collector Signed Proposal"/>
+                        </div>
+                    </group>
+                    
+                    <!-- Action Buttons Row: Approve, Reject, Create Section 4 -->
+                    <group>
+                        <!-- Approve Button (Collector only) -->
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                 icon="fa-check"
-                                invisible="not collector_signed_file"/>
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted' or not collector_signed_file"/>
+                        
+                        <!-- Reject Button (Collector only) -->
                         <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
-                                icon="fa-times"/>
+                                icon="fa-times"
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted'"/>
+                        
+                        <!-- Create Section 4 Notification (SDM only) -->
+                        <button name="action_create_section4_notification" string="Create Section 4 Notification" 
+                                type="object" class="btn-primary" icon="fa-file-text"
+                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'approved'"
+                                help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     </group>
                     
                     <!-- Reset to Draft button (for rejected records) -->
                     <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
                             invisible="state != 'rejected'"/>
-                    
-                    <!-- Download SIA Report (common for all users) -->
-                    <button name="action_download_sia_file" string="SIA Report" type="object" 
-                            class="btn-primary" icon="fa-file-pdf"
-                            invisible="state == 'draft'"
-                            title="Download unsigned SIA Report PDF"/>
-                    
-                    <!-- Download SDM Signed (SDM only) -->
-                    <button name="action_download_sdm_signed_file" string="SDM Signed" type="object" 
-                            class="btn-primary" icon="fa-file-pdf"
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="state == 'draft' or not sdm_signed_file"
-                            title="Download SDM signed SIA Report"/>
-                    
-                    <!-- Download Collector Signed (Collector only) -->
-                    <button name="action_download_collector_signed_file" string="Collector Signed" type="object" 
-                            class="btn-primary" icon="fa-file-pdf"
-                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                            invisible="state == 'draft' or not collector_signed_file"
-                            title="Download Collector signed SIA Report"/>
-                    
-                    <!-- Create Section 4 Notification (SDM only) -->
-                    <button name="action_create_section4_notification" string="Create Section 4 Notification" 
-                            type="object" class="btn-primary" icon="fa-file-text"
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="state != 'approved'"
-                            help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                 </header>
                 <sheet>

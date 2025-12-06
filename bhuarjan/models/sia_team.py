@@ -384,6 +384,7 @@ class SiaTeam(models.Model):
             'target': 'self',
         }
     
+    
     def action_create_section4_notification(self):
         """Create Section 4 Notifications for all villages in this SIA Team"""
         self.ensure_one()

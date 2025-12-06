@@ -28,9 +28,13 @@
                     <!-- File Upload Section for SDM -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
+                        <div style="margin-bottom: 5px;">
+                            <i class="fa fa-upload" style="color: #7c7bad; margin-right: 8px;"/>
+                            <span style="font-weight: bold;">Upload Signed SIA Proposal</span>
+                        </div>
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
-                               widget="binary"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                               widget="binary"
                                placeholder="Upload Signed SIA Proposal"/>
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
@@ -40,6 +44,10 @@
                     <!-- File Upload Section for Collector -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'submitted'">
+                        <div style="margin-bottom: 5px;">
+                            <i class="fa fa-upload" style="color: #7c7bad; margin-right: 8px;"/>
+                            <span style="font-weight: bold;">Upload SIA Approval Letter</span>
+                        </div>
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                nolabel="1"
                                widget="binary"
@@ -60,21 +68,13 @@
                         </div>
                     </group>
                     
-                    <!-- Download Button Group for Collector (visible when submitted) -->
+                    <!-- Download Button for Collector (visible when submitted) - Only SDM Signed Proposal -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                            invisible="state != 'submitted'">
-                        <div class="btn-group" role="group">
-                            <!-- Collector can download SDM Signed Proposal -->
-                            <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    invisible="not sdm_signed_file"
-                                    title="Download SDM Signed Proposal"/>
-                            <!-- Collector Signed Download (when file exists) -->
-                            <button name="action_download_collector_signed_file" string="Download Collector SIA Approval Letter" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    invisible="not collector_signed_file"
-                                    title="Download Collector SIA Approval Letter"/>
-                        </div>
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                invisible="not sdm_signed_file"
+                                title="Download SDM Signed Proposal"/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
@@ -108,7 +108,7 @@
                 <sheet>
                     <group col="2">
                         <group>
-                            <field name="project_id" required="1"/>
+                            <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')"/>
                             <field name="requiring_body_id" required="1" options="{'no_open': True}"/>
                             <field name="village_ids" widget="many2many_tags" readonly="1"
                                    placeholder="Affected villages (auto-populated from project)..."

@@ -50,10 +50,10 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of SIA Team
                     </td>
-                    <td><button class="btn btn-success w-100" t-on-click="_onClickSiaTeamFormNew">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100" t-on-click="_onClickSiaTeam">View</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100" t-on-click="_onClickSiaTeamFormNew"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100" t-on-click="_onClickSiaTeam"><i class="fa fa-eye me-1"></i>View</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
@@ -62,10 +62,10 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of Expert Committee
                     </td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
@@ -74,10 +74,10 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of Section 4 Notification
                     </td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
@@ -86,10 +86,10 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of Section 11 Notification
                     </td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
@@ -98,10 +98,10 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of Section 19 Notification
                     </td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
@@ -110,20 +110,20 @@
                     <td class="text-start fw-semibold">
                         Make a Proposal of Section 21 Notice
                     </td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 
                 <tr>
                     <td>7</td>
                     <td class="text-start fw-semibold">Make Compensation</td>
-                    <td><button class="btn btn-success w-100">CREATE</button></td>
-                    <td><button class="btn btn-primary w-100">EDIT</button></td>
-                    <td><button class="btn btn-danger w-100">DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100">UPLOAD</button></td>
+                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
+                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
+                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
+                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
                     <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
                 </tr>
 

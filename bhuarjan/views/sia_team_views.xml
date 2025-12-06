@@ -101,7 +101,7 @@
                     
                     <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
                     <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            groups="bhuarjan.group_bhuarjan_sdm"
                             invisible="state != 'send_back'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>

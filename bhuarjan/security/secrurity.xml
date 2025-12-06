@@ -73,6 +73,73 @@
     
     <!-- Survey access rule for Patwari -->
     <data noupdate="0">
+        <!-- ##################### ADMINISTRATOR ################### -->
+        <!-- SIA TEAM -->
+        <record id="record_bhu_sia_team_rule_admin" model="ir.rule">
+            <field name="name">SDM can see own sia data</field>
+            <field name="model_id" ref="model_bhu_sia_team"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Section Notification Rule -->
+        <record id="record_bhu_section4_notification_rule_admin" model="ir.rule">
+            <field name="name">SDM can see own Section Notification Rule Data</field>
+            <field name="model_id" ref="model_bhu_section4_notification"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Own Bhu Expert Committee Report -->
+        <record id="record_bhu_expert_committee_report_rule_admin" model="ir.rule">
+            <field name="name">SDM Can See Own Bhu Expert Committee Report Data</field>
+            <field name="model_id" ref="model_bhu_expert_committee_report"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Own Bhu Expert Committee -->
+        <record id="record_bhu_expert_committee_report_rule_admin" model="ir.rule">
+            <field name="name">SDM Can See Own Bhu Expert Committee Report Data</field>
+            <field name="model_id" ref="model_bhu_expert_committee_report"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Section 11 Report -->
+        <record id="record_bhu_section11_preliminary_report_rule_admin" model="ir.rule">
+            <field name="name">SDM Can Section 11 Report Data</field>
+            <field name="model_id" ref="model_bhu_section11_preliminary_report"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Bhu Section15 Objection -->
+        <record id="record_bhu_section15_objection_rule_admin" model="ir.rule">
+            <field name="name">SDM Can Bhu Section15 Objection Report Data</field>
+            <field name="model_id" ref="model_bhu_section15_objection"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- Section 19 Notification -->
+        <record id="record_bhu_section19_notification_rule_admin" model="ir.rule">
+            <field name="name">SDM Can Section 19 Notification Data</field>
+            <field name="model_id" ref="model_bhu_section19_notification"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+        <!-- BHU Draft Award -->
+        <record id="record_bhu_draft_award_rule_admin" model="ir.rule">
+            <field name="name">SDM Can BHU Draft Award Report Data</field>
+            <field name="model_id" ref="model_bhu_draft_award"/>
+            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
+
+        <!-- ##################### SDM ################### -->
         <!-- SIA TEAM -->
         <record id="record_bhu_sia_team_rule" model="ir.rule">
             <field name="name">SDM can see own sia data</field>

@@ -58,6 +58,7 @@ access_bhu_app_version_admin,access_bhu_app_version_admin,model_bhu_app_version,
 access_bhu_process_report,access_bhu_process_report,model_bhu_process_report,base.group_user,1,0,1,0
 access_bhu_process_report_wizard,access_bhu_process_report_wizard,model_bhu_process_report_wizard,base.group_user,1,1,1,1
 access_process_send_back_wizard,access_process_send_back_wizard,model_process_send_back_wizard,base.group_user,1,1,1,1
+access_bhuarjan_escalation_matrix,access_bhuarjan_escalation_matrix,model_bhuarjan_escalation_matrix,base.group_user,1,1,1,1
 
 
 

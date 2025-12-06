@@ -39,6 +39,16 @@
                                 <field name="workflow_settings_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_workflow_settings_tree'}"/>
                             </page>
                             
+                            <!-- Escalation Matrix Tab -->
+                            <page string="Escalation Matrix" name="escalation_matrix">
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Escalation Matrix Configuration</strong><br/>
+                                    Configure the number of days allowed between process stages. For example, after Form 10 is completed, configure X days to complete SIA Approval, then Y days for Section 4 Notification, and so on.
+                                </div>
+                                
+                                <field name="escalation_matrix_ids" nolabel="1" context="{'tree_view_ref': 'bhuarjan.view_bhuarjan_escalation_matrix_tree'}"/>
+                            </page>
+                            
                             <!-- AWS Configuration Tab -->
                             <page string="AWS Configuration" name="aws_configuration">
                                 <div class="alert alert-info" role="alert">
@@ -251,6 +261,46 @@
                     <field name="active" widget="boolean_toggle"/>
                     <field name="settings_master_id" optional="hide"/>
                 </list>
+            </field>
+        </record>
+
+        <!-- Escalation Matrix Tree View -->
+        <record id="view_bhuarjan_escalation_matrix_tree" model="ir.ui.view">
+            <field name="name">bhuarjan.escalation.matrix.tree</field>
+            <field name="model">bhuarjan.escalation.matrix</field>
+            <field name="arch" type="xml">
+                <list string="Escalation Matrix" decoration-info="active == True" decoration-muted="active == False">
+                    <field name="sequence" string="Seq. / क्रम"/>
+                    <field name="from_process" string="From Process / प्रक्रिया से"/>
+                    <field name="to_process" string="To Process / प्रक्रिया तक"/>
+                    <field name="days_required" string="Days Required / आवश्यक दिन"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="settings_master_id" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Escalation Matrix Form View -->
+        <record id="view_bhuarjan_escalation_matrix_form" model="ir.ui.view">
+            <field name="name">bhuarjan.escalation.matrix.form</field>
+            <field name="model">bhuarjan.escalation.matrix</field>
+            <field name="arch" type="xml">
+                <form string="Escalation Matrix">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="sequence" required="1"/>
+                                <field name="from_process" required="1"/>
+                                <field name="to_process" required="1"/>
+                            </group>
+                            <group>
+                                <field name="days_required" required="1"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
             </field>
         </record>
 

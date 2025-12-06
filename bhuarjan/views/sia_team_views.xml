@@ -30,7 +30,7 @@
                            invisible="state != 'draft'">
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
-                               widget="binary"
+                               widget="binary"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
                                placeholder="Upload Signed SIA Proposal"/>
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
@@ -158,7 +158,14 @@
                                 </list>
                             </field>
                         </page>
+
+                        
                     </notebook>
+                        <group>
+                            <div style="text-align:right; padding:2rem;">
+                                <button name="action_bottom_save" type="object" class="btn btn-primary">Save As Draft</button>
+                            </div>
+                        </group>
                 </sheet>
                 <chatter/>
             </form>

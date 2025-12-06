@@ -101,6 +101,19 @@ class SiaTeam(models.Model):
                                            store=False,
                                            help='Villages mapped to the selected project (read-only for reference)')
     
+    def action_bottom_save(self):
+        self.ensure_one()
+        if self.id:
+            return True   # record already stored; form view auto-saves
+        else:
+            return {
+                "type": "ir.actions.act_window",
+                "res_model": self._name,
+                "res_id": self.create(self.read()[0]).id,
+                "view_mode": "form",
+            }
+
+
     @api.depends('village_ids', 'village_ids.tehsil_id')
     def _compute_tehsil_ids(self):
         """Compute tehsils from selected villages"""

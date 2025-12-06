@@ -50,8 +50,9 @@
                                placeholder="Upload SIA Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group for SDM (always visible for SDM/Admin) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                    <!-- Download Button Group for SDM (visible only in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
                         <div class="btn-group" role="group">
                             <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"

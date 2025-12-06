@@ -43,11 +43,7 @@
                     
                     <!-- File Upload Section for Collector -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'submitted'">
-                        <div style="margin-bottom: 5px;">
-                            <i class="fa fa-upload" style="color: #7c7bad; margin-right: 8px;"/>
-                            <span style="font-weight: bold;">Upload SIA Approval Letter</span>
-                        </div>
+                           invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                nolabel="1"
                                widget="binary"

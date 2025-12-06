@@ -42,7 +42,8 @@
             <list string="Process Report / प्रक्रिया रिपोर्ट" 
                   default_order="serial_number"
                   decoration-success="status_mark == 'Green'"
-                  decoration-danger="status_mark == 'Red'">
+                  decoration-danger="status_mark == 'Red'"
+                  delete="0">
                 <field name="serial_number" string="S.No. / स.क्र."/>
                 <field name="department_id" string="Department / विभाग"/>
                 <field name="project_id" string="Project / परियोजना"/>

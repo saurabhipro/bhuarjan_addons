@@ -102,8 +102,8 @@ class ProcessReportWizard(models.TransientModel):
         if self.village_id:
             domain.append(('village_id', '=', self.village_id.id))
         
-        # Clear existing report records
-        self.env['bhu.process.report'].search([]).unlink()
+        # Clear existing report records (use sudo for transient model cleanup)
+        self.env['bhu.process.report'].sudo().search([]).unlink()
         
         report_records = []
         serial = 1

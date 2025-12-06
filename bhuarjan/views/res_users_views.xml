@@ -271,6 +271,33 @@ t-att-style="'background-color:' + (record.department_color.raw_value or '#69202
                 (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>
         </record>
 
+        <!-- Customize User Preferences Dialog -->
+        <record id="view_users_form_simple_modif_bhuarjan" model="ir.ui.view">
+            <field name="name">res.users.preferences.bhuarjan</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+            <field name="arch" type="xml">
+                
+                <!-- Hide Account Security Page -->
+                <xpath expr="//page[@name='page_account_security']" position="replace"/>
+                
+                <!-- Hide Devices Page -->
+                <xpath expr="//page[@name='page_devices']" position="replace"/>
+                
+                <!-- Hide OdooBot Status field if it exists -->
+                <xpath expr="//field[@name='odoobot_state']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                
+                <!-- Add Assigned Projects in Preferences tab -->
+                <xpath expr="//group[@name='signature']" position="after">
+                    <group string="Assigned Projects / आवंटित परियोजनाएं">
+                        <field name="assigned_project_ids" nolabel="1" readonly="1" widget="many2many_tags"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
 
     </data>
 </odoo>

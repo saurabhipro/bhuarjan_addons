@@ -48,6 +48,23 @@ class ResUsers(models.Model):
     ], string="Bhuarjan Role", default=False)
 
 
+    assigned_project_ids = fields.Many2many(
+        'bhu.project', 
+        compute='_compute_assigned_projects',
+        string='Assigned Projects',
+        help='Projects where this user is assigned as SDM or Tehsildar'
+    )
+
+    def _compute_assigned_projects(self):
+        """Compute projects assigned to this user"""
+        for user in self:
+            projects = self.env['bhu.project'].search([
+                '|',
+                ('sdm_ids', 'in', user.id),
+                ('tehsildar_ids', 'in', user.id)
+            ])
+            user.assigned_project_ids = projects
+
     @api.onchange('bhuarjan_role')
     def _onchange_bhuarjan_role(self):
         """Assign the corresponding group based on selected role"""

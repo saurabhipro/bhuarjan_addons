@@ -75,24 +75,24 @@
                     <!-- Download Button Group for SDM (visible only in draft state) -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                            invisible="state != 'draft'">
-                        <div class="btn-group" role="group">
-                            <button name="action_download_unsigned_file" string="Download Objection Document" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    title="Download Objection Document (Unsigned)"/>
-                            <button name="action_download_sdm_signed_file" string="SDM Signed Response" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    invisible="not sdm_signed_file"
-                                    title="Download SDM Signed Response"/>
-                        </div>
+                         <div class="btn-group" role="group">
+                             <button name="action_download_unsigned_file" string="Download PDF" type="object" 
+                                     class="btn-primary" icon="fa-download"
+                                     title="Download Objection Document (Unsigned)"/>
+                             <button name="action_download_sdm_signed_file" string="Download PDF" type="object" 
+                                     class="btn-primary" icon="fa-download"
+                                     invisible="not sdm_signed_file"
+                                     title="Download SDM Signed Response"/>
+                         </div>
                     </group>
                     
                     <!-- Download Button for Collector (visible when submitted) -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                            invisible="state != 'submitted'">
-                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Response" type="object" 
-                                class="btn-primary" icon="fa-download"
-                                invisible="not sdm_signed_file"
-                                title="Download SDM Signed Response"/>
+                         <button name="action_download_sdm_signed_file" string="Download PDF" type="object" 
+                                 class="btn-primary" icon="fa-download"
+                                 invisible="not sdm_signed_file"
+                                 title="Download SDM Signed Response"/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Resolve -->
@@ -109,10 +109,11 @@
                                 invisible="state == 'approved'" icon="fa-check"/>
                     </group>
                     
-                    <!-- Resubmit button (for sent back records) -->
-                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                            groups="bhuarjan.group_bhuarjan_sdm"
-                            invisible="state != 'send_back'"/>
+                     <!-- Resubmit button (for sent back records) -->
+                     <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                             icon="fa-refresh"
+                             groups="bhuarjan.group_bhuarjan_sdm"
+                             invisible="state != 'send_back'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>

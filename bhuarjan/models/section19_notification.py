@@ -10,7 +10,7 @@ import json
 class Section19Notification(models.Model):
     _name = 'bhu.section19.notification'
     _description = 'Section 19 Notification'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', required=True, default='New', tracking=True)
@@ -89,11 +89,7 @@ class Section19Notification(models.Model):
     # UUID for QR code
     notification_uuid = fields.Char(string='Notification UUID', copy=False, readonly=True, index=True)
     
-    state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('generated', 'Generated / जेनरेट किया गया'),
-        ('signed', 'Signed / हस्ताक्षरित'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+    # State field is inherited from mixin
     
     @api.depends('signed_document_file')
     def _compute_has_signed_document(self):
@@ -384,11 +380,15 @@ class Section19Notification(models.Model):
         except Exception as e:
             return None
     
-    def action_generate_pdf(self):
-        """Generate Section 19 Notification PDF"""
+    # Override mixin method to generate Section 19 PDF
+    def action_download_unsigned_file(self):
+        """Generate and download Section 19 Notification PDF (unsigned) - Override mixin"""
         self.ensure_one()
-        self.state = 'generated'
         return self.env.ref('bhuarjan.action_report_section19_notification').report_action(self)
+    
+    def action_generate_pdf(self):
+        """Generate Section 19 Notification PDF - Legacy method"""
+        return self.action_download_unsigned_file()
     
     def action_mark_signed(self):
         """Mark notification as signed"""

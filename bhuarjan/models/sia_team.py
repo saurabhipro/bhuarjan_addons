@@ -7,7 +7,7 @@ import json
 class SiaTeam(models.Model):
     _name = 'bhu.sia.team'
     _description = 'SIA Team'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
     
     _sql_constraints = [
@@ -27,14 +27,6 @@ class SiaTeam(models.Model):
                                    help='Affected villages for this SIA Team (auto-populated from project)')
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil_ids', store=False, readonly=True,
                                   help='Tehsils from the selected villages')
-    
-    # Workflow
-    state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('submitted', 'Submitted / प्रस्तुत'),
-        ('approved', 'Approved / अनुमोदित'),
-        ('send_back', 'Sent Back / वापस भेजा गया'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
     
     # SIA Team Members - 5 Sections
     # (क) Non-Government Social Scientist
@@ -74,14 +66,6 @@ class SiaTeam(models.Model):
     # Documents
     sia_file = fields.Binary(string='SIA File / SIA फ़ाइल')
     sia_filename = fields.Char(string='SIA Filename')
-    
-    # Signed SIA Reports
-    sdm_signed_file = fields.Binary(string='SDM Signed SIA Report / SDM हस्ताक्षरित SIA रिपोर्ट', 
-                                     help='Upload the signed SIA report from SDM')
-    sdm_signed_filename = fields.Char(string='SDM Signed Filename')
-    collector_signed_file = fields.Binary(string='Collector SIA Approval Letter / कलेक्टर SIA अनुमोदन पत्र',
-                                          help='Upload the Collector SIA Approval Letter')
-    collector_signed_filename = fields.Char(string='Collector SIA Approval Letter Filename')
     
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
@@ -300,111 +284,23 @@ class SiaTeam(models.Model):
                 all_members |= record.tehsildar_id
             record.team_member_ids = all_members
     
-    # Workflow Actions
+    # Workflow Actions - Override mixin methods for SIA-specific validations
     def action_submit(self):
-        """Submit SIA Team for approval by Collector (SDM action)"""
-        self.ensure_one()
-        
-        # Check if user is SDM
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can submit SIA Team for approval.'))
-        
-        # Validate that SDM signed file is uploaded
-        if not self.sdm_signed_file:
-            raise ValidationError(_('Please upload the SDM signed SIA report before submitting.'))
-        
-        # Validate all team members are filled
+        """Submit SIA Team for approval by Collector (SDM action) - Override mixin"""
+        # Validate all team members are filled (SIA-specific)
         self._check_all_team_members_filled()
-        
-        self.state = 'submitted'
-        self.message_post(body=_('SIA Team submitted for Collector approval by %s') % self.env.user.name)
-    
-    def action_approve(self):
-        """Approve SIA Team (Collector action)"""
-        self.ensure_one()
-        
-        # Check if user is Collector
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only Collector can approve SIA Team.'))
-        
-        # Validate that Collector signed file is uploaded
-        if not self.collector_signed_file:
-            raise ValidationError(_('Please upload the Collector signed SIA report before approving.'))
-        
-        # Validate state is submitted
-        if self.state != 'submitted':
-            raise ValidationError(_('Only submitted SIA Teams can be approved.'))
-        
-        self.state = 'approved'
-        self.message_post(body=_('SIA Team approved by %s') % self.env.user.name)
-    
-    def action_send_back(self):
-        """Open wizard to send back SIA Team (Collector action)"""
-        self.ensure_one()
-        
-        # Check if user is Collector
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only Collector can send back SIA Team.'))
-        
-        # Validate state is submitted
-        if self.state != 'submitted':
-            raise ValidationError(_('Only submitted SIA Teams can be sent back.'))
-        
-        # Open wizard
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Send Back SIA Team'),
-            'res_model': 'sia.send.back.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_sia_team_id': self.id,
-            }
-        }
-    
-    def action_draft(self):
-        """Reset to draft (only allowed when sent back) - allows SDM to resubmit"""
-        self.ensure_one()
-        
-        # Only allow reset to draft if sent back
-        if self.state != 'send_back':
-            raise ValidationError(_('Only sent back SIA Teams can be reset to draft for resubmission.'))
-        
-        self.state = 'draft'
-        self.message_post(body=_('SIA Team reset to draft by %s for resubmission') % self.env.user.name)
+        # Call parent mixin method
+        return super().action_submit()
     
     # Document Actions
-    def action_download_sia_file(self):
-        """Generate and download SIA Order Report PDF (unsigned)"""
+    def action_download_unsigned_file(self):
+        """Generate and download SIA Order Report PDF (unsigned) - Override mixin"""
         self.ensure_one()
         return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
     
-    def action_download_sdm_signed_file(self):
-        """Download SDM signed SIA report"""
-        self.ensure_one()
-        if not self.sdm_signed_file:
-            raise ValidationError(_('SDM signed SIA report is not available.'))
-        filename = self.sdm_signed_filename or 'sdm_signed_sia_report.pdf'
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/bhu.sia.team/{self.id}/sdm_signed_file/{filename}?download=true',
-            'target': 'self',
-        }
-    
-    def action_download_collector_signed_file(self):
-        """Download Collector signed SIA report"""
-        self.ensure_one()
-        if not self.collector_signed_file:
-            raise ValidationError(_('Collector signed SIA report is not available.'))
-        filename = self.collector_signed_filename or 'collector_signed_sia_report.pdf'
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/bhu.sia.team/{self.id}/collector_signed_file/{filename}?download=true',
-            'target': 'self',
-        }
+    def action_download_sia_file(self):
+        """Alias for action_download_unsigned_file - for backward compatibility with views"""
+        return self.action_download_unsigned_file()
     
     
     def action_create_section4_notification(self):

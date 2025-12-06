@@ -9,7 +9,7 @@ import json
 class Section11PreliminaryReport(models.Model):
     _name = 'bhu.section11.preliminary.report'
     _description = 'Section 11 Preliminary Report'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
     # Note: Removed unique project constraint to allow one Section 11 per village per project
@@ -182,11 +182,7 @@ class Section11PreliminaryReport(models.Model):
     # UUID for QR code
     report_uuid = fields.Char(string='Report UUID', copy=False, readonly=True, index=True)
     
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('generated', 'Generated'),
-        ('signed', 'Signed'),
-    ], string='Status', default='draft', tracking=True)
+    # State field is inherited from mixin
     
     @api.depends('signed_document_file')
     def _compute_has_signed_document(self):
@@ -518,16 +514,16 @@ class Section11PreliminaryReport(models.Model):
             }
         }
     
-    def action_download_pdf(self):
-        """Download Section 11 Preliminary Report PDF (for generated/signed notifications)"""
+    # Override mixin method to generate Section 11 PDF
+    def action_download_unsigned_file(self):
+        """Generate and download Section 11 Preliminary Report PDF (unsigned) - Override mixin"""
         self.ensure_one()
-        
-        if self.state not in ('generated', 'signed'):
-            raise ValidationError(_('Notification must be generated before downloading.'))
-        
-        # Always generate PDF report (signed document download will be separate from document vault)
         report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
         return report_action.report_action(self.ids)
+    
+    def action_download_pdf(self):
+        """Download Section 11 Preliminary Report PDF - Legacy method"""
+        return self.action_download_unsigned_file()
     
     @api.model
     def action_open_wizard(self):

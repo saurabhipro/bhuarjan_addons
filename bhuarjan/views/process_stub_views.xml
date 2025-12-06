@@ -21,9 +21,8 @@
                                        widget="html" nolabel="1"/>
                             </group>
                             <group string="Public Hearing Details / जन सुनवाई विवरण">
-                                <group col="3">
-                                    <field name="public_hearing_date"/>
-                                    <field name="public_hearing_time"/>
+                                <group col="2">
+                                    <field name="public_hearing_datetime" widget="datetime"/>
                                     <field name="public_hearing_place"/>
                                 </group>
                             </group>

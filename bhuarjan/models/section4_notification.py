@@ -13,7 +13,7 @@ import uuid
 class Section4Notification(models.Model):
     _name = 'bhu.section4.notification'
     _description = 'Section 4 Notification'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
@@ -50,9 +50,7 @@ class Section4Notification(models.Model):
                                  help='Description of public purpose for land acquisition', tracking=True)
     
     # Public Hearing Details
-    public_hearing_date = fields.Date(string='Public Hearing Date / जन सुनवाई दिनांक', tracking=True)
-    public_hearing_time = fields.Char(string='Public Hearing Time / जन सुनवाई समय', 
-                                      help='e.g., 10:00 AM', tracking=True)
+    public_hearing_datetime = fields.Datetime(string='Public Hearing Date & Time / जन सुनवाई दिनांक और समय', tracking=True)
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
     
     # 11 Questions from the template
@@ -84,12 +82,9 @@ class Section4Notification(models.Model):
     # UUID for QR code
     notification_uuid = fields.Char(string='Notification UUID', copy=False, readonly=True, index=True)
     
-    state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('generated', 'Generated / जेनरेट किया गया'),
-        ('signed', 'Signed / हस्ताक्षरित'),
-        ('notification_11', 'Notification 11 / अधिसूचना 11'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+    # State field is inherited from mixin (draft, submitted, approved, send_back)
+    # Keep notification_11 as a computed field or separate flag if needed
+    has_notification_11 = fields.Boolean(string='Has Notification 11', compute='_compute_has_section11', store=False)
     
     @api.depends('signed_document_file', 'state', 'signed_date')
     def _compute_has_signed_document(self):
@@ -174,11 +169,30 @@ class Section4Notification(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset village when project changes and set domain"""
+        """Auto-populate requiring_body_id and set village domain from project"""
+        # Reset fields when project changes
         self.village_id = False
-        if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
-        return {'domain': {'village_id': []}}
+        self.requiring_body_id = False
+        self.tehsil_id = False
+        
+        if self.project_id:
+            # Auto-populate requiring_body_id from project's department
+            if self.project_id.department_id:
+                self.requiring_body_id = self.project_id.department_id
+            
+            # Set domain to only show project villages (user will select from dropdown)
+            if self.project_id.village_ids:
+                return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+            else:
+                return {'domain': {'village_id': [('id', '=', False)]}}
+        else:
+            return {'domain': {'village_id': [('id', '=', False)]}}
+    
+    @api.onchange('village_id')
+    def _onchange_village_id(self):
+        """Auto-populate tehsil when village is selected"""
+        if self.village_id and self.village_id.tehsil_id:
+            self.tehsil_id = self.village_id.tehsil_id
     
     @api.model
     def _default_project_id(self):
@@ -254,6 +268,12 @@ class Section4Notification(models.Model):
         # Create new records
         if new_vals_list:
             records = super().create(new_vals_list)
+            # Auto-populate requiring_body_id after creation (village will be selected by user)
+            for record in records:
+                if record.project_id:
+                    if not record.requiring_body_id and record.project_id.department_id:
+                        record.requiring_body_id = record.project_id.department_id
+                    # Tehsil will be computed automatically when village is selected
         else:
             records = self.env['bhu.section4.notification']
         
@@ -261,6 +281,20 @@ class Section4Notification(models.Model):
             records = records | self.env['bhu.section4.notification'].browse([r.id for r in existing_records])
         
         return records
+    
+    def write(self, vals):
+        """Override write to auto-populate requiring_body_id when project is set"""
+        result = super().write(vals)
+        
+        # If project_id is set, auto-populate requiring_body_id
+        for record in self:
+            if 'project_id' in vals or (record.project_id and not record.requiring_body_id):
+                if record.project_id:
+                    # Auto-populate requiring_body_id from project's department
+                    if not record.requiring_body_id and record.project_id.department_id:
+                        record.requiring_body_id = record.project_id.department_id
+        
+        return result
     
     def _get_consolidated_village_data(self):
         """Get consolidated survey data for the village"""
@@ -292,10 +326,24 @@ class Section4Notification(models.Model):
         return []
     
     def get_formatted_hearing_date(self):
-        """Format public hearing date for display"""
+        """Format public hearing date and time for display"""
         self.ensure_one()
-        if self.public_hearing_date:
-            return self.public_hearing_date.strftime('%d/%m/%Y')
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%d/%m/%Y %I:%M %p')
+        return '........................'
+    
+    def get_formatted_hearing_date_only(self):
+        """Format public hearing date only (for backward compatibility)"""
+        self.ensure_one()
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%d/%m/%Y')
+        return '........................'
+    
+    def get_formatted_hearing_time_only(self):
+        """Format public hearing time only (for backward compatibility)"""
+        self.ensure_one()
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%I:%M %p')
         return '........................'
     
     def get_qr_code_data(self):
@@ -336,9 +384,55 @@ class Section4Notification(models.Model):
         except Exception as e:
             return None
     
+    def _validate_required_fields(self):
+        """Validate that all required fields are filled before generating PDF"""
+        self.ensure_one()
+        missing_fields = []
+        
+        # Basic Information fields
+        if not self.public_purpose:
+            missing_fields.append(_('Public Purpose / लोक प्रयोजन'))
+        if not self.public_hearing_datetime:
+            missing_fields.append(_('Public Hearing Date & Time / सार्वजनिक सुनवाई की तारीख और समय'))
+        if not self.public_hearing_place:
+            missing_fields.append(_('Public Hearing Place / सार्वजनिक सुनवाई का स्थान'))
+        
+        # Section 4 Questions
+        if not self.q1_brief_description:
+            missing_fields.append(_('Question 1: Brief Description / प्रश्न 1: संक्षिप्त विवरण'))
+        if not self.q2_directly_affected:
+            missing_fields.append(_('Question 2: Directly Affected Families / प्रश्न 2: प्रत्यक्ष रूप से प्रभावित परिवार'))
+        if not self.q3_indirectly_affected:
+            missing_fields.append(_('Question 3: Indirectly Affected Families / प्रश्न 3: अप्रत्यक्ष रूप से प्रभावित परिवार'))
+        if not self.q4_private_assets:
+            missing_fields.append(_('Question 4: Private Assets / प्रश्न 4: निजी संपत्ति'))
+        if not self.q5_government_assets:
+            missing_fields.append(_('Question 5: Government Assets / प्रश्न 5: सरकारी संपत्ति'))
+        if not self.q6_minimal_acquisition:
+            missing_fields.append(_('Question 6: Is Acquisition Minimal? / प्रश्न 6: क्या अर्जन न्यूनतम है?'))
+        if not self.q7_alternatives_considered:
+            missing_fields.append(_('Question 7: Alternatives Considered? / प्रश्न 7: विकल्पों पर विचार किया गया?'))
+        if not self.q8_total_cost:
+            missing_fields.append(_('Question 8: Total Cost / प्रश्न 8: कुल लागत'))
+        if not self.q9_project_benefits:
+            missing_fields.append(_('Question 9: Project Benefits / प्रश्न 9: परियोजना लाभ'))
+        if not self.q10_compensation_measures:
+            missing_fields.append(_('Question 10: Compensation Measures / प्रश्न 10: मुआवजा उपाय'))
+        if not self.q11_other_components:
+            missing_fields.append(_('Question 11: Other Components / प्रश्न 11: अन्य घटक'))
+        
+        if missing_fields:
+            raise ValidationError(
+                _('Please fill in all required fields before generating the notification:\n\n%s') %
+                '\n'.join(['- ' + field for field in missing_fields])
+            )
+    
     def action_generate_pdf(self):
         """Generate Section 4 Notification PDF"""
         self.ensure_one()
+        
+        # Validate required fields
+        self._validate_required_fields()
         
         # Validate that all surveys for selected village are approved
         if not self.project_id or not self.village_id:
@@ -353,26 +447,16 @@ class Section4Notification(models.Model):
         if not all_surveys:
             raise ValidationError(_('No surveys found for the selected village. Please create surveys first.'))
         
-        # Check if all surveys are approved or locked (treat locked as approved)
-        non_approved_surveys = all_surveys.filtered(lambda s: s.state not in ('approved', 'locked'))
+        # Check if all surveys are approved
+        non_approved_surveys = all_surveys.filtered(lambda s: s.state != 'approved')
         if non_approved_surveys:
             raise ValidationError(_(
                 'Cannot generate Section 4 Notification. Some surveys are not approved yet.\n\n'
                 'Please approve all surveys before generating the notification.'
             ))
         
-        self.state = 'generated'
-        
-        # Lock all approved surveys for the selected village (skip already locked ones)
-        approved_surveys = all_surveys.filtered(lambda s: s.state == 'approved')
-        if approved_surveys:
-            approved_surveys.write({'state': 'locked'})
-            self.message_post(
-                body=_('Locked %d survey(s) for village: %s') % (
-                    len(approved_surveys),
-                    self.village_id.name
-                )
-            )
+        # Don't change state - keep it in draft until submitted
+        # State will be changed when SDM submits to Collector
         
         # Use wizard to generate PDF (reuse existing logic)
         # Always create a fresh wizard with current data to ensure report has all data
@@ -380,8 +464,7 @@ class Section4Notification(models.Model):
             'project_id': self.project_id.id,
             'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
-            'public_hearing_date': self.public_hearing_date,
-            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
             'q1_brief_description': self.q1_brief_description,
             'q2_directly_affected': self.q2_directly_affected,
@@ -399,14 +482,10 @@ class Section4Notification(models.Model):
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
         return report_action.report_action(wizard)
     
-    def action_mark_signed(self):
-        """Mark notification as signed"""
-        self.ensure_one()
-        if not self.signed_document_file:
-            raise ValidationError(_('Please upload signed document first.'))
-        self.state = 'signed'
-        if not self.signed_date:
-            self.signed_date = fields.Date.today()
+    # Override mixin method to generate Section 4 PDF
+    def action_download_unsigned_file(self):
+        """Generate and download Section 4 Notification PDF (unsigned) - Override mixin"""
+        return self.action_generate_pdf()
     
     def action_download_pdf(self):
         """Download Section 4 Notification PDF (for generated/signed/notification_11 notifications)"""
@@ -428,8 +507,7 @@ class Section4Notification(models.Model):
             'project_id': self.project_id.id,
             'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
-            'public_hearing_date': self.public_hearing_date,
-            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
             'q1_brief_description': self.q1_brief_description,
             'q2_directly_affected': self.q2_directly_affected,
@@ -459,9 +537,7 @@ class Section4NotificationWizard(models.TransientModel):
                                  help='Description of public purpose for land acquisition')
     
     # Public Hearing Details
-    public_hearing_date = fields.Date(string='Public Hearing Date / जन सुनवाई दिनांक')
-    public_hearing_time = fields.Char(string='Public Hearing Time / जन सुनवाई समय', 
-                                      help='e.g., 10:00 AM')
+    public_hearing_datetime = fields.Datetime(string='Public Hearing Date & Time / जन सुनवाई दिनांक और समय')
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान')
     
     # 11 Questions from the template
@@ -521,10 +597,24 @@ class Section4NotificationWizard(models.TransientModel):
         return []
 
     def get_formatted_hearing_date(self):
-        """Format public hearing date for display"""
+        """Format public hearing date and time for display"""
         self.ensure_one()
-        if self.public_hearing_date:
-            return self.public_hearing_date.strftime('%d/%m/%Y')
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%d/%m/%Y %I:%M %p')
+        return '........................'
+    
+    def get_formatted_hearing_date_only(self):
+        """Format public hearing date only (for backward compatibility)"""
+        self.ensure_one()
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%d/%m/%Y')
+        return '........................'
+    
+    def get_formatted_hearing_time_only(self):
+        """Format public hearing time only (for backward compatibility)"""
+        self.ensure_one()
+        if self.public_hearing_datetime:
+            return self.public_hearing_datetime.strftime('%I:%M %p')
         return '........................'
     
     
@@ -546,8 +636,7 @@ class Section4NotificationWizard(models.TransientModel):
             'project_id': self.project_id.id,
             'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
-            'public_hearing_date': self.public_hearing_date,
-            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
             'q1_brief_description': self.q1_brief_description,
             'q2_directly_affected': self.q2_directly_affected,
@@ -572,8 +661,7 @@ class Section4NotificationWizard(models.TransientModel):
             'project_id': self.project_id.id,
             'village_id': self.village_id.id,
             'public_purpose': self.public_purpose,
-            'public_hearing_date': self.public_hearing_date,
-            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
             'q1_brief_description': self.q1_brief_description,
             'q2_directly_affected': self.q2_directly_affected,

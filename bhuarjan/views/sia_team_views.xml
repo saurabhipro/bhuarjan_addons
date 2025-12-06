@@ -28,10 +28,7 @@
                     <!-- File Upload Section for SDM -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
-                        <div style="margin-bottom: 5px;">
-                            <i class="fa fa-upload" style="color: #7c7bad; margin-right: 8px;"/>
-                            <span style="font-weight: bold;">Upload Signed SIA Proposal</span>
-                        </div>
+                        
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
                                widget="binary"

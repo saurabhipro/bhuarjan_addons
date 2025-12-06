@@ -16,10 +16,11 @@ from . import settings_master
 from . import message_wizard
 from . import survey_bulk_approval_wizard
 from . import document_vault
-from . import sia_team
-from . import sia_team_member
 from . import utils
 from . import notification_mixin
+from . import process_workflow_mixin
+from . import sia_team
+from . import sia_team_member
 from . import section15_objection
 from . import section4_notification
 from . import expert_committee_report

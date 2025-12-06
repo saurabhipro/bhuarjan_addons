@@ -46,7 +46,6 @@
                             <field name="notification_number" readonly="1"/>
                         </group>
                         <group>
-                            <field name="total_khasras_count" readonly="1"/>
                             <field name="total_area_acquired" readonly="1"/>
                         </group>
                     </group>

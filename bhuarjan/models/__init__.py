@@ -27,6 +27,7 @@ from . import expert_committee_report
 from . import section11_preliminary_report
 from . import section19_notification
 from . import draft_award
+from . import process_report
 from . import ir_http
 from . import ir_attachment
 from . import dashboard

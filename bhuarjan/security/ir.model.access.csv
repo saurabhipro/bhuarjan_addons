@@ -55,6 +55,9 @@ access_jwt_token,jwt.token,model_jwt_token,base.group_user,1,1,1,1
 access_bhu_channel_master,access_bhu_channel_master,model_bhu_channel_master,base.group_user,1,1,1,1
 access_bhu_app_version,access_bhu_app_version,model_bhu_app_version,base.group_user,1,1,1,1
 access_bhu_app_version_admin,access_bhu_app_version_admin,model_bhu_app_version,bhuarjan.group_bhuarjan_admin,1,1,1,1
+access_bhu_process_report,access_bhu_process_report,model_bhu_process_report,base.group_user,1,0,1,0
+access_bhu_process_report_wizard,access_bhu_process_report_wizard,model_bhu_process_report_wizard,base.group_user,1,1,1,1
+access_process_send_back_wizard,access_process_send_back_wizard,model_process_send_back_wizard,base.group_user,1,1,1,1
 
 
 

@@ -66,6 +66,7 @@
         'views/section4_notification_views.xml',
         'views/section11_preliminary_report_views.xml',
         'views/section19_notification_views.xml',
+        'views/process_report_views.xml',
         'views/draft_award_views.xml',
         'views/dashboard_views.xml',
         'views/expert_committee_report_views.xml',

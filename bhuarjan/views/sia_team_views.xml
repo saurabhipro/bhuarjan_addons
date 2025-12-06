@@ -28,9 +28,10 @@
                     <!-- File Upload Section for SDM -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
+                        
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
-                               widget="binary"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                               widget="binary"
                                placeholder="Upload Signed SIA Proposal"/>
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
@@ -39,35 +40,38 @@
                     
                     <!-- File Upload Section for Collector -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'submitted'">
+                           invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                nolabel="1"
                                widget="binary"
-                               placeholder="Upload Signed SIA Proposal"/>
+                               placeholder="Upload SIA Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group (always visible for all users) -->
-                    <group>
+                    <!-- Download Button Group for SDM (visible only in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
                         <div class="btn-group" role="group">
                             <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download SIA Proposal (Unsigned)"/>
-                            <!-- SDM Signed Download (SDM/Admin users only, when file exists) -->
+                            <!-- SDM Signed Download (when file exists) -->
                             <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
-                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                                     invisible="not sdm_signed_file"
                                     title="Download SDM Signed Proposal"/>
-                            <!-- Collector Signed Download (Collector/Admin users only, when file exists) -->
-                            <button name="action_download_collector_signed_file" string="Collector Signed Proposal" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                    invisible="not collector_signed_file"
-                                    title="Download Collector Signed Proposal"/>
                         </div>
                     </group>
                     
-                    <!-- Action Buttons Row: Approve, Reject, Create Section 4 -->
+                    <!-- Download Button for Collector (visible when submitted) - Only SDM Signed Proposal -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'submitted'">
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                invisible="not sdm_signed_file"
+                                title="Download SDM Signed Proposal"/>
+                    </group>
+                    
+                    <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
                     <group>
                         <!-- Approve Button (Collector only) -->
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
@@ -75,9 +79,9 @@
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted' or not collector_signed_file"/>
                         
-                        <!-- Reject Button (Collector only) -->
-                        <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
-                                icon="fa-times"
+                        <!-- Send Back Button (Collector only) -->
+                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                                icon="fa-arrow-left"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted'"/>
                         
@@ -89,15 +93,16 @@
                                 help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     </group>
                     
-                    <!-- Reset to Draft button (for rejected records) -->
-                    <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
-                            invisible="state != 'rejected'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
+                    <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            groups="bhuarjan.group_bhuarjan_sdm"
+                            invisible="state != 'send_back'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>
                 <sheet>
                     <group col="2">
                         <group>
-                            <field name="project_id" required="1"/>
+                            <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')"/>
                             <field name="requiring_body_id" required="1" options="{'no_open': True}"/>
                             <field name="village_ids" widget="many2many_tags" readonly="1"
                                    placeholder="Affected villages (auto-populated from project)..."
@@ -108,7 +113,6 @@
                                    options="{'no_create_edit': True}" force_save="1"/>
                         </group>
                         <group>
-                            <field name="total_khasras_count" readonly="1"/>
                             <field name="total_area_acquired" readonly="1"/>
                         </group>
                     </group>
@@ -153,7 +157,6 @@
                                     <field name="name" string="Village Name / ग्राम का नाम"/>
                                     <field name="district_id" string="District / जिला"/>
                                     <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                    <field name="total_khasras_count" string="Total Khasras / कुल खसरा"/>
                                     <field name="total_captured_area" string="Total Captured Area (Hectares) / कुल कैप्चर क्षेत्रफल (हेक्टेयर)"/>
                                 </list>
                             </field>

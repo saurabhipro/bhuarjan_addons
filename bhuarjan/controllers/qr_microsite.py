@@ -260,10 +260,9 @@ class Form10PDFController(http.Controller):
             # Create wizard with notification data
             wizard = request.env['bhu.section4.notification.wizard'].sudo().create({
                 'project_id': notification.project_id.id,
-                'village_ids': [(6, 0, notification.village_ids.ids)],
+                'village_id': notification.village_id.id,
                 'public_purpose': notification.public_purpose,
-                'public_hearing_date': notification.public_hearing_date,
-                'public_hearing_time': notification.public_hearing_time,
+                'public_hearing_datetime': notification.public_hearing_datetime,
                 'public_hearing_place': notification.public_hearing_place,
                 'q1_brief_description': notification.q1_brief_description,
                 'q2_directly_affected': notification.q2_directly_affected,

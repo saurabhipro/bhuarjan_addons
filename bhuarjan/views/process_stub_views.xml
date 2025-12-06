@@ -21,9 +21,8 @@
                                        widget="html" nolabel="1"/>
                             </group>
                             <group string="Public Hearing Details / जन सुनवाई विवरण">
-                                <group col="3">
-                                    <field name="public_hearing_date"/>
-                                    <field name="public_hearing_time"/>
+                                <group col="2">
+                                    <field name="public_hearing_datetime" widget="datetime"/>
                                     <field name="public_hearing_place"/>
                                 </group>
                             </group>
@@ -110,8 +109,10 @@
             <form string="Generate Section 19 Notification">
                 <sheet>
                     <group>
-                        <field name="project_id" required="1"/>
-                        <field name="village_ids" widget="many2many_tags" required="1"/>
+                        <field name="project_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="village_id" required="1" 
+                               options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                               placeholder="Select village from project..."/>
                     </group>
                 </sheet>
                 <footer>

@@ -9,22 +9,21 @@
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="state" widget="badge" 
-                       decoration-success="state == 'signed'" 
-                       decoration-info="state == 'approved'" 
-                       decoration-warning="state == 'submitted'" 
-                       decoration-muted="state == 'draft'"
-                       decoration-danger="state == 'rejected'"/>
+                       decoration-success="state == 'approved'" 
+                       decoration-info="state == 'submitted'" 
+                       decoration-warning="state == 'draft'"
+                       decoration-danger="state == 'send_back'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
                 <field name="signatory_name"/>
-                <button name="action_approve" string="Approve" type="object" 
+                    <button name="action_approve" string="Approve" type="object" 
                         class="btn-success" icon="fa-check" 
-                        invisible="state not in ['draft', 'submitted']"
+                        invisible="state != 'submitted'"
                         title="Approve Expert Committee Report"/>
-                <button name="action_reject" string="Reject" type="object" 
+                <button name="action_send_back" string="Send Back" type="object" 
                         class="btn-danger" icon="fa-times" 
-                        invisible="state not in ['draft', 'submitted']"
-                        title="Reject Expert Committee Report"/>
+                        invisible="state != 'submitted'"
+                        title="Send Back Expert Committee Report"/>
                 <button name="action_generate_order" string="Generate Order" type="object" 
                         class="btn-primary" icon="fa-file-text" title="Generate Expert Committee Order"/>
             </list>
@@ -44,7 +43,7 @@
                     <button name="action_approve" string="Approve / अनुमोदित करें" 
                             type="object" class="btn-success" icon="fa-check"
                             invisible="state != 'submitted'"/>
-                    <button name="action_reject" string="Reject / अस्वीकृत करें" 
+                    <button name="action_send_back" string="Send Back / वापस भेजें" 
                             type="object" class="btn-danger" icon="fa-times"
                             invisible="state != 'submitted'"/>
                     <button name="action_generate_order" string="Generate Order / आदेश जेनरेट करें" 
@@ -53,9 +52,6 @@
                             type="object" class="btn-primary" icon="fa-file-text"
                             invisible="state != 'approved'"
                             help="Create Section 11 Preliminary Report from this Expert Committee Report"/>
-                    <button name="action_mark_signed" string="Mark as Signed / हस्ताक्षरित के रूप में चिह्नित करें" 
-                            type="object" class="btn-success" 
-                            invisible="state == 'signed' or not has_signed_document"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,signed"/>
                 </header>
                 <sheet>
@@ -68,7 +64,6 @@
                                    options="{'no_create_edit': True}"/>
                         </group>
                         <group>
-                            <field name="total_khasras_count" readonly="1"/>
                             <field name="total_area_acquired" readonly="1"/>
                         </group>
                     </group>
@@ -109,7 +104,6 @@
                                     <field name="name" string="Village Name / ग्राम का नाम"/>
                                     <field name="district_id" string="District / जिला"/>
                                     <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                    <field name="total_khasras_count" string="Total Khasras / कुल खसरा"/>
                                     <field name="total_captured_area" string="Total Captured Area (Hectares) / कुल कैप्चर क्षेत्रफल (हेक्टेयर)"/>
                                 </list>
                             </field>
@@ -133,8 +127,7 @@
                 <filter string="Draft / प्रारूप" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Submitted / प्रस्तुत" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved / स्वीकृत" name="approved" domain="[('state', '=', 'approved')]"/>
-                <filter string="Rejected / अस्वीकृत" name="rejected" domain="[('state', '=', 'rejected')]"/>
-                <filter string="Signed / हस्ताक्षरित" name="signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Sent Back / वापस भेजा गया" name="send_back" domain="[('state', '=', 'send_back')]"/>
                 <filter string="Has Signed Document / हस्ताक्षरित दस्तावेज़ है" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
                 <separator/>
                 <filter string="My Reports / मेरी रिपोर्ट" name="my_reports" domain="[('create_uid', '=', uid)]"/>

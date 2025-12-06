@@ -8,7 +8,7 @@ import uuid
 class ExpertCommitteeReport(models.Model):
     _name = 'bhu.expert.committee.report'
     _description = 'Expert Committee Report / विशेषज्ञ समिति रिपोर्ट'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Report Name / रिपोर्ट का नाम', required=True, default='New', tracking=True)
@@ -149,13 +149,7 @@ class ExpertCommitteeReport(models.Model):
     signatory_name = fields.Char(string='Signatory Name / हस्ताक्षरकर्ता का नाम', tracking=True)
     signatory_designation = fields.Char(string='Signatory Designation / हस्ताक्षरकर्ता का पद', tracking=True)
     
-    state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('submitted', 'Submitted / प्रस्तुत'),
-        ('approved', 'Approved / स्वीकृत'),
-        ('rejected', 'Rejected / अस्वीकृत'),
-        ('signed', 'Signed / हस्ताक्षरित'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+    # State field is inherited from mixin
     
     @api.depends('signed_document_file')
     def _compute_has_signed_document(self):
@@ -192,12 +186,14 @@ class ExpertCommitteeReport(models.Model):
         if not self.signed_date:
             self.signed_date = fields.Date.today()
     
-    def action_approve(self):
-        """Approve the Expert Committee Report"""
+    # Workflow methods are inherited from mixin
+    # Override action_download_unsigned_file to generate PDF report
+    def action_download_unsigned_file(self):
+        """Generate and download Expert Committee Report PDF (unsigned) - Override mixin"""
         self.ensure_one()
-        if self.state not in ['draft', 'submitted']:
-            raise ValidationError(_('Only draft or submitted reports can be approved.'))
-        self.state = 'approved'
+        # TODO: Add report action reference when Expert Committee report template is created
+        # For now, return error
+        raise ValidationError(_('Expert Committee Report PDF generation is not yet implemented.'))
     
     def action_create_section11_notification(self):
         """Create Section 11 Preliminary Report from this Expert Committee Report - Creates one per village"""
@@ -272,21 +268,8 @@ class ExpertCommitteeReport(models.Model):
                 'target': 'current',
             }
     
-    def action_reject(self):
-        """Reject the Expert Committee Report"""
-        self.ensure_one()
-        if self.state not in ['draft', 'submitted']:
-            raise ValidationError(_('Only draft or submitted reports can be rejected.'))
-        self.state = 'rejected'
-        return True
-    
-    def action_submit(self):
-        """Submit the Expert Committee Report for approval"""
-        self.ensure_one()
-        if self.state != 'draft':
-            raise ValidationError(_('Only draft reports can be submitted.'))
-        self.state = 'submitted'
-        return True
+    # action_reject is replaced by action_send_back in mixin
+    # action_submit is inherited from mixin
     
     def action_generate_order(self):
         """Generate Expert Committee Order - Opens wizard with current report's project"""

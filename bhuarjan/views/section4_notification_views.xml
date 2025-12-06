@@ -12,8 +12,12 @@
                 <field name="tehsil_id"/>
                 <field name="village_id"/>
                 <field name="area_captured_from_form10" string="Area from Form 10"/>
-                <field name="public_hearing_date"/>
-                <field name="state" widget="badge" decoration-success="state in ('signed', 'notification_11')" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="public_hearing_datetime"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'approved'" 
+                       decoration-info="state == 'submitted'" 
+                       decoration-warning="state == 'draft'"
+                       decoration-danger="state == 'send_back'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
             </list>
@@ -27,11 +31,68 @@
         <field name="arch" type="xml">
             <form string="Section 4 Notification">
                 <header>
-                    <button name="action_generate_pdf" string="Generate Notification 4" type="object" class="btn-primary" icon="fa-file-pdf"
-                            invisible="state != 'draft' or (state == 'draft' and not all_surveys_approved)"/>
-                    <button name="action_download_pdf" string="Download Notification 4" type="object" class="btn-primary" icon="fa-download"
-                            invisible="state not in ('generated', 'signed', 'notification_11')"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed,notification_11"/>
+                    <!-- File Upload Section for SDM -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Signed Section 4 Notification"/>
+                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
+                                icon="fa-paper-plane"
+                                invisible="not sdm_signed_file"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'submitted'">
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               placeholder="Upload Section 4 Approval Letter"/>
+                    </group>
+                    
+                    <!-- Download Button Group for SDM (visible in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
+                        <div class="btn-group" role="group">
+                            <button name="action_download_unsigned_file" string="Download Section 4 Notification" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    title="Download Section 4 Notification (Unsigned)"/>
+                            <button name="action_download_sdm_signed_file" string="SDM Signed Notification" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    invisible="not sdm_signed_file"
+                                    title="Download SDM Signed Notification"/>
+                        </div>
+                    </group>
+                    
+                    <!-- Download Button for Collector (visible when submitted) -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'submitted'">
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Notification" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                invisible="not sdm_signed_file"
+                                title="Download SDM Signed Notification"/>
+                    </group>
+                    
+                    <!-- Action Buttons: Approve, Send Back -->
+                    <group>
+                        <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                                icon="fa-check"
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted' or not collector_signed_file"/>
+                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                                icon="fa-arrow-left"
+                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'submitted'"/>
+                    </group>
+                    
+                    <!-- Resubmit button (for sent back records) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            groups="bhuarjan.group_bhuarjan_sdm"
+                            invisible="state != 'send_back'"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>
                 <div class="alert alert-danger" role="alert" invisible="not has_pending_surveys or not project_id or not village_id or state != 'draft'" 
                      style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
@@ -41,21 +102,20 @@
                      style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
                     <strong style="color: #dc3545; font-weight: bold;">⚠ Error:</strong> <span style="color: #dc3545; font-weight: bold;">No surveys in this village, so no notification can be created.</span>
                 </div>
-                <sheet readonly="has_section11 or state in ('signed', 'notification_11') or (has_pending_surveys and state == 'draft' and project_id and village_id) or (has_no_surveys and state == 'draft' and project_id and village_id) or (not village_id and state == 'draft')">
+                <sheet readonly="has_section11 or state in ('submitted', 'approved', 'send_back') or (has_pending_surveys and state == 'draft' and project_id and village_id) or (has_no_surveys and state == 'draft' and project_id and village_id) or (not village_id and state == 'draft')">
                     <group>
                         <group>
-                            <field name="project_id" required="1" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document" 
+                            <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')" 
                                    options="{'no_create': True, 'no_open': True}"/>
-                            <field name="requiring_body_id" required="1"/>
+                            <field name="requiring_body_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')"/>
                             <field name="tehsil_id" readonly="1"/>
                             <field name="village_id" required="1" 
-                                    domain="village_domain"
                                    options="{'no_create_edit': True,'no_create':True,'no_open':True}"
-                                   readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                   readonly="state in ('submitted', 'approved', 'send_back')"
+                                   placeholder="Select village from project..."/>
                         </group>
                         <group>
                             <field name="area_captured_from_form10" readonly="1"/>
-                            <field name="total_area" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -86,81 +146,76 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Basic Information" icon="fa-info-circle">
-                            <group string="Public Purpose">
+                        <page string="Notification Details" icon="fa-info-circle">
+                            <!-- Basic Information Section -->
+                            <group string="Public Purpose / लोक प्रयोजन">
                                 <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
                                        widget="html" nolabel="1"
-                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                       readonly="state in ('submitted', 'approved', 'send_back')"/>
                             </group>
-                            <group string="Public Hearing Details">
-                                <field name="public_hearing_date" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
-                                <field name="public_hearing_time" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
-                                <field name="public_hearing_place" readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                            <group string="Public Hearing Details / सार्वजनिक सुनवाई विवरण">
+                                <group col="2">
+                                    <field name="public_hearing_datetime" widget="datetime" readonly="state in ('submitted', 'approved', 'send_back')"/>
+                                    <field name="public_hearing_place" readonly="state in ('submitted', 'approved', 'send_back')"/>
+                                </group>
                             </group>
-                        </page>
-                        <page string="Section 4 Questions" icon="fa-question-circle">
+                            
+                            <!-- Section 4 Questions -->
                             <group>
                                 <group string="(1) Brief Description of Public Purpose / लोक प्रयोजन का संक्षिप्त विवरण">
                                     <field name="q1_brief_description" widget="html" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                                 <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
                                     <field name="q2_directly_affected" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
                                     <field name="q3_indirectly_affected" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                                 <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
                                     <field name="q4_private_assets" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
                                     <field name="q5_government_assets" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                                 <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है?">
                                     <field name="q6_minimal_acquisition" widget="radio" nolabel="1"
                                            options="{'horizontal': true}"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है?">
                                     <field name="q7_alternatives_considered" widget="radio" nolabel="1"
                                            options="{'horizontal': true}"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
                                     <field name="q8_total_cost" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                                 <group string="(9) Benefits from the Project / परियोजना से लाभ">
                                     <field name="q9_project_benefits" widget="html" nolabel="1"
-                                           readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                           readonly="state in ('submitted', 'approved', 'send_back')"/>
                                 </group>
                             </group>
                             <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
                                 <field name="q10_compensation_measures" widget="html" nolabel="1"
-                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
+                                       readonly="state in ('submitted', 'approved', 'send_back')"/>
                             </group>
                             <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
                                 <field name="q11_other_components" widget="html" nolabel="1"
-                                       readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
-                            </group>
-                        </page>
-                        <page string="Signed Document" icon="fa-file-signature">
-                            <group string="Signed Notification">
-                                <field name="signed_document_file" filename="signed_document_filename"
-                                      readonly="state in ('signed', 'notification_11')"/>
-                                <field name="signed_document_filename" invisible="1"/>
+                                       readonly="state in ('submitted', 'approved', 'send_back')"/>
                             </group>
                         </page>
                     </notebook>
@@ -181,7 +236,7 @@
                 <field name="project_id"/>
                 <field name="tehsil_id"/>
                 <field name="village_id"/>
-                <field name="public_hearing_date"/>
+                <field name="public_hearing_datetime"/>
                 <field name="public_hearing_place"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>

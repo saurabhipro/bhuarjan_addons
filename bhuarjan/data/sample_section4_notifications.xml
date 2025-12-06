@@ -12,8 +12,7 @@
             <field name="village_id" ref="pandripani_village"/>
             <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन। यह परियोजना शहर के यातायात को सुविधाजनक बनाने और आर्थिक विकास को बढ़ावा देने के लिए है।</p>]]></field>
-            <field name="public_hearing_date">2024-12-20</field>
-            <field name="public_hearing_time">11:00 AM</field>
+            <field name="public_hearing_datetime">2024-12-20 11:00:00</field>
             <field name="public_hearing_place">ग्राम पंचायत भवन, पंडरीपानी</field>
             <field name="q1_brief_description"><![CDATA[<p><strong>लोक प्रयोजन:</strong> रिंग रोड रायगढ़ परियोजना के अंतर्गत पंडरीपानी ग्राम में <strong>2.5000 हेक्टेयर</strong> भूमि का अर्जन किया जा रहा है।</p>]]></field>
             <field name="q2_directly_affected">12</field>
@@ -35,8 +34,7 @@
             <field name="village_id" ref="gopalpur_village"/>
             <field name="state">generated</field>
             <field name="public_purpose"><![CDATA[<p><strong>रिंग रोड रायगढ़</strong> परियोजना के लिए भूमि अर्जन।</p>]]></field>
-            <field name="public_hearing_date">2024-12-25</field>
-            <field name="public_hearing_time">2:00 PM</field>
+            <field name="public_hearing_datetime">2024-12-25 14:00:00</field>
             <field name="public_hearing_place">ग्राम पंचायत भवन, गोपालपुर</field>
             <field name="q1_brief_description"><![CDATA[<p><strong>लोक प्रयोजन:</strong> रिंग रोड रायगढ़ परियोजना के अंतर्गत गोपालपुर ग्राम में <strong>4.0000 हेक्टेयर</strong> भूमि का अर्जन।</p>]]></field>
             <field name="q2_directly_affected">18</field>

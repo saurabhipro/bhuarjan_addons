@@ -323,8 +323,8 @@
                     <div class="hearing-info">
                         <p style="text-align: justify; margin-bottom: 0; font-size: 16px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;">
                             उपरोक्त उल्लिखित भूमि के अर्जन हेतु सामाजिक समाघात निर्धारण के अध्ययन हेतु जन सुनवाई (दिनांक) 
-                            <strong><t t-esc="wizard.get_formatted_hearing_date()"/></strong> को 
-                            (समय) <strong><t t-esc="wizard.public_hearing_time or '........................'"/></strong> बजे 
+                            <strong><t t-esc="wizard.get_formatted_hearing_date_only()"/></strong> को 
+                            (समय) <strong><t t-esc="wizard.get_formatted_hearing_time_only() or '........................'"/></strong> बजे 
                             (स्थान) <strong><t t-esc="wizard.public_hearing_place or '........................'"/></strong> पर तयत की गई है। 
                             प्रस्तावित भूमि अर्जन का अन्य विवरण निम्नानुसार है :-
                         </p>

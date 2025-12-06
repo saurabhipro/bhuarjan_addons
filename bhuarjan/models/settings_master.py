@@ -152,6 +152,84 @@ class BhuarjanWorkflowSettings(models.Model):
     # This enables multiple makers for the same workflow
 
 
+class BhuarjanEscalationMatrix(models.Model):
+    _name = 'bhuarjan.escalation.matrix'
+    _description = 'Bhuarjan Escalation Matrix'
+    _rec_name = 'display_name'
+    _order = 'sequence, from_process, to_process'
+
+    sequence = fields.Integer(string='Sequence / क्रम', default=10, required=True,
+                             help='Sequence number to order the process flow steps')
+    from_process = fields.Selection([
+        ('form10', 'Form 10'),
+        ('sia_approval', 'SIA Approval'),
+        ('section4_notification', 'Section 4 Notification'),
+        ('expert_committee', 'Expert Committee Report'),
+        ('section11_notification', 'Section 11 Notification'),
+        ('section15_objection', 'Section 15 Objection'),
+        ('section19_notification', 'Section 19 Notification'),
+        ('draft_award', 'Draft Award'),
+    ], string='From Process / प्रक्रिया से', required=True,
+       help='The process/stage that must be completed before the next process can start')
+    
+    to_process = fields.Selection([
+        ('sia_approval', 'SIA Approval'),
+        ('section4_notification', 'Section 4 Notification'),
+        ('expert_committee', 'Expert Committee Report'),
+        ('section11_notification', 'Section 11 Notification'),
+        ('section15_objection', 'Section 15 Objection'),
+        ('section19_notification', 'Section 19 Notification'),
+        ('draft_award', 'Draft Award'),
+        ('payment_file', 'Payment File'),
+    ], string='To Process / प्रक्रिया तक', required=True,
+       help='The next process/stage that should be completed')
+    
+    days_required = fields.Integer(string='Days Required / आवश्यक दिन', required=True, default=0,
+                                   help='Number of days allowed to complete the next process after the previous process is completed')
+    
+    settings_master_id = fields.Many2one('bhuarjan.settings.master', string='Settings Master', required=True, ondelete='cascade')
+    active = fields.Boolean(string='Active', default=True)
+    display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
+    
+    _sql_constraints = [
+        ('unique_process_flow', 'unique(from_process, to_process, settings_master_id)', 
+         'Escalation matrix entry must be unique for each from-to process combination!'),
+        ('unique_sequence', 'unique(sequence, settings_master_id)', 
+         'Sequence number must be unique for each settings master!')
+    ]
+    
+    @api.depends('from_process', 'to_process', 'days_required')
+    def _compute_display_name(self):
+        """Compute display name for escalation matrix entry"""
+        for record in self:
+            from_label = dict(record._fields['from_process'].selection).get(record.from_process, record.from_process) if record.from_process else ''
+            to_label = dict(record._fields['to_process'].selection).get(record.to_process, record.to_process) if record.to_process else ''
+            if from_label and to_label:
+                record.display_name = f"{from_label} → {to_label} ({record.days_required} days)"
+            else:
+                record.display_name = "Escalation Matrix"
+    
+    @api.constrains('from_process', 'to_process')
+    def _check_process_flow(self):
+        """Validate that from_process and to_process are different"""
+        for record in self:
+            if record.from_process == record.to_process:
+                raise ValidationError('From Process and To Process cannot be the same!')
+    
+    @api.model
+    def get_days_required(self, from_process, to_process):
+        """Get days required for a process flow"""
+        escalation = self.search([
+            ('from_process', '=', from_process),
+            ('to_process', '=', to_process),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if escalation:
+            return escalation.days_required
+        return 0  # Default to 0 days if not configured
+
+
 class BhuarjanSettingsMaster(models.Model):
     _name = 'bhuarjan.settings.master'
     _description = 'Bhuarjan Settings Master'
@@ -166,6 +244,10 @@ class BhuarjanSettingsMaster(models.Model):
     # Workflow Settings
     workflow_settings_ids = fields.One2many('bhuarjan.workflow.settings', 'settings_master_id', 
                                            string='Workflow Settings')
+    
+    # Escalation Matrix
+    escalation_matrix_ids = fields.One2many('bhuarjan.escalation.matrix', 'settings_master_id', 
+                                           string='Escalation Matrix')
     
     # AWS Configuration
     s3_bucket_name = fields.Char(string='S3 Bucket Name', help='AWS S3 bucket name for storing files')

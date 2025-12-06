@@ -22,6 +22,7 @@ access_bhuarjan_sequence_settings,access_bhuarjan_sequence_settings,model_bhuarj
 access_bhuarjan_workflow_settings,access_bhuarjan_workflow_settings,model_bhuarjan_workflow_settings,base.group_user,1,1,1,1
 access_report_wizard,access_report_wizard,model_report_wizard,base.group_user,1,1,1,1
 access_user_report_wizard,access_user_report_wizard,model_user_report_wizard,base.group_user,1,1,1,1
+access_sia_send_back_wizard,access_sia_send_back_wizard,model_sia_send_back_wizard,base.group_user,1,1,1,1
 access_bhu_survey_message_wizard,access_bhu_survey_message_wizard,model_bhu_survey_message_wizard,base.group_user,1,0,1,0
 access_bhu_survey_bulk_approval_wizard,access_bhu_survey_bulk_approval_wizard,model_bhu_survey_bulk_approval_wizard,base.group_user,1,1,1,1
 access_bhu_document_vault,access_bhu_document_vault,model_bhu_document_vault,base.group_user,1,1,1,1
@@ -54,6 +55,10 @@ access_jwt_token,jwt.token,model_jwt_token,base.group_user,1,1,1,1
 access_bhu_channel_master,access_bhu_channel_master,model_bhu_channel_master,base.group_user,1,1,1,1
 access_bhu_app_version,access_bhu_app_version,model_bhu_app_version,base.group_user,1,1,1,1
 access_bhu_app_version_admin,access_bhu_app_version_admin,model_bhu_app_version,bhuarjan.group_bhuarjan_admin,1,1,1,1
+access_bhu_process_report,access_bhu_process_report,model_bhu_process_report,base.group_user,1,0,1,0
+access_bhu_process_report_wizard,access_bhu_process_report_wizard,model_bhu_process_report_wizard,base.group_user,1,1,1,1
+access_process_send_back_wizard,access_process_send_back_wizard,model_process_send_back_wizard,base.group_user,1,1,1,1
+access_bhuarjan_escalation_matrix,access_bhuarjan_escalation_matrix,model_bhuarjan_escalation_matrix,base.group_user,1,1,1,1
 
 
 

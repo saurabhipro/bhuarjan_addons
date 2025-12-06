@@ -7,13 +7,10 @@
         <field name="arch" type="xml">
             <list string="Section 19 Notifications / धारा 19 अधिसूचनाएं" delete="1">
                 <field name="name"/>
-                <field name="notification_number"/>
                 <field name="project_id"/>
-                <field name="village_ids" widget="many2many_tags"/>
+                <field name="village_id"/>
                 <field name="khasra_numbers"/>
                 <field name="khasra_count"/>
-                <field name="notification_date"/>
-                <field name="total_land_area"/>
                 <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
@@ -35,25 +32,15 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="section11_report_id" 
-                                   domain="[('state', 'in', ('generated', 'signed'))]"
-                                   options="{'no_create_edit': True}"
-                                   placeholder="Select Section 11 Preliminary Report to auto-populate data"
-                                   help="Select Section 11 Preliminary Report to auto-populate all data including land parcels"/>
-                            <field name="name" readonly="section11_report_id"/>
-                            <field name="project_id" required="1" readonly="section11_report_id"
+                            <field name="project_id" required="1" 
                                    options="{'no_create': True, 'no_open': True}"/>
-                            <field name="village_ids" widget="many2many_tags" required="1" 
-                                   readonly="section11_report_id"
-                                   options="{'no_create_edit': True, 'no_open':True, 'no_create':True}" 
-                                   domain="village_domain"/>
-                            <field name="notification_number" readonly="section11_report_id"/>
-                            <field name="notification_date"/>
+                            <field name="village_id" required="1" 
+                                   options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                                   placeholder="Select village from project..."/>
                         </group>
                         <group>
                             <field name="district_id" readonly="1"/>
                             <field name="tehsil_id" readonly="1"/>
-                            <field name="total_land_area" readonly="1"/>
                         </group>
                     </group>
                     
@@ -127,9 +114,8 @@
         <field name="arch" type="xml">
             <search string="Section 19 Notifications">
                 <field name="name"/>
-                <field name="notification_number"/>
                 <field name="project_id"/>
-                <field name="village_ids"/>
+                <field name="village_id"/>
                 <field name="district_id"/>
                 <field name="tehsil_id"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
@@ -137,14 +123,11 @@
                 <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
                 <separator/>
                 <filter string="With Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
-                <separator/>
-                <filter string="Today" name="today" domain="[('notification_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
                     <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
                     <filter string="Tehsil" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
-                    <filter string="Date" name="group_date" context="{'group_by': 'notification_date'}"/>
                 </group>
             </search>
         </field>
@@ -157,9 +140,10 @@
         <field name="arch" type="xml">
             <form string="Generate Section 19 Notification">
                 <group>
-                    <field name="project_id" required="1"/>
-                    <field name="village_ids" widget="many2many_tags" required="1" 
-                           options="{'no_create_edit': True}"/>
+                    <field name="project_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="village_id" required="1" 
+                           options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                           placeholder="Select village from project..."/>
                 </group>
                 <footer>
                     <button string="Generate Notification" name="action_generate_notification" type="object" class="btn-primary"/>

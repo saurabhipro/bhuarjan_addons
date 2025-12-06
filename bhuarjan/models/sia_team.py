@@ -33,7 +33,7 @@ class SiaTeam(models.Model):
         ('draft', 'Draft / प्रारूप'),
         ('submitted', 'Submitted / प्रस्तुत'),
         ('approved', 'Approved / अनुमोदित'),
-        ('send_back', 'Send Back / वापस भेजें'),
+        ('rejected', 'Rejected / अस्वीकृत'),
     ], string='Status / स्थिति', default='draft', tracking=True)
     
     # SIA Team Members - 5 Sections
@@ -74,6 +74,14 @@ class SiaTeam(models.Model):
     # Documents
     sia_file = fields.Binary(string='SIA File / SIA फ़ाइल')
     sia_filename = fields.Char(string='SIA Filename')
+    
+    # Signed SIA Reports
+    sdm_signed_file = fields.Binary(string='SDM Signed SIA Report / SDM हस्ताक्षरित SIA रिपोर्ट', 
+                                     help='Upload the signed SIA report from SDM')
+    sdm_signed_filename = fields.Char(string='SDM Signed Filename')
+    collector_signed_file = fields.Binary(string='Collector Signed SIA Report / कलेक्टर हस्ताक्षरित SIA रिपोर्ट',
+                                          help='Upload the signed SIA report from Collector')
+    collector_signed_filename = fields.Char(string='Collector Signed Filename')
     
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
@@ -281,24 +289,70 @@ class SiaTeam(models.Model):
     
     # Workflow Actions
     def action_submit(self):
-        """Submit SIA Team for approval"""
+        """Submit SIA Team for approval by Collector (SDM action)"""
         self.ensure_one()
+        
+        # Check if user is SDM
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can submit SIA Team for approval.'))
+        
+        # Validate that SDM signed file is uploaded
+        if not self.sdm_signed_file:
+            raise ValidationError(_('Please upload the SDM signed SIA report before submitting.'))
+        
+        # Validate all team members are filled
+        self._check_all_team_members_filled()
+        
         self.state = 'submitted'
+        self.message_post(body=_('SIA Team submitted for Collector approval by %s') % self.env.user.name)
     
     def action_approve(self):
-        """Approve SIA Team"""
+        """Approve SIA Team (Collector action)"""
         self.ensure_one()
+        
+        # Check if user is Collector
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only Collector can approve SIA Team.'))
+        
+        # Validate that Collector signed file is uploaded
+        if not self.collector_signed_file:
+            raise ValidationError(_('Please upload the Collector signed SIA report before approving.'))
+        
+        # Validate state is submitted
+        if self.state != 'submitted':
+            raise ValidationError(_('Only submitted SIA Teams can be approved.'))
+        
         self.state = 'approved'
+        self.message_post(body=_('SIA Team approved by %s') % self.env.user.name)
     
-    def action_send_back(self):
-        """Send back SIA Team for revision"""
+    def action_reject(self):
+        """Reject SIA Team (Collector action)"""
         self.ensure_one()
-        self.state = 'send_back'
+        
+        # Check if user is Collector
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only Collector can reject SIA Team.'))
+        
+        # Validate state is submitted
+        if self.state != 'submitted':
+            raise ValidationError(_('Only submitted SIA Teams can be rejected.'))
+        
+        self.state = 'rejected'
+        self.message_post(body=_('SIA Team rejected by %s') % self.env.user.name)
     
     def action_draft(self):
-        """Reset to draft"""
+        """Reset to draft (only allowed when rejected)"""
         self.ensure_one()
+        
+        # Only allow reset to draft if rejected
+        if self.state != 'rejected':
+            raise ValidationError(_('Only rejected SIA Teams can be reset to draft.'))
+        
         self.state = 'draft'
+        self.message_post(body=_('SIA Team reset to draft by %s') % self.env.user.name)
     
     # Document Actions
     def action_download_sia_file(self):

@@ -25,14 +25,35 @@
         <field name="arch" type="xml">
             <form string="SIA Team / SIA टीम">
                 <header>
-                    <button name="action_submit" string="Submit" type="object" class="btn-primary" 
-                            invisible="state != 'draft'"/>
-                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                            invisible="state != 'submitted'"/>
-                    <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
-                            invisible="state not in ('submitted', 'approved')"/>
+                    <!-- File Upload Section for SDM -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               string="Upload SDM Signed SIA Report / SDM हस्ताक्षरित SIA रिपोर्ट अपलोड करें"
+                               widget="binary"/>
+                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
+                                icon="fa-paper-plane"
+                                invisible="not sdm_signed_file"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                           invisible="state != 'submitted'">
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               string="Upload Collector Signed SIA Report / कलेक्टर हस्ताक्षरित SIA रिपोर्ट अपलोड करें"
+                               widget="binary"/>
+                        <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                                icon="fa-check"
+                                invisible="not collector_signed_file"/>
+                        <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
+                                icon="fa-times"/>
+                    </group>
+                    
+                    <!-- Reset to Draft button (for rejected records) -->
                     <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
-                            invisible="state == 'draft'"/>
+                            invisible="state != 'rejected'"/>
+                    
+                    <!-- Download and Create Section 4 buttons -->
                     <button name="action_download_sia_file" string="Download SIA Report" type="object" 
                             class="btn-primary" icon="fa-download"
                             invisible="state == 'draft'"/>
@@ -40,7 +61,7 @@
                             type="object" class="btn-primary" icon="fa-file-text"
                             invisible="state != 'approved'"
                             help="Create Section 4 Notifications for all villages in this SIA Team"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                 </header>
                 <sheet>
                     <group col="2">
@@ -91,10 +112,6 @@
                                 <field name="tehsildar_id" nolabel="1"
                                        placeholder="Select Tehsildar (Convener)..."
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
-                            </group>
-                            <group>
-                                <field name="sia_file" filename="sia_filename" 
-                                       string="Upload SIA File / SIA फ़ाइल अपलोड करें"/>
                             </group>
                         </page>
                         <page string="Project Villages / परियोजना ग्राम" invisible="not project_id">

@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from . import utils
 import uuid
-import json
+
 
 # Stub models for Process menu items - to be implemented later
 # These are minimal models to allow the module to load
@@ -19,10 +19,10 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
+                                       help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
-    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
-                                       help='Select the requiring body/department', related="project_id.department_id")
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     area_captured_from_form10 = fields.Float(string='Area Captured from Form 10 (Hectares) / फॉर्म 10 से कैप्चर किया गया क्षेत्रफल (हेक्टेयर)',
@@ -40,8 +40,8 @@ class Section4Notification(models.Model):
     survey_count = fields.Integer(string='Survey Count', compute='_compute_survey_ids', readonly=True)
     approved_survey_count = fields.Integer(string='Approved Survey Count', compute='_compute_survey_ids', readonly=True)
     all_surveys_approved = fields.Boolean(string='All Surveys Approved', compute='_compute_survey_ids', readonly=True)
-    has_pending_surveys = fields.Boolean(string="Has Pending Surveys", compute="_compute_survey_ids", readonly=True)
-    has_no_surveys = fields.Boolean(string="Has No Surveys", compute="_compute_survey_ids", readonly=True)
+    has_pending_surveys = fields.Boolean(string="Has Pending Surveys", compute='_compute_survey_ids', readonly=True)
+    has_no_surveys = fields.Boolean(string="Has No Surveys", compute='_compute_survey_ids', readonly=True)
     
     # Check if Section 11 exists for any of the villages (makes form read-only)
     has_section11 = fields.Boolean(string='Has Section 11', compute='_compute_has_section11', readonly=True)
@@ -63,11 +63,11 @@ class Section4Notification(models.Model):
     q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True)
     q6_minimal_acquisition = fields.Selection([
         ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
+        ('no', 'No / नहीं')
     ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='no', tracking=True)
     q7_alternatives_considered = fields.Selection([
         ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
+        ('no', 'No / नहीं')
     ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='no', tracking=True)
     q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True)
     q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True)
@@ -122,7 +122,7 @@ class Section4Notification(models.Model):
                 surveys = self.env['bhu.survey'].search([
                     ('project_id', '=', record.project_id.id),
                     ('village_id', '=', record.village_id.id),
-                    ('state', '=', 'approved')
+                    ('state', 'in', ('approved', 'locked'))
                 ])
                 record.area_captured_from_form10 = sum(surveys.mapped('acquired_area'))
                 record.total_area = sum(surveys.mapped('total_area'))
@@ -141,15 +141,15 @@ class Section4Notification(models.Model):
                 ])
                 record.survey_ids = [(6, 0, surveys.ids)]
                 record.survey_count = len(surveys)
-                # Get approved surveys
-                approved_surveys = surveys.filtered(lambda s: s.state == 'approved')
-                record.approved_survey_count = len(approved_surveys)
-                # Check if all surveys are approved (and there are surveys)
-                record.all_surveys_approved = len(surveys) > 0 and len(approved_surveys) == len(surveys)
-                # Check if there are pending surveys (draft or submitted)
-                pending_surveys = surveys.filtered(lambda s: s.state in ("draft", "submitted"))
+                # Treat both 'approved' and 'locked' as approved
+                approved_or_locked_surveys = surveys.filtered(lambda s: s.state in ('approved', 'locked'))
+                record.approved_survey_count = len(approved_or_locked_surveys)
+                # Check if all surveys are approved or locked (and there are surveys)
+                record.all_surveys_approved = len(surveys) > 0 and len(approved_or_locked_surveys) == len(surveys)
+                # Check for pending surveys (draft or submitted)
+                pending_surveys = surveys.filtered(lambda s: s.state in ('draft', 'submitted'))
                 record.has_pending_surveys = len(pending_surveys) > 0
-                # Check if there are no surveys
+                # Check if no surveys exist
                 record.has_no_surveys = len(surveys) == 0
             else:
                 record.survey_ids = [(5, 0, 0)]
@@ -157,7 +157,7 @@ class Section4Notification(models.Model):
                 record.approved_survey_count = 0
                 record.all_surveys_approved = False
                 record.has_pending_surveys = False
-                record.has_no_surveys = True
+                record.has_no_surveys = False
     
     @api.depends('project_id', 'village_id')
     def _compute_has_section11(self):
@@ -172,18 +172,13 @@ class Section4Notification(models.Model):
             else:
                 record.has_section11 = False
     
-    village_domain = fields.Char()
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
-        for rec in self:
-            if rec.project_id and rec.project_id.village_ids:
-                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
-            else:
-                rec.village_domain = json.dumps([])   # empty domain
-                rec.village_id = False
-
-
+        self.village_id = False
+        if self.project_id and self.project_id.village_ids:
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_id': []}}
     
     @api.model
     def _default_project_id(self):
@@ -215,19 +210,9 @@ class Section4Notification(models.Model):
                     ('village_id', '=', village_id)
                 ], limit=1)
                 if existing:
-                    # Get village name for error message
-                    village = self.env['bhu.village'].browse(village_id)
-                    village_name = village.name if village.exists() else 'this village'
-                    raise ValidationError(_('Cannot create Notification 4 for village "%s" as it is already generated.') % village_name)
-            
-            # Validate that surveys exist for the selected village
-            if project_id and village_id and not is_data_loading:
-                surveys = self.env['bhu.survey'].search([
-                    ('project_id', '=', project_id),
-                    ('village_id', '=', village_id)
-                ])
-                if not surveys:
-                    raise ValidationError(_('No surveys in this village, so no notification can be created. Please create surveys first.'))
+                    # In normal create, return existing to prevent duplicate
+                    existing_records.append(existing)
+                    continue
             
             # Generate sequence number for notification_seq_number
             sequence_number = None
@@ -281,11 +266,11 @@ class Section4Notification(models.Model):
         """Get consolidated survey data for the village"""
         self.ensure_one()
         
-        # Get all approved surveys for the selected village in the project
+        # Get all approved or locked surveys for the selected village in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', '=', 'approved')
+            ('state', 'in', ('approved', 'locked'))
         ])
         
         # Return data for the single village
@@ -368,8 +353,8 @@ class Section4Notification(models.Model):
         if not all_surveys:
             raise ValidationError(_('No surveys found for the selected village. Please create surveys first.'))
         
-        # Check if all surveys are approved
-        non_approved_surveys = all_surveys.filtered(lambda s: s.state != 'approved')
+        # Check if all surveys are approved or locked (treat locked as approved)
+        non_approved_surveys = all_surveys.filtered(lambda s: s.state not in ('approved', 'locked'))
         if non_approved_surveys:
             raise ValidationError(_(
                 'Cannot generate Section 4 Notification. Some surveys are not approved yet.\n\n'
@@ -378,12 +363,12 @@ class Section4Notification(models.Model):
         
         self.state = 'generated'
         
-        # Note: Surveys remain in 'approved' state - no need to change state
+        # Lock all approved surveys for the selected village (skip already locked ones)
         approved_surveys = all_surveys.filtered(lambda s: s.state == 'approved')
         if approved_surveys:
-            # Surveys remain in approved state - no state change needed
+            approved_surveys.write({'state': 'locked'})
             self.message_post(
-                body=_('Generated Notification 4 using %d approved survey(s) for village: %s') % (
+                body=_('Locked %d survey(s) for village: %s') % (
                     len(approved_surveys),
                     self.village_id.name
                 )
@@ -487,11 +472,11 @@ class Section4NotificationWizard(models.TransientModel):
     q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
     q6_minimal_acquisition = fields.Selection([
         ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
+        ('no', 'No / नहीं')
     ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='no')
     q7_alternatives_considered = fields.Selection([
         ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
+        ('no', 'No / नहीं')
     ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='no')
     q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
     q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
@@ -510,11 +495,11 @@ class Section4NotificationWizard(models.TransientModel):
         """Get consolidated survey data for the village"""
         self.ensure_one()
         
-        # Get all approved surveys for the selected village in the project
+        # Get all approved or locked surveys for the selected village in the project
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', '=', 'approved')
+            ('state', 'in', ('approved', 'locked'))
         ])
         
         # Return data for the single village
@@ -557,6 +542,32 @@ class Section4NotificationWizard(models.TransientModel):
             raise ValidationError(_('No approved surveys found for the selected village.'))
         
         # Create notification record
+        notification = self.env['bhu.section4.notification'].create({
+            'project_id': self.project_id.id,
+            'village_id': self.village_id.id,
+            'public_purpose': self.public_purpose,
+            'public_hearing_date': self.public_hearing_date,
+            'public_hearing_time': self.public_hearing_time,
+            'public_hearing_place': self.public_hearing_place,
+            'q1_brief_description': self.q1_brief_description,
+            'q2_directly_affected': self.q2_directly_affected,
+            'q3_indirectly_affected': self.q3_indirectly_affected,
+            'q4_private_assets': self.q4_private_assets,
+            'q5_government_assets': self.q5_government_assets,
+            'q6_minimal_acquisition': self.q6_minimal_acquisition,
+            'q7_alternatives_considered': self.q7_alternatives_considered,
+            'q8_total_cost': self.q8_total_cost,
+            'q9_project_benefits': self.q9_project_benefits,
+            'q10_compensation_measures': self.q10_compensation_measures,
+            'q11_other_components': self.q11_other_components,
+            'state': 'generated',
+        })
+        
+        # Generate PDF report - pass the wizard recordset
+        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
+        return report_action.report_action(self)
+
+
         notification = self.env['bhu.section4.notification'].create({
             'project_id': self.project_id.id,
             'village_id': self.village_id.id,

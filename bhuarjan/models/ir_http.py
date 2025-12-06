@@ -125,4 +125,19 @@ class IrHttp(models.AbstractModel):
                 
         except Exception as e:
             _logger.error("Error in _check_server_restart: %s", e, exc_info=True)
+    
+    @classmethod
+    def get_frontend_session_info(cls):
+        """Override to safely handle cases where session might be None"""
+        try:
+            # Call parent method
+            result = super(IrHttp, cls).get_frontend_session_info()
+            # Ensure we return a dict, not None
+            if result is None:
+                return {}
+            return result
+        except Exception as e:
+            _logger.error("Error in get_frontend_session_info: %s", e, exc_info=True)
+            # Return empty dict as fallback
+            return {}
 

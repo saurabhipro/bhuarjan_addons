@@ -33,7 +33,7 @@ class SiaTeam(models.Model):
         ('draft', 'Draft / प्रारूप'),
         ('submitted', 'Submitted / प्रस्तुत'),
         ('approved', 'Approved / अनुमोदित'),
-        ('rejected', 'Rejected / अस्वीकृत'),
+        ('send_back', 'Sent Back / वापस भेजा गया'),
     ], string='Status / स्थिति', default='draft', tracking=True)
     
     # SIA Team Members - 5 Sections
@@ -79,9 +79,9 @@ class SiaTeam(models.Model):
     sdm_signed_file = fields.Binary(string='SDM Signed SIA Report / SDM हस्ताक्षरित SIA रिपोर्ट', 
                                      help='Upload the signed SIA report from SDM')
     sdm_signed_filename = fields.Char(string='SDM Signed Filename')
-    collector_signed_file = fields.Binary(string='Collector Signed SIA Report / कलेक्टर हस्ताक्षरित SIA रिपोर्ट',
-                                          help='Upload the signed SIA report from Collector')
-    collector_signed_filename = fields.Char(string='Collector Signed Filename')
+    collector_signed_file = fields.Binary(string='Collector SIA Approval Letter / कलेक्टर SIA अनुमोदन पत्र',
+                                          help='Upload the Collector SIA Approval Letter')
+    collector_signed_filename = fields.Char(string='Collector SIA Approval Letter Filename')
     
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
@@ -340,32 +340,41 @@ class SiaTeam(models.Model):
         self.state = 'approved'
         self.message_post(body=_('SIA Team approved by %s') % self.env.user.name)
     
-    def action_reject(self):
-        """Reject SIA Team (Collector action)"""
+    def action_send_back(self):
+        """Open wizard to send back SIA Team (Collector action)"""
         self.ensure_one()
         
         # Check if user is Collector
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only Collector can reject SIA Team.'))
+            raise ValidationError(_('Only Collector can send back SIA Team.'))
         
         # Validate state is submitted
         if self.state != 'submitted':
-            raise ValidationError(_('Only submitted SIA Teams can be rejected.'))
+            raise ValidationError(_('Only submitted SIA Teams can be sent back.'))
         
-        self.state = 'rejected'
-        self.message_post(body=_('SIA Team rejected by %s') % self.env.user.name)
+        # Open wizard
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Send Back SIA Team'),
+            'res_model': 'sia.send.back.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_sia_team_id': self.id,
+            }
+        }
     
     def action_draft(self):
-        """Reset to draft (only allowed when rejected)"""
+        """Reset to draft (only allowed when sent back) - allows SDM to resubmit"""
         self.ensure_one()
         
-        # Only allow reset to draft if rejected
-        if self.state != 'rejected':
-            raise ValidationError(_('Only rejected SIA Teams can be reset to draft.'))
+        # Only allow reset to draft if sent back
+        if self.state != 'send_back':
+            raise ValidationError(_('Only sent back SIA Teams can be reset to draft for resubmission.'))
         
         self.state = 'draft'
-        self.message_post(body=_('SIA Team reset to draft by %s') % self.env.user.name)
+        self.message_post(body=_('SIA Team reset to draft by %s for resubmission') % self.env.user.name)
     
     # Document Actions
     def action_download_sia_file(self):

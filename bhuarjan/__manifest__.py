@@ -58,6 +58,7 @@
         'views/document_vault_views.xml',
         'views/sia_team_views.xml',
         'views/sia_team_member_views.xml',
+        'wizard/sia_send_back_wizard.xml',
         'views/section15_objection_views.xml',
         'views/process_stub_views.xml',
         'views/process_views.xml',

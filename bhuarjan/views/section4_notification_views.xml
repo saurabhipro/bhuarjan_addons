@@ -49,7 +49,6 @@
                             <field name="requiring_body_id" required="1"/>
                             <field name="tehsil_id" readonly="1"/>
                             <field name="village_id" required="1" 
-                                    domain="village_domain"
                                    options="{'no_create_edit': True,'no_create':True,'no_open':True}"
                                    readonly="state in ('generated', 'signed', 'notification_11') or has_signed_document"/>
                         </group>

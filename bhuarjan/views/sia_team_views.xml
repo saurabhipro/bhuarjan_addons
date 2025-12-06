@@ -43,31 +43,41 @@
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                nolabel="1"
                                widget="binary"
-                               placeholder="Upload Signed SIA Proposal"/>
+                               placeholder="Upload SIA Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group (always visible for all users) -->
-                    <group>
+                    <!-- Download Button Group for SDM (always visible for SDM/Admin) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                         <div class="btn-group" role="group">
                             <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download SIA Proposal (Unsigned)"/>
-                            <!-- SDM Signed Download (SDM/Admin users only, when file exists) -->
+                            <!-- SDM Signed Download (when file exists) -->
                             <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
-                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                                     invisible="not sdm_signed_file"
                                     title="Download SDM Signed Proposal"/>
-                            <!-- Collector Signed Download (Collector/Admin users only, when file exists) -->
-                            <button name="action_download_collector_signed_file" string="Collector Signed Proposal" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                    invisible="not collector_signed_file"
-                                    title="Download Collector Signed Proposal"/>
                         </div>
                     </group>
                     
-                    <!-- Action Buttons Row: Approve, Reject, Create Section 4 -->
+                    <!-- Download Button Group for Collector (visible when submitted) -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'submitted'">
+                        <div class="btn-group" role="group">
+                            <!-- Collector can download SDM Signed Proposal -->
+                            <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    invisible="not sdm_signed_file"
+                                    title="Download SDM Signed Proposal"/>
+                            <!-- Collector Signed Download (when file exists) -->
+                            <button name="action_download_collector_signed_file" string="Download Collector SIA Approval Letter" type="object" 
+                                    class="btn-primary" icon="fa-download"
+                                    invisible="not collector_signed_file"
+                                    title="Download Collector SIA Approval Letter"/>
+                        </div>
+                    </group>
+                    
+                    <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
                     <group>
                         <!-- Approve Button (Collector only) -->
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
@@ -75,9 +85,9 @@
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted' or not collector_signed_file"/>
                         
-                        <!-- Reject Button (Collector only) -->
-                        <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
-                                icon="fa-times"
+                        <!-- Send Back Button (Collector only) -->
+                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                                icon="fa-arrow-left"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted'"/>
                         
@@ -89,10 +99,11 @@
                                 help="Create Section 4 Notifications for all villages in this SIA Team"/>
                     </group>
                     
-                    <!-- Reset to Draft button (for rejected records) -->
-                    <button name="action_draft" string="Reset to Draft" type="object" class="btn-secondary" 
-                            invisible="state != 'rejected'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
+                    <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'send_back'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back"/>
                 </header>
                 <sheet>
                     <group col="2">

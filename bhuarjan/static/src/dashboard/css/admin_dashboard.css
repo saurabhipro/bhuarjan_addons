@@ -143,26 +143,26 @@
 .o_card_departments,
 .o_card_surveys_done,
 .o_card_approved {
-    background-image: url('/bhuarjan/static/img/green_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/green_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_sub_divisions,
 .o_card_landowners,
 .o_card_mobile_users {
-    background-image: url('/bhuarjan/static/img/blue_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/blue_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_tehsils,
 .o_card_total_surveys {
-    background-image: url('/bhuarjan/static/img/purple_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/purple_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_villages,
 .o_card_draft {
-    background-image: url('/bhuarjan/static/img/pink_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/pink_pattern.jpg');
     color: #2c3e50;
 }
 
@@ -170,39 +170,39 @@
 .o_card_rate_masters,
 .o_card_pending,
 .o_card_submitted {
-    background-image: url('/bhuarjan/static/img/orange_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/orange_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_rejected {
-    background-image: url('/bhuarjan/static/img/yellow_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/yellow_pattern.jpg');
     color: #2c3e50;
 }
 
 /* Section Process Cards - using background images */
 .o_card_section4,
 .o_card_section11 {
-    background-image: url('/bhuarjan/static/img/green_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/green_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_section19 {
-    background-image: url('/bhuarjan/static/img/orange_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/orange_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_section15 {
-    background-image: url('/bhuarjan/static/img/pink_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/pink_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_expert_committee {
-    background-image: url('/bhuarjan/static/img/purple_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/purple_pattern.jpg');
     color: #2c3e50;
 }
 
 .o_card_sia {
-    background-image: url('/bhuarjan/static/img/blue_pattern.jpg');
+    background-image: url('/bhuarjan/static/src/dashboard/images/blue_pattern.jpg');
     color: #2c3e50;
 }
 

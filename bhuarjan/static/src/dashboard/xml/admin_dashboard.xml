@@ -6,22 +6,30 @@
             <div class="o_dashboard_header">
                 <h2>Admin Dashboard</h2>
                 <div class="o_dashboard_actions">
+                    <!-- Department Selector -->
+                    <select class="form-select o_department_selector" t-att-value="state.selectedDepartment" t-on-change="onDepartmentChange">
+                        <option value="">Select Department</option>
+                        <t t-foreach="state.departments" t-as="department" t-key="department.id">
+                            <option t-att-value="department.id"><t t-esc="department.name"/></option>
+                        </t>
+                    </select>
                     <!-- Project Selector -->
-                    <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange">
-                        <option value="">All Projects</option>
+                    <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment">
+                        <option value="">Project</option>
                         <t t-foreach="state.projects" t-as="project" t-key="project.id">
                             <option t-att-value="project.id"><t t-esc="project.name"/></option>
                         </t>
                     </select>
                     <!-- Village Selector -->
                     <select class="form-select o_village_selector" t-att-value="state.selectedVillage" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
-                        <option value="">All Villages</option>
+                        <option value="">Village</option>
                         <t t-foreach="state.villages" t-as="village" t-key="village.id">
                             <option t-att-value="village.id"><t t-esc="village.name"/></option>
                         </t>
                     </select>
-                    <button class="btn btn-primary" t-on-click="onRefresh" title="Refresh Dashboard">
-                        <i class="fa fa-refresh"/> Refresh
+                    <!-- Submit Button -->
+                    <button class="btn btn-primary o_submit_filters" t-on-click="onSubmitFilters" title="Apply Filters">
+                        <i class="fa fa-filter"/> Submit
                     </button>
                     <span class="text-muted" t-if="state and state.lastUpdate">
                         Last updated: <t t-esc="state.lastUpdate"/>

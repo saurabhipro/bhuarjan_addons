@@ -15,8 +15,10 @@ export class AdminDashboard extends Component {
 
         this.state = useState({
             loading: true,
+            selectedDepartment: null,
             selectedProject: null,
             selectedVillage: null,
+            departments: [],
             projects: [],
             villages: [],
             stats: {
@@ -53,7 +55,8 @@ export class AdminDashboard extends Component {
 
         onWillStart(async () => {
             try {
-                // Load projects first
+                // Load departments and projects first
+                this.state.departments = await this.orm.call("bhuarjan.dashboard", "get_all_departments", []);
                 this.state.projects = await this.orm.call("bhuarjan.dashboard", "get_all_projects", []);
                 await this.loadDashboardData();
             } catch (error) {
@@ -82,15 +85,21 @@ export class AdminDashboard extends Component {
     async loadDashboardData() {
         try {
             this.state.loading = true;
-            // Get dashboard stats with optional project and village filter
+            // Get dashboard stats with optional department, project and village filter
+            const filters = {};
+            if (this.state.selectedDepartment) {
+                filters.department_id = this.state.selectedDepartment;
+            }
+            if (this.state.selectedProject) {
+                filters.project_id = this.state.selectedProject;
+            }
+            if (this.state.selectedVillage) {
+                filters.village_id = this.state.selectedVillage;
+            }
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
-                [],
-                { context: { 
-                    project_id: this.state.selectedProject,
-                    village_id: this.state.selectedVillage
-                } }
+                [filters]
             );
 
             console.log("Dashboard stats received:", stats);
@@ -126,6 +135,32 @@ export class AdminDashboard extends Component {
         }
     }
     
+    async onDepartmentChange(ev) {
+        this.state.selectedDepartment = ev.target.value ? parseInt(ev.target.value) : null;
+        this.state.selectedProject = null; // Reset project when department changes
+        this.state.selectedVillage = null; // Reset village when department changes
+        
+        // Load projects for selected department
+        if (this.state.selectedDepartment) {
+            try {
+                this.state.projects = await this.orm.call("bhuarjan.dashboard", "get_all_projects", [this.state.selectedDepartment]);
+            } catch (error) {
+                console.error("Error loading projects:", error);
+                this.state.projects = [];
+            }
+        } else {
+            // Load all projects if no department selected
+            try {
+                this.state.projects = await this.orm.call("bhuarjan.dashboard", "get_all_projects", []);
+            } catch (error) {
+                console.error("Error loading projects:", error);
+                this.state.projects = [];
+            }
+        }
+        
+        this.state.villages = []; // Clear villages when department changes
+    }
+    
     async onProjectChange(ev) {
         this.state.selectedProject = ev.target.value ? parseInt(ev.target.value) : null;
         this.state.selectedVillage = null; // Reset village when project changes
@@ -141,49 +176,19 @@ export class AdminDashboard extends Component {
         } else {
             this.state.villages = [];
         }
-        
-        // Reload dashboard data with project filter
-        await this.loadDashboardData();
     }
     
     async onVillageChange(ev) {
         this.state.selectedVillage = ev.target.value ? parseInt(ev.target.value) : null;
-        // Reload dashboard data with village filter
-        await this.loadDashboardData();
     }
     
-    async loadDashboardData() {
+    async onSubmitFilters() {
+        // Reload dashboard data with all selected filters
+        await this.loadDashboardData();
         try {
-            this.state.loading = true;
-            // Get dashboard stats with optional project filter
-            const domain = this.state.selectedProject ? [('project_id', '=', this.state.selectedProject)] : [];
-            const stats = await this.orm.call(
-                "bhuarjan.dashboard",
-                "get_dashboard_stats",
-                [],
-                { context: { project_id: this.state.selectedProject } }
-            );
-
-            console.log("Dashboard stats received:", stats);
-            
-            if (stats) {
-                Object.assign(this.state.stats, stats);
-                console.log("State stats after assignment:", this.state.stats);
-            } else {
-                console.warn("No stats returned from server");
-            }
-            
-            this.state.lastUpdate = new Date().toLocaleTimeString();
-            this.state.loading = false;
+            this.notification.add(_t("Filters applied"), { type: "success" });
         } catch (error) {
-            console.error("Error loading dashboard:", error);
-            console.error("Error details:", error.message, error.stack);
-            this.state.loading = false;
-            try {
-                this.notification.add(_t("Error loading dashboard data: " + (error.message || "Unknown error")), { type: "danger" });
-            } catch (notifError) {
-                console.error("Notification error:", notifError);
-            }
+            console.error("Notification error:", error);
         }
     }
 

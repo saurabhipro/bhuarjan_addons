@@ -224,8 +224,9 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* Project and Village selector styling */
+/* Department, Project and Village selector styling - simple default styling */
 .o_dashboard_actions select.form-select,
+.o_dashboard_actions .o_department_selector,
 .o_dashboard_actions .o_project_selector,
 .o_dashboard_actions .o_village_selector {
     padding: 6px 12px;
@@ -233,9 +234,9 @@
     border-radius: 4px;
     background: white;
     font-size: 14px;
+    font-weight: bold;
     height: 34px;
-    min-width: 160px;
-    max-width: 200px;
+    min-width: 150px;
     flex-shrink: 0;
     display: block !important;
     visibility: visible !important;
@@ -244,12 +245,46 @@
     margin: 0;
     line-height: 22px;
     box-sizing: border-box;
+    text-align: left;
+}
+
+.o_dashboard_actions select.form-select option {
+    background: white;
+    color: #333;
+    padding: 8px;
+    text-align: left;
+    font-weight: normal;
+}
+
+.o_dashboard_actions .o_department_selector {
+    min-width: 180px;
+}
+
+.o_dashboard_actions .o_project_selector {
+    min-width: 140px;
+}
+
+.o_dashboard_actions .o_village_selector {
+    min-width: 120px;
+}
+
+.o_dashboard_actions .o_submit_filters {
+    background: linear-gradient(to bottom, #4dd0e1, #26a69a);
+    border: none;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.o_dashboard_actions .o_submit_filters:hover {
+    background: linear-gradient(to bottom, #26a69a, #00897b);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .o_dashboard_actions select.form-select:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
     background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .o_dashboard_actions .text-muted {

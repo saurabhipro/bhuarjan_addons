@@ -221,27 +221,42 @@ class BhuarjanDashboard(models.TransientModel):
         return result
     
     @api.model
-    def _get_all_counts(self, project_id=None, village_id=None):
+    def _get_all_counts(self, project_id=None, village_id=None, department_id=None):
         """Get all counts - cached computation"""
         # Build domain filters
         project_domain = [('project_id', '=', project_id)] if project_id else []
         village_domain = [('village_id', '=', village_id)] if village_id else []
         
+        # If department is selected but no project, filter projects by department
+        if department_id and not project_id:
+            department_projects = self.env['bhu.project'].search([('department_id', '=', department_id)])
+            if department_projects:
+                project_ids = department_projects.ids
+                project_domain = [('project_id', 'in', project_ids)]
+            else:
+                # No projects for this department, return zeros for project-related counts
+                project_domain = [('project_id', '=', False)]  # This will return 0 results
+        
         # Base domains for sections
-        section4_base = project_domain + village_domain if (project_id or village_id) else []
-        section11_base = project_domain + village_domain if (project_id or village_id) else []
-        section19_base = project_domain + village_domain if (project_id or village_id) else []
-        section15_base = project_domain + village_domain if (project_id or village_id) else []
-        expert_base = project_domain + village_domain if (project_id or village_id) else []
-        sia_base = project_domain + village_domain if (project_id or village_id) else []
+        section4_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        section11_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        section19_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        section15_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        expert_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        sia_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        
+        # Filter projects count by department if provided
+        project_count_domain = []
+        if department_id:
+            project_count_domain = [('department_id', '=', department_id)]
         
         return {
             # Master Data Counts
             'total_districts': self.env['bhu.district'].search_count([]),
             'total_sub_divisions': self.env['bhu.sub.division'].search_count([]),
             'total_tehsils': self.env['bhu.tehsil'].search_count([]),
-            'total_villages': self.env['bhu.village'].search_count([]),
-            'total_projects': self.env['bhu.project'].search_count([]),
+            'total_villages': self.env['bhu.village'].search_count(village_domain if village_id else []),
+            'total_projects': self.env['bhu.project'].search_count(project_count_domain),
             'total_departments': self.env['bhu.department'].search_count([]),
             'total_landowners': self.env['bhu.landowner'].search_count([]),
             'total_rate_masters': self.env['bhu.rate.master'].search_count([]),
@@ -622,9 +637,18 @@ class BhuarjanDashboard(models.TransientModel):
         }
     
     @api.model
-    def get_all_projects(self):
-        """Get all projects for dropdown"""
-        projects = self.env["bhu.project"].search([])
+    def get_all_departments(self):
+        """Get all departments for dropdown"""
+        departments = self.env["bhu.department"].search([])
+        return departments.read(["id", "name"])
+    
+    @api.model
+    def get_all_projects(self, department_id=None):
+        """Get all projects for dropdown, optionally filtered by department"""
+        domain = []
+        if department_id:
+            domain = [('department_id', '=', department_id)]
+        projects = self.env["bhu.project"].search(domain)
         return projects.read(["id", "name"])
     
     @api.model
@@ -638,8 +662,16 @@ class BhuarjanDashboard(models.TransientModel):
         return villages.read(["id", "name"])
     
     @api.model
-    def get_dashboard_stats(self):
-        """Get dashboard statistics for OWL component"""
-        counts = self._get_all_counts()
+    def get_dashboard_stats(self, filters=None):
+        """Get dashboard statistics for OWL component
+        Args:
+            filters: dict with keys 'department_id', 'project_id', 'village_id' (all optional)
+        """
+        if not filters:
+            filters = {}
+        department_id = filters.get('department_id') or None
+        project_id = filters.get('project_id') or None
+        village_id = filters.get('village_id') or None
+        counts = self._get_all_counts(project_id=project_id, village_id=village_id, department_id=department_id)
         return counts
 

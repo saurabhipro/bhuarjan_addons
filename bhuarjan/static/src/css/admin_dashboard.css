@@ -18,6 +18,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex-wrap: nowrap;
     gap: 12px;
+    min-height: 50px;
 }
 
 .o_dashboard_header h2 {
@@ -25,6 +26,8 @@
     color: #8B4513;
     font-weight: 600;
     font-size: 18px;
+    flex-shrink: 0;
+    line-height: 34px;
 }
 
 .o_dashboard_actions {
@@ -34,6 +37,8 @@
     flex-wrap: nowrap;
     flex: 1;
     justify-content: flex-end;
+    min-width: 0;
+    align-items: center;
 }
 
 .o_dashboard_actions .btn {
@@ -43,6 +48,8 @@
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
 }
 
 .o_dashboard_content {
@@ -218,7 +225,9 @@
 }
 
 /* Project and Village selector styling */
-.o_dashboard_actions select.form-select {
+.o_dashboard_actions select.form-select,
+.o_dashboard_actions .o_project_selector,
+.o_dashboard_actions .o_village_selector {
     padding: 6px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -226,18 +235,31 @@
     font-size: 14px;
     height: 34px;
     min-width: 160px;
+    max-width: 200px;
     flex-shrink: 0;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: auto;
+    margin: 0;
+    line-height: 22px;
+    box-sizing: border-box;
 }
 
 .o_dashboard_actions select.form-select:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    background-color: #f5f5f5;
 }
 
 .o_dashboard_actions .text-muted {
     white-space: nowrap;
     font-size: 13px;
     color: #6c757d;
+    flex-shrink: 0;
+    line-height: 34px;
+    margin: 0;
+    vertical-align: middle;
 }
 
 /* Responsive Design */

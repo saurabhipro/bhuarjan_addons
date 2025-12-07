@@ -7,14 +7,14 @@
                 <h2>Admin Dashboard</h2>
                 <div class="o_dashboard_actions">
                     <!-- Project Selector -->
-                    <select class="form-select" t-att-value="state.selectedProject" t-on-change="onProjectChange" style="min-width: 180px;">
+                    <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange">
                         <option value="">All Projects</option>
                         <t t-foreach="state.projects" t-as="project" t-key="project.id">
                             <option t-att-value="project.id"><t t-esc="project.name"/></option>
                         </t>
                     </select>
                     <!-- Village Selector -->
-                    <select class="form-select" t-att-value="state.selectedVillage" t-on-change="onVillageChange" style="min-width: 180px;" t-att-disabled="!state.selectedProject">
+                    <select class="form-select o_village_selector" t-att-value="state.selectedVillage" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
                         <option value="">All Villages</option>
                         <t t-foreach="state.villages" t-as="village" t-key="village.id">
                             <option t-att-value="village.id"><t t-esc="village.name"/></option>

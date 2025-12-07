@@ -89,8 +89,8 @@ class BhuProject(models.Model):
         
         # Admin and system users see all projects - no filtering needed
         if not (user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')):
-            # Get user's assigned projects using context flag to avoid recursion
-            assigned_projects = self.with_context(skip_project_domain_filter=True).search([
+            # Get user's assigned projects using sudo() to bypass access rights and context flag to avoid recursion
+            assigned_projects = self.sudo().with_context(skip_project_domain_filter=True).search([
                 '|',
                 ('sdm_ids', 'in', user.id),
                 ('tehsildar_ids', 'in', user.id)

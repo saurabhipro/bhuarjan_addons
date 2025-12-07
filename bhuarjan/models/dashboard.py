@@ -221,8 +221,13 @@ class BhuarjanDashboard(models.TransientModel):
         return result
     
     @api.model
-    def _get_all_counts(self):
+    def _get_all_counts(self, project_id=None):
         """Get all counts - cached computation"""
+        domain = []
+        if project_id:
+            # Filter by project for related models
+            domain = [('project_id', '=', project_id)]
+        
         return {
             # Master Data Counts
             'total_districts': self.env['bhu.district'].search_count([]),
@@ -243,36 +248,47 @@ class BhuarjanDashboard(models.TransientModel):
             'total_surveys_done': self.env['bhu.survey'].search_count([('state', 'in', ['approved', 'rejected'])]),
             'pending_surveys': self.env['bhu.survey'].search_count([('state', 'in', ['submitted', 'rejected'])]),
             
-            # Section 4 Notifications
-            'total_section4_notifications': self.env['bhu.section4.notification'].search_count([]),
-            'draft_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'draft')]),
-            'generated_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'generated')]),
-            'signed_section4': self.env['bhu.section4.notification'].search_count([('state', '=', 'signed')]),
+            # Section 4 Notifications - State wise (filter by project if provided)
+            'section4_total': self.env['bhu.section4.notification'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'section4_draft': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'section4_submitted': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'section4_approved': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'section4_send_back': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
-            # Section 11 Reports
-            'total_section11_reports': self.env['bhu.section11.preliminary.report'].search_count([]),
-            'draft_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'draft')]),
-            'generated_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'generated')]),
-            'signed_section11': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'signed')]),
+            # Section 11 Reports - State wise
+            'section11_total': self.env['bhu.section11.preliminary.report'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'section11_draft': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'section11_submitted': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'section11_approved': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'section11_send_back': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
-            # Expert Committee Reports
-            'total_expert_committee_reports': self.env['bhu.expert.committee.report'].search_count([]),
+            # Section 19 Notifications - State wise
+            'section19_total': self.env['bhu.section19.notification'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'section19_draft': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'section19_submitted': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'section19_approved': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'section19_send_back': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
-            # Section 15 Objections
-            'total_section15_objections': self.env['bhu.section15.objection'].search_count([]),
+            # Section 15 Objections - State wise
+            'section15_total': self.env['bhu.section15.objection'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'section15_draft': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'section15_submitted': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'section15_approved': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'section15_send_back': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
-            # Section 19 Notifications
-            'total_section19_notifications': self.env['bhu.section19.notification'].search_count([]),
-            'draft_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')]),
-            'generated_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'generated')]),
-            'signed_section19': self.env['bhu.section19.notification'].search_count([('state', '=', 'signed')]),
+            # Expert Committee Reports - State wise
+            'expert_committee_total': self.env['bhu.expert.committee.report'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'expert_committee_draft': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'expert_committee_submitted': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'expert_committee_approved': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'expert_committee_send_back': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
-            # SIA Teams
-            'total_sia_teams': self.env['bhu.sia.team'].search_count([]),
-            'draft_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'draft')]),
-            'submitted_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'submitted')]),
-            'approved_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'approved')]),
-            'send_back_sia_teams': self.env['bhu.sia.team'].search_count([('state', '=', 'send_back')]),
+            # SIA Teams - State wise
+            'sia_total': self.env['bhu.sia.team'].search_count([('project_id', '=', project_id)] if project_id else []),
+            'sia_draft': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
+            'sia_submitted': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
+            'sia_approved': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
+            'sia_send_back': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
             
             # Payment Files
             'total_payment_files': self.env['bhu.payment.file'].search_count([]),
@@ -290,6 +306,48 @@ class BhuarjanDashboard(models.TransientModel):
             
             # Active Mobile Users (unique users with JWT tokens from mobile channel)
             'active_mobile_users': len(set(self.env['jwt.token'].search([('channel_type', '=', 'mobile')]).mapped('user_id').ids)),
+            
+            # Section 4 Notifications - State wise
+            'section4_total': self.env['bhu.section4.notification'].search_count([]),
+            'section4_draft': self.env['bhu.section4.notification'].search_count([('state', '=', 'draft')]),
+            'section4_submitted': self.env['bhu.section4.notification'].search_count([('state', '=', 'submitted')]),
+            'section4_approved': self.env['bhu.section4.notification'].search_count([('state', '=', 'approved')]),
+            'section4_send_back': self.env['bhu.section4.notification'].search_count([('state', '=', 'send_back')]),
+            
+            # Section 11 Reports - State wise
+            'section11_total': self.env['bhu.section11.preliminary.report'].search_count([]),
+            'section11_draft': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'draft')]),
+            'section11_submitted': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'submitted')]),
+            'section11_approved': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'approved')]),
+            'section11_send_back': self.env['bhu.section11.preliminary.report'].search_count([('state', '=', 'send_back')]),
+            
+            # Section 19 Notifications - State wise
+            'section19_total': self.env['bhu.section19.notification'].search_count([]),
+            'section19_draft': self.env['bhu.section19.notification'].search_count([('state', '=', 'draft')]),
+            'section19_submitted': self.env['bhu.section19.notification'].search_count([('state', '=', 'submitted')]),
+            'section19_approved': self.env['bhu.section19.notification'].search_count([('state', '=', 'approved')]),
+            'section19_send_back': self.env['bhu.section19.notification'].search_count([('state', '=', 'send_back')]),
+            
+            # Section 15 Objections - State wise
+            'section15_total': self.env['bhu.section15.objection'].search_count([]),
+            'section15_draft': self.env['bhu.section15.objection'].search_count([('state', '=', 'draft')]),
+            'section15_submitted': self.env['bhu.section15.objection'].search_count([('state', '=', 'submitted')]),
+            'section15_approved': self.env['bhu.section15.objection'].search_count([('state', '=', 'approved')]),
+            'section15_send_back': self.env['bhu.section15.objection'].search_count([('state', '=', 'send_back')]),
+            
+            # Expert Committee Reports - State wise
+            'expert_committee_total': self.env['bhu.expert.committee.report'].search_count([]),
+            'expert_committee_draft': self.env['bhu.expert.committee.report'].search_count([('state', '=', 'draft')]),
+            'expert_committee_submitted': self.env['bhu.expert.committee.report'].search_count([('state', '=', 'submitted')]),
+            'expert_committee_approved': self.env['bhu.expert.committee.report'].search_count([('state', '=', 'approved')]),
+            'expert_committee_send_back': self.env['bhu.expert.committee.report'].search_count([('state', '=', 'send_back')]),
+            
+            # SIA Teams - State wise (already have these)
+            'sia_total': self.env['bhu.sia.team'].search_count([]),
+            'sia_draft': self.env['bhu.sia.team'].search_count([('state', '=', 'draft')]),
+            'sia_submitted': self.env['bhu.sia.team'].search_count([('state', '=', 'submitted')]),
+            'sia_approved': self.env['bhu.sia.team'].search_count([('state', '=', 'approved')]),
+            'sia_send_back': self.env['bhu.sia.team'].search_count([('state', '=', 'send_back')]),
         }
     
     def action_refresh(self):
@@ -424,6 +482,16 @@ class BhuarjanDashboard(models.TransientModel):
     def action_open_expert_committee(self):
         return self.env.ref('bhuarjan.action_expert_committee_report').read()[0]
     
+    def action_open_section4(self):
+        return self.env.ref('bhuarjan.action_section4_notification').read()[0]
+    
+    def action_open_section11(self):
+        return self.env.ref('bhuarjan.action_section11_preliminary_report').read()[0]
+    
+    def action_open_section11(self):
+        return self.env.ref("bhuarjan.action_section11_preliminary_report").read()[0]
+        return self.env.ref('bhuarjan.action_expert_committee_report').read()[0]
+    
     def action_open_section15(self):
         return self.env.ref('bhuarjan.action_section15_objections').read()[0]
     
@@ -501,4 +569,34 @@ class BhuarjanDashboard(models.TransientModel):
         action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
         action['domain'] = [('state', '=', 'send_back')]
         return action
+    
+    def action_open_mobile_users(self):
+        """Open mobile users list (JWT tokens with mobile channel)"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Active Mobile Users',
+            'res_model': 'jwt.token',
+            'view_mode': 'list,form',
+            'domain': [('channel_type', '=', 'mobile')],
+            'context': {'search_default_group_by_user': 1},
+        }
+    
+    @api.model
+    def get_all_projects(self):
+        """Get all projects for dropdown"""
+        projects = self.env["bhu.project"].search([])
+        return projects.read(["id", "name"])
+    
+    @api.model
+    def get_villages_by_project(self, project_id):
+        """Get villages for a specific project"""
+        project = self.env["bhu.project"].browse(project_id)
+        villages = self.env["bhu.village"].search([('project_id', '=', project_id)])
+        return villages.read(["id", "name"])
+    
+    @api.model
+    def get_dashboard_stats(self):
+        """Get dashboard statistics for OWL component"""
+        counts = self._get_all_counts()
+        return counts
 

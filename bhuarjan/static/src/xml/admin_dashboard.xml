@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.AdminDashboardTemplate" owl="1">
+        <div class="o_admin_dashboard">
+            <!-- Header -->
+            <div class="o_dashboard_header">
+                <h2>Admin Dashboard</h2>
+                <div class="o_dashboard_actions">
+                    <!-- Project Selector -->
+                    <select class="form-select" t-att-value="state.selectedProject" t-on-change="onProjectChange" style="min-width: 180px;">
+                        <option value="">All Projects</option>
+                        <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                            <option t-att-value="project.id"><t t-esc="project.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Village Selector -->
+                    <select class="form-select" t-att-value="state.selectedVillage" t-on-change="onVillageChange" style="min-width: 180px;" t-att-disabled="!state.selectedProject">
+                        <option value="">All Villages</option>
+                        <t t-foreach="state.villages" t-as="village" t-key="village.id">
+                            <option t-att-value="village.id"><t t-esc="village.name"/></option>
+                        </t>
+                    </select>
+                    <button class="btn btn-primary" t-on-click="onRefresh" title="Refresh Dashboard">
+                        <i class="fa fa-refresh"/> Refresh
+                    </button>
+                    <span class="text-muted" t-if="state and state.lastUpdate">
+                        Last updated: <t t-esc="state.lastUpdate"/>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state and state.loading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x"/> Loading...
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-if="state and !state.loading" class="o_dashboard_content">
+                <!-- Master Data Statistics -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-database"/> MASTER DATA STATISTICS
+                    </h3>
+                    <div class="o_stats_grid">
+                        <!-- Row 1 -->
+                        <div class="o_stat_card o_card_districts" t-on-click="() => this.openAction('action_open_districts')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-map-marker"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">DISTRICTS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_districts : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_sub_divisions" t-on-click="() => this.openAction('action_open_sub_divisions')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-sitemap"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SUB DIVISIONS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_sub_divisions : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_tehsils" t-on-click="() => this.openAction('action_open_tehsils')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-building"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">TEHSILS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_tehsils : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_villages" t-on-click="() => this.openAction('action_open_villages')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-home"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">VILLAGES</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_villages : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_projects" t-on-click="() => this.openAction('action_open_projects')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-briefcase"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">PROJECTS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_projects : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="o_stat_card o_card_departments" t-on-click="() => this.openAction('action_open_departments')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-building-o"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">DEPARTMENTS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_departments : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_landowners" t-on-click="() => this.openAction('action_open_landowners')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">LANDOWNERS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_landowners : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_rate_masters" t-on-click="() => this.openAction('action_open_rate_masters')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-money"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">RATE MASTERS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_rate_masters : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_mobile_users" t-on-click="() => this.openAction('action_open_mobile_users')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-mobile"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">ACTIVE MOBILE USERS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.active_mobile_users : 0"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Survey Statistics -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-list"/> SURVEY STATISTICS
+                    </h3>
+                    <div class="o_stats_grid">
+                        <!-- Row 1 -->
+                        <div class="o_stat_card o_card_total_surveys" t-on-click="() => this.openAction('action_open_surveys')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-list-alt"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">TOTAL SURVEYS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_surveys : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_surveys_done" t-on-click="() => this.openAction('action_open_surveys_done')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-check-circle"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">TOTAL SURVEYS DONE</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_surveys_done : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_draft" t-on-click="() => this.openAction('action_open_surveys_draft')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-file-o"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">DRAFT</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_surveys : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_approved" t-on-click="() => this.openAction('action_open_surveys_approved')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-check"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">APPROVED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.approved_surveys : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_rejected" t-on-click="() => this.openAction('action_open_surveys_rejected')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-times"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">REJECTED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.rejected_surveys : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="o_stat_card o_card_pending" t-on-click="() => this.openAction('action_open_surveys_pending')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-clock-o"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">PENDING</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.pending_surveys : 0"/></div>
+                            </div>
+                        </div>
+
+                        <div class="o_stat_card o_card_submitted" t-on-click="() => this.openAction('action_open_surveys_submitted')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-paper-plane"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SUBMITTED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.submitted_surveys : 0"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Statistics (Section 4, 11, 15, 19, Expert Committee, SIA) -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-file-text"/> PROCESS STATISTICS
+                    </h3>
+                    <div class="o_stats_grid">
+                        <!-- Section 4 -->
+                        <div class="o_stat_card o_card_section4" t-on-click="() => this.openAction('action_open_section4')">
+                            <div class="o_stat_icon"><i class="fa fa-file-o"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SECTION 4</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.section4_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.section4_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.section4_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.section4_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Section 11 -->
+                        <div class="o_stat_card o_card_section11" t-on-click="() => this.openAction('action_open_section11')">
+                            <div class="o_stat_icon"><i class="fa fa-file-text-o"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SECTION 11</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.section11_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.section11_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.section11_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.section11_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Section 19 -->
+                        <div class="o_stat_card o_card_section19" t-on-click="() => this.openAction('action_open_section19')">
+                            <div class="o_stat_icon"><i class="fa fa-file-o"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SECTION 19</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.section19_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.section19_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.section19_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.section19_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Section 15 -->
+                        <div class="o_stat_card o_card_section15" t-on-click="() => this.openAction('action_open_section15')">
+                            <div class="o_stat_icon"><i class="fa fa-exclamation-triangle"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SECTION 15</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.section15_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.section15_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.section15_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.section15_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Expert Committee -->
+                        <div class="o_stat_card o_card_expert_committee" t-on-click="() => this.openAction('action_open_expert_committee')">
+                            <div class="o_stat_icon"><i class="fa fa-users"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">EXPERT COMMITTEE</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_committee_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.expert_committee_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.expert_committee_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.expert_committee_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.expert_committee_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- SIA Teams -->
+                        <div class="o_stat_card o_card_sia" t-on-click="() => this.openAction('action_open_sia_teams')">
+                            <div class="o_stat_icon"><i class="fa fa-building"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SIA TEAMS</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span>D:<t t-esc="state.stats ? state.stats.sia_draft : 0"/></span>
+                                    <span>S:<t t-esc="state.stats ? state.stats.sia_submitted : 0"/></span>
+                                    <span>A:<t t-esc="state.stats ? state.stats.sia_approved : 0"/></span>
+                                    <span>B:<t t-esc="state.stats ? state.stats.sia_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+

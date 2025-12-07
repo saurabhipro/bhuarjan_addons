@@ -341,5 +341,11 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
         <field name="target">current</field>
         <field name="context">{'create': True, 'delete': False}</field>
     </record>
+    
+    <!-- Admin Dashboard Client Action (OWL) -->
+    <record id="action_admin_dashboard_owl" model="ir.actions.client">
+        <field name="name">Admin Dashboard</field>
+        <field name="tag">bhuarjan.admin_dashboard</field>
+    </record>
 
 </odoo>

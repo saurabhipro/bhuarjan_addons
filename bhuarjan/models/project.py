@@ -89,19 +89,28 @@ class BhuProject(models.Model):
         
         # Admin and system users see all projects - no filtering needed
         if not (user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')):
-            # Get user's assigned projects using sudo() to bypass access rights and context flag to avoid recursion
-            assigned_projects = self.sudo().with_context(skip_project_domain_filter=True).search([
-                '|',
-                ('sdm_ids', 'in', user.id),
-                ('tehsildar_ids', 'in', user.id)
-            ])
-            
-            if assigned_projects:
-                # Add domain to filter by assigned projects
-                args = args + [('id', 'in', assigned_projects.ids)]
-            else:
-                # No assigned projects, return domain that matches nothing
-                args = args + [('id', 'in', [])]
+            try:
+                # Get user's assigned projects using sudo() to bypass access rights and context flag to avoid recursion
+                # Use sudo() to ensure we can search even if user doesn't have direct access
+                assigned_projects = self.sudo().with_context(skip_project_domain_filter=True).search([
+                    '|',
+                    ('sdm_ids', 'in', user.id),
+                    ('tehsildar_ids', 'in', user.id)
+                ])
+                
+                if assigned_projects:
+                    # Add domain to filter by assigned projects
+                    args = args + [('id', 'in', assigned_projects.ids)]
+                else:
+                    # No assigned projects, return domain that matches nothing
+                    args = args + [('id', 'in', [])]
+            except Exception as e:
+                # If there's an error getting assigned projects, log it and continue without filtering
+                # This ensures users can still access projects if they have proper access rights
+                import logging
+                _logger = logging.getLogger(__name__)
+                _logger.warning(f"Error filtering projects by assigned projects for user {user.id}: {e}")
+                # Continue with original args - don't filter if there's an error
         
         # Call parent search with modified domain
         return super()._search(args, offset=offset, limit=limit, order=order)

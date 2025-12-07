@@ -445,7 +445,20 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model
     def action_open_districts(self):
-        return self.env.ref('bhuarjan.action_bhu_district').read()[0]
+        try:
+            action_ref = self.env.ref('bhuarjan.action_bhu_district')
+            action = action_ref.read()[0]
+            return action
+        except Exception as e:
+            _logger.error(f"Error getting action_bhu_district: {e}", exc_info=True)
+            # Fallback: create action dynamically
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Districts',
+                'res_model': 'bhu.district',
+                'view_mode': 'list,form',
+                'target': 'current',
+            }
     
     @api.model
     def action_open_sub_divisions(self):

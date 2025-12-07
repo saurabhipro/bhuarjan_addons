@@ -189,27 +189,42 @@ export class AdminDashboard extends Component {
 
     async openAction(actionName) {
         try {
-            // Get or create dashboard record
-            let dashboard = await this.orm.search("bhuarjan.dashboard", [], { limit: 1 });
-            if (!dashboard || dashboard.length === 0) {
-                dashboard = await this.orm.create("bhuarjan.dashboard", {});
-            } else {
-                dashboard = dashboard[0];
-            }
+            console.log("Opening action:", actionName);
             
+            // Call the action method on the dashboard model (these are @api.model methods, no record needed)
             const action = await this.orm.call(
                 "bhuarjan.dashboard",
                 actionName,
-                [[dashboard]]
+                []
             );
             
-            if (action) {
-                this.action.doAction(action);
+            console.log("Action returned:", action);
+            
+            if (action && typeof action === 'object') {
+                // Check if action has required fields
+                if (action.type) {
+                    await this.action.doAction(action);
+                } else if (action.id) {
+                    // If it's just an ID, try to load it
+                    const fullAction = await this.orm.call("ir.actions.act_window", "read", [[action.id]]);
+                    if (fullAction && fullAction.length > 0) {
+                        await this.action.doAction(fullAction[0]);
+                    } else {
+                        throw new Error("Could not load action with ID: " + action.id);
+                    }
+                } else {
+                    console.error("Invalid action format:", action);
+                    throw new Error("Action returned invalid format");
+                }
+            } else {
+                console.error("No action returned from server for:", actionName);
+                throw new Error("No action returned for: " + actionName);
             }
         } catch (error) {
             console.error(`Error opening ${actionName}:`, error);
+            console.error("Error details:", error.message, error.stack);
             try {
-                this.notification.add(_t("Error opening action"), { type: "danger" });
+                this.notification.add(_t("Error: " + (error.message || actionName)), { type: "danger" });
             } catch (notifError) {
                 console.error("Notification error:", notifError);
             }

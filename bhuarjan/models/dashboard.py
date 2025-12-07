@@ -422,24 +422,31 @@ class BhuarjanDashboard(models.TransientModel):
             'context': {'create': False, 'delete': False},
         }
     
+    @api.model
     def action_open_districts(self):
         return self.env.ref('bhuarjan.action_bhu_district').read()[0]
     
+    @api.model
     def action_open_sub_divisions(self):
         return self.env.ref('bhuarjan.action_bhu_sub_division').read()[0]
     
+    @api.model
     def action_open_tehsils(self):
         return self.env.ref('bhuarjan.action_bhu_tehsil').read()[0]
     
+    @api.model
     def action_open_villages(self):
         return self.env.ref('bhuarjan.action_bhu_village').read()[0]
     
+    @api.model
     def action_open_projects(self):
         return self.env.ref('bhuarjan.action_bhu_project').read()[0]
     
+    @api.model
     def action_open_departments(self):
         return self.env.ref('bhuarjan.action_bhu_department').read()[0]
     
+    @api.model
     def action_open_landowners(self):
         action = self.env.ref('bhuarjan.action_bhu_landowner').read()[0]
         # Clear any default filters to prevent saved filters from auto-applying
@@ -450,133 +457,159 @@ class BhuarjanDashboard(models.TransientModel):
         })
         return action
     
+    @api.model
     def action_open_rate_masters(self):
         return self.env.ref('bhuarjan.action_bhu_rate_master').read()[0]
     
+    @api.model
     def action_open_surveys(self):
         return self.env.ref('bhuarjan.action_bhu_survey').read()[0]
     
+    @api.model
     def action_open_surveys_draft(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    @api.model
     def action_open_surveys_rejected(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', '=', 'rejected')]
         return action
     
+    @api.model
     def action_open_surveys_submitted(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', '=', 'submitted')]
         return action
     
+    @api.model
     def action_open_surveys_approved(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', '=', 'approved')]
         return action
     
+    @api.model
     def action_open_surveys_pending(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', 'in', ['submitted', 'rejected'])]
         return action
     
+    @api.model
     def action_open_surveys_done(self):
         action = self.env.ref('bhuarjan.action_bhu_survey').read()[0]
         action['domain'] = [('state', 'in', ['approved', 'rejected'])]
         return action
     
+    @api.model
     def action_open_expert_committee(self):
         return self.env.ref('bhuarjan.action_expert_committee_report').read()[0]
     
+    @api.model
     def action_open_section4(self):
         return self.env.ref('bhuarjan.action_section4_notification').read()[0]
     
+    @api.model
     def action_open_section11(self):
         return self.env.ref('bhuarjan.action_section11_preliminary_report').read()[0]
     
-    def action_open_section11(self):
-        return self.env.ref("bhuarjan.action_section11_preliminary_report").read()[0]
-        return self.env.ref('bhuarjan.action_expert_committee_report').read()[0]
-    
+    @api.model
     def action_open_section15(self):
         return self.env.ref('bhuarjan.action_section15_objections').read()[0]
     
+    @api.model
     def action_open_documents(self):
         return self.env.ref('bhuarjan.action_document_vault').read()[0]
     
+    @api.model
     def action_open_section19(self):
         return self.env.ref('bhuarjan.action_section19_notification').read()[0]
     
+    @api.model
     def action_open_section19_draft(self):
         action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    @api.model
     def action_open_section19_generated(self):
         action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
         action['domain'] = [('state', '=', 'generated')]
         return action
     
+    @api.model
     def action_open_section19_signed(self):
         action = self.env.ref('bhuarjan.action_section19_notification').read()[0]
         action['domain'] = [('state', '=', 'signed')]
         return action
     
+    @api.model
     def action_open_payment_files(self):
         return self.env.ref('bhuarjan.action_payment_file').read()[0]
     
+    @api.model
     def action_open_payment_files_draft(self):
         action = self.env.ref('bhuarjan.action_payment_file').read()[0]
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    @api.model
     def action_open_payment_files_generated(self):
         action = self.env.ref('bhuarjan.action_payment_file').read()[0]
         action['domain'] = [('state', '=', 'generated')]
         return action
     
+    @api.model
     def action_open_payment_reconciliations(self):
         return self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
     
+    @api.model
     def action_open_reconciliations_draft(self):
         action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    @api.model
     def action_open_reconciliations_processed(self):
         action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
         action['domain'] = [('state', '=', 'processed')]
         return action
     
+    @api.model
     def action_open_reconciliations_completed(self):
         action = self.env.ref('bhuarjan.action_payment_reconciliation_bank').read()[0]
         action['domain'] = [('state', '=', 'completed')]
         return action
     
+    @api.model
     def action_open_sia_teams(self):
         return self.env.ref('bhuarjan.action_create_sia_team').read()[0]
     
+    @api.model
     def action_open_sia_teams_draft(self):
         action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
         action['domain'] = [('state', '=', 'draft')]
         return action
     
+    @api.model
     def action_open_sia_teams_submitted(self):
         action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
         action['domain'] = [('state', '=', 'submitted')]
         return action
     
+    @api.model
     def action_open_sia_teams_approved(self):
         action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
         action['domain'] = [('state', '=', 'approved')]
         return action
     
+    @api.model
     def action_open_sia_teams_send_back(self):
         action = self.env.ref('bhuarjan.action_create_sia_team').read()[0]
         action['domain'] = [('state', '=', 'send_back')]
         return action
     
+    @api.model
     def action_open_mobile_users(self):
         """Open mobile users list (JWT tokens with mobile channel)"""
         return {

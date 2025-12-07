@@ -150,6 +150,7 @@ class SiaTeam(models.Model):
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
     tehsildar_domain = fields.Char()
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-set tehsildar and villages based on project selection"""

@@ -76,3 +76,32 @@ class BhuProject(models.Model):
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 
                                 default=lambda self: self.env.company, tracking=True)
+    
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None):
+        """Override search to filter projects by user's assigned projects"""
+        # Skip filtering if context flag is set (to avoid recursion)
+        if self.env.context.get('skip_project_domain_filter'):
+            return super()._search(args, offset=offset, limit=limit, order=order)
+        
+        # Get current user
+        user = self.env.user
+        
+        # Admin and system users see all projects - no filtering needed
+        if not (user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')):
+            # Get user's assigned projects using context flag to avoid recursion
+            assigned_projects = self.with_context(skip_project_domain_filter=True).search([
+                '|',
+                ('sdm_ids', 'in', user.id),
+                ('tehsildar_ids', 'in', user.id)
+            ])
+            
+            if assigned_projects:
+                # Add domain to filter by assigned projects
+                args = args + [('id', 'in', assigned_projects.ids)]
+            else:
+                # No assigned projects, return domain that matches nothing
+                args = args + [('id', 'in', [])]
+        
+        # Call parent search with modified domain
+        return super()._search(args, offset=offset, limit=limit, order=order)

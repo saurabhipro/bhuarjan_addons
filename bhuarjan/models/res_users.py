@@ -64,6 +64,20 @@ class ResUsers(models.Model):
                 ('tehsildar_ids', 'in', user.id)
             ])
             user.assigned_project_ids = projects
+    
+    def _get_assigned_project_ids(self):
+        """Get assigned project IDs for current user (for domain use)"""
+        user = self.env.user
+        # Admin and system users see all projects
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            return []
+        
+        projects = self.env['bhu.project'].search([
+            '|',
+            ('sdm_ids', 'in', user.id),
+            ('tehsildar_ids', 'in', user.id)
+        ])
+        return projects.ids if projects else [False]  # Return [False] to show no projects
 
     @api.onchange('bhuarjan_role')
     def _onchange_bhuarjan_role(self):

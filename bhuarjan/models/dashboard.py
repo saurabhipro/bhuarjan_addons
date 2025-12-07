@@ -650,10 +650,31 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model
     def get_all_projects(self, department_id=None):
-        """Get all projects for dropdown, optionally filtered by department"""
+        """Get all projects for dropdown, optionally filtered by department and user's assigned projects"""
+        user = self.env.user
         domain = []
+        
+        # Filter by user's assigned projects (if not admin)
+        if not user.has_group('bhuarjan.group_bhuarjan_admin') and not user.has_group('base.group_system'):
+            # Get user's assigned projects
+            assigned_projects = self.env['bhu.project'].search([
+                '|',
+                ('sdm_ids', 'in', user.id),
+                ('tehsildar_ids', 'in', user.id)
+            ])
+            if assigned_projects:
+                domain.append(('id', 'in', assigned_projects.ids))
+            else:
+                # No assigned projects, return empty list
+                return []
+        
+        # Filter by department if provided
         if department_id:
-            domain = [('department_id', '=', department_id)]
+            if domain:
+                domain = ['&', ('department_id', '=', department_id)] + domain
+            else:
+                domain = [('department_id', '=', department_id)]
+        
         projects = self.env["bhu.project"].search(domain)
         return projects.read(["id", "name"])
     

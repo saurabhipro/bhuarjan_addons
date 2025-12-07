@@ -631,7 +631,10 @@ class BhuarjanDashboard(models.TransientModel):
     def get_villages_by_project(self, project_id):
         """Get villages for a specific project"""
         project = self.env["bhu.project"].browse(project_id)
-        villages = self.env["bhu.village"].search([('project_id', '=', project_id)])
+        if not project.exists():
+            return []
+        # Get villages from project's Many2many relationship
+        villages = project.village_ids
         return villages.read(["id", "name"])
     
     @api.model

@@ -221,12 +221,19 @@ class BhuarjanDashboard(models.TransientModel):
         return result
     
     @api.model
-    def _get_all_counts(self, project_id=None):
+    def _get_all_counts(self, project_id=None, village_id=None):
         """Get all counts - cached computation"""
-        domain = []
-        if project_id:
-            # Filter by project for related models
-            domain = [('project_id', '=', project_id)]
+        # Build domain filters
+        project_domain = [('project_id', '=', project_id)] if project_id else []
+        village_domain = [('village_id', '=', village_id)] if village_id else []
+        
+        # Base domains for sections
+        section4_base = project_domain + village_domain if (project_id or village_id) else []
+        section11_base = project_domain + village_domain if (project_id or village_id) else []
+        section19_base = project_domain + village_domain if (project_id or village_id) else []
+        section15_base = project_domain + village_domain if (project_id or village_id) else []
+        expert_base = project_domain + village_domain if (project_id or village_id) else []
+        sia_base = project_domain + village_domain if (project_id or village_id) else []
         
         return {
             # Master Data Counts
@@ -248,47 +255,47 @@ class BhuarjanDashboard(models.TransientModel):
             'total_surveys_done': self.env['bhu.survey'].search_count([('state', 'in', ['approved', 'rejected'])]),
             'pending_surveys': self.env['bhu.survey'].search_count([('state', 'in', ['submitted', 'rejected'])]),
             
-            # Section 4 Notifications - State wise (filter by project if provided)
-            'section4_total': self.env['bhu.section4.notification'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'section4_draft': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'section4_submitted': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'section4_approved': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'section4_send_back': self.env['bhu.section4.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            # Section 4 Notifications - State wise (filter by project/village if provided)
+            'section4_total': self.env['bhu.section4.notification'].search_count(section4_base),
+            'section4_draft': self.env['bhu.section4.notification'].search_count(section4_base + [('state', '=', 'draft')]),
+            'section4_submitted': self.env['bhu.section4.notification'].search_count(section4_base + [('state', '=', 'submitted')]),
+            'section4_approved': self.env['bhu.section4.notification'].search_count(section4_base + [('state', '=', 'approved')]),
+            'section4_send_back': self.env['bhu.section4.notification'].search_count(section4_base + [('state', '=', 'send_back')]),
             
             # Section 11 Reports - State wise
-            'section11_total': self.env['bhu.section11.preliminary.report'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'section11_draft': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'section11_submitted': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'section11_approved': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'section11_send_back': self.env['bhu.section11.preliminary.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            'section11_total': self.env['bhu.section11.preliminary.report'].search_count(section11_base),
+            'section11_draft': self.env['bhu.section11.preliminary.report'].search_count(section11_base + [('state', '=', 'draft')]),
+            'section11_submitted': self.env['bhu.section11.preliminary.report'].search_count(section11_base + [('state', '=', 'submitted')]),
+            'section11_approved': self.env['bhu.section11.preliminary.report'].search_count(section11_base + [('state', '=', 'approved')]),
+            'section11_send_back': self.env['bhu.section11.preliminary.report'].search_count(section11_base + [('state', '=', 'send_back')]),
             
             # Section 19 Notifications - State wise
-            'section19_total': self.env['bhu.section19.notification'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'section19_draft': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'section19_submitted': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'section19_approved': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'section19_send_back': self.env['bhu.section19.notification'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            'section19_total': self.env['bhu.section19.notification'].search_count(section19_base),
+            'section19_draft': self.env['bhu.section19.notification'].search_count(section19_base + [('state', '=', 'draft')]),
+            'section19_submitted': self.env['bhu.section19.notification'].search_count(section19_base + [('state', '=', 'submitted')]),
+            'section19_approved': self.env['bhu.section19.notification'].search_count(section19_base + [('state', '=', 'approved')]),
+            'section19_send_back': self.env['bhu.section19.notification'].search_count(section19_base + [('state', '=', 'send_back')]),
             
             # Section 15 Objections - State wise
-            'section15_total': self.env['bhu.section15.objection'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'section15_draft': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'section15_submitted': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'section15_approved': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'section15_send_back': self.env['bhu.section15.objection'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            'section15_total': self.env['bhu.section15.objection'].search_count(section15_base),
+            'section15_draft': self.env['bhu.section15.objection'].search_count(section15_base + [('state', '=', 'draft')]),
+            'section15_submitted': self.env['bhu.section15.objection'].search_count(section15_base + [('state', '=', 'submitted')]),
+            'section15_approved': self.env['bhu.section15.objection'].search_count(section15_base + [('state', '=', 'approved')]),
+            'section15_send_back': self.env['bhu.section15.objection'].search_count(section15_base + [('state', '=', 'send_back')]),
             
             # Expert Committee Reports - State wise
-            'expert_committee_total': self.env['bhu.expert.committee.report'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'expert_committee_draft': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'expert_committee_submitted': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'expert_committee_approved': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'expert_committee_send_back': self.env['bhu.expert.committee.report'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            'expert_committee_total': self.env['bhu.expert.committee.report'].search_count(expert_base),
+            'expert_committee_draft': self.env['bhu.expert.committee.report'].search_count(expert_base + [('state', '=', 'draft')]),
+            'expert_committee_submitted': self.env['bhu.expert.committee.report'].search_count(expert_base + [('state', '=', 'submitted')]),
+            'expert_committee_approved': self.env['bhu.expert.committee.report'].search_count(expert_base + [('state', '=', 'approved')]),
+            'expert_committee_send_back': self.env['bhu.expert.committee.report'].search_count(expert_base + [('state', '=', 'send_back')]),
             
             # SIA Teams - State wise
-            'sia_total': self.env['bhu.sia.team'].search_count([('project_id', '=', project_id)] if project_id else []),
-            'sia_draft': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'draft')]),
-            'sia_submitted': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'submitted')]),
-            'sia_approved': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'approved')]),
-            'sia_send_back': self.env['bhu.sia.team'].search_count(([('project_id', '=', project_id)] if project_id else []) + [('state', '=', 'send_back')]),
+            'sia_total': self.env['bhu.sia.team'].search_count(sia_base),
+            'sia_draft': self.env['bhu.sia.team'].search_count(sia_base + [('state', '=', 'draft')]),
+            'sia_submitted': self.env['bhu.sia.team'].search_count(sia_base + [('state', '=', 'submitted')]),
+            'sia_approved': self.env['bhu.sia.team'].search_count(sia_base + [('state', '=', 'approved')]),
+            'sia_send_back': self.env['bhu.sia.team'].search_count(sia_base + [('state', '=', 'send_back')]),
             
             # Payment Files
             'total_payment_files': self.env['bhu.payment.file'].search_count([]),

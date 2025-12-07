@@ -12,12 +12,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    padding: 8px 15px;
+    padding: 10px 15px;
     background: white;
     border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-wrap: nowrap;
+    gap: 12px;
 }
 
 .o_dashboard_header h2 {
@@ -31,7 +31,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    flex: 1;
+    justify-content: flex-end;
 }
 
 .o_dashboard_actions .btn {
@@ -73,7 +75,7 @@
 
 .o_stats_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
     gap: 12px;
 }
 
@@ -215,7 +217,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* Project selector styling */
+/* Project and Village selector styling */
 .o_dashboard_actions select.form-select {
     padding: 6px 12px;
     border: 1px solid #ddd;
@@ -223,13 +225,32 @@
     background: white;
     font-size: 14px;
     height: 34px;
-    min-width: 180px;
+    min-width: 160px;
+    flex-shrink: 0;
+}
+
+.o_dashboard_actions select.form-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.o_dashboard_actions .text-muted {
+    white-space: nowrap;
+    font-size: 13px;
+    color: #6c757d;
 }
 
 /* Responsive Design */
+@media (max-width: 1600px) {
+    .o_stats_grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+}
+
 @media (max-width: 1200px) {
     .o_stats_grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 10px;
     }
     
@@ -252,22 +273,37 @@
     }
 }
 
+@media (max-width: 992px) {
+    .o_stats_grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+}
+
 @media (max-width: 768px) {
     .o_admin_dashboard {
         padding: 8px;
     }
     
     .o_dashboard_header {
-        padding: 6px 10px;
+        padding: 8px 10px;
         margin-bottom: 10px;
+        flex-wrap: wrap;
     }
     
     .o_dashboard_header h2 {
         font-size: 16px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .o_dashboard_actions {
+        width: 100%;
+        flex-wrap: wrap;
     }
     
     .o_stats_grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     

@@ -66,10 +66,10 @@ export class AdminDashboard extends Component {
         });
 
         onMounted(() => {
-            // Auto-refresh every 30 seconds
-            this.refreshInterval = setInterval(() => {
-                this.loadDashboardData();
-            }, 30000);
+            // Auto-refresh disabled as per user request
+            // this.refreshInterval = setInterval(() => {
+            //     this.loadDashboardData();
+            // }, 30000);
         });
 
         onWillUnmount(() => {
@@ -88,14 +88,17 @@ export class AdminDashboard extends Component {
             // Get dashboard stats with optional department, project and village filter
             const filters = {};
             if (this.state.selectedDepartment) {
-                filters.department_id = this.state.selectedDepartment;
+                filters.department_id = parseInt(this.state.selectedDepartment);
             }
             if (this.state.selectedProject) {
-                filters.project_id = this.state.selectedProject;
+                filters.project_id = parseInt(this.state.selectedProject);
             }
             if (this.state.selectedVillage) {
-                filters.village_id = this.state.selectedVillage;
+                filters.village_id = parseInt(this.state.selectedVillage);
             }
+            
+            console.log("Loading dashboard with filters:", filters);
+            
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",

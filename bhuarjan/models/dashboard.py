@@ -2,6 +2,9 @@
 
 from odoo import models, fields, api
 from datetime import datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class BhuarjanDashboard(models.TransientModel):
@@ -237,13 +240,16 @@ class BhuarjanDashboard(models.TransientModel):
                 # No projects for this department, return zeros for project-related counts
                 project_domain = [('project_id', '=', False)]  # This will return 0 results
         
-        # Base domains for sections
+        # Base domains for sections - always create, but empty if no filters
         section4_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         section11_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         section19_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         section15_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         expert_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         sia_base = project_domain + village_domain if (project_id or village_id or department_id) else []
+        
+        # Survey domain - filter by project/village if provided
+        survey_base = project_domain + village_domain if (project_id or village_id or department_id) else []
         
         # Filter projects count by department if provided
         project_count_domain = []
@@ -261,14 +267,14 @@ class BhuarjanDashboard(models.TransientModel):
             'total_landowners': self.env['bhu.landowner'].search_count([]),
             'total_rate_masters': self.env['bhu.rate.master'].search_count([]),
             
-            # Survey Counts
-            'total_surveys': self.env['bhu.survey'].search_count([]),
-            'draft_surveys': self.env['bhu.survey'].search_count([('state', '=', 'draft')]),
-            'submitted_surveys': self.env['bhu.survey'].search_count([('state', '=', 'submitted')]),
-            'approved_surveys': self.env['bhu.survey'].search_count([('state', '=', 'approved')]),
-            'rejected_surveys': self.env['bhu.survey'].search_count([('state', '=', 'rejected')]),
-            'total_surveys_done': self.env['bhu.survey'].search_count([('state', 'in', ['approved', 'rejected'])]),
-            'pending_surveys': self.env['bhu.survey'].search_count([('state', 'in', ['submitted', 'rejected'])]),
+            # Survey Counts - with filtering
+            'total_surveys': self.env['bhu.survey'].search_count(survey_base),
+            'draft_surveys': self.env['bhu.survey'].search_count(survey_base + [('state', '=', 'draft')]),
+            'submitted_surveys': self.env['bhu.survey'].search_count(survey_base + [('state', '=', 'submitted')]),
+            'approved_surveys': self.env['bhu.survey'].search_count(survey_base + [('state', '=', 'approved')]),
+            'rejected_surveys': self.env['bhu.survey'].search_count(survey_base + [('state', '=', 'rejected')]),
+            'total_surveys_done': self.env['bhu.survey'].search_count(survey_base + [('state', 'in', ['approved', 'rejected'])]),
+            'pending_surveys': self.env['bhu.survey'].search_count(survey_base + [('state', 'in', ['submitted', 'rejected'])]),
             
             # Section 4 Notifications - State wise (filter by project/village if provided)
             'section4_total': self.env['bhu.section4.notification'].search_count(section4_base),
@@ -667,11 +673,42 @@ class BhuarjanDashboard(models.TransientModel):
         Args:
             filters: dict with keys 'department_id', 'project_id', 'village_id' (all optional)
         """
-        if not filters:
-            filters = {}
-        department_id = filters.get('department_id') or None
-        project_id = filters.get('project_id') or None
-        village_id = filters.get('village_id') or None
-        counts = self._get_all_counts(project_id=project_id, village_id=village_id, department_id=department_id)
-        return counts
+        try:
+            # Handle filters - can be None, empty dict, or dict with values
+            if filters is None:
+                filters = {}
+            elif not isinstance(filters, dict):
+                filters = {}
+            
+            # Extract filter values, converting to int if they exist
+            department_id = None
+            project_id = None
+            village_id = None
+            
+            if filters.get('department_id'):
+                try:
+                    department_id = int(filters.get('department_id'))
+                except (ValueError, TypeError):
+                    department_id = None
+            
+            if filters.get('project_id'):
+                try:
+                    project_id = int(filters.get('project_id'))
+                except (ValueError, TypeError):
+                    project_id = None
+            
+            if filters.get('village_id'):
+                try:
+                    village_id = int(filters.get('village_id'))
+                except (ValueError, TypeError):
+                    village_id = None
+            
+            counts = self._get_all_counts(project_id=project_id, village_id=village_id, department_id=department_id)
+            return counts
+        except Exception as e:
+            import traceback
+            _logger = logging.getLogger(__name__)
+            _logger.error("Error in get_dashboard_stats: %s\n%s", str(e), traceback.format_exc())
+            # Return empty counts on error
+            return self._get_all_counts(project_id=None, village_id=None, department_id=None)
 

@@ -58,7 +58,7 @@
                     
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
-                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Project * / परियोजना *"/>
+                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
                             <field name="department_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Department * / विभाग *"/>
                             <field name="survey_date" widget="date" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>

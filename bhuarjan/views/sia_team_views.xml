@@ -26,20 +26,23 @@
             <form string="SIA Team / SIA टीम">
                 <header>
                     <!-- File Upload Section for SDM -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
                            invisible="state != 'draft'">
                         
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
                                widget="binary"
                                placeholder="Upload Signed SIA Proposal"/>
+
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
-                                invisible="not sdm_signed_file"/>
+                                invisible="not sdm_signed_file"
+                                confirm="Are you sure want to submit this record."
+                                />
                     </group>
                     
                     <!-- File Upload Section for Collector -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
                            invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                nolabel="1"
@@ -53,12 +56,14 @@
                         <div class="btn-group" role="group">
                             <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
-                                    title="Download SIA Proposal (Unsigned)"/>
+                                    title="Download SIA Proposal (Unsigned)"
+                                    confirm="Are you sure want to submit this record."/>
                             <!-- SDM Signed Download (when file exists) -->
                             <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     invisible="not sdm_signed_file"
-                                    title="Download SDM Signed Proposal"/>
+                                    title="Download SDM Signed Proposal"
+                                    confirm="Are you sure want to submit this record."/>
                         </div>
                     </group>
                     
@@ -68,7 +73,8 @@
                         <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 invisible="not sdm_signed_file"
-                                title="Download SDM Signed Proposal"/>
+                                title="Download SDM Signed Proposal"
+                                confirm="Are you sure want to submit this record."/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
@@ -77,20 +83,23 @@
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                 icon="fa-check"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted' or not collector_signed_file"/>
+                                invisible="state != 'submitted' or not collector_signed_file"
+                                confirm="Are you sure want to submit this record."/>
                         
                         <!-- Send Back Button (Collector only) -->
                         <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
                                 icon="fa-arrow-left"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted'"/>
+                                invisible="state != 'submitted'"
+                                confirm="Are you sure want to submit this record."/>
                         
                         <!-- Create Section 4 Notification (SDM only) -->
                         <button name="action_create_section4_notification" string="Create Section 4 Notification" 
                                 type="object" class="btn-primary" icon="fa-file-text"
                                 groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'approved'"
-                                help="Create Section 4 Notifications for all villages in this SIA Team"/>
+                                help="Create Section 4 Notifications for all villages in this SIA Team"
+                                confirm="Are you sure want to submit this record."/>
                     </group>
                     
                     <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
@@ -98,7 +107,8 @@
                             icon="fa-refresh"
                             groups="bhuarjan.group_bhuarjan_sdm"
                             invisible="state != 'send_back'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"
+                    confirm="Are you sure want to submit this record."/>
                 </header>
                 <sheet>
                     <group col="2">

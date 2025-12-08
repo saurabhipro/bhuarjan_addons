@@ -19,7 +19,7 @@ class SiaTeam(models.Model):
     
     # New fields
     sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=False, tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade', domain=lambda self: [('sdm_ids', 'in', [self.env.user.id])])
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department', related="project_id.department_id")
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
@@ -150,6 +150,9 @@ class SiaTeam(models.Model):
                 record.total_khasras_count = 0
                 record.total_area_acquired = 0.0
     tehsildar_domain = fields.Char()
+
+
+
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-set tehsildar and villages based on project selection"""

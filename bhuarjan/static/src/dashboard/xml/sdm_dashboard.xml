@@ -3,33 +3,37 @@
         <div class="o_admin_dashboard">
             <!-- Header -->
             <div class="o_dashboard_header">
-                <h2>Dashboard</h2>
+                <div class="o_dashboard_title_section">
+                    <h2>Dashboard</h2>
+                    <t t-if="state.selectedProjectName">
+                        <div class="o_selected_project_display">
+                            <i class="fa fa-briefcase" style="margin-right: 8px;"/>
+                            <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
+                        </div>
+                    </t>
+                </div>
                 <div class="o_dashboard_actions">
                     <!-- Department Selector -->
-                    <select class="form-select o_department_selector" t-att-value="state.selectedDepartment" t-on-change="onDepartmentChange">
+                    <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange">
                         <option value="">Select Department</option>
                         <t t-foreach="state.departments" t-as="department" t-key="department.id">
-                            <option t-att-value="department.id"><t t-esc="department.name"/></option>
+                            <option t-att-value="this.toString(department.id)"><t t-esc="department.name"/></option>
                         </t>
                     </select>
                     <!-- Project Selector -->
-                    <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment">
+                    <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment">
                         <option value="">Project</option>
                         <t t-foreach="state.projects" t-as="project" t-key="project.id">
-                            <option t-att-value="project.id"><t t-esc="project.name"/></option>
+                            <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>
                         </t>
                     </select>
                     <!-- Village Selector -->
-                    <select class="form-select o_village_selector" t-att-value="state.selectedVillage" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
+                    <select class="form-select o_village_selector" t-att-value="this.toString(state.selectedVillage)" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
                         <option value="">Village</option>
                         <t t-foreach="state.villages" t-as="village" t-key="village.id">
-                            <option t-att-value="village.id"><t t-esc="village.name"/></option>
+                            <option t-att-value="this.toString(village.id)"><t t-esc="village.name"/></option>
                         </t>
                     </select>
-                    <!-- Submit Button -->
-                    <button class="btn btn-primary o_submit_filters" t-on-click="onSubmitFilters" title="Apply Filters">
-                        <i class="fa fa-filter"/> Submit
-                    </button>
         </div>
     </div>
 
@@ -166,8 +170,13 @@
                 <div class="o_dashboard_section">
                     <h3 class="o_section_title">
                         <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
+                        <t t-if="state.selectedProjectName">
+                            <span class="text-muted" style="font-size: 0.8em; margin-left: 10px;">
+                                - <t t-esc="state.selectedProjectName"/>
+                            </span>
+                        </t>
                     </h3>
-                    <div class="o_sections_list">
+                    <div class="o_sections_list o_sections_list_grid">
                         <!-- SIA Team -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.sia.team')">
                             <div class="o_section_list_icon">
@@ -206,7 +215,11 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 4) Section 4 Notifications</div>
-                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.send_back_count : 0) : 0"/></span>
+                                </div>
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
@@ -237,7 +250,11 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 7) Expert Committee Reports</div>
-                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.send_back_count : 0) : 0"/></span>
+                                </div>
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
@@ -268,7 +285,11 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 11) Section 11 Preliminary Reports</div>
-                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.send_back_count : 0) : 0"/></span>
+                                </div>
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
@@ -299,7 +320,11 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 15) Objections</div>
-                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.send_back_count : 0) : 0"/></span>
+                                </div>
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
@@ -330,7 +355,11 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 19) Section 19 Notifications</div>
-                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.send_back_count : 0) : 0"/></span>
+                                </div>
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">

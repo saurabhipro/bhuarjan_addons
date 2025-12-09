@@ -31,14 +31,33 @@ class BhuDashboard(models.Model):
 
     @api.model
     def get_all_projects_sdm(self, department_id=None):
-        """Get projects for SDM, optionally filtered by department"""
-        if self.env.user.has_group('bhuarjan.group_bhuarjan_sdm'):
-            domain = [('sdm_ids', 'in', [self.env.user.id])]
+        """Get projects for current user (SDM or Tehsildar), optionally filtered by department"""
+        user = self.env.user
+        domain = []
+        
+        # Admin and system users see all projects
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            # Show all projects for admin/system users
             if department_id:
-                domain.append(('department_id', '=', department_id))
+                domain = [('department_id', '=', department_id)]
             projects = self.env['bhu.project'].search(domain)
         else:
-            projects = self.env['bhu.project'].search([])
+            # For other users, filter by assigned projects (SDM or Tehsildar)
+            assigned_projects = self.env['bhu.project'].search([
+                '|',
+                ('sdm_ids', 'in', [user.id]),
+                ('tehsildar_ids', 'in', [user.id])
+            ])
+            
+            if assigned_projects:
+                domain = [('id', 'in', assigned_projects.ids)]
+                if department_id:
+                    domain = ['&', ('department_id', '=', department_id)] + domain
+                projects = self.env['bhu.project'].search(domain)
+            else:
+                # No assigned projects, return empty list
+                return []
+        
         return projects.read(["id", "name"])
 
     @api.model
@@ -108,11 +127,13 @@ class BhuDashboard(models.Model):
                     final_domain.append(('village_id', '=', village_id))
 
             # Helper function to get first pending document and check if all approved
-            def get_section_info(model_name, domain):
+            def get_section_info(model_name, domain, state_field='state'):
                 records = self.env[model_name].search(domain, order='create_date asc')
                 total = len(records)
-                submitted = records.filtered(lambda r: r.state == 'submitted')
-                approved = records.filtered(lambda r: r.state == 'approved')
+                submitted = records.filtered(lambda r: getattr(r, state_field, False) == 'submitted')
+                approved = records.filtered(lambda r: getattr(r, state_field, False) == 'approved')
+                rejected = records.filtered(lambda r: getattr(r, state_field, False) == 'rejected')
+                send_back = records.filtered(lambda r: getattr(r, state_field, False) == 'send_back')
                 all_approved = total > 0 and len(approved) == total
                 first_pending = submitted[0] if submitted else False
                 first_document = records[0] if records else False
@@ -120,6 +141,8 @@ class BhuDashboard(models.Model):
                     'total': total,
                     'submitted_count': len(submitted),
                     'approved_count': len(approved),
+                    'rejected_count': len(rejected),
+                    'send_back_count': len(send_back),
                     'all_approved': all_approved,
                     'first_pending_id': first_pending.id if first_pending else False,
                     'first_document_id': first_document.id if first_document else False,
@@ -129,6 +152,14 @@ class BhuDashboard(models.Model):
             
             return {
                 'is_collector': is_collector,
+                # Surveys - State wise
+                'survey_total': self.env['bhu.survey'].search_count(final_domain),
+                'survey_draft': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'draft')]),
+                'survey_submitted': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'submitted')]),
+                'survey_approved': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'approved')]),
+                'survey_rejected': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'rejected')]),
+                'survey_info': get_section_info('bhu.survey', final_domain, 'state'),
+                
                 # Section 4 Notifications - State wise
                 'section4_total': self.env['bhu.section4.notification'].search_count(final_domain),
                 'section4_draft': self.env['bhu.section4.notification'].search_count(final_domain + [('state', '=', 'draft')]),

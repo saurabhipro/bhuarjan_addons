@@ -23,13 +23,36 @@
     min-height: 50px;
 }
 
+.o_dashboard_title_section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .o_dashboard_header h2 {
     margin: 0;
     color: #8B4513;
     font-weight: 600;
     font-size: 18px;
-    flex-shrink: 0;
-    line-height: 34px;
+    line-height: 1.2;
+}
+
+.o_selected_project_display {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 2px solid #8B4513;
+}
+
+.o_project_name_bold {
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    color: #8B4513 !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .o_dashboard_actions {
@@ -385,6 +408,18 @@
     gap: 10px;
 }
 
+.o_sections_list_grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 992px) {
+    .o_sections_list_grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .o_section_list_item {
     display: flex;
     align-items: center;
@@ -426,6 +461,39 @@
 .o_section_list_count {
     font-size: 12px;
     color: #6c757d;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.o_count_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.o_count_badge i {
+    font-size: 10px;
+}
+
+.o_count_submitted {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.o_count_approved {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+
+.o_count_rejected {
+    background-color: #ffebee;
+    color: #d32f2f;
 }
 
 .o_section_list_actions {

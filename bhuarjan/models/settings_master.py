@@ -424,7 +424,7 @@ class BhuarjanSettingsMaster(models.Model):
                 if not existing_sequence:
                     # Create new sequence starting from calculated number
                     # Set number_next to next_seq_number + 1 since we'll use next_seq_number now
-                    existing_sequence = self.env['ir.sequence'].create({
+                    existing_sequence = self.env['ir.sequence'].sudo().create({
                         'name': f'Bhuarjan {process_name.title()} Sequence - Project {project.name}' + 
                                (f' - Village {village.name}' if village_id and village.exists() else ''),
                         'code': sequence_code,
@@ -444,7 +444,8 @@ class BhuarjanSettingsMaster(models.Model):
             # If no next_seq_number calculated, use ir.sequence as normal
             if not existing_sequence:
                 # Create new sequence for this project-village combination
-                self.env['ir.sequence'].create({
+                # Use sudo() to bypass access rights - sequences are system objects
+                self.env['ir.sequence'].sudo().create({
                     'name': f'Bhuarjan {process_name.title()} Sequence - Project {project.name}' + 
                            (f' - Village {village.name}' if village_id and village.exists() else ''),
                     'code': sequence_code,

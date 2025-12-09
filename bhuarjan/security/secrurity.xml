@@ -272,6 +272,14 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_patwari'))]"/>
         </record>
 
+        <!-- SDM Survey Rule -->
+        <record id="record_bhu_survey_rule_sdm" model="ir.rule">
+            <field name="name">SDM can see surveys from assigned projects</field>
+            <field name="model_id" ref="model_bhu_survey"/>
+            <field name="domain_force">[('project_id.sdm_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_sdm'))]"/>
+        </record>
+
        
         <record id="record_bhu_landowner_rule" model="ir.rule">
             <field name="name">Patwari can see landowners from assigned villages and their surveys</field>

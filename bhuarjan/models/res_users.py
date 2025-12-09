@@ -43,6 +43,7 @@ class ResUsers(models.Model):
         ('sdm', 'SDM'),
         ('additional_collector', 'Additional Collector'),
         ('collector', 'Collector'),
+        ('district_administrator', 'District Administrator'),
         ('administrator', 'Administrator'),
         ('sia_team_member', 'SIA Team Member'),
     ], string="Bhuarjan Role", default=False)
@@ -91,6 +92,7 @@ class ResUsers(models.Model):
             self.env.ref('bhuarjan.group_bhuarjan_sdm').id,
             self.env.ref('bhuarjan.group_bhuarjan_additional_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_collector').id,
+            self.env.ref('bhuarjan.group_bhuarjan_district_administrator').id,
             self.env.ref('bhuarjan.group_bhuarjan_admin').id,
             self.env.ref('bhuarjan.group_bhuarjan_sia_team_member').id,
         ]
@@ -106,6 +108,7 @@ class ResUsers(models.Model):
             'sdm': 'bhuarjan.group_bhuarjan_sdm',
             'additional_collector': 'bhuarjan.group_bhuarjan_additional_collector',
             'collector': 'bhuarjan.group_bhuarjan_collector',
+            'district_administrator': 'bhuarjan.group_bhuarjan_district_administrator',
             'administrator': 'bhuarjan.group_bhuarjan_admin',
             'sia_team_member': 'bhuarjan.group_bhuarjan_sia_team_member',
         }

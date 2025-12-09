@@ -104,6 +104,24 @@ export class OwlCrmDashboard extends Component {
     async loadDashboardData() {
         this.state.loading = true;
         try {
+            // If no project is selected, reset all stats to 0
+            if (!this.state.selectedProject) {
+                this.state.stats = {
+                    section4_total: 0, section4_draft: 0, section4_submitted: 0, section4_approved: 0, section4_send_back: 0,
+                    section11_total: 0, section11_draft: 0, section11_submitted: 0, section11_approved: 0, section11_send_back: 0,
+                    section15_total: 0, section15_draft: 0, section15_submitted: 0, section15_approved: 0, section15_send_back: 0,
+                    section19_total: 0, section19_draft: 0, section19_submitted: 0, section19_approved: 0, section19_send_back: 0,
+                    expert_total: 0, expert_draft: 0, expert_submitted: 0, expert_approved: 0, expert_send_back: 0,
+                    sia_total: 0, sia_draft: 0, sia_submitted: 0, sia_approved: 0, sia_send_back: 0,
+                    survey_total: 0, survey_submitted: 0, survey_approved: 0, survey_rejected: 0,
+                    draft_award_total: 0, draft_award_submitted: 0, draft_award_approved: 0, draft_award_send_back: 0,
+                    section4_info: null, section11_info: null, section15_info: null, section19_info: null,
+                    expert_info: null, sia_info: null, survey_info: null, draft_award_info: null
+                };
+                this.state.loading = false;
+                return;
+            }
+            
             const stats = await this.orm.call(
                 "bhu.dashboard",
                 "get_sdm_dashboard_stats",

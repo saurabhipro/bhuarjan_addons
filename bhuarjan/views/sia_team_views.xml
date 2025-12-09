@@ -165,20 +165,6 @@
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
                         </page>
-                        <page string="Project Villages / परियोजना ग्राम" invisible="not project_id">
-                            <field name="project_village_ids" nolabel="1" readonly="1"
-                                   options="{'no_create': True, 'no_create_edit': True, 'no_open': True}">
-                                <list>
-                                    <field name="village_code" string="Village Code / ग्राम कोड"/>
-                                    <field name="name" string="Village Name / ग्राम का नाम"/>
-                                    <field name="district_id" string="District / जिला"/>
-                                    <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                    <field name="total_captured_area" string="Total Captured Area (Hectares) / कुल कैप्चर क्षेत्रफल (हेक्टेयर)"/>
-                                </list>
-                            </field>
-                        </page>
-
-                        
                     </notebook>
                         <group>
                             <div style="text-align:right; padding:2rem;">

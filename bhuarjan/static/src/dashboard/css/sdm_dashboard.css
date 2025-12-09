@@ -88,6 +88,58 @@
     overflow-y: auto;
 }
 
+/* Status Legends */
+.o_status_legends {
+    background: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.o_legend_title {
+    font-weight: 600;
+    color: #8B4513;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.o_legend_item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.o_legend_icon_submitted {
+    color: #007bff;
+    font-size: 16px;
+}
+
+.o_legend_icon_approved {
+    color: #28a745;
+    font-size: 16px;
+}
+
+.o_legend_icon_sendback {
+    color: #ffc107;
+    font-size: 16px;
+}
+
+.o_legend_icon_rejected {
+    color: #dc3545;
+    font-size: 16px;
+}
+
+.o_legend_label {
+    color: #495057;
+    font-weight: 500;
+}
+
 .o_dashboard_section {
     background: white;
     padding: 15px;

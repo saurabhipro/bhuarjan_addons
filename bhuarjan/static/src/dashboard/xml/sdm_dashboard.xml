@@ -46,6 +46,27 @@
 
             <!-- Dashboard Content -->
             <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Status Legends -->
+                <div class="o_status_legends">
+                    <span class="o_legend_title">Status Indicators / स्थिति संकेतक:</span>
+                    <div class="o_legend_item">
+                        <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                        <span class="o_legend_label">Submitted / प्रस्तुत</span>
+                    </div>
+                    <div class="o_legend_item">
+                        <i class="fa fa-check-circle o_legend_icon_approved"/>
+                        <span class="o_legend_label">Approved / स्वीकृत</span>
+                    </div>
+                    <div class="o_legend_item">
+                        <i class="fa fa-undo o_legend_icon_sendback"/>
+                        <span class="o_legend_label">Send Back / वापस भेजें</span>
+                    </div>
+                    <div class="o_legend_item">
+                        <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                        <span class="o_legend_label">Rejected / अस्वीकृत</span>
+                    </div>
+                </div>
+                
                 <!-- Section Notifications -->
                 <div class="o_dashboard_section">
                     <h3 class="o_section_title">
@@ -200,7 +221,7 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
@@ -231,7 +252,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
@@ -273,7 +294,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
@@ -315,7 +336,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
@@ -357,7 +378,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
@@ -399,7 +420,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
@@ -441,7 +462,7 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)">
-                                    <i class="fa fa-eye"/> View
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"

@@ -57,13 +57,13 @@
                             <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download SIA Proposal (Unsigned)"
-                                    confirm="Are you sure want to submit this record."/>
+                                    />
                             <!-- SDM Signed Download (when file exists) -->
                             <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     invisible="not sdm_signed_file"
                                     title="Download SDM Signed Proposal"
-                                    confirm="Are you sure want to submit this record."/>
+                                    />
                         </div>
                     </group>
                     
@@ -74,7 +74,7 @@
                                 class="btn-primary" icon="fa-download"
                                 invisible="not sdm_signed_file"
                                 title="Download SDM Signed Proposal"
-                                confirm="Are you sure want to submit this record."/>
+                                />
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
@@ -84,7 +84,7 @@
                                 icon="fa-check"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted' or not collector_signed_file"
-                                confirm="Are you sure want to submit this record."/>
+                                confirm="Are you sure want to approve this record."/>
                         
                         <!-- Send Back Button (Collector only) -->
                         <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
@@ -99,7 +99,7 @@
                                 groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'approved'"
                                 help="Create Section 4 Notifications for all villages in this SIA Team"
-                                confirm="Are you sure want to submit this record."/>
+                                confirm="Are you sure want to Create Section 4 Notification ."/>
                     </group>
                     
                     <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
@@ -182,6 +182,12 @@
                     </notebook>
                         <group>
                             <div style="text-align:right; padding:2rem;">
+                                <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
+                                    icon="fa-paper-plane"
+                                    invisible="not sdm_signed_file"
+                                    confirm="Are you sure want to submit this record."
+                                    />
+
                                 <button name="action_bottom_save" type="object" class="btn btn-primary">Save As Draft</button>
                             </div>
                         </group>

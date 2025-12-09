@@ -46,27 +46,6 @@
 
             <!-- Dashboard Content -->
             <div t-if="!state.loading" class="o_dashboard_content">
-                <!-- Status Legends -->
-                <div class="o_status_legends">
-                    <span class="o_legend_title">Status Indicators / स्थिति संकेतक:</span>
-                    <div class="o_legend_item">
-                        <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                        <span class="o_legend_label">Submitted / प्रस्तुत</span>
-                    </div>
-                    <div class="o_legend_item">
-                        <i class="fa fa-check-circle o_legend_icon_approved"/>
-                        <span class="o_legend_label">Approved / स्वीकृत</span>
-                    </div>
-                    <div class="o_legend_item">
-                        <i class="fa fa-undo o_legend_icon_sendback"/>
-                        <span class="o_legend_label">Send Back / वापस भेजें</span>
-                    </div>
-                    <div class="o_legend_item">
-                        <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                        <span class="o_legend_label">Rejected / अस्वीकृत</span>
-                    </div>
-                </div>
-                
                 <!-- Section Notifications -->
                 <div class="o_dashboard_section">
                     <h3 class="o_section_title">
@@ -169,10 +148,26 @@
                             </div>
                         </div>
 
-                        <!-- Surveys Card (Menu Order: 7) -->
+                        <!-- Draft Award Card (Menu Order: 7) -->
+                        <div class="o_stat_card o_card_draft_award" t-on-click="() => this.openSectionList('bhu.draft.award')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-gavel"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Draft Award</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_award_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.draft_award_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.draft_award_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.draft_award_send_back : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Surveys Card (Menu Order: 8) -->
                         <div class="o_stat_card o_card_survey" t-on-click="() => this.openSectionList('bhu.survey')">
                             <div class="o_stat_icon">
-                                <i class="fa fa-clipboard-list"/>
+                                <i class="fa fa-clipboard"/>
                             </div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Surveys</div>
@@ -189,23 +184,45 @@
 
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
-                    <h3 class="o_section_title">
-                        <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
-                        <t t-if="state.selectedProjectName">
-                            <span class="text-muted" style="font-size: 0.8em; margin-left: 10px;">
-                                - <t t-esc="state.selectedProjectName"/>
-                            </span>
-                        </t>
-                    </h3>
+                    <div class="o_section_title_with_legends">
+                        <h3 class="o_section_title">
+                            <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
+                            <t t-if="state.selectedProjectName">
+                                <span class="text-muted" style="font-size: 0.8em; margin-left: 10px;">
+                                    - <t t-esc="state.selectedProjectName"/>
+                                </span>
+                            </t>
+                        </h3>
+                        <!-- Status Indicators - Positioned on the right on same line as heading -->
+                        <div class="o_status_legends">
+                            <span class="o_legend_title">Status Indicators:</span>
+                            <div class="o_legend_item">
+                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                <span class="o_legend_label">Submitted</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                <span class="o_legend_label">Approved</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-undo o_legend_icon_sendback"/>
+                                <span class="o_legend_label">Send Back</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                <span class="o_legend_label">Rejected</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="o_sections_list o_sections_list_grid">
                         <!-- Surveys -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.survey')">
                             <div class="o_section_list_icon">
-                                <i class="fa fa-clipboard-list"/>
+                                <i class="fa fa-clipboard"/>
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    <i class="fa fa-clipboard-list" style="margin-right: 8px; color: #8B4513;"/>
+                                    <i class="fa fa-clipboard" style="margin-right: 8px; color: #8B4513;"/>
                                     Surveys / सर्वे
                                     <t t-if="state.stats &amp;&amp; state.stats.survey_info &amp;&amp; state.stats.survey_info.is_completed">
                                         <span class="o_completion_tick" title="All surveys completed">
@@ -473,6 +490,48 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Draft Award -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.draft.award')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-gavel"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    (Sec 21) Draft Awards
+                                    <t t-if="state.stats &amp;&amp; state.stats.draft_award_info &amp;&amp; state.stats.draft_award_info.is_completed">
+                                        <span class="o_completion_tick" title="All Draft Awards completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.send_back_count : 0) : 0"/></span>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.draft.award')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info.first_pending_id : false, state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info.first_pending_id : false, state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
                                         title="Reject First Pending">
                                     <i class="fa fa-times"/> Reject
                                 </button>

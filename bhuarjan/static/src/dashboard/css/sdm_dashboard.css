@@ -88,17 +88,23 @@
     overflow-y: auto;
 }
 
-/* Status Legends */
+/* Section Title with Legends - Same line layout */
+.o_section_title_with_legends {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Status Legends - Positioned on the right on same line as heading */
 .o_status_legends {
-    background: white;
-    padding: 8px 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    margin-left: auto;
 }
 
 .o_legend_title {
@@ -305,6 +311,11 @@
 
 .o_card_survey {
     background-image: url('/bhuarjan/static/src/dashboard/images/blue_pattern.jpg');
+    color: #2c3e50;
+}
+
+.o_card_draft_award {
+    background-image: url('/bhuarjan/static/src/dashboard/images/orange_pattern.jpg');
     color: #2c3e50;
 }
 
@@ -593,7 +604,7 @@
 }
 
 /* Make survey icon visible in list view */
-.o_section_list_item .o_section_list_icon .fa-clipboard-list {
+.o_section_list_item .o_section_list_icon .fa-clipboard {
     font-size: 28px;
     color: #8B4513;
     opacity: 1;

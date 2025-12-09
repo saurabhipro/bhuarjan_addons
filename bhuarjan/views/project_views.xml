@@ -6,6 +6,7 @@
         <field name="model">bhu.project</field>
         <field name="arch" type="xml">
             <list>
+                <field name="department_id" string="Department / विभाग"/>
                 <field name="name"/>
                 <field name="code" string="Project Code"/>
                 <field name="sdm_ids" widget="many2many_tags" string="SDM / उप-विभागीय मजिस्ट्रेट" options="{'no_create_edit': True}"/>

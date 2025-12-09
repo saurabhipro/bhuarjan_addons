@@ -35,14 +35,17 @@ class BhuDashboard(models.Model):
         user = self.env.user
         domain = []
         
-        # Admin and system users see all projects
-        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
-            # Show all projects for admin/system users
+        # Admin, system users, and collectors see all projects
+        if (user.has_group('bhuarjan.group_bhuarjan_admin') or 
+            user.has_group('base.group_system') or
+            user.has_group('bhuarjan.group_bhuarjan_collector') or
+            user.has_group('bhuarjan.group_bhuarjan_additional_collector')):
+            # Show all projects for admin/system/collector users
             if department_id:
                 domain = [('department_id', '=', department_id)]
             projects = self.env['bhu.project'].search(domain)
         else:
-            # For other users, filter by assigned projects (SDM or Tehsildar)
+            # For other users (SDM/Tehsildar), filter by assigned projects
             assigned_projects = self.env['bhu.project'].search([
                 '|',
                 ('sdm_ids', 'in', [user.id]),
@@ -127,14 +130,23 @@ class BhuDashboard(models.Model):
                     final_domain.append(('village_id', '=', village_id))
 
             # Helper function to get first pending document and check if all approved
-            def get_section_info(model_name, domain, state_field='state'):
+            def get_section_info(model_name, domain, state_field='state', is_survey=False):
                 records = self.env[model_name].search(domain, order='create_date asc')
                 total = len(records)
                 submitted = records.filtered(lambda r: getattr(r, state_field, False) == 'submitted')
                 approved = records.filtered(lambda r: getattr(r, state_field, False) == 'approved')
                 rejected = records.filtered(lambda r: getattr(r, state_field, False) == 'rejected')
                 send_back = records.filtered(lambda r: getattr(r, state_field, False) == 'send_back')
+                draft = records.filtered(lambda r: getattr(r, state_field, False) == 'draft')
                 all_approved = total > 0 and len(approved) == total
+                
+                # For surveys: completed if all are approved OR rejected (no pending/submitted/draft)
+                # For other sections: completed if all are approved
+                if is_survey:
+                    is_completed = total > 0 and len(submitted) == 0 and len(draft) == 0 and (len(approved) + len(rejected) == total)
+                else:
+                    is_completed = all_approved
+                
                 first_pending = submitted[0] if submitted else False
                 first_document = records[0] if records else False
                 return {
@@ -144,6 +156,7 @@ class BhuDashboard(models.Model):
                     'rejected_count': len(rejected),
                     'send_back_count': len(send_back),
                     'all_approved': all_approved,
+                    'is_completed': is_completed,
                     'first_pending_id': first_pending.id if first_pending else False,
                     'first_document_id': first_document.id if first_document else False,
                 }
@@ -158,7 +171,7 @@ class BhuDashboard(models.Model):
                 'survey_submitted': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'submitted')]),
                 'survey_approved': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'approved')]),
                 'survey_rejected': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'rejected')]),
-                'survey_info': get_section_info('bhu.survey', final_domain, 'state'),
+                'survey_info': get_section_info('bhu.survey', final_domain, 'state', is_survey=True),
                 
                 # Section 4 Notifications - State wise
                 'section4_total': self.env['bhu.section4.notification'].search_count(final_domain),

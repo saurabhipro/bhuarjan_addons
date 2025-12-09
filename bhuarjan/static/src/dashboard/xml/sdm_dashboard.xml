@@ -163,6 +163,22 @@
                                 <i class="fa fa-plus"/>
                             </button>
                         </div>
+
+                        <!-- Surveys Card (Menu Order: 7) -->
+                        <div class="o_stat_card o_card_survey" t-on-click="() => this.openSectionList('bhu.survey')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-clipboard-list"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Surveys</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.survey_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.survey_approved : 0"/></span>
+                                    <span><i class="fa fa-times-circle"/> <t t-esc="state.stats ? state.stats.survey_rejected : 0"/></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -177,6 +193,46 @@
                         </t>
                     </h3>
                     <div class="o_sections_list o_sections_list_grid">
+                        <!-- Surveys -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.survey')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-clipboard-list"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    <i class="fa fa-clipboard-list" style="margin-right: 8px; color: #8B4513;"/>
+                                    Surveys / सर्वे
+                                    <t t-if="state.stats &amp;&amp; state.stats.survey_info &amp;&amp; state.stats.survey_info.is_completed">
+                                        <span class="o_completion_tick" title="All surveys completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.submitted_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.approved_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.rejected_count : 0) : 0"/></span>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApprovedSurvey(state.stats.survey_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApprovedSurvey(state.stats.survey_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- SIA Team -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.sia.team')">
                             <div class="o_section_list_icon">
@@ -214,7 +270,14 @@
                                 <i class="fa fa-bell"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 4) Section 4 Notifications</div>
+                                <div class="o_section_list_title">
+                                    (Sec 4) Section 4 Notifications
+                                    <t t-if="state.stats &amp;&amp; state.stats.section4_info &amp;&amp; state.stats.section4_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 4 Notifications completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.approved_count : 0) : 0"/></span>
@@ -249,7 +312,14 @@
                                 <i class="fa fa-graduation-cap"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 7) Expert Committee Reports</div>
+                                <div class="o_section_list_title">
+                                    (Sec 7) Expert Committee Reports
+                                    <t t-if="state.stats &amp;&amp; state.stats.expert_info &amp;&amp; state.stats.expert_info.is_completed">
+                                        <span class="o_completion_tick" title="All Expert Committee Reports completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.approved_count : 0) : 0"/></span>
@@ -284,7 +354,14 @@
                                 <i class="fa fa-file-text"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 11) Section 11 Preliminary Reports</div>
+                                <div class="o_section_list_title">
+                                    (Sec 11) Section 11 Preliminary Reports
+                                    <t t-if="state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 11 Reports completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.approved_count : 0) : 0"/></span>
@@ -319,7 +396,14 @@
                                 <i class="fa fa-exclamation-triangle"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 15) Objections</div>
+                                <div class="o_section_list_title">
+                                    (Sec 15) Objections
+                                    <t t-if="state.stats &amp;&amp; state.stats.section15_info &amp;&amp; state.stats.section15_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 15 Objections completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.approved_count : 0) : 0"/></span>
@@ -354,7 +438,14 @@
                                 <i class="fa fa-bullhorn"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 19) Section 19 Notifications</div>
+                                <div class="o_section_list_title">
+                                    (Sec 19) Section 19 Notifications
+                                    <t t-if="state.stats &amp;&amp; state.stats.section19_info &amp;&amp; state.stats.section19_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 19 Notifications completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.approved_count : 0) : 0"/></span>

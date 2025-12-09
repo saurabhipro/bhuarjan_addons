@@ -391,6 +391,16 @@ export class OwlCrmDashboard extends Component {
         });
     }
 
+    // Check if all surveys are approved (for surveys, check approved + rejected)
+    isAllApprovedSurvey(sectionInfo) {
+        if (!sectionInfo) return true;
+        const total = sectionInfo.total || 0;
+        const approved = sectionInfo.approved_count || 0;
+        const rejected = sectionInfo.rejected_count || 0;
+        // All are approved or rejected (no pending)
+        return total > 0 && (approved + rejected) === total;
+    }
+
     // Check if all documents are approved for a section (disable buttons if all approved or no submitted)
     isAllApproved(sectionInfo) {
         if (!sectionInfo) return true;

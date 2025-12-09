@@ -246,6 +246,11 @@
     color: #2c3e50;
 }
 
+.o_card_survey {
+    background-image: url('/bhuarjan/static/src/dashboard/images/blue_pattern.jpg');
+    color: #2c3e50;
+}
+
 /* Department, Project and Village selector styling */
 .o_dashboard_actions select.form-select,
 .o_dashboard_actions .o_department_selector,
@@ -494,6 +499,47 @@
 .o_count_rejected {
     background-color: #ffebee;
     color: #d32f2f;
+}
+
+/* Completion Tick Indicator */
+.o_completion_tick {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    color: #28a745;
+    font-size: 18px;
+    animation: pulse 2s infinite;
+}
+
+.o_completion_tick i {
+    color: #28a745;
+    font-size: 20px;
+    text-shadow: 0 0 3px rgba(40, 167, 69, 0.5);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Make survey icon more visible in card */
+.o_card_survey .o_stat_icon {
+    font-size: 40px;
+    color: #2c3e50;
+    opacity: 0.9;
+}
+
+/* Make survey icon visible in list view */
+.o_section_list_item .o_section_list_icon .fa-clipboard-list {
+    font-size: 28px;
+    color: #8B4513;
+    opacity: 1;
 }
 
 .o_section_list_actions {

@@ -104,6 +104,11 @@
                     <strong style="color: #dc3545; font-weight: bold;">⚠ Error:</strong> <span style="color: #dc3545; font-weight: bold;">No surveys in this village, so no notification can be created.</span>
                 </div>
                 <sheet readonly="has_section11 or state in ('submitted', 'approved', 'send_back') or (has_pending_surveys and state == 'draft' and project_id and village_id) or (has_no_surveys and state == 'draft' and project_id and village_id) or (not village_id and state == 'draft')">
+                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
+                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                            <i class="fa fa-bell" style="margin-right: 10px;"></i>Section 4 Notification / धारा 4 अधिसूचना
+                        </h1>
+                    </div>
                     <group>
                         <group>
                             <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')" 

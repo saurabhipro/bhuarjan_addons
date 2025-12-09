@@ -1,136 +1,361 @@
 <templates xml:space="preserve">
     <t t-name="bhuarjan.SDMTemplate" owl="1">
-<div class="container py-5">
-
-    <!-- Header Card -->
-    <div class="d-flex justify-content-center mb-5">
-        <div class="card-body text-center">
-            <h1 class="card-title mb-3 text-primary" style="font-weight: 700; font-size: xxx-large;">
-                Welcome to Bhuarjan
-            </h1>
-            <p class="card-text text-muted" style="font-size: 15px;">
-                Manage your Land Acquisition – District Administration Raigarh, CG.
-            </p>
+        <div class="o_admin_dashboard">
+            <!-- Header -->
+            <div class="o_dashboard_header">
+                <h2>Dashboard</h2>
+                <div class="o_dashboard_actions">
+                    <!-- Department Selector -->
+                    <select class="form-select o_department_selector" t-att-value="state.selectedDepartment" t-on-change="onDepartmentChange">
+                        <option value="">Select Department</option>
+                        <t t-foreach="state.departments" t-as="department" t-key="department.id">
+                            <option t-att-value="department.id"><t t-esc="department.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Project Selector -->
+                    <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment">
+                        <option value="">Project</option>
+                        <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                            <option t-att-value="project.id"><t t-esc="project.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Village Selector -->
+                    <select class="form-select o_village_selector" t-att-value="state.selectedVillage" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
+                        <option value="">Village</option>
+                        <t t-foreach="state.villages" t-as="village" t-key="village.id">
+                            <option t-att-value="village.id"><t t-esc="village.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Submit Button -->
+                    <button class="btn btn-primary o_submit_filters" t-on-click="onSubmitFilters" title="Apply Filters">
+                        <i class="fa fa-filter"/> Submit
+                    </button>
         </div>
     </div>
 
-    <!-- Project -->
-    <div class="table-responsive">
-        <select class="form-select" t-on-change="_onProjectChange">
-            <option value="">Select Project</option>
-            <t t-foreach="projects.list" t-as="p" t-key="p.id">
-                <option t-att-value="p.id">
-                    <t t-esc="p.name" />
-                </option>
-            </t>
-        </select>
+            <!-- Loading State -->
+            <div t-if="state.loading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x"/> Loading...
     </div>
 
+            <!-- Dashboard Content -->
+            <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Section Notifications -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-file-text"/> Section Notifications / धारा अधिसूचनाएं
+                    </h3>
+                    <div class="o_stats_grid">
+                        <!-- SIA Team Card (Menu Order: 1) -->
+                        <div class="o_stat_card o_card_sia" t-on-click="() => this.openSectionList('bhu.sia.team')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SIA Team</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.sia_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.sia_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.sia_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
 
-    <!-- Table Style Section -->
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center shadow-sm">
-            <thead class="bg-secondary text-white">
-                <tr>
-                    <th style="width: 60px;">#</th>
-                    <th>Action Name</th>
-                    <th style="width: 120px;">Create</th>
-                    <th style="width: 120px;">Edit</th>
-                    <th style="width: 120px;">Delete</th>
-                    <th style="width: 120px;">Upload</th>
-                    <th style="width: 150px;">Status</th>
-                </tr>
-            </thead>
+                        <!-- Section 4 Card (Menu Order: 2) -->
+                        <div class="o_stat_card o_card_section4" t-on-click="() => this.openSectionList('bhu.section4.notification')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-bell"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 4</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section4_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section4_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section4_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
 
-            <tbody>
+                        <!-- Expert Committee Card (Menu Order: 3) -->
+                        <div class="o_stat_card o_card_expert_committee" t-on-click="() => this.openSectionList('bhu.expert.committee.report')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-graduation-cap"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Expert Committee</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.expert_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.expert_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.expert_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
 
-                <!-- Row Template Function -->
-                <tr>
-                    <td>1</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of SIA Team
-                    </td>
-                    <td><button class="btn btn-success w-100" t-on-click="_onClickSiaTeamFormNew"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100" t-on-click="_onClickSiaTeam"><i class="fa fa-eye me-1"></i>View</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Section 11 Card (Menu Order: 4) -->
+                        <div class="o_stat_card o_card_section11" t-on-click="() => this.openSectionList('bhu.section11.preliminary.report')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-file-text"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 11</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section11_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section11_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section11_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
 
-                <tr>
-                    <td>2</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of Expert Committee
-                    </td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Section 15 Card (Menu Order: 5) -->
+                        <div class="o_stat_card o_card_section15" t-on-click="() => this.openSectionList('bhu.section15.objection')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 15</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section15_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section15_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section15_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
 
-                <tr>
-                    <td>3</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of Section 4 Notification
-                    </td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Section 19 Card (Menu Order: 6) -->
+                        <div class="o_stat_card o_card_section19" t-on-click="() => this.openSectionList('bhu.section19.notification')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-bullhorn"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 19</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
+                                <div class="o_stat_states">
+                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section19_submitted : 0"/></span>
+                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section19_approved : 0"/></span>
+                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section19_send_back : 0"/></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')" title="Create New">
+                                <i class="fa fa-plus"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-                <tr>
-                    <td>4</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of Section 11 Notification
-                    </td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                <!-- List View Section -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
+                    </h3>
+                    <div class="o_sections_list">
+                        <!-- SIA Team -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.sia.team')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 4) Create SIA Team</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.sia_info ? this.isAllApproved(state.stats.sia_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.sia_info ? this.isAllApproved(state.stats.sia_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
 
-                <tr>
-                    <td>5</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of Section 19 Notification
-                    </td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Section 4 -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section4.notification')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-bell"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 4) Section 4 Notifications</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section4_info ? this.isAllApproved(state.stats.section4_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section4_info ? this.isAllApproved(state.stats.section4_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
 
-                <tr>
-                    <td>6</td>
-                    <td class="text-start fw-semibold">
-                        Make a Proposal of Section 21 Notice
-                    </td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Expert Committee -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.expert.committee.report')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-graduation-cap"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 7) Expert Committee Reports</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.expert_info ? this.isAllApproved(state.stats.expert_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.expert_info ? this.isAllApproved(state.stats.expert_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
 
-                <tr>
-                    <td>7</td>
-                    <td class="text-start fw-semibold">Make Compensation</td>
-                    <td><button class="btn btn-success w-100"><i class="fa fa-plus me-1"></i>CREATE</button></td>
-                    <td><button class="btn btn-primary w-100"><i class="fa fa-edit me-1"></i>EDIT</button></td>
-                    <td><button class="btn btn-danger w-100"><i class="fa fa-trash me-1"></i>DELETE</button></td>
-                    <td><button class="btn btn-info text-white w-100"><i class="fa fa-upload me-1"></i>UPLOAD</button></td>
-                    <td><span class="badge bg-warning text-dark p-2">APPROVED / PENDING</span></td>
-                </tr>
+                        <!-- Section 11 -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section11.preliminary.report')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-file-text"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 11) Section 11 Preliminary Reports</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
 
-            </tbody>
-        </table>
+                        <!-- Section 15 -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section15.objection')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 15) Objections</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
     </div>
 
+                        <!-- Section 19 -->
+                        <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section19.notification')">
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-bullhorn"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">(Sec 19) Section 19 Notifications</div>
+                                <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
+                                        title="Reject First Pending">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 </div>
     </t>
 </templates>

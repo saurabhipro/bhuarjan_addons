@@ -104,6 +104,7 @@
             'bhuarjan/static/src/dashboard/xml/admin_dashboard.xml',
             'bhuarjan/static/src/dashboard/js/web_client_dashboard.js',
             # SDM Dashboard files
+            'bhuarjan/static/src/dashboard/css/sdm_dashboard.css',
             'bhuarjan/static/src/dashboard/js/sdm_dashboard.js',
             'bhuarjan/static/src/dashboard/xml/sdm_dashboard.xml',
             # 'bhuarjan/static/src/css/landowner_documents.css',

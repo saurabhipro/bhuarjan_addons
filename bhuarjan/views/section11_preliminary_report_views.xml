@@ -91,6 +91,11 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
                 <sheet>
+                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
+                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                            <i class="fa fa-file-text" style="margin-right: 10px;"></i>Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट
+                        </h1>
+                    </div>
                     <group col="2">
                         <group>
                             <field name="project_id" required="1" 

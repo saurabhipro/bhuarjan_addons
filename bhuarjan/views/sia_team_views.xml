@@ -111,6 +111,11 @@
                     confirm="Are you sure want to submit this record."/>
                 </header>
                 <sheet>
+                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
+                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                            <i class="fa fa-users" style="margin-right: 10px;"></i>SIA Team / SIA टीम
+                        </h1>
+                    </div>
                     <group col="2">
                         <group>
                             <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')"/>

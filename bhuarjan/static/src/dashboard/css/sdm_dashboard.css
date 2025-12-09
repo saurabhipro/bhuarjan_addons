@@ -1,0 +1,456 @@
+/* SDM Dashboard Styles - Reusing Admin Dashboard Styles */
+
+/* Import admin dashboard styles */
+.o_admin_dashboard {
+    padding: 10px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.o_dashboard_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: nowrap;
+    gap: 12px;
+    min-height: 50px;
+}
+
+.o_dashboard_header h2 {
+    margin: 0;
+    color: #8B4513;
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 34px;
+}
+
+.o_dashboard_actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.o_dashboard_actions .btn {
+    padding: 6px 20px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.o_dashboard_content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.o_dashboard_section {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.o_section_title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #8B4513;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.o_section_title i {
+    font-size: 18px;
+}
+
+.o_stats_grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+}
+
+.o_stat_card {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    min-height: 90px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.o_stat_card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.o_stat_card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.o_stat_icon {
+    font-size: 32px;
+    margin-right: 12px;
+    opacity: 1;
+    flex-shrink: 0;
+}
+
+.o_stat_content {
+    flex: 1;
+}
+
+.o_stat_label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 1;
+    letter-spacing: 0.5px;
+}
+
+.o_stat_value {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+/* State indicators in section cards */
+.o_stat_states {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 10px;
+    flex-wrap: wrap;
+}
+
+.o_stat_states span {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.o_stat_states span i {
+    font-size: 9px;
+}
+
+/* Create button on cards */
+.o_create_btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 2;
+    opacity: 0.8;
+    transition: all 0.2s;
+}
+
+.o_create_btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background: white !important;
+}
+
+.o_create_btn i {
+    font-size: 12px;
+    color: #8B4513;
+}
+
+/* Card Background Images - using old dashboard patterns */
+.o_card_section4,
+.o_card_section11 {
+    background-image: url('/bhuarjan/static/src/dashboard/images/green_pattern.jpg');
+    color: #2c3e50;
+}
+
+.o_card_section19 {
+    background-image: url('/bhuarjan/static/src/dashboard/images/orange_pattern.jpg');
+    color: #2c3e50;
+}
+
+.o_card_section15 {
+    background-image: url('/bhuarjan/static/src/dashboard/images/pink_pattern.jpg');
+    color: #2c3e50;
+}
+
+.o_card_expert_committee {
+    background-image: url('/bhuarjan/static/src/dashboard/images/purple_pattern.jpg');
+    color: #2c3e50;
+}
+
+.o_card_sia {
+    background-image: url('/bhuarjan/static/src/dashboard/images/blue_pattern.jpg');
+    color: #2c3e50;
+}
+
+/* Department, Project and Village selector styling */
+.o_dashboard_actions select.form-select,
+.o_dashboard_actions .o_department_selector,
+.o_dashboard_actions .o_project_selector,
+.o_dashboard_actions .o_village_selector {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+    font-weight: bold;
+    height: 34px;
+    min-width: 150px;
+    flex-shrink: 0;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: auto;
+    margin: 0;
+    line-height: 22px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.o_dashboard_actions select.form-select option {
+    background: white;
+    color: #333;
+    padding: 8px;
+    text-align: left;
+    font-weight: normal;
+}
+
+.o_dashboard_actions .o_department_selector {
+    min-width: 180px;
+}
+
+.o_dashboard_actions .o_project_selector {
+    min-width: 140px;
+}
+
+.o_dashboard_actions .o_village_selector {
+    min-width: 120px;
+}
+
+.o_dashboard_actions .o_submit_filters {
+    background: linear-gradient(to bottom, #4dd0e1, #26a69a);
+    border: none;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.o_dashboard_actions .o_submit_filters:hover {
+    background: linear-gradient(to bottom, #26a69a, #00897b);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.o_dashboard_actions select.form-select:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1600px) {
+    .o_stats_grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .o_stats_grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    
+    .o_stat_card {
+        padding: 10px;
+        min-height: 85px;
+    }
+    
+    .o_stat_icon {
+        font-size: 28px;
+        margin-right: 10px;
+    }
+    
+    .o_stat_value {
+        font-size: 24px;
+    }
+    
+    .o_stat_label {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 992px) {
+    .o_stats_grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .o_admin_dashboard {
+        padding: 8px;
+    }
+    
+    .o_dashboard_header {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .o_dashboard_header h2 {
+        font-size: 16px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .o_dashboard_actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .o_stats_grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .o_stat_card {
+        padding: 8px;
+        min-height: 80px;
+    }
+    
+    .o_stat_icon {
+        font-size: 24px;
+        margin-right: 8px;
+    }
+    
+    .o_stat_value {
+        font-size: 20px;
+    }
+    
+    .o_stat_label {
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .o_stats_grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* List View Section Styles */
+.o_sections_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.o_section_list_item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 15px;
+}
+
+.o_section_list_item:hover {
+    background: #e9ecef;
+    border-color: #8B4513;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateX(5px);
+}
+
+.o_section_list_icon {
+    font-size: 24px;
+    color: #8B4513;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.o_section_list_content {
+    flex: 1;
+}
+
+.o_section_list_title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.o_section_list_count {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.o_section_list_actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.o_section_list_actions .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.o_section_list_actions .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.o_section_list_actions .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.o_section_list_actions .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

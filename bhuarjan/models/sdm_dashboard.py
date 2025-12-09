@@ -25,8 +25,36 @@ class BhuDashboard(models.Model):
 
     @api.model
     def get_all_departments(self):
-        """Get all departments"""
-        departments = self.env['bhu.department'].search([])
+        """Get departments - filtered by user's assigned projects for SDM/Tehsildar, all for admin/collector"""
+        user = self.env.user
+        
+        # Admin, system users, and collectors see all departments
+        if (user.has_group('bhuarjan.group_bhuarjan_admin') or 
+            user.has_group('base.group_system') or
+            user.has_group('bhuarjan.group_bhuarjan_collector') or
+            user.has_group('bhuarjan.group_bhuarjan_additional_collector')):
+            # Show all departments for admin/system/collector users
+            departments = self.env['bhu.department'].search([])
+        else:
+            # For SDM/Tehsildar users, only show departments where they have assigned projects
+            assigned_projects = self.env['bhu.project'].search([
+                '|',
+                ('sdm_ids', 'in', [user.id]),
+                ('tehsildar_ids', 'in', [user.id])
+            ])
+            
+            if assigned_projects:
+                # Get unique department IDs from assigned projects
+                department_ids = assigned_projects.mapped('department_id').ids
+                if department_ids:
+                    departments = self.env['bhu.department'].search([('id', 'in', department_ids)])
+                else:
+                    # No departments found, return empty list
+                    return []
+            else:
+                # No assigned projects, return empty list
+                return []
+        
         return departments.read(["id", "name"])
 
     @api.model
@@ -82,52 +110,87 @@ class BhuDashboard(models.Model):
 
     @api.model
     def get_sdm_dashboard_stats(self, department_id=None, project_id=None, village_id=None):
-        """Get dashboard statistics for SDM filtered by assigned projects"""
+        """Get dashboard statistics for SDM/Collector filtered by assigned projects"""
         try:
-            # Get SDM's assigned projects
-            if self.env.user.has_group('bhuarjan.group_bhuarjan_sdm'):
+            user = self.env.user
+            
+            # Build domain filters
+            project_domain = []
+            village_domain = []
+            
+            # Get user's assigned projects (for SDM/Tehsildar) or all projects (for admin/collector)
+            if (user.has_group('bhuarjan.group_bhuarjan_admin') or 
+                user.has_group('base.group_system') or
+                user.has_group('bhuarjan.group_bhuarjan_collector') or
+                user.has_group('bhuarjan.group_bhuarjan_additional_collector')):
+                # Admin/Collector: can see all projects (no project restriction)
+                project_ids = None  # None means no filtering needed
+            elif user.has_group('bhuarjan.group_bhuarjan_sdm'):
+                # SDM: only assigned projects
                 assigned_projects = self.env['bhu.project'].search([
-                    ('sdm_ids', 'in', [self.env.user.id])
+                    ('sdm_ids', 'in', [user.id])
                 ])
                 project_ids = assigned_projects.ids
-                
-                # Build domain filters
-                project_domain = []
-                village_domain = []
-                
-                # Filter by department if provided
+            else:
+                # Tehsildar or other: assigned projects
+                assigned_projects = self.env['bhu.project'].search([
+                    '|',
+                    ('sdm_ids', 'in', [user.id]),
+                    ('tehsildar_ids', 'in', [user.id])
+                ])
+                project_ids = assigned_projects.ids if assigned_projects else []
+            
+            # Build project domain
+            if project_ids is not None:  # User has project restrictions (SDM/Tehsildar)
+                if project_ids:  # Has assigned projects
+                    # Filter by department if provided
+                    if department_id and not project_id:
+                        dept_projects = self.env['bhu.project'].search([
+                            ('department_id', '=', department_id),
+                            ('id', 'in', project_ids)
+                        ])
+                        if dept_projects:
+                            project_domain = [('project_id', 'in', dept_projects.ids)]
+                        else:
+                            project_domain = [('project_id', '=', False)]
+                    elif project_id:
+                        # If specific project is selected, filter by it
+                        if project_id in project_ids:
+                            project_domain = [('project_id', '=', project_id)]
+                        else:
+                            project_domain = [('project_id', '=', False)]
+                    else:
+                        # Filter by all assigned projects
+                        project_domain = [('project_id', 'in', project_ids)]
+                else:
+                    # No assigned projects, return empty domain
+                    project_domain = [('project_id', '=', False)]
+            else:
+                # Admin/Collector: no project restrictions, but can filter by department/project
                 if department_id and not project_id:
+                    # Filter by department - need to get projects in that department
                     dept_projects = self.env['bhu.project'].search([
-                        ('department_id', '=', department_id),
-                        ('id', 'in', project_ids)
+                        ('department_id', '=', department_id)
                     ])
                     if dept_projects:
                         project_domain = [('project_id', 'in', dept_projects.ids)]
                     else:
                         project_domain = [('project_id', '=', False)]
                 elif project_id:
-                    # If specific project is selected, filter by it
-                    if project_id in project_ids:
-                        project_domain = [('project_id', '=', project_id)]
-                    else:
-                        project_domain = [('project_id', '=', False)]
-                else:
-                    # Filter by all assigned projects
-                    project_domain = [('project_id', 'in', project_ids)] if project_ids else [('project_id', '=', False)]
-                
-                # Filter by village if provided
-                if village_id:
-                    village_domain = [('village_id', '=', village_id)]
-                
-                # Combine domains
-                final_domain = project_domain + village_domain if (project_domain or village_domain) else project_domain
+                    project_domain = [('project_id', '=', project_id)]
+                # else: no project domain filter (show all)
+            
+            # Filter by village if provided
+            if village_id:
+                village_domain = [('village_id', '=', village_id)]
+            
+            # Combine domains
+            if project_domain:
+                final_domain = project_domain + village_domain if village_domain else project_domain
+            elif village_domain:
+                final_domain = village_domain
             else:
-                # Not SDM, return zeros or all (depending on requirement)
-                final_domain = []
-                if project_id:
-                    final_domain.append(('project_id', '=', project_id))
-                if village_id:
-                    final_domain.append(('village_id', '=', village_id))
+                final_domain = []  # No filters - show all (for admin/collector)
 
             # Helper function to get first pending document and check if all approved
             def get_section_info(model_name, domain, state_field='state', is_survey=False):
@@ -224,18 +287,21 @@ class BhuDashboard(models.Model):
         except Exception as e:
             _logger.error(f"Error getting SDM dashboard stats: {e}", exc_info=True)
             # Return zeros on error
+            is_collector = self.is_collector_user()
             return {
-                'is_collector': False,
+                'is_collector': is_collector,
+                'survey_total': 0, 'survey_draft': 0, 'survey_submitted': 0, 'survey_approved': 0, 'survey_rejected': 0,
+                'survey_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'section4_total': 0, 'section4_draft': 0, 'section4_submitted': 0, 'section4_approved': 0, 'section4_send_back': 0,
-                'section4_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'section4_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'section11_total': 0, 'section11_draft': 0, 'section11_submitted': 0, 'section11_approved': 0, 'section11_send_back': 0,
-                'section11_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'section11_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'section15_total': 0, 'section15_draft': 0, 'section15_submitted': 0, 'section15_approved': 0, 'section15_send_back': 0,
-                'section15_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'section15_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'section19_total': 0, 'section19_draft': 0, 'section19_submitted': 0, 'section19_approved': 0, 'section19_send_back': 0,
-                'section19_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'section19_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'expert_total': 0, 'expert_draft': 0, 'expert_submitted': 0, 'expert_approved': 0, 'expert_send_back': 0,
-                'expert_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'expert_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'sia_total': 0, 'sia_draft': 0, 'sia_submitted': 0, 'sia_approved': 0, 'sia_send_back': 0,
-                'sia_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'all_approved': True, 'first_pending_id': False, 'first_document_id': False},
+                'sia_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
             }

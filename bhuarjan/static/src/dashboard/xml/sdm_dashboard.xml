@@ -4,13 +4,15 @@
             <!-- Header -->
             <div class="o_dashboard_header">
                 <div class="o_dashboard_title_section">
-                    <h2>Dashboard</h2>
-                    <t t-if="state.selectedProjectName">
-                        <div class="o_selected_project_display">
-                            <i class="fa fa-briefcase" style="margin-right: 8px;"/>
-                            <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
-                        </div>
-                    </t>
+                    <h2>
+                        Dashboard
+                        <t t-if="state.selectedProjectName">
+                            <span class="o_selected_project_inline">
+                                <i class="fa fa-briefcase" style="margin-right: 8px;"/>
+                                <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
+                            </span>
+                        </t>
+                    </h2>
                 </div>
                 <div class="o_dashboard_actions">
                     <!-- Department Selector -->
@@ -64,9 +66,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.sia_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Section 4 Card (Menu Order: 2) -->
@@ -83,9 +82,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section4_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Expert Committee Card (Menu Order: 3) -->
@@ -102,9 +98,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.expert_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Section 11 Card (Menu Order: 4) -->
@@ -121,9 +114,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section11_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Section 15 Card (Menu Order: 5) -->
@@ -140,9 +130,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section15_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Section 19 Card (Menu Order: 6) -->
@@ -159,9 +146,6 @@
                                     <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section19_send_back : 0"/></span>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-light o_create_btn" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')" title="Create New">
-                                <i class="fa fa-plus"/>
-                            </button>
                         </div>
 
                         <!-- Surveys Card (Menu Order: 7) -->

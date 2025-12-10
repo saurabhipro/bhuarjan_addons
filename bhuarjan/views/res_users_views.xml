@@ -85,9 +85,13 @@
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            </group>
+                            <group>
                                 <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                                <field name="village_ids" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="project_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="village_domain" invisible="1"/>
+                                <field name="village_ids" domain="village_domain" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             </group>
                         </group>
                         <group string="Subordinates" invisible="1">

@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+import json
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
@@ -34,6 +35,9 @@ class ResUsers(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला')
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', 
+                                 help='Select a project to filter villages. Only villages from this project will be shown.')
+    village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False)
     village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),
@@ -130,4 +134,24 @@ class ResUsers(models.Model):
             if rec.bhuarjan_role == 'collector' and rec.district_id:
                 sub_divisions = self.env['bhu.sub.division'].search([('district_id', '=', rec.district_id.id)])
                 rec.sub_division_ids = [(6, 0, sub_divisions.ids)]
+
+    @api.depends('project_id')
+    def _compute_village_domain(self):
+        """Compute domain for villages based on selected project"""
+        for record in self:
+            if record.project_id and record.project_id.village_ids:
+                record.village_domain = json.dumps([('id', 'in', record.project_id.village_ids.ids)])
+            else:
+                record.village_domain = json.dumps([])
+
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Filter villages based on selected project"""
+        if self.project_id:
+            # Get villages from the selected project
+            project_villages = self.project_id.village_ids.ids
+            # Filter out villages that are not in the selected project
+            if self.village_ids:
+                valid_villages = self.village_ids.filtered(lambda v: v.id in project_villages)
+                self.village_ids = valid_villages
 

@@ -5,7 +5,7 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc">
+            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc" create="not groups='bhuarjan.group_bhuarjan_collector'">
                 <field name="name"/>
                 <field name="user_id"/>
                 <field name="project_id"/>
@@ -33,12 +33,12 @@
         <field name="name">bhu.survey.form</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form">
+            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="not groups='bhuarjan.group_bhuarjan_collector'" edit="not groups='bhuarjan.group_bhuarjan_collector'">
                 <header>
-                    <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Are you sure you want to submit this survey?"/>
-                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'"/>
-                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'"/>
-                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'"/>
+                    <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" groups="!bhuarjan.group_bhuarjan_collector" confirm="Are you sure you want to submit this survey?"/>
+                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'" groups="!bhuarjan.group_bhuarjan_collector"/>
+                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'" groups="!bhuarjan.group_bhuarjan_collector"/>
+                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'" groups="!bhuarjan.group_bhuarjan_collector"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                     <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>
@@ -58,16 +58,17 @@
                     
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
-                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
-                            <field name="department_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Department * / विभाग *"/>
-                            <field name="survey_date" widget="date" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
+                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
+                            <field name="department_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Department * / विभाग *"/>
+                            <field name="survey_date" widget="date" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी" class="survey-icon-location">
-                            <field name="company_id" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="District"/>
-                            <field name="village_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Village * / ग्राम का नाम *"/>
-                            <field name="tehsil_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Tehsil * / तहसील *"/>
-                            <field name="district_name" readonly="is_notification_4_generated or state == 'submitted'"/>
-                            <field name="user_id"/>
+                            <field name="company_id" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="District"/>
+                            <field name="village_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Village * / ग्राम का नाम *"/>
+                            <field name="tehsil_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Tehsil * / तहसील *"/>
+                            <field name="district_name" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                            <field name="user_id" readonly="is_collector_readonly"/>
+                            <field name="is_collector_readonly" invisible="1"/>
                         </group>
                     </group>
                     
@@ -77,40 +78,40 @@
                         <page string="Survey / सर्वे" name="survey_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी" class="survey-icon-land">
-                                    <field name="khasra_number" widget="char" readonly="is_notification_4_generated or state == 'submitted'" required="1" string="Khasra Number * / खसरा नंबर *"/>
-                                    <field name="total_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="acquired_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
-                                    <field name="has_traded_land" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
-                                    <field name="traded_land_area" widget="float" readonly="is_notification_4_generated or state == 'submitted'" 
+                                    <field name="khasra_number" widget="char" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Khasra Number * / खसरा नंबर *"/>
+                                    <field name="total_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="acquired_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
+                                    <field name="has_traded_land" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="traded_land_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" 
                                            invisible="has_traded_land != 'yes'" required="has_traded_land == 'yes'"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी" class="survey-icon-crop">
-                                    <field name="crop_type_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted'" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
-                                    <field name="irrigation_type" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="crop_type_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
+                                    <field name="irrigation_type" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="House Information / घर की जानकारी" class="survey-icon-house">
-                                    <field name="has_house" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
-                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="has_shed" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
-                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
+                                    <field name="has_house" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_shed" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं" class="survey-icon-infrastructure">
-                                    <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
-                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
-                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_notification_4_generated or state == 'submitted'"/>
-                                    <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted'" options="{'horizontal': true}"/>
+                                    <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">
-                                    <field name="remarks" placeholder="Enter any additional notes"/>
+                                    <field name="remarks" placeholder="Enter any additional notes" readonly="is_collector_readonly"/>
                                 </group>
                             </group>
                             
@@ -119,7 +120,8 @@
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
                             <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
                                 <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
-                                       context="{'default_company_id': company_id, 'default_village_id': village_id, 'default_tehsil_id': tehsil_id}"/>
+                                       context="{'default_company_id': company_id, 'default_village_id': village_id, 'default_tehsil_id': tehsil_id}"
+                                       readonly="is_collector_readonly"/>
                             </group>
                             
                             <group string="Landowner Details / भूमिस्वामी विवरण" style="margin-top: 20px;">
@@ -142,7 +144,7 @@
                         
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
                             <group string="Trees / वृक्ष">
-                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1" 
+                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1" 
                                        context="{'default_development_stage': 'undeveloped'}">
                                         <list string="Trees / वृक्ष" editable="bottom">
                                             <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
@@ -158,7 +160,7 @@
                         
                         <page string="Photos / फोटो" name="survey_photos">
                             <group string="Survey Photos / सर्वे फोटो">
-                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted'" nolabel="1"/>
+                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>
@@ -247,116 +249,48 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
         <field name="name">bhu.survey.kanban</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-        <kanban string="Surveys / सर्वे" class="o_kanban_large_column o_kanban_mobile">
+            <kanban default_group_by="state" class="o_kanban_small_column" create="not groups='bhuarjan.group_bhuarjan_collector'">
+                <field name="id"/>
                 <field name="name"/>
+                <field name="state"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
-                <field name="state"/>
+                <field name="khasra_number"/>
                 <field name="survey_date"/>
                 <field name="user_id"/>
-                <field name="user_id" widget="image"/>
-                <field name="khasra_number"/>
-
+                <field name="is_notification_4_generated"/>
+                <progressbar field="state" colors='{"draft": "info", "submitted": "warning", "approved": "success", "rejected": "danger"}'/>
                 <templates>
-                    <t t-name="card">
-                        <div class="p-3">
-                                
-                                <!-- Compact Header -->
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div class="flex-grow-1">
-                                        
-                                        <h5 class="mb-1 text-dark font-weight-bold" style="font-size: 1rem; font-weight: 700;">
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
                                             <field name="name"/>
-                                        </h5>
-                                        <div class="d-flex align-items-center mb-1">
-                                            <i class="fa fa-folder mr-1 text-muted" style="font-size: 0.8rem;" title="Project"></i>
-                                            <span class="text-muted small">
-                                                <field name="project_id"/>
-                                            </span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fa fa-map-marker mr-1 text-muted" style="font-size: 0.8rem;" title="Khasra"></i>
-                                            <span class="text-muted small">
-                                                Khasra: <field name="khasra_number"/>
-                                            </span>
-                                        </div>
+                                        </strong>
                                     </div>
-                                    
-                                    <!-- User Image/Avatar -->
-                                    <div class="d-flex flex-column align-items-center">
-                                        
-                                            <field name="user_id" widget="many2one_avatar_user"/>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                                     </div>
-                                    
-                                    <!-- Actions Dropdown -->
-                                    <div class="dropdown ml-1">
-                                        <a class="dropdown-toggle text-muted" data-toggle="dropdown" href="#" title="Actions" style="font-size: 0.9rem;">
-                                            <i class="fa fa-ellipsis-v" title="More Actions"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="border: 1px solid #e5e7eb; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                            <a role="menuitem" type="edit" class="dropdown-item">
-                                                <i class="fa fa-pencil-alt mr-2 text-primary" title="Edit"></i> Edit
-                                            </a>
-                                            <a role="menuitem" class="dropdown-item" onclick="shareOnWhatsApp()">
-                                                <i class="fab fa-whatsapp mr-2 text-success" title="Share on WhatsApp"></i> Share on WhatsApp
-                                            </a>
-                                            <a role="menuitem" type="delete" class="dropdown-item text-danger">
-                                                <i class="fa fa-trash mr-2" title="Delete"></i> Delete
-                                            </a>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div><strong>Project:</strong> <field name="project_id"/></div>
+                                            <div><strong>Village:</strong> <field name="village_id"/></div>
+                                            <div><strong>Khasra:</strong> <field name="khasra_number"/></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div><strong>Survey Date:</strong> <field name="survey_date"/></div>
+                                            <div><strong>User:</strong> <field name="user_id"/></div>
+                                            <div t-if="is_notification_4_generated">
+                                                <span class="badge badge-info">Notification 4 Generated</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Compact Body -->
-                                <div class="mb-2">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <i class="fa fa-home mr-3 text-muted" style="font-size: 0.8rem;" title="Village"></i>
-                                        <span class="text-muted small mr-3">Village:</span>
-                                        <span class="text-dark small">
-                                            <field name="village_id"/>
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center mb-1">
-                                        <i class="fa fa-calendar mr-3 text-muted" style="font-size: 0.8rem;" title="Date"></i>
-                                        <span class="text-muted small mr-3">Date:</span>
-                                        <span class="text-dark small">
-                                            <field name="survey_date"/>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Compact Footer -->
-                                <div class="d-flex justify-content-between align-items-center border-top pt-2" style="border-color: #f3f4f6 !important;">
-                                    <!-- Approved - Green -->
-                                    <span t-if="record.state.raw_value == 'approved'" 
-                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                          style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: #ffffff !important; border: 2px solid #047857 !important; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;">
-                                        <field name="state"/>
-                                    </span>
-                                    <!-- Submitted - Yellow -->
-                                    <span t-if="record.state.raw_value == 'submitted'" 
-                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                          style="background: #fbbf24 !important; color: #78350f !important; border: 2px solid #f59e0b !important; box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3) !important;">
-                                        <field name="state"/>
-                                    </span>
-                                    <!-- Rejected - Red -->
-                                    <span t-if="record.state.raw_value == 'rejected'" 
-                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                          style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; color: #ffffff !important; border: 2px solid #b91c1c !important; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;">
-                                        <field name="state"/>
-                                    </span>
-                                    <!-- Draft - Blue -->
-                                    <span t-if="record.state.raw_value == 'draft'" 
-                                          class="badge px-3 py-2 text-uppercase small font-weight-bold" 
-                                          style="background: #dbeafe !important; color: #1e40af !important; border: 1px solid #93c5fd !important;">
-                                        <field name="state"/>
-                                    </span>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <span class="small">Survey</span>
-                                    </div>
-                                </div>
-
+                            </div>
                         </div>
                     </t>
                 </templates>
@@ -364,89 +298,51 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
         </field>
     </record>
 
-    <!-- WhatsApp Share JavaScript -->
-    <template id="whatsapp_share_script" name="WhatsApp Share Script">
-        <script type="text/javascript">
-            function shareOnWhatsApp() {
-                // Get current survey data
-                var surveyName = document.querySelector('.oe_kanban_card h5').textContent;
-                var projectName = document.querySelector('.oe_kanban_card .fa-folder').nextSibling.textContent.trim();
-                var villageName = document.querySelector('.oe_kanban_card .fa-home').parentElement.querySelector('div').textContent.trim();
-                var surveyDate = document.querySelector('.oe_kanban_card .fa-calendar').parentElement.querySelector('div').textContent.trim();
-                
-                // Create survey URL
-                var surveyUrl = window.location.origin + '/web#model=bhu.survey&amp;view_type=form';
-                
-                // Create WhatsApp message
-                var message = '🏗️ *Survey Update*\n\n' +
-                             '📋 *Survey:* ' + surveyName + '\n' +
-                             '🏢 *Project:* ' + projectName + '\n' +
-                             '🏘️ *Village:* ' + villageName + '\n' +
-                             '📅 *Date:* ' + surveyDate + '\n\n' +
-                             '🔗 *View Details:* ' + surveyUrl;
-                
-                // Encode message for URL
-                var encodedMessage = encodeURIComponent(message);
-                
-                // Open WhatsApp
-                var whatsappUrl = 'https://wa.me/?text=' + encodedMessage;
-                window.open(whatsappUrl, '_blank');
-            }
-        </script>
-    </template>
-
-    <!-- Survey Tree Line List View -->
+    <!-- Survey Tree Line Views -->
     <record id="view_bhu_survey_tree_line_tree" model="ir.ui.view">
         <field name="name">bhu.survey.tree.line.tree</field>
         <field name="model">bhu.survey.tree.line</field>
-        <field name="type">list</field>
         <field name="arch" type="xml">
-            <list string="Tree Lines" editable="bottom">
-                <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="200"/>
-                <field name="tree_type"/>
-                <field name="development_stage" string="Development Stage / विकास स्तर" width="150"
-                       invisible="tree_type == 'fruit_bearing'"/>
-                <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" width="120"
-                       invisible="tree_type == 'fruit_bearing'"/>
-                <field name="quantity" required="1" string="Quantity / मात्रा" width="150"/>
+            <list string="Tree Details / वृक्ष विवरण">
+                <field name="tree_master_id" string="Tree / वृक्ष"/>
+                <field name="tree_type" string="Tree Type / वृक्ष प्रकार"/>
+                <field name="development_stage" string="Development Stage / विकास स्तर"/>
+                <field name="girth_cm" string="Girth (cm) / छाती (से.मी.)" invisible="tree_type == 'fruit_bearing'"/>
+                <field name="quantity" string="Quantity / मात्रा"/>
             </list>
         </field>
     </record>
 
-    <!-- Survey Photo List View -->
+    <!-- Survey Photo Views -->
     <record id="view_bhu_survey_photo_list" model="ir.ui.view">
         <field name="name">bhu.survey.photo.list</field>
         <field name="model">bhu.survey.photo</field>
-        <field name="type">list</field>
         <field name="arch" type="xml">
-            <list string="Photos / फोटो" editable="bottom">
-                <field name="sequence" widget="handle"/>
-                <field name="filename"/>
-                <field name="s3_url" widget="url" string="S3 URL / S3 यूआरएल"/>
-                <field name="file_size" string="File Size / फ़ाइल आकार"/>
-                <field name="create_date" string="Upload Date / अपलोड दिनांक" widget="date"/>
-                <field name="file_upload" filename="filename" widget="binary" string="Upload File / फ़ाइल अपलोड करें"/>
+            <list string="Survey Photos / सर्वे फोटो">
+                <field name="display_name" string="Name / नाम"/>
+                <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
+                <field name="filename" string="Filename / फ़ाइल नाम"/>
+                <field name="s3_filename_display" string="S3 File / S3 फ़ाइल"/>
+                <field name="sequence"/>
             </list>
         </field>
     </record>
 
-    <!-- Survey Photo Form View -->
     <record id="view_bhu_survey_photo_form" model="ir.ui.view">
         <field name="name">bhu.survey.photo.form</field>
         <field name="model">bhu.survey.photo</field>
-        <field name="type">form</field>
         <field name="arch" type="xml">
             <form string="Survey Photo / सर्वे फोटो">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="photo_type_id" options="{'no_create_edit': True}"/>
-                            <field name="sequence" widget="handle"/>
-                            <field name="file_upload" filename="filename" widget="binary" string="Upload File / फ़ाइल अपलोड करें"/>
-                            <field name="filename" readonly="1"/>
-                            <field name="s3_url" widget="url" readonly="1"/>
-                            <field name="file_size" readonly="1"/>
-                        </group>
+                        <field name="display_name" string="Name / नाम" readonly="1"/>
+                        <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
+                        <field name="filename" string="Filename / फ़ाइल नाम"/>
+                        <field name="s3_url" string="S3 URL / S3 यूआरएल"/>
+                        <field name="s3_filename_display" string="S3 File / S3 फ़ाइल" readonly="1"/>
+                        <field name="file_size" string="File Size (bytes) / फ़ाइल आकार"/>
+                        <field name="sequence"/>
+                        <field name="file_upload" string="Upload File / फ़ाइल अपलोड करें" widget="binary"/>
                     </group>
                 </sheet>
             </form>

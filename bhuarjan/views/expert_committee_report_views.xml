@@ -5,7 +5,7 @@
         <field name="name">bhu.expert.committee.report.list</field>
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
-            <list string="Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट">
+            <list string="Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट" create="not groups='bhuarjan.group_bhuarjan_collector'">
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="state" widget="badge" 

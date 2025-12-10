@@ -210,7 +210,7 @@
                             </div>
                             <div class="o_legend_item">
                                 <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                <span class="o_legend_label">Rejected</span>
+                                <span class="o_legend_label">Returned</span>
                             </div>
                         </div>
                     </div>
@@ -240,18 +240,6 @@
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
-                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApprovedSurvey(state.stats.survey_info) : true"
-                                        title="Approve First Pending">
-                                    <i class="fa fa-check"/> Approve
-                                </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
-                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApprovedSurvey(state.stats.survey_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
-                                </button>
                             </div>
                         </div>
 
@@ -265,7 +253,7 @@
                                 <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
@@ -280,8 +268,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.sia_info ? this.isAllApproved(state.stats.sia_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -307,7 +295,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
@@ -322,8 +310,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section4_info ? this.isAllApproved(state.stats.section4_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -349,7 +337,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
@@ -364,8 +352,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.expert_info ? this.isAllApproved(state.stats.expert_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -391,7 +379,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
@@ -406,8 +394,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -433,7 +421,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)">
@@ -448,8 +436,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
     </div>
@@ -475,7 +463,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)">
@@ -490,8 +478,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -517,7 +505,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.draft.award')">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.draft.award')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)">
@@ -532,8 +520,8 @@
                                 <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info.first_pending_id : false, state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
-                                        title="Reject First Pending">
-                                    <i class="fa fa-times"/> Reject
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>

@@ -5,7 +5,7 @@
         <field name="name">bhu.section11.preliminary.report.list</field>
         <field name="model">bhu.section11.preliminary.report</field>
         <field name="arch" type="xml">
-            <list string="Section 11 Preliminary Reports" delete="1">
+            <list string="Section 11 Preliminary Reports" delete="1" create="not groups='bhuarjan.group_bhuarjan_collector'">
                 <header>
                     <button name="action_open_wizard" string="Generate" type="object" icon="fa-plus" 
                             class="oe_highlight" title="Generate new Section 11 Preliminary Report"/>

@@ -222,19 +222,19 @@
         <!-- ##################### COLLECTOR ################### -->
         <!-- Collectors can see ALL process documents for ALL projects -->
         <!-- Note: Collector group implies Additional Collector, so this covers both -->
-        <!-- SIA TEAM -->
+        <!-- SIA TEAM - Collector can only see submitted/approved/send_back records, not draft -->
         <record id="record_bhu_sia_team_rule_collector" model="ir.rule">
-            <field name="name">Collector can see all SIA Team data</field>
+            <field name="name">Collector can see SIA Team data (excluding draft)</field>
             <field name="model_id" ref="model_bhu_sia_team"/>
-            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="domain_force">[('state', '!=', 'draft')]</field>            
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_collector'))]"/>
         </record>
 
-        <!-- Section 4 Notification -->
+        <!-- Section 4 Notification - Collector can only see submitted/approved/send_back records, not draft -->
         <record id="record_bhu_section4_notification_rule_collector" model="ir.rule">
-            <field name="name">Collector can see all Section 4 Notification data</field>
+            <field name="name">Collector can see Section 4 Notification data (excluding draft)</field>
             <field name="model_id" ref="model_bhu_section4_notification"/>
-            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="domain_force">[('state', '!=', 'draft')]</field>            
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_collector'))]"/>
         </record>
 
@@ -300,6 +300,14 @@
             <field name="model_id" ref="model_bhu_survey"/>
             <field name="domain_force">[('project_id.department_user_ids', 'in', [user.id])]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_department_user'))]"/>
+        </record>
+
+        <!-- Collector Survey Rule - Read-only access to all surveys -->
+        <record id="record_bhu_survey_rule_collector" model="ir.rule">
+            <field name="name">Collector can see all surveys (read-only)</field>
+            <field name="model_id" ref="model_bhu_survey"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_collector'))]"/>
         </record>
 
        

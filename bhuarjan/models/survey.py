@@ -172,6 +172,16 @@ class Survey(models.Model):
     # Notification 4 Generation - Read-only, controlled from Notification 4 process
     is_notification_4_generated = fields.Boolean(string='Is Noti 4 Generated / अधिसूचना 4 जेनरेट है', default=False, tracking=True, readonly=True, help='This field is automatically set when Notification 4 is generated. It cannot be manually edited.')
     
+    # Computed field to check if current user is a collector (for readonly purposes)
+    is_collector_readonly = fields.Boolean(string='Is Collector Readonly', compute='_compute_is_collector_readonly', store=False)
+    
+    @api.depends()
+    def _compute_is_collector_readonly(self):
+        """Compute if current user is a collector for readonly purposes"""
+        is_collector = self.env.user.has_group('bhuarjan.group_bhuarjan_collector')
+        for record in self:
+            record.is_collector_readonly = is_collector
+    
     # Computed fields for Form 10 report
     is_single_crop = fields.Boolean(string='Is Single Crop', compute='_compute_crop_fields', store=False)
     is_double_crop = fields.Boolean(string='Is Double Crop', compute='_compute_crop_fields', store=False)

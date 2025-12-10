@@ -97,29 +97,44 @@ class BhuarjanAPIController(http.Controller):
             # Start from user's villages and build the hierarchy: Village -> Project -> Department
             # Structure: Department -> Projects -> Villages
             
-            # Get all projects to search through
-            all_projects = request.env['bhu.project'].sudo().search([])
-            
             # Map: village_id -> list of projects that contain it
             village_project_map = {}  # {village_id: [project1, project2, ...]}
             
             # Map: project_id -> set of departments
             project_department_map = {}  # {project_id: [dept1, dept2, ...]}
             
-            # For each user village, find projects that contain it
+            # For each user village, find projects that contain it using domain-based search with sudo
+            # This ensures we bypass any record rules that might prevent patwari users from accessing projects
+            # Use skip_project_domain_filter context to bypass the _search override in project model
             for village_id in user_village_ids:
                 village = request.env['bhu.village'].sudo().browse(village_id)
                 if not village.exists():
                     _logger.warning(f"get_user_projects: Village {village_id} does not exist")
                     continue
                 
-                # Find projects that contain this village
-                projects_for_village = all_projects.filtered(
-                    lambda p: village_id in p.village_ids.ids
-                )
+                # Find projects that contain this village using domain search with sudo
+                # Use skip_project_domain_filter to bypass the _search override that filters by SDM/Tehsildar
+                # This bypasses record rules and access restrictions
+                projects_for_village = request.env['bhu.project'].sudo().with_context(
+                    skip_project_domain_filter=True
+                ).search([
+                    ('village_ids', 'in', [village_id])
+                ])
                 
                 village_project_map[village_id] = projects_for_village
                 _logger.info(f"get_user_projects: Village {village_id} ({village.name}) is in {len(projects_for_village)} projects: {projects_for_village.ids}")
+                
+                # Additional debug: Check if any projects exist at all and if they have villages
+                if not projects_for_village:
+                    # Try to find all projects and check their village_ids
+                    all_projects_debug = request.env['bhu.project'].sudo().with_context(
+                        skip_project_domain_filter=True
+                    ).search([])
+                    _logger.warning(f"get_user_projects: No projects found for village {village_id}. Total projects in system: {len(all_projects_debug)}")
+                    # Check a few projects to see if they have villages
+                    for proj in all_projects_debug[:5]:  # Check first 5 projects
+                        proj_village_ids = proj.sudo().village_ids.ids
+                        _logger.info(f"get_user_projects: Debug - Project {proj.id} ({proj.name}) has villages: {proj_village_ids}")
                 
                 # For each project, get its departments
                 for project in projects_for_village:

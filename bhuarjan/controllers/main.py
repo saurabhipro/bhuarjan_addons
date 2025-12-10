@@ -227,7 +227,10 @@ def check_app_version(func):
             return func(*args, **kwargs)
             
         except Exception as e:
-            _logger.error(f"Error in check_app_version: {str(e)}", exc_info=True)
+            # Only log if it's a version-related error, not JWT/auth errors
+            error_str = str(e)
+            if 'jwt' not in error_str.lower() and 'token' not in error_str.lower() and 'auth' not in error_str.lower():
+                _logger.error(f"Error in check_app_version: {str(e)}", exc_info=True)
             # Don't block the request if version check fails due to error
             # Just log and proceed
             return func(*args, **kwargs)

@@ -107,6 +107,8 @@
             'bhuarjan/static/src/dashboard/css/sdm_dashboard.css',
             'bhuarjan/static/src/dashboard/js/sdm_dashboard.js',
             'bhuarjan/static/src/dashboard/xml/sdm_dashboard.xml',
+            # Role-based Dashboard (routes to Admin or SDM dashboard based on user role)
+            'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
             # 'bhuarjan/static/src/css/landowner_documents.css',
             # 'bhuarjan/static/src/scss/hierarchy_view.scss',
             # 'bhuarjan/static/src/scss/organization_chart.scss',

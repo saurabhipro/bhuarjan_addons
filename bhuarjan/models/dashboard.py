@@ -1218,4 +1218,33 @@ class BhuarjanDashboard(models.TransientModel):
             _logger.error("Error in get_dashboard_stats: %s\n%s", str(e), traceback.format_exc())
             # Return empty counts on error
             return self._get_all_counts(project_id=None, village_id=None, department_id=None)
+    
+    @api.model
+    def get_role_based_dashboard_action(self):
+        """Return the appropriate dashboard action based on user role"""
+        user = self.env.user
+        is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
+        
+        # Use sudo() to bypass permission checks when reading action references
+        if is_admin:
+            # Return Admin Dashboard action
+            action_ref = self.env.sudo().ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
+            tag = 'bhuarjan.admin_dashboard'
+        else:
+            # Return SDM Dashboard action for all other users
+            action_ref = self.env.sudo().ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
+            tag = 'bhuarjan.sdm_dashboard_tag'
+        
+        if not action_ref:
+            # Fallback to admin dashboard if action not found
+            action_ref = self.env.sudo().ref('bhuarjan.action_admin_dashboard_owl')
+            tag = 'bhuarjan.admin_dashboard'
+        
+        # Return a proper client action dictionary instead of reading the record
+        # This avoids issues with action IDs that don't exist
+        return {
+            'type': 'ir.actions.client',
+            'tag': tag,
+            'name': action_ref.name if action_ref else 'Dashboard',
+        }
 

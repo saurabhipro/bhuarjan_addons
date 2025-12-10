@@ -39,7 +39,7 @@
     <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
     <!-- Process Menu -->
-    <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_sec4_create_sia_team" name="(Sec 4) Create SIA Team" action="action_create_sia_team" parent="menu_bhu_process" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_sec4_notifications" name="(Sec 4) Section 4 Notifications" action="action_section4_notification" parent="menu_bhu_process" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_sec7_expert_committee" name="(Sec 7) Expert Committee Reports" action="action_expert_committee_report" parent="menu_bhu_process" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>

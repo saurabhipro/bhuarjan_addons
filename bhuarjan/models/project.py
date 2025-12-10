@@ -72,6 +72,10 @@ class BhuProject(models.Model):
                                      string="Tehsildar / तहसीलदार", 
                                      domain="[('bhuarjan_role', '=', 'tahsildar')]", tracking=True,
                                      help="Select Tehsildars for this project")
+    department_user_ids = fields.Many2many('res.users', 'bhu_project_department_user_rel', 'project_id', 'user_id',
+                                           string="Department User / विभाग उपयोगकर्ता", 
+                                           domain="[('bhuarjan_role', '=', 'department_user')]", tracking=True,
+                                           help="Select Department Users for this project. They can approve/reject surveys.")
     
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 
@@ -95,10 +99,13 @@ class BhuProject(models.Model):
             try:
                 # Get user's assigned projects using sudo() to bypass access rights and context flag to avoid recursion
                 # Use sudo() to ensure we can search even if user doesn't have direct access
+                # Include department users in the search
                 assigned_projects = self.sudo().with_context(skip_project_domain_filter=True).search([
                     '|',
+                    '|',
                     ('sdm_ids', 'in', user.id),
-                    ('tehsildar_ids', 'in', user.id)
+                    ('tehsildar_ids', 'in', user.id),
+                    ('department_user_ids', 'in', user.id)
                 ])
                 
                 if assigned_projects:

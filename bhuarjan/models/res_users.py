@@ -46,6 +46,7 @@ class ResUsers(models.Model):
         ('district_administrator', 'District Administrator'),
         ('administrator', 'Administrator'),
         ('sia_team_member', 'SIA Team Member'),
+        ('department_user', 'Department User'),
     ], string="Bhuarjan Role", default=False)
 
 
@@ -61,8 +62,10 @@ class ResUsers(models.Model):
         for user in self:
             projects = self.env['bhu.project'].search([
                 '|',
+                '|',
                 ('sdm_ids', 'in', user.id),
-                ('tehsildar_ids', 'in', user.id)
+                ('tehsildar_ids', 'in', user.id),
+                ('department_user_ids', 'in', user.id)
             ])
             user.assigned_project_ids = projects
     
@@ -75,8 +78,10 @@ class ResUsers(models.Model):
         
         projects = self.env['bhu.project'].search([
             '|',
+            '|',
             ('sdm_ids', 'in', user.id),
-            ('tehsildar_ids', 'in', user.id)
+            ('tehsildar_ids', 'in', user.id),
+            ('department_user_ids', 'in', user.id)
         ])
         return projects.ids if projects else [False]  # Return [False] to show no projects
 
@@ -95,6 +100,7 @@ class ResUsers(models.Model):
             self.env.ref('bhuarjan.group_bhuarjan_district_administrator').id,
             self.env.ref('bhuarjan.group_bhuarjan_admin').id,
             self.env.ref('bhuarjan.group_bhuarjan_sia_team_member').id,
+            self.env.ref('bhuarjan.group_bhuarjan_department_user').id,
         ]
         if self.groups_id:
             self.groups_id = [(3, gid) for gid in all_custom_group_ids if gid in self.groups_id.ids]
@@ -111,6 +117,7 @@ class ResUsers(models.Model):
             'district_administrator': 'bhuarjan.group_bhuarjan_district_administrator',
             'administrator': 'bhuarjan.group_bhuarjan_admin',
             'sia_team_member': 'bhuarjan.group_bhuarjan_sia_team_member',
+            'department_user': 'bhuarjan.group_bhuarjan_department_user',
         }
 
         group_ref = group_map.get(self.bhuarjan_role)

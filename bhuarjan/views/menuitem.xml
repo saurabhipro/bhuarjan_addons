@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1" web_icon="bhuarjan,static/description/icon.png" action="action_admin_dashboard_owl"/>
+    <menuitem id="menu_bhu_root" name="Bhuarjan" sequence="1" web_icon="bhuarjan,static/description/icon.png" action="action_role_based_dashboard"/>
     
-    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
     <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2"/>
 
@@ -51,17 +51,16 @@
     <menuitem id="menu_sec11_preliminary_reports" name="(Sec 11) Section 11 Preliminary Reports" action="action_section11_preliminary_report" parent="menu_bhu_process" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_sec15_objections" name="(Sec 15) Objections" action="action_section15_objections" parent="menu_bhu_process" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_sec19_notifications" name="(Sec 19) Section 19 Notifications" action="action_section19_notification" parent="menu_bhu_process" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
-    <menuitem id="menu_sec21_draft_award" name="(Sec 21) Draft Awards" action="action_draft_award" parent="menu_bhu_root" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
-    <menuitem id="menu_process_report" name="Process Report / प्रक्रिया रिपोर्ट" action="action_process_report_wizard" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_sec21_draft_award" name="(Sec 21) Draft Awards" action="action_draft_award" parent="menu_bhu_process" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_process_report" name="Reports" action="action_process_report_wizard" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     
     <!-- Payment Menu -->
     <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
-    <!-- Document Vault Menu -->
-    <menuitem id="menu_bhu_document_vault" name="Document Vault" parent="menu_bhu_root" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_document_vault_list" name="Documents" action="action_document_vault" parent="menu_bhu_document_vault" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>   
+    <!-- Document Vault Menu - Moved to Process -->
+    <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault" parent="menu_bhu_process" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>   
     <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_sia_team_members" name="SIA Team Members" action="action_sia_team_member" parent="menu_bhu_users_maai_menu" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
@@ -72,7 +71,7 @@
         <field name="name">Dashboard</field>
         <field name="tag">bhuarjan.sdm_dashboard_tag</field>
     </record>
-    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="base.group_system,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
 
 
 </odoo>

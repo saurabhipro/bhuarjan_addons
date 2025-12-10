@@ -27,8 +27,8 @@ patch(WebClient.prototype, {
                     logo.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // Use window.location to navigate to dashboard action
-                        window.location.href = '/web#action=bhuarjan.action_admin_dashboard_owl';
+                        // Use role-based dashboard action that checks user role
+                        window.location.href = '/web#action=bhuarjan.action_role_based_dashboard';
                     });
                 }
             });

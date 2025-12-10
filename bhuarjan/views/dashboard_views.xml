@@ -347,5 +347,36 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
         <field name="name">Admin Dashboard</field>
         <field name="tag">bhuarjan.admin_dashboard</field>
     </record>
+    
+    <!-- SDM Dashboard Client Action (OWL) -->
+    <record id="action_sdm_dashboard_owl" model="ir.actions.client">
+        <field name="name">SDM Dashboard</field>
+        <field name="tag">bhuarjan.sdm_dashboard_tag</field>
+    </record>
+    
+    <!-- Role-based Dashboard Action - Returns Admin Dashboard for Admin, SDM Dashboard for others -->
+    <record id="action_role_based_dashboard" model="ir.actions.server">
+        <field name="name">Dashboard</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="state">code</field>
+        <field name="code">
+# Check if user is admin
+user = env.user
+is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
+
+if is_admin:
+    # Return Admin Dashboard action
+    action_ref = env.ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
+else:
+    # Return SDM Dashboard action for all other users
+    action_ref = env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
+
+if not action_ref:
+    # Fallback to admin dashboard if action not found
+    action_ref = env.ref('bhuarjan.action_admin_dashboard_owl')
+
+action = action_ref.read()[0]
+        </field>
+    </record>
 
 </odoo>

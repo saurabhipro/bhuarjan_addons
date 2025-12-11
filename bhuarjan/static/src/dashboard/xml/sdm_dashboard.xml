@@ -5,7 +5,12 @@
             <div class="o_dashboard_header">
                 <div class="o_dashboard_title_section">
                     <h2>
-                        Dashboard
+                        <t t-if="state.isCollector">
+                            Collector Dashboard
+                        </t>
+                        <t t-if="!state.isCollector">
+                            SDM Dashboard
+                        </t>
                         <t t-if="state.selectedProjectName">
                             <span class="o_selected_project_inline">
                                 <i class="fa fa-briefcase" style="margin-right: 8px;"/>

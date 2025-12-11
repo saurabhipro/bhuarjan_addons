@@ -27,8 +27,6 @@
     <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="menu_bhu_master" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="menu_bhu_master" sequence="15" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_app_version"
                   name="App Versions"
                   parent="menu_bhu_master"
@@ -68,5 +66,8 @@
     </record>
     <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
 
+    <!-- Move Settings Master and Sequence Settings to General Settings section -->
+    <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="base.menu_administration" sequence="101" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
 </odoo>

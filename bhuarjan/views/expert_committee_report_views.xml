@@ -16,16 +16,6 @@
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
                 <field name="signatory_name"/>
-                    <button name="action_approve" string="Approve" type="object" 
-                        class="btn-success" icon="fa-check" 
-                        invisible="state != 'submitted'"
-                        title="Approve Expert Committee Report"/>
-                <button name="action_send_back" string="Send Back" type="object" 
-                        class="btn-danger" icon="fa-times" 
-                        invisible="state != 'submitted'"
-                        title="Send Back Expert Committee Report"/>
-                <button name="action_generate_order" string="Generate Order" type="object" 
-                        class="btn-primary" icon="fa-file-text" title="Generate Expert Committee Order"/>
             </list>
         </field>
     </record>
@@ -35,9 +25,9 @@
         <field name="name">bhu.expert.committee.report.form</field>
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
-            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट">
+            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <header>
-                    <!-- File Upload Section for SDM -->
+                    <!-- File Upload Section for SDM (editable only in draft state) -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
@@ -49,7 +39,20 @@
                                 invisible="not sdm_signed_file"/>
                     </group>
                     
-                    <!-- File Upload Section for Collector -->
+                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file or state == 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="SDM Signed Report (Uploaded)"/>
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Report" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download SDM Signed Report"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector (editable only in submitted state) -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
@@ -58,27 +61,33 @@
                                placeholder="Upload Expert Committee Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group for SDM (visible only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                         <div class="btn-group" role="group">
-                             <button name="action_download_unsigned_file" string="Download PDF" type="object" 
-                                     class="btn-primary" icon="fa-download"
-                                     title="Download Expert Committee Report (Unsigned)"/>
-                             <button name="action_download_sdm_signed_file" string="Download PDF" type="object" 
-                                     class="btn-primary" icon="fa-download"
-                                     invisible="not sdm_signed_file"
-                                     title="Download SDM Signed Report"/>
-                         </div>
+                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not collector_signed_file or state == 'draft'">
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="Collector Signed Approval (Uploaded)"/>
+                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download Collector Signed Approval"/>
                     </group>
                     
-                    <!-- Download Button for Collector (visible when submitted) -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'submitted'">
-                         <button name="action_download_sdm_signed_file" string="Download PDF" type="object" 
-                                 class="btn-primary" icon="fa-download"
-                                 invisible="not sdm_signed_file"
-                                 title="Download SDM Signed Report"/>
+                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file and not collector_signed_file">
+                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
+                                class="btn-primary" icon="fa-file-pdf"
+                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
+                    </group>
+                    
+                    <!-- Download Unsigned PDF Button (visible in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
+                        <button name="action_download_unsigned_file" string="Download PDF (Unsigned)" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download Expert Committee Report (Unsigned)"/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 11 -->
@@ -105,6 +114,11 @@
                              invisible="state != 'send_back'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
+                <field name="is_sdm" invisible="1"/>
+                <field name="is_collector" invisible="1"/>
+                <field name="can_sdm_edit" invisible="1"/>
+                <field name="can_collector_edit" invisible="1"/>
+                
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
@@ -113,9 +127,11 @@
                     </div>
                     <group col="2">
                         <group>
-                            <field name="project_id" required="1" options="{'no_create_edit': True}"/>
-                            <field name="requiring_body_id" required="1"/>
+                            <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->
+                            <field name="project_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_create_edit': True}"/>
+                            <field name="requiring_body_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="village_ids" widget="many2many_tags" 
+                                   readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    placeholder="Select affected villages..."
                                    options="{'no_create_edit': True}"/>
                         </group>
@@ -128,27 +144,31 @@
                             <group col="2">
                                 <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
                                     <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select non-government social scientist..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ख) Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि">
                                     <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select representatives of local bodies..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ">
                                     <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select resettlement expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
                                     <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select technical expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                             </group>
                             <group string="Original Report / मूल रिपोर्ट">
-                                <field name="report_file" filename="report_filename"/>
+                                <field name="report_file" filename="report_filename" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                 <field name="report_filename" invisible="1"/>
                             </group>
                         </page>
@@ -166,7 +186,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>
         </field>
     </record>

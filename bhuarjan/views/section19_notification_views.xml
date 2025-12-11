@@ -23,9 +23,14 @@
         <field name="name">bhu.section19.notification.form</field>
         <field name="model">bhu.section19.notification</field>
         <field name="arch" type="xml">
-            <form string="Section 19 Notification">
+            <form string="Section 19 Notification" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
+                <field name="is_sdm" invisible="1"/>
+                <field name="is_collector" invisible="1"/>
+                <field name="can_sdm_edit" invisible="1"/>
+                <field name="can_collector_edit" invisible="1"/>
                 <header>
                     <!-- File Upload Section for SDM -->
+                    <!-- File Upload Section for SDM (editable only in draft state) -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'draft'">
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
@@ -37,7 +42,20 @@
                                 invisible="not sdm_signed_file"/>
                     </group>
                     
-                    <!-- File Upload Section for Collector -->
+                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file or state == 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="SDM Signed Notification (Uploaded)"/>
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Notification" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download SDM Signed Notification"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector (editable only in submitted state) -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
                            invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
@@ -46,27 +64,33 @@
                                placeholder="Upload Section 19 Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group for SDM (visible only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                         <div class="btn-group" role="group">
-                             <button name="action_download_unsigned_file" string="Download PDF" type="object" 
-                                     class="btn-primary" icon="fa-download"
-                                     title="Download Section 19 Notification (Unsigned)"/>
-                             <button name="action_download_sdm_signed_file" string="Signed PDF" type="object" 
-                                     class="btn-primary" icon="fa-check"
-                                     invisible="not sdm_signed_file"
-                                     title="Download SDM Signed Notification"/>
-                         </div>
+                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not collector_signed_file or state == 'draft'">
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="Collector Signed Approval (Uploaded)"/>
+                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download Collector Signed Approval"/>
                     </group>
                     
-                    <!-- Download Button for Collector (visible when submitted) -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'submitted'">
-                         <button name="action_download_sdm_signed_file" string="Download PDF" type="object" 
-                                 class="btn-primary" icon="fa-download"
-                                 invisible="not sdm_signed_file"
-                                 title="Download SDM Signed Notification"/>
+                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file and not collector_signed_file">
+                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
+                                class="btn-primary" icon="fa-file-pdf"
+                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
+                    </group>
+                    
+                    <!-- Download Unsigned PDF Button (visible in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
+                        <button name="action_download_unsigned_file" string="Download PDF (Unsigned)" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download Section 19 Notification (Unsigned)"/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back -->
@@ -166,7 +190,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>
         </field>
     </record>

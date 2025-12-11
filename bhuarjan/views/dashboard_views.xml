@@ -347,7 +347,7 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
         <field name="name">Admin Dashboard</field>
         <field name="tag">bhuarjan.admin_dashboard</field>
     </record>
-    
+
     <!-- SDM Dashboard Client Action (OWL) -->
     <record id="action_sdm_dashboard_owl" model="ir.actions.client">
         <field name="name">SDM Dashboard</field>
@@ -362,6 +362,7 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
     <record id="action_role_based_dashboard" model="ir.actions.client">
         <field name="name">Dashboard</field>
         <field name="tag">bhuarjan.role_based_dashboard</field>
+        <!-- Ensure no res_model is set to prevent breadcrumb errors -->
     </record>
 
 </odoo>

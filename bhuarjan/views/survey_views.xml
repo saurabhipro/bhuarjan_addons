@@ -36,9 +36,10 @@
             <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="not groups='bhuarjan.group_bhuarjan_collector'" edit="not groups='bhuarjan.group_bhuarjan_collector'">
                 <header>
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" groups="!bhuarjan.group_bhuarjan_collector" confirm="Are you sure you want to submit this survey?"/>
-                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'" groups="!bhuarjan.group_bhuarjan_collector"/>
-                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'" groups="!bhuarjan.group_bhuarjan_collector"/>
-                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'" groups="!bhuarjan.group_bhuarjan_collector"/>
+                    <!-- Approve/Reject buttons: Only Department User and Admin can approve/reject surveys -->
+                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin"/>
+                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin"/>
+                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                     <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>

@@ -51,6 +51,7 @@ class ResUsers(models.Model):
         ('administrator', 'Administrator'),
         ('sia_team_member', 'SIA Team Member'),
         ('department_user', 'Department User'),
+        ('banker', 'Banker'),
     ], string="Bhuarjan Role", default=False)
 
 
@@ -122,6 +123,7 @@ class ResUsers(models.Model):
             'administrator': 'bhuarjan.group_bhuarjan_admin',
             'sia_team_member': 'bhuarjan.group_bhuarjan_sia_team_member',
             'department_user': 'bhuarjan.group_bhuarjan_department_user',
+            'banker': 'bhuarjan.group_bhuarjan_banker',
         }
 
         group_ref = group_map.get(self.bhuarjan_role)

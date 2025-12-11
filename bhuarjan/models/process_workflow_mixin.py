@@ -26,6 +26,40 @@ class ProcessWorkflowMixin(models.AbstractModel):
     collector_signed_file = fields.Binary(string='Collector Signed Document / कलेक्टर हस्ताक्षरित दस्तावेज़',
                                          help='Upload the signed document from Collector')
     collector_signed_filename = fields.Char(string='Collector Signed Filename')
+    
+    # Computed fields for edit permissions
+    is_sdm = fields.Boolean(string='Is SDM', compute='_compute_user_roles', store=False)
+    is_collector = fields.Boolean(string='Is Collector', compute='_compute_user_roles', store=False)
+    can_sdm_edit = fields.Boolean(string='Can SDM Edit', compute='_compute_edit_permissions', store=False,
+                                   help='SDM can edit when state is draft or send_back, readonly when approved')
+    can_collector_edit = fields.Boolean(string='Can Collector Edit', compute='_compute_edit_permissions', store=False,
+                                        help='Collector can edit when state is submitted, readonly when approved')
+    
+    @api.depends()
+    def _compute_user_roles(self):
+        """Compute if current user is SDM or Collector"""
+        current_user = self.env.user
+        is_sdm_user = current_user.has_group('bhuarjan.group_bhuarjan_sdm')
+        is_collector_user = current_user.has_group('bhuarjan.group_bhuarjan_collector')
+        
+        for record in self:
+            record.is_sdm = is_sdm_user
+            record.is_collector = is_collector_user
+    
+    @api.depends('state', 'is_sdm', 'is_collector')
+    def _compute_edit_permissions(self):
+        """Compute edit permissions based on state and user role"""
+        for record in self:
+            # For new records (no id), allow editing if user is SDM or admin
+            if not record.id:
+                record.can_sdm_edit = record.is_sdm or record.env.user.has_group('bhuarjan.group_bhuarjan_admin') or record.env.user.has_group('base.group_system')
+                record.can_collector_edit = False  # Collectors can't create new records
+            else:
+                # SDM can edit when state is 'draft' or 'send_back', readonly when 'approved'
+                record.can_sdm_edit = record.is_sdm and record.state in ('draft', 'send_back')
+                
+                # Collector can edit when state is 'submitted', readonly when 'approved'
+                record.can_collector_edit = record.is_collector and record.state == 'submitted'
 
     def write(self, vals):
         """Override write to intercept state changes and validate them"""
@@ -303,4 +337,15 @@ class ProcessWorkflowMixin(models.AbstractModel):
             'url': f'/web/content/{self._name}/{self.id}/collector_signed_file/{filename}?download=true',
             'target': 'self',
         }
+    
+    def action_download_latest_pdf(self):
+        """Download the latest available PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"""
+        self.ensure_one()
+        # Priority: Collector signed > SDM signed > Unsigned
+        if self.collector_signed_file:
+            return self.action_download_collector_signed_file()
+        elif self.sdm_signed_file:
+            return self.action_download_sdm_signed_file()
+        else:
+            return self.action_download_unsigned_file()
 

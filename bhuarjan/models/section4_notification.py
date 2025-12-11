@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from . import utils
 import uuid
+import json
 
 
 # Stub models for Process menu items - to be implemented later
@@ -21,10 +22,11 @@ class Section4Notification(models.Model):
                                           help='Sequence number for this notification')
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False, readonly=True)
     area_captured_from_form10 = fields.Float(string='Area Captured from Form 10 (Hectares) / फॉर्म 10 से कैप्चर किया गया क्षेत्रफल (हेक्टेयर)',
                                              compute='_compute_area_captured', store=False, digits=(16, 4), readonly=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)',
@@ -109,6 +111,15 @@ class Section4Notification(models.Model):
             else:
                 record.tehsil_id = False
     
+    @api.depends('project_id')
+    def _compute_village_domain(self):
+        """Compute domain for village_id based on project"""
+        for record in self:
+            if record.project_id and record.project_id.village_ids:
+                record.village_domain = json.dumps([('id', 'in', record.project_id.village_ids.ids)])
+            else:
+                record.village_domain = json.dumps([])
+    
     @api.depends('project_id', 'village_id')
     def _compute_area_captured(self):
         """Compute total area and area captured from Form 10 surveys"""
@@ -169,7 +180,7 @@ class Section4Notification(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Auto-populate requiring_body_id and set village domain from project"""
+        """Auto-populate requiring_body_id and reset village/tehsil when project changes"""
         # Reset fields when project changes
         self.village_id = False
         self.requiring_body_id = False
@@ -179,14 +190,6 @@ class Section4Notification(models.Model):
             # Auto-populate requiring_body_id from project's department
             if self.project_id.department_id:
                 self.requiring_body_id = self.project_id.department_id
-            
-            # Set domain to only show project villages (user will select from dropdown)
-            if self.project_id.village_ids:
-                return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
-            else:
-                return {'domain': {'village_id': [('id', '=', False)]}}
-        else:
-            return {'domain': {'village_id': [('id', '=', False)]}}
     
     @api.onchange('village_id')
     def _onchange_village_id(self):
@@ -385,7 +388,7 @@ class Section4Notification(models.Model):
             return None
     
     def _validate_required_fields(self):
-        """Validate that all required fields are filled before generating PDF"""
+        """Validate that all required fields are filled before generating PDF or submitting"""
         self.ensure_one()
         missing_fields = []
         
@@ -423,9 +426,27 @@ class Section4Notification(models.Model):
         
         if missing_fields:
             raise ValidationError(
-                _('Please fill in all required fields before generating the notification:\n\n%s') %
+                _('Please fill in all required fields before submitting to collector:\n\n%s') %
                 '\n'.join(['- ' + field for field in missing_fields])
             )
+    
+    def action_submit(self):
+        """Override mixin method to validate required fields before submitting"""
+        self.ensure_one()
+        
+        # Validate all required fields are filled
+        self._validate_required_fields()
+        
+        # Call parent method from mixin (validates SDM signed file and permissions)
+        return super().action_submit()
+    
+    def _validate_state_to_submitted(self):
+        """Override mixin method to validate required fields before submitting via statusbar"""
+        # Call parent validation first (validates permissions and SDM signed file)
+        super()._validate_state_to_submitted()
+        
+        # Then validate all required fields are filled
+        self._validate_required_fields()
     
     def action_generate_pdf(self):
         """Generate Section 4 Notification PDF"""

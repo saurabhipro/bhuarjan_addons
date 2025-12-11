@@ -9,16 +9,45 @@ export class RoleBasedDashboard extends Component {
     
     setup() {
         this.action = useService("action");
+        this.orm = useService("orm");
         
-        // Redirect immediately without blocking - default to SDM dashboard
-        // Admin users will see admin dashboard via menu visibility rules
+        // Redirect immediately without blocking
         onMounted(async () => {
-            // Default to SDM dashboard for all users
-            // Admin users have a separate menu item that shows admin dashboard
-            await this.action.doAction({
-                type: "ir.actions.client",
-                tag: "bhuarjan.sdm_dashboard_tag",
-            });
+            try {
+                // Call server-side method to get the appropriate dashboard action
+                // This avoids client-side user service availability issues
+                const dashboardAction = await this.orm.call(
+                    "bhuarjan.dashboard",
+                    "get_role_based_dashboard_action",
+                    []
+                );
+                
+                if (dashboardAction && dashboardAction.tag) {
+                    // Use replaceStacked to replace current action and prevent breadcrumb issues
+                    await this.action.doAction(dashboardAction, {
+                        replaceStacked: true,
+                    });
+                } else {
+                    // Fallback to SDM dashboard if action is not returned
+                    await this.action.doAction({
+                        type: "ir.actions.client",
+                        tag: "bhuarjan.sdm_dashboard_tag",
+                        name: "SDM Dashboard",
+                    }, {
+                        replaceStacked: true,
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading dashboard:", error);
+                // Fallback to SDM dashboard on any error
+                await this.action.doAction({
+                    type: "ir.actions.client",
+                    tag: "bhuarjan.sdm_dashboard_tag",
+                    name: "SDM Dashboard",
+                }, {
+                    replaceStacked: true,
+                });
+            }
         });
     }
 }

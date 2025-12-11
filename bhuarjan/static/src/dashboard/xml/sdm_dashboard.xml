@@ -48,9 +48,6 @@
             <div t-if="!state.loading" class="o_dashboard_content">
                 <!-- Section Notifications -->
                 <div class="o_dashboard_section">
-                    <h3 class="o_section_title">
-                        <i class="fa fa-file-text"/> Section Notifications / धारा अधिसूचनाएं
-                    </h3>
                     <div class="o_stats_grid">
                         <!-- SIA Team Card (Menu Order: 1) -->
                         <div class="o_stat_card o_card_sia" t-on-click="() => this.openSectionList('bhu.sia.team')">
@@ -60,11 +57,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SIA Team</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.sia_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.sia_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.sia_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -76,11 +68,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Section 4</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section4_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section4_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section4_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -92,11 +79,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Expert Committee</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.expert_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.expert_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.expert_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -108,11 +90,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Section 11</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section11_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section11_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section11_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -124,11 +101,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Section 15</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section15_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section15_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section15_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -140,11 +112,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Section 19</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.section19_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.section19_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.section19_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -156,11 +123,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Draft Award</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_award_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.draft_award_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.draft_award_approved : 0"/></span>
-                                    <span><i class="fa fa-undo"/> <t t-esc="state.stats ? state.stats.draft_award_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
 
@@ -172,11 +134,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Surveys</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? state.stats.survey_submitted : 0"/></span>
-                                    <span><i class="fa fa-check-circle"/> <t t-esc="state.stats ? state.stats.survey_approved : 0"/></span>
-                                    <span><i class="fa fa-times-circle"/> <t t-esc="state.stats ? state.stats.survey_rejected : 0"/></span>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -185,7 +142,7 @@
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
                     <div class="o_section_title_with_legends">
-                        <h3 class="o_section_title">
+                        <h3 class="o_section_title" style="display: none;">
                             <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
                             <t t-if="state.selectedProjectName">
                                 <span class="text-muted" style="font-size: 0.8em; margin-left: 10px;">
@@ -230,6 +187,12 @@
                                         </span>
                                     </t>
                                 </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.survey_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.survey_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.approved_count : 0) : 0"/></span>
@@ -250,6 +213,12 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">(Sec 4) Create SIA Team</div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.sia_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.sia_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
+                                </div>
                                 <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
                             </div>
                             <div class="o_section_list_actions">
@@ -287,6 +256,12 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section4_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.section4_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
                                 </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.submitted_count : 0) : 0"/></span>
@@ -330,6 +305,12 @@
                                         </span>
                                     </t>
                                 </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.expert_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.expert_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.approved_count : 0) : 0"/></span>
@@ -371,6 +352,12 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section11_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.section11_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
                                 </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
@@ -414,6 +401,12 @@
                                         </span>
                                     </t>
                                 </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section15_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.section15_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.approved_count : 0) : 0"/></span>
@@ -456,6 +449,12 @@
                                         </span>
                                     </t>
                                 </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section19_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.section19_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
+                                </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.approved_count : 0) : 0"/></span>
@@ -497,6 +496,12 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                </div>
+                                <div class="o_completion_widget_list">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.draft_award_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_progress_bar_list">
+                                        <div class="o_progress_fill_list" t-att-style="'width: ' + (state.stats ? (state.stats.draft_award_completion_percent || 0) : 0) + '%'"></div>
+                                    </div>
                                 </div>
                                 <div class="o_section_list_count">
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.submitted_count : 0) : 0"/></span>

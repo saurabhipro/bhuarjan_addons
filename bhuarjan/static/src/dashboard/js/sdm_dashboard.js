@@ -114,9 +114,12 @@ export class OwlCrmDashboard extends Component {
                     expert_total: 0, expert_draft: 0, expert_submitted: 0, expert_approved: 0, expert_send_back: 0,
                     sia_total: 0, sia_draft: 0, sia_submitted: 0, sia_approved: 0, sia_send_back: 0,
                     survey_total: 0, survey_submitted: 0, survey_approved: 0, survey_rejected: 0,
-                    draft_award_total: 0, draft_award_submitted: 0, draft_award_approved: 0, draft_award_send_back: 0,
+                    draft_award_total: 0, draft_award_draft: 0, draft_award_generated: 0, draft_award_approved: 0,
                     section4_info: null, section11_info: null, section15_info: null, section19_info: null,
-                    expert_info: null, sia_info: null, survey_info: null, draft_award_info: null
+                    expert_info: null, sia_info: null, survey_info: null, draft_award_info: null,
+                    survey_completion_percent: 0, section4_completion_percent: 0, section11_completion_percent: 0,
+                    section15_completion_percent: 0, section19_completion_percent: 0, expert_completion_percent: 0,
+                    sia_completion_percent: 0, draft_award_completion_percent: 0
                 };
                 this.state.loading = false;
                 return;

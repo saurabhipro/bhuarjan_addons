@@ -30,7 +30,11 @@
         <field name="name">bhu.draft.award.form</field>
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
-            <form string="Draft Award / अवार्ड आदेश">
+            <form string="Draft Award / अवार्ड आदेश" edit="not (state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit))">
+                <field name="is_sdm" invisible="1"/>
+                <field name="is_collector" invisible="1"/>
+                <field name="can_sdm_edit" invisible="1"/>
+                <field name="can_collector_edit" invisible="1"/>
                 <header>
                     <button name="action_generate_pdf" string="Generate Draft Award" type="object" class="btn-primary" icon="fa-file-pdf"
                             invisible="state == 'signed'"/>
@@ -41,31 +45,33 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="project_id" required="1"/>
+                            <!-- SDM can edit in draft/generated, Collector can edit in generated, readonly when signed -->
+                            <field name="name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                            <field name="project_id" required="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="section19_notification_id" 
+                                   readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
                                    options="{'no_create_edit': True}"
                                    placeholder="Select Section 19 Notification to auto-populate land parcels"
                                    help="Select Section 19 Notification to auto-populate all land parcels from survey tables"
                                    domain="[('project_id', '=', project_id)]"/>
-                            <field name="village_id" required="1" readonly="section19_notification_id"
+                            <field name="village_id" required="1" readonly="section19_notification_id or state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
                                    options="{'no_create': True, 'no_open': True}" domain="village_domain"/>
-                            <field name="case_number"/>
-                            <field name="patwari_halka_number"/>
+                            <field name="case_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                            <field name="patwari_halka_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                         </group>
                         <group>
                             <field name="district_id" readonly="1"/>
                             <field name="tehsil_id" readonly="1"/>
-                            <field name="award_number"/>
-                            <field name="award_date"/>
+                            <field name="award_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                            <field name="award_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="total_land_area" readonly="1"/>
                             <field name="total_khasra_count" readonly="1"/>
                         </group>
                     </group>
                     
                     <group string="Applicant / आवेदक">
-                        <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..."/>
-                        <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..."/>
+                        <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                        <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                     </group>
                     
                     <group string="Respondents / अनावेदक (Auto-populated from Section 11)">
@@ -77,7 +83,7 @@
                         <strong>ℹ Information:</strong> Land parcels below are auto-populated from the selected Section 19 Notification. All survey details including status, location, and authorized officer information are included.
                     </div>
                     <group string="Land Parcels / भूमि खंड (Auto-populated from Section 19)">
-                        <field name="land_parcel_ids" nolabel="1">
+                        <field name="land_parcel_ids" nolabel="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)">
                             <list string="Land Parcels">
                                 <field name="khasra_number" string="Khasra Number"/>
                                 <field name="area_hectares" string="Area (Hectares)"/>
@@ -102,36 +108,36 @@
                         <page string="Publication Details / प्रकाशन विवरण">
                             <group>
                                 <group string="Section 11 Publication / धारा 11 प्रकाशन">
-                                    <field name="section11_gazette_date"/>
-                                    <field name="section11_gazette_part"/>
-                                    <field name="section11_gazette_page"/>
-                                    <field name="section11_newspaper_1_name"/>
-                                    <field name="section11_newspaper_1_date"/>
-                                    <field name="section11_newspaper_2_name"/>
-                                    <field name="section11_newspaper_2_date"/>
-                                    <field name="section11_munadi_date"/>
+                                    <field name="section11_gazette_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_gazette_part" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_gazette_page" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_newspaper_1_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_newspaper_1_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_newspaper_2_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_newspaper_2_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_munadi_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                                 </group>
                                 <group string="Section 19 Publication / धारा 19 प्रकाशन">
-                                    <field name="section19_gazette_date"/>
-                                    <field name="section19_gazette_part"/>
-                                    <field name="section19_gazette_page"/>
-                                    <field name="section19_newspaper_1_name"/>
-                                    <field name="section19_newspaper_1_date"/>
-                                    <field name="section19_newspaper_2_name"/>
-                                    <field name="section19_newspaper_2_date"/>
-                                    <field name="section19_munadi_date"/>
+                                    <field name="section19_gazette_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_gazette_part" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_gazette_page" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_newspaper_1_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_newspaper_1_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_newspaper_2_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_newspaper_2_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_munadi_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                                 </group>
                             </group>
                             <group string="Section 21 Details / धारा 21 विवरण">
-                                <field name="section21_notice_date"/>
-                                <field name="section21_hearing_date"/>
+                                <field name="section21_notice_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                <field name="section21_hearing_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             </group>
                         </page>
                         <page string="Compensation / मुआवजा">
                             <group>
                                 <field name="total_compensation_amount" readonly="1"/>
-                                <field name="compensation_amount_text" placeholder="Enter amount in words..."/>
-                                <field name="is_displacement_involved"/>
+                                <field name="compensation_amount_text" placeholder="Enter amount in words..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                <field name="is_displacement_involved" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             </group>
                         </page>
                         <page string="References / संदर्भ">
@@ -154,7 +160,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>
         </field>
     </record>

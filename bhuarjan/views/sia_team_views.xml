@@ -23,17 +23,15 @@
         <field name="name">bhu.sia.team.form</field>
         <field name="model">bhu.sia.team</field>
         <field name="arch" type="xml">
-            <form string="SIA Team / SIA टीम">
+            <form string="SIA Team / SIA टीम" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <header>
-                    <!-- File Upload Section for SDM -->
+                    <!-- File Upload Section for SDM (editable only in draft state) -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
                            invisible="state != 'draft'">
-                        
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
                                widget="binary"
                                placeholder="Upload Signed SIA Proposal"/>
-
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
                                 invisible="not sdm_signed_file"
@@ -41,7 +39,20 @@
                                 />
                     </group>
                     
-                    <!-- File Upload Section for Collector -->
+                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file or state == 'draft'">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="SDM Signed Proposal (Uploaded)"/>
+                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download SDM Signed Proposal"/>
+                    </group>
+                    
+                    <!-- File Upload Section for Collector (editable only in submitted state) -->
                     <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
                            invisible="state != 'submitted'">                        
                         <field name="collector_signed_file" filename="collector_signed_filename" 
@@ -50,31 +61,33 @@
                                placeholder="Upload SIA Approval Letter"/>
                     </group>
                     
-                    <!-- Download Button Group for SDM (visible only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                        <div class="btn-group" role="group">
-                            <button name="action_download_sia_file" string="Download SIA Proposal" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    title="Download SIA Proposal (Unsigned)"
-                                    />
-                            <!-- SDM Signed Download (when file exists) -->
-                            <button name="action_download_sdm_signed_file" string="SDM Signed Proposal" type="object" 
-                                    class="btn-primary" icon="fa-download"
-                                    invisible="not sdm_signed_file"
-                                    title="Download SDM Signed Proposal"
-                                    />
-                        </div>
+                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not collector_signed_file or state == 'draft'">
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                               nolabel="1"
+                               widget="binary"
+                               readonly="1"
+                               string="Collector Signed Approval (Uploaded)"/>
+                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download Collector Signed Approval"/>
                     </group>
                     
-                    <!-- Download Button for Collector (visible when submitted) - Only SDM Signed Proposal -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'submitted'">
-                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
-                                class="btn-primary" icon="fa-download"
-                                invisible="not sdm_signed_file"
-                                title="Download SDM Signed Proposal"
-                                />
+                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not sdm_signed_file and not collector_signed_file">
+                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
+                                class="btn-primary" icon="fa-file-pdf"
+                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
+                    </group>
+                    
+                    <!-- Download Unsigned PDF Button (visible in draft state) -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                           invisible="state != 'draft'">
+                        <button name="action_download_sia_file" string="Download SIA Proposal (Unsigned)" type="object" 
+                                class="btn-secondary" icon="fa-download"
+                                title="Download SIA Proposal (Unsigned)"/>
                     </group>
                     
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
@@ -116,11 +129,17 @@
                             <i class="fa fa-users" style="margin-right: 10px;"></i>SIA Team / SIA टीम
                         </h1>
                     </div>
+                    <field name="is_sdm" invisible="1"/>
+                    <field name="is_collector" invisible="1"/>
+                    <field name="can_sdm_edit" invisible="1"/>
+                    <field name="can_collector_edit" invisible="1"/>
+                    
                     <group col="2">
                         <group>
-                            <field name="project_id" required="1" readonly="state in ('submitted', 'approved', 'send_back')"/>
-                            <field name="requiring_body_id" required="1" options="{'no_open': True}"/>
-                            <field name="village_ids" widget="many2many_tags" readonly="1"
+                            <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->
+                            <field name="project_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            <field name="requiring_body_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_open': True}"/>
+                            <field name="village_ids" widget="many2many_tags" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    placeholder="Affected villages (auto-populated from project)..."
                                    options="{'no_create_edit': True}"
                                    context="{'default_project_id': project_id}" force_save="1"/>
@@ -138,21 +157,25 @@
                             <group col="2">
                                 <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
                                     <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select non-government social scientist..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
                                     <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select representatives of local bodies..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
                                     <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select resettlement expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
                                     <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
+                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select technical expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
@@ -161,6 +184,7 @@
                                 <field name="tehsildar_domain" invisible="1"/>
                                 
                                 <field name="tehsildar_id" nolabel="1"
+                                       readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                        placeholder="Select Tehsildar (Convener)..."
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
@@ -168,17 +192,22 @@
                     </notebook>
                         <group>
                             <div style="text-align:right; padding:2rem;">
+                                <!-- Submit button - only visible to SDM and Admin -->
                                 <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                     icon="fa-paper-plane"
-                                    invisible="not sdm_signed_file"
+                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                    invisible="not sdm_signed_file or state != 'draft'"
                                     confirm="Are you sure want to submit this record."
                                     />
 
-                                <button name="action_bottom_save" type="object" class="btn btn-primary">Save As Draft</button>
+                                <!-- Save As Draft button - only visible to SDM and Admin when in draft/send_back state -->
+                                <button name="action_bottom_save" type="object" class="btn btn-primary" 
+                                        groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                        invisible="state not in ('draft', 'send_back')">Save As Draft</button>
                             </div>
                         </group>
                 </sheet>
-                <chatter/>
+                <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>
         </field>
     </record>

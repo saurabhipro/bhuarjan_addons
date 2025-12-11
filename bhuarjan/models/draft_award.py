@@ -128,6 +128,35 @@ class DraftAward(models.Model):
         ('signed', 'Signed / हस्ताक्षरित'),
     ], string='Status / स्थिति', default='draft', tracking=True)
     
+    # Computed fields for edit permissions (similar to process workflow mixin)
+    is_sdm = fields.Boolean(string='Is SDM', compute='_compute_user_roles', store=False)
+    is_collector = fields.Boolean(string='Is Collector', compute='_compute_user_roles', store=False)
+    can_sdm_edit = fields.Boolean(string='Can SDM Edit', compute='_compute_edit_permissions', store=False,
+                                   help='SDM can edit when state is draft or generated, readonly when signed')
+    can_collector_edit = fields.Boolean(string='Can Collector Edit', compute='_compute_edit_permissions', store=False,
+                                        help='Collector can edit when state is generated, readonly when signed')
+    
+    @api.depends()
+    def _compute_user_roles(self):
+        """Compute if current user is SDM or Collector"""
+        current_user = self.env.user
+        is_sdm_user = current_user.has_group('bhuarjan.group_bhuarjan_sdm')
+        is_collector_user = current_user.has_group('bhuarjan.group_bhuarjan_collector')
+        
+        for record in self:
+            record.is_sdm = is_sdm_user
+            record.is_collector = is_collector_user
+    
+    @api.depends('state', 'is_sdm', 'is_collector')
+    def _compute_edit_permissions(self):
+        """Compute edit permissions based on state and user role"""
+        for record in self:
+            # SDM can edit when state is 'draft' or 'generated', readonly when 'signed'
+            record.can_sdm_edit = record.is_sdm and record.state in ('draft', 'generated')
+            
+            # Collector can edit when state is 'generated', readonly when 'signed'
+            record.can_collector_edit = record.is_collector and record.state == 'generated'
+    
     _sql_constraints = [
         ('unique_village_project', 'UNIQUE(village_id, project_id)', 
          'Only one Draft Award can be created per village per project! / प्रति ग्राम प्रति परियोजना केवल एक अवार्ड बनाया जा सकता है!')

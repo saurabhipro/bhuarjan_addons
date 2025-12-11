@@ -9,24 +9,24 @@
         <field name="action" ref="action_role_based_dashboard"/>
     </record>
     
-    <!-- Surveys menu - visible to Admin, System, SDM, and Department User (NOT Collector) -->
-    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
+    <!-- Surveys menu - visible to Admin, System, Patwari, SDM, and Department User (NOT Collector) -->
+    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_patwari,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
     <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2"/>
 
-    <!-- Master Data menu - visible only to Admin and System users (NOT Collector) -->
-    <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_land_type" name="Land Types" action="action_bhu_land_type" parent="menu_bhu_master" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_tree_master" name="Tree Master" action="action_bhu_tree_master" parent="menu_bhu_master" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_tehsil" name="Tehsils" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <!-- Master Data menu - visible to Admin, System, and District Administrator (NOT Collector, NOT Settings Master/Sequence Settings/Users for District Admin) -->
+    <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_land_type" name="Land Types" action="action_bhu_land_type" parent="menu_bhu_master" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_tree_master" name="Tree Master" action="action_bhu_tree_master" parent="menu_bhu_master" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_tehsil" name="Tehsils" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_app_version"
                   name="App Versions"
                   parent="menu_bhu_master"
@@ -34,7 +34,7 @@
                   sequence="16"
                   groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
-    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_landowner" name="Landowners" action="action_bhu_landowner" parent="menu_bhu_root" sequence="3"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     
     <!-- Process Menu -->
     <menuitem id="menu_bhu_process" name="Process" parent="menu_bhu_root" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
@@ -47,15 +47,16 @@
     <menuitem id="menu_sec21_draft_award" name="(Sec 21) Draft Awards" action="action_draft_award" parent="menu_bhu_process" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_process_report" name="Reports" action="action_process_report_wizard" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     
-    <!-- Payment Menu -->
-    <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <!-- Payment Menu - visible to Admin, System, and Banker -->
+    <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_banker"/>
+    <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_banker"/>
+    <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_banker"/>
     
     <!-- Document Vault Menu - Moved to Process -->
     <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault" parent="menu_bhu_process" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>   
-    <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <!-- Users Menu - visible to Admin, System, and Banker -->
+    <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_banker"/>
+    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_banker"/>
     <menuitem id="menu_sia_team_members" name="SIA Team Members" action="action_sia_team_member" parent="menu_bhu_users_maai_menu" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" /> <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
@@ -64,7 +65,8 @@
         <field name="name">Dashboard</field>
         <field name="tag">bhuarjan.sdm_dashboard_tag</field>
     </record>
-    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
+    <!-- SDM Dashboard - visible to SDM and Department User (NOT Administrator) -->
+    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
 
     <!-- Move Settings Master and Sequence Settings to General Settings section -->
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

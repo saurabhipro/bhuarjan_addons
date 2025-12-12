@@ -44,6 +44,7 @@
                             <field name="name"/>
                             <field name="code"/>
                             <field name="department_id"/>
+                            <field name="law_master_id" options="{'no_create': False}"/>
                             <field name="project_uuid" invisible="1"/>
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
                         </group>

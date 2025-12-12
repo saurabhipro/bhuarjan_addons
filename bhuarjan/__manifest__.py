@@ -79,6 +79,7 @@
         'views/rate_master_views.xml',
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
+        'views/law_master_views.xml',
         'views/photo_type_master_views.xml',
         'views/settings_master_views.xml',
         'views/channel_master_views.xml',

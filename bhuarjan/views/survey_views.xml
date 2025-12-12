@@ -5,25 +5,25 @@
         <field name="name">bhu.survey.list</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <list duplicate="0" string="Surveys / सर्वे" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc" create="not groups='bhuarjan.group_bhuarjan_collector'">
-                <field name="name"/>
-                <field name="user_id"/>
-                <field name="project_id"/>
-                <field name="village_id"/>
-                <field name="tehsil_id"/>
-                <field name="khasra_number"/>
-                <field name="total_area"/>
-                <field name="acquired_area"/>
+            <list duplicate="0" string="Surveys" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc" create="0">
+                <field name="name" string="Survey Number"/>
+                <field name="user_id" string="User"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="tehsil_id" string="Tehsil"/>
+                <field name="khasra_number" string="Khasra Number"/>
+                <field name="total_area" string="Total Area (Hectares)"/>
+                <field name="acquired_area" string="Acquired Area"/>
                 <field name="landowner_count" string="Landowners"/>
-                <field name="survey_date"/>
+                <field name="survey_date" string="Survey Date"/>
                 <field name="pending_since" string="Pending Since" invisible="state != 'submitted'"/>
-                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved' or state == 'rejected'"/>
-                <field name="state" widget="badge" 
+                <field name="pending_with" string="Pending With" invisible="state == 'approved' or state == 'rejected'"/>
+                <field name="state" widget="badge" string="Status"
                        decoration-success="state == 'approved'"
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'submitted'"
                        decoration-danger="state == 'rejected'"/>
-                <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1"/>
+                <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" invisible="1"/>
                 
             </list>
         </field>
@@ -34,7 +34,7 @@
         <field name="name">bhu.survey.form</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="not groups='bhuarjan.group_bhuarjan_collector'" edit="not groups='bhuarjan.group_bhuarjan_collector' and not groups='bhuarjan.group_bhuarjan_sdm' and state != 'approved'">
+            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="0" edit="not groups='bhuarjan.group_bhuarjan_collector' and not groups='bhuarjan.group_bhuarjan_sdm' and state != 'approved'">
                 <header>
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" groups="!bhuarjan.group_bhuarjan_collector" confirm="Are you sure you want to submit this survey?"/>
                     <!-- Approve/Reject buttons: Only Department User and Admin can approve/reject surveys -->

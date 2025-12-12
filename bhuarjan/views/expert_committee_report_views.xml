@@ -127,6 +127,7 @@
                             <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Report / विशेषज्ञ समिति रिपोर्ट
                         </h1>
                     </div>
+                    
                     <group>
                         <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
                     </group>
@@ -175,6 +176,25 @@
                             <group string="Original Report / मूल रिपोर्ट">
                                 <field name="report_file" filename="report_filename" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                 <field name="report_filename" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Expert Group Report / विशेषज्ञ समूह रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                            <group>
+                                <group string="Upload Expert Group Report">
+                                    <field name="expert_group_report_file" filename="expert_group_report_filename" 
+                                           string="Upload Expert Group Report" 
+                                           widget="binary"
+                                           nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           placeholder="Upload Expert Group Report"/>
+                                    <field name="expert_group_report_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <group invisible="not expert_group_report_file">
+                                <button name="action_download_expert_group_report" string="Download Expert Group Report" type="object" 
+                                        class="btn-primary" icon="fa-download"
+                                        title="Download Expert Group Report"
+                                        groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
                             </group>
                         </page>
                         <page string="Project Villages / परियोजना ग्राम" invisible="not project_id">

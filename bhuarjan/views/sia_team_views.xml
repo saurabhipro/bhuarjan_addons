@@ -194,6 +194,25 @@
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
                         </page>
+                        <page string="SIA Team Report / SIA टीम रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                            <group>
+                                <group string="Upload SIA Team Report">
+                                    <field name="sia_team_report_file" filename="sia_team_report_filename" 
+                                           string="Upload SIA Team Report" 
+                                           widget="binary"
+                                           nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           placeholder="Upload SIA Team Report"/>
+                                    <field name="sia_team_report_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <group invisible="not sia_team_report_file">
+                                <button name="action_download_sia_team_report" string="Download SIA Team Report" type="object" 
+                                        class="btn-primary" icon="fa-download"
+                                        title="Download SIA Team Report"
+                                        groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
+                            </group>
+                        </page>
                     </notebook>
                         <group>
                             <div style="text-align:right; padding:2rem;">

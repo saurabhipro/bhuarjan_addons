@@ -67,6 +67,10 @@ class SiaTeam(models.Model):
     sia_file = fields.Binary(string='SIA File / SIA फ़ाइल')
     sia_filename = fields.Char(string='SIA Filename')
     
+    # SIA Team Report
+    sia_team_report_file = fields.Binary(string='SIA Team Report / SIA टीम रिपोर्ट')
+    sia_team_report_filename = fields.Char(string='SIA Team Report Filename')
+    
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
                                       compute='_compute_team_members', store=False)
@@ -303,6 +307,17 @@ class SiaTeam(models.Model):
         """Alias for action_download_unsigned_file - for backward compatibility with views"""
         return self.action_download_unsigned_file()
     
+    def action_download_sia_team_report(self):
+        """Download SIA Team Report file"""
+        self.ensure_one()
+        if not self.sia_team_report_file:
+            raise ValidationError(_('SIA Team Report file is not available.'))
+        filename = self.sia_team_report_filename or 'sia_team_report.pdf'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self._name}/{self.id}/sia_team_report_file/{filename}?download=true',
+            'target': 'self',
+        }
     
     def action_create_section4_notification(self):
         """Create Section 4 Notifications for all villages in this SIA Team"""

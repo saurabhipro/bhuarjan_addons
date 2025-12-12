@@ -138,6 +138,10 @@ class ExpertCommitteeReport(models.Model):
     report_file = fields.Binary(string='Report File / रिपोर्ट फ़ाइल')
     report_filename = fields.Char(string='File Name / फ़ाइल नाम')
     
+    # Expert Group Report
+    expert_group_report_file = fields.Binary(string='Expert Group Report / विशेषज्ञ समूह रिपोर्ट')
+    expert_group_report_filename = fields.Char(string='Expert Group Report Filename')
+    
     # Signed document fields (similar to Section 4 Notification)
     signed_document_file = fields.Binary(string='Signed Report / हस्ताक्षरित रिपोर्ट')
     signed_document_filename = fields.Char(string='Signed File Name / हस्ताक्षरित फ़ाइल नाम')
@@ -194,6 +198,18 @@ class ExpertCommitteeReport(models.Model):
         # TODO: Add report action reference when Expert Committee report template is created
         # For now, return error
         raise ValidationError(_('Expert Committee Report PDF generation is not yet implemented.'))
+    
+    def action_download_expert_group_report(self):
+        """Download Expert Group Report file"""
+        self.ensure_one()
+        if not self.expert_group_report_file:
+            raise ValidationError(_('Expert Group Report file is not available.'))
+        filename = self.expert_group_report_filename or 'expert_group_report.pdf'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self._name}/{self.id}/expert_group_report_file/{filename}?download=true',
+            'target': 'self',
+        }
     
     def action_create_section11_notification(self):
         """Create Section 11 Preliminary Report from this Expert Committee Report - Creates one per village"""

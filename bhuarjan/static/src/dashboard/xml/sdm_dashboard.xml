@@ -179,6 +179,9 @@
                     <div class="o_sections_list o_sections_list_grid">
                         <!-- Surveys -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.survey')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 1</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-clipboard"/>
                             </div>
@@ -213,6 +216,9 @@
 
                         <!-- SIA Team -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.sia.team')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 2</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-users"/>
                             </div>
@@ -250,6 +256,9 @@
 
                         <!-- Section 4 -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section4.notification')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 3</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bell"/>
                             </div>
@@ -298,6 +307,9 @@
 
                         <!-- Expert Committee -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.expert.committee.report')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 4</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-graduation-cap"/>
                             </div>
@@ -346,6 +358,9 @@
 
                         <!-- Section 11 -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section11.preliminary.report')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 5</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-text"/>
                             </div>
@@ -394,6 +409,9 @@
 
                         <!-- Section 15 -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section15.objection')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 6</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-exclamation-triangle"/>
                             </div>
@@ -442,6 +460,9 @@
 
                         <!-- Section 19 -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.section19.notification')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 7</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bullhorn"/>
                             </div>
@@ -490,6 +511,9 @@
 
                         <!-- Draft Award -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.draft.award')">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 8</span>
+                            </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-gavel"/>
                             </div>

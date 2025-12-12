@@ -98,14 +98,14 @@
     gap: 15px;
 }
 
-/* Status Legends - Positioned in header */
+/* Status Legends - Positioned in dashboard */
 .o_status_legends {
     display: flex;
     align-items: center;
-    flex-wrap: nowrap;
-    gap: 10px;
-    margin-right: 15px;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px 0;
+    justify-content: center;
 }
 
 .o_legend_title {
@@ -157,6 +157,12 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Dashboard Footer */
+.o_dashboard_footer {
+    margin-top: 20px;
+    padding-bottom: 20px;
+}
+
 .o_section_title {
     display: flex;
     align-items: center;
@@ -183,7 +189,7 @@
     align-items: center;
     padding: 8px;
     border-radius: 4px;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: relative;
@@ -195,11 +201,6 @@
     background-position: center;
     background-repeat: no-repeat;
     min-width: 0;
-}
-
-.o_stat_card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .o_stat_card > * {

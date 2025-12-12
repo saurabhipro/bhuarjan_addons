@@ -20,26 +20,6 @@
                     </h2>
                 </div>
                 <div class="o_dashboard_actions">
-                    <!-- Status Indicators -->
-                    <div class="o_status_legends">
-                        <span class="o_legend_title">Status Indicators:</span>
-                        <div class="o_legend_item">
-                            <i class="fa fa-file-o o_legend_icon_draft"/>
-                            <span class="o_legend_label">Draft</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                            <span class="o_legend_label">Submitted</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-check-circle o_legend_icon_approved"/>
-                            <span class="o_legend_label">Approved</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                            <span class="o_legend_label">Returned</span>
-                        </div>
-                    </div>
                     <!-- Department Selector -->
                     <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange">
                         <option value="">Select Department</option>
@@ -75,7 +55,7 @@
                 <div class="o_dashboard_section">
                     <div class="o_stats_grid">
                         <!-- SIA Team Card (Menu Order: 1) -->
-                        <div class="o_stat_card o_card_sia" t-on-click="() => this.openSectionList('bhu.sia.team')">
+                        <div class="o_stat_card o_card_sia">
                             <div class="o_stat_icon">
                                 <i class="fa fa-users"/>
                             </div>
@@ -86,7 +66,7 @@
                         </div>
 
                         <!-- Section 4 Card (Menu Order: 2) -->
-                        <div class="o_stat_card o_card_section4" t-on-click="() => this.openSectionList('bhu.section4.notification')">
+                        <div class="o_stat_card o_card_section4">
                             <div class="o_stat_icon">
                                 <i class="fa fa-bell"/>
                             </div>
@@ -97,7 +77,7 @@
                         </div>
 
                         <!-- Expert Committee Card (Menu Order: 3) -->
-                        <div class="o_stat_card o_card_expert_committee" t-on-click="() => this.openSectionList('bhu.expert.committee.report')">
+                        <div class="o_stat_card o_card_expert_committee">
                             <div class="o_stat_icon">
                                 <i class="fa fa-graduation-cap"/>
                             </div>
@@ -108,7 +88,7 @@
                         </div>
 
                         <!-- Section 11 Card (Menu Order: 4) -->
-                        <div class="o_stat_card o_card_section11" t-on-click="() => this.openSectionList('bhu.section11.preliminary.report')">
+                        <div class="o_stat_card o_card_section11">
                             <div class="o_stat_icon">
                                 <i class="fa fa-file-text"/>
                             </div>
@@ -119,7 +99,7 @@
                         </div>
 
                         <!-- Section 15 Card (Menu Order: 5) -->
-                        <div class="o_stat_card o_card_section15" t-on-click="() => this.openSectionList('bhu.section15.objection')">
+                        <div class="o_stat_card o_card_section15">
                             <div class="o_stat_icon">
                                 <i class="fa fa-exclamation-triangle"/>
                             </div>
@@ -130,7 +110,7 @@
                         </div>
 
                         <!-- Section 19 Card (Menu Order: 6) -->
-                        <div class="o_stat_card o_card_section19" t-on-click="() => this.openSectionList('bhu.section19.notification')">
+                        <div class="o_stat_card o_card_section19">
                             <div class="o_stat_icon">
                                 <i class="fa fa-bullhorn"/>
                             </div>
@@ -141,7 +121,7 @@
                         </div>
 
                         <!-- Draft Award Card (Menu Order: 7) -->
-                        <div class="o_stat_card o_card_draft_award" t-on-click="() => this.openSectionList('bhu.draft.award')">
+                        <div class="o_stat_card o_card_draft_award">
                             <div class="o_stat_icon">
                                 <i class="fa fa-gavel"/>
                             </div>
@@ -152,7 +132,7 @@
                         </div>
 
                         <!-- Surveys Card (Menu Order: 8) -->
-                        <div class="o_stat_card o_card_survey" t-on-click="() => this.openSectionList('bhu.survey')">
+                        <div class="o_stat_card o_card_survey">
                             <div class="o_stat_icon">
                                 <i class="fa fa-clipboard"/>
                             </div>
@@ -536,6 +516,31 @@
                                     <i class="fa fa-times"/> Return
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer with Status Indicators -->
+            <div t-if="!state.loading" class="o_dashboard_footer">
+                <div class="o_dashboard_section">
+                    <div class="o_status_legends">
+                        <span class="o_legend_title">Status Indicators:</span>
+                        <div class="o_legend_item">
+                            <i class="fa fa-file-o o_legend_icon_draft"/>
+                            <span class="o_legend_label">Draft</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                            <span class="o_legend_label">Submitted</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-check-circle o_legend_icon_approved"/>
+                            <span class="o_legend_label">Approved</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                            <span class="o_legend_label">Returned</span>
                         </div>
                     </div>
                 </div>

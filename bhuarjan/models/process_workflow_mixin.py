@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from datetime import datetime
 
 
 class ProcessWorkflowMixin(models.AbstractModel):
@@ -16,6 +17,23 @@ class ProcessWorkflowMixin(models.AbstractModel):
         ('approved', 'Approved / अनुमोदित'),
         ('send_back', 'Sent Back / वापस भेजा गया'),
     ], string='Status / स्थिति', default='draft', tracking=True)
+    
+    # Date tracking
+    submitted_date = fields.Datetime(string='Submitted Date / प्रस्तुत दिनांक', 
+                                     readonly=True, tracking=True,
+                                     help='Date when record was submitted to Collector')
+    approved_date = fields.Datetime(string='Approved Date / अनुमोदित दिनांक', 
+                                   readonly=True, tracking=True,
+                                   help='Date when record was approved by Collector')
+    
+    # Days pending approval
+    days_pending_approval = fields.Integer(string='Days Pending / लंबित दिन',
+                                          compute='_compute_days_pending', store=False,
+                                          help='Number of days record has been pending approval')
+    
+    # Pending with field - shows who the document is currently pending with (name + department + days)
+    pending_with = fields.Char(string='Pending With / लंबित', compute='_compute_pending_with', store=False,
+                                help='Shows who the document is currently pending with (name, department, and days pending)')
 
     # SDM signed file
     sdm_signed_file = fields.Binary(string='SDM Signed Document / SDM हस्ताक्षरित दस्तावेज़', 
@@ -82,6 +100,12 @@ class ProcessWorkflowMixin(models.AbstractModel):
                         # Fallback: validate basic transition rules
                         record._validate_state_transition(old_state, new_state)
                     
+                    # Track dates when state changes
+                    if new_state == 'submitted' and not record.submitted_date:
+                        vals['submitted_date'] = fields.Datetime.now()
+                    elif new_state == 'approved' and not record.approved_date:
+                        vals['approved_date'] = fields.Datetime.now()
+                    
                     # If validation passes, post message
                     record._post_state_change_message(old_state, new_state)
         
@@ -130,6 +154,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
             raise ValidationError(_('Please upload the SDM signed document before submitting.'))
         
         self.state = 'submitted'
+        self.submitted_date = fields.Datetime.now()
         self.message_post(body=_('Submitted for Collector approval by %s') % self.env.user.name)
     
     def action_approve(self):
@@ -150,6 +175,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
             raise ValidationError(_('Only submitted records can be approved.'))
         
         self.state = 'approved'
+        self.approved_date = fields.Datetime.now()
         self.message_post(body=_('Approved by %s') % self.env.user.name)
     
     def action_send_back(self):
@@ -263,6 +289,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
             if not self.sdm_signed_file:
                 raise ValidationError(_('Please upload the SDM signed document before submitting.'))
             self.state = 'submitted'
+            self.submitted_date = fields.Datetime.now()
             self.message_post(body=_('Status changed to Submitted by %s') % self.env.user.name)
         elif self.state == 'submitted':
             # Already in submitted state
@@ -283,6 +310,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
             if not self.collector_signed_file:
                 raise ValidationError(_('Please upload the Collector signed document before approving.'))
             self.state = 'approved'
+            self.approved_date = fields.Datetime.now()
             self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
         elif self.state == 'approved':
             # Already in approved state
@@ -348,4 +376,74 @@ class ProcessWorkflowMixin(models.AbstractModel):
             return self.action_download_sdm_signed_file()
         else:
             return self.action_download_unsigned_file()
+    
+    @api.depends('state', 'submitted_date')
+    def _compute_days_pending(self):
+        """Compute number of days pending approval"""
+        for record in self:
+            if record.state == 'submitted' and record.submitted_date:
+                now = fields.Datetime.now()
+                delta = now - record.submitted_date
+                record.days_pending_approval = delta.days
+            else:
+                record.days_pending_approval = 0
+    
+    @api.depends('state', 'project_id', 'submitted_date', 'days_pending_approval')
+    def _compute_pending_with(self):
+        """Compute who the document is currently pending with (name + department + days)"""
+        for record in self:
+            if record.state == 'approved':
+                # Hide when approved
+                record.pending_with = ''
+            elif record.state == 'submitted':
+                # Pending with Collector - get collector name and department
+                collector_users = self.env['res.users'].search([
+                    ('groups_id', 'in', self.env.ref('bhuarjan.group_bhuarjan_collector').id)
+                ], limit=1)
+                if collector_users:
+                    collector = collector_users[0]
+                    collector_name = collector.name or 'Collector'
+                    # Get department from user's company or project
+                    department_name = ''
+                    if hasattr(record, 'project_id') and record.project_id and record.project_id.department_id:
+                        department_name = record.project_id.department_id.name or ''
+                    elif collector.company_id:
+                        # Try to get department from company
+                        department_name = collector.company_id.name or ''
+                    
+                    days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                    if department_name:
+                        record.pending_with = _('Collector: %s (%s)%s') % (collector_name, department_name, days_text)
+                    else:
+                        record.pending_with = _('Collector: %s%s') % (collector_name, days_text)
+                else:
+                    days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                    record.pending_with = _('Collector / कलेक्टर%s') % days_text
+            elif record.state in ('draft', 'send_back'):
+                # Pending with SDM - get SDM name and department from project
+                if hasattr(record, 'project_id') and record.project_id and record.project_id.sdm_ids:
+                    sdm_users = record.project_id.sdm_ids
+                    sdm_names = []
+                    department_name = ''
+                    if record.project_id.department_id:
+                        department_name = record.project_id.department_id.name or ''
+                    
+                    for sdm in sdm_users:
+                        sdm_names.append(sdm.name or 'SDM')
+                    
+                    if sdm_names:
+                        names_str = ', '.join(sdm_names)
+                        days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                        if department_name:
+                            record.pending_with = _('SDM: %s (%s)%s') % (names_str, department_name, days_text)
+                        else:
+                            record.pending_with = _('SDM: %s%s') % (names_str, days_text)
+                    else:
+                        days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                        record.pending_with = _('SDM / उप-विभागीय मजिस्ट्रेट%s') % days_text
+                else:
+                    days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                    record.pending_with = _('SDM / उप-विभागीय मजिस्ट्रेट%s') % days_text
+            else:
+                record.pending_with = ''
 

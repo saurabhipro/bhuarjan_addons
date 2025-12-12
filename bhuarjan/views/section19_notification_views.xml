@@ -12,6 +12,7 @@
                 <field name="khasra_numbers"/>
                 <field name="khasra_count"/>
                 <field name="state" widget="badge" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
             </list>
@@ -118,6 +119,9 @@
                             <i class="fa fa-bullhorn" style="margin-right: 10px;"></i>Section 19 Notification / धारा 19 अधिसूचना
                         </h1>
                     </div>
+                    <group>
+                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="state == 'approved'"/>
+                    </group>
                     <group>
                         <group>
                             <field name="project_id" required="1" 

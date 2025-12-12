@@ -35,6 +35,7 @@
                 <field name="objection_type"/>
                 <field name="objection_date"/>
                 <field name="age_days"/>
+                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
                 <field name="state" widget="badge" 
                        decoration-danger="state == 'send_back'"
                        decoration-warning="state == 'draft'"
@@ -145,6 +146,9 @@
                             <i class="fa fa-exclamation-triangle" style="margin-right: 10px;"></i>Section 15 Objection / धारा 15 आपत्ति
                         </h1>
                     </div>
+                    <group>
+                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="state == 'approved'"/>
+                    </group>
                     <group>
                         <group>
                             <field name="name" required="1"/>

@@ -17,6 +17,7 @@
                 <field name="landowner_count" string="Landowners"/>
                 <field name="survey_date"/>
                 <field name="pending_since" string="Pending Since" invisible="state != 'submitted'"/>
+                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved' or state == 'rejected'"/>
                 <field name="state" widget="badge" 
                        decoration-success="state == 'approved'"
                        decoration-info="state == 'draft'"
@@ -57,6 +58,9 @@
                         <strong>अधिसूचना 4 जेनरेट:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है। कोई और संशोधन की अनुमति नहीं है।
                     </div>
                     
+                    <group>
+                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="state == 'approved' or state == 'rejected'"/>
+                    </group>
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
                             <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>

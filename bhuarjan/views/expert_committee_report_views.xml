@@ -13,6 +13,7 @@
                        decoration-info="state == 'submitted'" 
                        decoration-warning="state == 'draft'"
                        decoration-danger="state == 'send_back'"/>
+                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
                 <field name="has_signed_document" widget="boolean_toggle"/>
                 <field name="signed_date"/>
                 <field name="signatory_name"/>
@@ -125,6 +126,9 @@
                             <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Report / विशेषज्ञ समिति रिपोर्ट
                         </h1>
                     </div>
+                    <group>
+                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="state == 'approved'"/>
+                    </group>
                     <group col="2">
                         <group>
                             <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->

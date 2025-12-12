@@ -134,6 +134,15 @@ class Survey(models.Model):
     pending_since = fields.Char(string='Pending Since / लंबित', compute='_compute_pending_since', store=False,
                                 help='How long the survey has been pending for approval')
     
+    # Days pending approval
+    days_pending_approval = fields.Integer(string='Days Pending / लंबित दिन',
+                                          compute='_compute_days_pending_survey', store=False,
+                                          help='Number of days survey has been pending approval')
+    
+    # Pending with field - shows who the survey is currently pending with (name + department + days)
+    pending_with = fields.Char(string='Pending With / लंबित', compute='_compute_pending_with_survey', store=False,
+                                help='Shows who the survey is currently pending with (name, department, and days pending)')
+    
     @api.depends('landowner_ids')
     def _compute_landowner_count(self):
         """Compute the count of landowners"""
@@ -181,6 +190,68 @@ class Survey(models.Model):
         is_collector = self.env.user.has_group('bhuarjan.group_bhuarjan_collector')
         for record in self:
             record.is_collector_readonly = is_collector
+    
+    @api.depends('state', 'submitted_date')
+    def _compute_days_pending_survey(self):
+        """Compute number of days pending approval"""
+        for record in self:
+            if record.state == 'submitted' and record.submitted_date:
+                now = fields.Datetime.now()
+                submitted = record.submitted_date
+                # Ensure submitted is naive datetime
+                if submitted.tzinfo is not None:
+                    submitted = submitted.replace(tzinfo=None)
+                delta = now - submitted
+                record.days_pending_approval = delta.days
+            else:
+                record.days_pending_approval = 0
+    
+    @api.depends('state', 'project_id', 'submitted_date', 'days_pending_approval', 'department_id')
+    def _compute_pending_with_survey(self):
+        """Compute who the survey is currently pending with (name + department + days)"""
+        for record in self:
+            if record.state == 'approved' or record.state == 'rejected':
+                # Hide when approved or rejected
+                record.pending_with = ''
+            elif record.state == 'submitted':
+                # Pending with Department User - get names from project
+                if record.project_id and record.project_id.department_user_ids:
+                    dept_users = record.project_id.department_user_ids
+                    dept_user_names = dept_users.mapped('name')
+                    department_name = record.department_id.name if record.department_id else ''
+                    
+                    days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                    
+                    if dept_user_names:
+                        names_str = ', '.join(dept_user_names)
+                        if department_name:
+                            record.pending_with = _('Department User: %s (%s)%s') % (names_str, department_name, days_text)
+                        else:
+                            record.pending_with = _('Department User: %s%s') % (names_str, days_text)
+                    else:
+                        if department_name:
+                            record.pending_with = _('Department User / विभाग उपयोगकर्ता (%s)%s') % (department_name, days_text)
+                        else:
+                            record.pending_with = _('Department User / विभाग उपयोगकर्ता%s') % days_text
+                else:
+                    department_name = record.department_id.name if record.department_id else ''
+                    days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                    if department_name:
+                        record.pending_with = _('Department User / विभाग उपयोगकर्ता (%s)%s') % (department_name, days_text)
+                    else:
+                        record.pending_with = _('Department User / विभाग उपयोगकर्ता%s') % days_text
+            elif record.state == 'draft':
+                # Pending with Patwari (creator)
+                patwari_name = record.user_id.name if record.user_id else 'Patwari'
+                department_name = record.department_id.name if record.department_id else ''
+                days_text = f" ({record.days_pending_approval} day{'s' if record.days_pending_approval != 1 else ''})" if record.days_pending_approval > 0 else ""
+                
+                if department_name:
+                    record.pending_with = _('Patwari: %s (%s)%s') % (patwari_name, department_name, days_text)
+                else:
+                    record.pending_with = _('Patwari: %s%s') % (patwari_name, days_text)
+            else:
+                record.pending_with = ''
     
     # Computed fields for Form 10 report
     is_single_crop = fields.Boolean(string='Is Single Crop', compute='_compute_crop_fields', store=False)

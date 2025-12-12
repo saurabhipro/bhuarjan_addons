@@ -264,6 +264,7 @@ export class OwlCrmDashboard extends Component {
         }
         this.action.doAction({
             type: "ir.actions.act_window",
+            name: this.getSectionName(sectionModel),
             res_model: sectionModel,
             view_mode: "list,form",
             views: [[false, "list"], [false, "form"]],
@@ -277,11 +278,12 @@ export class OwlCrmDashboard extends Component {
         const sectionNames = {
             'bhu.survey': 'Surveys',
             'bhu.sia.team': 'SIA Team',
-            'bhu.section4.notification': 'Section 4 Notification',
-            'bhu.expert.committee.report': 'Expert Group Report',
+            'bhu.section4.notification': 'Section 4 Notifications',
+            'bhu.expert.committee.report': 'Expert Group Reports',
             'bhu.section11.preliminary.report': 'Section 11 Notifications',
-            'bhu.section15.objection': 'Section 15 Objection',
-            'bhu.section19.notification': 'Section 19 Notification',
+            'bhu.section15.objection': 'Section 15 Objections',
+            'bhu.section19.notification': 'Section 19 Notifications',
+            'bhu.draft.award': 'Sec 21 notice',
         };
         return sectionNames[sectionModel] || 'Document';
     }

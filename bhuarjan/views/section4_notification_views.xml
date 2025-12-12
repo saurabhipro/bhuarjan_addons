@@ -7,20 +7,19 @@
         <field name="arch" type="xml">
             <list string="Section 4 Notifications" delete="1" create="not groups='bhuarjan.group_bhuarjan_collector'">
                 <field name="notification_seq_number" string="Notification Sequence Number"/>
-                <field name="requiring_body_id"/>
-                <field name="project_id"/>
-                <field name="tehsil_id"/>
-                <field name="village_id"/>
+                <field name="requiring_body_id" string="Requiring Body"/>
+                <field name="project_id" string="Project"/>
+                <field name="tehsil_id" string="Tehsil"/>
+                <field name="village_id" string="Village"/>
                 <field name="area_captured_from_form10" string="Area from Form 10"/>
-                <field name="public_hearing_datetime"/>
-                <field name="state" widget="badge" 
+                <field name="public_hearing_datetime" string="Public Hearing Date &amp; Time"/>
+                <field name="state" widget="badge" string="Status"
                        decoration-success="state == 'approved'" 
                        decoration-info="state == 'submitted'" 
                        decoration-warning="state == 'draft'"
                        decoration-danger="state == 'send_back'"/>
-                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
-                <field name="has_signed_document" widget="boolean_toggle"/>
-                <field name="signed_date"/>
+                <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
+                <field name="signed_date" string="Signed Date"/>
             </list>
         </field>
     </record>

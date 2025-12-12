@@ -5,22 +5,21 @@
         <field name="name">bhu.draft.award.list</field>
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
-            <list string="Draft Awards / अवार्ड आदेश" delete="1">
-                <field name="name"/>
-                <field name="award_number"/>
-                <field name="project_id"/>
-                <field name="village_id"/>
-                <field name="case_number"/>
-                <field name="award_date"/>
-                <field name="total_land_area"/>
-                <field name="total_khasra_count"/>
-                <field name="total_compensation_amount"/>
-                <field name="state" widget="badge" 
+            <list string="Sec 21 notice" delete="1">
+                <field name="name" string="Award Name"/>
+                <field name="award_number" string="Award Number"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="case_number" string="Case Number"/>
+                <field name="award_date" string="Award Date"/>
+                <field name="total_land_area" string="Total Land Area"/>
+                <field name="total_khasra_count" string="Total Khasra Count"/>
+                <field name="total_compensation_amount" string="Total Compensation Amount"/>
+                <field name="state" widget="badge" string="Status"
                        decoration-success="state == 'signed'"
                        decoration-info="state == 'generated'"
                        decoration-muted="state == 'draft'"/>
-                <field name="has_signed_document" widget="boolean_toggle"/>
-                <field name="signed_date"/>
+                <field name="signed_date" string="Signed Date"/>
             </list>
         </field>
     </record>
@@ -189,7 +188,7 @@
 
     <!-- Draft Award Action -->
     <record id="action_draft_award" model="ir.actions.act_window">
-        <field name="name">Draft Awards / अवार्ड आदेश</field>
+        <field name="name">Sec 21 notice</field>
         <field name="res_model">bhu.draft.award</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">

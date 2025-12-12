@@ -5,18 +5,17 @@
         <field name="name">bhu.expert.committee.report.list</field>
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
-            <list string="Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट" create="not groups='bhuarjan.group_bhuarjan_collector'">
-                <field name="name"/>
-                <field name="project_id"/>
-                <field name="state" widget="badge" 
+            <list string="Expert Group Reports" create="not groups='bhuarjan.group_bhuarjan_collector'">
+                <field name="name" string="Report Name"/>
+                <field name="project_id" string="Project"/>
+                <field name="state" widget="badge" string="Status"
                        decoration-success="state == 'approved'" 
                        decoration-info="state == 'submitted'" 
                        decoration-warning="state == 'draft'"
                        decoration-danger="state == 'send_back'"/>
-                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
-                <field name="has_signed_document" widget="boolean_toggle"/>
-                <field name="signed_date"/>
-                <field name="signatory_name"/>
+                <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
+                <field name="signed_date" string="Signed Date"/>
+                <field name="signatory_name" string="Signatory Name"/>
             </list>
         </field>
     </record>
@@ -219,7 +218,7 @@
 
     <!-- Expert Committee Report Action -->
     <record id="action_expert_committee_report" model="ir.actions.act_window">
-        <field name="name">Expert Committee Reports / विशेषज्ञ समिति रिपोर्ट</field>
+        <field name="name">Expert Group Reports</field>
         <field name="res_model">bhu.expert.committee.report</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_my_reports': 1}</field>

@@ -25,18 +25,18 @@
         <field name="name">bhu.section15.objection.list</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <list string="Objections / आपत्तियां">
-                <field name="name"/>
-                <field name="project_id"/>
-                <field name="village_id"/>
-                <field name="landowner_id"/>
-                <field name="survey_id"/>
-                <field name="survey_khasra_number"/>
-                <field name="objection_type"/>
-                <field name="objection_date"/>
-                <field name="age_days"/>
-                <field name="pending_with" string="Pending With / लंबित" invisible="state == 'approved'"/>
-                <field name="state" widget="badge" 
+            <list string="Section 15 Objections">
+                <field name="name" string="Objection Name"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="landowner_id" string="Landowner"/>
+                <field name="survey_id" string="Survey"/>
+                <field name="survey_khasra_number" string="Survey Khasra Number"/>
+                <field name="objection_type" string="Objection Type"/>
+                <field name="objection_date" string="Objection Date"/>
+                <field name="age_days" string="Age (Days)"/>
+                <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
+                <field name="state" widget="badge" string="Status"
                        decoration-danger="state == 'send_back'"
                        decoration-warning="state == 'draft'"
                        decoration-info="state == 'submitted'"
@@ -317,7 +317,7 @@
 
     <!-- Update Section 15 Objection Action -->
     <record id="action_section15_objections" model="ir.actions.act_window">
-        <field name="name">Section 15 Objections / धारा 15 आपत्तियां</field>
+        <field name="name">Section 15 Objections</field>
         <field name="res_model">bhu.section15.objection</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_section15_objection_search"/>

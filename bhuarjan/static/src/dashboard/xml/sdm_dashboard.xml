@@ -214,7 +214,12 @@
                                 <div class="o_section_list_title">(Sec 4) Create SIA Team</div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.sia_completion_percent || 0) : 0"/>% Complete</div>
-                                    <div class="o_section_list_count">Total: <t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.submitted_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.approved_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.send_back_count : 0) : 0"/></span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">

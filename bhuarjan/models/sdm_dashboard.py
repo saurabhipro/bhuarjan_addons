@@ -214,6 +214,7 @@ class BhuDashboard(models.Model):
                 first_document = records[0] if records else False
                 return {
                     'total': total,
+                    'draft_count': len(draft),
                     'submitted_count': len(submitted),
                     'approved_count': len(approved),
                     'rejected_count': len(rejected),

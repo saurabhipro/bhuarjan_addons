@@ -120,13 +120,13 @@
                             </div>
                         </div>
 
-                        <!-- Draft Award Card (Menu Order: 7) -->
+                        <!-- Sec 21 notice Card (Menu Order: 7) -->
                         <div class="o_stat_card o_card_draft_award">
                             <div class="o_stat_icon">
                                 <i class="fa fa-gavel"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Draft Award</div>
+                                <div class="o_stat_label">Sec 21 notice</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_award_total : 0"/></div>
                             </div>
                         </div>
@@ -332,9 +332,9 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    (Sec 11) Section 11 Preliminary Reports
+                                    Section 11 Notifications
                                     <t t-if="state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.is_completed">
-                                        <span class="o_completion_tick" title="All Section 11 Reports completed">
+                                        <span class="o_completion_tick" title="All Section 11 Notifications completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
@@ -469,7 +469,7 @@
                             </div>
                         </div>
 
-                        <!-- Draft Award -->
+                        <!-- Sec 21 notice -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.draft.award')">
                             <div class="o_section_list_step">
                                 <span class="o_step_number">Step 8</span>
@@ -479,9 +479,9 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    (Sec 21) Draft Awards
+                                    Sec 21 notice
                                     <t t-if="state.stats &amp;&amp; state.stats.draft_award_info &amp;&amp; state.stats.draft_award_info.is_completed">
-                                        <span class="o_completion_tick" title="All Draft Awards completed">
+                                        <span class="o_completion_tick" title="All Sec 21 notice completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>

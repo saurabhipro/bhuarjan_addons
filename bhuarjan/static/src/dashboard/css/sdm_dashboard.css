@@ -535,13 +535,13 @@
     display: flex;
     align-items: stretch;
     padding: 10px 12px;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
+    border: 1px solid #E8DCC6;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     gap: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
     min-height: 60px;
     height: auto;
     overflow: hidden;
@@ -585,9 +585,9 @@
 }
 
 .o_section_list_item:hover {
-    background: #f8f9fa;
-    border-color: #8B4513;
-    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.15);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 50%, #FDF5E6 100%);
+    border-color: #D4C4B0;
+    box-shadow: 0 3px 12px rgba(139, 69, 19, 0.12);
     transform: translateY(-2px);
 }
 
@@ -615,7 +615,7 @@
 
 .o_section_list_count {
     font-size: 11px;
-    color: #6c757d;
+    color: #495057;
     display: flex;
     gap: 6px;
     flex-wrap: wrap;

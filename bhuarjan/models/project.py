@@ -91,6 +91,13 @@ class BhuProject(models.Model):
         # Get current user
         user = self.env.user
         
+        # Allow public users to access all projects if they have access rights
+        # This is needed for API endpoints that use auth='public' with sudo()
+        if user.has_group('base.group_public') and not user.has_group('base.group_user'):
+            # Public user - check if they have access rights, if so, allow access to all projects
+            # The access rights check will happen at the ORM level, so we don't filter here
+            return super()._search(args, offset=offset, limit=limit, order=order)
+        
         # Admin, system users, and collectors see all projects - no filtering needed
         if not (user.has_group('bhuarjan.group_bhuarjan_admin') or 
                 user.has_group('base.group_system') or

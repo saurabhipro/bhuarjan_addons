@@ -20,6 +20,26 @@
                     </h2>
                 </div>
                 <div class="o_dashboard_actions">
+                    <!-- Status Indicators -->
+                    <div class="o_status_legends">
+                        <span class="o_legend_title">Status Indicators:</span>
+                        <div class="o_legend_item">
+                            <i class="fa fa-file-o o_legend_icon_draft"/>
+                            <span class="o_legend_label">Draft</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                            <span class="o_legend_label">Submitted</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-check-circle o_legend_icon_approved"/>
+                            <span class="o_legend_label">Approved</span>
+                        </div>
+                        <div class="o_legend_item">
+                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                            <span class="o_legend_label">Returned</span>
+                        </div>
+                    </div>
                     <!-- Department Selector -->
                     <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange">
                         <option value="">Select Department</option>
@@ -146,36 +166,6 @@
 
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
-                    <div class="o_section_title_with_legends">
-                        <h3 class="o_section_title" style="display: none;">
-                            <i class="fa fa-list"/> All Sections List View / सभी धाराओं की सूची
-                            <t t-if="state.selectedProjectName">
-                                <span class="text-muted" style="font-size: 0.8em; margin-left: 10px;">
-                                    - <t t-esc="state.selectedProjectName"/>
-                                </span>
-                            </t>
-                        </h3>
-                        <!-- Status Indicators - Positioned on the right on same line as heading -->
-                        <div class="o_status_legends">
-                            <span class="o_legend_title">Status Indicators:</span>
-                            <div class="o_legend_item">
-                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                                <span class="o_legend_label">Submitted</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-check-circle o_legend_icon_approved"/>
-                                <span class="o_legend_label">Approved</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-undo o_legend_icon_sendback"/>
-                                <span class="o_legend_label">Send Back</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                <span class="o_legend_label">Returned</span>
-                            </div>
-                        </div>
-                    </div>
                     <div class="o_sections_list o_sections_list_grid">
                         <!-- Surveys -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.survey')">
@@ -202,6 +192,7 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.approved_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.rejected_count : 0) : 0"/></span>
@@ -278,9 +269,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
@@ -329,9 +321,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
@@ -380,9 +373,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
@@ -431,9 +425,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
@@ -482,9 +477,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
@@ -533,9 +529,10 @@
                                     </div>
                                 </div>
                                 <div class="o_section_list_count">
+                                    <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.draft_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.submitted_count : 0) : 0"/></span>
                                     <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.approved_count : 0) : 0"/></span>
-                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-undo"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.send_back_count : 0) : 0"/></span>
+                                    <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.send_back_count : 0) : 0"/></span>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">

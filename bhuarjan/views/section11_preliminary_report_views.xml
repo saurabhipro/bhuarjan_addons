@@ -29,6 +29,8 @@
             <form string="Section 11 Preliminary Report" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
+                <field name="is_admin" invisible="1"/>
+                <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
@@ -126,8 +128,10 @@
                     <group col="2">
                         <group>
                             <field name="project_id" required="1" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    options="{'no_create_edit': True}"/>
                             <field name="village_id" required="1"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    options="{'no_create_edit': True, 'no_quick_create': True}"
                                    context="{'default_project_id': project_id}"
                                    placeholder="Select one village..."
@@ -143,45 +147,55 @@
                             <group>
                                 <group string="Paragraph 2: Claims/Objections Information / धारा 2: दावे/आपत्तियों की जानकारी">
                                     <field name="paragraph_2_claims_info" widget="text" nolabel="1" 
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Information about claims/objections submission (60 days deadline)"/>
                                 </group>
                                 <group string="Paragraph 3: Land Map Inspection / धारा 3: भूमि मानचित्र निरीक्षण">
                                     <field name="paragraph_3_map_inspection_location" 
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Location where land map can be inspected (SDO Revenue office)"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(छः) धारा 12 द्वारा प्राधिकृत अधिकारी / Officer authorized by Section 12">
                                     <field name="question_6_authorized_officer" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter officer name / अधिकारी का नाम दर्ज करें"/>
                                 </group>
                                 <group string="(सात) सार्वजनिक प्रयोजन का विवरण / Description of public purpose">
                                     <field name="question_7_public_purpose" widget="text" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter description / विवरण दर्ज करें"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(आठ) कितने परिवारों का विस्थापन निहित है। / How many families are displaced?">
-                                    <field name="paragraph_4_is_displacement" nolabel="1"/>
+                                    <field name="paragraph_4_is_displacement" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                     <field name="paragraph_4_affected_families_count" 
                                            invisible="not paragraph_4_is_displacement"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            string="Number of Families / परिवारों की संख्या"/>
                                 </group>
                                 <group string="(दस) पुनर्वास प्रशासक / Rehabilitation Administrator">
                                     <field name="paragraph_6_rehab_admin_name" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter name/designation / नाम/पदनाम दर्ज करें"/>
                                 </group>
                             </group>
                             <group string="(नौ) क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय &quot;दो&quot; एवं &quot;तीन&quot; के प्रावधानों से छूट प्रदान की गई है। / Has exemption been granted from the provisions of Chapters &quot;Two&quot; and &quot;Three&quot; of the Act 2013 for the proposed project?">
-                                <field name="paragraph_5_is_exemption" nolabel="1"/>
+                                <field name="paragraph_5_is_exemption" nolabel="1"
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                 <group string="Exemption Details / छूट विवरण" 
                                        invisible="not paragraph_5_is_exemption">
                                     <field name="paragraph_5_exemption_details" widget="text" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter exemption details / छूट विवरण दर्ज करें"/>
                                 </group>
                                 <group string="SIA Justification / SIA औचित्य" 
                                        invisible="paragraph_5_is_exemption">
                                     <field name="paragraph_5_sia_justification" widget="text" nolabel="1"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter SIA justification / SIA औचित्य दर्ज करें"/>
                                 </group>
                             </group>

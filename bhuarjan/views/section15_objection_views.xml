@@ -53,6 +53,8 @@
             <form string="Objection / आपत्ति" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
+                <field name="is_admin" invisible="1"/>
+                <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
@@ -151,19 +153,25 @@
                     </group>
                     <group>
                         <group>
-                            <field name="name" required="1"/>
-                            <field name="project_id" required="1"/>
-                            <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="name" required="1"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            <field name="project_id" required="1"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="filtered_landowner_ids" invisible="1"/>
                             <field name="landowner_id" required="1" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    domain="[('id', 'in', filtered_landowner_ids)]"/>
                             <field name="filtered_survey_ids" invisible="1"/>
                             <field name="survey_id" options="{'no_create': True, 'no_open': True}" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    context="{'show_khasra': True}"
                                    domain="[('id', 'in', filtered_survey_ids)]"/>
                         </group>
                         <group>
-                            <field name="objection_date" required="1"/>
+                            <field name="objection_date" required="1"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="resolved_date" readonly="1"/>
                         </group>
                     </group>
@@ -211,16 +219,19 @@
                                             <i class="fa fa-exclamation-triangle" style="color: #f39c12; margin-right: 8px;"/>
                                             Objection Type / आपत्ति प्रकार
                                         </label>
-                                        <field name="objection_type" required="1"/>
+                                        <field name="objection_type" required="1"
+                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                     </div>
-                                    <field name="new_area" invisible="objection_type != 'area_increase'">
+                                    <field name="new_area" invisible="objection_type != 'area_increase'"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)">
                                         <label for="new_area" string=""/>
                                         <div style="margin-bottom: 5px;">
                                             <i class="fa fa-area-chart" style="color: #7c7bad; margin-right: 8px;"/>
                                             <span>Expected New Area (Hectares) / अपेक्षित नया क्षेत्रफल (हेक्टेयर)</span>
                                         </div>
                                     </field>
-                                    <field name="new_rate" invisible="objection_type != 'rate_increase'">
+                                    <field name="new_rate" invisible="objection_type != 'rate_increase'"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)">
                                         <label for="new_rate" string=""/>
                                         <div style="margin-bottom: 5px;">
                                             <i class="fa fa-rupee" style="color: #7c7bad; margin-right: 8px;"/>
@@ -229,6 +240,7 @@
                                     </field>
                                     <field name="other_specific_details" 
                                            invisible="objection_type == 'area_increase' or objection_type == 'rate_increase'"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Enter specific details (e.g., tree count, boundary description, etc.)...">
                                         <label for="other_specific_details" string=""/>
                                         <div style="margin-bottom: 5px;">
@@ -243,7 +255,8 @@
                                     <i class="fa fa-comment-o" style="color: #7c7bad; margin-right: 8px; font-size: 16px;"/>
                                     <span style="font-weight: bold; font-size: 14px;">Objection Details / आपत्ति विवरण</span>
                                 </div>
-                                <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"/>
+                                <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             </group>
                             <group>
                                 <div style="margin-bottom: 10px;">
@@ -251,7 +264,8 @@
                                     <span style="font-weight: bold; font-size: 14px;">Objection Document / आपत्ति दस्तावेज़</span>
                                 </div>
                                 <field name="objection_document_filename" invisible="1"/>
-                                <field name="objection_document" filename="objection_document_filename" 
+                                <field name="objection_document" filename="objection_document_filename"
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" 
                                        widget="binary" 
                                        options="{'filename': 'objection_document_filename'}"
                                        placeholder="Upload a PDF, image, or other document related to this objection..."/>

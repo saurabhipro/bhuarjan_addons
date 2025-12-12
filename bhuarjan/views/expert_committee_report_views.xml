@@ -117,6 +117,8 @@
                 </header>
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
+                <field name="is_admin" invisible="1"/>
+                <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 
@@ -132,10 +134,10 @@
                     <group col="2">
                         <group>
                             <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->
-                            <field name="project_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_create_edit': True}"/>
-                            <field name="requiring_body_id" required="1" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            <field name="project_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_create_edit': True}"/>
+                            <field name="requiring_body_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="village_ids" widget="many2many_tags" 
-                                   readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    placeholder="Select affected villages..."
                                    options="{'no_create_edit': True}"/>
                         </group>
@@ -148,31 +150,31 @@
                             <group col="2">
                                 <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
                                     <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select non-government social scientist..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ख) Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि">
                                     <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select representatives of local bodies..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ">
                                     <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select resettlement expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
                                     <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                            placeholder="Select technical expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                             </group>
                             <group string="Original Report / मूल रिपोर्ट">
-                                <field name="report_file" filename="report_filename" readonly="state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                <field name="report_file" filename="report_filename" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                 <field name="report_filename" invisible="1"/>
                             </group>
                         </page>

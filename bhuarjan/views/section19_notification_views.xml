@@ -27,6 +27,8 @@
             <form string="Section 19 Notification" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
+                <field name="is_admin" invisible="1"/>
+                <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
@@ -125,8 +127,10 @@
                     <group>
                         <group>
                             <field name="project_id" required="1" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    options="{'no_create': True, 'no_open': True}"/>
                             <field name="village_id" required="1" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
                                    placeholder="Select village from project..."/>
                         </group>
@@ -138,6 +142,7 @@
                     
                     <group string="Public Purpose / लोक प्रयोजन">
                         <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
+                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                widget="html" nolabel="1"/>
                     </group>
                     

@@ -48,6 +48,10 @@ class ProcessWorkflowMixin(models.AbstractModel):
     # Computed fields for edit permissions
     is_sdm = fields.Boolean(string='Is SDM', compute='_compute_user_roles', store=False)
     is_collector = fields.Boolean(string='Is Collector', compute='_compute_user_roles', store=False)
+    is_admin = fields.Boolean(string='Is Admin', compute='_compute_user_roles', store=False,
+                              help='True if user is administrator or system user')
+    is_approved_readonly = fields.Boolean(string='Is Approved Readonly', compute='_compute_approved_readonly', store=False,
+                                          help='True when record is approved and should be readonly (except for admin)')
     can_sdm_edit = fields.Boolean(string='Can SDM Edit', compute='_compute_edit_permissions', store=False,
                                    help='SDM can edit when state is draft or send_back, readonly when approved')
     can_collector_edit = fields.Boolean(string='Can Collector Edit', compute='_compute_edit_permissions', store=False,
@@ -55,14 +59,23 @@ class ProcessWorkflowMixin(models.AbstractModel):
     
     @api.depends()
     def _compute_user_roles(self):
-        """Compute if current user is SDM or Collector"""
+        """Compute if current user is SDM, Collector, or Admin"""
         current_user = self.env.user
         is_sdm_user = current_user.has_group('bhuarjan.group_bhuarjan_sdm')
         is_collector_user = current_user.has_group('bhuarjan.group_bhuarjan_collector')
+        is_admin_user = current_user.has_group('bhuarjan.group_bhuarjan_admin') or current_user.has_group('base.group_system')
         
         for record in self:
             record.is_sdm = is_sdm_user
             record.is_collector = is_collector_user
+            record.is_admin = is_admin_user
+    
+    @api.depends('state', 'is_admin')
+    def _compute_approved_readonly(self):
+        """Compute if record should be readonly when approved (except for admin)"""
+        for record in self:
+            # Record is readonly when approved, unless user is admin
+            record.is_approved_readonly = record.state == 'approved' and not record.is_admin
     
     @api.depends('state', 'is_sdm', 'is_collector')
     def _compute_edit_permissions(self):

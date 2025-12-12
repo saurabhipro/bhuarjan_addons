@@ -34,7 +34,7 @@
         <field name="name">bhu.survey.form</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="not groups='bhuarjan.group_bhuarjan_collector'" edit="not groups='bhuarjan.group_bhuarjan_collector'">
+            <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="not groups='bhuarjan.group_bhuarjan_collector'" edit="not groups='bhuarjan.group_bhuarjan_collector' and not groups='bhuarjan.group_bhuarjan_sdm' and state != 'approved'">
                 <header>
                     <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn-primary" invisible="state != 'draft'" groups="!bhuarjan.group_bhuarjan_collector" confirm="Are you sure you want to submit this survey?"/>
                     <!-- Approve/Reject buttons: Only Department User and Admin can approve/reject surveys -->
@@ -45,6 +45,7 @@
                     <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>
                 <sheet>
+                    <field name="is_approved_readonly" invisible="1"/>
                     <!-- <div class="oe_title" style="margin-bottom: 10px;">
                         <h1 style="margin-bottom: 5px;">
                             <field name="name" placeholder="Survey Number / सर्वे नंबर" required="1" invisible="1"/>
@@ -63,16 +64,16 @@
                     </group>
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
-                            <field name="project_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
-                            <field name="department_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Department * / विभाग *"/>
-                            <field name="survey_date" widget="date" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
+                            <field name="project_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
+                            <field name="department_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Department * / विभाग *"/>
+                            <field name="survey_date" widget="date" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>
                         <group string="Location Information / स्थान की जानकारी" class="survey-icon-location">
-                            <field name="company_id" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="District"/>
-                            <field name="village_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Village * / ग्राम का नाम *"/>
-                            <field name="tehsil_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Tehsil * / तहसील *"/>
-                            <field name="district_name" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                            <field name="user_id" readonly="is_collector_readonly"/>
+                            <field name="company_id" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="District"/>
+                            <field name="village_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Village * / ग्राम का नाम *"/>
+                            <field name="tehsil_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Tehsil * / तहसील *"/>
+                            <field name="district_name" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                            <field name="user_id" readonly="is_collector_readonly or is_approved_readonly"/>
                             <field name="is_collector_readonly" invisible="1"/>
                         </group>
                     </group>
@@ -83,40 +84,40 @@
                         <page string="Survey / सर्वे" name="survey_details">
                             <group>
                                 <group string="Land Information / भूमि की जानकारी" class="survey-icon-land">
-                                    <field name="khasra_number" widget="char" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Khasra Number * / खसरा नंबर *"/>
-                                    <field name="total_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="acquired_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
-                                    <field name="has_traded_land" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
-                                    <field name="traded_land_area" widget="float" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" 
+                                    <field name="khasra_number" widget="char" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Khasra Number * / खसरा नंबर *"/>
+                                    <field name="total_area" widget="float" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="acquired_area" widget="float" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" string="Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)"/>
+                                    <field name="has_traded_land" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="traded_land_area" widget="float" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" 
                                            invisible="has_traded_land != 'yes'" required="has_traded_land == 'yes'"/>
                                 </group>
                                 <group string="Crop Information / फसल की जानकारी" class="survey-icon-crop">
-                                    <field name="crop_type_id" widget="selection" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
-                                    <field name="irrigation_type" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="crop_type_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'no_create_edit': True}" string="Crop Type / फसल का प्रकार"/>
+                                    <field name="irrigation_type" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="House Information / घर की जानकारी" class="survey-icon-house">
-                                    <field name="has_house" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
-                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="has_shed" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
-                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_house" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="house_type" widget="selection" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="house_area" widget="float" invisible="has_house != 'yes'" required="has_house == 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_shed" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="shed_area" widget="float" invisible="has_shed != 'yes'" required="has_shed == 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
                                 </group>
                             </group>
                             
                             <group>
                                 <group string="Infrastructure / बुनियादी सुविधाएं" class="survey-icon-infrastructure">
-                                    <field name="has_well" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
-                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="has_tubewell" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
-                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
-                                    <field name="has_pond" widget="radio" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="has_well" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="well_type" widget="selection" invisible="has_well != 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="well_count" invisible="has_well != 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_tubewell" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
+                                    <field name="tubewell_count" invisible="has_tubewell != 'yes'" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
+                                    <field name="has_pond" widget="radio" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" options="{'horizontal': true}"/>
                                 </group>
                                 <group string="Remarks / टिप्पणी" class="survey-icon-remarks">
-                                    <field name="remarks" placeholder="Enter any additional notes" readonly="is_collector_readonly"/>
+                                    <field name="remarks" placeholder="Enter any additional notes" readonly="is_collector_readonly or is_approved_readonly"/>
                                 </group>
                             </group>
                             
@@ -126,7 +127,7 @@
                             <group string="Landowners / भूमिस्वामी" class="survey-icon-landowners" style="margin-top: 10px;">
                                 <field name="landowner_ids" widget="many2many_tags" options="{'no_create': False, 'no_create_edit': False}" 
                                        context="{'default_company_id': company_id, 'default_village_id': village_id, 'default_tehsil_id': tehsil_id}"
-                                       readonly="is_collector_readonly"/>
+                                       readonly="is_collector_readonly or is_approved_readonly"/>
                             </group>
                             
                             <group string="Landowner Details / भूमिस्वामी विवरण" style="margin-top: 20px;">
@@ -149,7 +150,7 @@
                         
                         <page string="Tree Details / वृक्ष विवरण" name="tree_details">
                             <group string="Trees / वृक्ष">
-                                <field name="tree_line_ids" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1" 
+                                <field name="tree_line_ids" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1" 
                                        context="{'default_development_stage': 'undeveloped'}">
                                         <list string="Trees / वृक्ष" editable="bottom">
                                             <field name="tree_master_id" options="{'no_create_edit': True}" required="1" string="Tree / वृक्ष" width="250"/>
@@ -165,7 +166,7 @@
                         
                         <page string="Photos / फोटो" name="survey_photos">
                             <group string="Survey Photos / सर्वे फोटो">
-                                <field name="photo_ids" readonly="is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1"/>
+                                <field name="photo_ids" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>

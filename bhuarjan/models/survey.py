@@ -143,6 +143,16 @@ class Survey(models.Model):
     pending_with = fields.Char(string='Pending With / लंबित', compute='_compute_pending_with_survey', store=False,
                                 help='Shows who the survey is currently pending with (name, department, and days pending)')
     
+    # Computed field to check if survey is approved (for readonly)
+    is_approved_readonly = fields.Boolean(string='Is Approved Readonly', compute='_compute_is_approved_readonly', store=False,
+                                          help='True when survey is approved, making it readonly')
+    
+    @api.depends('state')
+    def _compute_is_approved_readonly(self):
+        """Compute if survey is approved and should be readonly"""
+        for record in self:
+            record.is_approved_readonly = record.state == 'approved'
+    
     @api.depends('landowner_ids')
     def _compute_landowner_count(self):
         """Compute the count of landowners"""

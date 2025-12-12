@@ -1,5 +1,17 @@
 /* SDM Dashboard Styles - Reusing Admin Dashboard Styles */
 
+/* Ensure Font Awesome icons are visible */
+.fa, [class^="fa-"], [class*=" fa-"] {
+    font-family: "FontAwesome" !important;
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+}
+
 /* Import admin dashboard styles */
 .o_admin_dashboard {
     padding: 10px;
@@ -213,6 +225,22 @@
     margin-right: 8px;
     opacity: 1;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.o_stat_icon i,
+.o_stat_icon .fa {
+    font-family: "FontAwesome" !important;
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+    font-size: inherit;
 }
 
 .o_stat_content {
@@ -598,6 +626,21 @@
     text-align: center;
     flex-shrink: 0;
     opacity: 0.9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.o_section_list_icon i,
+.o_section_list_icon .fa {
+    font-family: "FontAwesome" !important;
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
 }
 
 .o_section_list_content {

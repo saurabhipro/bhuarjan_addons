@@ -23,7 +23,6 @@
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'submitted'"
                        decoration-danger="state == 'rejected'"/>
-                <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" invisible="1"/>
                 
             </list>
         </field>

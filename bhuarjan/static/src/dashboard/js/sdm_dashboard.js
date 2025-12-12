@@ -278,7 +278,7 @@ export class OwlCrmDashboard extends Component {
             'bhu.survey': 'Surveys',
             'bhu.sia.team': 'SIA Team',
             'bhu.section4.notification': 'Section 4 Notification',
-            'bhu.expert.committee.report': 'Expert Committee Report',
+            'bhu.expert.committee.report': 'Expert Group Report',
             'bhu.section11.preliminary.report': 'Section 11 Preliminary Report',
             'bhu.section15.objection': 'Section 15 Objection',
             'bhu.section19.notification': 'Section 19 Notification',

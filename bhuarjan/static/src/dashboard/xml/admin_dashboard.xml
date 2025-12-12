@@ -224,7 +224,7 @@
                     </div>
                 </div>
 
-                <!-- Process Statistics (Section 4, 11, 15, 19, Expert Committee, SIA) -->
+                <!-- Process Statistics (Section 4, 11, 15, 19, Expert Group, SIA) -->
                 <div class="o_dashboard_section">
                     <h3 class="o_section_title">
                         <i class="fa fa-file-text"/> PROCESS STATISTICS
@@ -286,11 +286,11 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Expert Committee -->
+                        <!-- Expert Group -->
                         <div class="o_stat_card o_card_expert_committee" t-on-click="() => this.openAction('action_open_expert_committee')">
                             <div class="o_stat_icon"><i class="fa fa-users"/></div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">EXPERT COMMITTEE</div>
+                                <div class="o_stat_label">EXPERT GROUP</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_committee_total : 0"/></div>
                                 <div class="o_stat_states">
                                     <span>D:<t t-esc="state.stats ? state.stats.expert_committee_draft : 0"/></span>

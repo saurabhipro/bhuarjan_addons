@@ -76,13 +76,13 @@
                             </div>
                         </div>
 
-                        <!-- Expert Committee Card (Menu Order: 3) -->
+                        <!-- Expert Group Card (Menu Order: 3) -->
                         <div class="o_stat_card o_card_expert_committee">
                             <div class="o_stat_icon">
                                 <i class="fa fa-graduation-cap"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Expert Committee</div>
+                                <div class="o_stat_label">Expert Group</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
                             </div>
                         </div>
@@ -273,7 +273,7 @@
                             </div>
                         </div>
 
-                        <!-- Expert Committee -->
+                        <!-- Expert Group -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.expert.committee.report')">
                             <div class="o_section_list_step">
                                 <span class="o_step_number">Step 4</span>
@@ -283,9 +283,9 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    (Sec 7) Expert Committee Reports
+                                    Expert Group
                                     <t t-if="state.stats &amp;&amp; state.stats.expert_info &amp;&amp; state.stats.expert_info.is_completed">
-                                        <span class="o_completion_tick" title="All Expert Committee Reports completed">
+                                        <span class="o_completion_tick" title="All Expert Group completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>

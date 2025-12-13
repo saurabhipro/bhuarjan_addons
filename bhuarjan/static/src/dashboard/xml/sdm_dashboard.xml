@@ -146,6 +146,28 @@
 
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
+                    <!-- Status Indicators in Parent Container -->
+                    <div class="o_section_status_indicators_container">
+                        <div class="o_status_legends">
+                            <span class="o_legend_title">Status:</span>
+                            <div class="o_legend_item">
+                                <i class="fa fa-file-o o_legend_icon_draft"/>
+                                <span class="o_legend_label">Draft</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                <span class="o_legend_label">Submitted</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                <span class="o_legend_label">Approved</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                <span class="o_legend_label">Returned</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="o_sections_list o_sections_list_grid">
                         <!-- Surveys -->
                         <div class="o_section_list_item" t-on-click="() => this.openSectionList('bhu.survey')">
@@ -521,30 +543,6 @@
                 </div>
             </div>
 
-            <!-- Footer with Status Indicators -->
-            <div t-if="!state.loading" class="o_dashboard_footer">
-                <div class="o_dashboard_section">
-                    <div class="o_status_legends">
-                        <span class="o_legend_title">Status Indicators:</span>
-                        <div class="o_legend_item">
-                            <i class="fa fa-file-o o_legend_icon_draft"/>
-                            <span class="o_legend_label">Draft</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                            <span class="o_legend_label">Submitted</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-check-circle o_legend_icon_approved"/>
-                            <span class="o_legend_label">Approved</span>
-                        </div>
-                        <div class="o_legend_item">
-                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                            <span class="o_legend_label">Returned</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 </div>
     </t>
 </templates>

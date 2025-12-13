@@ -110,14 +110,27 @@
     gap: 15px;
 }
 
-/* Status Legends - Positioned in dashboard */
+/* Status Indicators Container - Parent div for all cards */
+.o_section_status_indicators_container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+}
+
+/* Status Legends - Positioned in parent container */
 .o_status_legends {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
-    padding: 10px 0;
-    justify-content: center;
+    padding: 0;
+    justify-content: flex-end;
 }
 
 .o_legend_title {

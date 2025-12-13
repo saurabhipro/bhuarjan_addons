@@ -3,10 +3,46 @@
         <div class="o_admin_dashboard">
             <!-- Header with Role Title -->
             <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1.5px solid #8B4513;">
-                <div class="o_dashboard_title_section">
-                    <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                        <i class="fa fa-user-tie" style="margin-right: 10px;"/> Department User Dashboard
-                    </h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="o_dashboard_title_section">
+                        <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
+                            <i class="fa fa-user-tie" style="margin-right: 10px;"/> Department User Dashboard
+                            <t t-if="state.selectedProjectName">
+                                <span class="o_selected_project_inline">
+                                    <i class="fa fa-briefcase" style="margin-right: 8px;"/>
+                                    <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
+                                </span>
+                            </t>
+                        </h2>
+                    </div>
+                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: auto; margin-left: auto;">
+                        <!-- Department Display (Locked/Read-only) -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f5f5f5; padding: 8px 12px; border: 3px solid #8B4513; border-radius: 4px; min-width: 200px;">
+                            <i class="fa fa-lock" style="color: #8B4513;"/>
+                            <span style="color: #8B4513; font-weight: bold; flex: 1;">
+                                <t t-if="state.selectedDepartmentName">
+                                    <t t-esc="state.selectedDepartmentName"/>
+                                </t>
+                                <t t-if="!state.selectedDepartmentName">
+                                    <span style="color: #999;">No Department</span>
+                                </t>
+                            </span>
+                        </div>
+                        <!-- Project Selector -->
+                        <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
+                            <option value="">Project</option>
+                            <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                                <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>
+                            </t>
+                        </select>
+                        <!-- Village Selector -->
+                        <select class="form-select o_village_selector" t-att-value="this.toString(state.selectedVillage)" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
+                            <option value="">Village</option>
+                            <t t-foreach="state.villages" t-as="village" t-key="village.id">
+                                <option t-att-value="this.toString(village.id)"><t t-esc="village.name"/></option>
+                            </t>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -17,105 +53,97 @@
 
             <!-- Dashboard Content -->
             <div t-if="!state.loading" class="o_dashboard_content">
-                <!-- Survey Statistics Section -->
+                <!-- Survey Statistics Cards -->
                 <div class="o_dashboard_section">
-                    <h3 class="o_section_title" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <i class="fa fa-clipboard-list"/> SURVEY STATISTICS
-                    </h3>
-                    
-                    <!-- Survey Stats Cards -->
-                    <div class="o_stats_grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                        <!-- Total Surveys Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="openSurveyList">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Surveys</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_total || 0"/></div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-clipboard-list"/>
-                                </div>
+                    <div class="o_stats_grid">
+                        <!-- Surveys Card -->
+                        <div class="o_stat_card o_card_survey">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-clipboard"/>
                             </div>
-                        </div>
-
-                        <!-- Draft Surveys Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('draft')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Draft Surveys</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_draft || 0"/></div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-file-alt"/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submitted Surveys Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('submitted')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Submitted Surveys</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_submitted || 0"/></div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-paper-plane"/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Approved Surveys Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('approved')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Approved Surveys</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_approved || 0"/></div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-check-circle"/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rejected Surveys Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('rejected')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Rejected Surveys</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_rejected || 0"/></div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-times-circle"/>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Completion Percentage Card -->
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Completion Rate</div>
-                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_completion_percent || 0"/>%</div>
-                                </div>
-                                <div style="font-size: 48px; opacity: 0.3;">
-                                    <i class="fa fa-chart-pie"/>
-                                </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Surveys</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Quick Actions -->
-                    <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <h4 style="margin-bottom: 15px; color: #667eea;">
-                            <i class="fa fa-bolt"/> Quick Actions
-                        </h4>
-                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" t-on-click="openSurveyList" style="padding: 10px 20px; border-radius: 6px;">
-                                <i class="fa fa-list"/> View All Surveys
-                            </button>
-                            <button class="btn btn-info" t-on-click="() => this.openSurveysByState('submitted')" style="padding: 10px 20px; border-radius: 6px;">
-                                <i class="fa fa-paper-plane"/> Pending Approval
-                            </button>
+                <!-- List View Section - Only Surveys -->
+                <div class="o_dashboard_section">
+                    <div class="o_sections_list o_sections_list_grid">
+                        <!-- Surveys -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 1</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-clipboard"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    <i class="fa fa-clipboard" style="margin-right: 8px; color: #8B4513;"/>
+                                    Surveys / सर्वे
+                                    <t t-if="state.stats &amp;&amp; state.stats.survey_info &amp;&amp; state.stats.survey_info.is_completed">
+                                        <span class="o_completion_tick" title="All surveys completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.survey_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.submitted_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.approved_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.rejected_count : 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 12: Status Indicators -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step" style="display: none;">
+                                <span class="o_step_number">Step 12</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-info-circle"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Status Legend
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_section_list_count" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-file-o o_legend_icon_draft"/>
+                                            <span class="o_legend_label">Draft</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                            <span class="o_legend_label">Submitted</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                            <span class="o_legend_label">Approved</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                            <span class="o_legend_label">Returned</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <!-- No actions for status legend -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,4 +151,3 @@
         </div>
     </t>
 </templates>
-

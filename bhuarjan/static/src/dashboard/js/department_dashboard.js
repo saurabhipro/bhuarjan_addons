@@ -16,13 +16,14 @@ export class DepartmentDashboard extends Component {
         this.state = useState({
             loading: true,
             selectedDepartment: null,
+            selectedDepartmentName: null,
             selectedProject: null,
+            selectedProjectName: null,
             selectedVillage: null,
             departments: [],
             projects: [],
             villages: [],
             stats: {
-                // Survey counts - main focus for Department Users
                 survey_total: 0,
                 survey_draft: 0,
                 survey_submitted: 0,
@@ -36,12 +37,95 @@ export class DepartmentDashboard extends Component {
 
         onWillStart(async () => {
             try {
+                await this.loadInitialData();
                 await this.loadDashboardData();
             } catch (error) {
                 console.error("Error in onWillStart:", error);
                 this.state.loading = false;
             }
         });
+    }
+
+    async loadInitialData() {
+        try {
+            // Get user's locked department from project master
+            const userDepartment = await this.orm.call(
+                "bhuarjan.dashboard",
+                "get_department_user_department",
+                []
+            );
+
+            console.log("Department response from backend:", userDepartment);
+
+            if (userDepartment && userDepartment.id) {
+                this.state.selectedDepartment = userDepartment.id;
+                this.state.selectedDepartmentName = userDepartment.name;
+                this.state.departments = [{
+                    id: userDepartment.id,
+                    name: userDepartment.name
+                }];
+                console.log("Successfully loaded department:", {
+                    id: this.state.selectedDepartment,
+                    name: this.state.selectedDepartmentName
+                });
+            } else {
+                console.warn("No department found for user. Response:", userDepartment);
+                this.notification.add("No department assigned to your projects. Please contact administrator.", { 
+                    type: "warning",
+                    sticky: true
+                });
+            }
+
+            // Load mapped projects for the department
+            if (this.state.selectedDepartment) {
+                await this.loadProjects();
+            }
+        } catch (error) {
+            console.error("Error loading initial data:", error);
+            this.notification.add("Error loading department information: " + (error.message || error), { 
+                type: "danger",
+                sticky: true
+            });
+        }
+    }
+
+    async loadProjects() {
+        try {
+            const projects = await this.orm.call(
+                "bhuarjan.dashboard",
+                "get_department_user_projects",
+                [this.state.selectedDepartment]
+            );
+            this.state.projects = projects || [];
+            
+            // Auto-select first project if only one
+            if (this.state.projects.length === 1 && !this.state.selectedProject) {
+                this.state.selectedProject = this.state.projects[0].id;
+                this.state.selectedProjectName = this.state.projects[0].name;
+                await this.loadVillages();
+            }
+        } catch (error) {
+            console.error("Error loading projects:", error);
+            this.state.projects = [];
+        }
+    }
+
+    async loadVillages() {
+        try {
+            if (!this.state.selectedProject) {
+                this.state.villages = [];
+                return;
+            }
+            const villages = await this.orm.call(
+                "bhuarjan.dashboard",
+                "get_villages_by_project",
+                [this.state.selectedProject]
+            );
+            this.state.villages = villages || [];
+        } catch (error) {
+            console.error("Error loading villages:", error);
+            this.state.villages = [];
+        }
     }
 
     async loadDashboardData() {
@@ -58,7 +142,6 @@ export class DepartmentDashboard extends Component {
                 filters.village_id = parseInt(this.state.selectedVillage);
             }
             
-            // Use the same controller method but filter for department user view
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
@@ -66,7 +149,6 @@ export class DepartmentDashboard extends Component {
             );
 
             if (stats) {
-                // Only show survey-related stats for Department Users
                 this.state.stats = {
                     survey_total: stats.total_surveys || 0,
                     survey_draft: stats.draft_surveys || 0,
@@ -80,6 +162,7 @@ export class DepartmentDashboard extends Component {
                         submitted_count: stats.submitted_surveys || 0,
                         approved_count: stats.approved_surveys || 0,
                         rejected_count: stats.rejected_surveys || 0,
+                        is_completed: stats.survey_completion_percent === 100,
                     },
                 };
             }
@@ -92,26 +175,106 @@ export class DepartmentDashboard extends Component {
         }
     }
 
-    async openSurveyList() {
+    async onProjectChange(ev) {
+        const value = ev.target.value;
+        const projectId = value ? parseInt(value, 10) : null;
+        this.state.selectedProject = projectId;
+        
+        if (projectId) {
+            const project = this.state.projects.find(p => p.id === projectId);
+            this.state.selectedProjectName = project ? project.name : null;
+            await this.loadVillages();
+        } else {
+            this.state.selectedProjectName = null;
+            this.state.selectedVillage = null;
+            this.state.villages = [];
+        }
+        
+        await this.loadDashboardData();
+    }
+
+    async onVillageChange(ev) {
+        const value = ev.target.value;
+        const villageId = value ? parseInt(value, 10) : null;
+        this.state.selectedVillage = villageId;
+        await this.loadDashboardData();
+    }
+
+    toString(value) {
+        return value ? String(value) : "";
+    }
+
+    async openFirstDocument(model, info) {
+        try {
+            if (!info || !info.total || info.total === 0) {
+                await this.openSectionList(model);
+                return;
+            }
+
+            // Get the first record
+            const records = await this.orm.searchRead(
+                model,
+                this.getDomain(),
+                ["id"],
+                { limit: 1 }
+            );
+
+            if (records && records.length > 0) {
+                const domain = this.getDomain();
+                await this.action.doAction({
+                    type: 'ir.actions.act_window',
+                    name: 'Surveys',
+                    res_model: model,
+                    res_id: records[0].id,
+                    view_mode: 'form',
+                    views: [[false, 'form']],
+                    domain: domain,
+                    target: 'current',
+                    context: {
+                        'default_project_id': this.state.selectedProject || false,
+                        'default_village_id': this.state.selectedVillage || false,
+                    },
+                });
+            } else {
+                await this.openSectionList(model);
+            }
+        } catch (error) {
+            console.error("Error opening document:", error);
+            await this.openSectionList(model);
+        }
+    }
+
+    async openSectionList(model) {
+        const domain = this.getDomain();
         await this.action.doAction({
             type: 'ir.actions.act_window',
-            res_model: 'bhu.survey',
-            view_mode: 'list,form',
             name: 'Surveys',
+            res_model: model,
+            view_mode: 'list,form',
+            views: [[false, 'list'], [false, 'form']],
+            domain: domain,
+            target: 'current',
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
         });
     }
 
-    async openSurveysByState(state) {
-        await this.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'bhu.survey',
-            view_mode: 'list,form',
-            domain: [['state', '=', state]],
-            name: `Surveys - ${state.charAt(0).toUpperCase() + state.slice(1)}`,
-        });
+    getDomain() {
+        const domain = [];
+        if (this.state.selectedDepartment) {
+            domain.push(['department_id', '=', parseInt(this.state.selectedDepartment)]);
+        }
+        if (this.state.selectedProject) {
+            domain.push(['project_id', '=', parseInt(this.state.selectedProject)]);
+        }
+        if (this.state.selectedVillage) {
+            domain.push(['village_id', '=', parseInt(this.state.selectedVillage)]);
+        }
+        return domain;
     }
 }
 
 // Register the component
 registry.category("actions").add("bhuarjan.department_dashboard", DepartmentDashboard);
-

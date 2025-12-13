@@ -472,14 +472,14 @@
 @media (max-width: 1600px) {
     .o_stats_grid {
         grid-template-columns: repeat(8, minmax(0, 1fr));
-        gap: 3px;
+        gap: 12px;
     }
 }
 
 @media (max-width: 1200px) {
     .o_stats_grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+        gap: 12px;
     }
     
     .o_stat_card {
@@ -506,7 +506,7 @@
 @media (max-width: 992px) {
     .o_stats_grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+        gap: 12px;
     }
 }
 
@@ -534,7 +534,7 @@
     
     .o_stats_grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 10px;
     }
     
     .o_stat_card {

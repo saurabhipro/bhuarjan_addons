@@ -15,7 +15,7 @@
                             </t>
                         </h2>
                     </div>
-                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: 100%;">
+                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: auto; margin-left: auto;">
                         <!-- Department Selector -->
                         <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
                             <option value="">Select Department</option>
@@ -143,28 +143,6 @@
 
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
-                    <!-- Status Indicators in Parent Container -->
-                    <div class="o_section_status_indicators_container">
-                        <div class="o_status_legends">
-                            <span class="o_legend_title">Status:</span>
-                            <div class="o_legend_item">
-                                <i class="fa fa-file-o o_legend_icon_draft"/>
-                                <span class="o_legend_label">Draft</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                                <span class="o_legend_label">Submitted</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-check-circle o_legend_icon_approved"/>
-                                <span class="o_legend_label">Approved</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                <span class="o_legend_label">Returned</span>
-                            </div>
-                        </div>
-                    </div>
                     <div class="o_sections_list o_sections_list_grid">
                         <!-- Surveys -->
                         <div class="o_section_list_item o_card_no_click">
@@ -623,6 +601,45 @@
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 12: Status Indicators -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step" style="display: none;">
+                                <span class="o_step_number">Step 12</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-info-circle"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Status Legend
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_section_list_count" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-file-o o_legend_icon_draft"/>
+                                            <span class="o_legend_label">Draft</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                            <span class="o_legend_label">Submitted</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                            <span class="o_legend_label">Approved</span>
+                                        </div>
+                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                            <span class="o_legend_label">Returned</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <!-- No actions for status legend -->
                             </div>
                         </div>
                     </div>

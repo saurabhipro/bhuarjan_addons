@@ -14,7 +14,6 @@ export class RoleBasedDashboard extends Component {
         // Redirect immediately without blocking
         onMounted(async () => {
             try {
-                console.log("\n role base ")
                 // Call server-side method to get the appropriate dashboard action
                 // This avoids client-side user service availability issues
                 const dashboardAction = await this.orm.call(
@@ -22,8 +21,6 @@ export class RoleBasedDashboard extends Component {
                     "get_role_based_dashboard_action",
                     []
                 );
-                    console.log("\n\n dashboardAction - ", dashboardAction)
-                    console.log("\n\n dashboardAction - ", dashboardAction.tag)
 
                 if (dashboardAction && dashboardAction.tag) {
                     // Use replaceStacked to replace current action and prevent breadcrumb issues

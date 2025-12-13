@@ -1223,11 +1223,8 @@ class BhuarjanDashboard(models.TransientModel):
     def get_role_based_dashboard_action(self):
         """Return the appropriate dashboard action based on user role"""
         user = self.env.user
-
-        
         # Check user roles in priority order
         is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
-        print("\n\n  - ", user, is_admin)
         is_collector = user.has_group('bhuarjan.group_bhuarjan_collector') or user.has_group('bhuarjan.group_bhuarjan_additional_collector')
         is_department = user.has_group('bhuarjan.group_bhuarjan_department_user')
         is_sdm = user.has_group('bhuarjan.group_bhuarjan_sdm')
@@ -1267,7 +1264,6 @@ class BhuarjanDashboard(models.TransientModel):
         
         # Return a proper client action dictionary instead of reading the record
         # This avoids issues with action IDs that don't exist
-        print("\n\n tag - ", tag, name)
         return {
             'type': 'ir.actions.client',
             'tag': tag,

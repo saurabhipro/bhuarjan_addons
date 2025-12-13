@@ -81,6 +81,11 @@ class BhuProject(models.Model):
     law_master_id = fields.Many2one('bhu.law.master', string='Law', tracking=True,
                                     help='Select the law applicable to this project')
     
+    # SIA Exemption - If True, project is exempt from Social Impact Assessment
+    is_sia_exempt = fields.Boolean(string='SIA Exempt / सामाजिक समाघत अध्ययन से छूट', 
+                                   default=False, tracking=True,
+                                   help='If checked, this project is exempt from Social Impact Assessment. Section 4 and Expert Group will be disabled for this project.')
+    
     # Company field for multi-company support
     company_id = fields.Many2one('res.company', string='Company', required=True, 
                                 default=lambda self: self.env.company, tracking=True)

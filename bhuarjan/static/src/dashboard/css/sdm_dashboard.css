@@ -632,6 +632,18 @@
     transform: translateY(-2px);
 }
 
+/* Disable hover and cursor for non-clickable cards */
+.o_section_list_item.o_card_no_click {
+    cursor: default !important;
+}
+
+.o_section_list_item.o_card_no_click:hover {
+    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
+    border-color: #E8DCC6;
+    box-shadow: 0 1px 3px rgba(139, 69, 19, 0.08);
+    transform: none;
+}
+
 .o_section_list_icon {
     font-size: 20px;
     color: #8B4513;

@@ -20,16 +20,17 @@ export class OwlCrmDashboard extends Component {
         const savedProjectName = localStorage.getItem('sdm_dashboard_project_name');
         const savedVillage = localStorage.getItem('sdm_dashboard_village');
         
-        this.state = useState({
-            loading: true,
-            selectedDepartment: savedDepartment ? parseInt(savedDepartment, 10) : null,
-            selectedProject: savedProject ? parseInt(savedProject, 10) : null,
-            selectedProjectName: savedProjectName || null,
-            selectedVillage: savedVillage ? parseInt(savedVillage, 10) : null,
-            departments: [],
-            projects: [],
-            villages: [],
-            isCollector: false,
+            this.state = useState({
+                loading: true,
+                selectedDepartment: savedDepartment ? parseInt(savedDepartment, 10) : null,
+                selectedProject: savedProject ? parseInt(savedProject, 10) : null,
+                selectedProjectName: savedProjectName || null,
+                selectedVillage: savedVillage ? parseInt(savedVillage, 10) : null,
+                departments: [],
+                projects: [],
+                villages: [],
+                isCollector: false,
+                isProjectExempt: false,
             stats: {
                 section4_total: 0, section4_draft: 0, section4_submitted: 0, section4_approved: 0, section4_send_back: 0,
                 section11_total: 0, section11_draft: 0, section11_submitted: 0, section11_approved: 0, section11_send_back: 0,
@@ -136,6 +137,7 @@ export class OwlCrmDashboard extends Component {
             );
             this.state.stats = stats || this.state.stats;
             this.state.isCollector = stats ? (stats.is_collector || false) : false;
+            this.state.isProjectExempt = stats ? (stats.is_project_exempt || false) : false;
         } catch (error) {
             console.error("Error loading dashboard stats:", error);
         } finally {

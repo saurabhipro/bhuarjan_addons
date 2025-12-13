@@ -23,7 +23,8 @@ class Section4Notification(models.Model):
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
-                                  default=lambda self: self._default_project_id())
+                                  default=lambda self: self._default_project_id(),
+                                  domain="[('is_sia_exempt', '=', False)]")
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False, readonly=True)
@@ -216,6 +217,12 @@ class Section4Notification(models.Model):
         for vals in vals_list:
             project_id = vals.get('project_id')
             village_id = vals.get('village_id')
+            
+            # Check if project is SIA exempt
+            if project_id:
+                project = self.env['bhu.project'].browse(project_id)
+                if project.is_sia_exempt:
+                    raise ValidationError(_('Section 4 Notifications cannot be created for projects that are exempt from Social Impact Assessment.'))
             
             # Check for existing records to prevent UniqueViolation
             # Skip this check during data loading - let Odoo's mechanism handle it

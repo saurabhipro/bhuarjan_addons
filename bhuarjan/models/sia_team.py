@@ -28,6 +28,11 @@ class SiaTeam(models.Model):
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil_ids', store=False, readonly=True,
                                   help='Tehsils from the selected villages')
     
+    # SIA Exemption Checkbox
+    is_sia_exempt = fields.Boolean(string='कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?', 
+                                   default=False, tracking=True,
+                                   help='If checked, this project is exempt from Social Impact Assessment. This will disable Section 4 and Expert Group for this project.')
+    
     # SIA Team Members - 5 Sections
     # (क) Non-Government Social Scientist
     non_govt_social_scientist_ids = fields.Many2many('bhu.sia.team.member', 
@@ -243,8 +248,12 @@ class SiaTeam(models.Model):
     @api.constrains('non_govt_social_scientist_ids', 'local_bodies_representative_ids', 
                     'resettlement_expert_ids', 'technical_expert_ids', 'tehsildar_id')
     def _check_all_team_members_filled(self):
-        """Validate that all team member sections are filled"""
+        """Validate that all team member sections are filled - Skip if SIA is exempt"""
         for record in self:
+            # Skip validation if SIA is exempt
+            if record.is_sia_exempt:
+                continue
+            
             missing_fields = []
             
             if not record.non_govt_social_scientist_ids:
@@ -289,10 +298,120 @@ class SiaTeam(models.Model):
                 all_members |= record.tehsildar_id
             record.team_member_ids = all_members
     
+    @api.onchange('is_sia_exempt')
+    def _onchange_is_sia_exempt(self):
+        """Show confirmation when SIA exemption is checked and update project"""
+        if self.is_sia_exempt and self.project_id:
+            # Update project immediately when checkbox is checked
+            self.project_id.write({'is_sia_exempt': True})
+            # Show warning confirmation
+            return {
+                'warning': {
+                    'title': _('SIA Exemption Confirmation'),
+                    'message': _('This will disable Section 4 and Expert Group for this project. The project master has been updated. The SIA will be auto-approved when saved. Are you sure you want to continue?')
+                }
+            }
+        elif not self.is_sia_exempt and self.project_id:
+            # Update project when checkbox is unchecked
+            self.project_id.write({'is_sia_exempt': False})
+    
+    @api.model
+    def create(self, vals):
+        """Override create to set project exemption status and auto-approve if exempt"""
+        # If is_sia_exempt is True, auto-approve
+        if vals.get('is_sia_exempt') and vals.get('state', 'draft') == 'draft':
+            vals['state'] = 'approved'
+            vals['approved_date'] = fields.Datetime.now()
+        
+        record = super().create(vals)
+        
+        # Update project exemption status
+        if record.is_sia_exempt and record.project_id:
+            record.project_id.write({'is_sia_exempt': True})
+        
+        # Post message if auto-approved
+        if record.is_sia_exempt and record.state == 'approved':
+            record.message_post(
+                body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
+                message_type='notification'
+            )
+        
+        return record
+    
+    def _validate_state_transition(self, old_state, new_state):
+        """Override to allow direct transition from draft to approved when SIA is exempt"""
+        # Allow direct transition from draft to approved if SIA is exempt
+        if old_state == 'draft' and new_state == 'approved' and self.is_sia_exempt:
+            return  # Skip validation for exempt projects
+        # For all other cases, use parent validation
+        return super()._validate_state_transition(old_state, new_state)
+    
+    def _validate_state_to_approved(self):
+        """Override to allow direct approval from draft when SIA is exempt"""
+        # Allow direct approval from draft if SIA is exempt
+        # Check context flag first (set during write when exemption is being set)
+        if self.env.context.get('sia_exempt_auto_approve', False) and self.state == 'draft':
+            # Skip all validation for exempt projects (no collector check, no file check)
+            return
+        # Also check if already exempt (for cases where exemption was set earlier)
+        if getattr(self, 'is_sia_exempt', False) and self.state == 'draft':
+            # Skip all validation for exempt projects
+            return
+        # For all other cases, use parent validation
+        return super()._validate_state_to_approved()
+    
+    def write(self, vals):
+        """Override write to update project exemption status and auto-approve if exempt"""
+        # Check if is_sia_exempt is being set to True
+        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') and self.state == 'draft':
+            # Auto-approve when exemption is set to True in draft state
+            vals['state'] = 'approved'
+            vals['approved_date'] = fields.Datetime.now()
+            # Set context flag to bypass validation - DO NOT set field directly to avoid recursion
+            self = self.with_context(sia_exempt_auto_approve=True)
+        
+        result = super().write(vals)
+        
+        # Update project exemption status
+        if 'is_sia_exempt' in vals and self.project_id:
+            self.project_id.write({'is_sia_exempt': vals['is_sia_exempt']})
+        
+        # Post message if auto-approved
+        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') and 'state' in vals and vals.get('state') == 'approved':
+            self.message_post(
+                body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
+                message_type='notification'
+            )
+        
+        return result
+    
     # Workflow Actions - Override mixin methods for SIA-specific validations
     def action_submit(self):
         """Submit SIA Team for approval by Collector (SDM action) - Override mixin"""
-        # Validate all team members are filled (SIA-specific)
+        self.ensure_one()
+        
+        # If SIA is exempt, auto-approve at SDM level
+        if self.is_sia_exempt:
+            # Skip team member validation for exempt projects
+            # Auto-approve directly
+            self.state = 'approved'
+            self.approved_date = fields.Datetime.now()
+            self.message_post(
+                body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
+                message_type='notification'
+            )
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('SIA Team has been auto-approved as the project is exempt from Social Impact Assessment.'),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        
+        # Normal flow: Validate all team members are filled (SIA-specific)
         self._check_all_team_members_filled()
         # Call parent mixin method
         return super().action_submit()
@@ -322,6 +441,10 @@ class SiaTeam(models.Model):
     def action_create_section4_notification(self):
         """Create Section 4 Notifications for all villages in this SIA Team"""
         self.ensure_one()
+        
+        # Check if project is SIA exempt
+        if self.is_sia_exempt or (self.project_id and self.project_id.is_sia_exempt):
+            raise ValidationError(_('Section 4 Notifications cannot be created for projects that are exempt from Social Impact Assessment.'))
         
         if not self.project_id:
             raise ValidationError(_('Please select a project first.'))

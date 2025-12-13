@@ -323,8 +323,16 @@ class BhuDashboard(models.Model):
             draft_award_total = self.env['bhu.draft.award'].search_count(final_domain)
             draft_award_approved = self.env['bhu.draft.award'].search_count(final_domain + [('state', '=', 'signed')])
             
+            # Get project exemption status if a specific project is selected
+            is_project_exempt = False
+            if project_id:
+                project = self.env['bhu.project'].browse(project_id)
+                if project.exists():
+                    is_project_exempt = project.is_sia_exempt or False
+            
             return {
                 'is_collector': is_collector,
+                'is_project_exempt': is_project_exempt,
                 # Surveys - State wise
                 'survey_total': survey_total,
                 'survey_draft': self.env['bhu.survey'].search_count(final_domain + [('state', '=', 'draft')]),
@@ -412,6 +420,7 @@ class BhuDashboard(models.Model):
             is_collector = self.is_collector_user()
             return {
                 'is_collector': is_collector,
+                'is_project_exempt': False,
                 'survey_total': 0, 'survey_draft': 0, 'survey_submitted': 0, 'survey_approved': 0, 'survey_rejected': 0,
                 'survey_info': {'total': 0, 'submitted_count': 0, 'approved_count': 0, 'rejected_count': 0, 'send_back_count': 0, 'all_approved': True, 'is_completed': True, 'first_pending_id': False, 'first_document_id': False},
                 'section4_total': 0, 'section4_draft': 0, 'section4_submitted': 0, 'section4_approved': 0, 'section4_send_back': 0,

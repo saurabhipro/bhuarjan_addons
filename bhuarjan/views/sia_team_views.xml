@@ -31,10 +31,11 @@
                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                nolabel="1"
                                widget="binary"
-                               placeholder="Upload Signed SIA Proposal"/>
+                               placeholder="Upload Signed SIA Proposal"
+                               invisible="is_sia_exempt"/>
                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                 icon="fa-paper-plane"
-                                invisible="not sdm_signed_file"
+                                invisible="(not sdm_signed_file and not is_sia_exempt)"
                                 confirm="Are you sure want to submit this record."
                                 />
                     </group>
@@ -106,11 +107,11 @@
                                 invisible="state != 'submitted'"
                                 confirm="Are you sure want to submit this record."/>
                         
-                        <!-- Create Section 4 Notification (SDM only) -->
+                        <!-- Create Section 4 Notification (SDM only) - Hidden for SIA exempt projects -->
                         <button name="action_create_section4_notification" string="Create Section 4 Notification" 
                                 type="object" class="btn-primary" icon="fa-file-text"
                                 groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'approved'"
+                                invisible="state != 'approved' or is_sia_exempt"
                                 help="Create Section 4 Notifications for all villages in this SIA Team"
                                 confirm="Are you sure want to Create Section 4 Notification ."/>
                     </group>
@@ -151,6 +152,10 @@
                             <field name="tehsil_ids" widget="many2many_tags" readonly="1"
                                    placeholder="Tehsils (from selected villages)..."
                                    options="{'no_create_edit': True}" force_save="1"/>
+                            <!-- SIA Exemption Checkbox - Editable only in draft state by SDM -->
+                            <field name="is_sia_exempt" widget="boolean_toggle" 
+                                   readonly="is_approved_readonly or state != 'draft' or not can_sdm_edit"
+                                   string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
                         </group>
                         <group>
                             <field name="total_area_acquired" readonly="1"/>
@@ -162,25 +167,25 @@
                             <group col="2">
                                 <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
                                     <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt"
                                            placeholder="Select non-government social scientist..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
                                     <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt"
                                            placeholder="Select representatives of local bodies..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
                                     <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt"
                                            placeholder="Select resettlement expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
                                 <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
                                     <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt"
                                            placeholder="Select technical expert..."
                                            options="{'no_quick_create': True}"/>
                                 </group>
@@ -189,7 +194,7 @@
                                 <field name="tehsildar_domain" invisible="1"/>
                                 
                                 <field name="tehsildar_id" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt"
                                        placeholder="Select Tehsildar (Convener)..."
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
@@ -220,7 +225,7 @@
                                 <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
                                     icon="fa-paper-plane"
                                     groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                    invisible="not sdm_signed_file or state != 'draft'"
+                                    invisible="(not sdm_signed_file and not is_sia_exempt) or state != 'draft'"
                                     confirm="Are you sure want to submit this record."
                                     />
 

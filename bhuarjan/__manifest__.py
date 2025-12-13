@@ -20,7 +20,7 @@
         # 'data/chhattisgarh_districts_data.xml',
         # 'data/raigarh_sub_division_data.xml',
         # 'data/raipur_sub_division_data.xml',
-        'data/tehsil_data.xml',
+        # 'data/tehsil_data.xml',
         # Village data - commented out to prevent import
         # 'data/raigarh_village_data.xml',
         'data/department_data.xml',
@@ -36,7 +36,7 @@
         # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data
         # 'data/sample_section11_reports.xml',
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
-        'data/kharsiyan_rate_master_data.xml',
+        # 'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',
@@ -116,7 +116,7 @@
             # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
             # 'bhuarjan/static/src/css/landowner_documents.css',
-            # 'bhuarjan/static/src/scss/hierarchy_view.scss',
+            'bhuarjan/static/src/scss/hierarchy_view.scss',
             # 'bhuarjan/static/src/scss/organization_chart.scss',
             # 'bhuarjan/static/src/js/hierarchy_expand.js',
             # 'bhuarjan/static/src/js/survey_form_confirm.js',

@@ -28,10 +28,13 @@ class SiaTeam(models.Model):
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil_ids', store=False, readonly=True,
                                   help='Tehsils from the selected villages')
     
-    # SIA Exemption Checkbox
-    is_sia_exempt = fields.Boolean(string='कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?', 
-                                   default=False, tracking=True,
-                                   help='If checked, this project is exempt from Social Impact Assessment. This will disable Section 4 and Expert Group for this project.')
+    # SIA Exemption Selection (Yes/No)
+    is_sia_exempt = fields.Selection([
+        ('no', 'No'),
+        ('yes', 'Yes')
+    ], string='कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?', 
+      default='no', tracking=True,
+      help='If Yes, this project is exempt from Social Impact Assessment. This will disable Section 4 and Expert Group for this project.')
     
     # SIA Team Members - 5 Sections
     # (क) Non-Government Social Scientist
@@ -93,6 +96,31 @@ class SiaTeam(models.Model):
                                            compute='_compute_project_villages', 
                                            store=False,
                                            help='Villages mapped to the selected project (read-only for reference)')
+    
+    def read(self, fields=None, load='_classic_read'):
+        """Override read to convert old Boolean values to Selection values"""
+        result = super().read(fields=fields, load=load)
+        
+        # Convert any old Boolean values to Selection values
+        # Check if is_sia_exempt field is requested or if all fields are requested
+        requested_fields = fields if fields else []
+        if not fields or 'is_sia_exempt' in requested_fields:
+            for record_data in result:
+                if 'is_sia_exempt' in record_data:
+                    value = record_data['is_sia_exempt']
+                    # If value is Boolean True/False, convert to 'yes'/'no'
+                    if isinstance(value, bool):
+                        record_data['is_sia_exempt'] = 'yes' if value else 'no'
+                    elif value not in ('yes', 'no', False, None, ''):
+                        # Handle other unexpected values (strings, numbers, etc.)
+                        if str(value).lower() in ('true', 't', '1', 'yes'):
+                            record_data['is_sia_exempt'] = 'yes'
+                        else:
+                            record_data['is_sia_exempt'] = 'no'
+                    elif value is None or value == '':
+                        record_data['is_sia_exempt'] = 'no'
+        
+        return result
     
     def action_bottom_save(self):
         self.ensure_one()
@@ -251,7 +279,7 @@ class SiaTeam(models.Model):
         """Validate that all team member sections are filled - Skip if SIA is exempt"""
         for record in self:
             # Skip validation if SIA is exempt
-            if record.is_sia_exempt:
+            if record.is_sia_exempt == 'yes':
                 continue
             
             missing_fields = []
@@ -300,37 +328,42 @@ class SiaTeam(models.Model):
     
     @api.onchange('is_sia_exempt')
     def _onchange_is_sia_exempt(self):
-        """Show confirmation when SIA exemption is checked and update project"""
-        if self.is_sia_exempt and self.project_id:
-            # Update project immediately when checkbox is checked
-            self.project_id.write({'is_sia_exempt': True})
-            # Show warning confirmation
+        """Show confirmation when SIA exemption is changed from No to Yes"""
+        # Get the previous value from the record if it exists, otherwise default to 'no'
+        if self.id:
+            # Record exists - read the current value from database
+            current_record = self.browse(self.id)
+            previous_value = current_record.is_sia_exempt or 'no'
+        else:
+            # New record - check if there's a previous value in context, otherwise default to 'no'
+            previous_value = self.env.context.get('previous_is_sia_exempt', 'no')
+        
+        # Show confirmation only when changing from No to Yes
+        if previous_value == 'no' and self.is_sia_exempt == 'yes':
+            # Show warning confirmation - user can still change back to No before saving
             return {
                 'warning': {
                     'title': _('SIA Exemption Confirmation'),
-                    'message': _('This will disable Section 4 and Expert Group for this project. The project master has been updated. The SIA will be auto-approved when saved. Are you sure you want to continue?')
+                    'message': _('This will disable Section 4 and Expert Group for this project. The SIA will be auto-approved when you save. You can change it back to "No" before saving if needed. Do you want to continue?')
                 }
             }
-        elif not self.is_sia_exempt and self.project_id:
-            # Update project when checkbox is unchecked
-            self.project_id.write({'is_sia_exempt': False})
     
     @api.model
     def create(self, vals):
         """Override create to set project exemption status and auto-approve if exempt"""
-        # If is_sia_exempt is True, auto-approve
-        if vals.get('is_sia_exempt') and vals.get('state', 'draft') == 'draft':
+        # If is_sia_exempt is 'yes', auto-approve
+        if vals.get('is_sia_exempt') == 'yes' and vals.get('state', 'draft') == 'draft':
             vals['state'] = 'approved'
             vals['approved_date'] = fields.Datetime.now()
         
         record = super().create(vals)
         
         # Update project exemption status
-        if record.is_sia_exempt and record.project_id:
+        if record.is_sia_exempt == 'yes' and record.project_id:
             record.project_id.write({'is_sia_exempt': True})
         
         # Post message if auto-approved
-        if record.is_sia_exempt and record.state == 'approved':
+        if record.is_sia_exempt == 'yes' and record.state == 'approved':
             record.message_post(
                 body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
                 message_type='notification'
@@ -341,7 +374,7 @@ class SiaTeam(models.Model):
     def _validate_state_transition(self, old_state, new_state):
         """Override to allow direct transition from draft to approved when SIA is exempt"""
         # Allow direct transition from draft to approved if SIA is exempt
-        if old_state == 'draft' and new_state == 'approved' and self.is_sia_exempt:
+        if old_state == 'draft' and new_state == 'approved' and self.is_sia_exempt == 'yes':
             return  # Skip validation for exempt projects
         # For all other cases, use parent validation
         return super()._validate_state_transition(old_state, new_state)
@@ -354,7 +387,7 @@ class SiaTeam(models.Model):
             # Skip all validation for exempt projects (no collector check, no file check)
             return
         # Also check if already exempt (for cases where exemption was set earlier)
-        if getattr(self, 'is_sia_exempt', False) and self.state == 'draft':
+        if getattr(self, 'is_sia_exempt', 'no') == 'yes' and self.state == 'draft':
             # Skip all validation for exempt projects
             return
         # For all other cases, use parent validation
@@ -362,9 +395,9 @@ class SiaTeam(models.Model):
     
     def write(self, vals):
         """Override write to update project exemption status and auto-approve if exempt"""
-        # Check if is_sia_exempt is being set to True
-        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') and self.state == 'draft':
-            # Auto-approve when exemption is set to True in draft state
+        # Check if is_sia_exempt is being set to 'yes'
+        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') == 'yes' and self.state == 'draft':
+            # Auto-approve when exemption is set to 'yes' in draft state
             vals['state'] = 'approved'
             vals['approved_date'] = fields.Datetime.now()
             # Set context flag to bypass validation - DO NOT set field directly to avoid recursion
@@ -374,10 +407,11 @@ class SiaTeam(models.Model):
         
         # Update project exemption status
         if 'is_sia_exempt' in vals and self.project_id:
-            self.project_id.write({'is_sia_exempt': vals['is_sia_exempt']})
+            # Convert 'yes'/'no' to boolean for project
+            self.project_id.write({'is_sia_exempt': vals['is_sia_exempt'] == 'yes'})
         
         # Post message if auto-approved
-        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') and 'state' in vals and vals.get('state') == 'approved':
+        if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') == 'yes' and 'state' in vals and vals.get('state') == 'approved':
             self.message_post(
                 body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
                 message_type='notification'
@@ -391,7 +425,7 @@ class SiaTeam(models.Model):
         self.ensure_one()
         
         # If SIA is exempt, auto-approve at SDM level
-        if self.is_sia_exempt:
+        if self.is_sia_exempt == 'yes':
             # Skip team member validation for exempt projects
             # Auto-approve directly
             self.state = 'approved'
@@ -443,7 +477,7 @@ class SiaTeam(models.Model):
         self.ensure_one()
         
         # Check if project is SIA exempt
-        if self.is_sia_exempt or (self.project_id and self.project_id.is_sia_exempt):
+        if self.is_sia_exempt == 'yes' or (self.project_id and self.project_id.is_sia_exempt):
             raise ValidationError(_('Section 4 Notifications cannot be created for projects that are exempt from Social Impact Assessment.'))
         
         if not self.project_id:

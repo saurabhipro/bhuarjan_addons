@@ -280,6 +280,36 @@ export class DepartmentDashboard extends Component {
         });
     }
 
+    async openSurveysByState(state) {
+        let domain = this.getDomain();
+        
+        // Add state filter if provided
+        if (state === 'draft') {
+            domain.push(['state', '=', 'draft']);
+        } else if (state === 'submitted') {
+            domain.push(['state', '=', 'submitted']);
+        } else if (state === 'approved') {
+            domain.push(['state', '=', 'approved']);
+        } else if (state === 'rejected') {
+            domain.push(['state', '=', 'rejected']);
+        }
+        // If state is null, show all surveys (no additional filter)
+        
+        await this.action.doAction({
+            type: 'ir.actions.act_window',
+            name: state ? `${state.charAt(0).toUpperCase() + state.slice(1)} Surveys` : 'All Surveys',
+            res_model: 'bhu.survey',
+            view_mode: 'list,form',
+            views: [[false, 'list'], [false, 'form']],
+            domain: domain,
+            target: 'current',
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
+        });
+    }
+
     getDomain() {
         const domain = [];
         if (this.state.selectedDepartment) {

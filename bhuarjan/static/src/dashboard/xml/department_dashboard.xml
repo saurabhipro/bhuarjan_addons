@@ -55,15 +55,62 @@
             <div t-if="!state.loading" class="o_dashboard_content">
                 <!-- Survey Statistics Cards -->
                 <div class="o_dashboard_section">
+                    <h3 class="o_section_title">
+                        <i class="fa fa-clipboard"/> SURVEY STATISTICS
+                    </h3>
                     <div class="o_stats_grid">
-                        <!-- Surveys Card -->
-                        <div class="o_stat_card o_card_survey">
+                        <!-- Total Surveys Card -->
+                        <div class="o_stat_card o_card_total_surveys" t-on-click="() => this.openSurveysByState(null)">
                             <div class="o_stat_icon">
-                                <i class="fa fa-clipboard"/>
+                                <i class="fa fa-list-alt"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Surveys</div>
+                                <div class="o_stat_label">TOTAL SURVEYS</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Draft Surveys Card -->
+                        <div class="o_stat_card o_card_draft" t-on-click="() => this.openSurveysByState('draft')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-file-o"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">DRAFT</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_draft : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Submitted Surveys Card -->
+                        <div class="o_stat_card o_card_submitted" t-on-click="() => this.openSurveysByState('submitted')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-paper-plane"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SUBMITTED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_submitted : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Approved Surveys Card -->
+                        <div class="o_stat_card o_card_approved" t-on-click="() => this.openSurveysByState('approved')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-check-circle"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">APPROVED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_approved : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Returned/Rejected Surveys Card -->
+                        <div class="o_stat_card o_card_rejected" t-on-click="() => this.openSurveysByState('rejected')">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-times-circle"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">RETURNED</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_rejected : 0"/></div>
                             </div>
                         </div>
                     </div>

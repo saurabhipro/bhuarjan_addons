@@ -163,6 +163,9 @@ export class AdminDashboard extends Component {
         }
         
         this.state.villages = []; // Clear villages when department changes
+        
+        // Auto-refresh dashboard data
+        await this.loadDashboardData();
     }
     
     async onProjectChange(ev) {
@@ -180,20 +183,16 @@ export class AdminDashboard extends Component {
         } else {
             this.state.villages = [];
         }
+        
+        // Auto-refresh dashboard data
+        await this.loadDashboardData();
     }
     
     async onVillageChange(ev) {
         this.state.selectedVillage = ev.target.value ? parseInt(ev.target.value) : null;
-    }
-    
-    async onSubmitFilters() {
-        // Reload dashboard data with all selected filters
+        
+        // Auto-refresh dashboard data
         await this.loadDashboardData();
-        try {
-            this.notification.add(_t("Filters applied"), { type: "success" });
-        } catch (error) {
-            console.error("Notification error:", error);
-        }
     }
 
     async openAction(actionName) {

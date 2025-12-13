@@ -1176,9 +1176,16 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model
     def get_department_user_department(self):
-        """Get the department for department user based on their assigned projects"""
+        """Get the department for department user - first from user's department_id field, then from assigned projects"""
         user = self.env.user
-        if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
+        _logger.info(f"Getting department for user: {user.id} ({user.name})")
+        
+        # Check if user has department_user group
+        has_group = user.has_group('bhuarjan.group_bhuarjan_department_user')
+        _logger.info(f"User has department_user group: {has_group}")
+        
+        if not has_group:
+            _logger.warning(f"User {user.id} ({user.name}) does not have department_user group")
             return None
       
         if not user.bhu_department_id:
@@ -1196,7 +1203,10 @@ class BhuarjanDashboard(models.TransientModel):
     def get_department_user_projects(self, department_id=None):
         """Get mapped projects for department user, optionally filtered by department"""
         user = self.env.user
+        _logger.info(f"Getting projects for department user: {user.id} ({user.name})")
+        
         if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
+            _logger.warning(f"User {user.id} does not have department_user group")
             return []
   
         # Filter by department if provided
@@ -1204,7 +1214,21 @@ class BhuarjanDashboard(models.TransientModel):
             domain = [('department_id', '=', int(department_id))]
         
         projects = self.env['bhu.project'].search(domain)
-        return projects.read(["id", "name", "department_id"])
+        _logger.info(f"Found {len(projects)} projects for user {user.id}")
+        
+        # Read project data including department_id
+        project_data = projects.read(["id", "name", "department_id"])
+        
+        # Log each project and its department
+        for proj in project_data:
+            dept_id = proj.get('department_id')
+            if dept_id:
+                dept_name = dept_id[1] if isinstance(dept_id, (list, tuple)) else 'Unknown'
+                _logger.info(f"  Project: {proj['name']} (ID: {proj['id']}), Department: {dept_name}")
+            else:
+                _logger.warning(f"  Project: {proj['name']} (ID: {proj['id']}) has NO department")
+        
+        return project_data
     
     @api.model
     def get_dashboard_stats(self, filters=None):

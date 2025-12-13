@@ -70,8 +70,8 @@ class BhuProject(models.Model):
                                help="Select Sub-Divisional Magistrates for this project")
     tehsildar_ids = fields.Many2many('res.users', 'bhu_project_tehsildar_rel', 'project_id', 'user_id',
                                      string="Tehsildar / तहसीलदार", 
-                                     domain="[('bhuarjan_role', '=', 'tahsildar')]", tracking=True,
-                                     help="Select Tehsildars for this project")
+                                     domain="[('bhuarjan_role', '=', 'sdm')]", tracking=True,
+                                     help="Select Tehsildars for this project (using SDM role)")
     department_user_ids = fields.Many2many('res.users', 'bhu_project_department_user_rel', 'project_id', 'user_id',
                                            string="Department User / विभाग उपयोगकर्ता", 
                                            domain="[('bhuarjan_role', '=', 'department_user')]", tracking=True,

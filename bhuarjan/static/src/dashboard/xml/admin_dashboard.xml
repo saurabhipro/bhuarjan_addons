@@ -32,10 +32,6 @@
                                 <option t-att-value="village.id"><t t-esc="village.name"/></option>
                             </t>
                         </select>
-                        <!-- Submit Button -->
-                        <button class="btn btn-primary o_submit_filters" t-on-click="onSubmitFilters" title="Apply Filters" style="background: #8B4513; color: white; border: 2px solid #8B4513; padding: 8px 16px;">
-                            <i class="fa fa-filter"/> Submit
-                        </button>
                         <span style="color: #8B4513; opacity: 0.9; font-size: 12px;" t-if="state and state.lastUpdate">
                             Last updated: <t t-esc="state.lastUpdate"/>
                         </span>
@@ -242,12 +238,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SECTION 4</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.section4_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.section4_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.section4_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.section4_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                         <!-- Section 11 -->
@@ -256,12 +246,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SECTION 11</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.section11_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.section11_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.section11_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.section11_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                         <!-- Section 19 -->
@@ -270,12 +254,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SECTION 19</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.section19_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.section19_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.section19_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.section19_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                         <!-- Section 15 -->
@@ -284,12 +262,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SECTION 15</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.section15_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.section15_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.section15_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.section15_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                         <!-- Expert Group -->
@@ -298,12 +270,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">EXPERT GROUP</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_committee_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.expert_committee_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.expert_committee_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.expert_committee_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.expert_committee_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                         <!-- SIA Teams -->
@@ -312,12 +278,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">SIA TEAMS</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
-                                <div class="o_stat_states">
-                                    <span>D:<t t-esc="state.stats ? state.stats.sia_draft : 0"/></span>
-                                    <span>S:<t t-esc="state.stats ? state.stats.sia_submitted : 0"/></span>
-                                    <span>A:<t t-esc="state.stats ? state.stats.sia_approved : 0"/></span>
-                                    <span>B:<t t-esc="state.stats ? state.stats.sia_send_back : 0"/></span>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -108,7 +108,12 @@
             'bhuarjan/static/src/dashboard/css/sdm_dashboard.css',
             'bhuarjan/static/src/dashboard/js/sdm_dashboard.js',
             'bhuarjan/static/src/dashboard/xml/sdm_dashboard.xml',
-            # Role-based Dashboard (routes to Admin or SDM dashboard based on user role)
+            # Department User Dashboard files
+            'bhuarjan/static/src/dashboard/js/department_dashboard.js',
+            'bhuarjan/static/src/dashboard/xml/department_dashboard.xml',
+            # Collector Dashboard XML (JS is shared with SDM)
+            'bhuarjan/static/src/dashboard/xml/collector_dashboard.xml',
+            # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
             # 'bhuarjan/static/src/css/landowner_documents.css',
             # 'bhuarjan/static/src/scss/hierarchy_view.scss',

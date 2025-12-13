@@ -6,6 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 export class OwlCrmDashboard extends Component {
+    // Template will be set dynamically based on role
     static template = "bhuarjan.SDMTemplate";
 
     setup() {
@@ -14,11 +15,21 @@ export class OwlCrmDashboard extends Component {
 
         this.notification = useService("notification");
         
+        // Determine dashboard type from context or detect role
+        this.dashboardType = this.props.dashboardType || 'sdm'; // 'sdm' or 'collector'
+        
+        // Helper method to get localStorage prefix
+        this.getLocalStoragePrefix = () => {
+            return this.dashboardType === 'collector' ? 'collector_dashboard' : 'sdm_dashboard';
+        };
+        
+        const localStoragePrefix = this.getLocalStoragePrefix();
+        
         // Load persisted selections from localStorage
-        const savedDepartment = localStorage.getItem('sdm_dashboard_department');
-        const savedProject = localStorage.getItem('sdm_dashboard_project');
-        const savedProjectName = localStorage.getItem('sdm_dashboard_project_name');
-        const savedVillage = localStorage.getItem('sdm_dashboard_village');
+        const savedDepartment = localStorage.getItem(`${localStoragePrefix}_department`);
+        const savedProject = localStorage.getItem(`${localStoragePrefix}_project`);
+        const savedProjectName = localStorage.getItem(`${localStoragePrefix}_project_name`);
+        const savedVillage = localStorage.getItem(`${localStoragePrefix}_village`);
         
             this.state = useState({
                 loading: true,
@@ -151,10 +162,11 @@ export class OwlCrmDashboard extends Component {
         this.state.selectedDepartment = departmentId;
         
         // Save to localStorage
+        const prefix = this.getLocalStoragePrefix();
         if (departmentId) {
-            localStorage.setItem('sdm_dashboard_department', String(departmentId));
+            localStorage.setItem(`${prefix}_department`, String(departmentId));
         } else {
-            localStorage.removeItem('sdm_dashboard_department');
+            localStorage.removeItem(`${prefix}_department`);
         }
         
         // Only reset project/village if department actually changed
@@ -166,9 +178,9 @@ export class OwlCrmDashboard extends Component {
                 this.state.selectedProjectName = null;
                 this.state.selectedVillage = null;
                 this.state.villages = [];
-                localStorage.removeItem('sdm_dashboard_project');
-                localStorage.removeItem('sdm_dashboard_project_name');
-                localStorage.removeItem('sdm_dashboard_village');
+                localStorage.removeItem(`${prefix}_project`);
+                localStorage.removeItem(`${prefix}_project_name`);
+                localStorage.removeItem(`${prefix}_village`);
             }
             await this.loadProjects();
         } else {
@@ -177,9 +189,9 @@ export class OwlCrmDashboard extends Component {
             this.state.selectedProjectName = null;
             this.state.selectedVillage = null;
             this.state.villages = [];
-            localStorage.removeItem('sdm_dashboard_project');
-            localStorage.removeItem('sdm_dashboard_project_name');
-            localStorage.removeItem('sdm_dashboard_village');
+            localStorage.removeItem(`${prefix}_project`);
+            localStorage.removeItem(`${prefix}_project_name`);
+            localStorage.removeItem(`${prefix}_village`);
         }
         // Don't auto-load dashboard data - wait for submit
     }
@@ -190,16 +202,17 @@ export class OwlCrmDashboard extends Component {
         this.state.selectedProject = projectId;
         
         // Save to localStorage
+        const prefix = this.getLocalStoragePrefix();
         if (projectId) {
-            localStorage.setItem('sdm_dashboard_project', String(projectId));
+            localStorage.setItem(`${prefix}_project`, String(projectId));
             const project = this.state.projects.find(p => p.id === projectId);
             this.state.selectedProjectName = project ? project.name : null;
             if (this.state.selectedProjectName) {
-                localStorage.setItem('sdm_dashboard_project_name', this.state.selectedProjectName);
+                localStorage.setItem(`${prefix}_project_name`, this.state.selectedProjectName);
             }
         } else {
-            localStorage.removeItem('sdm_dashboard_project');
-            localStorage.removeItem('sdm_dashboard_project_name');
+            localStorage.removeItem(`${prefix}_project`);
+            localStorage.removeItem(`${prefix}_project_name`);
             this.state.selectedProjectName = null;
         }
         
@@ -209,7 +222,7 @@ export class OwlCrmDashboard extends Component {
             const currentVillage = this.state.villages.find(v => v.id === this.state.selectedVillage);
             if (!currentVillage) {
                 this.state.selectedVillage = null;
-                localStorage.removeItem('sdm_dashboard_village');
+                localStorage.removeItem(`${prefix}_village`);
             }
             await this.loadVillages();
             // Auto-refresh dashboard data when project is selected
@@ -217,7 +230,7 @@ export class OwlCrmDashboard extends Component {
         } else {
             this.state.selectedVillage = null;
             this.state.villages = [];
-            localStorage.removeItem('sdm_dashboard_village');
+            localStorage.removeItem(`${prefix}_village`);
             // Refresh dashboard data when project is cleared
             await this.loadDashboardData();
         }
@@ -229,10 +242,11 @@ export class OwlCrmDashboard extends Component {
         this.state.selectedVillage = villageId;
         
         // Save to localStorage
+        const prefix = this.getLocalStoragePrefix();
         if (villageId) {
-            localStorage.setItem('sdm_dashboard_village', String(villageId));
+            localStorage.setItem(`${prefix}_village`, String(villageId));
         } else {
-            localStorage.removeItem('sdm_dashboard_village');
+            localStorage.removeItem(`${prefix}_village`);
         }
         // Auto-refresh dashboard data when village is selected
         await this.loadDashboardData();
@@ -434,8 +448,19 @@ export class OwlCrmDashboard extends Component {
     }
 }
 
-// Register the action
+// Register SDM Dashboard
 registry.category("actions").add(
     "bhuarjan.sdm_dashboard_tag",
     OwlCrmDashboard
 );
+
+// Register Collector Dashboard - reuse same component with different template
+export class CollectorDashboardWrapper extends OwlCrmDashboard {
+    static template = "bhuarjan.CollectorDashboardTemplate";
+    
+    setup() {
+        this.dashboardType = 'collector';
+        super.setup();
+    }
+}
+registry.category("actions").add("bhuarjan.collector_dashboard", CollectorDashboardWrapper);

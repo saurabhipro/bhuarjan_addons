@@ -62,12 +62,10 @@
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" /> <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
 
-    <record id="sdm_dashboard_action" model="ir.actions.client">
-        <field name="name">Dashboard</field>
-        <field name="tag">bhuarjan.sdm_dashboard_tag</field>
-    </record>
-    <!-- SDM Dashboard - visible to SDM and Department User (NOT Administrator) -->
-    <menuitem parent="menu_bhu_root" id="bhuarjan_sdm_dashboard" name="Dashboard" action="sdm_dashboard_action" sequence="1" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
+    <!-- Dashboard menu - uses role-based routing for all users -->
+    <!-- Remove old SDM dashboard action if it exists -->
+    <delete id="sdm_dashboard_action" model="ir.actions.client"/>
+    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu" name="Dashboard" action="action_role_based_dashboard" sequence="1"/>
 
     <!-- Move Settings Master and Sequence Settings to General Settings section -->
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

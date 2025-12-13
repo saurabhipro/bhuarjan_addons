@@ -353,8 +353,20 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
         <field name="name">SDM Dashboard</field>
         <field name="tag">bhuarjan.sdm_dashboard_tag</field>
     </record>
+
+    <!-- Department User Dashboard Client Action (OWL) -->
+    <record id="action_department_dashboard_owl" model="ir.actions.client">
+        <field name="name">Department User Dashboard</field>
+        <field name="tag">bhuarjan.department_dashboard</field>
+    </record>
+
+    <!-- Collector Dashboard Client Action (OWL) -->
+    <record id="action_collector_dashboard_owl" model="ir.actions.client">
+        <field name="name">Collector Dashboard</field>
+        <field name="tag">bhuarjan.collector_dashboard</field>
+    </record>
     
-    <!-- Role-based Dashboard Action - Returns Admin Dashboard for Admin, SDM Dashboard for others -->
+    <!-- Role-based Dashboard Action - Returns appropriate dashboard based on user role -->
     <!-- Delete old server action if it exists -->
     <delete id="action_role_based_dashboard" model="ir.actions.server"/>
     

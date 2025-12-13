@@ -1,0 +1,153 @@
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.CollectorDashboardTemplate" owl="1">
+        <div class="o_admin_dashboard">
+            <!-- Header with Role Title -->
+            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #D2B48C;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="o_dashboard_title_section">
+                        <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
+                            <i class="fa fa-gavel" style="margin-right: 10px;"/> Collector Dashboard
+                        <t t-if="state.selectedProjectName">
+                            <span class="o_selected_project_inline">
+                                <i class="fa fa-briefcase" style="margin-right: 8px;"/>
+                                <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
+                            </span>
+                        </t>
+                        </h2>
+                    </div>
+                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: 100%;">
+                    <!-- Department Selector -->
+                    <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                        <option value="">Select Department</option>
+                        <t t-foreach="state.departments" t-as="department" t-key="department.id">
+                            <option t-att-value="this.toString(department.id)"><t t-esc="department.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Project Selector -->
+                    <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                        <option value="">Project</option>
+                        <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                            <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>
+                        </t>
+                    </select>
+                    <!-- Village Selector -->
+                    <select class="form-select o_village_selector" t-att-value="this.toString(state.selectedVillage)" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                        <option value="">Village</option>
+                        <t t-foreach="state.villages" t-as="village" t-key="village.id">
+                            <option t-att-value="this.toString(village.id)"><t t-esc="village.name"/></option>
+                        </t>
+                    </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x"/> Loading...
+            </div>
+
+            <!-- Dashboard Content - Reuse SDM dashboard structure but with Collector branding -->
+            <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Section Notifications -->
+                <div class="o_dashboard_section">
+                    <div class="o_stats_grid">
+                        <!-- SIA Team Card -->
+                        <div class="o_stat_card o_card_sia">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-users"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SIA Team</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4 Card -->
+                        <div class="o_stat_card o_card_section4">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-bell"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 4</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Expert Group Card -->
+                        <div class="o_stat_card o_card_expert_committee">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-graduation-cap"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Expert Group</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 11 Card -->
+                        <div class="o_stat_card o_card_section11">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-file-text"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 11</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 15 Card -->
+                        <div class="o_stat_card o_card_section15">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 15</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 19 Card -->
+                        <div class="o_stat_card o_card_section19">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-bullhorn"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Section 19</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Survey Card -->
+                        <div class="o_stat_card o_card_survey">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-clipboard-list"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Surveys</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Sec 21 notice Card -->
+                        <div class="o_stat_card o_card_draft_award">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-gavel"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Sec 21 notice</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_award_total : 0"/></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section List View - Same as SDM but with Collector context -->
+                    <div class="o_sections_list_grid" style="margin-top: 30px;">
+                        <!-- Note: The detailed section list can be added here similar to SDM dashboard -->
+                        <!-- For now, showing the stat cards above -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+

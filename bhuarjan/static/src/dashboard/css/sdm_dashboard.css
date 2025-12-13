@@ -115,12 +115,12 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-bottom: 15px;
-    padding: 10px 15px;
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    box-shadow: none;
 }
 
 /* Status Legends - Positioned in parent container */
@@ -147,6 +147,9 @@
     gap: 5px;
     font-size: 12px;
     white-space: nowrap;
+    border: none !important;
+    padding: 0;
+    background: transparent !important;
 }
 
 .o_legend_icon_draft {
@@ -176,10 +179,12 @@
 }
 
 .o_dashboard_section {
-    background: white;
+    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
     padding: 15px;
-    border-radius: 6px;
+    border-radius: 8px;
+    border: 3px solid #8B4513;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
 /* Dashboard Footer */

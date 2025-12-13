@@ -1,0 +1,126 @@
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.DepartmentDashboardTemplate" owl="1">
+        <div class="o_admin_dashboard">
+            <!-- Header with Role Title -->
+            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #D2B48C;">
+                <div class="o_dashboard_title_section">
+                    <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
+                        <i class="fa fa-user-tie" style="margin-right: 10px;"/> Department User Dashboard
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="text-center p-4">
+                <i class="fa fa-spinner fa-spin fa-2x"/> Loading...
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Survey Statistics Section -->
+                <div class="o_dashboard_section">
+                    <h3 class="o_section_title" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <i class="fa fa-clipboard-list"/> SURVEY STATISTICS
+                    </h3>
+                    
+                    <!-- Survey Stats Cards -->
+                    <div class="o_stats_grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <!-- Total Surveys Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="openSurveyList">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Surveys</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_total || 0"/></div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-clipboard-list"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Draft Surveys Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('draft')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Draft Surveys</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_draft || 0"/></div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-file-alt"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submitted Surveys Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('submitted')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Submitted Surveys</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_submitted || 0"/></div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-paper-plane"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Approved Surveys Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('approved')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Approved Surveys</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_approved || 0"/></div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-check-circle"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rejected Surveys Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;" t-on-click="() => this.openSurveysByState('rejected')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Rejected Surveys</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_rejected || 0"/></div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-times-circle"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Completion Percentage Card -->
+                        <div class="o_stat_card" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Completion Rate</div>
+                                    <div style="font-size: 36px; font-weight: bold;"><t t-esc="state.stats.survey_completion_percent || 0"/>%</div>
+                                </div>
+                                <div style="font-size: 48px; opacity: 0.3;">
+                                    <i class="fa fa-chart-pie"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h4 style="margin-bottom: 15px; color: #667eea;">
+                            <i class="fa fa-bolt"/> Quick Actions
+                        </h4>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" t-on-click="openSurveyList" style="padding: 10px 20px; border-radius: 6px;">
+                                <i class="fa fa-list"/> View All Surveys
+                            </button>
+                            <button class="btn btn-info" t-on-click="() => this.openSurveysByState('submitted')" style="padding: 10px 20px; border-radius: 6px;">
+                                <i class="fa fa-paper-plane"/> Pending Approval
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+

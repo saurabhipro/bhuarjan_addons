@@ -1,48 +1,45 @@
 <templates xml:space="preserve">
     <t t-name="bhuarjan.SDMTemplate" owl="1">
         <div class="o_admin_dashboard">
-            <!-- Header -->
-            <div class="o_dashboard_header">
-                <div class="o_dashboard_title_section">
-                    <h2>
-                        <t t-if="state.isCollector">
-                            Collector Dashboard
-                        </t>
-                        <t t-if="!state.isCollector">
-                            SDM Dashboard
-                        </t>
-                        <t t-if="state.selectedProjectName">
-                            <span class="o_selected_project_inline">
-                                <i class="fa fa-briefcase" style="margin-right: 8px;"/>
-                                <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
-                            </span>
-                        </t>
-                    </h2>
+            <!-- Header with Role Title -->
+            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #D2B48C;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="o_dashboard_title_section">
+                        <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
+                            <i class="fa fa-user-cog" style="margin-right: 10px;"/> SDM Dashboard
+                            <t t-if="state.selectedProjectName">
+                                <span class="o_selected_project_inline">
+                                    <i class="fa fa-briefcase" style="margin-right: 8px;"/>
+                                    <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
+                                </span>
+                            </t>
+                        </h2>
+                    </div>
+                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: 100%;">
+                        <!-- Department Selector -->
+                        <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                            <option value="">Select Department</option>
+                            <t t-foreach="state.departments" t-as="department" t-key="department.id">
+                                <option t-att-value="this.toString(department.id)"><t t-esc="department.name"/></option>
+                            </t>
+                        </select>
+                        <!-- Project Selector -->
+                        <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                            <option value="">Project</option>
+                            <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                                <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>
+                            </t>
+                        </select>
+                        <!-- Village Selector -->
+                        <select class="form-select o_village_selector" t-att-value="this.toString(state.selectedVillage)" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;">
+                            <option value="">Village</option>
+                            <t t-foreach="state.villages" t-as="village" t-key="village.id">
+                                <option t-att-value="this.toString(village.id)"><t t-esc="village.name"/></option>
+                            </t>
+                        </select>
+                    </div>
                 </div>
-                <div class="o_dashboard_actions">
-                    <!-- Department Selector -->
-                    <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange">
-                        <option value="">Select Department</option>
-                        <t t-foreach="state.departments" t-as="department" t-key="department.id">
-                            <option t-att-value="this.toString(department.id)"><t t-esc="department.name"/></option>
-                        </t>
-                    </select>
-                    <!-- Project Selector -->
-                    <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment">
-                        <option value="">Project</option>
-                        <t t-foreach="state.projects" t-as="project" t-key="project.id">
-                            <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>
-                        </t>
-                    </select>
-                    <!-- Village Selector -->
-                    <select class="form-select o_village_selector" t-att-value="this.toString(state.selectedVillage)" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject">
-                        <option value="">Village</option>
-                        <t t-foreach="state.villages" t-as="village" t-key="village.id">
-                            <option t-att-value="this.toString(village.id)"><t t-esc="village.name"/></option>
-                        </t>
-                    </select>
-        </div>
-    </div>
+            </div>
 
             <!-- Loading State -->
             <div t-if="state.loading" class="text-center p-4">

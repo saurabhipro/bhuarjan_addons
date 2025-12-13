@@ -1180,35 +1180,16 @@ class BhuarjanDashboard(models.TransientModel):
         user = self.env.user
         if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
             return None
-        
-        # Get projects where user is assigned as department_user_ids
-        assigned_projects = self.env['bhu.project'].search([
-            ('department_user_ids', 'in', [user.id])
-        ])
-        
-        if not assigned_projects:
-            _logger.warning(f"Department user {user.id} ({user.name}) has no assigned projects")
+      
+        if not user.bhu_department_id:
             return None
         
-        # Get unique departments from assigned projects (filter out False/None)
-        # Get department_id from each project
-        departments = assigned_projects.mapped('department_id').filtered(lambda d: d)
         
-        if not departments:
-            _logger.warning(f"Department user {user.id} ({user.name}) has projects but no departments assigned to those projects")
-            # Log project details for debugging
-            for project in assigned_projects:
-                _logger.warning(f"  Project: {project.name} (ID: {project.id}), Department: {project.department_id.name if project.department_id else 'None'}")
-            return None
-        
-        # Get the first department (or only department if user has one)
-        department = departments[0]
         dept_data = {
-            'id': department.id,
-            'name': department.name
+            'id': user.bhu_department_id.id,
+            'name': user.bhu_department_id.name
         }
         
-        _logger.info(f"Department user {user.id} ({user.name}) assigned to department: {dept_data['name']} (ID: {dept_data['id']})")
         return dept_data
     
     @api.model
@@ -1217,13 +1198,10 @@ class BhuarjanDashboard(models.TransientModel):
         user = self.env.user
         if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
             return []
-        
-        # Get projects where user is assigned as department_user_ids
-        domain = [('department_user_ids', 'in', [user.id])]
-        
+  
         # Filter by department if provided
         if department_id:
-            domain.append(('department_id', '=', department_id))
+            domain = [('department_id', '=', int(department_id))]
         
         projects = self.env['bhu.project'].search(domain)
         return projects.read(["id", "name", "department_id"])

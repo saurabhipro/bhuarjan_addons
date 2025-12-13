@@ -109,6 +109,7 @@ class BhuProject(models.Model):
         
         # Admin, system users, and collectors see all projects - no filtering needed
         if not (user.has_group('bhuarjan.group_bhuarjan_admin') or 
+                user.has_group('bhuarjan.group_bhuarjan_department_user') or
                 user.has_group('base.group_system') or
                 user.has_group('bhuarjan.group_bhuarjan_collector') or
                 user.has_group('bhuarjan.group_bhuarjan_additional_collector')):

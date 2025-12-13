@@ -9,7 +9,6 @@ class ResUsers(models.Model):
     child_ids = fields.One2many('res.users', 'parent_id', string='Direct subordinates')
     # color = fields.Integer(string="Color Index")
     department_color = fields.Char(string="Color", default="#4c7cf3")
-
     def _get_state_domain(self):
         state_ids = self.env['bhu.district'].search([]).mapped('state_id.id')    
         return [('id', 'in', state_ids)]
@@ -37,6 +36,7 @@ class ResUsers(models.Model):
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', 
                                  help='Select a project to filter villages. Only villages from this project will be shown.')
+    bhu_department_id = fields.Many2one('bhu.department', string="Department")
     village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False)
     village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([

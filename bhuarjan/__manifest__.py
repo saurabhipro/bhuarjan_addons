@@ -22,8 +22,7 @@
         # 'data/raipur_sub_division_data.xml',
         # 'data/tehsil_data.xml',
         # Village data - commented out to prevent import
-        'data/raigarh_village_data.xml',
-        'data/raigarh_village_data.xml',
+        # 'data/raigarh_village_data.xml',
         'data/department_data.xml',
         'data/settings_master_data.xml',
         # Process-related sample data - commented out to prevent default import
@@ -37,7 +36,7 @@
         # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data
         # 'data/sample_section11_reports.xml',
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
-        'data/kharsiyan_rate_master_data.xml',
+        # 'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',

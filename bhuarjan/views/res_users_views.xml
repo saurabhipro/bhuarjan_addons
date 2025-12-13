@@ -105,6 +105,7 @@
                                 <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="project_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="bhu_department_id"/>
                                 <field name="village_domain" invisible="1"/>
                                 <field name="village_ids" domain="village_domain" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             </group>

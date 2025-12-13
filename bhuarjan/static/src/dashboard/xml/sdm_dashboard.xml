@@ -173,8 +173,8 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
-                                    <i class="fa fa-eye"/> View/Edit
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.survey')">
+                                    <i class="fa fa-eye"/> View
                                 </button>
                             </div>
                         </div>

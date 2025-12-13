@@ -173,8 +173,8 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
-                                    <i class="fa fa-eye"/> View/Edit
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.survey')">
+                                    <i class="fa fa-eye"/> View
                                 </button>
                             </div>
                         </div>
@@ -333,7 +333,13 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section8')">
-                                    <i class="fa fa-eye"/> View/Edit
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                                <button class="btn btn-sm btn-success" t-on-click.stop="() => this.openSection8ForRecommend('recommend')">
+                                    <i class="fa fa-check"/> Recommend
+                                </button>
+                                <button class="btn btn-sm btn-danger" t-on-click.stop="() => this.openSection8ForRecommend('not_recommend')">
+                                    <i class="fa fa-times"/> Not Recommend
                                 </button>
                             </div>
                         </div>
@@ -384,8 +390,8 @@
                             </div>
                         </div>
 
-                        <!-- Section 15 -->
-                        <div class="o_section_list_item o_card_no_click">
+                        <!-- Section 15 (Disabled for Collector) -->
+                        <div class="o_section_list_item o_card_no_click" style="opacity: 0.5; pointer-events: none;">
                             <div class="o_section_list_step">
                                 <span class="o_step_number">Step 7</span>
                             </div>
@@ -568,8 +574,8 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
-                                    <i class="fa fa-eye"/> View/Edit
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSection23AwardView('bhu.section23.award')">
+                                    <i class="fa fa-eye"/> View
                                 </button>
                             </div>
                         </div>

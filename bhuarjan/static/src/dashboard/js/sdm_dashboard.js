@@ -450,6 +450,69 @@ export class OwlCrmDashboard extends Component {
         // Disable if all approved, no total records, or no submitted records
         return sectionInfo.all_approved || sectionInfo.total === 0 || sectionInfo.submitted_count === 0;
     }
+
+    // Open Section 8 for Recommend/Not Recommend actions (Collector only)
+    openSection8ForRecommend(actionType) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        let domain = [];
+        if (this.state.selectedProject) {
+            domain.push(["project_id", "=", this.state.selectedProject]);
+        }
+        if (this.state.selectedVillage) {
+            domain.push(["village_id", "=", this.state.selectedVillage]);
+        }
+        
+        // Filter to show only draft records that can be recommended or not recommended
+        domain.push(["state", "=", "draft"]);
+        
+        const actionName = actionType === 'recommend' ? 'Recommend Section 8' : 'Not Recommend Section 8';
+        
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: actionName,
+            res_model: 'bhu.section8',
+            view_mode: "list,form",
+            views: [[false, "list"], [false, "form"]],
+            domain: domain,
+            target: "current",
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
+        });
+    }
+
+    // Open Section 23 Award in read-only view mode (Collector only)
+    openSection23AwardView(sectionModel) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        let domain = [];
+        if (this.state.selectedProject) {
+            domain.push(["project_id", "=", this.state.selectedProject]);
+        }
+        if (this.state.selectedVillage) {
+            domain.push(["village_id", "=", this.state.selectedVillage]);
+        }
+        
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "Section 23 Award",
+            res_model: sectionModel,
+            view_mode: "list",
+            views: [[false, "list"]],
+            domain: domain,
+            target: "current",
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
+        });
+    }
 }
 
 // Register SDM Dashboard

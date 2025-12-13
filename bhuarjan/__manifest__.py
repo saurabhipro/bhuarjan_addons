@@ -66,6 +66,9 @@
         'views/section4_notification_views.xml',
         'views/section11_preliminary_report_views.xml',
         'views/section19_notification_views.xml',
+        'views/section18_rr_scheme_views.xml',
+        'views/section8_views.xml',
+        'views/section23_award_views.xml',
         'views/process_report_views.xml',
         'views/draft_award_views.xml',
         'views/dashboard_views.xml',
@@ -90,6 +93,7 @@
         'wizard/user_report_wizard.xml',
         'views/qr_microsite_templates.xml',
         'data/mail_data.xml',
+        'views/menu_root.xml',
         'views/menuitem.xml',
 
     ],

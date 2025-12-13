@@ -115,11 +115,11 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
+    background: transparent;
     border: none;
     border-radius: 8px;
-    padding: 8px 10px;
-    margin-bottom: 10px;
+    padding: 3px 5px;
+    margin-bottom: 5px;
     box-shadow: none;
 }
 
@@ -128,7 +128,7 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     padding: 0;
     justify-content: flex-end;
 }
@@ -179,12 +179,14 @@
 }
 
 .o_dashboard_section {
-    background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%);
-    padding: 15px;
+    background: white;
+    padding: 12px;
     border-radius: 8px;
-    border: 3px solid #8B4513;
+    border: 1.5px solid #8B4513;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Dashboard Footer */
@@ -210,27 +212,29 @@
 .o_stats_grid {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
-    gap: 6px;
+    gap: 12px;
     grid-auto-flow: row;
+    width: 100%;
 }
 
 .o_stat_card {
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 10px 12px;
     border-radius: 4px;
     cursor: default;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
-    height: 64px;
-    min-height: 64px;
-    max-height: 64px;
+    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     min-width: 0;
+    max-width: 100%;
 }
 
 .o_stat_card > * {
@@ -239,13 +243,14 @@
 }
 
 .o_stat_icon {
-    font-size: 26px;
+    font-size: 32px;
     margin-right: 8px;
     opacity: 1;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 36px;
 }
 
 .o_stat_icon i,
@@ -268,21 +273,22 @@
 }
 
 .o_stat_label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     opacity: 1;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .o_stat_value {
     font-size: 22px;
     font-weight: 900;
-    line-height: 1.1;
+    line-height: 1;
     margin-bottom: 0;
 }
 
@@ -464,8 +470,8 @@
 /* Responsive Design */
 @media (max-width: 1600px) {
     .o_stats_grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 3px;
     }
 }
 

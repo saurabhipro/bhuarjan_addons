@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 23 Award List View -->
+    <record id="view_section23_award_list" model="ir.ui.view">
+        <field name="name">bhu.section23.award.list</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="arch" type="xml">
+            <list string="Section 23 Award">
+                <field name="name" string="Award Reference"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="award_number" string="Award Number"/>
+                <field name="award_date" string="Award Date"/>
+                <field name="award_document_filename" string="Award Document"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Section 23 Award Form View -->
+    <record id="view_section23_award_form" model="ir.ui.view">
+        <field name="name">bhu.section23.award.form</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="arch" type="xml">
+            <form string="Section 23 Award / धारा 23 अवार्ड">
+                <header>
+                    <button name="action_download_award" string="View / देखें" type="object" class="btn-primary" 
+                            icon="fa-download" invisible="not award_document"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="project_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="village_id" domain="village_domain" options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="award_number"/>
+                            <field name="award_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="award_document" filename="award_document_filename" 
+                               widget="binary" 
+                               string="Upload Award Document / अवार्ड दस्तावेज़ अपलोड करें"/>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Enter any additional notes..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 23 Award Search View -->
+    <record id="view_section23_award_search" model="ir.ui.view">
+        <field name="name">bhu.section23.award.search</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="arch" type="xml">
+            <search string="Section 23 Award">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="award_number"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Section 23 Award Action -->
+    <record id="action_section23_award" model="ir.actions.act_window">
+        <field name="name">Section 23 Award</field>
+        <field name="res_model">bhu.section23.award</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_section23_award_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Section 23 Award
+            </p>
+        </field>
+    </record>
+</odoo>

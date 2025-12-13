@@ -3,7 +3,7 @@
     <t t-name="bhuarjan.AdminDashboardTemplate" owl="1">
         <div class="o_admin_dashboard">
             <!-- Header with Role Title -->
-            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #D2B48C;">
+            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1.5px solid #8B4513;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">

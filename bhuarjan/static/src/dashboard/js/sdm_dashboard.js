@@ -299,8 +299,11 @@ export class OwlCrmDashboard extends Component {
             'bhu.expert.committee.report': 'Expert Group Reports',
             'bhu.section11.preliminary.report': 'Section 11 Notifications',
             'bhu.section15.objection': 'Section 15 Objections',
+            'bhu.section18.rr.scheme': 'Section 18 R and R Scheme',
             'bhu.section19.notification': 'Section 19 Notifications',
+            'bhu.section8': 'Section 8',
             'bhu.draft.award': 'Sec 21 notice',
+            'bhu.section23.award': 'Section 23 Award',
         };
         return sectionNames[sectionModel] || 'Document';
     }

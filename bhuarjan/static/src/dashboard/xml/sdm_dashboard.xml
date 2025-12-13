@@ -2,7 +2,7 @@
     <t t-name="bhuarjan.SDMTemplate" owl="1">
         <div class="o_admin_dashboard">
             <!-- Header with Role Title -->
-            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #D2B48C;">
+            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1.5px solid #8B4513;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div class="o_dashboard_title_section">
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
@@ -437,12 +437,41 @@
                                     <i class="fa fa-times"/> Return
                                 </button>
                             </div>
-    </div>
+                        </div>
+
+                        <!-- Section 18 R and R Scheme -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 7</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-file-pdf-o"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Section 18 R and R Scheme
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section18_rr_scheme_total || 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section18.rr.scheme')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section18.rr.scheme')">
+                                    <i class="fa fa-eye"/> View
+                                </button>
+                            </div>
+                        </div>
 
                         <!-- Section 19 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 7</span>
+                                <span class="o_step_number">Step 8</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bullhorn"/>
@@ -488,10 +517,41 @@
                             </div>
                         </div>
 
+                        <!-- Section 8 -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 9</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-check-square-o"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Section 8
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section8_draft || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section8_approved || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section8_rejected || 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section8')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section8')">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Sec 21 notice -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 8</span>
+                                <span class="o_step_number">Step 10</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-gavel"/>
@@ -533,6 +593,35 @@
                                         t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
                                         title="Return First Pending">
                                     <i class="fa fa-times"/> Return
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section 23 Award -->
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 11</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-trophy"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Section 23 Award
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_total || 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section23.award')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
+                                    <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
                         </div>

@@ -48,6 +48,8 @@ export class DepartmentDashboard extends Component {
 
     async loadInitialData() {
         try {
+            console.log("Loading initial data for department user...");
+            
             // Get user's locked department from project master
             const userDepartment = await this.orm.call(
                 "bhuarjan.dashboard",
@@ -56,21 +58,35 @@ export class DepartmentDashboard extends Component {
             );
 
             console.log("Department response from backend:", userDepartment);
+            console.log("Response type:", typeof userDepartment);
+            console.log("Response keys:", userDepartment ? Object.keys(userDepartment) : 'null');
 
-            if (userDepartment && userDepartment.id) {
-                this.state.selectedDepartment = userDepartment.id;
-                this.state.selectedDepartmentName = userDepartment.name;
-                this.state.departments = [{
-                    id: userDepartment.id,
-                    name: userDepartment.name
-                }];
-                console.log("Successfully loaded department:", {
-                    id: this.state.selectedDepartment,
-                    name: this.state.selectedDepartmentName
-                });
+            if (userDepartment) {
+                // Handle both object and array responses
+                const deptId = userDepartment.id || (Array.isArray(userDepartment) && userDepartment[0]?.id);
+                const deptName = userDepartment.name || (Array.isArray(userDepartment) && userDepartment[0]?.name);
+                
+                if (deptId) {
+                    this.state.selectedDepartment = deptId;
+                    this.state.selectedDepartmentName = deptName || `Department ${deptId}`;
+                    this.state.departments = [{
+                        id: deptId,
+                        name: deptName || `Department ${deptId}`
+                    }];
+                    console.log("Successfully loaded department:", {
+                        id: this.state.selectedDepartment,
+                        name: this.state.selectedDepartmentName
+                    });
+                } else {
+                    console.error("Department response missing id:", userDepartment);
+                    this.notification.add("Department data format error. Please check server logs.", { 
+                        type: "warning",
+                        sticky: true
+                    });
+                }
             } else {
                 console.warn("No department found for user. Response:", userDepartment);
-                this.notification.add("No department assigned to your projects. Please contact administrator.", { 
+                this.notification.add("No department assigned to your projects. Please ensure: 1) You are mapped to a project, 2) The project has a department assigned. Contact administrator if issue persists.", { 
                     type: "warning",
                     sticky: true
                 });
@@ -79,10 +95,13 @@ export class DepartmentDashboard extends Component {
             // Load mapped projects for the department
             if (this.state.selectedDepartment) {
                 await this.loadProjects();
+            } else {
+                console.warn("Cannot load projects - no department selected");
             }
         } catch (error) {
             console.error("Error loading initial data:", error);
-            this.notification.add("Error loading department information: " + (error.message || error), { 
+            console.error("Error stack:", error.stack);
+            this.notification.add("Error loading department information: " + (error.message || String(error)), { 
                 type: "danger",
                 sticky: true
             });

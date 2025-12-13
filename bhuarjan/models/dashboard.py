@@ -1176,29 +1176,46 @@ class BhuarjanDashboard(models.TransientModel):
     
     @api.model
     def get_department_user_department(self):
-        """Get the department for department user based on their assigned projects"""
+        """Get the department for department user - first from user's department_id field, then from assigned projects"""
         user = self.env.user
-        if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
+        _logger.info(f"Getting department for user: {user.id} ({user.name})")
+        
+        # Check if user has department_user group
+        has_group = user.has_group('bhuarjan.group_bhuarjan_department_user')
+        _logger.info(f"User has department_user group: {has_group}")
+        
+        if not has_group:
+            _logger.warning(f"User {user.id} ({user.name}) does not have department_user group")
             return None
         
-        # Get projects where user is assigned as department_user_ids
+        # First, check if user has bhu_department_id directly set (preferred method)
+        if hasattr(user, 'bhu_department_id') and user.bhu_department_id:
+            dept_data = {
+                'id': user.bhu_department_id.id,
+                'name': user.bhu_department_id.name
+            }
+            _logger.info(f"Department user {user.id} ({user.name}) has department set directly: {dept_data['name']} (ID: {dept_data['id']})")
+            return dept_data
+        
+        # Fallback: Get department from assigned projects
+        _logger.info("User does not have bhu_department_id set, checking assigned projects...")
         assigned_projects = self.env['bhu.project'].search([
             ('department_user_ids', 'in', [user.id])
         ])
+        
+        _logger.info(f"Found {len(assigned_projects)} projects for user {user.id}")
         
         if not assigned_projects:
             _logger.warning(f"Department user {user.id} ({user.name}) has no assigned projects")
             return None
         
         # Get unique departments from assigned projects (filter out False/None)
-        # Get department_id from each project
         departments = assigned_projects.mapped('department_id').filtered(lambda d: d)
+        
+        _logger.info(f"Found {len(departments)} unique departments from projects")
         
         if not departments:
             _logger.warning(f"Department user {user.id} ({user.name}) has projects but no departments assigned to those projects")
-            # Log project details for debugging
-            for project in assigned_projects:
-                _logger.warning(f"  Project: {project.name} (ID: {project.id}), Department: {project.department_id.name if project.department_id else 'None'}")
             return None
         
         # Get the first department (or only department if user has one)
@@ -1208,14 +1225,17 @@ class BhuarjanDashboard(models.TransientModel):
             'name': department.name
         }
         
-        _logger.info(f"Department user {user.id} ({user.name}) assigned to department: {dept_data['name']} (ID: {dept_data['id']})")
+        _logger.info(f"Department user {user.id} ({user.name}) assigned to department from projects: {dept_data['name']} (ID: {dept_data['id']})")
         return dept_data
     
     @api.model
     def get_department_user_projects(self, department_id=None):
         """Get mapped projects for department user, optionally filtered by department"""
         user = self.env.user
+        _logger.info(f"Getting projects for department user: {user.id} ({user.name})")
+        
         if not user.has_group('bhuarjan.group_bhuarjan_department_user'):
+            _logger.warning(f"User {user.id} does not have department_user group")
             return []
         
         # Get projects where user is assigned as department_user_ids
@@ -1226,7 +1246,21 @@ class BhuarjanDashboard(models.TransientModel):
             domain.append(('department_id', '=', department_id))
         
         projects = self.env['bhu.project'].search(domain)
-        return projects.read(["id", "name", "department_id"])
+        _logger.info(f"Found {len(projects)} projects for user {user.id}")
+        
+        # Read project data including department_id
+        project_data = projects.read(["id", "name", "department_id"])
+        
+        # Log each project and its department
+        for proj in project_data:
+            dept_id = proj.get('department_id')
+            if dept_id:
+                dept_name = dept_id[1] if isinstance(dept_id, (list, tuple)) else 'Unknown'
+                _logger.info(f"  Project: {proj['name']} (ID: {proj['id']}), Department: {dept_name}")
+            else:
+                _logger.warning(f"  Project: {proj['name']} (ID: {proj['id']}) has NO department")
+        
+        return project_data
     
     @api.model
     def get_dashboard_stats(self, filters=None):

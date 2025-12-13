@@ -35,23 +35,23 @@ class ResUsers(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला')
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
+    bhu_department_id = fields.Many2one(
+        'bhu.department',  # Maps to bhu.department model (Bhuarjan Department), NOT hr.department
+        string='Department / विभाग',
+        help='Select the Bhuarjan department for Department User role. This will be shown in the dashboard.'
+    )
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', 
                                  help='Select a project to filter villages. Only villages from this project will be shown.')
     village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False)
     village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),
-        ('revenue_inspector', 'Revenue Inspector'),
-        ('nayab_tahsildar', 'Nayab Tahsildar'),
-        ('tahsildar', 'Tahsildar'),
         ('sdm', 'SDM'),
         ('additional_collector', 'Additional Collector'),
         ('collector', 'Collector'),
         ('district_administrator', 'District Administrator'),
         ('administrator', 'Administrator'),
-        ('sia_team_member', 'SIA Team Member'),
         ('department_user', 'Department User'),
-        ('banker', 'Banker'),
     ], string="Bhuarjan Role", default=False)
 
 
@@ -96,15 +96,11 @@ class ResUsers(models.Model):
         # Clear all previous custom roles (you can add all group XML IDs here)
         all_custom_group_ids = [
             self.env.ref('bhuarjan.group_bhuarjan_patwari').id,
-            self.env.ref('bhuarjan.group_bhuarjan_ri').id,
-            self.env.ref('bhuarjan.group_bhuarjan_nayab_tahsildar').id,
-            self.env.ref('bhuarjan.group_bhuarjan_tahsildar').id,
             self.env.ref('bhuarjan.group_bhuarjan_sdm').id,
             self.env.ref('bhuarjan.group_bhuarjan_additional_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_district_administrator').id,
             self.env.ref('bhuarjan.group_bhuarjan_admin').id,
-            self.env.ref('bhuarjan.group_bhuarjan_sia_team_member').id,
             self.env.ref('bhuarjan.group_bhuarjan_department_user').id,
         ]
         if self.groups_id:
@@ -113,17 +109,12 @@ class ResUsers(models.Model):
         # Assign selected group
         group_map = {
             'patwari': 'bhuarjan.group_bhuarjan_patwari',
-            'revenue_inspector': 'bhuarjan.group_bhuarjan_ri',
-            'nayab_tahsildar': 'bhuarjan.group_bhuarjan_nayab_tahsildar',
-            'tahsildar': 'bhuarjan.group_bhuarjan_tahsildar',
             'sdm': 'bhuarjan.group_bhuarjan_sdm',
             'additional_collector': 'bhuarjan.group_bhuarjan_additional_collector',
             'collector': 'bhuarjan.group_bhuarjan_collector',
             'district_administrator': 'bhuarjan.group_bhuarjan_district_administrator',
             'administrator': 'bhuarjan.group_bhuarjan_admin',
-            'sia_team_member': 'bhuarjan.group_bhuarjan_sia_team_member',
             'department_user': 'bhuarjan.group_bhuarjan_department_user',
-            'banker': 'bhuarjan.group_bhuarjan_banker',
         }
 
         group_ref = group_map.get(self.bhuarjan_role)

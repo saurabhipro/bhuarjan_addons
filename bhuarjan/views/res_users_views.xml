@@ -10,6 +10,8 @@
                     <group string="Bhuarjan">
                         <group>
                             <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="bhu_department_id" invisible="bhuarjan_role != 'department_user'" 
+                                   options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
@@ -44,15 +46,14 @@
                     <field name="village_ids" widget="many2many_tags"/>
                     <field name="child_ids" widget="many2many_tags" invisible="1"/>
                 </xpath>
+                <!-- Hide Language column -->
                 <xpath expr="//field[@name='lang']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <!-- Hide Latest authentication (login_date) column -->
                 <xpath expr="//field[@name='login_date']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <!-- Hide Direct subordinates (child_ids) column - ensure it's hidden -->
-                <xpath expr="//field[@name='child_ids']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
             </field>
@@ -97,6 +98,8 @@
                             <group>
                                 <field name="active" string="Active / सक्रिय"/>
                                 <field name="bhuarjan_role"/>
+                                <field name="department_id" invisible="bhuarjan_role != 'department_user'" 
+                                       options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>

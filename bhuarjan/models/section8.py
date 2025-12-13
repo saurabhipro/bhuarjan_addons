@@ -16,10 +16,10 @@ class Section8(models.Model):
     
     # State for Approve/Reject
     state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('approved', 'Approved / अनुमोदित'),
-        ('rejected', 'Rejected / अस्वीकृत'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+        ('draft', 'Draft'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ], string='Status', default='draft', tracking=True)
     
     # Approval/Rejection details
     approval_date = fields.Datetime(string='Approval Date / अनुमोदन दिनांक', readonly=True, tracking=True)

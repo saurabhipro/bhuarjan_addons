@@ -254,7 +254,7 @@ action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_a
         <field name="name">bhu.survey.kanban</field>
         <field name="model">bhu.survey</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_small_column" create="not groups='bhuarjan.group_bhuarjan_collector'">
+            <kanban default_group_by="state" class="o_kanban_small_column" create="groups='bhuarjan.group_bhuarjan_admin' or groups='base.group_system'">
                 <field name="id"/>
                 <field name="name"/>
                 <field name="state"/>

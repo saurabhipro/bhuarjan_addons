@@ -12,11 +12,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
 
     # Common workflow state
     state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('submitted', 'Submitted / प्रस्तुत'),
-        ('approved', 'Approved / अनुमोदित'),
-        ('send_back', 'Sent Back / वापस भेजा गया'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('send_back', 'Sent Back'),
+    ], string='Status', default='draft', tracking=True)
     
     # Date tracking
     submitted_date = fields.Datetime(string='Submitted Date / प्रस्तुत दिनांक', 

@@ -96,6 +96,49 @@
     animation: approvedPulse 2s ease-in-out infinite;
 }
 
+/* Statusbar Alignment - Right Aligned */
+.o_form_view header {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+}
+
+.o_form_view .o_statusbar_status {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-left: auto !important;
+}
+
+.o_form_view .o_statusbar_buttons {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+}
+
+.o_form_view header .o_statusbar_status {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+}
+
+.o_form_view header .o_field_statusbar {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+}
+
+/* Ensure statusbar container takes available space and aligns right */
+.o_form_view header > div {
+    display: flex !important;
+    width: 100% !important;
+}
+
+.o_form_view header > div .o_statusbar_status,
+.o_form_view header > div .o_field_statusbar {
+    margin-left: auto !important;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .o_kanban_record .badge {

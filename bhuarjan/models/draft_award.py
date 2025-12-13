@@ -123,10 +123,10 @@ class DraftAward(models.Model):
     award_uuid = fields.Char(string='Award UUID', copy=False, readonly=True, index=True)
     
     state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('generated', 'Generated / जेनरेट किया गया'),
-        ('signed', 'Signed / हस्ताक्षरित'),
-    ], string='Status / स्थिति', default='draft', tracking=True)
+        ('draft', 'Draft'),
+        ('generated', 'Generated'),
+        ('signed', 'Signed'),
+    ], string='Status', default='draft', tracking=True)
     
     # Computed fields for edit permissions (similar to process workflow mixin)
     is_sdm = fields.Boolean(string='Is SDM', compute='_compute_user_roles', store=False)

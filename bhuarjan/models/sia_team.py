@@ -19,7 +19,7 @@ class SiaTeam(models.Model):
     
     # New fields
     sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=False, tracking=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade', domain=lambda self: [('sdm_ids', 'in', [self.env.user.id])])
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department', related="project_id.department_id")
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
@@ -244,6 +244,19 @@ class SiaTeam(models.Model):
         
         return {'domain': domain_updates}
     
+    @api.model
+    def _get_project_domain(self):
+        """Get domain for project_id based on user role"""
+        user = self.env.user
+        # Admin and system users can see all projects
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            return []
+        # SDM users can only see projects where they are assigned
+        if user.has_group('bhuarjan.group_bhuarjan_sdm'):
+            return [('sdm_ids', 'in', [user.id])]
+        # For other users, return empty domain (they shouldn't be creating SIA teams)
+        return []
+    
     @api.constrains('project_id')
     def _check_unique_project(self):
         """Ensure only one SIA Team per project"""
@@ -258,6 +271,24 @@ class SiaTeam(models.Model):
                         _('A SIA Team already exists for project "%s". Only one SIA Team can be created per project.') %
                         record.project_id.name
                     )
+    
+    @api.constrains('project_id')
+    def _check_sdm_project_assignment(self):
+        """Ensure SDM users can only create SIA teams for projects they're assigned to"""
+        user = self.env.user
+        # Skip validation for admin/system users
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            return
+        
+        # For SDM users, check if they're assigned to the project
+        if user.has_group('bhuarjan.group_bhuarjan_sdm'):
+            for record in self:
+                if record.project_id and record.project_id.sdm_ids:
+                    if user.id not in record.project_id.sdm_ids.ids:
+                        raise ValidationError(
+                            _('You are not assigned as SDM to project "%s". Please select a project where you are assigned as SDM.') %
+                            record.project_id.name
+                        )
     
     @api.constrains('village_ids', 'project_id')
     def _check_villages_belong_to_project(self):

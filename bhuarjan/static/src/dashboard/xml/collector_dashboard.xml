@@ -6,7 +6,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div class="o_dashboard_title_section">
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                            <i class="fa fa-gavel" style="margin-right: 10px;"/> Collector Dashboard
+                            <i class="fa fa-gavel" style="margin-right: 10px; font-size: 20px; color: #8B4513;"/> Collector Dashboard
                             <t t-if="state.selectedProjectName">
                                 <span class="o_selected_project_inline">
                                     <i class="fa fa-briefcase" style="margin-right: 8px;"/>

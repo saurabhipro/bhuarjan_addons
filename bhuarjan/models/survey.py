@@ -118,11 +118,11 @@ class Survey(models.Model):
     
     # Status
     state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('submitted', 'Submitted / प्रस्तुत'),
-        ('approved', 'Approved / अनुमोदित'),
-        ('rejected', 'Rejected / अस्वीकृत')
-    ], string='Status / स्थिति', default='draft', tracking=True)
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], string='Status', default='draft', tracking=True)
     
     # Track submission date
     submitted_date = fields.Datetime(string='Submitted Date / प्रस्तुत दिनांक', readonly=True, tracking=True,

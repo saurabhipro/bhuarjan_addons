@@ -54,8 +54,8 @@ class Section15Objection(models.Model):
     survey_acquired_area = fields.Float(string='Acquired Area / अर्जन क्षेत्रफल', readonly=True, compute='_compute_survey_details', store=False)
     survey_date = fields.Date(string='Survey Date / सर्वे दिनांक', readonly=True, compute='_compute_survey_details', store=False)
     survey_state = fields.Selection([
-        ('draft', 'Draft / प्रारूप'),
-        ('submitted', 'Submitted / प्रस्तुत'),
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
         ('approved', 'Approved / स्वीकृत'),
         ('locked', 'Locked / लॉक'),
     ], string='Survey Status / सर्वे स्थिति', readonly=True, compute='_compute_survey_details', store=False)

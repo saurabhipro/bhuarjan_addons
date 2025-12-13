@@ -13,7 +13,7 @@
                                         <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
                                     </span>
                                 </t>
-                        </div>
+                        </h2>
                     </div>
                     <div class="row w-50 gap-3">
                         <!-- Department Display (Locked/Read-only) -->

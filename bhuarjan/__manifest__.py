@@ -26,7 +26,7 @@
         'data/department_data.xml',
         'data/settings_master_data.xml',
         # Process-related sample data - commented out to prevent default import
-        # 'data/sample_project_data.xml',
+        'data/sample_project_data.xml',
         'data/sample_sequence_settings.xml',
         # 'data/sample_expert_committee_report.xml',
         # 'data/sample_landowners.xml',  # Disabled - not importing sample landowners
@@ -36,7 +36,7 @@
         # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data
         # 'data/sample_section11_reports.xml',
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
-        # 'data/kharsiyan_rate_master_data.xml',
+        'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',

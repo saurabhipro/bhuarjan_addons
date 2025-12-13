@@ -9,6 +9,7 @@ export class AdminDashboard extends Component {
     static template = "bhuarjan.AdminDashboardTemplate";
 
     setup() {
+        this.pageTitle = "Admin Dashboard";
         this.orm = useService("orm");
         this.action = useService("action");
         this.notification = useService("notification");

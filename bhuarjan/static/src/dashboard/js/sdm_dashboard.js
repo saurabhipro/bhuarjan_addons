@@ -10,6 +10,7 @@ export class OwlCrmDashboard extends Component {
     static template = "bhuarjan.SDMTemplate";
 
     setup() {
+        this.pageTitle = "SDM Dashboard";
         this.orm = useService("orm");
         this.action = useService("action");
 

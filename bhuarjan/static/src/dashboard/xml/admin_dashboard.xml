@@ -7,7 +7,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                            <i class="fa fa-crown" style="margin-right: 10px;"/> Admin Dashboard
+                            <i class="fa fa-crown" style="margin-right: 10px;"/> <t t-esc="pageTitle"/>
                         </h2>
                     </div>
                     <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: 100%;">

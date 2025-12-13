@@ -1223,9 +1223,11 @@ class BhuarjanDashboard(models.TransientModel):
     def get_role_based_dashboard_action(self):
         """Return the appropriate dashboard action based on user role"""
         user = self.env.user
+
         
         # Check user roles in priority order
         is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
+        print("\n\n  - ", user, is_admin)
         is_collector = user.has_group('bhuarjan.group_bhuarjan_collector') or user.has_group('bhuarjan.group_bhuarjan_additional_collector')
         is_department = user.has_group('bhuarjan.group_bhuarjan_department_user')
         is_sdm = user.has_group('bhuarjan.group_bhuarjan_sdm')
@@ -1233,38 +1235,39 @@ class BhuarjanDashboard(models.TransientModel):
         # Use sudo() to bypass permission checks when reading action references
         if is_admin:
             # Return Admin Dashboard action
-            action_ref = self.env.sudo().ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.admin_dashboard'
             name = 'Admin Dashboard'
         elif is_collector:
             # Return Collector Dashboard action
-            action_ref = self.env.sudo().ref('bhuarjan.action_collector_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_collector_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.collector_dashboard'
             name = 'Collector Dashboard'
         elif is_department:
             # Return Department User Dashboard action
-            action_ref = self.env.sudo().ref('bhuarjan.action_department_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_department_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.department_dashboard'
             name = 'Department User Dashboard'
         elif is_sdm:
             # Return SDM Dashboard action
-            action_ref = self.env.sudo().ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.sdm_dashboard_tag'
             name = 'SDM Dashboard'
         else:
             # Fallback to SDM dashboard for other users
-            action_ref = self.env.sudo().ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.sdm_dashboard_tag'
             name = 'SDM Dashboard'
         
         if not action_ref:
             # Fallback to admin dashboard if action not found
-            action_ref = self.env.sudo().ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
+            action_ref = self.env.ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.admin_dashboard'
             name = 'Admin Dashboard'
         
         # Return a proper client action dictionary instead of reading the record
         # This avoids issues with action IDs that don't exist
+        print("\n\n tag - ", tag, name)
         return {
             'type': 'ir.actions.client',
             'tag': tag,

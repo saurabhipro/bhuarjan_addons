@@ -29,8 +29,58 @@ class ReportWizard(models.TransientModel):
     allowed_village_ids = fields.Many2many(
         'bhu.village',
         string='Allowed Villages',
-        default=lambda self: [(6, 0, self.env.user.village_ids.ids)],
+        compute='_compute_allowed_village_ids',
+        store=False,
     )
+    
+    @api.depends('project_id')
+    def _compute_allowed_village_ids(self):
+        """Compute allowed villages based on project and user role"""
+        for wizard in self:
+            if wizard.project_id and wizard.project_id.village_ids:
+                # Get project villages
+                project_village_ids = wizard.project_id.village_ids.ids
+                if wizard.env.user.bhuarjan_role == 'patwari':
+                    # For patwari, only show villages that are both in project AND assigned to user
+                    user_village_ids = wizard.env.user.village_ids.ids
+                    allowed_ids = list(set(project_village_ids) & set(user_village_ids))
+                else:
+                    # For other users, show all project villages
+                    allowed_ids = project_village_ids
+                wizard.allowed_village_ids = [(6, 0, allowed_ids)]
+            else:
+                # No project selected or project has no villages
+                if wizard.env.user.bhuarjan_role == 'patwari':
+                    # For patwari, show only their assigned villages
+                    wizard.allowed_village_ids = [(6, 0, wizard.env.user.village_ids.ids)]
+                else:
+                    # For other users, show no villages until project is selected
+                    wizard.allowed_village_ids = [(6, 0, [])]
+    
+    
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        """Reset village when project changes and update domain to filter by project villages"""
+        self.village_id = False
+        if self.project_id and self.project_id.village_ids:
+            # Get project villages
+            project_village_ids = self.project_id.village_ids.ids
+            if self.env.user.bhuarjan_role == 'patwari':
+                # For patwari, only show villages that are both in project AND assigned to user
+                user_village_ids = self.env.user.village_ids.ids
+                allowed_ids = list(set(project_village_ids) & set(user_village_ids))
+            else:
+                # For other users, show all project villages
+                allowed_ids = project_village_ids
+            return {'domain': {'village_id': [('id', 'in', allowed_ids)]}}
+        else:
+            # No project selected or project has no villages
+            if self.env.user.bhuarjan_role == 'patwari':
+                # For patwari, show only their assigned villages
+                return {'domain': {'village_id': [('id', 'in', self.env.user.village_ids.ids)]}}
+            else:
+                # For other users, show no villages until project is selected
+                return {'domain': {'village_id': [('id', '=', False)]}}
 
     def action_print_report(self):
         """Generate Form 10 report in selected format (PDF/Excel/CSV)"""

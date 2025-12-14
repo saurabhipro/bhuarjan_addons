@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError, UserError
 import re
 
 
@@ -87,4 +87,38 @@ class BhuLandowner(models.Model):
             args = patwari_domain + args
         
         return super(BhuLandowner, self)._search(args, offset=offset, limit=limit, order=order)
+    
+    def unlink(self):
+        """Override unlink to handle survey relationships properly
+        
+        When a landowner is deleted:
+        - The Many2many links to surveys are automatically removed by Odoo
+        - Surveys themselves are NOT deleted (only the relationship is removed)
+        - We warn the user if there are approved/submitted surveys
+        """
+        for landowner in self:
+            # Check if landowner has linked surveys
+            if landowner.survey_ids:
+                survey_count = len(landowner.survey_ids)
+                # Get survey states for warning
+                approved_surveys = landowner.survey_ids.filtered(lambda s: s.state == 'approved')
+                submitted_surveys = landowner.survey_ids.filtered(lambda s: s.state == 'submitted')
+                
+                # Log warning (surveys will not be deleted, links will be removed automatically by Odoo)
+                import logging
+                _logger = logging.getLogger(__name__)
+                warning_msg = f"Deleting landowner '{landowner.name}' (ID: {landowner.id}) with {survey_count} linked survey(s). "
+                warning_msg += "Surveys will NOT be deleted - only the relationship links will be removed."
+                
+                if approved_surveys:
+                    warning_msg += f" WARNING: {len(approved_surveys)} survey(s) are APPROVED."
+                
+                if submitted_surveys:
+                    warning_msg += f" WARNING: {len(submitted_surveys)} survey(s) are SUBMITTED."
+                
+                _logger.warning(warning_msg)
+                
+        # Call parent unlink - Odoo automatically removes Many2many relationship records
+        # from bhu_survey_landowner_rel table, but surveys remain intact
+        return super(BhuLandowner, self).unlink()
     

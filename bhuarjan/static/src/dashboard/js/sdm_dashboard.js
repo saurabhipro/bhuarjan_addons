@@ -88,7 +88,7 @@ export class OwlCrmDashboard extends Component {
         try {
             this.state.projects = await this.orm.call(
                 "bhuarjan.dashboard",
-                "get_all_projects_sdm_filtered",
+                "get_user_projects",
                 [this.state.selectedDepartment]
             );
         } catch (error) {
@@ -105,7 +105,7 @@ export class OwlCrmDashboard extends Component {
         try {
             this.state.villages = await this.orm.call(
                 "bhuarjan.dashboard",
-                "get_villages_by_project_sdm",
+                "get_villages_by_project",
                 [this.state.selectedProject]
             );
         } catch (error) {
@@ -140,7 +140,7 @@ export class OwlCrmDashboard extends Component {
             
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
-                "get_sdm_dashboard_stats",
+                "get_dashboard_stats",  // Unified method for all dashboard types
                 [
                     this.state.selectedDepartment || null,
                     this.state.selectedProject || null,

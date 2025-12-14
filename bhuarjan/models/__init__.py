@@ -35,7 +35,7 @@ from . import process_report_signed_docs_download
 from . import process_report
 from . import ir_http
 from . import ir_attachment
-from . import dashboard
+# Dashboard is now in dashboard/ folder at root level, imported in root __init__.py
 from . import otp
 from . import token
 from . import channel_master

@@ -134,22 +134,14 @@ const DASHBOARD_CONFIG = {
         showProjectFilter: true,
         showVillageFilter: true,
         statsMapping: {
-            'total_districts': 'total_districts',
-            'total_sub_divisions': 'total_sub_divisions',
-            'total_tehsils': 'total_tehsils',
-            'total_villages': 'total_villages',
-            'total_projects': 'total_projects',
-            'total_departments': 'total_departments',
-            'total_landowners': 'total_landowners',
-            'total_rate_masters': 'total_rate_masters',
-            'active_mobile_users': 'active_mobile_users',
-            'total_surveys': 'total_surveys',
+            // Map backend field names to admin dashboard state field names
+            'survey_total': 'total_surveys',
+            'survey_draft': 'draft_surveys',
+            'survey_submitted': 'submitted_surveys',
+            'survey_approved': 'approved_surveys',
+            'survey_rejected': 'rejected_surveys',
             'total_surveys_done': 'total_surveys_done',
-            'draft_surveys': 'draft_surveys',
-            'approved_surveys': 'approved_surveys',
-            'rejected_surveys': 'rejected_surveys',
             'pending_surveys': 'pending_surveys',
-            'submitted_surveys': 'submitted_surveys',
             'section4_total': 'section4_total',
             'section4_draft': 'section4_draft',
             'section4_submitted': 'section4_submitted',
@@ -170,11 +162,11 @@ const DASHBOARD_CONFIG = {
             'section15_submitted': 'section15_submitted',
             'section15_approved': 'section15_approved',
             'section15_send_back': 'section15_send_back',
-            'expert_committee_total': 'expert_committee_total',
-            'expert_committee_draft': 'expert_committee_draft',
-            'expert_committee_submitted': 'expert_committee_submitted',
-            'expert_committee_approved': 'expert_committee_approved',
-            'expert_committee_send_back': 'expert_committee_send_back',
+            'expert_total': 'expert_committee_total',
+            'expert_draft': 'expert_committee_draft',
+            'expert_submitted': 'expert_committee_submitted',
+            'expert_approved': 'expert_committee_approved',
+            'expert_send_back': 'expert_committee_send_back',
             'sia_total': 'sia_total',
             'sia_draft': 'sia_draft',
             'sia_submitted': 'sia_submitted',
@@ -198,6 +190,53 @@ const DASHBOARD_CONFIG = {
             'survey_approved': 'survey_approved',
             'survey_rejected': 'survey_rejected',
             'survey_completion_percent': 'survey_completion_percent',
+        }
+    },
+    'admin': {
+        template: 'bhuarjan.AdminDashboardTemplate',
+        registryKey: 'bhuarjan.admin_dashboard',
+        pageTitle: 'Admin Dashboard',
+        localStoragePrefix: 'admin_dashboard',
+        showDepartmentFilter: true,
+        showProjectFilter: true,
+        showVillageFilter: true,
+        statsMapping: {
+            // Admin sees all stats - same as SDM
+            'survey_total': 'survey_total',
+            'survey_draft': 'survey_draft',
+            'survey_submitted': 'survey_submitted',
+            'survey_approved': 'survey_approved',
+            'survey_rejected': 'survey_rejected',
+            'section4_total': 'section4_total',
+            'section4_draft': 'section4_draft',
+            'section4_submitted': 'section4_submitted',
+            'section4_approved': 'section4_approved',
+            'section4_send_back': 'section4_send_back',
+            'section11_total': 'section11_total',
+            'section11_draft': 'section11_draft',
+            'section11_submitted': 'section11_submitted',
+            'section11_approved': 'section11_approved',
+            'section11_send_back': 'section11_send_back',
+            'section15_total': 'section15_total',
+            'section15_draft': 'section15_draft',
+            'section15_submitted': 'section15_submitted',
+            'section15_approved': 'section15_approved',
+            'section15_send_back': 'section15_send_back',
+            'section19_total': 'section19_total',
+            'section19_draft': 'section19_draft',
+            'section19_submitted': 'section19_submitted',
+            'section19_approved': 'section19_approved',
+            'section19_send_back': 'section19_send_back',
+            'expert_total': 'expert_total',
+            'expert_draft': 'expert_draft',
+            'expert_submitted': 'expert_submitted',
+            'expert_approved': 'expert_approved',
+            'expert_send_back': 'expert_send_back',
+            'sia_total': 'sia_total',
+            'sia_draft': 'sia_draft',
+            'sia_submitted': 'sia_submitted',
+            'sia_approved': 'sia_approved',
+            'sia_send_back': 'sia_send_back',
         }
     }
 };
@@ -578,10 +617,20 @@ export class UnifiedDashboard extends Component {
     }
 
     async openSectionList(model) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        // Special handling for R and R Scheme - open form directly (one per project)
+        if (model === 'bhu.section18.rr.scheme') {
+            await this.openRRSchemeForm();
+            return;
+        }
+        
         const domain = this.getDomain();
         await this.action.doAction({
             type: 'ir.actions.act_window',
-            name: model,
+            name: this.getSectionName(model),
             res_model: model,
             view_mode: 'list,form',
             views: [[false, 'list'], [false, 'form']],
@@ -592,6 +641,223 @@ export class UnifiedDashboard extends Component {
                 'default_village_id': this.state.selectedVillage || false,
             },
         });
+    }
+
+    // Open first document in form view with pagination (for View button)
+    async openFirstDocument(sectionModel, sectionInfo) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        let domain = [];
+        if (this.state.selectedProject) {
+            domain.push(["project_id", "=", this.state.selectedProject]);
+        }
+        if (this.state.selectedVillage) {
+            domain.push(["village_id", "=", this.state.selectedVillage]);
+        }
+        
+        // Try to get first pending, otherwise first document
+        let recordId = false;
+        if (sectionInfo) {
+            if (sectionInfo.first_pending_id) {
+                recordId = sectionInfo.first_pending_id;
+            } else if (sectionInfo.first_document_id) {
+                recordId = sectionInfo.first_document_id;
+            }
+        }
+        
+        const sectionName = this.getSectionName(sectionModel);
+        
+        if (recordId) {
+            // If only 1 document, open directly in form view, otherwise use list,form for pagination
+            const totalCount = sectionInfo ? (sectionInfo.total || 0) : 0;
+            const viewMode = totalCount === 1 ? "form" : "list,form";
+            const views = totalCount === 1 ? [[false, "form"]] : [[false, "list"], [false, "form"]];
+            
+            await this.action.doAction({
+                type: "ir.actions.act_window",
+                name: sectionName,
+                res_model: sectionModel,
+                res_id: recordId,
+                view_mode: viewMode,
+                views: views,
+                domain: domain,
+                target: "current",
+                context: {
+                    'default_project_id': this.state.selectedProject || false,
+                    'default_village_id': this.state.selectedVillage || false,
+                },
+            });
+        } else {
+            // No documents, open list view
+            await this.openSectionList(sectionModel);
+        }
+    }
+
+    // Create new record for a section
+    async createSectionRecord(sectionModel) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        // Special handling for R and R Scheme - open form directly (one per project)
+        if (sectionModel === 'bhu.section18.rr.scheme') {
+            await this.openRRSchemeForm();
+            return;
+        }
+        
+        let context = {};
+        if (this.state.selectedProject) {
+            context.default_project_id = this.state.selectedProject;
+        }
+        if (this.state.selectedVillage) {
+            context.default_village_id = this.state.selectedVillage;
+        }
+        await this.action.doAction({
+            type: "ir.actions.act_window",
+            name: _t("New Record"),
+            res_model: sectionModel,
+            view_mode: "form",
+            views: [[false, "form"]],
+            target: "current",
+            context: context,
+        });
+    }
+
+    // Open first pending document in form view for approval/rejection
+    async openFirstPending(sectionModel, pendingId, sectionInfo) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        if (!pendingId) {
+            // No pending documents, just open list view
+            await this.openSectionList(sectionModel);
+            return;
+        }
+        
+        let domain = [];
+        if (this.state.selectedProject) {
+            domain.push(["project_id", "=", this.state.selectedProject]);
+        }
+        if (this.state.selectedVillage) {
+            domain.push(["village_id", "=", this.state.selectedVillage]);
+        }
+        // Filter to only submitted records for pagination
+        domain.push(["state", "=", "submitted"]);
+        
+        const sectionName = this.getSectionName(sectionModel);
+        
+        // If only 1 submitted document, open directly in form view, otherwise use list,form for pagination
+        const submittedCount = sectionInfo ? (sectionInfo.submitted_count || 0) : 0;
+        const viewMode = submittedCount === 1 ? "form" : "list,form";
+        const views = submittedCount === 1 ? [[false, "form"]] : [[false, "list"], [false, "form"]];
+        
+        await this.action.doAction({
+            type: "ir.actions.act_window",
+            name: sectionName,
+            res_model: sectionModel,
+            res_id: pendingId,
+            view_mode: viewMode,
+            views: views,
+            domain: domain,
+            target: "current",
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
+        });
+    }
+
+    // Open R and R Scheme form directly (one per project)
+    async openRRSchemeForm() {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+
+        try {
+            const action = await this.orm.call(
+                'bhu.section18.rr.scheme',
+                'action_open_rr_scheme_form',
+                [this.state.selectedProject]
+            );
+            if (action && action.type) {
+                await this.action.doAction(action);
+            }
+        } catch (error) {
+            console.error('Error opening R and R Scheme:', error);
+            // Fallback to list view
+            await this.action.doAction({
+                type: "ir.actions.act_window",
+                name: "Section 18 R and R Scheme",
+                res_model: 'bhu.section18.rr.scheme',
+                view_mode: "list,form",
+                views: [[false, "list"], [false, "form"]],
+                target: "current",
+            });
+        }
+    }
+
+    // Check if all items in a section are approved
+    isAllApproved(sectionInfo) {
+        if (!sectionInfo) {
+            return true;
+        }
+        // Check if all are approved (no submitted or draft)
+        return sectionInfo.submitted_count === 0 && sectionInfo.draft_count === 0;
+    }
+
+    // Open surveys filtered by state (for department dashboard)
+    async openSurveysByState(state) {
+        let domain = this.getDomain();
+        
+        // Add state filter if provided
+        if (state === 'draft') {
+            domain.push(['state', '=', 'draft']);
+        } else if (state === 'submitted') {
+            domain.push(['state', '=', 'submitted']);
+        } else if (state === 'approved') {
+            domain.push(['state', '=', 'approved']);
+        } else if (state === 'rejected') {
+            domain.push(['state', '=', 'rejected']);
+        }
+        // If state is null, show all surveys (no additional filter)
+        
+        await this.action.doAction({
+            type: 'ir.actions.act_window',
+            name: state ? `${state.charAt(0).toUpperCase() + state.slice(1)} Surveys` : 'All Surveys',
+            res_model: 'bhu.survey',
+            view_mode: 'list,form',
+            views: [[false, 'list'], [false, 'form']],
+            domain: domain,
+            target: 'current',
+            context: {
+                'default_project_id': this.state.selectedProject || false,
+                'default_village_id': this.state.selectedVillage || false,
+            },
+        });
+    }
+
+    // Get section name from model
+    getSectionName(model) {
+        const names = {
+            'bhu.survey': 'Surveys',
+            'bhu.section4.notification': 'Section 4 Notifications',
+            'bhu.section11.preliminary.report': 'Section 11 Reports',
+            'bhu.section15.objection': 'Section 15 Objections',
+            'bhu.section19.notification': 'Section 19 Notifications',
+            'bhu.expert.committee.report': 'Expert Committee Reports',
+            'bhu.sia.team': 'SIA Teams',
+            'bhu.section18.rr.scheme': 'Section 18 R and R Scheme',
+            'bhu.draft.award': 'Draft Awards',
+            'bhu.section23.award': 'Section 23 Awards',
+        };
+        return names[model] || model;
+    }
+
+    toString(value) {
+        return value ? String(value) : '';
     }
 }
 

@@ -53,6 +53,34 @@
 
             <!-- Dashboard Content -->
             <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Status Legend Section - At the top -->
+                <div class="o_status_legend_section">
+                    <div class="o_status_legend_container">
+                        <div class="o_status_legend_title">
+                            <i class="fa fa-info-circle"/>
+                            <span>Status Legend</span>
+                        </div>
+                        <div class="o_status_legend_items">
+                            <div class="o_legend_item">
+                                <i class="fa fa-file-o o_legend_icon_draft"/>
+                                <span class="o_legend_label">Draft</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                <span class="o_legend_label">Submitted</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                <span class="o_legend_label">Approved</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                <span class="o_legend_label">Returned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Survey Statistics Cards -->
                 <div class="o_dashboard_section">
                     <h3 class="o_section_title">
@@ -118,8 +146,8 @@
 
                 <!-- List View Section - Only Surveys -->
                 <div class="o_dashboard_section">
-                    <div class="o_sections_list o_sections_list_grid">
-                        <!-- Surveys -->
+                    <div class="o_sections_list">
+                        <!-- Surveys - Step 1 Only -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number">Step 1</span>
@@ -151,45 +179,18 @@
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                            </div>
-                        </div>
-
-                        <!-- Step 12: Status Indicators -->
-                        <div class="o_section_list_item o_card_no_click">
-                            <div class="o_section_list_step" style="display: none;">
-                                <span class="o_step_number">Step 12</span>
-                            </div>
-                            <div class="o_section_list_icon">
-                                <i class="fa fa-info-circle"/>
-                            </div>
-                            <div class="o_section_list_content">
-                                <div class="o_section_list_title">
-                                    Status Legend
-                                </div>
-                                <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list">-</div>
-                                    <div class="o_section_list_count" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-file-o o_legend_icon_draft"/>
-                                            <span class="o_legend_label">Draft</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                                            <span class="o_legend_label">Submitted</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-check-circle o_legend_icon_approved"/>
-                                            <span class="o_legend_label">Approved</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                            <span class="o_legend_label">Returned</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="o_section_list_actions">
-                                <!-- No actions for status legend -->
+                                <button class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApproved(state.stats.survey_info) : true"
+                                        title="Approve First Pending Survey">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info.first_pending_id : false, state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.survey_info ? this.isAllApproved(state.stats.survey_info) : true"
+                                        title="Reject First Pending Survey">
+                                    <i class="fa fa-times"/> Reject
+                                </button>
                             </div>
                         </div>
                     </div>

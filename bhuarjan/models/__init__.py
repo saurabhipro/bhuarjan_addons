@@ -46,4 +46,3 @@ from . import law_master
 from . import survey_photo
 from . import form10_export_utils
 from . import app_version
-from . import sdm_dashboard

@@ -161,11 +161,15 @@ export class DepartmentDashboard extends Component {
                 filters.village_id = parseInt(this.state.selectedVillage);
             }
             
+            console.log("Loading dashboard with filters:", filters);
+            
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
                 [filters]
             );
+            
+            console.log("Received stats:", stats);
 
             if (stats) {
                 this.state.stats = {
@@ -203,6 +207,14 @@ export class DepartmentDashboard extends Component {
             const project = this.state.projects.find(p => p.id === projectId);
             this.state.selectedProjectName = project ? project.name : null;
             await this.loadVillages();
+            
+            // Clear village selection if current village doesn't belong to new project
+            if (this.state.selectedVillage) {
+                const villageExists = this.state.villages.find(v => v.id === this.state.selectedVillage);
+                if (!villageExists) {
+                    this.state.selectedVillage = null;
+                }
+            }
         } else {
             this.state.selectedProjectName = null;
             this.state.selectedVillage = null;

@@ -73,7 +73,7 @@ export class OwlCrmDashboard extends Component {
 
     async loadDepartments() {
         try {
-            this.state.departments = await this.orm.call("bhu.dashboard", "get_all_departments", []);
+            this.state.departments = await this.orm.call("bhuarjan.dashboard", "get_all_departments", []);
         } catch (error) {
             console.error("Error loading departments:", error);
             this.state.departments = [];
@@ -87,8 +87,8 @@ export class OwlCrmDashboard extends Component {
         }
         try {
             this.state.projects = await this.orm.call(
-                "bhu.dashboard",
-                "get_all_projects_sdm",
+                "bhuarjan.dashboard",
+                "get_all_projects_sdm_filtered",
                 [this.state.selectedDepartment]
             );
         } catch (error) {
@@ -104,7 +104,7 @@ export class OwlCrmDashboard extends Component {
         }
         try {
             this.state.villages = await this.orm.call(
-                "bhu.dashboard",
+                "bhuarjan.dashboard",
                 "get_villages_by_project_sdm",
                 [this.state.selectedProject]
             );
@@ -139,7 +139,7 @@ export class OwlCrmDashboard extends Component {
             }
             
             const stats = await this.orm.call(
-                "bhu.dashboard",
+                "bhuarjan.dashboard",
                 "get_sdm_dashboard_stats",
                 [
                     this.state.selectedDepartment || null,

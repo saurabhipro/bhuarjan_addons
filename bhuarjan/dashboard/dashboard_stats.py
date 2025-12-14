@@ -664,31 +664,48 @@ class DashboardStats(models.AbstractModel):
         - Others: See only assigned projects
         
         Args:
-            department_id: Optional department ID to filter by
+            department_id: Optional department ID to filter by (can be int, string, or None)
             
         Returns:
             list: List of project dictionaries with 'id' and 'name'
         """
+        # Convert department_id to int if provided
+        dept_id = None
+        if department_id:
+            try:
+                dept_id = int(department_id)
+            except (ValueError, TypeError):
+                _logger.warning(f"Invalid department_id provided: {department_id}, ignoring filter")
+                dept_id = None
+        
         user_access = self._get_user_project_access()
+        _logger.info(f"get_user_projects called - user: {self.env.user.name} (ID: {self.env.user.id}), "
+                    f"can_see_all: {user_access['can_see_all']}, department_id: {dept_id}")
+        
         domain = []
         
         if user_access['can_see_all']:
-            # Admin/Collector: can see all, optionally filter by department
-            if department_id:
-                domain = [('department_id', '=', department_id)]
+            # Admin/Collector/District Admin: can see all, optionally filter by department
+            if dept_id:
+                domain = [('department_id', '=', dept_id)]
             projects = self.env['bhu.project'].search(domain)
+            _logger.info(f"Found {len(projects)} projects (can_see_all=True, dept_filter={dept_id})")
         else:
             # User has project restrictions
             project_ids = user_access['project_ids'] or []
             if project_ids:
                 domain = [('id', 'in', project_ids)]
-                if department_id:
-                    domain = ['&', ('department_id', '=', department_id)] + domain
+                if dept_id:
+                    domain = ['&', ('department_id', '=', dept_id)] + domain
                 projects = self.env['bhu.project'].search(domain)
+                _logger.info(f"Found {len(projects)} projects (restricted access, dept_filter={dept_id})")
             else:
+                _logger.warning(f"No project_ids found for user {self.env.user.name} (ID: {self.env.user.id})")
                 return []
         
-        return projects.read(["id", "name"])
+        result = projects.read(["id", "name"])
+        _logger.info(f"Returning {len(result)} projects: {[p['name'] for p in result]}")
+        return result
     
     @api.model
     def get_villages_by_project(self, project_id):

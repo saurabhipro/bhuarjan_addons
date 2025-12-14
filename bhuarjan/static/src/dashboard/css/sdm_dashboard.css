@@ -659,7 +659,7 @@
 }
 
 .o_step_number {
-    background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
+    /* Background removed - use bg-primary class instead */
     color: white;
     font-weight: 700;
     font-size: 12px;
@@ -673,10 +673,10 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: 100%;
-    min-height: 60px;
-    box-sizing: border-box;
-    text-align: center;
+}
+
+.bg-primary {
+    background-color: #007bff !important;
 }
 
 .o_section_list_item:hover {

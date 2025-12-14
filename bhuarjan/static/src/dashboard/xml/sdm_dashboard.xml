@@ -177,7 +177,7 @@
                         <!-- Surveys -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 1</span>
+                                <span class="o_step_number bg-primary">Step 1</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-clipboard"/>
@@ -212,7 +212,7 @@
                         <!-- SIA Team -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 2</span>
+                                <span class="o_step_number bg-primary">Step 2</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-users"/>
@@ -254,7 +254,7 @@
                         <!-- Section 4 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 3</span>
+                                <span class="o_step_number bg-primary">Step 3</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bell"/>
@@ -303,7 +303,7 @@
                         <!-- Expert Group -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 4</span>
+                                <span class="o_step_number bg-primary">Step 4</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-graduation-cap"/>
@@ -352,7 +352,7 @@
                         <!-- Section 8 (Only for Collector, after Expert Group) -->
                         <div t-if="state.isCollector" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 5</span>
+                                <span class="o_step_number bg-primary">Step 5</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-check-square-o"/>
@@ -380,7 +380,7 @@
                         <!-- Section 11 (Step 5 for non-collector - stays in Column 1) -->
                         <div t-if="!state.isCollector" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 5</span>
+                                <span class="o_step_number bg-primary">Step 5</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-text"/>
@@ -421,7 +421,7 @@
                         <!-- Section 11 (Step 6 for Collector - goes in Column 2) -->
                         <div t-if="state.isCollector" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 6</span>
+                                <span class="o_step_number bg-primary">Step 6</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-text"/>
@@ -467,7 +467,7 @@
                         <!-- Section 15 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 7' : 'Step 6'"/></span>
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 7' : 'Step 6'"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-exclamation-triangle"/>
@@ -516,7 +516,7 @@
                         <!-- Section 18 R and R Scheme -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 8' : 'Step 7'"/></span>
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 8' : 'Step 7'"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-pdf-o"/>
@@ -545,7 +545,7 @@
                         <!-- Section 19 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 9' : 'Step 8'"/></span>
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 9' : 'Step 8'"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bullhorn"/>
@@ -594,7 +594,7 @@
                         <!-- Sec 21 notice -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 10' : 'Step 9'"/></span>
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 10' : 'Step 9'"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-gavel"/>
@@ -643,7 +643,7 @@
                         <!-- Section 23 Award -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 11' : 'Step 10'"/></span>
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 11' : 'Step 10'"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-trophy"/>

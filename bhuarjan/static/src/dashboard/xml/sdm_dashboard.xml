@@ -172,6 +172,8 @@
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
                     <div class="o_sections_list o_sections_list_grid">
+                        <!-- Column 1: Steps 1-5 -->
+                        <div class="o_sections_column">
                         <!-- Surveys -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
@@ -375,10 +377,10 @@
                             </div>
                         </div>
 
-                        <!-- Section 11 -->
-                        <div class="o_section_list_item o_card_no_click">
+                        <!-- Section 11 (Step 5 for non-collector - stays in Column 1) -->
+                        <div t-if="!state.isCollector" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number"><t t-esc="state.isCollector ? 'Step 6' : 'Step 5'"/></span>
+                                <span class="o_step_number">Step 5</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-text"/>
@@ -403,19 +405,57 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                            </div>
+                        </div>
+                        </div>
+                        <!-- End Column 1 -->
+
+                        <!-- Column 2: Steps 6-10 -->
+                        <div class="o_sections_column">
+                        <!-- Section 11 (Step 6 for Collector - goes in Column 2) -->
+                        <div t-if="state.isCollector" class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number">Step 6</span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-file-text"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Section 11 Notifications
+                                    <t t-if="state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 11 Notifications completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section11_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.approved_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.send_back_count : 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
                                         title="Return First Pending">
@@ -627,7 +667,9 @@
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
+                            </div>
                         </div>
+                        <!-- End Column 2 -->
 
                     </div>
                 </div>

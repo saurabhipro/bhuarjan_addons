@@ -8,7 +8,7 @@ class Section18RRScheme(models.Model):
     _description = 'Section 18 R and R Scheme'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
-    
+
     _sql_constraints = [
         ('unique_project', 'UNIQUE(project_id)', 
          'Only one R and R Scheme can be created per project! / प्रति परियोजना केवल एक R और R योजना बनाई जा सकती है!')
@@ -129,5 +129,5 @@ class Section18RRScheme(models.Model):
                 'context': {
                     'default_project_id': project_id,
                 }
-            }
+        }
 

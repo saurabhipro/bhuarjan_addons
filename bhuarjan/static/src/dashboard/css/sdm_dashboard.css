@@ -601,15 +601,29 @@
 }
 
 .o_sections_list_grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
     gap: 10px;
-    align-items: start;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.o_sections_column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 50%;
 }
 
 @media (max-width: 992px) {
     .o_sections_list_grid {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+    
+    .o_sections_column {
+        width: 100%;
     }
 }
 

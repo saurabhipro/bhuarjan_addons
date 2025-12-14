@@ -53,7 +53,7 @@ class ResUsers(models.Model):
         ('administrator', 'Administrator'),
         ('department_user', 'Department User'),
     ], string="Bhuarjan Role", default=False)
-    
+
     survey_count_in_project = fields.Integer(
         string='Survey Count / सर्वे संख्या',
         compute='_compute_survey_count_in_project',

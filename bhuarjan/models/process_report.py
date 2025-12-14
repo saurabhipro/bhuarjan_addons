@@ -45,6 +45,7 @@ class ProcessReportWizard(models.TransientModel):
     """Wizard for filtering Process Report"""
     _name = 'bhu.process.report.wizard'
     _description = 'Process Report Wizard'
+    _inherit = ['bhu.process.report.pdf.download.mixin', 'bhu.process.report.signed.docs.download.mixin']
 
     department_id = fields.Many2one('bhu.department', string='Department / विभाग')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', 
@@ -302,4 +303,50 @@ class ProcessReportWizard(models.TransientModel):
             'url': f'/web/content/{attachment.id}?download=true',
             'target': 'self',
         }
+
+    def _get_filtered_records(self):
+        """Get filtered records based on wizard filters"""
+        self.ensure_one()
+        
+        # Build domain for filtering
+        project_domain = []
+        if self.department_id:
+            project_domain.append(('department_id', '=', self.department_id.id))
+        if self.project_id:
+            project_domain.append(('id', '=', self.project_id.id))
+        
+        # Get filtered project IDs
+        project_ids = self.env['bhu.project'].search(project_domain).ids if project_domain else []
+        
+        # Build notification domain
+        domain = []
+        if project_ids:
+            domain.append(('project_id', 'in', project_ids))
+        elif self.project_id:
+            domain.append(('project_id', '=', self.project_id.id))
+        if self.village_id:
+            domain.append(('village_id', '=', self.village_id.id))
+        
+        records = {
+            'section4': [],
+            'section11': [],
+            'section19': [],
+        }
+        
+        # Section 4 Notifications
+        if self.status_type in ('sec4', 'all'):
+            section4_domain = domain.copy()
+            records['section4'] = self.env['bhu.section4.notification'].search(section4_domain)
+        
+        # Section 11 Preliminary Reports
+        if self.status_type in ('sec11', 'all'):
+            section11_domain = domain.copy()
+            records['section11'] = self.env['bhu.section11.preliminary.report'].search(section11_domain)
+        
+        # Section 19 Notifications
+        if self.status_type in ('sec19', 'all'):
+            section19_domain = domain.copy()
+            records['section19'] = self.env['bhu.section19.notification'].search(section19_domain)
+        
+        return records
 

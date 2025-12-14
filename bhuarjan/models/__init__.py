@@ -30,6 +30,8 @@ from . import section18_rr_scheme
 from . import section8
 from . import section23_award
 from . import draft_award
+from . import process_report_pdf_download
+from . import process_report_signed_docs_download
 from . import process_report
 from . import ir_http
 from . import ir_attachment

@@ -179,10 +179,9 @@ const DASHBOARD_CONFIG = {
         registryKey: 'bhuarjan.department_dashboard',
         pageTitle: 'Department User Dashboard',
         localStoragePrefix: 'department_dashboard',
-        showDepartmentFilter: false, // Department is auto-selected
+        showDepartmentFilter: true, // Department users can select any department
         showProjectFilter: true,
         showVillageFilter: true,
-        initialDataMethod: 'get_department_user_department',
         statsMapping: {
             'survey_total': 'survey_total',
             'survey_draft': 'survey_draft',
@@ -190,6 +189,53 @@ const DASHBOARD_CONFIG = {
             'survey_approved': 'survey_approved',
             'survey_rejected': 'survey_rejected',
             'survey_completion_percent': 'survey_completion_percent',
+        }
+    },
+    'district': {
+        template: 'bhuarjan.DistrictDashboardTemplate',
+        registryKey: 'bhuarjan.district_dashboard',
+        pageTitle: 'District Admin Dashboard',
+        localStoragePrefix: 'district_dashboard',
+        showDepartmentFilter: true,
+        showProjectFilter: true,
+        showVillageFilter: true,
+        isReadOnly: true, // District admin can only view, not create
+        statsMapping: {
+            'survey_total': 'survey_total',
+            'survey_draft': 'survey_draft',
+            'survey_submitted': 'survey_submitted',
+            'survey_approved': 'survey_approved',
+            'survey_rejected': 'survey_rejected',
+            'section4_total': 'section4_total',
+            'section4_draft': 'section4_draft',
+            'section4_submitted': 'section4_submitted',
+            'section4_approved': 'section4_approved',
+            'section4_send_back': 'section4_send_back',
+            'section11_total': 'section11_total',
+            'section11_draft': 'section11_draft',
+            'section11_submitted': 'section11_submitted',
+            'section11_approved': 'section11_approved',
+            'section11_send_back': 'section11_send_back',
+            'section15_total': 'section15_total',
+            'section15_draft': 'section15_draft',
+            'section15_submitted': 'section15_submitted',
+            'section15_approved': 'section15_approved',
+            'section15_send_back': 'section15_send_back',
+            'section19_total': 'section19_total',
+            'section19_draft': 'section19_draft',
+            'section19_submitted': 'section19_submitted',
+            'section19_approved': 'section19_approved',
+            'section19_send_back': 'section19_send_back',
+            'expert_total': 'expert_total',
+            'expert_draft': 'expert_draft',
+            'expert_submitted': 'expert_submitted',
+            'expert_approved': 'expert_approved',
+            'expert_send_back': 'expert_send_back',
+            'sia_total': 'sia_total',
+            'sia_draft': 'sia_draft',
+            'sia_submitted': 'sia_submitted',
+            'sia_approved': 'sia_approved',
+            'sia_send_back': 'sia_send_back',
         }
     },
     'admin': {
@@ -278,6 +324,7 @@ export class UnifiedDashboard extends Component {
             villages: [],
             isCollector: false,
             isProjectExempt: false,
+            isReadOnly: this.config.isReadOnly || false, // District admin is read-only
             stats: this._getInitialStats(),
             lastUpdate: null,
         };
@@ -325,12 +372,18 @@ export class UnifiedDashboard extends Component {
         if (this.config.showDepartmentFilter) {
             await this.loadDepartments();
         } else if (this.config.initialDataMethod) {
-            // For department dashboard, load user's department
+            // For department dashboard (if auto-select was enabled), load user's department
             await this.loadUserDepartment();
         }
         
-        // Load projects if department is selected
-        if (this.state.selectedDepartment || !this.config.showDepartmentFilter) {
+        // Load projects
+        // For department users, load all projects immediately (no department filter required)
+        // For others, only load if department is selected (when showDepartmentFilter is true)
+        if (this.dashboardType === 'department') {
+            // Department users can see all projects without selecting department
+            await this.loadProjects();
+        } else if (this.state.selectedDepartment || !this.config.showDepartmentFilter) {
+            // Other dashboards: load projects if department selected or no department filter
             await this.loadProjects();
         }
         
@@ -375,18 +428,24 @@ export class UnifiedDashboard extends Component {
     }
 
     async loadProjects() {
-        const departmentId = this.config.showDepartmentFilter ? this.state.selectedDepartment : this.state.selectedDepartment;
+        // For department users, show all projects (department filter is optional)
+        // For other users, require department selection if showDepartmentFilter is true
+        const departmentId = this.config.showDepartmentFilter ? this.state.selectedDepartment : null;
         
-        if (!departmentId && this.config.showDepartmentFilter) {
+        // Only require department selection for non-department users
+        if (!departmentId && this.config.showDepartmentFilter && this.dashboardType !== 'department') {
             this.state.projects = [];
             return;
         }
         
         try {
+            // For department users, pass null to get all projects
+            // For others, pass departmentId (which may be null if not selected)
+            const filterId = (this.dashboardType === 'department') ? null : departmentId;
             this.state.projects = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_user_projects",
-                [departmentId]
+                [filterId]
             );
         } catch (error) {
             console.error("Error loading projects:", error);
@@ -698,6 +757,15 @@ export class UnifiedDashboard extends Component {
     // Create new record for a section
     async createSectionRecord(sectionModel) {
         if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        // District admin cannot create records - read-only mode
+        if (this.config.isReadOnly) {
+            this.notification.add(_t("District Admin can only view data. Cannot create records."), { 
+                type: "warning",
+                sticky: false
+            });
             return;
         }
         

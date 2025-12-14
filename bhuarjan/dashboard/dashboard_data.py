@@ -15,12 +15,14 @@ class DashboardData(models.AbstractModel):
     def get_all_departments(self):
         """Get all departments for dropdown - merged from sdm_dashboard with SDM filtering"""
         user = self.env.user
-        # Admin, system users, and collectors see all departments
+        # Admin, system users, collectors, district administrators, and department users see all departments
         if (user.has_group('bhuarjan.group_bhuarjan_admin') or 
             user.has_group('base.group_system') or
             user.has_group('bhuarjan.group_bhuarjan_collector') or
-            user.has_group('bhuarjan.group_bhuarjan_additional_collector')):
-            # Show all departments for admin/system/collector users
+            user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
+            user.has_group('bhuarjan.group_bhuarjan_district_administrator') or
+            user.has_group('bhuarjan.group_bhuarjan_department_user')):
+            # Show all departments for admin/system/collector/district admin/department users
             departments = self.env['bhu.department'].search([])
         else:
             # For SDM/Tehsildar users, only show departments where they have assigned projects
@@ -153,6 +155,7 @@ class DashboardData(models.AbstractModel):
         is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
         is_collector = user.has_group('bhuarjan.group_bhuarjan_collector') or user.has_group('bhuarjan.group_bhuarjan_additional_collector')
         is_department = user.has_group('bhuarjan.group_bhuarjan_department_user')
+        is_district_admin = user.has_group('bhuarjan.group_bhuarjan_district_administrator')
         is_sdm = user.has_group('bhuarjan.group_bhuarjan_sdm')
         # Use sudo() to bypass permission checks when reading action references
         if is_admin:
@@ -170,6 +173,11 @@ class DashboardData(models.AbstractModel):
             action_ref = self.env.ref('bhuarjan.action_department_dashboard_owl', raise_if_not_found=False)
             tag = 'bhuarjan.department_dashboard'
             name = 'Department User Dashboard'
+        elif is_district_admin:
+            # Return District Admin Dashboard action
+            action_ref = self.env.ref('bhuarjan.action_district_dashboard_owl', raise_if_not_found=False)
+            tag = 'bhuarjan.district_dashboard'
+            name = 'District Admin Dashboard'
         elif is_sdm:
             # Return SDM Dashboard action
             action_ref = self.env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)

@@ -37,6 +37,8 @@ class DashboardStats(models.AbstractModel):
             'base.group_system',                        # System users
             'bhuarjan.group_bhuarjan_collector',       # Collector users
             'bhuarjan.group_bhuarjan_additional_collector',  # Additional Collector users
+            'bhuarjan.group_bhuarjan_district_administrator',  # District Administrator users
+            'bhuarjan.group_bhuarjan_department_user',  # Department users - can see all projects
         ],
         'sdm_groups': [
             'bhuarjan.group_bhuarjan_sdm',             # SDM users

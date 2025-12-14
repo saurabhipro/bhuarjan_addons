@@ -6,7 +6,7 @@
                 <div class="w-100" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div class="o_dashboard_title_section">
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                            <span><i class="fa fa-shield" style="font-size: 20px; color: #8B4513;"/></span><span style="margin-left: -0.5rem;"> SDM Dashboard </span>
+                            <span><i class="fa fa-shield" style="font-size: 20px; color: #8B4513;"/></span><span style="margin-left: -0.5rem;"> <t t-esc="pageTitle"/> </span>
                             <t t-if="state.selectedProjectName">
                                 <span class="o_selected_project_inline">
                                     <i class="fa fa-briefcase" style="margin-right: 8px;"/>

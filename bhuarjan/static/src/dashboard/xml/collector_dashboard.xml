@@ -3,10 +3,10 @@
         <div class="o_admin_dashboard">
             <!-- Header with Role Title -->
             <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1.5px solid #8B4513;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="w-100" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div class="o_dashboard_title_section">
                         <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                            <i class="fa fa-gavel" style="margin-right: 10px; font-size: 20px; color: #8B4513;"/> Collector Dashboard
+                            <span><i class="fa fa-gavel" style="margin-right: 10px; font-size: 20px; color: #8B4513;"/> </span> <span style="margin-left:-1.5rem;">Collector Dashboard</span>
                             <t t-if="state.selectedProjectName">
                                 <span class="o_selected_project_inline">
                                     <i class="fa fa-briefcase" style="margin-right: 8px;"/>

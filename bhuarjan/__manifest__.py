@@ -105,15 +105,14 @@
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders
             'bhuarjan/static/src/dashboard/css/admin_dashboard.css',
-            'bhuarjan/static/src/dashboard/js/admin_dashboard.js',
             'bhuarjan/static/src/dashboard/xml/admin_dashboard.xml',
             'bhuarjan/static/src/dashboard/js/web_client_dashboard.js',
-            # SDM Dashboard files
+            # Unified Dashboard (replaces separate JS files)
+            'bhuarjan/static/src/dashboard/js/unified_dashboard.js',
+            # SDM Dashboard files (CSS and XML only - JS is in unified_dashboard.js)
             'bhuarjan/static/src/dashboard/css/sdm_dashboard.css',
-            'bhuarjan/static/src/dashboard/js/sdm_dashboard.js',
             'bhuarjan/static/src/dashboard/xml/sdm_dashboard.xml',
-            # Department User Dashboard files
-            'bhuarjan/static/src/dashboard/js/department_dashboard.js',
+            # Department User Dashboard files (XML only - JS is in unified_dashboard.js)
             'bhuarjan/static/src/dashboard/xml/department_dashboard.xml',
             # Collector Dashboard XML (JS is shared with SDM)
             'bhuarjan/static/src/dashboard/xml/collector_dashboard.xml',

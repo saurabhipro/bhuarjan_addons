@@ -141,6 +141,34 @@
                     </div>
                 </div>
 
+                <!-- Status Legend Section - Between Card Grid and List View -->
+                <div class="o_status_legend_section">
+                    <div class="o_status_legend_container">
+                        <div class="o_status_legend_title">
+                            <i class="fa fa-info-circle"/>
+                            <span>Status Legend</span>
+                        </div>
+                        <div class="o_status_legend_items">
+                            <div class="o_legend_item">
+                                <i class="fa fa-file-o o_legend_icon_draft"/>
+                                <span class="o_legend_label">Draft</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                <span class="o_legend_label">Submitted</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                <span class="o_legend_label">Approved</span>
+                            </div>
+                            <div class="o_legend_item">
+                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                <span class="o_legend_label">Returned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- List View Section -->
                 <div class="o_dashboard_section">
                     <div class="o_sections_list o_sections_list_grid">
@@ -601,44 +629,6 @@
                             </div>
                         </div>
 
-                        <!-- Step 12: Status Indicators -->
-                        <div class="o_section_list_item o_card_no_click">
-                            <div class="o_section_list_step" style="display: none;">
-                                <span class="o_step_number">Step 12</span>
-                            </div>
-                            <div class="o_section_list_icon">
-                                <i class="fa fa-info-circle"/>
-                            </div>
-                            <div class="o_section_list_content">
-                                <div class="o_section_list_title">
-                                    Status Legend
-                                </div>
-                                <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list">-</div>
-                                    <div class="o_section_list_count" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-file-o o_legend_icon_draft"/>
-                                            <span class="o_legend_label">Draft</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                                            <span class="o_legend_label">Submitted</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-check-circle o_legend_icon_approved"/>
-                                            <span class="o_legend_label">Approved</span>
-                                        </div>
-                                        <div class="o_legend_item" style="display: flex; align-items: center; gap: 5px;">
-                                            <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                            <span class="o_legend_label">Returned</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="o_section_list_actions">
-                                <!-- No actions for status legend -->
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -111,27 +111,52 @@
     gap: 15px;
 }
 
-/* Status Indicators Container - Parent div for all cards */
-.o_section_status_indicators_container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+/* Status Legend Section - Between Card Grid and List View */
+.o_status_legend_section {
+    margin: 2px 0;
+    padding: 0;
+    width: 100%;
+}
+
+.o_status_legend_container {
     background: transparent;
     border: none;
-    border-radius: 8px;
-    padding: 3px 5px;
-    margin-bottom: 5px;
+    border-radius: 0;
+    padding: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 5px;
     box-shadow: none;
 }
 
-/* Status Legends - Positioned in parent container */
-.o_status_legends {
+.o_status_legend_title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #8B4513;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.o_status_legend_title i {
+    font-size: 16px;
+    color: #8B4513;
+}
+
+.o_status_legend_items {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 7px;
+    flex: 1;
+    justify-content: flex-start;
+    margin: 0;
     padding: 0;
-    justify-content: flex-end;
 }
 
 .o_legend_title {
@@ -145,38 +170,41 @@
 .o_legend_item {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12px;
+    gap: 6px;
+    font-size: 13px;
     white-space: nowrap;
     border: none !important;
-    padding: 0;
-    background: transparent !important;
+    padding: 2px 8px;
+    background: white !important;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin: 0;
 }
 
 .o_legend_icon_draft {
     color: #6c757d;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .o_legend_icon_submitted {
     color: #007bff;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .o_legend_icon_approved {
     color: #28a745;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .o_legend_icon_rejected {
     color: #dc3545;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .o_legend_label {
     color: #495057;
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: 600;
+    font-size: 13px;
 }
 
 .o_dashboard_section {
@@ -683,6 +711,9 @@
 .o_section_list_content {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
 }
 
 .o_section_list_title {
@@ -697,9 +728,12 @@
     font-size: 11px;
     color: #495057;
     display: flex;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
     margin-top: 2px;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
 }
 
 .o_count_badge {
@@ -711,6 +745,9 @@
     font-size: 10px;
     font-weight: 600;
     line-height: 1.2;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin: 1px 0;
 }
 
 .o_count_badge i {
@@ -827,10 +864,12 @@
 
 .o_completion_widget_list.o_completion_single_line {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    align-content: flex-start;
     gap: 12px;
     margin: 2px 0;
     padding: 0;
+    flex-wrap: wrap;
 }
 
 .o_completion_single_line .o_completion_percent_list {
@@ -841,9 +880,12 @@
 .o_completion_single_line .o_section_list_count {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
     margin-top: 0;
+    flex: 1;
+    min-width: 0;
+    align-content: flex-start;
 }
 
 .o_completion_percent_list {

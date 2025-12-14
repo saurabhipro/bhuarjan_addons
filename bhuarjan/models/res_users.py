@@ -53,6 +53,32 @@ class ResUsers(models.Model):
         ('administrator', 'Administrator'),
         ('department_user', 'Department User'),
     ], string="Bhuarjan Role", default=False)
+    
+    survey_count_in_project = fields.Integer(
+        string='Survey Count / सर्वे संख्या',
+        compute='_compute_survey_count_in_project',
+        store=False
+    )
+    
+    @api.depends('bhuarjan_role')
+    def _compute_survey_count_in_project(self):
+        """Compute survey count for patwari in the current project context"""
+        project_id = self.env.context.get('default_project_id') or self.env.context.get('active_id')
+        if not project_id:
+            # Try to get from parent record if in Many2many view
+            active_model = self.env.context.get('active_model')
+            active_id = self.env.context.get('active_id')
+            if active_model == 'bhu.project' and active_id:
+                project_id = active_id
+        
+        for user in self:
+            if user.bhuarjan_role == 'patwari' and project_id:
+                user.survey_count_in_project = self.env['bhu.survey'].search_count([
+                    ('user_id', '=', user.id),
+                    ('project_id', '=', project_id)
+                ])
+            else:
+                user.survey_count_in_project = 0
 
 
     assigned_project_ids = fields.Many2many(
@@ -147,4 +173,48 @@ class ResUsers(models.Model):
             if self.village_ids:
                 valid_villages = self.village_ids.filtered(lambda v: v.id in project_villages)
                 self.village_ids = valid_villages
+    
+    def action_view_surveys_in_project(self):
+        """Open surveys for this patwari in the project from context"""
+        self.ensure_one()
+        # Get project_id from context
+        project_id = self.env.context.get('default_project_id') or self.env.context.get('active_id')
+        if not project_id:
+            # Try to get from parent record if in Many2many view
+            active_model = self.env.context.get('active_model')
+            active_id = self.env.context.get('active_id')
+            if active_model == 'bhu.project' and active_id:
+                project_id = active_id
+        
+        if not project_id:
+            return False
+        
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': f'Surveys by {self.name}',
+            'res_model': 'bhu.survey',
+            'view_mode': 'list,form',
+            'domain': [
+                ('user_id', '=', self.id),
+                ('project_id', '=', project_id)
+            ],
+            'context': {
+                'default_project_id': project_id,
+                'default_user_id': self.id,
+                'search_default_group_by_state': 1,
+            },
+            'target': 'current',
+        }
+        # Try to get the survey action reference for better view configuration
+        try:
+            survey_action = self.env.ref('bhuarjan.action_bhu_survey')
+            if survey_action:
+                action_ref = survey_action.read(['view_mode', 'views'])[0]
+                if action_ref.get('views'):
+                    action['views'] = action_ref['views']
+                if action_ref.get('view_mode'):
+                    action['view_mode'] = action_ref['view_mode']
+        except Exception:
+            pass  # Use default if reference not found
+        return action
 

@@ -96,6 +96,14 @@ class BhuProject(models.Model):
             else:
                 project.patwari_ids = False
     
+    def action_view_patwari_surveys(self, patwari_id):
+        """Open surveys for a specific patwari in this project"""
+        self.ensure_one()
+        patwari = self.env['res.users'].browse(patwari_id)
+        if not patwari.exists():
+            return False
+        return patwari.action_view_surveys_in_project(self.id)
+    
     # Law Master - Many to One relationship
     law_master_id = fields.Many2one('bhu.law.master', string='Law', tracking=True,
                                     help='Select the law applicable to this project')

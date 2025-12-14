@@ -150,8 +150,16 @@ class Form10PDFController(http.Controller):
             
             # Render PDF directly - Odoo will populate 'docs' in template with these records
             # _render_qweb_pdf signature: (reportname, docids, data=None)
-            # Pass explicit data dict to ensure correct context
+            # Odoo automatically populates 'docs' from res_ids, so we don't need to pass it explicitly
             report_name = report_action.report_name
+            
+            # Verify surveys exist before rendering
+            verify_surveys = request.env['bhu.survey'].sudo().browse(res_ids)
+            _logger.info(f"Verifying {len(verify_surveys)} surveys before PDF render: {verify_surveys.ids}")
+            if not verify_surveys:
+                _logger.error("No surveys found to render PDF!")
+                return request.not_found("No surveys found for PDF generation")
+            
             data = {
                 'report_type': 'qweb-pdf',
                 'context': {
@@ -162,7 +170,7 @@ class Form10PDFController(http.Controller):
             try:
                 pdf_result = report_action.sudo()._render_qweb_pdf(report_name, res_ids, data=data)
             except Exception as render_error:
-                # Fallback: try with minimal data (no context)
+                # Fallback: try with minimal data
                 _logger.warning(f"PDF render with data failed: {str(render_error)}, trying fallback")
                 try:
                     pdf_result = report_action.sudo()._render_qweb_pdf(report_name, res_ids, data={})

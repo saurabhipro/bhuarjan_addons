@@ -271,8 +271,10 @@
 
 
     <template id="form10_bulk_table_report">
-        <t t-set="surveys" t-value="docs"/>
-        <t t-set="first" t-value="surveys and surveys[0] or False"/>
+        <!-- Odoo automatically populates 'docs' from res_ids passed to _render_qweb_pdf -->
+        <!-- Set surveys from docs - handle both list and recordset -->
+        <t t-set="surveys" t-value="docs if docs else (object and [object] or [])"/>
+        <t t-set="first" t-value="surveys and len(surveys) > 0 and surveys[0] or (object or False)"/>
         <t t-call="web.html_container">
             <t t-call="bhuarjan.report_custom_external_layout">  
                 <div class="page">
@@ -382,7 +384,18 @@
                         <table class="bulk-form10-table" style="border: 2px solid #000;">
                             
                             <tbody>
-                                <t t-foreach="surveys" t-as="s">
+                                <!-- Debug: Show message if no docs/surveys -->
+                                <t t-if="not docs or (hasattr(docs, '__len__') and len(docs) == 0)">
+                                    <tr>
+                                        <td colspan="18" style="text-align: center; padding: 20px; color: red; font-weight: bold;">
+                                            No surveys found. Please check that surveys exist for the selected project and village.
+                                            <br/>docs type: <t t-esc="type(docs).__name__ if docs else 'None'"/>
+                                            <br/>docs length: <t t-esc="len(docs) if docs and hasattr(docs, '__len__') else 'N/A'"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <!-- Iterate directly over docs (Odoo standard) -->
+                                <t t-foreach="docs" t-as="s">
                                     <tr class="survey-row">
                                         <td style="text-align:center"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center">

@@ -82,6 +82,18 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Patwaris / पटवारी">
+                            <field name="patwari_ids" nolabel="1"
+                                   options="{'no_create_edit': True}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                    <field name="mobile"/>
+                                    <field name="bhuarjan_role"/>
+                                    <field name="village_ids" widget="many2many_tags" string="Assigned Villages / नियुक्त ग्राम"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>

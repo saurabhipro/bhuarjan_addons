@@ -272,6 +272,12 @@ export class OwlCrmDashboard extends Component {
             return;
         }
         
+        // Special handling for R and R Scheme - open form directly (one per project)
+        if (sectionModel === 'bhu.section18.rr.scheme') {
+            this.openRRSchemeForm();
+            return;
+        }
+        
         let domain = [];
         if (this.state.selectedProject) {
             domain.push(["project_id", "=", this.state.selectedProject]);
@@ -288,6 +294,38 @@ export class OwlCrmDashboard extends Component {
             domain: domain,
             target: "current",
         });
+    }
+    
+    // Open R and R Scheme form directly (one per project)
+    async openRRSchemeForm() {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        try {
+            const action = await this.orm.call(
+                'bhu.section18.rr.scheme',
+                'action_open_rr_scheme_form',
+                [this.state.selectedProject]
+            );
+            if (action && action.type) {
+                await this.action.doAction(action);
+            }
+        } catch (error) {
+            console.error('Error opening R and R Scheme:', error);
+            // Fallback to list view
+            this.action.doAction({
+                type: "ir.actions.act_window",
+                name: "Section 18 R and R Scheme",
+                res_model: "bhu.section18.rr.scheme",
+                view_mode: "list,form",
+                domain: [["project_id", "=", this.state.selectedProject]],
+                target: "current",
+                context: {
+                    'default_project_id': this.state.selectedProject || false,
+                },
+            });
+        }
     }
 
     // Get section display name
@@ -368,6 +406,12 @@ export class OwlCrmDashboard extends Component {
     // Create new record for a section
     createSectionRecord(sectionModel) {
         if (!this.checkProjectSelected()) {
+            return;
+        }
+        
+        // Special handling for R and R Scheme - open form directly (one per project)
+        if (sectionModel === 'bhu.section18.rr.scheme') {
+            this.openRRSchemeForm();
             return;
         }
         

@@ -6,9 +6,8 @@
         <field name="model">bhu.section18.rr.scheme</field>
         <field name="arch" type="xml">
             <list string="Section 18 R and R Scheme">
-                <field name="name" string="Scheme Reference"/>
+                <field name="name" string="Scheme Name"/>
                 <field name="project_id" string="Project"/>
-                <field name="village_id" string="Village"/>
                 <field name="scheme_filename" string="Scheme File"/>
                 <field name="create_date" string="Created On"/>
             </list>
@@ -28,9 +27,8 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
+                            <field name="name" readonly="1"/>
                             <field name="project_id" options="{'no_create': True, 'no_create_edit': True}"/>
-                            <field name="village_id" domain="village_domain" options="{'no_create': True, 'no_create_edit': True}"/>
                         </group>
                     </group>
                     <group>
@@ -57,22 +55,15 @@
             <search string="Section 18 R and R Scheme">
                 <field name="name"/>
                 <field name="project_id"/>
-                <field name="village_id"/>
             </search>
         </field>
     </record>
 
-    <!-- Section 18 R and R Scheme Action -->
+    <!-- Section 18 R and R Scheme Action - Opens form directly (one per project) -->
     <record id="action_section18_rr_scheme" model="ir.actions.act_window">
         <field name="name">Section 18 R and R Scheme</field>
         <field name="res_model">bhu.section18.rr.scheme</field>
-        <field name="view_mode">list,form</field>
-        <field name="context">{}</field>
-        <field name="search_view_id" ref="view_section18_rr_scheme_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create a new Section 18 R and R Scheme
-            </p>
-        </field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
     </record>
 </odoo>

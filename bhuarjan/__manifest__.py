@@ -116,6 +116,8 @@
             'bhuarjan/static/src/dashboard/xml/department_dashboard.xml',
             # Collector Dashboard XML (JS is shared with SDM)
             'bhuarjan/static/src/dashboard/xml/collector_dashboard.xml',
+            # District Admin Dashboard XML (JS is in unified_dashboard.js)
+            'bhuarjan/static/src/dashboard/xml/district_dashboard.xml',
             # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
             # 'bhuarjan/static/src/css/landowner_documents.css',

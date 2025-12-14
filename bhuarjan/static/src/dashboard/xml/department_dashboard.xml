@@ -15,21 +15,16 @@
                                 </t>
                         </h2>
                     </div>
-                    <div class="row w-50 gap-3">
-                        <!-- Department Display (Locked/Read-only) -->
-                        <div class="col-2" style="display: flex; align-items: center; gap: 8px; background: #f5f5f5; padding: 8px 12px; border: 3px solid #8B4513; border-radius: 4px; min-width: 200px;">
-                            <i class="fa fa-lock" style="color: #8B4513;"/>
-                            <span style="color: #8B4513; font-weight: bold; flex: 1;">
-                                <t t-if="state.selectedDepartmentName">
-                                    <t t-esc="state.selectedDepartmentName"/>
-                                </t>
-                                <t t-if="!state.selectedDepartmentName">
-                                    <span style="color: #999;">No Department</span>
-                                </t>
-                            </span>
-                        </div>
+                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: auto; margin-left: auto;">
+                        <!-- Department Selector -->
+                        <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
+                            <option value="">Select Department</option>
+                            <t t-foreach="state.departments" t-as="department" t-key="department.id">
+                                <option t-att-value="this.toString(department.id)"><t t-esc="department.name"/></option>
+                            </t>
+                        </select>
                         <!-- Project Selector -->
-                        <select class="col-2 form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
+                        <select class="form-select o_project_selector" t-att-value="this.toString(state.selectedProject)" t-on-change="onProjectChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
                             <option value="">Project</option>
                             <t t-foreach="state.projects" t-as="project" t-key="project.id">
                                 <option t-att-value="this.toString(project.id)"><t t-esc="project.name"/></option>

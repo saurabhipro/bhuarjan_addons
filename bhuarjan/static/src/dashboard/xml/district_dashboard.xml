@@ -53,50 +53,51 @@
                     <h3 class="o_section_title" style="color: #8B4513; margin-bottom: 15px;">
                         <i class="fa fa-cog"/> MASTER DATA MANAGEMENT
                     </h3>
-                    <div class="o_stats_grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_districts')">
-                            <div class="o_stat_icon"><i class="fa fa-map"/></div>
-                            <div class="o_stat_content">
-                                <div class="o_stat_label">Districts</div>
-                            </div>
-                        </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_sub_divisions')">
+                    <div class="o_stats_grid">
+                        <!-- Sub Divisions Card - using same background as SIA Team -->
+                        <div class="o_stat_card o_card_sia" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_sub_divisions')">
                             <div class="o_stat_icon"><i class="fa fa-sitemap"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Sub Divisions</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_tehsils')">
+                        <!-- Tehsils Card - using same background as Section 4 -->
+                        <div class="o_stat_card o_card_section4" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_tehsils')">
                             <div class="o_stat_icon"><i class="fa fa-building"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Tehsils</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_villages')">
+                        <!-- Villages Card - using same background as Expert Group -->
+                        <div class="o_stat_card o_card_expert_committee" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_villages')">
                             <div class="o_stat_icon"><i class="fa fa-home"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Villages</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_projects')">
+                        <!-- Projects Card - using same background as Section 11 -->
+                        <div class="o_stat_card o_card_section11" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_projects')">
                             <div class="o_stat_icon"><i class="fa fa-briefcase"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Projects</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_departments')">
+                        <!-- Departments Card - using same background as Section 15 -->
+                        <div class="o_stat_card o_card_section15" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_departments')">
                             <div class="o_stat_icon"><i class="fa fa-building-o"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Departments</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_landowners')">
+                        <!-- Landowners Card - using same background as Section 19 -->
+                        <div class="o_stat_card o_card_section19" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_landowners')">
                             <div class="o_stat_icon"><i class="fa fa-users"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Landowners</div>
                             </div>
                         </div>
-                        <div class="o_stat_card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); cursor: pointer;" t-on-click="() => this.openAction('action_open_rate_masters')">
+                        <!-- Rate Masters Card - using same background as Sec 21 notice -->
+                        <div class="o_stat_card o_card_draft_award" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_rate_masters')">
                             <div class="o_stat_icon"><i class="fa fa-money"/></div>
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Rate Masters</div>
@@ -234,7 +235,7 @@
                         <!-- Surveys -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 1</span>
+                                <span class="o_step_number bg-primary">Step 1</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-clipboard"/>
@@ -269,7 +270,7 @@
                         <!-- SIA Team -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 2</span>
+                                <span class="o_step_number bg-primary">Step 2</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-users"/>
@@ -296,7 +297,7 @@
                         <!-- Section 4 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 3</span>
+                                <span class="o_step_number bg-primary">Step 3</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bell"/>
@@ -330,7 +331,7 @@
                         <!-- Expert Group -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 4</span>
+                                <span class="o_step_number bg-primary">Step 4</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-graduation-cap"/>
@@ -364,7 +365,7 @@
                         <!-- Section 11 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 5</span>
+                                <span class="o_step_number bg-primary">Step 5</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-text"/>
@@ -402,7 +403,7 @@
                         <!-- Section 15 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 6</span>
+                                <span class="o_step_number bg-primary">Step 6</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-exclamation-triangle"/>
@@ -436,7 +437,7 @@
                         <!-- Section 18 R and R Scheme -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 7</span>
+                                <span class="o_step_number bg-primary">Step 7</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-file-pdf-o"/>
@@ -462,7 +463,7 @@
                         <!-- Section 19 -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 8</span>
+                                <span class="o_step_number bg-primary">Step 8</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-bullhorn"/>
@@ -496,7 +497,7 @@
                         <!-- Sec 21 notice -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 9</span>
+                                <span class="o_step_number bg-primary">Step 9</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-gavel"/>
@@ -530,7 +531,7 @@
                         <!-- Section 23 Award -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number">Step 10</span>
+                                <span class="o_step_number bg-primary">Step 10</span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-trophy"/>

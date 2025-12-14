@@ -428,25 +428,40 @@ export class UnifiedDashboard extends Component {
     }
 
     async loadProjects() {
-        // For department users, show all projects (department filter is optional)
-        // For other users, require department selection if showDepartmentFilter is true
+        // Get department ID from state if department filter is shown
         const departmentId = this.config.showDepartmentFilter ? this.state.selectedDepartment : null;
         
-        // Only require department selection for non-department users
-        if (!departmentId && this.config.showDepartmentFilter && this.dashboardType !== 'department') {
+        console.log(`loadProjects called - departmentId: ${departmentId}, dashboardType: ${this.dashboardType}, showDepartmentFilter: ${this.config.showDepartmentFilter}`);
+        
+        // For department dashboard type, allow loading all projects even without department selection
+        // For other dashboards, if department filter is shown and no department is selected, clear projects
+        if (departmentId === null && this.config.showDepartmentFilter && this.dashboardType !== 'department') {
+            console.log('No department selected, clearing projects');
             this.state.projects = [];
             return;
         }
         
         try {
-            // For department users, pass null to get all projects
-            // For others, pass departmentId (which may be null if not selected)
-            const filterId = (this.dashboardType === 'department') ? null : departmentId;
-            this.state.projects = await this.orm.call(
+            // Always pass departmentId (can be null) to get_user_projects
+            // The backend will handle filtering appropriately
+            console.log(`Calling get_user_projects with departmentId: ${departmentId}`);
+            const projects = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_user_projects",
-                [filterId]
+                [departmentId]
             );
+            
+            // Ensure we have an array
+            const projectsArray = Array.isArray(projects) ? projects : [];
+            this.state.projects = projectsArray;
+            
+            // Log for debugging
+            console.log(`Loaded ${projectsArray.length} projects for department: ${departmentId}`, projectsArray);
+            
+            // Force reactivity update
+            if (this.state.projects.length === 0 && departmentId) {
+                console.warn(`No projects found for department ${departmentId}. Check if projects exist for this department.`);
+            }
         } catch (error) {
             console.error("Error loading projects:", error);
             this.state.projects = [];
@@ -554,7 +569,11 @@ export class UnifiedDashboard extends Component {
         if (!this.config.showDepartmentFilter) return;
         
         const value = ev.target.value;
-        const departmentId = value ? parseInt(value, 10) : null;
+        const departmentId = value && value !== '' ? parseInt(value, 10) : null;
+        
+        console.log(`Department changed to: ${departmentId} (value: ${value})`);
+        
+        // Update state
         this.state.selectedDepartment = departmentId;
         
         // Save to localStorage
@@ -567,6 +586,7 @@ export class UnifiedDashboard extends Component {
         
         // Reset project and village when department changes
         this.state.selectedProject = null;
+        this.state.selectedProjectName = null;
         this.state.selectedVillage = null;
         this.state.projects = [];
         this.state.villages = [];
@@ -574,7 +594,16 @@ export class UnifiedDashboard extends Component {
         localStorage.removeItem(`${prefix}_project_name`);
         localStorage.removeItem(`${prefix}_village`);
         
-        await this.loadProjects();
+        // Load projects for the selected department
+        if (departmentId) {
+            try {
+                await this.loadProjects();
+                console.log(`After loadProjects, projects array length: ${this.state.projects.length}`);
+            } catch (error) {
+                console.error("Error in loadProjects after department change:", error);
+            }
+        }
+        
         await this.loadDashboardData();
     }
 

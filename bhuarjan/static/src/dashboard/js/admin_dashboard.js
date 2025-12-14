@@ -100,10 +100,15 @@ export class AdminDashboard extends Component {
             
             console.log("Loading dashboard with filters:", filters);
             
+            // Convert filters dict to individual parameters for unified method
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
-                [filters]
+                [
+                    filters.department_id || null,
+                    filters.project_id || null,
+                    filters.village_id || null
+                ]
             );
 
             console.log("Dashboard stats received:", stats);

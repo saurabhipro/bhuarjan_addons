@@ -394,7 +394,7 @@ class DashboardStats(models.AbstractModel):
                 user.has_group('base.group_system'))
 
     @api.model
-    def get_dashboard_stats(self, department_id=None, project_id=None, village_id=None):
+    def get_dashboard_stats(self, department_id=None, project_id=None, village_id=None, filters=None):
         """Get unified dashboard statistics for all dashboard types
         
         This method works for:
@@ -405,21 +405,54 @@ class DashboardStats(models.AbstractModel):
         - District Admin Dashboard
         - Any other dashboard type
         
+        Supports both calling styles:
+        1. Individual parameters: get_dashboard_stats(department_id, project_id, village_id)
+        2. Filters dict: get_dashboard_stats(filters={'department_id': 1, 'project_id': 2})
+        
         Args:
-            department_id: Optional department ID to filter by
-            project_id: Optional project ID to filter by
-            village_id: Optional village ID to filter by
+            department_id: Optional department ID to filter by (if called with individual params)
+            project_id: Optional project ID to filter by (if called with individual params)
+            village_id: Optional village ID to filter by (if called with individual params)
+            filters: Optional dict with keys 'department_id', 'project_id', 'village_id' (legacy style)
             
         Returns:
             dict: Complete dashboard statistics
         """
         try:
+            # Handle both calling styles: individual params or filters dict
+            if filters is not None and isinstance(filters, dict):
+                # Legacy style: called with filters dict
+                department_id = filters.get('department_id') or department_id
+                project_id = filters.get('project_id') or project_id
+                village_id = filters.get('village_id') or village_id
+                # Convert to int if they exist
+                if department_id:
+                    try:
+                        department_id = int(department_id)
+                    except (ValueError, TypeError):
+                        department_id = None
+                if project_id:
+                    try:
+                        project_id = int(project_id)
+                    except (ValueError, TypeError):
+                        project_id = None
+                if village_id:
+                    try:
+                        village_id = int(village_id)
+                    except (ValueError, TypeError):
+                        village_id = None
+            
             # Build filter domains based on user access
             domains = self._build_filter_domains(department_id, project_id, village_id)
+            
+            # Log the filters and domains for debugging
+            _logger.info(f"Dashboard Stats - Filters: department_id={department_id}, project_id={project_id}, village_id={village_id}")
+            _logger.info(f"Dashboard Stats - Domains: final_domain={domains['final_domain']}, domain_without_village={domains['domain_without_village']}")
             
             # Get user info
             user_access = self._get_user_project_access()
             is_collector = self.is_collector_user()
+            _logger.info(f"Dashboard Stats - User access: can_see_all={user_access['can_see_all']}, user_type={user_access['user_type']}, project_ids={user_access['project_ids']}")
             
             # Get project exemption status
             is_project_exempt = False
@@ -433,6 +466,9 @@ class DashboardStats(models.AbstractModel):
             
             # Get all section counts
             counts = self._get_all_section_counts(domains)
+            
+            # Log survey counts for debugging
+            _logger.info(f"Dashboard Stats - Survey counts: total={counts['survey']['total']}, approved={counts['survey']['approved']}, domain={domains['final_domain']}")
             
             # Build response with all statistics
             result = {

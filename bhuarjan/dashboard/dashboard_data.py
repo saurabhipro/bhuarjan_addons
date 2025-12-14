@@ -142,45 +142,9 @@ class DashboardData(models.AbstractModel):
             else:
                 _logger.warning(f"  Project: {proj['name']} (ID: {proj['id']}) has NO department")
         return project_data
-    @api.model
-    def get_dashboard_stats(self, filters=None):
-        """Get dashboard statistics for OWL component
-        Args:
-            filters: dict with keys 'department_id', 'project_id', 'village_id' (all optional)
-        """
-        try:
-            # Handle filters - can be None, empty dict, or dict with values
-            if filters is None:
-                filters = {}
-            elif not isinstance(filters, dict):
-                filters = {}
-            # Extract filter values, converting to int if they exist
-            department_id = None
-            project_id = None
-            village_id = None
-            if filters.get('department_id'):
-                try:
-                    department_id = int(filters.get('department_id'))
-                except (ValueError, TypeError):
-                    department_id = None
-            if filters.get('project_id'):
-                try:
-                    project_id = int(filters.get('project_id'))
-                except (ValueError, TypeError):
-                    project_id = None
-            if filters.get('village_id'):
-                try:
-                    village_id = int(filters.get('village_id'))
-                except (ValueError, TypeError):
-                    village_id = None
-            counts = self._get_all_counts(project_id=project_id, village_id=village_id, department_id=department_id)
-            return counts
-        except Exception as e:
-            import traceback
-            _logger = logging.getLogger(__name__)
-            _logger.error("Error in get_dashboard_stats: %s\n%s", str(e), traceback.format_exc())
-            # Return empty counts on error
-            return self._get_all_counts(project_id=None, village_id=None, department_id=None)
+    # NOTE: get_dashboard_stats() method has been moved to dashboard_stats.py
+    # The unified method in dashboard_stats.py handles all dashboard types
+    # This method is removed to avoid conflicts - dashboard_stats.get_dashboard_stats() will be used
     @api.model
     def get_role_based_dashboard_action(self):
         """Return the appropriate dashboard action based on user role"""

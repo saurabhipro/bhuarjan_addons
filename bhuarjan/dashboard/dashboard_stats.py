@@ -156,11 +156,13 @@ class DashboardStats(models.AbstractModel):
         # Build project domain based on user access
         if user_access['can_see_all']:
             # Admin/Collector: can filter by department/project, but no restriction
-            if department_id and not project_id:
+            if project_id:
+                # If project is explicitly selected, always filter by it (even if village is also selected)
+                project_domain = [('project_id', '=', project_id)]
+            elif department_id:
+                # Filter by department if no specific project selected
                 dept_projects = self.env['bhu.project'].search([('department_id', '=', department_id)])
                 project_domain = [('project_id', 'in', dept_projects.ids)] if dept_projects else [('project_id', '=', False)]
-            elif project_id:
-                project_domain = [('project_id', '=', project_id)]
             # else: no project domain filter (show all)
         else:
             # User has project restrictions
@@ -189,15 +191,31 @@ class DashboardStats(models.AbstractModel):
         if village_id:
             village_domain = [('village_id', '=', village_id)]
         
-        # Combine domains
-        if project_domain:
-            final_domain = project_domain + village_domain if village_domain else project_domain
-        elif village_domain:
-            final_domain = village_domain
-        else:
-            final_domain = []
+        # Combine domains - IMPORTANT: Always combine project and village if both exist
+        # CRITICAL: When village is selected, we MUST preserve project filter if project was selected
+        # This ensures that when user selects a project, then selects a village, both filters apply
         
-        # Domain for models without village_id (only project filter)
+        # Log domain combination for debugging
+        _logger.info(f"Domain Building - project_id={project_id}, village_id={village_id}, project_domain={project_domain}, village_domain={village_domain}")
+        
+        if project_domain and village_domain:
+            # Both project and village filters - combine with AND (this is the expected case)
+            final_domain = project_domain + village_domain
+            _logger.info(f"Domain Building - Combined both: {final_domain}")
+        elif project_domain:
+            # Only project filter (no village selected)
+            final_domain = project_domain
+            _logger.info(f"Domain Building - Project only: {final_domain}")
+        elif village_domain:
+            # Only village filter (no project selected) - this should still work
+            final_domain = village_domain
+            _logger.info(f"Domain Building - Village only: {final_domain}")
+        else:
+            # No filters
+            final_domain = []
+            _logger.info(f"Domain Building - No filters")
+        
+        # Domain for models without village_id (only project filter, no village)
         domain_without_village = project_domain if project_domain else []
         
         # Extract project IDs for completion calculations
@@ -446,13 +464,20 @@ class DashboardStats(models.AbstractModel):
             domains = self._build_filter_domains(department_id, project_id, village_id)
             
             # Log the filters and domains for debugging
-            _logger.info(f"Dashboard Stats - Filters: department_id={department_id}, project_id={project_id}, village_id={village_id}")
-            _logger.info(f"Dashboard Stats - Domains: final_domain={domains['final_domain']}, domain_without_village={domains['domain_without_village']}")
+            _logger.info(f"Dashboard Stats - Input Filters: department_id={department_id}, project_id={project_id}, village_id={village_id}")
+            _logger.info(f"Dashboard Stats - Built Domains: project_domain={domains['project_domain']}, village_domain={domains['village_domain']}, final_domain={domains['final_domain']}")
             
             # Get user info
             user_access = self._get_user_project_access()
             is_collector = self.is_collector_user()
             _logger.info(f"Dashboard Stats - User access: can_see_all={user_access['can_see_all']}, user_type={user_access['user_type']}, project_ids={user_access['project_ids']}")
+            
+            # Debug: Test survey query directly
+            if domains['final_domain']:
+                test_surveys = self.env['bhu.survey'].search(domains['final_domain'], limit=10)
+                _logger.info(f"Dashboard Stats - Test query found {len(test_surveys)} surveys with domain {domains['final_domain']}")
+                if test_surveys:
+                    _logger.info(f"Dashboard Stats - Sample survey IDs: {test_surveys.mapped('id')}")
             
             # Get project exemption status
             is_project_exempt = False
@@ -470,6 +495,19 @@ class DashboardStats(models.AbstractModel):
             # Log survey counts for debugging
             _logger.info(f"Dashboard Stats - Survey counts: total={counts['survey']['total']}, approved={counts['survey']['approved']}, domain={domains['final_domain']}")
             
+            # Debug: Test the domain directly to verify it's working
+            if domains['final_domain']:
+                test_surveys = self.env['bhu.survey'].search(domains['final_domain'], limit=10)
+                test_count = len(test_surveys)
+                _logger.info(f"Dashboard Stats - Direct test: Found {test_count} surveys with domain {domains['final_domain']}")
+                if test_surveys:
+                    _logger.info(f"Dashboard Stats - Sample survey IDs: {test_surveys.mapped('id')}, villages: {test_surveys.mapped('village_id.id')}")
+                else:
+                    # Try without village filter to see if project filter works
+                    if domains['project_domain']:
+                        test_without_village = self.env['bhu.survey'].search(domains['project_domain'], limit=10)
+                        _logger.info(f"Dashboard Stats - Without village filter: Found {len(test_without_village)} surveys with project domain {domains['project_domain']}")
+            
             # Build response with all statistics
             result = {
                 'is_collector': is_collector,
@@ -485,7 +523,7 @@ class DashboardStats(models.AbstractModel):
                 'survey_completion_percent': counts['survey']['completion_percent'],
                 'survey_info': self._get_section_info('bhu.survey', domains['final_domain'], 'state', is_survey=True),
                 
-                # Section 4
+                # Section 4 (has village_id)
                 'section4_total': counts['section4']['total'],
                 'section4_draft': counts['section4']['draft'],
                 'section4_submitted': counts['section4']['submitted'],
@@ -496,7 +534,7 @@ class DashboardStats(models.AbstractModel):
                 ) if domains['project_ids_from_domain'] else 0.0,
                 'section4_info': self._get_section_info('bhu.section4.notification', domains['final_domain']),
                 
-                # Section 11
+                # Section 11 (has village_id)
                 'section11_total': counts['section11']['total'],
                 'section11_draft': counts['section11']['draft'],
                 'section11_submitted': counts['section11']['submitted'],
@@ -507,7 +545,7 @@ class DashboardStats(models.AbstractModel):
                 ) if domains['project_ids_from_domain'] else 0.0,
                 'section11_info': self._get_section_info('bhu.section11.preliminary.report', domains['final_domain']),
                 
-                # Section 15
+                # Section 15 (has village_id)
                 'section15_total': counts['section15']['total'],
                 'section15_draft': counts['section15']['draft'],
                 'section15_submitted': counts['section15']['submitted'],
@@ -518,7 +556,7 @@ class DashboardStats(models.AbstractModel):
                 ),
                 'section15_info': self._get_section_info('bhu.section15.objection', domains['final_domain']),
                 
-                # Section 19
+                # Section 19 (has village_id)
                 'section19_total': counts['section19']['total'],
                 'section19_draft': counts['section19']['draft'],
                 'section19_submitted': counts['section19']['submitted'],
@@ -529,7 +567,7 @@ class DashboardStats(models.AbstractModel):
                 ) if domains['project_ids_from_domain'] else 0.0,
                 'section19_info': self._get_section_info('bhu.section19.notification', domains['final_domain']),
                 
-                # Expert Committee
+                # Expert Committee (NO village_id - use domain_without_village)
                 'expert_total': counts['expert']['total'],
                 'expert_draft': counts['expert']['draft'],
                 'expert_submitted': counts['expert']['submitted'],
@@ -538,9 +576,9 @@ class DashboardStats(models.AbstractModel):
                 'expert_completion_percent': self._calculate_completion_percentage(
                     counts['expert']['approved'], 0, counts['expert']['total'], is_survey=False
                 ),
-                'expert_info': self._get_section_info('bhu.expert.committee.report', domains['final_domain']),
+                'expert_info': self._get_section_info('bhu.expert.committee.report', domains['domain_without_village']),
                 
-                # SIA Teams
+                # SIA Teams (NO village_id - use domain_without_village)
                 'sia_total': counts['sia']['total'],
                 'sia_draft': counts['sia']['draft'],
                 'sia_submitted': counts['sia']['submitted'],
@@ -549,7 +587,7 @@ class DashboardStats(models.AbstractModel):
                 'sia_completion_percent': self._calculate_completion_percentage(
                     counts['sia']['approved'], 0, counts['sia']['total'], is_survey=False
                 ),
-                'sia_info': self._get_section_info('bhu.sia.team', domains['final_domain']),
+                'sia_info': self._get_section_info('bhu.sia.team', domains['domain_without_village']),
                 
                 # Draft Award
                 'draft_award_total': counts['draft_award']['total'],

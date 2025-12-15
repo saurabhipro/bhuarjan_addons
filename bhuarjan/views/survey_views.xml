@@ -36,12 +36,14 @@
             <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="0" edit="not groups='bhuarjan.group_bhuarjan_collector' and not groups='bhuarjan.group_bhuarjan_sdm' and state != 'approved'">
                 <header>
                     <!-- Submit button removed - Surveys are submitted via mobile app only -->
-                    <!-- Approve/Reject buttons: Only Department User can approve/reject surveys -->
-                    <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user"/>
-                    <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user"/>
-                    <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                     <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
+                    <!-- Approve/Reject buttons: Only Department User can approve/reject surveys - Right aligned -->
+                    <div class="oe_button_box">
+                        <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user"/>
+                        <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn-success" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user"/>
+                        <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn-danger" invisible="state != 'submitted'" groups="bhuarjan.group_bhuarjan_department_user"/>
+                    </div>
                 </header>
                 <sheet>
                     <field name="is_approved_readonly" invisible="1"/>

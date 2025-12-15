@@ -385,12 +385,11 @@
                             
                             <tbody>
                                 <!-- Debug: Show message if no docs/surveys -->
-                                <t t-if="not docs or (hasattr(docs, '__len__') and len(docs) == 0)">
+                                <t t-if="not docs or len(docs) == 0">
                                     <tr>
                                         <td colspan="18" style="text-align: center; padding: 20px; color: red; font-weight: bold;">
                                             No surveys found. Please check that surveys exist for the selected project and village.
-                                            <br/>docs type: <t t-esc="type(docs).__name__ if docs else 'None'"/>
-                                            <br/>docs length: <t t-esc="len(docs) if docs and hasattr(docs, '__len__') else 'N/A'"/>
+                                            <br/>Number of surveys: <t t-esc="len(docs) if docs else 0"/>
                                         </td>
                                     </tr>
                                 </t>

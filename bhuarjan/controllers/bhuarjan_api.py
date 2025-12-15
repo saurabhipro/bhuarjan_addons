@@ -1132,7 +1132,6 @@ class BhuarjanAPIController(http.Controller):
                 'traded_land_area': data.get('traded_land_area', 0.0),
                 'irrigation_type': data.get('irrigation_type', 'irrigated'),
                 'has_house': data.get('has_house', 'no'),
-                'house_type': data.get('house_type'),
                 'house_area': data.get('house_area', 0.0),
                 'has_shed': data.get('has_shed', 'no'),
                 'shed_area': data.get('shed_area', 0.0),
@@ -1161,9 +1160,35 @@ class BhuarjanAPIController(http.Controller):
             if 'survey_date' in data and data.get('survey_date'):
                 survey_vals['survey_date'] = data.get('survey_date')
             
-            # Handle well_type separately - only set if provided (optional field)
-            if 'well_type' in data and data.get('well_type'):
-                survey_vals['well_type'] = data.get('well_type')
+            # Handle well_type separately - convert 'false' string to False
+            if 'well_type' in data:
+                well_type_value = data.get('well_type')
+                if well_type_value == 'false' or well_type_value is False or well_type_value is None or well_type_value == '':
+                    survey_vals['well_type'] = False
+                elif well_type_value in ['kaccha', 'pakka']:
+                    survey_vals['well_type'] = well_type_value
+                # If invalid, don't set it (will use default or existing value)
+            
+            # Handle house_type - convert 'false' string to False
+            if 'house_type' in data:
+                house_type_value = data.get('house_type')
+                if house_type_value == 'false' or house_type_value is False or house_type_value is None or house_type_value == '':
+                    survey_vals['house_type'] = False
+                elif house_type_value in ['kaccha', 'pakka']:
+                    survey_vals['house_type'] = house_type_value
+                # If invalid, don't set it (will use default or existing value)
+            
+            # If has_house is 'no', ensure house_type is False
+            if survey_vals.get('has_house') == 'no':
+                survey_vals['house_type'] = False
+                if 'house_area' not in survey_vals:
+                    survey_vals['house_area'] = 0.0
+            
+            # If has_well is 'no', ensure well_type is False
+            if survey_vals.get('has_well') == 'no':
+                survey_vals['well_type'] = False
+                if 'well_count' not in survey_vals:
+                    survey_vals['well_count'] = 0
 
             # Handle survey image if provided (base64 encoded)
             if data.get('survey_image'):
@@ -2755,20 +2780,61 @@ class BhuarjanAPIController(http.Controller):
                     # Handle text fields (remarks) - allow None and empty strings
                     elif field in ['remarks']:
                         update_vals[field] = value if value is not None else ''
+                    # Handle house_type - convert 'false' string to False
+                    elif field == 'house_type':
+                        if value == 'false' or value is False or value is None or value == '':
+                            update_vals[field] = False
+                        elif value in ['kaccha', 'pakka']:
+                            update_vals[field] = value
+                        else:
+                            # Invalid value, skip it
+                            _logger.warning(f"Invalid house_type value: {value}, skipping")
+                    # Handle well_type - convert 'false' string to False
+                    elif field == 'well_type':
+                        if value == 'false' or value is False or value is None or value == '':
+                            update_vals[field] = False
+                        elif value in ['kaccha', 'pakka']:
+                            update_vals[field] = value
+                        else:
+                            # Invalid value, skip it
+                            _logger.warning(f"Invalid well_type value: {value}, skipping")
                     # Handle other fields
                     else:
                         update_vals[field] = value
                 else:
                     _logger.warning(f"Field '{field}' is not allowed to be updated via API")
             
+            # Handle house_type - convert 'false' string to False when has_house is 'no'
+            if 'has_house' in update_vals:
+                if update_vals['has_house'] == 'no':
+                    # Clear house_type and house_area when there's no house
+                    update_vals['house_type'] = False
+                    if 'house_area' not in update_vals:
+                        update_vals['house_area'] = 0.0
+            elif 'house_type' in update_vals:
+                # If house_type is sent as 'false' string, convert to False
+                if update_vals['house_type'] == 'false' or update_vals['house_type'] is False:
+                    update_vals['house_type'] = False
+                # Also check if has_house is 'no' in existing survey
+                if survey.has_house == 'no':
+                    update_vals['house_type'] = False
+            
             # Handle well_count and tubewell_count based on has_well and has_tubewell
-            # If has_well is being set to 'no', reset well_count to 0
+            # If has_well is being set to 'no', reset well_count to 0 and clear well_type
             if 'has_well' in update_vals:
                 if update_vals['has_well'] == 'no':
                     update_vals['well_count'] = 0
+                    update_vals['well_type'] = False
                 elif update_vals['has_well'] == 'yes' and 'well_count' not in update_vals:
                     # If well is set to yes but count not provided, default to 1
                     update_vals['well_count'] = 1
+            elif 'well_type' in update_vals:
+                # If well_type is sent as 'false' string, convert to False
+                if update_vals['well_type'] == 'false' or update_vals['well_type'] is False:
+                    update_vals['well_type'] = False
+                # Also check if has_well is 'no' in existing survey
+                if survey.has_well == 'no':
+                    update_vals['well_type'] = False
             
             # If has_tubewell is being set to 'no', reset tubewell_count to 0
             if 'has_tubewell' in update_vals:

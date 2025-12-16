@@ -311,6 +311,7 @@ export class UnifiedDashboard extends Component {
         const savedProject = localStorage.getItem(`${localStoragePrefix}_project`);
         const savedProjectName = localStorage.getItem(`${localStoragePrefix}_project_name`);
         const savedVillage = localStorage.getItem(`${localStoragePrefix}_village`);
+        const savedVillageName = localStorage.getItem(`${localStoragePrefix}_village_name`);
         
         // Initialize state based on configuration
         const initialState = {
@@ -319,6 +320,7 @@ export class UnifiedDashboard extends Component {
             selectedProject: savedProject ? parseInt(savedProject, 10) : null,
             selectedProjectName: savedProjectName || null,
             selectedVillage: savedVillage ? parseInt(savedVillage, 10) : null,
+            selectedVillageName: savedVillageName || null,
             departments: [],
             projects: [],
             villages: [],
@@ -368,6 +370,8 @@ export class UnifiedDashboard extends Component {
     }
 
     async loadInitialData() {
+        const localStoragePrefix = this.config.localStoragePrefix;
+        
         // Load department if configured
         if (this.config.showDepartmentFilter) {
             await this.loadDepartments();
@@ -390,6 +394,23 @@ export class UnifiedDashboard extends Component {
         // Load villages if project is selected
         if (this.state.selectedProject) {
             await this.loadVillages();
+            
+            // Restore saved village name after villages are loaded
+            const savedVillageName = localStorage.getItem(`${localStoragePrefix}_village_name`);
+            if (this.state.selectedVillage && this.state.villages.length > 0) {
+                // If we have a saved village name, use it; otherwise get it from the loaded list
+                if (savedVillageName) {
+                    this.state.selectedVillageName = savedVillageName;
+                } else {
+                    const village = this.state.villages.find(v => v.id === this.state.selectedVillage);
+                    if (village) {
+                        this.state.selectedVillageName = village.name;
+                        localStorage.setItem(`${localStoragePrefix}_village_name`, village.name);
+                    }
+                }
+            } else {
+                this.state.selectedVillageName = null;
+            }
         }
     }
 
@@ -588,11 +609,13 @@ export class UnifiedDashboard extends Component {
         this.state.selectedProject = null;
         this.state.selectedProjectName = null;
         this.state.selectedVillage = null;
+        this.state.selectedVillageName = null;
         this.state.projects = [];
         this.state.villages = [];
         localStorage.removeItem(`${prefix}_project`);
         localStorage.removeItem(`${prefix}_project_name`);
         localStorage.removeItem(`${prefix}_village`);
+        localStorage.removeItem(`${prefix}_village_name`);
         
         // Load projects for the selected department
         if (departmentId) {
@@ -635,12 +658,20 @@ export class UnifiedDashboard extends Component {
             const currentVillage = this.state.villages.find(v => v.id === this.state.selectedVillage);
             if (!currentVillage) {
                 this.state.selectedVillage = null;
+                this.state.selectedVillageName = null;
                 localStorage.removeItem(`${prefix}_village`);
+                localStorage.removeItem(`${prefix}_village_name`);
+            } else {
+                // Update village name if village still exists
+                this.state.selectedVillageName = currentVillage.name;
+                localStorage.setItem(`${prefix}_village_name`, currentVillage.name);
             }
         } else {
             this.state.selectedVillage = null;
+            this.state.selectedVillageName = null;
             this.state.villages = [];
             localStorage.removeItem(`${prefix}_village`);
+            localStorage.removeItem(`${prefix}_village_name`);
         }
         
         await this.loadDashboardData();
@@ -653,12 +684,19 @@ export class UnifiedDashboard extends Component {
         const villageId = value ? parseInt(value, 10) : null;
         this.state.selectedVillage = villageId;
         
-        // Save to localStorage
+        // Get and save village name
         const prefix = this.config.localStoragePrefix;
         if (villageId) {
             localStorage.setItem(`${prefix}_village`, String(villageId));
+            const village = this.state.villages.find(v => v.id === villageId);
+            if (village) {
+                this.state.selectedVillageName = village.name;
+                localStorage.setItem(`${prefix}_village_name`, village.name);
+            }
         } else {
             localStorage.removeItem(`${prefix}_village`);
+            localStorage.removeItem(`${prefix}_village_name`);
+            this.state.selectedVillageName = null;
         }
         
         await this.loadDashboardData();
@@ -804,21 +842,18 @@ export class UnifiedDashboard extends Component {
             return;
         }
         
-        // Special handling for Section 11 - require village selection
-        if (sectionModel === 'bhu.section11.preliminary.report') {
-            if (!this.state.selectedVillage) {
-                this.notification.add(_t("Please select a village first before creating Section 11 Preliminary Report."), { 
-                    type: "warning",
-                    sticky: true
-                });
-                return;
-            }
-        }
+        // Village-specific sections that require village selection
+        const villageSpecificSections = {
+            'bhu.section4.notification': 'Section 4 Notification',
+            'bhu.section11.preliminary.report': 'Section 11 Preliminary Report',
+            'bhu.section19.notification': 'Section 19 Notification',
+            'bhu.draft.award': 'Section 21 Notice (Draft Award)',
+            'bhu.section23.award': 'Section 23 Award'
+        };
         
-        // Special handling for Section 19 - require village selection
-        if (sectionModel === 'bhu.section19.notification') {
+        if (villageSpecificSections[sectionModel]) {
             if (!this.state.selectedVillage) {
-                this.notification.add(_t("Please select a village first before creating Section 19 Notification."), { 
+                this.notification.add(_t(`Please select a village first before creating ${villageSpecificSections[sectionModel]}.`), { 
                     type: "warning",
                     sticky: true
                 });

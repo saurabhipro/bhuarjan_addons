@@ -24,6 +24,12 @@
                                 <span class="o_project_name_bold"><t t-esc="state.selectedProjectName"/></span>
                             </span>
                         </t>
+                        <t t-if="state.selectedVillageName">
+                            <span class="o_selected_project_inline" style="margin-left: 10px;">
+                                <i class="fa fa-home" style="margin-right: 8px;"/>
+                                <span class="o_project_name_bold"><t t-esc="state.selectedVillageName"/></span>
+                            </span>
+                        </t>
                     </h2>
                 </div>
                 <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: auto; margin-left: auto;">

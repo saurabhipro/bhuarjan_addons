@@ -27,10 +27,7 @@ class PaymentFile(models.Model):
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     award_id = fields.Many2one('bhu.draft.award', string='Draft Award / अवार्ड', required=True, tracking=True)
     
-    # Case Details
-    case_number = fields.Char(string='Case Number / भू.अर्जन प्र. क्र.', related='award_id.case_number', readonly=True)
-    patwari_halka_number = fields.Char(string='Patwari Halka Number / प.ह.नं.', related='award_id.patwari_halka_number', readonly=True)
-    award_date = fields.Date(string='Award Date / अवार्ड दिनांक', related='award_id.award_date', readonly=True)
+    # Case Details - removed as fields no longer exist in award model
     
     # District, Tehsil
     district_id = fields.Many2one('bhu.district', string='District / जिला', related='village_id.district_id', store=True, readonly=True)
@@ -239,7 +236,7 @@ class PaymentFile(models.Model):
         worksheet.write(0, 10, 'Annexure', title_format)
         
         # Row 2: Case Number
-        case_num_text = f"राजस्व प्रकरण क्रमांक {self.case_number or '........................'} / अ-82 वर्ष {self.award_date.strftime('%Y-%m') if self.award_date else '2018-19'}"
+        case_num_text = f"राजस्व प्रकरण क्रमांक ........................ / अ-82 वर्ष {fields.Date.today().strftime('%Y-%m')}"
         worksheet.write(1, 6, case_num_text, cell_format)
         
         # Row 3: Village, Tehsil, District
@@ -253,7 +250,7 @@ class PaymentFile(models.Model):
         worksheet.write(3, 0, instruction1, cell_format)
         
         # Row 5: Detailed instruction
-        award_date_str = self.award_date.strftime('%d.%m.%Y') if self.award_date else '26.12.2019'
+        award_date_str = fields.Date.today().strftime('%d.%m.%Y')
         instruction2 = f"प्रकरण में पारित आवार्ड दिनांक {award_date_str} के अनुसार निम्नलिखित पक्षकारों / प्रभावित भूस्वामियों को मुआवजा का भुगतान हेतु निम्नानुसार सूची तैयार कर संबंधित भू-स्वामी के बैंक खाते में उनकी मुआवजा राशि RTGS के माध्यम से जमा करावे ।"
         worksheet.merge_range(4, 0, 4, 10, instruction2, cell_format)
         

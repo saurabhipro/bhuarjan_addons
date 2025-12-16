@@ -14,6 +14,10 @@ class Section23Award(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
+    # Department - computed from project (for filtering purposes)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
+                                   related='project_id.department_id', store=True, readonly=True)
+    
     # Award details
     award_date = fields.Date(string='Award Date / अवार्ड दिनांक', default=fields.Date.today, tracking=True)
     award_number = fields.Char(string='Award Number / अवार्ड संख्या', tracking=True)

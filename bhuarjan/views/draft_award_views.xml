@@ -6,14 +6,10 @@
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
             <list string="Sec 21 notice" delete="1">
-                <field name="name" string="Award Name"/>
-                <field name="award_number" string="Award Number"/>
+                <field name="name" string="Award Reference"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
-                <field name="case_number" string="Case Number"/>
-                <field name="award_date" string="Award Date"/>
                 <field name="total_land_area" string="Total Land Area"/>
-                <field name="total_khasra_count" string="Total Khasra Count"/>
                 <field name="total_compensation_amount" string="Total Compensation Amount"/>
                 <field name="state" widget="badge" string="Status"
                        decoration-success="state == 'signed'"
@@ -29,7 +25,7 @@
         <field name="name">bhu.draft.award.form</field>
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
-            <form string="Draft Award / अवार्ड आदेश" edit="not (state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit))">
+            <form string="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)" edit="not (state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
@@ -42,65 +38,34 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_generate_pdf" type="object" class="oe_stat_button" icon="fa-gavel" context="{'form_view_initial_mode': 'edit'}">
+                            <field name="state" widget="statinfo" string="Status"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <span class="fa fa-gavel" style="font-size: 20px; color: #8B4513; margin-right: 10px;"/>
+                            <field name="name" readonly="1" class="oe_inline" placeholder="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)"/>
+                        </h1>
+                    </div>
                     <group>
                         <group>
                             <!-- SDM can edit in draft/generated, Collector can edit in generated, readonly when signed -->
-                            <field name="name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="project_id" required="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                            <field name="section19_notification_id" 
-                                   readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
-                                   options="{'no_create_edit': True}"
-                                   placeholder="Select Section 19 Notification to auto-populate land parcels"
-                                   help="Select Section 19 Notification to auto-populate all land parcels from survey tables"
-                                   domain="[('project_id', '=', project_id)]"/>
-                            <field name="village_id" required="1" readonly="section19_notification_id or state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
+                            <field name="village_id" required="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
                                    options="{'no_create': True, 'no_open': True}" domain="village_domain"/>
-                            <field name="case_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                            <field name="patwari_halka_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                         </group>
                         <group>
                             <field name="district_id" readonly="1"/>
                             <field name="tehsil_id" readonly="1"/>
-                            <field name="award_number" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                            <field name="award_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="total_land_area" readonly="1"/>
-                            <field name="total_khasra_count" readonly="1"/>
                         </group>
                     </group>
                     
                     <group string="Applicant / आवेदक">
                         <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
                         <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                    </group>
-                    
-                    <group string="Respondents / अनावेदक (Auto-populated from Section 11)">
-                        <field name="respondent_ids" widget="many2many_tags" readonly="1" nolabel="1"/>
-                    </group>
-                    
-                    <div class="alert alert-info" role="alert" invisible="not section19_notification_id" 
-                         style="margin: 10px; padding: 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                        <strong>ℹ Information:</strong> Land parcels below are auto-populated from the selected Section 19 Notification. All survey details including status, location, and authorized officer information are included.
-                    </div>
-                    <group string="Land Parcels / भूमि खंड (Auto-populated from Section 19)">
-                        <field name="land_parcel_ids" nolabel="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)">
-                            <list string="Land Parcels">
-                                <field name="khasra_number" string="Khasra Number"/>
-                                <field name="area_hectares" string="Area (Hectares)"/>
-                                <field name="survey_number" string="Survey Number"/>
-                                <field name="survey_date" string="Survey Date"/>
-                                <field name="district_id" string="District"/>
-                                <field name="tehsil_id" string="Tehsil"/>
-                                <field name="village_id" string="Village"/>
-                                <field name="project_id" string="Project"/>
-                                <field name="public_purpose_description" string="Public Purpose" widget="text"/>
-                                <field name="survey_state" string="Status" widget="badge"
-                                       decoration-success="survey_state == 'approved'"
-                                       decoration-info="survey_state == 'submitted'"
-                                       decoration-warning="survey_state == 'draft'"
-                                       decoration-danger="survey_state == 'rejected'"
-                                       decoration-muted="survey_state == 'locked'"/>
-                            </list>
-                        </field>
                     </group>
                     
                     <notebook>
@@ -142,7 +107,6 @@
                         <page string="References / संदर्भ">
                             <group>
                                 <field name="section11_report_id" readonly="1"/>
-                                <field name="section19_notification_id" readonly="1"/>
                             </group>
                         </page>
                         <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
@@ -171,11 +135,8 @@
         <field name="arch" type="xml">
             <search string="Draft Awards">
                 <field name="name"/>
-                <field name="award_number"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
-                <field name="case_number"/>
-                <field name="award_date"/>
                 <field name="state"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
@@ -202,4 +163,3 @@
     </record>
 
 </odoo>
-

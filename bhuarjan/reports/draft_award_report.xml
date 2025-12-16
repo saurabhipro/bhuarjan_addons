@@ -127,9 +127,7 @@
                         <span t-if="not award or not award.village_id">........................</span>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
-                        <strong>अवार्ड दिनांक :</strong>
-                        <span t-if="award and award.award_date" t-esc="award.award_date.strftime('%d/%m/%Y')"/>
-                        <span t-if="not award or not award.award_date">........................</span>
+                        <!-- Empty cell -->
                     </td>
                 </tr>
                 <tr>
@@ -170,15 +168,14 @@
 
                 <div class="page" style="font-size: 14px; color: #333; padding: 15px;">
 
-                <!-- Case Number and Location -->
-                <p class="report-paragraph" style="text-align: center; font-weight: bold; margin-bottom: 15px;">
-                    <strong>भू.अर्जन प्र. क्र. <span t-if="award and award.case_number" t-esc="award.case_number"/><span t-if="not award or not award.case_number">........................</span></strong>
+                <!-- Subject/Reference Line -->
+                <p class="report-paragraph" style="text-align: left; margin-bottom: 15px;">
+                    <strong>विषय:-</strong> <span t-if="award and award.void_title" t-esc="award.void_title"/><span t-if="not award or not award.void_title">........................</span>
                 </p>
-                <p class="report-paragraph" style="text-align: center; margin-bottom: 15px;">
-                    <strong>ग्राम - <span t-if="award and award.village_id" t-esc="award.village_id.name"/><span t-if="not award or not award.village_id">........................</span>, 
-                    प.ह.नं.<span t-if="award and award.patwari_halka_number" t-esc="award.patwari_halka_number"/><span t-if="not award or not award.patwari_halka_number">....</span>, 
-                    तहसील-<span t-if="award and award.tehsil_id" t-esc="award.tehsil_id.name"/><span t-if="not award or not award.tehsil_id">........................</span> व 
-                    जिला-<span t-if="award and award.district_id" t-esc="award.district_id.name"/><span t-if="not award or not award.district_id">........................</span> (छ.ग.)</strong>
+                <p class="report-paragraph" style="text-align: left; margin-bottom: 15px;">
+                    <strong>(छ.ग.) के</strong> <span t-if="award and award.project_id" t-esc="award.project_id.name"/><span t-if="not award or not award.project_id">........................</span>
+                    <strong>हेतु शुसि</strong> <span t-if="award and award.district_id" t-esc="award.district_id.name"/><span t-if="not award or not award.district_id">........................</span>
+                    <strong>देखें</strong> see section 21 (1) के तुहत्, <span t-if="award and award.village_id" t-esc="award.village_id.name"/><span t-if="not award or not award.village_id">........................</span>
                 </p>
 
                 <!-- Parties Section -->
@@ -225,7 +222,7 @@
                     <strong>अवार्ड आदेश</strong>
                 </h2>
                 <p style="text-align: center; margin-bottom: 20px;">
-                    <strong>(दिनांक <span t-if="award and award.award_date" t-esc="award.award_date.strftime('%d/%m/%Y')"/><span t-if="not award or not award.award_date">........................</span>)</strong>
+                    <strong>(दिनांक ........................)</strong>
                 </p>
 
                 <!-- Paragraphs -->
@@ -236,7 +233,8 @@
                         के पत्रांक के अनुसार <span t-if="award and award.project_id" t-esc="award.project_id.name"/><span t-if="not award or not award.project_id">केलो परियोजना</span> 
                         के लिए <span t-if="award and award.village_id" t-esc="award.village_id.name"/><span t-if="not award or not award.village_id">ग्राम</span> 
                         में निजी भूमि अर्जन हेतु प्रस्ताव प्रस्तुत किया गया है। प्रस्तावानुसार 
-                        <span t-if="award and award.total_khasra_count" t-esc="award.total_khasra_count"/><span t-if="not award or not award.total_khasra_count">06</span> 
+                        <t t-set="khasra_count" t-value="len(award.land_parcel_ids) if award and award.land_parcel_ids else 0"/>
+                        <span t-if="khasra_count > 0" t-esc="khasra_count"/><span t-if="khasra_count == 0">06</span> 
                         खसरा नं. <span t-if="award and award.total_land_area" t-esc="'{:.3f}'.format(award.total_land_area)"/><span t-if="not award or not award.total_land_area">0.252</span> 
                         है. क्षेत्र का अर्जन प्रस्तावित है। प्रस्ताव प्रस्तुत किया गया है तथा 
                         <span t-if="award and award.is_displacement_involved == False">किसी भी व्यक्ति का विस्थापन निहित नहीं है।</span>
@@ -285,7 +283,8 @@
                 <!-- Land Details Table -->
                 <div style="margin-bottom: 20px;">
                     <p class="report-paragraph" style="font-weight: bold; margin-bottom: 10px;">
-                        अर्जित की रही निजी भूमि कुल ख.नं. <span t-if="award and award.total_khasra_count" t-esc="award.total_khasra_count"/><span t-if="not award or not award.total_khasra_count">06</span> 
+                        <t t-set="khasra_count" t-value="len(award.land_parcel_ids) if award and award.land_parcel_ids else 0"/>
+                        अर्जित की रही निजी भूमि कुल ख.नं. <span t-if="khasra_count > 0" t-esc="khasra_count"/><span t-if="khasra_count == 0">06</span> 
                         कुल रकबा <span t-if="award and award.total_land_area" t-esc="'{:.3f}'.format(award.total_land_area)"/><span t-if="not award or not award.total_land_area">0.252</span> 
                         हैं. विस्तृत विवरण इस प्रकार है।
                     </p>
@@ -305,7 +304,8 @@
                                     </tr>
                                 </t>
                                 <tr style="font-weight: bold;">
-                                    <td>योग कुल ख.नं. <span t-esc="award.total_khasra_count or 0"/></td>
+                                    <t t-set="khasra_count" t-value="len(award.land_parcel_ids) if award and award.land_parcel_ids else 0"/>
+                                    <td>योग कुल ख.नं. <span t-esc="khasra_count"/></td>
                                     <td>कुल रकबा <span t-esc="'{:.3f}'.format(award.total_land_area) if award.total_land_area else '0.000'"/> है.</td>
                                 </tr>
                             </t>
@@ -442,7 +442,7 @@
                     </p>
                     <p style="margin-bottom: 5px;">
                         <span t-if="award and award.district_id" t-esc="award.district_id.name"/><span t-if="not award or not award.district_id">रायगढ़</span> 
-                        दिनांक- <span t-if="award and award.award_date" t-esc="award.award_date.strftime('%d/%m/%Y')"/><span t-if="not award or not award.award_date">31/07/2025</span>
+                        दिनांक- ........................
                     </p>
                 </div>
 

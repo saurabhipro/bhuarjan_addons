@@ -116,6 +116,55 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     _logger.error(f"Error generating PDF for Section 19 record {record.id}: {str(e)}", exc_info=True)
                     continue
             
+            # Generate Form 10 PDFs (grouped by village)
+            for village_id in records.get('form10', []):
+                try:
+                    village = self.env['bhu.village'].browse(village_id)
+                    if not village:
+                        continue
+                    
+                    # Get surveys for this village
+                    survey_domain = [('village_id', '=', village_id)]
+                    if self.project_id:
+                        survey_domain.append(('project_id', '=', self.project_id.id))
+                    elif self.department_id:
+                        # Get all projects in department
+                        project_ids = self.env['bhu.project'].search([
+                            ('department_id', '=', self.department_id.id)
+                        ]).ids
+                        if project_ids:
+                            survey_domain.append(('project_id', 'in', project_ids))
+                    
+                    surveys = self.env['bhu.survey'].search(survey_domain)
+                    if not surveys:
+                        continue
+                    
+                    # Get first survey for project context
+                    first_survey = surveys[0]
+                    
+                    # Generate Form 10 PDF - pass all survey IDs so the report includes all surveys
+                    report_action = self.env.ref('bhuarjan.action_report_form10_bulk_table')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        surveys.ids,  # Pass all survey IDs for the village
+                        data={
+                            'village_id': village_id,
+                            'project_id': first_survey.project_id.id if first_survey.project_id else False,
+                        }
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (first_survey.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if first_survey.project_id else 'Unknown'
+                            village_name = (village.name or 'Unknown').replace('/', '_').replace('\\', '_')
+                            filename = f'Form10_{project_name}_{village_name}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating Form 10 PDF for village {village_id}: {str(e)}", exc_info=True)
+                    continue
+            
             zip_file.close()
             
             if pdf_count == 0:

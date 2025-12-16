@@ -10,8 +10,6 @@
                 <field name="award_id"/>
                 <field name="village_id"/>
                 <field name="project_id"/>
-                <field name="case_number"/>
-                <field name="award_date"/>
                 <field name="total_compensation" sum="Total Compensation"/>
                 <field name="total_net_payable" sum="Total Net Payable"/>
                 <field name="state" widget="badge" 
@@ -42,9 +40,6 @@
                             <field name="award_id" required="1"/>
                         </group>
                         <group>
-                            <field name="case_number" readonly="1"/>
-                            <field name="patwari_halka_number" readonly="1"/>
-                            <field name="award_date" readonly="1"/>
                             <field name="district_id" readonly="1"/>
                             <field name="tehsil_id" readonly="1"/>
                         </group>
@@ -96,7 +91,6 @@
                 <field name="award_id"/>
                 <field name="village_id"/>
                 <field name="project_id"/>
-                <field name="case_number"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
                 <group expand="0" string="Group By">

@@ -38,6 +38,7 @@ class ProcessReport(models.TransientModel):
         ('sec19', 'Section 19'),
         ('sec21', 'Section 21'),
         ('sec23', 'Section 23'),
+        ('form10', 'Form 10'),
     ], string='Section Type', readonly=True)
 
 
@@ -57,6 +58,7 @@ class ProcessReportWizard(models.TransientModel):
         ('sec19', 'Sec-19'),
         ('sec21', 'Sec-21'),
         ('sec23', 'Sec-23'),
+        ('form10', 'Form-10'),
         ('all', 'All'),
     ], string='Status Wise / स्टेटस वाइज', default='all')
 
@@ -331,6 +333,7 @@ class ProcessReportWizard(models.TransientModel):
             'section4': [],
             'section11': [],
             'section19': [],
+            'form10': [],  # Will store village IDs for Form 10
         }
         
         # Section 4 Notifications
@@ -347,6 +350,22 @@ class ProcessReportWizard(models.TransientModel):
         if self.status_type in ('sec19', 'all'):
             section19_domain = domain.copy()
             records['section19'] = self.env['bhu.section19.notification'].search(section19_domain)
+        
+        # Form 10 (surveys grouped by village)
+        if self.status_type in ('form10', 'all'):
+            # Build survey domain
+            survey_domain = []
+            if project_ids:
+                survey_domain.append(('project_id', 'in', project_ids))
+            elif self.project_id:
+                survey_domain.append(('project_id', '=', self.project_id.id))
+            if self.village_id:
+                survey_domain.append(('village_id', '=', self.village_id.id))
+            
+            # Get surveys and group by village
+            surveys = self.env['bhu.survey'].search(survey_domain)
+            village_ids = list(set(surveys.mapped('village_id.id')))
+            records['form10'] = village_ids
         
         return records
 

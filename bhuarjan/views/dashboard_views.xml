@@ -365,7 +365,7 @@ action = env['bhuarjan.dashboard'].action_open_dashboard()
         <field name="name">Collector Dashboard</field>
         <field name="tag">bhuarjan.collector_dashboard</field>
     </record>
-
+    
     <!-- District Admin Dashboard Client Action (OWL) -->
     <record id="action_district_dashboard_owl" model="ir.actions.client">
         <field name="name">District Admin Dashboard</field>

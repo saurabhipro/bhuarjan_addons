@@ -90,6 +90,14 @@
                                 title="Download Expert Committee Report (Unsigned)"/>
                     </group>
                     
+                    <!-- Download Expert Committee Order Button (visible for Collector in submitted/approved state) -->
+                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="state not in ('submitted', 'approved')">
+                        <button name="action_download_expert_committee_order" string="Download Expert Committee Order" type="object" 
+                                class="btn-primary" icon="fa-file-pdf"
+                                title="Download Expert Committee Approval Order PDF"/>
+                    </group>
+                    
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 11 -->
                     <group>
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 

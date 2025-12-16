@@ -42,7 +42,14 @@ class Section11PreliminaryReport(models.Model):
         """Reset village when project changes and set domain"""
         for rec in self:
             if rec.project_id and rec.project_id.village_ids:
-                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+                # If village is already set and is in the project's villages, keep it
+                if rec.village_id and rec.village_id.id in rec.project_id.village_ids.ids:
+                    # Village is valid, keep it
+                    rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+                else:
+                    # Village is not valid for this project, reset it
+                    rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+                    rec.village_id = False
             else:
                 rec.village_domain = json.dumps([])   # empty domain
                 rec.village_id = False
@@ -258,6 +265,19 @@ class Section11PreliminaryReport(models.Model):
         # Set the land parcels
         if parcel_vals:
             self.land_parcel_ids = parcel_vals
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from context"""
+        res = super().default_get(fields_list)
+        
+        # Get defaults from context (set by dashboard or other actions)
+        if 'default_project_id' in self.env.context:
+            res['project_id'] = self.env.context['default_project_id']
+        if 'default_village_id' in self.env.context:
+            res['village_id'] = self.env.context['default_village_id']
+        
+        return res
     
     @api.model
     def _default_project_id(self):

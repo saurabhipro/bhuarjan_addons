@@ -62,8 +62,8 @@
                     <td style="width: 40%; font-size: 14px;">
                         <strong>विभाग का नाम :</strong>
                         <t t-set="department_name" t-value="''"/>
-                        <t t-if="notification and notification.project_id and notification.village_ids and len(notification.village_ids) > 0">
-                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', 'in', notification.village_ids.ids)], limit=1)"/>
+                        <t t-if="notification and notification.project_id and notification.village_id">
+                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', '=', notification.village_id.id)], limit=1)"/>
                             <t t-if="first_survey and first_survey.department_id">
                                 <t t-set="department_name" t-value="first_survey.department_id.name"/>
                             </t>
@@ -108,13 +108,10 @@
                 <tr>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>ग्राम/नगर का नाम :</strong>
-                        <span t-if="notification and notification.village_ids and len(notification.village_ids) > 0">
-                            <t t-foreach="notification.village_ids" t-as="village">
-                                <t t-esc="village.name"/>
-                                <t t-if="not village_last">, </t>
-                            </t>
+                        <span t-if="notification and notification.village_id">
+                            <t t-esc="notification.village_id.name"/>
                         </span>
-                        <span t-if="not notification or not notification.village_ids or len(notification.village_ids) == 0">........................</span>
+                        <span t-if="not notification or not notification.village_id">........................</span>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>तहसील का नाम :</strong>
@@ -131,8 +128,8 @@
                     <td style="width: 40%; font-size: 14px;">
                         <strong>सर्वे दिनाँक :</strong>
                         <t t-set="survey_date" t-value="''"/>
-                        <t t-if="notification and notification.project_id and notification.village_ids and len(notification.village_ids) > 0">
-                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', 'in', notification.village_ids.ids)], limit=1, order='survey_date desc')"/>
+                        <t t-if="notification and notification.project_id and notification.village_id">
+                            <t t-set="first_survey" t-value="notification.env['bhu.survey'].search([('project_id', '=', notification.project_id.id), ('village_id', '=', notification.village_id.id)], limit=1, order='survey_date desc')"/>
                             <t t-if="first_survey and first_survey.survey_date">
                                 <t t-set="survey_date" t-value="first_survey.survey_date.strftime('%d/%m/%Y')"/>
                             </t>
@@ -260,13 +257,10 @@
                         </tr>
                         <tr>
                             <td style="padding: 5px; border: 1px solid #000;"><strong>ग्राम/नगर :</strong> 
-                                <span t-if="notification and notification.village_ids and len(notification.village_ids) > 0">
-                                    <t t-foreach="notification.village_ids" t-as="village">
-                                        <t t-esc="village.name"/>
-                                        <t t-if="not village_last">, </t>
-                                    </t>
+                                <span t-if="notification and notification.village_id">
+                                    <t t-esc="notification.village_id.name"/>
                                 </span>
-                                <span t-if="not notification or not notification.village_ids or len(notification.village_ids) == 0">........................</span>
+                                <span t-if="not notification or not notification.village_id">........................</span>
                             </td>
                         </tr>
                         <tr>

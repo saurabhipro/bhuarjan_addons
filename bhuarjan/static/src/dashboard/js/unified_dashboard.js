@@ -804,6 +804,28 @@ export class UnifiedDashboard extends Component {
             return;
         }
         
+        // Special handling for Section 11 - require village selection
+        if (sectionModel === 'bhu.section11.preliminary.report') {
+            if (!this.state.selectedVillage) {
+                this.notification.add(_t("Please select a village first before creating Section 11 Preliminary Report."), { 
+                    type: "warning",
+                    sticky: true
+                });
+                return;
+            }
+        }
+        
+        // Special handling for Section 19 - require village selection
+        if (sectionModel === 'bhu.section19.notification') {
+            if (!this.state.selectedVillage) {
+                this.notification.add(_t("Please select a village first before creating Section 19 Notification."), { 
+                    type: "warning",
+                    sticky: true
+                });
+                return;
+            }
+        }
+        
         let context = {};
         if (this.state.selectedProject) {
             context.default_project_id = this.state.selectedProject;

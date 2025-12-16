@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Expert Committee Order Report Action -->
+    <record id="action_report_expert_committee_order" model="ir.actions.report">
+        <field name="name">Expert Committee Order / विशेषज्ञ समिति आदेश</field>
+        <field name="model">bhu.expert.committee.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.expert_committee_order_report</field>
+        <field name="report_file">bhuarjan.expert_committee_order_report</field>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
+        <field name="print_report_name">'Expert_Committee_Order_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+    </record>
+
+    <!-- Expert Committee Order Report Template -->
+    <template id="expert_committee_order_report">
+        <t t-call="web.html_container">
+            <meta charset="utf-8"/>
+            <t t-foreach="docs" t-as="report">
+                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 20px; font-size: 14px;">
+                    <style>
+                        body, .page, table, td, th, p, span {
+                            font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                        }
+                        .header-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 15px;
+                        }
+                        .header-table td {
+                            padding: 8px;
+                            vertical-align: top;
+                        }
+                        .expert-list-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 15px 0;
+                            border: 1px solid #000;
+                        }
+                        .expert-list-table td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            vertical-align: top;
+                        }
+                        .signatory-section {
+                            margin-top: 30px;
+                        }
+                        .copy-section {
+                            margin-top: 40px;
+                            border-top: 1px solid #000;
+                            padding-top: 15px;
+                        }
+                    </style>
+
+                    <!-- Office Header -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; font-size: 16px; font-weight: bold;">
+                            कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
+                        </h3>
+                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">//आदेश//</p>
+                    </div>
+
+                    <!-- Reference Number and Date -->
+                    <div style="margin-bottom: 15px;">
+                        <table class="header-table">
+                            <tr>
+                                <td style="width: 50%;">
+                                    <p style="margin: 5px 0; font-size: 14px;">
+                                        <strong>क्रमांक/</strong> ../भू-अर्जन/2025
+                                    </p>
+                                </td>
+                                <td style="width: 50%; text-align: right;">
+                                    <p style="margin: 5px 0; font-size: 14px;">
+                                        रायगढ़, <strong>दिनांक /</strong> 
+                                        <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
+                                        <t t-if="not report.create_date">/ /2025</t>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Main Body - Context and Purpose -->
+                    <div style="margin-bottom: 20px;">
+                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
+                            छ.ग. भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर एवं पारदर्शिता का अधिकार (सामाजिक समाघात सहमति एवं जनसुनवाई) नियम 2016 के अंतर्गत विभाग
+                            <t t-if="report.requiring_body_id">
+                                <span t-esc="report.requiring_body_id.name or ''"/>
+                            </t>
+                            <t t-if="not report.requiring_body_id">........................</t>
+                            जिला रायगढ़ (छ.ग.) अंतर्गत परियोजना
+                            <t t-if="report.project_id">
+                                <span t-esc="report.project_id.name or ''"/>
+                            </t>
+                            <t t-if="not report.project_id">........................</t>
+                            में प्रभावित ग्राम
+                            <t t-if="report.village_ids">
+                                <t t-foreach="report.village_ids" t-as="village" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-if="not report.village_ids">........................</t>
+                            तहसील
+                            <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
+                                <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
+                            </t>
+                            <t t-if="not report.village_ids or not report.village_ids[0] or not report.village_ids[0].tehsil_id">........................</t>
+                            की निजी भूमि कुल रकबा
+                            <t t-if="report.total_area_acquired">
+                                <span t-esc="'{:.4f}'.format(report.total_area_acquired)"/>
+                            </t>
+                            <t t-if="not report.total_area_acquired">........................</t>
+                            हेक्टेयर भूमि के अधिग्रहण के संदर्भ में सामाजिक समाघात निर्धारण अध्ययन दल द्वारा प्रस्तुत सामाजिक समाघात निर्धारण रिपोर्ट एवं सामाजिक समाघात प्रबंधन योजना के मूल्यांकन हेतु अनुविभागीय अधिकारी (राजस्व) जिला रायगढ़ (छ.ग.) के प्रस्ताव अनुसार निम्नानुसार विशेषज्ञ समूह का गठन किया जाता है :-
+                        </p>
+                    </div>
+
+                    <!-- Expert Group Members List -->
+                    <div style="margin-bottom: 20px;">
+                        <!-- (क) Non-Government Social Scientist -->
+                        <div style="margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                                <strong>(क) गैर शासकीय सामाजिक वैज्ञानिक</strong>
+                            </p>
+                            <t t-if="report.non_govt_social_scientist_ids">
+                                <t t-set="counter" t-value="0"/>
+                                <t t-foreach="report.non_govt_social_scientist_ids" t-as="member">
+                                    <t t-set="counter" t-value="counter + 1"/>
+                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                        <span t-esc="counter"/>.
+                                        <span t-esc="member.name or ''"/>
+                                        <t t-if="member.post">, <span t-esc="member.post"/></t>
+                                        <t t-if="member.address">, <span t-esc="member.address"/></t>
+                                    </p>
+                                </t>
+                            </t>
+                            <t t-if="not report.non_govt_social_scientist_ids">
+                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                            </t>
+                        </div>
+
+                        <!-- (ख) Representatives of Local Bodies -->
+                        <div style="margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                                <strong>(ख) स्थानीय निकायों के प्रतिनिधि</strong>
+                            </p>
+                            <t t-if="report.local_bodies_representative_ids">
+                                <t t-set="counter" t-value="0"/>
+                                <t t-foreach="report.local_bodies_representative_ids" t-as="member">
+                                    <t t-set="counter" t-value="counter + 1"/>
+                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                        <span t-esc="counter"/>.
+                                        <span t-esc="member.name or ''"/>
+                                        <t t-if="member.post">, <span t-esc="member.post"/></t>
+                                        <t t-if="member.address">, <span t-esc="member.address"/></t>
+                                    </p>
+                                </t>
+                            </t>
+                            <t t-if="not report.local_bodies_representative_ids">
+                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                            </t>
+                        </div>
+
+                        <!-- (ग) Resettlement Expert -->
+                        <div style="margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                                <strong>(ग) पुनर्व्यवस्थापन विशेषज्ञ</strong>
+                            </p>
+                            <t t-if="report.resettlement_expert_ids">
+                                <t t-set="counter" t-value="0"/>
+                                <t t-foreach="report.resettlement_expert_ids" t-as="member">
+                                    <t t-set="counter" t-value="counter + 1"/>
+                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                        <span t-esc="counter"/>.
+                                        <span t-esc="member.name or ''"/>
+                                        <t t-if="member.post">, <span t-esc="member.post"/></t>
+                                        <t t-if="member.address">, <span t-esc="member.address"/></t>
+                                    </p>
+                                </t>
+                            </t>
+                            <t t-if="not report.resettlement_expert_ids">
+                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                            </t>
+                        </div>
+
+                        <!-- (घ) Technical Expert on Project Related Subject -->
+                        <div style="margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                                <strong>(घ) परियोजना से संबंधित विषय का तकनीकी विशेषज्ञ</strong>
+                            </p>
+                            <t t-if="report.technical_expert_ids">
+                                <t t-set="counter" t-value="0"/>
+                                <t t-foreach="report.technical_expert_ids" t-as="member">
+                                    <t t-set="counter" t-value="counter + 1"/>
+                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                        <span t-esc="counter"/>.
+                                        <span t-esc="member.name or ''"/>
+                                        <t t-if="member.post">, <span t-esc="member.post"/></t>
+                                        <t t-if="member.address">, <span t-esc="member.address"/></t>
+                                    </p>
+                                </t>
+                            </t>
+                            <t t-if="not report.technical_expert_ids">
+                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Concluding Paragraph -->
+                    <div style="margin-bottom: 20px;">
+                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
+                            उपरोक्त विशेषज्ञ समूह समाजिक समाघात निर्धारण अध्ययन दल द्वारा प्रस्तुत सामाजिक समाघात निर्धारण रिपोर्ट एवं सामाजिक समाघात प्रबंधन योजना का मूल्यांकन उपरांत अभिमत सहित प्रतिवेदन अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी जिला रायगढ़ (छ.ग.) को प्रस्तुत करेंगे।
+                        </p>
+                    </div>
+
+                    <!-- Main Signatory (Collector) -->
+                    <div class="signatory-section" style="text-align: right;">
+                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                            <strong>कलेक्टर</strong>
+                        </p>
+                        <p style="margin: 5px 0; font-size: 14px;">
+                            रायगढ़ (छ.ग.)
+                        </p>
+                    </div>
+
+                    <!-- Footer/Copy to Section -->
+                    <div class="copy-section">
+                        <table class="header-table">
+                            <tr>
+                                <td style="width: 50%;">
+                                    <p style="margin: 5px 0; font-size: 14px;">
+                                        <strong>पृ.क्रमांक/</strong> -/भू-अर्जन/2025
+                                    </p>
+                                </td>
+                                <td style="width: 50%; text-align: right;">
+                                    <p style="margin: 5px 0; font-size: 14px;">
+                                        रायगढ़, <strong>दिनांक /</strong> 
+                                        <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
+                                        <t t-if="not report.create_date">/ /2025</t>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin: 10px 0 5px 0; font-size: 14px; font-weight: bold;">
+                            <strong>प्रतिलिपिः-</strong>
+                        </p>
+
+                        <div style="margin-top: 10px;">
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                1. सचिव, छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग, मंत्रालय महानदी भवन, रायपुर की ओर सादर सूचनार्थ।
+                            </p>
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                2. आयुक्त, बिलासपुर संभाग बिलासपुर की ओर सादर सूचनार्थ।
+                            </p>
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी
+                                <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
+                                    <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
+                                </t>
+                                की ओर सूचनार्थ। उपरोक्त विशेषज्ञ समिति के समक्ष सामाजिक समाघात निर्धारण अध्ययन दल द्वारा प्रस्तुत प्रतिवेदन को प्रस्तुत करते हुये नियमानुसार आवश्यक कार्यवाही सुनिश्चित करें।
+                            </p>
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                4. विभाग
+                                <t t-if="report.requiring_body_id">
+                                    <span t-esc="report.requiring_body_id.name or ''"/>
+                                </t>
+                                <t t-if="not report.requiring_body_id">........................</t>
+                                रायगढ़ (छ.ग.) की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
+                            </p>
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                5. तहसीलदार
+                                <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
+                                    <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
+                                </t>
+                                की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
+                            </p>
+                            <p style="margin: 3px 0; font-size: 14px;">
+                                6. समिति के सर्व संबंधित पदाधिकारी को सूचनार्थ एवं आवश्यक कार्यवाही हेतु प्रेषित।
+                            </p>
+                        </div>
+
+                        <!-- Secondary Signatory (Additional Collector) -->
+                        <div class="signatory-section" style="text-align: right; margin-top: 20px;">
+                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                                <strong>अपर कलेक्टर</strong>
+                            </p>
+                            <p style="margin: 5px 0; font-size: 14px;">
+                                रायगढ़ (छ.ग.)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
+

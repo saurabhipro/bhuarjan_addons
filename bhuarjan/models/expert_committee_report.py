@@ -4,6 +4,9 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 import uuid
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class ExpertCommitteeReport(models.Model):
     _name = 'bhu.expert.committee.report'
@@ -201,11 +204,30 @@ class ExpertCommitteeReport(models.Model):
     # Workflow methods are inherited from mixin
     # Override action_download_unsigned_file to generate PDF report
     def action_download_unsigned_file(self):
-        """Generate and download Expert Committee Report PDF (unsigned) - Override mixin"""
+        """Generate and download Expert Committee Proposal PDF (unsigned) - Override mixin"""
         self.ensure_one()
-        # TODO: Add report action reference when Expert Committee report template is created
-        # For now, return error
-        raise ValidationError(_('Expert Committee Report PDF generation is not yet implemented.'))
+        # Get the report action
+        report_action = self.env['ir.actions.report'].sudo().search([
+            ('report_name', '=', 'bhuarjan.expert_committee_proposal_report')
+        ], limit=1)
+        
+        if not report_action:
+            # Fallback: try using ir.model.data
+            try:
+                report_data = self.env['ir.model.data'].sudo().search([
+                    ('module', '=', 'bhuarjan'),
+                    ('name', '=', 'action_report_expert_committee_proposal')
+                ], limit=1)
+                if report_data and report_data.res_id:
+                    report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
+            except Exception as e:
+                _logger.error(f"Error in fallback for expert committee report: {str(e)}", exc_info=True)
+        
+        if not report_action or not report_action.exists():
+            raise ValidationError(_('Expert Committee Proposal report template not found. Please contact administrator.'))
+        
+        # Generate PDF
+        return report_action.report_action(self)
     
     def action_download_expert_group_report(self):
         """Download Expert Group Report file"""
@@ -218,6 +240,38 @@ class ExpertCommitteeReport(models.Model):
             'url': f'/web/content/{self._name}/{self.id}/expert_group_report_file/{filename}?download=true',
             'target': 'self',
         }
+    
+    def action_download_expert_committee_order(self):
+        """Generate and download Expert Committee Approval Order PDF - For Collector"""
+        self.ensure_one()
+        # Get the report action
+        report_action = self.env['ir.actions.report'].sudo().search([
+            ('report_name', '=', 'bhuarjan.expert_committee_order_report')
+        ], limit=1)
+        
+        if not report_action:
+            # Fallback: try using ir.model.data
+            try:
+                report_data = self.env['ir.model.data'].sudo().search([
+                    ('module', '=', 'bhuarjan'),
+                    ('name', '=', 'action_report_expert_committee_order')
+                ], limit=1)
+                if report_data and report_data.res_id:
+                    report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
+            except Exception as e:
+                _logger.error(f"Error in fallback for expert committee order report: {str(e)}", exc_info=True)
+        
+        if not report_action or not report_action.exists():
+            raise ValidationError(_('Expert Committee Order report template not found. Please contact administrator.'))
+        
+        # Generate PDF
+        return report_action.report_action(self)
+    
+    def action_download_latest_pdf(self):
+        """Override mixin method to always download Expert Committee Proposal PDF"""
+        self.ensure_one()
+        # Always use the proposal report template
+        return self.action_download_unsigned_file()
     
     def action_create_section11_notification(self):
         """Create Section 11 Preliminary Report from this Expert Committee Report - Creates one per village"""

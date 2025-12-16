@@ -115,10 +115,19 @@ class Section19Notification(models.Model):
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain to only show project villages"""
-        self.village_id = False
+        # Only reset village if it's not valid for the new project
         if self.project_id and self.project_id.village_ids:
+            # If village is already set and is in the project's villages, keep it
+            if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
+                # Village is valid, keep it
+                pass
+            else:
+                # Village is not valid for this project, reset it
+                self.village_id = False
             return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
+            # No villages in project, reset village
+            self.village_id = False
             return {'domain': {'village_id': [('id', '=', False)]}}
     
     @api.onchange('village_id', 'project_id')
@@ -151,10 +160,11 @@ class Section19Notification(models.Model):
                     khasra_area_map[parcel.khasra_number] = parcel.area_in_hectares
         
         # Get all khasra numbers that have objections (Section 15)
+        # Exclude resolved objections (those with resolved_date set)
         objections = self.env['bhu.section15.objection'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('status', '!=', 'resolved')  # Exclude resolved objections
+            ('resolved_date', '=', False)  # Exclude resolved objections
         ])
         
         objection_khasras = set()
@@ -179,6 +189,19 @@ class Section19Notification(models.Model):
         # Set the land parcels
         if parcel_vals:
             self.land_parcel_ids = parcel_vals
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from context"""
+        res = super().default_get(fields_list)
+        
+        # Get defaults from context (set by dashboard or other actions)
+        if 'default_project_id' in self.env.context:
+            res['project_id'] = self.env.context['default_project_id']
+        if 'default_village_id' in self.env.context:
+            res['village_id'] = self.env.context['default_village_id']
+        
+        return res
     
     @api.model
     def _default_project_id(self):
@@ -339,10 +362,19 @@ class Section19NotificationWizard(models.TransientModel):
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain to only show project villages"""
-        self.village_id = False
+        # Only reset village if it's not valid for the new project
         if self.project_id and self.project_id.village_ids:
+            # If village is already set and is in the project's villages, keep it
+            if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
+                # Village is valid, keep it
+                pass
+            else:
+                # Village is not valid for this project, reset it
+                self.village_id = False
             return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
+            # No villages in project, reset village
+            self.village_id = False
             return {'domain': {'village_id': [('id', '=', False)]}}
     
     def action_generate_notification(self):

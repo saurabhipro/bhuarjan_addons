@@ -107,6 +107,7 @@
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders
             'bhuarjan/static/src/dashboard/css/admin_dashboard.css',
+            'bhuarjan/static/src/dashboard/xml/dashboard_header.xml',
             'bhuarjan/static/src/dashboard/xml/admin_dashboard.xml',
             'bhuarjan/static/src/dashboard/js/web_client_dashboard.js',
             # Unified Dashboard (replaces separate JS files)

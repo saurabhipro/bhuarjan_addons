@@ -3,40 +3,15 @@
     <t t-name="bhuarjan.AdminDashboardTemplate" owl="1">
         <div class="o_admin_dashboard">
             <!-- Header with Role Title -->
-            <div class="o_dashboard_header" style="background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); color: #8B4513; padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1.5px solid #8B4513;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <h2 style="margin: 0; color: #8B4513; font-weight: bold; font-size: 18px;">
-                            <i class="fa fa-crown" style="margin-right: 10px;"/> <t t-esc="pageTitle"/>
-                        </h2>
-                    </div>
-                    <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: 100%;">
-                        <!-- Department Selector -->
-                        <select class="form-select o_department_selector" t-att-value="state.selectedDepartment" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
-                            <option value="">Select Department</option>
-                            <t t-foreach="state.departments" t-as="department" t-key="department.id">
-                                <option t-att-value="department.id"><t t-esc="department.name"/></option>
-                            </t>
-                        </select>
-                        <!-- Project Selector -->
-                        <select class="form-select o_project_selector" t-att-value="state.selectedProject" t-on-change="onProjectChange" t-att-disabled="!state.selectedDepartment" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
-                            <option value="">Project</option>
-                            <t t-foreach="state.projects" t-as="project" t-key="project.id">
-                                <option t-att-value="project.id"><t t-esc="project.name"/></option>
-                            </t>
-                        </select>
-                        <!-- Village Selector -->
-                        <select class="form-select o_village_selector" t-att-value="state.selectedVillage" t-on-change="onVillageChange" t-att-disabled="!state.selectedProject" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">
-                            <option value="">Village</option>
-                            <t t-foreach="state.villages" t-as="village" t-key="village.id">
-                                <option t-att-value="village.id"><t t-esc="village.name"/></option>
-                            </t>
-                        </select>
-                        <span style="color: #8B4513; opacity: 0.9; font-size: 12px;" t-if="state and state.lastUpdate">
-                            Last updated: <t t-esc="state.lastUpdate"/>
-                        </span>
-                    </div>
-                </div>
+            <t t-call="bhuarjan.DashboardHeader">
+                <t t-set="title" t-value="pageTitle"/>
+                <t t-set="iconClass" t-value="'fa fa-crown'"/>
+            </t>
+            <!-- Last Update for Admin Dashboard -->
+            <div style="text-align: right; margin-top: -15px; margin-bottom: 10px;">
+                <span style="color: #8B4513; opacity: 0.9; font-size: 12px;" t-if="state and state.lastUpdate">
+                    Last updated: <t t-esc="state.lastUpdate"/>
+                </span>
             </div>
 
             <!-- Loading State -->

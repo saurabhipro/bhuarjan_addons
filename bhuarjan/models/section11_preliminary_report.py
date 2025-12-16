@@ -36,23 +36,34 @@ class Section11PreliminaryReport(models.Model):
                     )
 
 
-    village_domain = fields.Char()
+    village_domain = fields.Char(default='[]')
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
         for rec in self:
             if rec.project_id and rec.project_id.village_ids:
+                village_ids = rec.project_id.village_ids.ids
                 # If village is already set and is in the project's villages, keep it
-                if rec.village_id and rec.village_id.id in rec.project_id.village_ids.ids:
+                if rec.village_id and rec.village_id.id in village_ids:
                     # Village is valid, keep it
-                    rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+                    rec.village_domain = json.dumps([('id', 'in', village_ids)])
                 else:
                     # Village is not valid for this project, reset it
-                    rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+                    rec.village_domain = json.dumps([('id', 'in', village_ids)])
                     rec.village_id = False
             else:
                 rec.village_domain = json.dumps([])   # empty domain
                 rec.village_id = False
+    
+    @api.onchange('village_id')
+    def _onchange_village_id(self):
+        """Ensure domain is set when village is changed"""
+        for rec in self:
+            if rec.project_id and rec.project_id.village_ids:
+                rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
+            else:
+                rec.village_domain = json.dumps([])
 
 
     
@@ -271,9 +282,22 @@ class Section11PreliminaryReport(models.Model):
         """Set default values from context"""
         res = super().default_get(fields_list)
         
+        # Initialize village_domain to empty list if not set
+        if 'village_domain' not in res or not res.get('village_domain'):
+            res['village_domain'] = json.dumps([])
+        
         # Get defaults from context (set by dashboard or other actions)
         if 'default_project_id' in self.env.context:
-            res['project_id'] = self.env.context['default_project_id']
+            project_id = self.env.context['default_project_id']
+            res['project_id'] = project_id
+            # Set domain based on project
+            if project_id:
+                project = self.env['bhu.project'].browse(project_id)
+                if project.exists() and project.village_ids:
+                    res['village_domain'] = json.dumps([('id', 'in', project.village_ids.ids)])
+                else:
+                    res['village_domain'] = json.dumps([])
+        
         if 'default_village_id' in self.env.context:
             res['village_id'] = self.env.context['default_village_id']
         

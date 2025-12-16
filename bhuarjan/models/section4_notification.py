@@ -25,6 +25,11 @@ class Section4Notification(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(),
                                   domain="[('is_sia_exempt', '=', False)]")
+    
+    # Department - computed from project (for filtering purposes)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
+                                   related='project_id.department_id', store=True, readonly=True)
+    
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False, readonly=True)

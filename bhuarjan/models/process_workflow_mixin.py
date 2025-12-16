@@ -80,17 +80,22 @@ class ProcessWorkflowMixin(models.AbstractModel):
     @api.depends('state', 'is_sdm', 'is_collector')
     def _compute_edit_permissions(self):
         """Compute edit permissions based on state and user role"""
+        current_user = self.env.user
+        is_sdm_user = current_user.has_group('bhuarjan.group_bhuarjan_sdm')
+        is_collector_user = current_user.has_group('bhuarjan.group_bhuarjan_collector')
+        is_admin_user = current_user.has_group('bhuarjan.group_bhuarjan_admin') or current_user.has_group('base.group_system')
+        
         for record in self:
             # For new records (no id), allow editing if user is SDM or admin
             if not record.id:
-                record.can_sdm_edit = record.is_sdm or record.env.user.has_group('bhuarjan.group_bhuarjan_admin') or record.env.user.has_group('base.group_system')
+                record.can_sdm_edit = is_sdm_user or is_admin_user
                 record.can_collector_edit = False  # Collectors can't create new records
             else:
                 # SDM can edit when state is 'draft' or 'send_back', readonly when 'approved'
-                record.can_sdm_edit = record.is_sdm and record.state in ('draft', 'send_back')
+                record.can_sdm_edit = (is_sdm_user or is_admin_user) and record.state in ('draft', 'send_back')
                 
                 # Collector can edit when state is 'submitted', readonly when 'approved'
-                record.can_collector_edit = record.is_collector and record.state == 'submitted'
+                record.can_collector_edit = (is_collector_user or is_admin_user) and record.state == 'submitted'
 
     def write(self, vals):
         """Override write to intercept state changes and validate them"""

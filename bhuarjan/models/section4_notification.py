@@ -182,8 +182,19 @@ class Section4Notification(models.Model):
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Auto-populate requiring_body_id and reset village/tehsil when project changes"""
-        # Reset fields when project changes
-        self.village_id = False
+        # If village is already set and is in the project's villages, keep it
+        if self.project_id and self.project_id.village_ids:
+            if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
+                # Village is valid, keep it
+                pass
+            else:
+                # Village is not valid for this project, reset it
+                self.village_id = False
+        else:
+            # No villages in project, reset village
+            self.village_id = False
+        
+        # Reset other fields when project changes
         self.requiring_body_id = False
         self.tehsil_id = False
         
@@ -197,6 +208,19 @@ class Section4Notification(models.Model):
         """Auto-populate tehsil when village is selected"""
         if self.village_id and self.village_id.tehsil_id:
             self.tehsil_id = self.village_id.tehsil_id
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from context"""
+        res = super().default_get(fields_list)
+        
+        # Get defaults from context (set by dashboard or other actions)
+        if 'default_project_id' in self.env.context:
+            res['project_id'] = self.env.context['default_project_id']
+        if 'default_village_id' in self.env.context:
+            res['village_id'] = self.env.context['default_village_id']
+        
+        return res
     
     @api.model
     def _default_project_id(self):

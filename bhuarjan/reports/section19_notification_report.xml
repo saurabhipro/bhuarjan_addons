@@ -12,6 +12,7 @@
     </record>
 
     <!-- Custom Layout header for Section 19 -->
+    <!-- Updated: Fixed village_id reference (singular, not plural) -->
     <template id="section19_report_custom_layout">
         <div class="header-section" style="margin-bottom: 12px;">
             <style>
@@ -222,7 +223,7 @@
 
                 <!-- Notification Number -->
                 <div class="notification-number">
-                    <strong>क्र. <t t-if="notification and notification.notification_number" t-esc="notification.notification_number"/><t t-if="not notification or not notification.notification_number">/अ-82/2015-16</t></strong>
+                    <strong>क्र. <t t-if="notification and notification.name" t-esc="notification.name"/><t t-if="not notification or not notification.name">/अ-82/2015-16</t></strong>
                 </div>
 
                 <!-- Legal Preamble -->
@@ -241,6 +242,7 @@
 
                 <!-- Schedule Section -->
                 <div class="schedule-section">
+                    <t t-set="total_land_area" t-value="sum([parcel.area_hectares for parcel in (notification.land_parcel_ids or [])]) if notification and notification.land_parcel_ids else 0.0"/>
                     <div class="schedule-title">भूमि का वर्णन -</div>
                     <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
                         <tr>
@@ -265,10 +267,10 @@
                         </tr>
                         <tr>
                             <td style="padding: 5px; border: 1px solid #000;"><strong>भूमि का क्षेत्रफल :</strong> 
-                                <span t-if="notification and notification.total_land_area">
-                                    <t t-esc="'{:.4f}'.format(notification.total_land_area)"/> हेक्टेयर
+                                <span t-if="notification and notification.land_parcel_ids and total_land_area > 0">
+                                    <t t-esc="'{:.4f}'.format(total_land_area)"/> हेक्टेयर
                                 </span>
-                                <span t-if="not notification or not notification.total_land_area">........................</span>
+                                <span t-if="not notification or not notification.land_parcel_ids or total_land_area == 0">........................</span>
                             </td>
                         </tr>
                     </table>
@@ -293,10 +295,10 @@
                                     <td><strong>योग -</strong></td>
                                     <td style="text-align: right;">
                                         <strong>
-                                            <t t-if="notification and notification.total_land_area">
-                                                <t t-esc="'{:.4f}'.format(notification.total_land_area)"/>
+                                            <t t-if="notification and notification.land_parcel_ids and total_land_area > 0">
+                                                <t t-esc="'{:.4f}'.format(total_land_area)"/>
                                             </t>
-                                            <t t-if="not notification or not notification.total_land_area">0.0000</t>
+                                            <t t-if="not notification or not notification.land_parcel_ids or total_land_area == 0">0.0000</t>
                                         </strong>
                                     </td>
                                 </tr>

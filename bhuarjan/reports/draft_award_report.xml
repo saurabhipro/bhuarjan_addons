@@ -324,8 +324,7 @@
                         <strong>भाग-1 (क) भूमि का मुआवजा पत्रक</strong>
                     </p>
                     <p class="report-paragraph" style="margin-bottom: 10px;">
-                        <strong>ग्राम- <span t-if="award and award.village_id" t-esc="award.village_id.name"/><span t-if="not award or not award.village_id">........................</span> 
-                        भू अ. प्र. क्र. <span t-if="award and award.case_number" t-esc="award.case_number"/><span t-if="not award or not award.case_number">........................</span></strong>
+                        <strong>ग्राम- <span t-if="award and award.village_id" t-esc="award.village_id.name"/><span t-if="not award or not award.village_id">........................</span></strong>
                     </p>
                     <t t-if="award and award.compensation_line_ids and len(award.compensation_line_ids) > 0">
                         <table class="report-content-table" style="font-size: 9px; width: 100%; border-collapse: collapse;">

@@ -147,228 +147,75 @@
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
             <t t-set="notification" t-value="object or (docs and docs[0]) or None"/>
-            <t t-call="bhuarjan.section19_report_custom_layout"/>
-            
+            <!-- <t t-call="bhuarjan.section19_report_custom_layout"/> -->
+            <t t-call="web.basic_layout">
             <style>
-                /* Global Font Settings for Section 19 Report */
-                body, .page, div, p, span, td, th, h2, h3, strong, .notification-content,
-                .header-info-table, .schedule-section, .legal-preamble {
-                    font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                .letter_space{
+                    letter-spacing: 1px;
+                }
+                .fsc{
+                    font-size: 18px;
                 }
             </style>
+
             
-            <div class="page" style="font-size: 14px; line-height: 1.6; padding: 20px;">
-                <style>
-                    .notification-content {
-                        margin-top: 20px;
-                    }
-                    .notification-number {
-                        text-align: right;
-                        margin-bottom: 15px;
-                        font-weight: bold;
-                        font-size: 14px;
-                    }
-                    .legal-preamble {
-                        text-align: justify;
-                        margin-bottom: 20px;
-                        line-height: 1.8;
-                    }
-                    .schedule-section {
-                        margin: 20px 0;
-                    }
-                    .schedule-title {
-                        font-weight: bold;
-                        font-size: 16px;
-                        margin-bottom: 10px;
-                    }
-                    .schedule-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 15px 0;
-                        border: 1px solid #000;
-                    }
-                    .schedule-table th,
-                    .schedule-table td {
-                        border: 1px solid #000;
-                        padding: 8px;
-                        text-align: left;
-                    }
-                    .schedule-table th {
-                        background-color: #f0f0f0;
-                        font-weight: bold;
-                        text-align: center;
-                    }
-                    .schedule-table .total-row {
-                        font-weight: bold;
-                        background-color: #f9f9f9;
-                    }
-                    .paragraph {
-                        margin: 15px 0;
-                        text-align: justify;
-                        line-height: 1.8;
-                    }
-                    .paragraph-number {
-                        font-weight: bold;
-                        display: inline;
-                    }
-                    .footer-section {
-                        margin-top: 40px;
-                        text-align: right;
-                    }
-                    .signature-line {
-                        margin-top: 60px;
-                        text-align: right;
-                    }
-                </style>
-
-                <!-- Notification Number -->
-                <div class="notification-number">
-                    <strong>क्र. <t t-if="notification and notification.name" t-esc="notification.name"/><t t-if="not notification or not notification.name">/अ-82/2015-16</t></strong>
+            <div class="container letter_space">
+                <div class="text-center mx-auto">
+                    <h3 class="hindi letter_space">
+                        प्रारूप अधिसूचना<br/>
+                        कार्यालय कलेक्टर, जिला रायगढ़ एवं उप सचिव,<br/>
+                        छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग
+                    </h3>
                 </div>
-
-                <!-- Legal Preamble -->
-                <div class="legal-preamble">
-                    <p>
-                        चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की 
-                        <t t-if="notification and notification.public_purpose">
-                            <t t-raw="notification.public_purpose"/>
-                        </t>
-                        <t t-if="not notification or not notification.public_purpose">
-                            <strong>सार्वजनिक प्रयोजन</strong>
-                        </t>
-                        के लिए आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिले एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 19 के तहत् यह घोषित किया जाता है, कि इस भूमि का उक्त प्रयोजन के लिए आवश्यकता है :-
-                    </p>
+                <div class="h3 text-center letter_space"><u>//अधिसूचना//</u></div>
+                <div class="letter_space fsc">
+                    &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;भू-अर्जन प्रकरण क्रमांक -------------------@व-82@वर्ष ----------------- चूँकि राज्य शासन को यह
+                    समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की -------------------------- सार्वजनिक प्रयोजन के लिये
+                    आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता अधिकार अधिनियम, 2013
+                    (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 19 के तहत यह घोषित किया जाता है कि इस भूमि का उक्त प्रयोजन के लिये
+                    आवश्यकता है :-
                 </div>
+                <div class="h3 text-center letter_space"><u>अनुसूची</u></div>
+                <div class="h3 text-left fsc"><u><b>भूमि का विवरण :-</b></u></div>
+                <div><ol>
 
-                <!-- Schedule Section -->
-                <div class="schedule-section">
-                    <t t-set="total_land_area" t-value="sum([parcel.area_hectares for parcel in (notification.land_parcel_ids or [])]) if notification and notification.land_parcel_ids else 0.0"/>
-                    <div class="schedule-title">भूमि का वर्णन -</div>
-                    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                        <tr>
-                            <td style="padding: 5px; border: 1px solid #000;"><strong>जिला :</strong> 
-                                <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
-                                <span t-if="not notification or not notification.district_id">........................</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; border: 1px solid #000;"><strong>तहसील :</strong> 
-                                <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
-                                <span t-if="not notification or not notification.tehsil_id">........................</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; border: 1px solid #000;"><strong>ग्राम/नगर :</strong> 
-                                <span t-if="notification and notification.village_id">
-                                    <t t-esc="notification.village_id.name"/>
-                                </span>
-                                <span t-if="not notification or not notification.village_id">........................</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; border: 1px solid #000;"><strong>भूमि का क्षेत्रफल :</strong> 
-                                <span t-if="notification and notification.land_parcel_ids and total_land_area > 0">
-                                    <t t-esc="'{:.4f}'.format(total_land_area)"/> हेक्टेयर
-                                </span>
-                                <span t-if="not notification or not notification.land_parcel_ids or total_land_area == 0">........................</span>
-                            </td>
-                        </tr>
-                    </table>
+                    <li>- जिला</li>
+                    <li>- तहसील</li>
+                    <li>- ग्राम/नगर</li>
+                    <li>- भूमि का क्षेत्रफल</li>
 
-                    <!-- Land Parcels Table -->
-                    <table class="schedule-table">
+                </ol></div>
+                <br/>
+                <div class="w-100">
+                    <table class="w-100 text-center fsc">
                         <thead>
                             <tr>
-                                <th style="width: 50%;">खसरा नंबर</th>
-                                <th style="width: 50%;">रकबा (हेक्टेयर में)</th>
+                                <td>खसरा नम्बर</td>
+                                <td>अर्जित रकबा (हेक्टेयर में)</td>
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-if="notification and notification.land_parcel_ids and len(notification.land_parcel_ids) > 0">
-                                <t t-foreach="notification.land_parcel_ids" t-as="parcel">
-                                    <tr>
-                                        <td t-esc="parcel.khasra_number or ''"/>
-                                        <td style="text-align: right;" t-esc="'{:.4f}'.format(parcel.area_hectares) if parcel.area_hectares else '0.0000'"/>
-                                    </tr>
-                                </t>
-                                <tr class="total-row">
-                                    <td><strong>योग -</strong></td>
-                                    <td style="text-align: right;">
-                                        <strong>
-                                            <t t-if="notification and notification.land_parcel_ids and total_land_area > 0">
-                                                <t t-esc="'{:.4f}'.format(total_land_area)"/>
-                                            </t>
-                                            <t t-if="not notification or not notification.land_parcel_ids or total_land_area == 0">0.0000</t>
-                                        </strong>
-                                    </td>
-                                </tr>
-                            </t>
-                            <t t-if="not notification or not notification.land_parcel_ids or len(notification.land_parcel_ids) == 0">
-                                <tr>
-                                    <td colspan="2" style="text-align: center; padding: 20px;">
-                                        कोई भूमि खंड उपलब्ध नहीं है / No land parcels available
-                                    </td>
-                                </tr>
-                            </t>
+                            <td>23</td>
+                            <td>23</td>
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Paragraph 2: Map Inspection -->
-                <div class="paragraph">
-                    <span class="paragraph-number">2.</span>
-                    भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व) 
-                    <t t-if="notification and notification.sdo_office_location" t-esc="notification.sdo_office_location"/>
-                    <t t-if="not notification or not notification.sdo_office_location">...........................</t>
-                    के कार्यालय में किया जा सकता है।
+                <div class="fsc">
+                    <p>2- भूमि का स्वामी (पता) का पंजीकरण विवरण अधिनियम (राज्य) ------------------ के क्रमांक के अनुसार किया जाना है।  </p>
+                    <p>3- उक्त भूमि अर्जन में किसी भी अन्य अधिकारी का हस्तक्षेप उचित नहीं है।</p>
                 </div>
-
-                <!-- Paragraph 3: Displacement and Rehabilitation -->
-                <div class="paragraph">
-                    <span class="paragraph-number">3.</span>
-                    <t t-if="notification and notification.is_displacement_involved">
-                        उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित व्यक्तियों का पुनर्वासित किया जाना प्रस्तावित है। पुनर्वासन तथा पुनर्व्यवस्थापन हेतु ग्राम 
-                        <t t-if="notification.rehab_village_id" t-esc="notification.rehab_village_id.name"/>
-                        <t t-if="not notification.rehab_village_id">...........................</t>
-                        तहसील 
-                        <t t-if="notification.rehab_tehsil_id" t-esc="notification.rehab_tehsil_id.name"/>
-                        <t t-if="not notification.rehab_tehsil_id">...........................</t>
-                        जिला 
-                        <t t-if="notification.rehab_district_id" t-esc="notification.rehab_district_id.name"/>
-                        <t t-if="not notification.rehab_district_id">...........................</t>
-                        की भूमि खसरा नंबर 
-                        <t t-if="notification.rehab_khasra_number" t-esc="notification.rehab_khasra_number"/>
-                        <t t-if="not notification.rehab_khasra_number">...........................</t>
-                        रकवा 
-                        <t t-if="notification.rehab_area_hectares">
-                            <t t-esc="'{:.4f}'.format(notification.rehab_area_hectares)"/> हेक्टेयर
-                        </t>
-                        <t t-if="not notification.rehab_area_hectares">...........................</t>
-                        का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व) 
-                        <t t-if="notification.rehab_officer_office_location" t-esc="notification.rehab_officer_office_location"/>
-                        <t t-if="not notification.rehab_officer_office_location">...........................</t>
-                        के कार्यालय में किया जा सकता है।
-                    </t>
-                    <t t-if="not notification or not notification.is_displacement_involved">
-                        उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निहित नहीं है।
-                    </t>
-                </div>
-
-                <!-- Footer -->
-                <div class="footer-section">
-                    <div style="margin-top: 40px;">
-                        <p><strong>छत्तीसगढ़ के राज्यपाल के नाम से</strong></p>
-                        <p><strong>तथा आदेशानुसार</strong></p>
-                    </div>
-                    <div class="signature-line">
-                        <p style="margin-top: 60px;">
-                            <t t-if="notification and notification.collector_name" t-esc="notification.collector_name"/>
-                            <t t-if="not notification or not notification.collector_name">(.........................)</t>
-                        </p>
-                        <p><strong>कलेक्टर</strong></p>
-                    </div>
-                </div>
+                <div class="h3 text-center fsc"><u>इसके अलावा</u></div>
+                <div class="fsc "><p>उक्त भूमि अर्जन के लिए अधिसूचित पुनर्वासन योजना के अंतर्गत अधिकारियों को  
+                    पुनर्वासित किया जाना है। पुनर्वासन एवं पुनर्व्यवस्थापन के अनुसार ग्राम ------------------------------- तहसील ------------------  
+                    जिला ------------------ की भूमि खसरा नम्बर -------------------------- अर्जित रकबा ------------------ हेक्टेयर में तय किया गया है।  
+                    पुनर्वासित योजना का कार्यान्वयन अधिनियम/अनुसूची अधिनियम (राज्य) -------------------- के क्रमांक के अनुसार किया जाना है।</p></div>
+                <div class="text-right h4">न्यायालय के प्रकरण क्रमांक से  
+                    और हस्ताक्षर द्वारा  
+                    (-----------------------------------)  
+                    समाधान हो गया, और सूचना निम्नलिखित:  
+                    राज्य शासन, जिला एवं संबंधित कार्यालय</div>
             </div>
+            </t>
         </t>
     </template>
 </odoo>

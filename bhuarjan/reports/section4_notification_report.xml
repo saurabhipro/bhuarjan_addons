@@ -34,7 +34,7 @@
                 }
             </style>
             <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px; font-weight: bold;">
-                <strong>प्ररूप-एक (नियम 11 देखिये)</strong>
+                <strong>प्ररूप-एक (111नियम 11 देखिये)</strong>
             </h2>
             <h2 style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 18px; font-weight: bold;">
                 <strong>कार्यालय कलेक्टर एवं पदेन उप सचिव, राजस्व एवं आपदा प्रबंधन विभाग</strong>
@@ -45,19 +45,12 @@
 
             <table class="header-info-table">
                 <tr>
-                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
-                        <!-- Logo - Left Header Box -->
-                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
-                                height="65"
-                                width="80"/>
-                        </td>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>
                         <span t-if="wizard and wizard.project_id" t-esc="wizard.project_id.name"/>
                         <span t-if="not wizard or not wizard.project_id">........................</span>
                     </td>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <strong>विभाग का नाम :</strong>
                         <t t-set="department_name" t-value="''"/>
                         <t t-if="wizard and wizard.project_id and wizard.village_id">
@@ -68,53 +61,16 @@
                         </t>
                         <span t-esc="department_name if department_name else 'Public Works Department'"/>
                     </td>
-                    <td rowspan="3" style="width: 10%; padding: 0; text-align: center; vertical-align: middle;">
-                        <!-- QR Code - Right Header Box -->
-                        <t t-if="wizard">
-                            <t t-set="notification" t-value="wizard.env['bhu.section4.notification'].search([('project_id', '=', wizard.project_id.id), ('village_id', '=', wizard.village_id.id)], limit=1, order='create_date desc')"/>
-                            <t t-if="notification">
-                                <t t-set="qr_code_img" t-value="notification.get_qr_code_data()"/>
-                                <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section4/' + str(notification.notification_uuid or '') + '/download'"/>
-                                <t t-if="qr_code_img">
-                                    <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
-                                        <img t-att-src="'data:image/png;base64,' + qr_code_img" 
-                                             alt="QR Code - Click to download PDF" 
-                                             style="width: 100%; max-width: 100%; height: auto; aspect-ratio: 1; border: none; display: block; margin: 0; padding: 0;"/>
-                                    </a>
-                                </t>
-                                <t t-if="not qr_code_img">
-                                    <a t-att-href="qr_download_url" style="display: block; width: 100%; margin: 0; padding: 0; text-decoration: none;">
-                                        <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
-                                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                                <div style="text-align: center; font-size: 7px;">
-                                                    <div style="font-weight: bold;">QR Code</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </t>
-                            </t>
-                            <t t-if="not notification">
-                                <div style="width: 100%; padding-top: 100%; position: relative; border: none; background: white; margin: 0;">
-                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                        <div style="text-align: center; font-size: 7px;">
-                                            <div style="font-weight: bold;">QR Code</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </t>
-                        </t>
-                    </td>
                 </tr>
                 <tr>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <strong>ग्राम का नाम :</strong>
                         <span t-if="wizard and wizard.village_id">
                             <t t-esc="wizard.village_id.name"/>
                         </span>
                         <span t-if="not wizard or not wizard.village_id">........................</span>
                     </td>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <strong>तहसील का नाम :</strong>
                         <span t-if="wizard and wizard.village_id">
                             <t t-esc="wizard.village_id.tehsil_id.name if wizard.village_id and wizard.village_id.tehsil_id else ''"/>
@@ -124,7 +80,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <strong>सर्वे दिनाँक :</strong>
                         <t t-set="survey_date" t-value="''"/>
                         <t t-if="wizard and wizard.project_id and wizard.village_id">
@@ -135,7 +91,7 @@
                         </t>
                         <span t-esc="survey_date if survey_date else '........................'"/>
                     </td>
-                    <td style="width: 40%; font-size: 14px;">
+                    <td style="width: 50%; font-size: 14px;">
                         <!-- Empty cell -->
                     </td>
                 </tr>
@@ -201,29 +157,58 @@
                     text-align: left;
                     padding-left: 10px;
                 }
-                .questions-section {
+                .questions-table {
+                    width: 100%;
                     margin-top: 20px;
+                    border-collapse: collapse;
+                    table-layout: fixed;
                 }
+<<<<<<< Updated upstream
+                .questions-table td {
+                    padding: 8px 8px 8px 0;
+                    vertical-align: middle;
+                    font-size: 16px;
+=======
                 .question-item {
-                    margin-bottom: 15px;
+                    margin-bottom: 12px;
                     padding: 0;
                     page-break-inside: avoid;
+                    line-height: 1.8;
+>>>>>>> Stashed changes
                 }
-                .question-label {
+                .questions-table td:first-child {
                     font-weight: bold;
+<<<<<<< Updated upstream
+                    padding-right: 8px;
+                    width: 45%;
+                }
+                .questions-table td:last-child {
+                    width: 55%;
+                    vertical-align: middle;
+=======
                     font-size: 16px;
-                    margin-bottom: 8px;
-                    display: block;
+                    display: inline;
                     text-align: left;
+                    margin-right: 8px;
+                    vertical-align: top;
                 }
                 .question-answer {
-                    margin-top: 5px;
-                    margin-bottom: 15px;
+                    display: inline;
                     margin-left: 0;
-                    text-align: justify;
+                    text-align: left;
                     font-size: 16px;
-                    line-height: 1.6;
+                    line-height: 1.8;
                     padding: 0;
+                    vertical-align: top;
+                }
+                .question-answer p {
+                    display: inline;
+                    margin: 0;
+                    padding: 0;
+                }
+                .question-answer br {
+                    display: none;
+>>>>>>> Stashed changes
                 }
                 .section-divider {
                     border-top: 2px solid #000;
@@ -332,90 +317,139 @@
                     
                     <div class="section-divider"></div>
                     
+<<<<<<< Updated upstream
+                    <table class="questions-table">
+                        <tr>
+                            <td>(एक) लोक प्रयोजन का संक्षिप्त विवरण :-</td>
+                            <td><t t-if="wizard.q1_brief_description"><t t-raw="wizard.q1_brief_description"/></t><t t-if="not wizard.q1_brief_description">........................</t></td>
+                        </tr>
+                        <tr>
+                            <td>(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या :-</td>
+                            <td><t t-esc="wizard.q2_directly_affected or '........................'"/></td>
+                        </tr>
+                        <tr>
+                            <td>(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या :-</td>
+                            <td><t t-esc="wizard.q3_indirectly_affected or '........................'"/></td>
+                        </tr>
+                        <tr>
+                            <td>(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या :-</td>
+                            <td><t t-esc="wizard.q4_private_assets or '........................'"/></td>
+                        </tr>
+                        <tr>
+                            <td>(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या :-</td>
+                            <td><t t-esc="wizard.q5_government_assets or '........................'"/></td>
+                        </tr>
+                        <tr>
+                            <td>(छः) क्या प्रस्तावित अर्जन न्यूनतम है ?</td>
+                            <td><t t-if="wizard.q6_minimal_acquisition == 'yes'">हाँ / Yes</t><t t-if="wizard.q6_minimal_acquisition == 'no'">नहीं / No</t><t t-if="not wizard.q6_minimal_acquisition">........................</t></td>
+                        </tr>
+                        <tr>
+                            <td>(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</td>
+                            <td><t t-if="wizard.q7_alternatives_considered == 'yes'">हाँ / Yes</t><t t-if="wizard.q7_alternatives_considered == 'no'">नहीं / No</t><t t-if="not wizard.q7_alternatives_considered">........................</t></td>
+                        </tr>
+                        <tr>
+                            <td>(आठ) परियोजना की कुल लागत :-</td>
+                            <td><t t-esc="wizard.q8_total_cost or '........................'"/></td>
+                        </tr>
+                        <tr>
+                            <td>(नौ) परियोजना से होने वाला लाभ :-</td>
+                            <td><t t-if="wizard.q9_project_benefits"><t t-raw="wizard.q9_project_benefits"/></t><t t-if="not wizard.q9_project_benefits">........................</t></td>
+                        </tr>
+                        <tr>
+                            <td>(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय :-</td>
+                            <td><t t-if="wizard.q10_compensation_measures"><t t-raw="wizard.q10_compensation_measures"/></t><t t-if="not wizard.q10_compensation_measures">........................</t></td>
+                        </tr>
+                        <tr>
+                            <td>(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक :-</td>
+                            <td><t t-if="wizard.q11_other_components"><t t-raw="wizard.q11_other_components"/></t><t t-if="not wizard.q11_other_components">........................</t></td>
+                        </tr>
+                    </table>
+=======
                     <div class="questions-section">
                         <div class="question-item">
-                            <div class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण।</div>
+                            <span class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण।</span>
                             <t t-if="wizard.q1_brief_description">
-                                <div class="question-answer"><t t-raw="wizard.q1_brief_description"/></div>
+                                <span class="question-answer"><t t-raw="wizard.q1_brief_description"/></span>
                             </t>
                             <t t-if="not wizard.q1_brief_description">
-                                <div class="question-answer">........................</div>
+                                <span class="question-answer">........................</span>
                             </t>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</div>
-                            <div class="question-answer"><t t-esc="wizard.q2_directly_affected or '........................'"/></div>
+                            <span class="question-label">(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q2_directly_affected or '........................'"/></span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</div>
-                            <div class="question-answer"><t t-esc="wizard.q3_indirectly_affected or '........................'"/></div>
+                            <span class="question-label">(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q3_indirectly_affected or '........................'"/></span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</div>
-                            <div class="question-answer"><t t-esc="wizard.q4_private_assets or '........................'"/></div>
+                            <span class="question-label">(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q4_private_assets or '........................'"/></span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</div>
-                            <div class="question-answer"><t t-esc="wizard.q5_government_assets or '........................'"/></div>
+                            <span class="question-label">(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q5_government_assets or '........................'"/></span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(छः) क्या प्रस्तावित अर्जन न्यूनतम है ?</div>
-                            <div class="question-answer">
+                            <span class="question-label">(छः) क्या प्रस्तावित अर्जन न्यूनतम है ?</span>
+                            <span class="question-answer">
                                 <t t-if="wizard.q6_minimal_acquisition == 'yes'">हाँ / Yes</t>
                                 <t t-if="wizard.q6_minimal_acquisition == 'no'">नहीं / No</t>
                                 <t t-if="not wizard.q6_minimal_acquisition">........................</t>
-                            </div>
+                            </span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</div>
-                            <div class="question-answer">
+                            <span class="question-label">(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</span>
+                            <span class="question-answer">
                                 <t t-if="wizard.q7_alternatives_considered == 'yes'">हाँ / Yes</t>
                                 <t t-if="wizard.q7_alternatives_considered == 'no'">नहीं / No</t>
                                 <t t-if="not wizard.q7_alternatives_considered">........................</t>
-                            </div>
+                            </span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(आठ) परियोजना की कुल लागत।</div>
-                            <div class="question-answer"><t t-esc="wizard.q8_total_cost or '........................'"/></div>
+                            <span class="question-label">(आठ) परियोजना की कुल लागत।</span>
+                            <span class="question-answer"><t t-esc="wizard.q8_total_cost or '........................'"/></span>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(नौ) परियोजना से होने वाला लाभ।</div>
+                            <span class="question-label">(नौ) परियोजना से होने वाला लाभ।</span>
                             <t t-if="wizard.q9_project_benefits">
-                                <div class="question-answer"><t t-raw="wizard.q9_project_benefits"/></div>
+                                <span class="question-answer"><t t-raw="wizard.q9_project_benefits"/></span>
                             </t>
                             <t t-if="not wizard.q9_project_benefits">
-                                <div class="question-answer">........................</div>
+                                <span class="question-answer">........................</span>
                             </t>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</div>
+                            <span class="question-label">(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</span>
                             <t t-if="wizard.q10_compensation_measures">
-                                <div class="question-answer"><t t-raw="wizard.q10_compensation_measures"/></div>
+                                <span class="question-answer"><t t-raw="wizard.q10_compensation_measures"/></span>
                             </t>
                             <t t-if="not wizard.q10_compensation_measures">
-                                <div class="question-answer">........................</div>
+                                <span class="question-answer">........................</span>
                             </t>
                         </div>
                         
                         <div class="question-item">
-                            <div class="question-label">(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</div>
+                            <span class="question-label">(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</span>
                             <t t-if="wizard.q11_other_components">
-                                <div class="question-answer"><t t-raw="wizard.q11_other_components"/></div>
+                                <span class="question-answer"><t t-raw="wizard.q11_other_components"/></span>
                             </t>
                             <t t-if="not wizard.q11_other_components">
-                                <div class="question-answer">........................</div>
+                                <span class="question-answer">........................</span>
                             </t>
                         </div>
                     </div>
+>>>>>>> Stashed changes
                     
                     <div class="section-divider"></div>
                     

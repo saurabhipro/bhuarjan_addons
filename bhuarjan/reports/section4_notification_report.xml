@@ -163,19 +163,52 @@
                     border-collapse: collapse;
                     table-layout: fixed;
                 }
+<<<<<<< Updated upstream
                 .questions-table td {
                     padding: 8px 8px 8px 0;
                     vertical-align: middle;
                     font-size: 16px;
+=======
+                .question-item {
+                    margin-bottom: 12px;
+                    padding: 0;
+                    page-break-inside: avoid;
+                    line-height: 1.8;
+>>>>>>> Stashed changes
                 }
                 .questions-table td:first-child {
                     font-weight: bold;
+<<<<<<< Updated upstream
                     padding-right: 8px;
                     width: 45%;
                 }
                 .questions-table td:last-child {
                     width: 55%;
                     vertical-align: middle;
+=======
+                    font-size: 16px;
+                    display: inline;
+                    text-align: left;
+                    margin-right: 8px;
+                    vertical-align: top;
+                }
+                .question-answer {
+                    display: inline;
+                    margin-left: 0;
+                    text-align: left;
+                    font-size: 16px;
+                    line-height: 1.8;
+                    padding: 0;
+                    vertical-align: top;
+                }
+                .question-answer p {
+                    display: inline;
+                    margin: 0;
+                    padding: 0;
+                }
+                .question-answer br {
+                    display: none;
+>>>>>>> Stashed changes
                 }
                 .section-divider {
                     border-top: 2px solid #000;
@@ -284,6 +317,7 @@
                     
                     <div class="section-divider"></div>
                     
+<<<<<<< Updated upstream
                     <table class="questions-table">
                         <tr>
                             <td>(एक) लोक प्रयोजन का संक्षिप्त विवरण :-</td>
@@ -330,6 +364,92 @@
                             <td><t t-if="wizard.q11_other_components"><t t-raw="wizard.q11_other_components"/></t><t t-if="not wizard.q11_other_components">........................</t></td>
                         </tr>
                     </table>
+=======
+                    <div class="questions-section">
+                        <div class="question-item">
+                            <span class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण।</span>
+                            <t t-if="wizard.q1_brief_description">
+                                <span class="question-answer"><t t-raw="wizard.q1_brief_description"/></span>
+                            </t>
+                            <t t-if="not wizard.q1_brief_description">
+                                <span class="question-answer">........................</span>
+                            </t>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q2_directly_affected or '........................'"/></span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q3_indirectly_affected or '........................'"/></span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q4_private_assets or '........................'"/></span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
+                            <span class="question-answer"><t t-esc="wizard.q5_government_assets or '........................'"/></span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(छः) क्या प्रस्तावित अर्जन न्यूनतम है ?</span>
+                            <span class="question-answer">
+                                <t t-if="wizard.q6_minimal_acquisition == 'yes'">हाँ / Yes</t>
+                                <t t-if="wizard.q6_minimal_acquisition == 'no'">नहीं / No</t>
+                                <t t-if="not wizard.q6_minimal_acquisition">........................</t>
+                            </span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है ?</span>
+                            <span class="question-answer">
+                                <t t-if="wizard.q7_alternatives_considered == 'yes'">हाँ / Yes</t>
+                                <t t-if="wizard.q7_alternatives_considered == 'no'">नहीं / No</t>
+                                <t t-if="not wizard.q7_alternatives_considered">........................</t>
+                            </span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(आठ) परियोजना की कुल लागत।</span>
+                            <span class="question-answer"><t t-esc="wizard.q8_total_cost or '........................'"/></span>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(नौ) परियोजना से होने वाला लाभ।</span>
+                            <t t-if="wizard.q9_project_benefits">
+                                <span class="question-answer"><t t-raw="wizard.q9_project_benefits"/></span>
+                            </t>
+                            <t t-if="not wizard.q9_project_benefits">
+                                <span class="question-answer">........................</span>
+                            </t>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</span>
+                            <t t-if="wizard.q10_compensation_measures">
+                                <span class="question-answer"><t t-raw="wizard.q10_compensation_measures"/></span>
+                            </t>
+                            <t t-if="not wizard.q10_compensation_measures">
+                                <span class="question-answer">........................</span>
+                            </t>
+                        </div>
+                        
+                        <div class="question-item">
+                            <span class="question-label">(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</span>
+                            <t t-if="wizard.q11_other_components">
+                                <span class="question-answer"><t t-raw="wizard.q11_other_components"/></span>
+                            </t>
+                            <t t-if="not wizard.q11_other_components">
+                                <span class="question-answer">........................</span>
+                            </t>
+                        </div>
+                    </div>
+>>>>>>> Stashed changes
                     
                     <div class="section-divider"></div>
                     

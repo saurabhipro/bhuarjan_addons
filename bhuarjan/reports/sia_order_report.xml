@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- SIA Order Report Action -->
+    <!-- SIA Proposal Report Action -->
     <record id="action_report_sia_order" model="ir.actions.report">
-        <field name="name">SIA Order / SIA आदेश</field>
+        <field name="name">SIA Proposal / SIA प्रस्ताव</field>
         <field name="model">bhu.sia.team</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.sia_order_report</field>
         <field name="report_file">bhuarjan.sia_order_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'SIA_Order_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+        <field name="print_report_name">'SIA_Proposal_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
     </record>
 
-    <!-- SIA Order Report Template -->
+    <!-- SIA Proposal Report Template -->
     <template id="sia_order_report">
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
@@ -20,49 +20,82 @@
                     <!-- Header -->
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h3 style="margin: 0; font-size: 16px; font-weight: bold; font-family:sans-serif">
-                            कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
+                            कार्यालय अनुविभागीय अधिकारी (राजस्व) जिला-रायगढ़ (छ.ग.)
                         </h3>
-                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">//आदेश//</p>
                     </div>
 
                     <!-- Reference and Date -->
                     <div style="margin-bottom: 15px;">
-                        <p style="margin: 5px 0; font-size: 14px;">
-                            <strong>क्रमांक /</strong> LAND-43/85/2025-COLL RGH BHUARJAN SEC रायगढ़, 
+                        <p style="margin: 5px 0; font-size: 14px; display: flex; justify-content: space-between;">
+                            <span>
+                            <strong>क्रमांक /</strong> ............................................................., 
+                            </span>
+                            <span style="text-align: right;">
                             <strong>दिनांक /</strong> <span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%d/%m/%Y')"/><span t-if="not sia_team.create_date">........................</span>
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- Recipient -->
+                    <div style="margin-bottom: 15px;">
+                        <p style="margin: 5px 0; font-size: 14px;">
+                            <strong>कलेक्टर</strong><br/>
+                            <strong>(भू-अर्जन शाखा)</strong><br/>
+                            <strong>जिला-रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
 
                     <!-- Subject -->
                     <div style="margin-bottom: 20px;">
                         <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
-                            <strong>विषय:</strong> समाजिक समाघात निर्धारण दल के गठन हेतु प्रस्ताव के संबंध में।
+                            <strong>विषय:</strong> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or ''"/> हेतु <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> द्वारा जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव, अनुमोदन बाबत।
                         </p>
                         <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
-                            अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ द्वारा समाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव प्रस्तुत किया गया है। 
-                            यह प्रस्ताव <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> द्वारा <span t-esc="sia_team.project_id.name or ''"/> परियोजना के अंतर्गत 
-                            <t t-if="sia_team.project_id and sia_team.project_id.village_ids">
+                            उपरोक्त विषयांतर्गत प्रभावित ग्राम 
+                            <t t-if="sia_team.village_ids">
+                                <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-if="not sia_team.village_ids and sia_team.project_id and sia_team.project_id.village_ids">
                                 <t t-foreach="sia_team.project_id.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>
-                                </t> ग्राम में भूमि अर्जन के संबंध में है।
+                                </t>
                             </t>
-                            <t t-if="not sia_team.project_id or not sia_team.project_id.village_ids">
-                                <span t-esc="'[ग्राम]'"/> ग्राम में भूमि अर्जन के संबंध में है।
+                            <t t-if="not sia_team.village_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
+                                ........................
                             </t>
-                            प्रभावित भूमि निजी भूमि, खसरा नंबर <span t-esc="'[खसरा विवरण]'"/> है, जिसका कुल क्षेत्रफल <span t-esc="'[क्षेत्रफल]'"/> हेक्टेयर है।
+                            , तहसील 
+                            <t t-if="sia_team.tehsil_ids">
+                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-if="not sia_team.tehsil_ids">
+                                ........................
+                            </t>
+                            , जिला रायगढ़ (छ.ग.) अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or ''"/> के लिए निजी भूमि कुल रकबा 
+                            <t t-if="sia_team.total_area_acquired and sia_team.total_area_acquired > 0">
+                                <span t-esc="'{:,.4f}'.format(sia_team.total_area_acquired)"/>
+                            </t>
+                            <t t-if="not sia_team.total_area_acquired or sia_team.total_area_acquired == 0">
+                                ........................
+                            </t>
+                            हेक्टेयर भूमि के अर्जन प्रस्ताव पूर्व, सामाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव कलेक्टर साहब की ओर अनुमोदन हेतु प्रस्तुत है-
+                        
                         </p>
                     </div>
 
                     <!-- Team Members Table -->
                     <div style="margin-bottom: 20px;">
-                        <h4 style="margin: 10px 0; font-size: 15px; font-weight: bold; text-align: center;">
-                            समाजिक समाघात निर्धारण दल का विवरण
-                        </h4>
+                        
                         <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 14px; margin-top: 10px;">
                             <thead>
                                 <tr>
                                     <th style="border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; width: 40%;">
-                                        विवरण
+                                           समाजिक समाघात निर्धारण दल का विवरण
+                                           
+                                           
                                     </th>
                                     <th style="border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; width: 60%;">
                                         सदस्य का नाम / पता
@@ -77,13 +110,18 @@
                                     </td>
                                     <td style="border: 1px solid #000; padding: 8px;">
                                         <t t-if="sia_team.non_govt_social_scientist_ids">
-                                            <t t-set="counter" t-value="0"/>
                                             <t t-foreach="sia_team.non_govt_social_scientist_ids" t-as="member">
-                                                <t t-set="counter" t-value="counter + 1"/>
-                                                <p style="margin: 3px 0;">
-                                                    <span t-esc="counter"/>.
-                                                    <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
+                                                <p style="margin: 3px 0; line-height: 1.5;">
+                                                    <strong>श्री <span t-esc="member.name or ''"/></strong>
+                                                    <t t-if="member.post">
+                                                        <br/><span t-esc="member.post"/>
+                                                    </t>
+                                                    <t t-if="member.department_id">
+                                                        <br/><span t-esc="member.department_id.name or ''"/>
+                                                    </t>
+                                                    <t t-if="member.address">
+                                                        <br/><span t-esc="member.address"/>
+                                                    </t>
                                                 </p>
                                             </t>
                                         </t>
@@ -100,13 +138,18 @@
                                     </td>
                                     <td style="border: 1px solid #000; padding: 8px;">
                                         <t t-if="sia_team.local_bodies_representative_ids">
-                                            <t t-set="counter" t-value="0"/>
                                             <t t-foreach="sia_team.local_bodies_representative_ids" t-as="member">
-                                                <t t-set="counter" t-value="counter + 1"/>
-                                                <p style="margin: 3px 0;">
-                                                    <span t-esc="counter"/>.
-                                                    <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
+                                                <p style="margin: 3px 0; line-height: 1.5;">
+                                                    <strong>श्रीमती/श्री <span t-esc="member.name or ''"/></strong>
+                                                    <t t-if="member.post">
+                                                        <br/><span t-esc="member.post"/>
+                                                    </t>
+                                                    <t t-if="member.department_id">
+                                                        <br/><span t-esc="member.department_id.name or ''"/>
+                                                    </t>
+                                                    <t t-if="member.address">
+                                                        <br/><span t-esc="member.address"/>
+                                                    </t>
                                                 </p>
                                             </t>
                                         </t>
@@ -123,13 +166,18 @@
                                     </td>
                                     <td style="border: 1px solid #000; padding: 8px;">
                                         <t t-if="sia_team.resettlement_expert_ids">
-                                            <t t-set="counter" t-value="0"/>
                                             <t t-foreach="sia_team.resettlement_expert_ids" t-as="member">
-                                                <t t-set="counter" t-value="counter + 1"/>
-                                                <p style="margin: 3px 0;">
-                                                    <span t-esc="counter"/>.
-                                                    <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
+                                                <p style="margin: 3px 0; line-height: 1.5;">
+                                                    <strong>श्री <span t-esc="member.name or ''"/></strong>
+                                                    <t t-if="member.post">
+                                                        <br/><span t-esc="member.post"/>
+                                                    </t>
+                                                    <t t-if="member.department_id">
+                                                        <br/><span t-esc="member.department_id.name or ''"/>
+                                                    </t>
+                                                    <t t-if="member.address">
+                                                        <br/><span t-esc="member.address"/>
+                                                    </t>
                                                 </p>
                                             </t>
                                         </t>
@@ -146,13 +194,18 @@
                                     </td>
                                     <td style="border: 1px solid #000; padding: 8px;">
                                         <t t-if="sia_team.technical_expert_ids">
-                                            <t t-set="counter" t-value="0"/>
                                             <t t-foreach="sia_team.technical_expert_ids" t-as="member">
-                                                <t t-set="counter" t-value="counter + 1"/>
-                                                <p style="margin: 3px 0;">
-                                                    <span t-esc="counter"/>.
-                                                    <span t-esc="member.name or ''"/>
-                                                    <t t-if="member.department_id">, <span t-esc="member.department_id.name"/></t>
+                                                <p style="margin: 3px 0; line-height: 1.5;">
+                                                    <strong>श्री <span t-esc="member.name or ''"/></strong>
+                                                    <t t-if="member.post">
+                                                        <br/><span t-esc="member.post"/>
+                                                    </t>
+                                                    <t t-if="member.department_id">
+                                                        <br/><span t-esc="member.department_id.name or ''"/>
+                                                    </t>
+                                                    <t t-if="member.address">
+                                                        <br/><span t-esc="member.address"/>
+                                                    </t>
                                                 </p>
                                             </t>
                                         </t>
@@ -169,9 +222,8 @@
                                     </td>
                                     <td style="border: 1px solid #000; padding: 8px;">
                                         <t t-if="sia_team.tehsildar_id">
-                                            <p style="margin: 3px 0;">
-                                                <span t-esc="sia_team.tehsildar_id.name or ''"/> (संयोजक)
-                                                <t t-if="sia_team.tehsildar_id.department_id">, <span t-esc="sia_team.tehsildar_id.department_id.name"/></t>
+                                            <p style="margin: 3px 0; line-height: 1.5;">
+                                                <strong>तहसीलदार</strong> (संयोजक)
                                             </p>
                                         </t>
                                         <t t-if="not sia_team.tehsildar_id">
@@ -183,55 +235,24 @@
                         </table>
                     </div>
 
-                    <!-- Roles and Responsibilities -->
-                    <div style="margin-bottom: 20px;">
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
-                            <strong>समिति की भूमिका और जिम्मेदारियां:</strong>
-                        </p>
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
-                            उपरोक्त तालिका के अनुसार, श्रेणी "क" (गैर शासकीय सामाजिक वैज्ञानिक) समिति के अध्यक्ष होंगे। 
-                            श्रेणी "ख" से "घ" तक के सदस्य समिति के सदस्य होंगे। 
-                            यह समिति अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ के मार्गदर्शन में कार्य करेगी, 
-                            जो पुनर्वास प्रशासक भी हैं। समिति नियमों के अनुसार समाजिक समाघात निर्धारण कार्य पूर्ण करके 
-                            निर्धारित समय सीमा के भीतर पुनर्वास प्रशासक को रिपोर्ट प्रस्तुत करेगी।
-                        </p>
-                    </div>
-
                     <!-- Issuing Authority -->
-                    <div style="margin-top: 30px; margin-bottom: 20px;">
+                    <div style="margin-top: 40px; margin-bottom: 20px;">
                         <p style="margin: 5px 0; font-size: 14px; text-align: right;">
-                            <strong>कलेक्टर रायगढ़ (छ.ग.)</strong>
+                            <strong>अनुविभागीय अधिकारी (राजस्व)</strong><br/>
+                            <strong>सह भू-अर्जन अधिकारी,</strong><br/>
+                            <strong>जिला रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
 
                     <!-- Copy Distribution -->
                     <div style="margin-top: 40px; border-top: 1px solid #000; padding-top: 15px;">
-                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
-                            <strong>प्रतिलिपि:</strong>
-                        </p>
                         <p style="margin: 5px 0; font-size: 14px;">
-                            <strong>पृ.क्रमांक /</strong> LAND-43/85/2025-COLL RGH BHUARJAN SEC रायगढ़, 
-                            <strong>दिनांक /</strong> <span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%d/%m/%Y')"/><span t-if="not sia_team.create_date">........................</span>
+                            <strong>विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।</strong>
                         </p>
-                        <div style="margin-top: 10px;">
-                            <p style="margin: 3px 0; font-size: 14px;">
-                                1. सचिव, छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग, मंत्रालय महानदी भवन, रायपुर (जानकारी एवं आवश्यक कार्यवाही हेतु)।
-                            </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
-                                2. आयुक्त, बिलासपुर संभाग, बिलासपुर (जानकारी हेतु)।
-                            </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
-                                3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, रायगढ़ (जानकारी हेतु एवं समिति द्वारा SIA रिपोर्ट प्रस्तुत करने हेतु आवश्यक कार्यवाही सुनिश्चित करने हेतु)।
-                            </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
-                                4. <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> (जानकारी एवं आवश्यक कार्यवाही हेतु)।
-                            </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
-                                5. समिति के सभी संबंधित अधिकारी (जानकारी एवं आवश्यक कार्यवाही हेतु)।
-                            </p>
-                        </div>
                         <p style="margin: 15px 0 5px 0; font-size: 14px; text-align: right;">
-                            <strong>अपर कलेक्टर रायगढ़ (छ.ग.)</strong>
+                            <strong>अनुविभागीय अधिकारी (राजस्व)</strong><br/>
+                            <strong>सह भू-अर्जन अधिकारी,</strong><br/>
+                            <strong>जिला रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
                 </div>

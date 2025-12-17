@@ -11,34 +11,36 @@
         <field name="print_report_name">'SIA_Proposal_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
     </record>
 
+    
+
     <!-- SIA Proposal Report Template -->
     <template id="sia_order_report">
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
             <t t-foreach="docs" t-as="sia_team">
-                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 20px; font-size: 14px;">
+                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 40px 30px; font-size: 14px; line-height: 1.8; color: #000; background: #fff;">
                     <!-- Header -->
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h3 style="margin: 0; font-size: 16px; font-weight: bold; font-family:sans-serif">
+                    <div style="text-align: center; margin-bottom: 35px; padding-bottom: 15px; border-bottom: 2px solid #000;">
+                        <h1 style="margin: 0; font-size: 22px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif; letter-spacing: 0.5px; line-height: 1.4;">
                             कार्यालय अनुविभागीय अधिकारी (राजस्व) जिला-रायगढ़ (छ.ग.)
-                        </h3>
+                        </h1>
                     </div>
 
                     <!-- Reference and Date -->
-                    <div style="margin-bottom: 15px;">
-                        <p style="margin: 5px 0; font-size: 14px; display: flex; justify-content: space-between;">
-                            <span>
-                            <strong>क्रमांक /</strong> ............................................................., 
+                    <div style="margin-bottom: 25px;">
+                        <p style="margin: 8px 0; font-size: 14px; display: flex; justify-content: space-between; align-items: baseline;">
+                            <span style="font-weight: 500;">
+                                <strong>क्रमांक /</strong> ............................................................., 
                             </span>
-                            <span style="text-align: right;">
-                            <strong>दिनांक /</strong> <span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%d/%m/%Y')"/><span t-if="not sia_team.create_date">........................</span>
+                            <span style="text-align: right; font-weight: 500;">
+                                <strong>दिनांक /</strong> <span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%d/%m/%Y')"/><span t-if="not sia_team.create_date">........................</span>
                             </span>
                         </p>
                     </div>
 
                     <!-- Recipient -->
-                    <div style="margin-bottom: 15px;">
-                        <p style="margin: 5px 0; font-size: 14px;">
+                    <div style="margin-bottom: 25px; margin-top: 10px;">
+                        <p style="margin: 8px 0; font-size: 14px; line-height: 1.8;">
                             <strong>कलेक्टर</strong><br/>
                             <strong>(भू-अर्जन शाखा)</strong><br/>
                             <strong>जिला-रायगढ़ (छ.ग.)</strong>
@@ -46,11 +48,11 @@
                     </div>
 
                     <!-- Subject -->
-                    <div style="margin-bottom: 20px;">
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
-                            <strong>विषय:</strong> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or ''"/> हेतु <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> द्वारा जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव, अनुमोदन बाबत।
+                    <div style="margin-bottom: 30px; margin-top: 20px;">
+                        <p style="margin: 10px 0; font-size: 14px; text-align: justify; line-height: 1.8; text-indent: 0;">
+                            <strong style="font-size: 15px;">विषय:</strong> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or ''"/> हेतु <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else ''"/> द्वारा जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल के गठन का प्रस्ताव, अनुमोदन बाबत।
                         </p>
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
+                        <p style="margin: 10px 0; font-size: 14px; text-align: justify; line-height: 1.8; text-indent: 0;">
                             उपरोक्त विषयांतर्गत प्रभावित ग्राम 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
@@ -87,17 +89,14 @@
                     </div>
 
                     <!-- Team Members Table -->
-                    <div style="margin-bottom: 20px;">
-                        
-                        <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 14px; margin-top: 10px;">
+                    <div style="margin-bottom: 30px; margin-top: 25px;">
+                        <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 14px; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             <thead>
                                 <tr>
-                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; width: 40%;">
-                                           समाजिक समाघात निर्धारण दल का विवरण
-                                           
-                                           
+                                    <th style="border: 1px solid #000; padding: 12px; text-align: center; background-color: #f5f5f5; width: 40%; font-weight: bold; font-size: 14px;">
+                                        समाजिक समाघात निर्धारण दल का विवरण
                                     </th>
-                                    <th style="border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; width: 60%;">
+                                    <th style="border: 1px solid #000; padding: 12px; text-align: center; background-color: #f5f5f5; width: 60%; font-weight: bold; font-size: 14px;">
                                         सदस्य का नाम / पता
                                     </th>
                                 </tr>
@@ -105,10 +104,10 @@
                             <tbody>
                                 <!-- (क) Non-Government Social Scientist -->
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                    <td style="border: 1px solid #000; padding: 10px; vertical-align: top; background-color: #fafafa;">
                                         <strong>(क) गैर शासकीय सामाजिक वैज्ञानिक</strong>
                                     </td>
-                                    <td style="border: 1px solid #000; padding: 8px;">
+                                    <td style="border: 1px solid #000; padding: 10px;">
                                         <t t-if="sia_team.non_govt_social_scientist_ids">
                                             <t t-foreach="sia_team.non_govt_social_scientist_ids" t-as="member">
                                                 <p style="margin: 3px 0; line-height: 1.5;">
@@ -133,10 +132,10 @@
 
                                 <!-- (ख) Representatives of Local Bodies -->
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                    <td style="border: 1px solid #000; padding: 10px; vertical-align: top; background-color: #fafafa;">
                                         <strong>(ख) स्थानीय निकायों के प्रतिनिधि</strong>
                                     </td>
-                                    <td style="border: 1px solid #000; padding: 8px;">
+                                    <td style="border: 1px solid #000; padding: 10px;">
                                         <t t-if="sia_team.local_bodies_representative_ids">
                                             <t t-foreach="sia_team.local_bodies_representative_ids" t-as="member">
                                                 <p style="margin: 3px 0; line-height: 1.5;">
@@ -161,10 +160,10 @@
 
                                 <!-- (ग) Resettlement Expert -->
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                    <td style="border: 1px solid #000; padding: 10px; vertical-align: top; background-color: #fafafa;">
                                         <strong>(ग) पुनर्व्यवस्थापन विशेषज्ञ</strong>
                                     </td>
-                                    <td style="border: 1px solid #000; padding: 8px;">
+                                    <td style="border: 1px solid #000; padding: 10px;">
                                         <t t-if="sia_team.resettlement_expert_ids">
                                             <t t-foreach="sia_team.resettlement_expert_ids" t-as="member">
                                                 <p style="margin: 3px 0; line-height: 1.5;">
@@ -189,10 +188,10 @@
 
                                 <!-- (घ) Technical Expert -->
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                    <td style="border: 1px solid #000; padding: 10px; vertical-align: top; background-color: #fafafa;">
                                         <strong>(घ) परियोजना से संबंधित विषय का तकनीकी विशेषज्ञ</strong>
                                     </td>
-                                    <td style="border: 1px solid #000; padding: 8px;">
+                                    <td style="border: 1px solid #000; padding: 10px;">
                                         <t t-if="sia_team.technical_expert_ids">
                                             <t t-foreach="sia_team.technical_expert_ids" t-as="member">
                                                 <p style="margin: 3px 0; line-height: 1.5;">
@@ -217,10 +216,10 @@
 
                                 <!-- (ड.) Tehsildar -->
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 8px; vertical-align: top;">
+                                    <td style="border: 1px solid #000; padding: 10px; vertical-align: top; background-color: #fafafa;">
                                         <strong>(ड.) प्रभावित क्षेत्र का तहसीलदार</strong>
                                     </td>
-                                    <td style="border: 1px solid #000; padding: 8px;">
+                                    <td style="border: 1px solid #000; padding: 10px;">
                                         <t t-if="sia_team.tehsildar_id">
                                             <p style="margin: 3px 0; line-height: 1.5;">
                                                 <strong>तहसीलदार</strong> (संयोजक)
@@ -236,8 +235,8 @@
                     </div>
 
                     <!-- Issuing Authority -->
-                    <div style="margin-top: 40px; margin-bottom: 20px;">
-                        <p style="margin: 5px 0; font-size: 14px; text-align: right;">
+                    <div style="margin-top: 50px; margin-bottom: 30px;">
+                        <p style="margin: 10px 0; font-size: 14px; text-align: right; line-height: 1.8;">
                             <strong>अनुविभागीय अधिकारी (राजस्व)</strong><br/>
                             <strong>सह भू-अर्जन अधिकारी,</strong><br/>
                             <strong>जिला रायगढ़ (छ.ग.)</strong>
@@ -245,11 +244,11 @@
                     </div>
 
                     <!-- Copy Distribution -->
-                    <div style="margin-top: 40px; border-top: 1px solid #000; padding-top: 15px;">
-                        <p style="margin: 5px 0; font-size: 14px;">
+                    <div style="margin-top: 50px; border-top: 2px solid #000; padding-top: 20px;">
+                        <p style="margin: 10px 0; font-size: 14px; line-height: 1.8;">
                             <strong>विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।</strong>
                         </p>
-                        <p style="margin: 15px 0 5px 0; font-size: 14px; text-align: right;">
+                        <p style="margin: 20px 0 10px 0; font-size: 14px; text-align: right; line-height: 1.8;">
                             <strong>अनुविभागीय अधिकारी (राजस्व)</strong><br/>
                             <strong>सह भू-अर्जन अधिकारी,</strong><br/>
                             <strong>जिला रायगढ़ (छ.ग.)</strong>

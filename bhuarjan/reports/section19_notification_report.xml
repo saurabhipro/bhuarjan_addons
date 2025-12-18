@@ -224,10 +224,32 @@
                         </div>
                         <div style="margin-bottom: 15px; font-size: 18px !important;">
                             <ol style="margin: 0; padding-left: 20px;">
-                                <li style="margin-bottom: 5px;">जिला</li>
-                                <li style="margin-bottom: 5px;">तहसील</li>
-                                <li style="margin-bottom: 5px;">ग्राम/नगर</li>
-                                <li style="margin-bottom: 5px;">भूमि का क्षेत्रफल</li>
+                                <li style="margin-bottom: 5px;">
+                                    जिला
+                                    <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
+                                    <span t-if="not notification or not notification.district_id">........................</span>
+                                </li>
+                                <li style="margin-bottom: 5px;">
+                                    तहसील
+                                    <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
+                                    <span t-if="not notification or not notification.tehsil_id">........................</span>
+                                </li>
+                                <li style="margin-bottom: 5px;">
+                                    ग्राम/नगर
+                                    <span t-if="notification and notification.village_id" t-esc="notification.village_id.name"/>
+                                    <span t-if="not notification or not notification.village_id">........................</span>
+                                </li>
+                                <li style="margin-bottom: 5px;">
+                                    भूमि का क्षेत्रफल
+                                    <t t-set="total_area" t-value="0.0"/>
+                                    <t t-if="notification and notification.land_parcel_ids">
+                                        <t t-foreach="notification.land_parcel_ids" t-as="parcel">
+                                            <t t-set="total_area" t-value="total_area + (parcel.area_hectares or 0.0)"/>
+                                        </t>
+                                    </t>
+                                    <span t-if="total_area > 0" t-esc="'{:.4f}'.format(total_area) + ' हेक्टेयर'"/>
+                                    <span t-if="total_area == 0">........................</span>
+                                </li>
                             </ol>
                         </div>
                         <table class="schedule-table">
@@ -241,16 +263,21 @@
                                 <t t-if="notification and notification.land_parcel_ids and len(notification.land_parcel_ids) > 0">
                                     <t t-foreach="notification.land_parcel_ids" t-as="parcel">
                                         <tr>
-                                            <td style="font-size: 18px !important;"><t t-esc="parcel.khasra_number or '........................'"/></td>
-                                            <td style="font-size: 18px !important;"><t t-esc="'{:.4f}'.format(parcel.area_hectares) if parcel.area_hectares else '........................'"/></td>
+                                            <td style="font-size: 18px !important; text-align: center;">
+                                                <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
+                                                <t t-if="not parcel.khasra_number">........................</t>
+                                            </td>
+                                            <td style="font-size: 18px !important; text-align: center;">
+                                                <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
+                                                <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
+                                            </td>
                                         </tr>
                                     </t>
                                 </t>
                                 <t t-if="not notification or not notification.land_parcel_ids or len(notification.land_parcel_ids) == 0">
                                     <tr>
-                                        <td colspan="2" style="text-align: center; padding: 20px; color: #999; font-size: 18px !important;">
-                                            कोई भूमि खंड जोड़ा नहीं गया है
-                                        </td>
+                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
+                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
                                     </tr>
                                 </t>
                             </tbody>
@@ -277,26 +304,28 @@
                             </t>
                             <t t-if="notification and notification.is_displacement_involved">
                                 <div style="margin-top: 10px;">
-                                    <div style="text-align: center; font-weight: bold; margin: 10px 0; text-decoration: underline;">अथवा</div>
-                                    <div style="margin-top: 10px;">
-                                        उक्त भूमि अर्जन के लिए अधिसूचित पुनर्वासन योजना के अंतर्गत
+                                    <div style="text-align: center; font-weight: bold; margin: 15px 0; text-decoration: underline; font-size: 18px !important;">अथवा</div>
+                                    <div style="margin-top: 10px; font-size: 18px !important; line-height: 1.6 !important;">
+                                        उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित
+                                        <span style="text-decoration: underline;">........................</span>
+                                        व्यक्तियों को पुनर्वासित किया जाना प्रस्तावित है। पुनर्वासन तथा पुनर्व्यवस्थापन हेतु ग्राम
                                         <span t-if="notification.rehab_village_id" t-esc="notification.rehab_village_id.name"/>
-                                        <span t-if="not notification.rehab_village_id">ग्राम ........................</span>
+                                        <span t-if="not notification.rehab_village_id" style="text-decoration: underline;">........................</span>
                                         तहसील
                                         <span t-if="notification.rehab_tehsil_id" t-esc="notification.rehab_tehsil_id.name"/>
-                                        <span t-if="not notification.rehab_tehsil_id">........................</span>
+                                        <span t-if="not notification.rehab_tehsil_id" style="text-decoration: underline;">........................</span>
                                         जिला
                                         <span t-if="notification.rehab_district_id" t-esc="notification.rehab_district_id.name"/>
-                                        <span t-if="not notification.rehab_district_id">........................</span>
+                                        <span t-if="not notification.rehab_district_id" style="text-decoration: underline;">........................</span>
                                         की भूमि खसरा नम्बर
                                         <span t-if="notification.rehab_khasra_number" t-esc="notification.rehab_khasra_number"/>
-                                        <span t-if="not notification.rehab_khasra_number">........................</span>
-                                        अर्जित रकबा
+                                        <span t-if="not notification.rehab_khasra_number" style="text-decoration: underline;">........................</span>
+                                        रकबा
                                         <span t-if="notification.rehab_area_hectares" t-esc="'{:.4f}'.format(notification.rehab_area_hectares)"/>
-                                        <span t-if="not notification.rehab_area_hectares">........................</span>
-                                        हेक्टेयर में तय किया गया है। पुनर्वासित योजना का निरीक्षण
+                                        <span t-if="not notification.rehab_area_hectares" style="text-decoration: underline;">........................</span>
+                                        हेक्टेयर का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व)
                                         <span t-if="notification.rehab_officer_office_location" t-esc="notification.rehab_officer_office_location"/>
-                                        <span t-if="not notification.rehab_officer_office_location">अनुविभागीय अधिकारी (राजस्व) ........................</span>
+                                        <span t-if="not notification.rehab_officer_office_location" style="text-decoration: underline;">........................</span>
                                         के कार्यालय में किया जा सकता है।
                                     </div>
                                 </div>

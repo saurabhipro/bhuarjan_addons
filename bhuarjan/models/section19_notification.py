@@ -149,15 +149,47 @@ class Section19Notification(models.Model):
             ('state', 'in', ['generated', 'signed'])
         ])
         
-        # Get all khasra numbers from Section 11 land parcels
-        section11_khasras = set()
-        khasra_area_map = {}
+        if not section11_reports:
+            # No Section 11 reports found, clear land parcels
+            self.land_parcel_ids = [(5, 0, 0)]
+            return
+        
+        # Get all khasra numbers from Section 11 land parcels with full details
+        section11_parcels_map = {}
         for report in section11_reports:
             for parcel in report.land_parcel_ids:
                 if parcel.khasra_number:
-                    section11_khasras.add(parcel.khasra_number)
-                    # Store area (use the latest one if duplicate khasras exist)
-                    khasra_area_map[parcel.khasra_number] = parcel.area_in_hectares
+                    # Get survey info directly from survey if computed fields are not available
+                    survey_number = parcel.survey_number or ''
+                    survey_date = parcel.survey_date or False
+                    survey_state = parcel.survey_state or False
+                    
+                    # If computed fields are empty, try to get from survey directly
+                    if not survey_number and parcel.khasra_number and parcel.village_id and report.project_id:
+                        survey = self.env['bhu.survey'].search([
+                            ('khasra_number', '=', parcel.khasra_number),
+                            ('village_id', '=', parcel.village_id.id),
+                            ('project_id', '=', report.project_id.id),
+                            ('state', 'in', ('locked', 'approved'))
+                        ], limit=1, order='create_date desc')
+                        if survey:
+                            survey_number = survey.name or ''
+                            survey_date = survey.survey_date or False
+                            survey_state = survey.state or False
+                    
+                    # Store full parcel details (use the latest one if duplicate khasras exist)
+                    section11_parcels_map[parcel.khasra_number] = {
+                        'area_hectares': parcel.area_in_hectares or 0.0,
+                        'survey_number': survey_number,
+                        'survey_date': survey_date,
+                        'survey_state': survey_state,
+                        'authorized_officer': parcel.authorized_officer or '',
+                        'public_purpose_description': parcel.public_purpose_description or '',
+                        'district_id': parcel.district_id.id if parcel.district_id else False,
+                        'tehsil_id': parcel.tehsil_id.id if parcel.tehsil_id else False,
+                        'village_id': parcel.village_id.id if parcel.village_id else False,
+                        'project_id': parcel.project_id.id if parcel.project_id else False,
+                    }
         
         # Get all khasra numbers that have objections (Section 15)
         # Exclude resolved objections (those with resolved_date set)
@@ -173,17 +205,27 @@ class Section19Notification(models.Model):
                 objection_khasras.add(objection.survey_id.khasra_number)
         
         # Filter out khasras with objections
-        approved_khasras = section11_khasras - objection_khasras
+        approved_khasras = set(section11_parcels_map.keys()) - objection_khasras
         
         # Clear existing land parcels
         self.land_parcel_ids = [(5, 0, 0)]
         
-        # Create land parcel records from approved khasras
+        # Create land parcel records from approved khasras with all details
         parcel_vals = []
         for khasra_number in sorted(approved_khasras):
+            parcel_data = section11_parcels_map[khasra_number]
             parcel_vals.append((0, 0, {
                 'khasra_number': khasra_number,
-                'area_hectares': khasra_area_map.get(khasra_number, 0.0),
+                'area_hectares': parcel_data['area_hectares'],
+                'survey_number': parcel_data['survey_number'],
+                'survey_date': parcel_data['survey_date'],
+                'survey_state': parcel_data['survey_state'],
+                'authorized_officer': parcel_data['authorized_officer'],
+                'public_purpose_description': parcel_data['public_purpose_description'],
+                'district_id': parcel_data['district_id'] or self.district_id.id if self.district_id else False,
+                'tehsil_id': parcel_data['tehsil_id'] or self.tehsil_id.id if self.tehsil_id else False,
+                'village_id': parcel_data['village_id'] or self.village_id.id if self.village_id else False,
+                'project_id': parcel_data['project_id'] or self.project_id.id if self.project_id else False,
             }))
         
         # Set the land parcels

@@ -383,32 +383,32 @@
                         <div class="questions-section" style="margin-top: 10px !important;">
                             <div class="question-item">
                                 <span class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण :-</span>
-                                <t t-if="wizard.q1_brief_description">
-                                    <span class="question-answer"><t t-raw="wizard.q1_brief_description"/></span>
+                                <t t-if="wizard.brief_description">
+                                    <span class="question-answer"><t t-raw="wizard.brief_description"/></span>
                                 </t>
-                                <t t-if="not wizard.q1_brief_description">
+                                <t t-if="not wizard.brief_description">
                                     <span class="question-answer">........................</span>
                                 </t>
                             </div>
                             
                             <div class="question-item">
                                 <span class="question-label">(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या :-</span>
-                                <span class="question-answer"><t t-esc="(wizard.q2_directly_affected if wizard and wizard.q2_directly_affected else (wizard.project_id.q2_directly_affected if wizard and wizard.project_id and wizard.project_id.q2_directly_affected else '........................'))"/></span>
+                                <span class="question-answer"><t t-esc="(wizard.directly_affected if wizard and wizard.directly_affected else (wizard.project_id.directly_affected if wizard and wizard.project_id and wizard.project_id.directly_affected else '........................'))"/></span>
                             </div>
                             
                             <div class="question-item">
                                 <span class="question-label">(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या।</span>
-                                <span class="question-answer"><t t-esc="(wizard.q3_indirectly_affected if wizard and wizard.q3_indirectly_affected else (wizard.project_id.q3_indirectly_affected if wizard and wizard.project_id and wizard.project_id.q3_indirectly_affected else '........................'))"/></span>
+                                <span class="question-answer"><t t-esc="(wizard.indirectly_affected if wizard and wizard.indirectly_affected else (wizard.project_id.indirectly_affected if wizard and wizard.project_id and wizard.project_id.indirectly_affected else '........................'))"/></span>
                             </div>
                             
                             <div class="question-item">
                                 <span class="question-label">(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
-                                <span class="question-answer"><t t-esc="(wizard.q4_private_assets if wizard and wizard.q4_private_assets else (wizard.project_id.q4_private_assets if wizard and wizard.project_id and wizard.project_id.q4_private_assets else '........................'))"/></span>
+                                <span class="question-answer"><t t-esc="(wizard.private_assets if wizard and wizard.private_assets else (wizard.project_id.private_assets if wizard and wizard.project_id and wizard.project_id.private_assets else '........................'))"/></span>
                             </div>
                             
-                            <div class="question-item">
+                            <div class="question-item"></div>
                                 <span class="question-label">(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या।</span>
-                                <span class="question-answer"><t t-esc="(wizard.q5_government_assets if wizard and wizard.q5_government_assets else (wizard.project_id.q5_government_assets if wizard and wizard.project_id and wizard.project_id.q5_government_assets else '........................'))"/></span>
+                                <span class="question-answer"><t t-esc="(wizard.government_assets if wizard and wizard.government_assets else (wizard.project_id.government_assets if wizard and wizard.project_id and wizard.project_id.government_assets else '........................'))"/></span>
                             </div>
                             
                             <div class="question-item">
@@ -423,12 +423,12 @@
                             
                             <div class="question-item">
                                 <span class="question-label">(आठ) परियोजना की कुल लागत।</span>
-                                <span class="question-answer"><t t-esc="(wizard.q8_total_cost if wizard and wizard.q8_total_cost else (wizard.project_id.q8_total_cost if wizard and wizard.project_id and wizard.project_id.q8_total_cost else '........................'))"/></span>
+                                <span class="question-answer"><t t-esc="(wizard.total_cost if wizard and wizard.total_cost else (wizard.project_id.total_cost if wizard and wizard.project_id and wizard.project_id.total_cost else '........................'))"/></span>
                             </div>
                             
                             <div class="question-item">
                                 <span class="question-label">(नौ) परियोजना से होने वाला लाभ।</span>
-                                <t t-set="q9_value" t-value="(wizard.q9_project_benefits if wizard and wizard.q9_project_benefits else (wizard.project_id.q9_project_benefits if wizard and wizard.project_id and wizard.project_id.q9_project_benefits else None))"/>
+                                <t t-set="q9_value" t-value="(wizard.project_benefits if wizard and wizard.project_benefits else (wizard.project_id.project_benefits if wizard and wizard.project_id and wizard.project_id.project_benefits else None))"/>
                                 <t t-if="q9_value">
                                     <span class="question-answer"><t t-raw="q9_value"/></span>
                                 </t>
@@ -439,7 +439,7 @@
                             
                             <div class="question-item" style="display: flex; align-items: baseline; flex-wrap: nowrap;">
                                 <span class="question-label" style="white-space: nowrap; flex-shrink: 0;">(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</span>
-                                <t t-set="q10_value" t-value="(wizard.q10_compensation_measures if wizard and wizard.q10_compensation_measures else (wizard.project_id.q10_compensation_measures if wizard and wizard.project_id and wizard.project_id.q10_compensation_measures else None))"/>
+                                <t t-set="q10_value" t-value="(wizard.compensation_measures if wizard and wizard.compensation_measures else (wizard.project_id.compensation_measures if wizard and wizard.project_id and wizard.project_id.compensation_measures else None))"/>
                                 <t t-if="q10_value">
                                     <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-raw="q10_value"/></span>
                                 </t>
@@ -450,7 +450,7 @@
                             
                             <div class="question-item" style="display: flex; align-items: baseline; flex-wrap: nowrap;">
                                 <span class="question-label" style="white-space: nowrap; flex-shrink: 0;">(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</span>
-                                <t t-set="q11_value" t-value="(wizard.q11_other_components if wizard and wizard.q11_other_components else (wizard.project_id.q11_other_components if wizard and wizard.project_id and wizard.project_id.q11_other_components else None))"/>
+                                <t t-set="q11_value" t-value="(wizard.other_components if wizard and wizard.other_components else (wizard.project_id.other_components if wizard and wizard.project_id and wizard.project_id.other_components else None))"/>
                                 <t t-if="q11_value">
                                     <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-raw="q11_value"/></span>
                                 </t>
@@ -477,7 +477,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
                 </t>
             </t>
         </t>

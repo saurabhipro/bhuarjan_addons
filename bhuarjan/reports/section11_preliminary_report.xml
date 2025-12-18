@@ -285,74 +285,63 @@
                         </table>
                     </div>
                     
-                    <!-- Paragraph 2: Claims/Objections -->
+                    <!-- Paragraph 2: Map Inspection (was 3) -->
                     <div class="paragraph-section">
                         <span class="paragraph-number">2.</span>
                         <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            <t t-if="report.paragraph_2_claims_info">
-                                <t t-raw="report.paragraph_2_claims_info"/>
-                            </t>
-                            <t t-if="not report.paragraph_2_claims_info">
-                                हितबुद्ध व्यक्ति को, अर्जित भूमि के क्षेत्र, उपयुक्तता, सार्वजनिक प्रयोजन के औचित्य और सामाजिक समाघात अध्ययन के निष्कर्षों के संबंध में दावा आपत्ति, अधिसूचना की प्रकाशन तिथि से 60 दिनों के भीतर, कलेक्टर या प्राधिकृत व्यक्ति को व्यक्तिगत रूप से अथवा प्राधिकृत प्रतिनिधि के माध्यम से लिखित रूप में प्रस्तुत करने का अधिकार है, जैसा कि अधिनियम, 2013 की धारा 15, उपधारा (1) के अंतर्गत प्रदान किया गया है।
-                            </t>
-                        </span>
-                    </div>
-                    
-                    <!-- Paragraph 3: Map Inspection -->
-                    <div class="paragraph-section">
-                        <span class="paragraph-number">3.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
                             भूमि का नक्शा (योजना) अनुविभागीय अधिकारी (राजस्व) 
-                            <span t-if="report.paragraph_3_map_inspection_location" t-esc="report.paragraph_3_map_inspection_location"/>
-                            <span t-if="not report.paragraph_3_map_inspection_location">........................</span>
+                            <span t-if="report.map_inspection_location" t-esc="report.map_inspection_location"/>
+                            <span t-if="not report.map_inspection_location">........................</span>
                             के कार्यालय में निरीक्षण किया जा सकता है।
                         </span>
                     </div>
                     
-                    <!-- Paragraph 4: Displacement -->
+                    <!-- Paragraph 3: Displacement (was 4) -->
+                    <div class="paragraph-section">
+                        <span class="paragraph-number">3.</span>
+                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
+                            <t t-if="not report.is_displacement">
+                                प्रस्तावित भू-अर्जन से किसी भी प्रभावित परिवार का विस्थापन निहित नहीं है।
+                            </t>
+                            <t t-if="report.is_displacement">
+                                प्रस्तावित भू-अर्जन से 
+                                <span t-if="report.affected_families_count" t-esc="report.affected_families_count"/>
+                                <span t-if="not report.affected_families_count">........................</span>
+                                प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
+                            </t>
+                        </span>
+                    </div>
+                    
+                    <!-- Paragraph 4: Exemption or SIA (was 5) -->
                     <div class="paragraph-section">
                         <span class="paragraph-number">4.</span>
                         <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            प्रस्तावित भू-अर्जन से किसी भी प्रभावित परिवार का विस्थापन निहित नहीं है।
-                            <br/>
-                            <strong>अथवा</strong>
-                            <br/>
-                            प्रस्तावित भू-अर्जन से 
-                            <span t-if="report.paragraph_4_affected_families_count" t-esc="report.paragraph_4_affected_families_count"/>
-                            <span t-if="not report.paragraph_4_affected_families_count">........................</span>
-                            प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
+                            <t t-if="report.is_exemption">
+                                <t t-if="report.exemption_details">
+                                    <t t-raw="report.exemption_details"/>
+                                </t>
+                                <t t-if="not report.exemption_details">
+                                    प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनांक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।
+                                </t>
+                            </t>
+                            <t t-if="not report.is_exemption">
+                                <t t-if="report.sia_justification">
+                                    <t t-raw="report.sia_justification"/>
+                                </t>
+                                <t t-if="not report.sia_justification">
+                                    प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।
+                                </t>
+                            </t>
                         </span>
                     </div>
                     
-                    <!-- Paragraph 5: Exemption or SIA -->
+                    <!-- Paragraph 5: Rehabilitation Administrator (was 6) -->
                     <div class="paragraph-section">
                         <span class="paragraph-number">5.</span>
                         <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            <t t-if="report.paragraph_5_exemption_details">
-                                <t t-raw="report.paragraph_5_exemption_details"/>
-                            </t>
-                            <t t-if="not report.paragraph_5_exemption_details">
-                                प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनांक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।
-                            </t>
-                            <br/>
-                            <strong>अथवा</strong>
-                            <br/>
-                            <t t-if="report.paragraph_5_sia_justification">
-                                <t t-raw="report.paragraph_5_sia_justification"/>
-                            </t>
-                            <t t-if="not report.paragraph_5_sia_justification">
-                                प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।
-                            </t>
-                        </span>
-                    </div>
-                    
-                    <!-- Paragraph 6: Rehabilitation Administrator -->
-                    <div class="paragraph-section">
-                        <span class="paragraph-number">6.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
                             प्रस्तावित भू-अर्जन के लिए, अनुविभागीय अधिकारी (राजस्व) 
-                            <span t-if="report.paragraph_6_rehab_admin_name" t-esc="report.paragraph_6_rehab_admin_name"/>
-                            <span t-if="not report.paragraph_6_rehab_admin_name">........................</span>
+                            <span t-if="report.rehab_admin_name" t-esc="report.rehab_admin_name"/>
+                            <span t-if="not report.rehab_admin_name">........................</span>
                             जिला रायगढ़ को अधिनियम, 2013 की धारा 43 के अंतर्गत पुनर्वास और पुनर्व्यवस्थापन प्रशासक के रूप में नियुक्त किया गया है।
                         </span>
                     </div>

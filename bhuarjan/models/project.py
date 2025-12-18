@@ -118,22 +118,42 @@ class BhuProject(models.Model):
                                 default=lambda self: self.env.company, tracking=True)
     
     # Section 4 Notification fields - These are project-level fields
-    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', tracking=True,
+    directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', tracking=True,
                                       help='Number of directly affected families for this project')
-    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', tracking=True,
+    indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', tracking=True,
                                         help='Number of indirectly affected families for this project')
-    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', tracking=True,
-                                    help='Estimated number of private houses and other assets in the affected area')
-    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True,
+    private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', tracking=True,
+                                    help='Esti  mated number of private houses and other assets in the affected area')
+    government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True,
                                       help='Estimated number of government houses and other assets in the affected area')
-    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True,
+    total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True,
                                help='Total cost of the project')
-    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True,
+    project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True,
                                       help='Benefits from the project')
-    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', tracking=True,
+    compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', tracking=True,
                                            help='Measures for compensation of proposed social impact and potential expenditure thereon')
-    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', tracking=True,
+    other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', tracking=True,
                                       help='Other components affected by the project')
+    
+    # Section 11 Preliminary Report fields - These are project-level fields
+    map_inspection_location = fields.Char(string='Land Map Inspection / भूमि मानचित्र निरीक्षण', tracking=True,
+                                                       help='Location where land map can be inspected (SDO Revenue office)')
+    authorized_officer = fields.Char(string='Officer authorized by Section 12 / धारा 12 द्वारा प्राधिकृत अधिकारी', tracking=True,
+                                               help='Officer authorized by Section 12')
+    is_displacement = fields.Boolean(string='Is Displacement Involved? / कितने परिवारों का विस्थापन निहित है।', 
+                                                 default=False, tracking=True,
+                                                 help='Whether displacement is involved for this project')
+    affected_families_count = fields.Integer(string='Affected Families Count / प्रभावित परिवारों की संख्या', tracking=True,
+                                                         help='Number of affected families if displacement is involved')
+    is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
+                                               default=False, tracking=True,
+                                               help='Whether exemption is granted from Chapters Two and Three of Act 2013')
+    exemption_details = fields.Text(string='Exemption Details / छूट विवरण', tracking=True,
+                                                 help='Details of exemption notification (number, date, exempted chapters)')
+    sia_justification = fields.Text(string='SIA Justification / SIA औचित्य', tracking=True,
+                                                help='SIA justification details (last resort, social benefits)')
+    rehab_admin_name = fields.Char(string='Rehabilitation Administrator / पुनर्वास प्रशासक', tracking=True,
+                                               help='Name/Designation of Rehabilitation and Resettlement Administrator')
     
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):

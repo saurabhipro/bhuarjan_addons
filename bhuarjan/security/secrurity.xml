@@ -85,7 +85,7 @@
         <!-- ##################### ADMINISTRATOR ################### -->
         <!-- Project Rule for Administrator -->
         <record id="record_bhu_project_rule_admin" model="ir.rule">
-            <field name="name">Administrator can see all projects</field>
+            <field name="name">Admin can see all projects</field>
             <field name="model_id" ref="model_bhu_project"/>
             <field name="domain_force">[(1, '=', 1)]</field>            
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>

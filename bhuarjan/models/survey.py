@@ -25,8 +25,13 @@ class Survey(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset village when project changes and filter villages to only those mapped to the project"""
+        """Reset village when project changes and filter villages to only those mapped to the project.
+        Also auto-set department_id from project if project has a department."""
         if self.project_id:
+            # Auto-set department_id from project if project has a department
+            # This ensures surveys are always linked to the correct department for visibility
+            if self.project_id.department_id:
+                self.department_id = self.project_id.department_id
             # Reset village if it's not in the project's villages
             if self.village_id and self.village_id not in self.project_id.village_ids:
                 self.village_id = False

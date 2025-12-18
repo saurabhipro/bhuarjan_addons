@@ -117,6 +117,24 @@ class BhuProject(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, 
                                 default=lambda self: self.env.company, tracking=True)
     
+    # Section 4 Notification fields - These are project-level fields
+    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', tracking=True,
+                                      help='Number of directly affected families for this project')
+    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', tracking=True,
+                                        help='Number of indirectly affected families for this project')
+    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', tracking=True,
+                                    help='Estimated number of private houses and other assets in the affected area')
+    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', tracking=True,
+                                      help='Estimated number of government houses and other assets in the affected area')
+    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', tracking=True,
+                               help='Total cost of the project')
+    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', tracking=True,
+                                      help='Benefits from the project')
+    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', tracking=True,
+                                           help='Measures for compensation of proposed social impact and potential expenditure thereon')
+    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', tracking=True,
+                                      help='Other components affected by the project')
+    
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):
         """Override search to filter projects by user's assigned projects"""

@@ -184,76 +184,80 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Notification Details" icon="fa-info-circle">
-                            <!-- Basic Information Section -->
+                        <page string="Public Hearing Details / सार्वजनिक सुनवाई विवरण" icon="fa-calendar-alt">
+                            <!-- Public Purpose Section -->
                             <group string="Public Purpose / लोक प्रयोजन">
-                                <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
-                                       widget="html" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
-                            </group>
-                            <group string="Public Hearing Details / सार्वजनिक सुनवाई विवरण">
-                                <group col="2">
-                                    <field name="public_hearing_datetime" widget="datetime" readonly="is_approved_readonly or state in ('submitted', 'send_back')"/>
-                                    <field name="public_hearing_place" readonly="is_approved_readonly or state in ('submitted', 'send_back')"/>
+                                <group>
+                                    <field name="project_id" string="Project Name / परियोजना का नाम" 
+                                           readonly="1"
+                                           options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                                </group>
+                                <group>
+                                    <field name="public_purpose" string="Additional Details / अतिरिक्त विवरण" 
+                                           placeholder="Enter additional description of public purpose for land acquisition (optional)..." 
+                                           widget="html" 
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                                 </group>
                             </group>
-                            
+                            <!-- Public Hearing Details Section -->
+                            <group string="Public Hearing Details / सार्वजनिक सुनवाई विवरण">
+                                <group col="2">
+                                    <field name="public_hearing_datetime" widget="datetime" 
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                    <field name="public_hearing_place" 
+                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Project Details / परियोजना विवरण" icon="fa-info-circle">
                             <!-- Section 4 Questions -->
                             <group>
                                 <group string="(1) Brief Description of Public Purpose / लोक प्रयोजन का संक्षिप्त विवरण">
                                     <field name="q1_brief_description" widget="html" nolabel="1"
                                            readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                                 </group>
-                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
-                                    <field name="q2_directly_affected" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या (From Project Master)">
+                                    <field name="q2_directly_affected" nolabel="1" readonly="1"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
-                                    <field name="q3_indirectly_affected" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या (From Project Master)">
+                                    <field name="q3_indirectly_affected" nolabel="1" readonly="1"/>
                                 </group>
-                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
-                                    <field name="q4_private_assets" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या (From Project Master)">
+                                    <field name="q4_private_assets" nolabel="1" readonly="1"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
-                                    <field name="q5_government_assets" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या (From Project Master)">
+                                    <field name="q5_government_assets" nolabel="1" readonly="1"/>
                                 </group>
-                                <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है?">
+                                <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है? (Always Yes)">
                                     <field name="q6_minimal_acquisition" widget="radio" nolabel="1"
                                            options="{'horizontal': true}"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                           readonly="1"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है?">
+                                <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है? (Always Yes)">
                                     <field name="q7_alternatives_considered" widget="radio" nolabel="1"
                                            options="{'horizontal': true}"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                           readonly="1"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
-                                    <field name="q8_total_cost" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत (From Project Master)">
+                                    <field name="q8_total_cost" nolabel="1" readonly="1"/>
                                 </group>
-                                <group string="(9) Benefits from the Project / परियोजना से लाभ">
-                                    <field name="q9_project_benefits" widget="html" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                <group string="(9) Benefits from the Project / परियोजना से लाभ (From Project Master)">
+                                    <field name="q9_project_benefits" widget="html" nolabel="1" readonly="1"/>
                                 </group>
                             </group>
-                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
-                                <field name="q10_compensation_measures" widget="html" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय (From Project Master)">
+                                <field name="q10_compensation_measures" widget="html" nolabel="1" readonly="1"/>
                             </group>
-                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
-                                <field name="q11_other_components" widget="html" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक (From Project Master)">
+                                <field name="q11_other_components" widget="html" nolabel="1" readonly="1"/>
                             </group>
                         </page>
                     </notebook>

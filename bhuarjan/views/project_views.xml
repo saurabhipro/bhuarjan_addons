@@ -103,6 +103,38 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Project Details / परियोजना विवरण">
+                            <group>
+                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
+                                    <field name="q2_directly_affected" nolabel="1"/>
+                                </group>
+                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
+                                    <field name="q3_indirectly_affected" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
+                                    <field name="q4_private_assets" nolabel="1"/>
+                                </group>
+                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
+                                    <field name="q5_government_assets" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
+                                    <field name="q8_total_cost" nolabel="1"/>
+                                </group>
+                                <group string="(9) Benefits from the Project / परियोजना से लाभ">
+                                    <field name="q9_project_benefits" widget="html" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
+                                <field name="q10_compensation_measures" widget="html" nolabel="1"/>
+                            </group>
+                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
+                                <field name="q11_other_components" widget="html" nolabel="1"/>
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>

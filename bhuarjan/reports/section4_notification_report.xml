@@ -345,12 +345,8 @@
                             </thead>
                             <tbody>
                                 <t t-set="consolidated_data" t-value="wizard._get_consolidated_village_data() if wizard else []"/>
-                                <!-- Use project name if public_purpose is empty, otherwise use public_purpose -->
-                                <t t-set="project_name" t-value="wizard.project_id.name if wizard and wizard.project_id and wizard.project_id.name else ''"/>
-                                <t t-set="public_purpose_html" t-value="wizard.public_purpose if wizard and wizard.public_purpose else ''"/>
-                                <t t-set="public_purpose_clean_html" t-value="wizard.get_plain_text_from_html(public_purpose_html) if wizard and public_purpose_html else ''"/>
-                                <t t-set="public_purpose" t-value="public_purpose_clean_html if public_purpose_clean_html else project_name"/>
-                                <t t-set="public_purpose_clean" t-value="public_purpose"/>
+                                <!-- Always use project name in the last column -->
+                                <t t-set="project_name" t-value="wizard.project_id.name if wizard and wizard.project_id and wizard.project_id.name else '........................'"/>
                                 <t t-if="consolidated_data and len(consolidated_data) > 0">
                                     <t t-foreach="consolidated_data" t-as="v_data">
                                         <tr>
@@ -358,7 +354,7 @@
                                             <td style="font-size: 18px !important;"><t t-esc="v_data.get('tehsil', '')"/></td>
                                             <td style="font-size: 18px !important;"><t t-esc="v_data.get('village_name', '')"/></td>
                                             <td style="font-size: 18px !important;"><t t-esc="'{:.4f}'.format(v_data.get('total_area', 0.0))"/></td>
-                                            <td style="font-size: 18px !important; text-align: left !important;"><t t-esc="public_purpose_clean"/></td>
+                                            <td style="font-size: 18px !important; text-align: left !important;"><t t-esc="project_name"/></td>
                                         </tr>
                                     </t>
                                 </t>

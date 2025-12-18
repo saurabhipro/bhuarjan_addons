@@ -277,7 +277,7 @@
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
                                     <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 24px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                        कार्यालय कलेक्टर एवं पदेन उप सचिव, राजस्व एवं आपदा प्रबंधन विभाग
+                                        कार्यालय कलेक्टर एवं पदेन उप सचिव,
                                     </h3>
                                 </td>
                                 <!-- QR Code on Right -->
@@ -309,9 +309,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <!-- Header Text - Line 2 (empty, just for rowspan alignment) -->
+                                <!-- Header Text - Line 2 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                    <!-- Empty row for alignment -->
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 24px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                        राजस्व एवं आपदा प्रबंधन विभाग
+                                    </h3>
                                 </td>
                             </tr>
                         </table>

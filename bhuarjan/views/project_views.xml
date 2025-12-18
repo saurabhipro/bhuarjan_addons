@@ -105,34 +105,66 @@
                         </page>
                         <page string="Project Details / परियोजना विवरण">
                             <group>
-                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
-                                    <field name="q2_directly_affected" nolabel="1"/>
+                                <group string="(1) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
+                                    <field name="directly_affected" nolabel="1"/>
                                 </group>
-                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
-                                    <field name="q3_indirectly_affected" nolabel="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
-                                    <field name="q4_private_assets" nolabel="1"/>
-                                </group>
-                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
-                                    <field name="q5_government_assets" nolabel="1"/>
+                                <group string="(2) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">
+                                    <field name="indirectly_affected" nolabel="1"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत">
-                                    <field name="q8_total_cost" nolabel="1"/>
+                                <group string="(3) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
+                                    <field name="private_assets" nolabel="1"/>
                                 </group>
-                                <group string="(9) Benefits from the Project / परियोजना से लाभ">
-                                    <field name="q9_project_benefits" widget="html" nolabel="1"/>
+                                <group string="(4) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या">
+                                    <field name="government_assets" nolabel="1"/>
                                 </group>
                             </group>
-                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
-                                <field name="q10_compensation_measures" widget="html" nolabel="1"/>
+                            <group>
+                                <group string="(5) Total Cost of the Project / परियोजना की कुल लागत">
+                                    <field name="total_cost" nolabel="1"/>
+                                </group>
+                                <group string="(6) Benefits from the Project / परियोजना से लाभ">
+                                    <field name="project_benefits" widget="html" nolabel="1"/>
+                                </group>
                             </group>
-                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
-                                <field name="q11_other_components" widget="html" nolabel="1"/>
+                            <group>
+                                <group string="(7) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
+                                    <field name="compensation_measures" widget="html" nolabel="1"/>
+                                </group>
+                                <group string="(8) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
+                                    <field name="other_components" widget="html" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(9) Land Map Inspection / भूमि मानचित्र निरीक्षण">
+                                    <field name="map_inspection_location" nolabel="1"/>
+                                </group>
+                                <group string="(10) Officer authorized by Section 12 / धारा 12 द्वारा प्राधिकृत अधिकारी">
+                                    <field name="authorized_officer" nolabel="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="(11) Rehabilitation Administrator / पुनर्वास प्रशासक">
+                                    <field name="rehab_admin_name" nolabel="1"/>
+                                </group>
+                                <group string="(12) Is Displacement Involved? / कितने परिवारों का विस्थापन निहित है।">
+                                    <field name="is_displacement" nolabel="1"/>
+                                    <field name="affected_families_count" 
+                                           invisible="not is_displacement"
+                                           string="Number of Families / परिवारों की संख्या"/>
+                                </group>
+                            </group>
+                            <group string="(13) Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय &quot;दो&quot; एवं &quot;तीन&quot; के प्रावधानों से छूट प्रदान की गई है।">
+                                <field name="is_exemption" nolabel="1"/>
+                                <group string="Exemption Details / छूट विवरण" 
+                                       invisible="not is_exemption">
+                                    <field name="exemption_details" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="SIA Justification / SIA औचित्य" 
+                                       invisible="is_exemption">
+                                    <field name="sia_justification" widget="text" nolabel="1"/>
+                                </group>
                             </group>
                         </page>
                     </notebook>

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
@@ -148,44 +146,47 @@ class Section11PreliminaryReport(models.Model):
                 record.survey_numbers = ''
                 record.survey_date = False
     
-    # Paragraph 2: Claims/Objections Information
-    paragraph_2_claims_info = fields.Text(string='Paragraph 2: Claims/Objections Info / धारा 2: दावे/आपत्तियों की जानकारी',
-                                          help='Information about claims/objections submission (60 days deadline)',
-                                          tracking=True)
+    # Paragraph 2: Claims/Objections Information - REMOVED (not needed)
+    # paragraph_2_claims_info removed as per user request
     
-    # Paragraph 3: Land Map Inspection
-    paragraph_3_map_inspection_location = fields.Char(string='Paragraph 3: Land Map Inspection / धारा 3: भूमि मानचित्र निरीक्षण',
+    # Land Map Inspection - Read-only from project (not stored)
+    map_inspection_location = fields.Char(string='Land Map Inspection / भूमि मानचित्र निरीक्षण',
+                                                       related='project_id.map_inspection_location', readonly=True,
                                                        help='Location where land map can be inspected (SDO Revenue office)',
                                                        tracking=True)
     
-    # Question 6: Officer authorized by Section 12
-    question_6_authorized_officer = fields.Char(string='Question 6: Officer authorized by Section 12 / (छः) धारा 12 द्वारा प्राधिकृत अधिकारी',
-                                                tracking=True,
-                                                help='Officer authorized by Section 12')
+    # Officer authorized by Section 12 - Read-only from project (not stored)
+    authorized_officer = fields.Char(string='Officer authorized by Section 12 / धारा 12 द्वारा प्राधिकृत अधिकारी',
+                                                related='project_id.authorized_officer', readonly=True,
+                                                help='Officer authorized by Section 12',
+                                                tracking=True)
     
-    # Question 7: Description of public purpose
-    question_7_public_purpose = fields.Text(string='Question 7: Description of public purpose / (सात) सार्वजनिक प्रयोजन का विवरण',
-                                           tracking=True,
-                                           help='Description of public purpose')
+    # Description of public purpose - REMOVED (not needed)
     
-    # Question 8: Displacement (Paragraph 4)
-    paragraph_4_is_displacement = fields.Boolean(string='Question 8: Is Displacement Involved? / (आठ) कितने परिवारों का विस्थापन निहित है।',
+    # Displacement - Read-only from project (not stored)
+    is_displacement = fields.Boolean(string='Is Displacement Involved? / कितने परिवारों का विस्थापन निहित है।',
+                                                 related='project_id.is_displacement', readonly=True,
                                                  default=False, tracking=True)
-    paragraph_4_affected_families_count = fields.Integer(string='Affected Families Count / प्रभावित परिवारों की संख्या',
+    affected_families_count = fields.Integer(string='Affected Families Count / प्रभावित परिवारों की संख्या',
+                                                         related='project_id.affected_families_count', readonly=True,
                                                          tracking=True)
     
-    # Question 9: Exemption or SIA Justification (Paragraph 5)
-    paragraph_5_is_exemption = fields.Boolean(string='Question 9: Is Exemption Granted? / (नौ) क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
+    # Exemption or SIA Justification - Read-only from project (not stored)
+    is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
+                                               related='project_id.is_exemption', readonly=True,
                                                default=False, tracking=True)
-    paragraph_5_exemption_details = fields.Text(string='Exemption Details / छूट विवरण',
+    exemption_details = fields.Text(string='Exemption Details / छूट विवरण',
+                                                 related='project_id.exemption_details', readonly=True,
                                                  help='Details of exemption notification (number, date, exempted chapters)',
                                                  tracking=True)
-    paragraph_5_sia_justification = fields.Text(string='SIA Justification / SIA औचित्य',
+    sia_justification = fields.Text(string='SIA Justification / SIA औचित्य',
+                                                related='project_id.sia_justification', readonly=True,
                                                 help='SIA justification details (last resort, social benefits)',
                                                 tracking=True)
     
-    # Question 10: Rehabilitation Administrator (Paragraph 6)
-    paragraph_6_rehab_admin_name = fields.Char(string='Question 10: Rehabilitation Administrator / (दस) पुनर्वास प्रशासक',
+    # Rehabilitation Administrator - Read-only from project (not stored)
+    rehab_admin_name = fields.Char(string='Rehabilitation Administrator / पुनर्वास प्रशासक',
+                                               related='project_id.rehab_admin_name', readonly=True,
                                                help='Name/Designation of Rehabilitation and Resettlement Administrator',
                                                tracking=True)
     
@@ -465,40 +466,9 @@ class Section11PreliminaryReport(models.Model):
     
     def _validate_required_fields(self):
         """Validate that all required fields in Questions tab are filled"""
-        missing_fields = []
-        
-        # Required fields
-        if not self.paragraph_2_claims_info:
-            missing_fields.append(_('Paragraph 2: Claims/Objections Information'))
-        
-        if not self.paragraph_3_map_inspection_location:
-            missing_fields.append(_('Paragraph 3: Land Map Inspection Location'))
-        
-        if not self.question_6_authorized_officer:
-            missing_fields.append(_('Question 6: Officer authorized by Section 12'))
-        
-        if not self.question_7_public_purpose:
-            missing_fields.append(_('Question 7: Description of public purpose'))
-        
-        if not self.paragraph_6_rehab_admin_name:
-            missing_fields.append(_('Question 10: Rehabilitation Administrator'))
-        
-        # Conditional required fields
-        if self.paragraph_4_is_displacement and not self.paragraph_4_affected_families_count:
-            missing_fields.append(_('Question 8: Affected Families Count (required when displacement is involved)'))
-        
-        if self.paragraph_5_is_exemption:
-            if not self.paragraph_5_exemption_details:
-                missing_fields.append(_('Question 9: Exemption Details (required when exemption is granted)'))
-        else:
-            if not self.paragraph_5_sia_justification:
-                missing_fields.append(_('Question 9: SIA Justification (required when exemption is not granted)'))
-        
-        if missing_fields:
-            raise ValidationError(
-                _('Please fill in all required fields in the Questions tab:\n\n%s') %
-                '\n'.join(['- ' + field for field in missing_fields])
-            )
+        # Fields are now read-only from project master, so validation is not needed
+        # All required fields should be filled at project level
+        pass
     
     def action_generate_pdf(self):
         """Generate Section 11 Preliminary Report PDF - Creates separate notifications for each village with approved surveys"""

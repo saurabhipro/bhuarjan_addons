@@ -62,32 +62,32 @@ class Section4Notification(models.Model):
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
     
     # 11 Questions from the template
-    q1_brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose', tracking=True)
-    # Fields 2, 3, 4, 5, 8, 9, 10, 11 are read-only and come from project master
-    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', 
-                                      related='project_id.q2_directly_affected', readonly=True, store=True, tracking=True)
-    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', 
-                                         related='project_id.q3_indirectly_affected', readonly=True, store=True, tracking=True)
-    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', 
-                                    related='project_id.q4_private_assets', readonly=True, store=True, tracking=True)
-    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', 
-                                       related='project_id.q5_government_assets', readonly=True, store=True, tracking=True)
-    q6_minimal_acquisition = fields.Selection([
+    brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose', tracking=True)
+    # Fields 2, 3, 4, 5, 8, 9, 10, 11 are read-only and come from project master (not stored)
+    directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', 
+                                      related='project_id.directly_affected', readonly=True, tracking=True)
+    indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families', 
+                                         related='project_id.indirectly_affected', readonly=True, tracking=True)
+    private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets', 
+                                    related='project_id.private_assets', readonly=True, tracking=True)
+    government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets', 
+                                       related='project_id.government_assets', readonly=True, tracking=True)
+    minimal_acquisition = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं')
     ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='yes', readonly=True, tracking=True)
-    q7_alternatives_considered = fields.Selection([
+    alternatives_considered = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं')
     ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='yes', readonly=True, tracking=True)
-    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', 
-                                related='project_id.q8_total_cost', readonly=True, store=True, tracking=True)
-    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', 
-                                     related='project_id.q9_project_benefits', readonly=True, store=True, tracking=True)
-    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', 
-                                            related='project_id.q10_compensation_measures', readonly=True, store=True, tracking=True)
-    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', 
-                                      related='project_id.q11_other_components', readonly=True, store=True, tracking=True)
+    total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project', 
+                                related='project_id.total_cost', readonly=True, tracking=True)
+    project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project', 
+                                     related='project_id.project_benefits', readonly=True, tracking=True)
+    compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure', 
+                                            related='project_id.compensation_measures', readonly=True, tracking=True)
+    other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project', 
+                                      related='project_id.other_components', readonly=True, tracking=True)
     
     # Signed document fields
     signed_document_file = fields.Binary(string='Signed Notification / हस्ताक्षरित अधिसूचना')
@@ -445,26 +445,26 @@ class Section4Notification(models.Model):
             missing_fields.append(_('Public Hearing Place / सार्वजनिक सुनवाई का स्थान'))
         
         # Section 4 Questions
-        # Q1 is optional - removed validation
-        if not self.q2_directly_affected:
+        # Brief description is optional - removed validation
+        if not self.directly_affected:
             missing_fields.append(_('Question 2: Directly Affected Families / प्रश्न 2: प्रत्यक्ष रूप से प्रभावित परिवार'))
-        if not self.q3_indirectly_affected:
+        if not self.indirectly_affected:
             missing_fields.append(_('Question 3: Indirectly Affected Families / प्रश्न 3: अप्रत्यक्ष रूप से प्रभावित परिवार'))
-        if not self.q4_private_assets:
+        if not self.private_assets:
             missing_fields.append(_('Question 4: Private Assets / प्रश्न 4: निजी संपत्ति'))
-        if not self.q5_government_assets:
+        if not self.government_assets:
             missing_fields.append(_('Question 5: Government Assets / प्रश्न 5: सरकारी संपत्ति'))
-        if not self.q6_minimal_acquisition:
+        if not self.minimal_acquisition:
             missing_fields.append(_('Question 6: Is Acquisition Minimal? / प्रश्न 6: क्या अर्जन न्यूनतम है?'))
-        if not self.q7_alternatives_considered:
+        if not self.alternatives_considered:
             missing_fields.append(_('Question 7: Alternatives Considered? / प्रश्न 7: विकल्पों पर विचार किया गया?'))
-        if not self.q8_total_cost:
+        if not self.total_cost:
             missing_fields.append(_('Question 8: Total Cost / प्रश्न 8: कुल लागत'))
-        if not self.q9_project_benefits:
+        if not self.project_benefits:
             missing_fields.append(_('Question 9: Project Benefits / प्रश्न 9: परियोजना लाभ'))
-        if not self.q10_compensation_measures:
+        if not self.compensation_measures:
             missing_fields.append(_('Question 10: Compensation Measures / प्रश्न 10: मुआवजा उपाय'))
-        if not self.q11_other_components:
+        if not self.other_components:
             missing_fields.append(_('Question 11: Other Components / प्रश्न 11: अन्य घटक'))
         
         if missing_fields:
@@ -530,17 +530,17 @@ class Section4Notification(models.Model):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'q1_brief_description': self.q1_brief_description,
-            'q2_directly_affected': self.q2_directly_affected,
-            'q3_indirectly_affected': self.q3_indirectly_affected,
-            'q4_private_assets': self.q4_private_assets,
-            'q5_government_assets': self.q5_government_assets,
-            'q6_minimal_acquisition': self.q6_minimal_acquisition,
-            'q7_alternatives_considered': self.q7_alternatives_considered,
-            'q8_total_cost': self.q8_total_cost,
-            'q9_project_benefits': self.q9_project_benefits,
-            'q10_compensation_measures': self.q10_compensation_measures,
-            'q11_other_components': self.q11_other_components,
+            'brief_description': self.brief_description,
+            'directly_affected': self.directly_affected,
+            'indirectly_affected': self.indirectly_affected,
+            'private_assets': self.private_assets,
+            'government_assets': self.government_assets,
+            'minimal_acquisition': self.minimal_acquisition,
+            'alternatives_considered': self.alternatives_considered,
+            'total_cost': self.total_cost,
+            'project_benefits': self.project_benefits,
+            'compensation_measures': self.compensation_measures,
+            'other_components': self.other_components,
         })
         
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
@@ -573,17 +573,17 @@ class Section4Notification(models.Model):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'q1_brief_description': self.q1_brief_description,
-            'q2_directly_affected': self.q2_directly_affected,
-            'q3_indirectly_affected': self.q3_indirectly_affected,
-            'q4_private_assets': self.q4_private_assets,
-            'q5_government_assets': self.q5_government_assets,
-            'q6_minimal_acquisition': 'yes',  # Always yes
-            'q7_alternatives_considered': 'yes',  # Always yes
-            'q8_total_cost': self.q8_total_cost,
-            'q9_project_benefits': self.q9_project_benefits,
-            'q10_compensation_measures': self.q10_compensation_measures,
-            'q11_other_components': self.q11_other_components,
+            'brief_description': self.brief_description,
+            'directly_affected': self.directly_affected,
+            'indirectly_affected': self.indirectly_affected,
+            'private_assets': self.private_assets,
+            'government_assets': self.government_assets,
+            'minimal_acquisition': 'yes',  # Always yes
+            'alternatives_considered': 'yes',  # Always yes
+            'total_cost': self.total_cost,
+            'project_benefits': self.project_benefits,
+            'compensation_measures': self.compensation_measures,
+            'other_components': self.other_components,
         })
         
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
@@ -605,53 +605,53 @@ class Section4NotificationWizard(models.TransientModel):
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान')
     
     # 11 Questions from the template
-    q1_brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose')
-    q2_directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families')
-    q3_indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
-    q4_private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
-    q5_government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
-    q6_minimal_acquisition = fields.Selection([
+    brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose')
+    directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families')
+    indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
+    private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
+    government_assets = fields.Char(string='(पाँच) प्रभावित क्षेत्र में शासकीय मकान तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of government houses and other assets')
+    minimal_acquisition = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं')
     ], string='(छः) क्या प्रस्तावित अर्जन न्यूनतम है? / Is the proposed acquisition minimal?', default='yes', readonly=True)
-    q7_alternatives_considered = fields.Selection([
+    alternatives_considered = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं')
     ], string='(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?', default='yes', readonly=True)
-    q8_total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
-    q9_project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
-    q10_compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure')
-    q11_other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project')
+    total_cost = fields.Char(string='(आठ) परियोजना की कुल लागत / Total cost of the project')
+    project_benefits = fields.Text(string='(नौ) परियोजना से होने वाला लाभ / Benefits from the project')
+    compensation_measures = fields.Text(string='(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure')
+    other_components = fields.Text(string='(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project')
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes, set domain, and pull project-level fields"""
         self.village_id = False
-        # Always set q6 and q7 to 'yes'
-        self.q6_minimal_acquisition = 'yes'
-        self.q7_alternatives_considered = 'yes'
-        # Pull project-level fields (q2, q3, q4, q5, q8, q9, q10, q11)
+        # Always set minimal_acquisition and alternatives_considered to 'yes'
+        self.minimal_acquisition = 'yes'
+        self.alternatives_considered = 'yes'
+        # Pull project-level fields (directly_affected, indirectly_affected, private_assets, government_assets, total_cost, project_benefits, compensation_measures, other_components)
         if self.project_id:
-            self.q2_directly_affected = self.project_id.q2_directly_affected
-            self.q3_indirectly_affected = self.project_id.q3_indirectly_affected
-            self.q4_private_assets = self.project_id.q4_private_assets
-            self.q5_government_assets = self.project_id.q5_government_assets
-            self.q8_total_cost = self.project_id.q8_total_cost
-            self.q9_project_benefits = self.project_id.q9_project_benefits
-            self.q10_compensation_measures = self.project_id.q10_compensation_measures
-            self.q11_other_components = self.project_id.q11_other_components
+            self.directly_affected = self.project_id.directly_affected
+            self.indirectly_affected = self.project_id.indirectly_affected
+            self.private_assets = self.project_id.private_assets
+            self.government_assets = self.project_id.government_assets
+            self.total_cost = self.project_id.total_cost
+            self.project_benefits = self.project_id.project_benefits
+            self.compensation_measures = self.project_id.compensation_measures
+            self.other_components = self.project_id.other_components
             if self.project_id.village_ids:
                 return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
             # Clear project-level fields if no project selected
-            self.q2_directly_affected = False
-            self.q3_indirectly_affected = False
-            self.q4_private_assets = False
-            self.q5_government_assets = False
-            self.q8_total_cost = False
-            self.q9_project_benefits = False
-            self.q10_compensation_measures = False
-            self.q11_other_components = False
+            self.directly_affected = False
+            self.indirectly_affected = False
+            self.private_assets = False
+            self.government_assets = False
+            self.total_cost = False
+            self.project_benefits = False
+            self.compensation_measures = False
+            self.other_components = False
         return {'domain': {'village_id': []}}
 
     def _get_consolidated_village_data(self):
@@ -750,17 +750,17 @@ class Section4NotificationWizard(models.TransientModel):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'q1_brief_description': self.q1_brief_description,
-            'q2_directly_affected': self.q2_directly_affected,
-            'q3_indirectly_affected': self.q3_indirectly_affected,
-            'q4_private_assets': self.q4_private_assets,
-            'q5_government_assets': self.q5_government_assets,
-            'q6_minimal_acquisition': self.q6_minimal_acquisition,
-            'q7_alternatives_considered': self.q7_alternatives_considered,
-            'q8_total_cost': self.q8_total_cost,
-            'q9_project_benefits': self.q9_project_benefits,
-            'q10_compensation_measures': self.q10_compensation_measures,
-            'q11_other_components': self.q11_other_components,
+            'brief_description': self.brief_description,
+            'directly_affected': self.directly_affected,
+            'indirectly_affected': self.indirectly_affected,
+            'private_assets': self.private_assets,
+            'government_assets': self.government_assets,
+            'minimal_acquisition': self.minimal_acquisition,
+            'alternatives_considered': self.alternatives_considered,
+            'total_cost': self.total_cost,
+            'project_benefits': self.project_benefits,
+            'compensation_measures': self.compensation_measures,
+            'other_components': self.other_components,
             'state': 'generated',
         })
         

@@ -29,25 +29,25 @@
                         </page>
                         <page string="Section 4 Questions / धारा 4 प्रश्न">
                             <group string="(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose">
-                                <field name="q1_brief_description" widget="html" nolabel="1"/>
+                                <field name="brief_description" widget="html" nolabel="1"/>
                             </group>
-                            <field name="q2_directly_affected"/>
-                            <field name="q3_indirectly_affected"/>
-                            <field name="q4_private_assets"/>
-                            <field name="q5_government_assets"/>
-                            <field name="q6_minimal_acquisition"/>
+                            <field name="directly_affected"/>
+                            <field name="indirectly_affected"/>
+                            <field name="private_assets"/>
+                            <field name="government_assets"/>
+                            <field name="minimal_acquisition"/>
                             <group string="(सात) क्या संभव विकल्पों और इसकी साध्यता पर विचार कर लिया गया है? / Have possible alternatives and their feasibility been considered?">
-                                <field name="q7_alternatives_considered" widget="html" nolabel="1"/>
+                                <field name="alternatives_considered" widget="html" nolabel="1"/>
                             </group>
-                            <field name="q8_total_cost"/>
+                            <field name="total_cost"/>
                             <group string="(नौ) परियोजना से होने वाला लाभ / Benefits from the project">
-                                <field name="q9_project_benefits" widget="html" nolabel="1"/>
+                                <field name="project_benefits" widget="html" nolabel="1"/>
                             </group>
                             <group string="(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय / Measures for compensation and likely expenditure">
-                                <field name="q10_compensation_measures" widget="html" nolabel="1"/>
+                                <field name="compensation_measures" widget="html" nolabel="1"/>
                             </group>
                             <group string="(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक / Other components affected by the project">
-                                <field name="q11_other_components" widget="html" nolabel="1"/>
+                                <field name="other_components" widget="html" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>

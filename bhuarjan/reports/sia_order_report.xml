@@ -23,7 +23,7 @@
                     /* Override basic_layout styles aggressively */
                     body, html, .container, .page {
                         font-size: 21px !important;
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                        font-family: 'Noto Sans Devanagari', sans-serif !important;
                     }
                     .header-info-table { 
                         width: 100% !important; 
@@ -66,9 +66,9 @@
                     .fsc{
                         font-size: 21px !important;
                     }
-                    /* Global Font Settings - More aggressive */
+                    /* Global Font Settings - More aggressive - Use Noto Sans Devanagari for Hindi text */
                     body, .header-section, .header-info-table, h2, h3, strong, span, td, th, p, div, .container, .page {
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                        font-family: 'Noto Sans Devanagari', sans-serif !important;
                     }
                     /* Date and Reference Section - Force layout */
                     .date-reference-section {

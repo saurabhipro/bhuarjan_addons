@@ -250,7 +250,9 @@
                     <!-- Recipient -->
                     <div style="margin-bottom: 12px !important; margin-top: 5px !important;">
                         <p class="normal-text letter_space" style="margin: 4px 0 !important; line-height: 1.5 !important; font-size: 18px !important;">
-                            <strong style="font-size: 18px !important;">प्रति,</strong><br/>
+                            <strong style="font-size: 18px !important;">प्रति,</strong>
+                        </p>
+                        <p class="normal-text letter_space" style="margin: 4px 0 !important; line-height: 1.5 !important; font-size: 18px !important;">
                             <strong style="font-size: 18px !important;">कलेक्टर</strong><br/>
                             <strong style="font-size: 18px !important;">(भू-अर्जन शाखा)</strong><br/>
                             <strong style="font-size: 18px !important;">जिला-रायगढ़ (छ.ग.)</strong>
@@ -260,7 +262,9 @@
                     <!-- Subject -->
                     <div class="subject-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 18px !important;">
-                            <strong>विषय:-</strong> विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or '........................'"/> हेतु प्रभावित ग्राम 
+                            <strong>विषय:-</strong>
+                            <span style="padding-left: 20px !important; display: inline;">
+                                विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or '........................'"/> हेतु प्रभावित ग्राम 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>
@@ -284,6 +288,7 @@
                                 ........................
                             </t>
                             जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदन बाबत।
+                            </span>
                         </p>
                     </div>
 
@@ -485,7 +490,7 @@
                     </div>
 
                     <!-- Issuing Authority -->
-                    <div class="footer-section" style="margin-top: 20px !important; margin-bottom: 15px !important;">
+                    <div class="footer-section" style="margin-top: 80px !important; margin-bottom: 15px !important;">
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 18px !important;">
                             <strong style="font-size: 18px !important;">अनुविभागीय अधिकारी (राजस्व)</strong><br/>
                             <strong style="font-size: 18px !important;">सह भू-अर्जन अधिकारी,</strong> 

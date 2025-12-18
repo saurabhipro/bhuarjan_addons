@@ -400,6 +400,86 @@ class Form10PDFController(http.Controller):
             _logger.error(f"Error in download_sia_pdf: {str(e)}", exc_info=True)
             return request.not_found(f"Error: {str(e)}")
     
+    @http.route('/bhuarjan/expert/<path:expert_committee_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_expert_committee_pdf(self, expert_committee_uuid, **kwargs):
+        """Download Expert Committee Report PDF using Expert Committee UUID"""
+        _logger.info(f"Expert Committee PDF download route called: expert_committee_uuid={expert_committee_uuid}")
+        try:
+            # Find Expert Committee Report by UUID
+            expert_report = request.env['bhu.expert.committee.report'].sudo().with_context({}).search([('expert_committee_uuid', '=', expert_committee_uuid)], limit=1)
+            
+            if not expert_report:
+                _logger.error(f"Expert Committee Report not found with UUID: {expert_committee_uuid}")
+                return request.not_found("Expert Committee Report not found")
+            
+            _logger.info(f"Expert Committee Report found: id={expert_report.id}, name={expert_report.name}")
+            
+            # Generate PDF
+            _logger.info("Generating Expert Committee PDF")
+            try:
+                # Use sudo() to bypass access rights when getting the report action
+                report_action = request.env['ir.actions.report'].sudo().search([
+                    ('report_name', '=', 'bhuarjan.expert_committee_proposal_report')
+                ], limit=1)
+                
+                if not report_action:
+                    # Fallback: try using ir.model.data
+                    _logger.info("Expert Committee download: Report not found by name, trying ir.model.data")
+                    try:
+                        report_data = request.env['ir.model.data'].sudo().search([
+                            ('module', '=', 'bhuarjan'),
+                            ('name', '=', 'action_report_expert_committee_proposal')
+                        ], limit=1)
+                        if report_data and report_data.res_id:
+                            report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
+                    except Exception as e:
+                        _logger.error(f"Expert Committee download: Error in fallback: {str(e)}", exc_info=True)
+                
+                if not report_action or not report_action.exists():
+                    _logger.error("Expert Committee download: Report action not found")
+                    return request.not_found("Report not found")
+                
+                _logger.info(f"Expert Committee download: Report action found: {report_action.id}, report_name: {report_action.report_name}")
+            except Exception as e:
+                _logger.error(f"Expert Committee download: Error getting report action: {str(e)}", exc_info=True)
+                return request.not_found(f"Error accessing report: {str(e)}")
+            
+            # Generate PDF directly from Expert Committee Report record
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [expert_report.id], data={})
+            
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
+            
+            # Extract PDF bytes
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+            
+            if not isinstance(pdf_data, bytes):
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                else:
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
+                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
+            
+            # Return PDF response
+            project_name = (expert_report.project_id.name or 'Project').replace(' ', '_')
+            filename = f"Expert_Committee_{project_name}_{expert_report.create_date.strftime('%Y%m%d') if expert_report.create_date else 'Date'}.pdf"
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data))),
+                ]
+            )
+            return response
+        
+        except Exception as e:
+            _logger.error(f"Error in download_expert_committee_pdf: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")
+    
     @http.route('/bhuarjan/section11/<path:report_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_section11_pdf(self, report_uuid, **kwargs):
         """Download Section 11 Preliminary Report PDF using report UUID - serves signed document if exists, else unsigned PDF"""

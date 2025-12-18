@@ -15,6 +15,8 @@ class ExpertCommitteeReport(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Report Name / रिपोर्ट का नाम', required=True, default='New', tracking=True)
+    expert_committee_uuid = fields.Char(string='Expert Committee UUID', readonly=True, copy=False, index=True,
+                                        help='Unique identifier for QR code download')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True,
                                   domain="[('is_sia_exempt', '=', False)]")
@@ -190,7 +192,12 @@ class ExpertCommitteeReport(models.Model):
                 project = self.env['bhu.project'].browse(project_id)
                 if project.is_sia_exempt:
                     raise ValidationError(_('Expert Group Reports cannot be created for projects that are exempt from Social Impact Assessment.'))
-        return super().create(vals_list)
+            
+            # Generate UUID if not provided
+            if not vals.get('expert_committee_uuid'):
+                vals['expert_committee_uuid'] = str(uuid.uuid4())
+        records = super().create(vals_list)
+        return records
     
     def action_mark_signed(self):
         """Mark report as signed"""
@@ -362,6 +369,53 @@ class ExpertCommitteeReport(models.Model):
                 'default_project_id': self.project_id.id,
             }
         }
+    
+    @api.model
+    def _generate_missing_uuids(self):
+        """Generate UUIDs for existing Expert Committee Reports that don't have one"""
+        reports_without_uuid = self.search([('expert_committee_uuid', '=', False)])
+        for report in reports_without_uuid:
+            report.write({'expert_committee_uuid': str(uuid.uuid4())})
+        return len(reports_without_uuid)
+    
+    def get_qr_code_data(self):
+        """Generate QR code data for the Expert Committee Report"""
+        try:
+            import qrcode
+            import io
+            import base64
+            
+            # Ensure UUID exists
+            if not self.expert_committee_uuid:
+                self.write({'expert_committee_uuid': str(uuid.uuid4())})
+            
+            # Generate QR code URL - using Expert Committee UUID
+            qr_url = f"https://bhuarjan.com/bhuarjan/expert/{self.expert_committee_uuid}/download"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=2,
+            )
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            
+            # Generate image
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return img_str
+        except ImportError:
+            return None
+        except Exception as e:
+            _logger.error(f"Error generating QR code for Expert Committee Report {self.id}: {str(e)}", exc_info=True)
+            return None
 
 
 class ExpertCommitteeOrderWizard(models.TransientModel):

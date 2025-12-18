@@ -117,21 +117,65 @@
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
                         <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
                     </div>
-                    <!-- Header -->
-                    <div class="text-center mx-auto" style="margin-bottom: 15px; padding-bottom: 8px;">
-                        <h3 class="hindi letter_space header-text" style="margin: 0;">
-                            <t t-set="header_subdivision_name" t-value="''"/>
-                            <t t-if="sia_team.sub_division_id">
-                                <t t-set="header_subdivision_name" t-value="sia_team.sub_division_id.name"/>
-                            </t>
-                            <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
-                                <t t-set="first_sdm_header" t-value="sia_team.project_id.sdm_ids[0]"/>
-                                <t t-if="first_sdm_header.sub_division_ids and len(first_sdm_header.sub_division_ids) > 0">
-                                    <t t-set="header_subdivision_name" t-value="first_sdm_header.sub_division_ids[0].name"/>
-                                </t>
-                            </t>
-                            कार्यालय अनुविभागीय अधिकारी (राजस्व), <span t-esc="header_subdivision_name if header_subdivision_name else '........................'"/> जिला-रायगढ़ (छ.ग.)
-                        </h3>
+                    <!-- Header with Logo and QR Code -->
+                    <div style="margin-bottom: 15px; padding-bottom: 8px;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+                            <tr>
+                                <!-- Logo on Left -->
+                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                                         height="65"
+                                         width="65"
+                                         style="display: block; margin: 0 auto; object-fit: contain;"/>
+                                </td>
+                                <!-- Header Text - Line 1 -->
+                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 2px 5px;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; font-size: 22px; line-height: 1.2;">
+                                        <t t-set="header_subdivision_name" t-value="''"/>
+                                        <t t-if="sia_team.sub_division_id">
+                                            <t t-set="header_subdivision_name" t-value="sia_team.sub_division_id.name"/>
+                                        </t>
+                                        <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
+                                            <t t-set="first_sdm_header" t-value="sia_team.project_id.sdm_ids[0]"/>
+                                            <t t-if="first_sdm_header.sub_division_ids and len(first_sdm_header.sub_division_ids) > 0">
+                                                <t t-set="header_subdivision_name" t-value="first_sdm_header.sub_division_ids[0].name"/>
+                                            </t>
+                                        </t>
+                                        कार्यालय अनुविभागीय अधिकारी (राजस्व), <span t-esc="header_subdivision_name if header_subdivision_name else '........................'"/>
+                                    </h3>
+                                </td>
+                                <!-- QR Code on Right -->
+                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                    <t t-set="qr_code_img" t-value="sia_team.get_qr_code_data()"/>
+                                    <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/sia/' + str(sia_team.sia_team_uuid or '') + '/download'"/>
+                                    <t t-if="qr_code_img">
+                                        <a t-att-href="qr_download_url" style="display: block; width: 65px; height: 65px; margin: 0 auto; padding: 0; text-decoration: none;">
+                                            <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                 alt="QR Code - Click to download PDF" 
+                                                 style="width: 65px; height: 65px; border: none; display: block; margin: 0; padding: 0; object-fit: contain;"/>
+                                        </a>
+                                    </t>
+                                    <t t-if="not qr_code_img">
+                                        <a t-att-href="qr_download_url" style="display: block; width: 65px; height: 65px; margin: 0 auto; padding: 0; text-decoration: none;">
+                                            <div style="width: 65px; height: 65px; position: relative; border: none; background: white; margin: 0; display: flex; align-items: center; justify-content: center;">
+                                                <div style="text-align: center; font-size: 7px;">
+                                                    <div style="font-weight: bold;">QR Code</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Header Text - Line 2 -->
+                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; font-size: 22px; line-height: 1.2;">
+                                        जिला-रायगढ़ (छ.ग.)
+                                    </h3>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                     <!-- Reference and Date -->

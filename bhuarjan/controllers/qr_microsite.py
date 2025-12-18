@@ -320,6 +320,60 @@ class Form10PDFController(http.Controller):
             _logger.error(f"Error in download_section4_pdf: {str(e)}", exc_info=True)
             return request.not_found(f"Error: {str(e)}")
     
+    @http.route('/bhuarjan/sia/<path:sia_team_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_sia_pdf(self, sia_team_uuid, **kwargs):
+        """Download SIA Team PDF using SIA team UUID"""
+        _logger.info(f"SIA PDF download route called: sia_team_uuid={sia_team_uuid}")
+        try:
+            # Find SIA team by UUID
+            sia_team = request.env['bhu.sia.team'].sudo().with_context({}).search([('sia_team_uuid', '=', sia_team_uuid)], limit=1)
+            
+            if not sia_team:
+                _logger.error(f"SIA team not found with UUID: {sia_team_uuid}")
+                return request.not_found("SIA team not found")
+            
+            _logger.info(f"SIA team found: id={sia_team.id}, name={sia_team.name}")
+            
+            # Generate PDF
+            _logger.info("Generating SIA PDF")
+            report_action = request.env.ref('bhuarjan.action_report_sia_order')
+            
+            # Generate PDF directly from SIA team record
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [sia_team.id], data={})
+            
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
+            
+            # Extract PDF bytes
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+            
+            if not isinstance(pdf_data, bytes):
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                else:
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
+                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
+            
+            # Return PDF response
+            project_name = (sia_team.project_id.name or 'Project').replace(' ', '_')
+            filename = f"SIA_{project_name}_{sia_team.create_date.strftime('%Y%m%d') if sia_team.create_date else 'Date'}.pdf"
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data))),
+                ]
+            )
+            return response
+        
+        except Exception as e:
+            _logger.error(f"Error in download_sia_pdf: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")
+    
     @http.route('/bhuarjan/section11/<path:report_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_section11_pdf(self, report_uuid, **kwargs):
         """Download Section 11 Preliminary Report PDF using report UUID - serves signed document if exists, else unsigned PDF"""

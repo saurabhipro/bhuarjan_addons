@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import json
+import uuid
 
 class SiaTeam(models.Model):
     _name = 'bhu.sia.team'
@@ -78,6 +79,10 @@ class SiaTeam(models.Model):
     # SIA Team Report
     sia_team_report_file = fields.Binary(string='SIA Team Report / SIA टीम रिपोर्ट')
     sia_team_report_filename = fields.Char(string='SIA Team Report Filename')
+    
+    # UUID for QR code
+    sia_team_uuid = fields.Char(string='SIA Team UUID', copy=False, readonly=True, index=True,
+                                 help='Unique identifier for QR code download')
     
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
@@ -592,4 +597,49 @@ class SiaTeam(models.Model):
                 }
             }
     
+    @api.model
+    def _generate_missing_uuids(self):
+        """Generate UUIDs for existing SIA teams that don't have one"""
+        teams_without_uuid = self.search([('sia_team_uuid', '=', False)])
+        for team in teams_without_uuid:
+            team.write({'sia_team_uuid': str(uuid.uuid4())})
+        return len(teams_without_uuid)
+    
+    def get_qr_code_data(self):
+        """Generate QR code data for the SIA team"""
+        try:
+            import qrcode
+            import io
+            import base64
+            
+            # Ensure UUID exists
+            if not self.sia_team_uuid:
+                self.write({'sia_team_uuid': str(uuid.uuid4())})
+            
+            # Generate QR code URL - using SIA team UUID
+            qr_url = f"https://bhuarjan.com/bhuarjan/sia/{self.sia_team_uuid}/download"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=2,
+            )
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            
+            # Generate image
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return img_str
+        except ImportError:
+            return None
+        except Exception as e:
+            return None
 

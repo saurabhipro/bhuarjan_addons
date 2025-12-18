@@ -438,16 +438,14 @@ class Section4Notification(models.Model):
         missing_fields = []
         
         # Basic Information fields
-        if not self.public_purpose:
-            missing_fields.append(_('Public Purpose / लोक प्रयोजन'))
+        # Public Purpose and Q1 are optional - removed validation
         if not self.public_hearing_datetime:
             missing_fields.append(_('Public Hearing Date & Time / सार्वजनिक सुनवाई की तारीख और समय'))
         if not self.public_hearing_place:
             missing_fields.append(_('Public Hearing Place / सार्वजनिक सुनवाई का स्थान'))
         
         # Section 4 Questions
-        if not self.q1_brief_description:
-            missing_fields.append(_('Question 1: Brief Description / प्रश्न 1: संक्षिप्त विवरण'))
+        # Q1 is optional - removed validation
         if not self.q2_directly_affected:
             missing_fields.append(_('Question 2: Directly Affected Families / प्रश्न 2: प्रत्यक्ष रूप से प्रभावित परिवार'))
         if not self.q3_indirectly_affected:

@@ -238,13 +238,13 @@
                     </div>
 
                     <!-- Reference and Date -->
-                    <div class="date-reference-section" style="margin-bottom: 12px !important;">
-                        <span class="normal-text letter_space" style="font-weight: 500 !important; font-size: 18px !important; text-align: left !important;">
-                            <strong>क्रमांक /</strong>................./&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
-                        </span>
-                        <span class="normal-text letter_space" style="text-align: right !important; font-weight: 500 !important; font-size: 18px !important; margin-left: auto !important;">
-                            <strong>दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
-                        </span>
+                    <div class="date-reference-section row w-100" style="margin-bottom: 12px !important;">
+                        <div class="col w-100 normal-text letter_space" style="">
+                                <strong>क्रमांक /</strong>................./&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
+                        </div>
+                        <div class="col normal-text letter_space text-right w-100" style="text-align:right! important;">
+                                <strong>दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
+                        </div>
                     </div>
 
                     <!-- Recipient -->

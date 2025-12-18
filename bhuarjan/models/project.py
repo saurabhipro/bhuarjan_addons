@@ -145,6 +145,8 @@ class BhuProject(models.Model):
                                                  help='Whether displacement is involved for this project')
     affected_families_count = fields.Integer(string='Affected Families Count / प्रभावित परिवारों की संख्या', tracking=True,
                                                          help='Number of affected families if displacement is involved')
+    affected_persons_count = fields.Integer(string='Affected Persons Count / प्रभावित व्यक्तियों की संख्या', tracking=True,
+                                                         help='Number of persons affected by the proposed land acquisition who will be rehabilitated')
     is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
                                                default=False, tracking=True,
                                                help='Whether exemption is granted from Chapters Two and Three of Act 2013')

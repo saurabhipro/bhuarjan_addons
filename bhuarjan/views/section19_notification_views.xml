@@ -176,6 +176,7 @@
                             </group>
                             <group string="Displacement &amp; Rehabilitation / विस्थापन और पुनर्वास">
                                 <field name="is_displacement_involved"/>
+                                <field name="affected_persons_count" invisible="not is_displacement_involved"/>
                                 <field name="rehab_village_id" invisible="not is_displacement_involved"/>
                                 <field name="rehab_tehsil_id" invisible="not is_displacement_involved"/>
                                 <field name="rehab_district_id" invisible="not is_displacement_involved"/>

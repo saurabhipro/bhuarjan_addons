@@ -46,6 +46,11 @@ class Section19Notification(models.Model):
     is_displacement_involved = fields.Boolean(string='Is Displacement Involved? / क्या विस्थापन शामिल है?',
                                               default=False, tracking=True)
     
+    # Number of affected persons for rehabilitation - Related from project
+    affected_persons_count = fields.Integer(string='Affected Persons Count / प्रभावित व्यक्तियों की संख्या',
+                                             related='project_id.affected_persons_count', readonly=True, tracking=True,
+                                             help='Number of persons affected by the proposed land acquisition who will be rehabilitated')
+    
     # Rehabilitation land details (conditional)
     rehab_village_id = fields.Many2one('bhu.village', string='Rehabilitation Village / पुनर्वास ग्राम',
                                        tracking=True)
@@ -149,9 +154,10 @@ class Section19Notification(models.Model):
             ('state', 'in', ['generated', 'signed'])
         ])
         
-        if not section11_reports:
-            # No Section 11 reports found, clear land parcels
-            self.land_parcel_ids = [(5, 0, 0)]
+        # If no Section 11 reports or no land parcels in reports, try to populate from approved surveys directly
+        if not section11_reports or not any(report.land_parcel_ids for report in section11_reports):
+            # Fallback: Populate directly from approved surveys
+            self._populate_land_parcels_from_surveys_direct()
             return
         
         # Get all khasra numbers from Section 11 land parcels with full details
@@ -232,6 +238,69 @@ class Section19Notification(models.Model):
         if parcel_vals:
             self.land_parcel_ids = parcel_vals
     
+    def _populate_land_parcels_from_surveys_direct(self):
+        """Fallback method to populate land parcels directly from approved surveys if Section 11 reports don't exist"""
+        self.ensure_one()
+        if not self.village_id or not self.project_id:
+            return
+        
+        # Get all approved/locked surveys for the selected village and project
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked']),
+            ('khasra_number', '!=', False)
+        ], order='create_date desc')
+        
+        if not surveys:
+            # No approved surveys found, clear land parcels
+            self.land_parcel_ids = [(5, 0, 0)]
+            return
+        
+        # Get all khasra numbers that have objections (Section 15)
+        # Exclude resolved objections (those with resolved_date set)
+        objections = self.env['bhu.section15.objection'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+            ('resolved_date', '=', False)  # Exclude resolved objections
+        ])
+        
+        objection_khasras = set()
+        for objection in objections:
+            if objection.survey_id and objection.survey_id.khasra_number:
+                objection_khasras.add(objection.survey_id.khasra_number)
+        
+        # Group surveys by khasra number (use latest survey for each khasra)
+        survey_map = {}
+        for survey in surveys:
+            if survey.khasra_number and survey.khasra_number not in objection_khasras:
+                # Use the latest survey for each khasra
+                if survey.khasra_number not in survey_map:
+                    survey_map[survey.khasra_number] = survey
+        
+        # Clear existing land parcels
+        self.land_parcel_ids = [(5, 0, 0)]
+        
+        # Create land parcel records from surveys
+        parcel_vals = []
+        for khasra_number in sorted(survey_map.keys()):
+            survey = survey_map[khasra_number]
+            parcel_vals.append((0, 0, {
+                'khasra_number': khasra_number,
+                'area_hectares': survey.acquired_area or 0.0,
+                'survey_number': survey.name or '',
+                'survey_date': survey.survey_date or False,
+                'survey_state': survey.state or False,
+                'district_id': self.district_id.id if self.district_id else False,
+                'tehsil_id': self.tehsil_id.id if self.tehsil_id else False,
+                'village_id': self.village_id.id if self.village_id else False,
+                'project_id': self.project_id.id if self.project_id else False,
+            }))
+        
+        # Set the land parcels
+        if parcel_vals:
+            self.land_parcel_ids = parcel_vals
+    
     @api.model
     def default_get(self, fields_list):
         """Set default values from context"""
@@ -292,6 +361,16 @@ class Section19Notification(models.Model):
             if record.village_id and record.project_id:
                 record._populate_land_parcels_from_surveys()
         return records
+    
+    def write(self, vals):
+        """Override write to repopulate land parcels when village or project changes"""
+        result = super().write(vals)
+        # If village_id or project_id changed, repopulate land parcels
+        if 'village_id' in vals or 'project_id' in vals:
+            for record in self:
+                if record.village_id and record.project_id:
+                    record._populate_land_parcels_from_surveys()
+        return result
     
     def get_qr_code_data(self):
         """Generate QR code data for the notification"""

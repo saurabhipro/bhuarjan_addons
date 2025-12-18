@@ -153,6 +153,9 @@
                                     <field name="affected_families_count" 
                                            invisible="not is_displacement"
                                            string="Number of Families / परिवारों की संख्या"/>
+                                    <field name="affected_persons_count" 
+                                           invisible="not is_displacement"
+                                           string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
                                 </group>
                             </group>
                             <group string="(13) Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय &quot;दो&quot; एवं &quot;तीन&quot; के प्रावधानों से छूट प्रदान की गई है।">

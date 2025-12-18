@@ -299,37 +299,33 @@
                     <div style="margin: 15px 0; font-size: 18px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">3.</span>
                         <span style="margin-left: 8px;">
-                            <t t-if="not notification or not notification.is_displacement_involved">
-                                उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निहित नहीं है।
-                            </t>
-                            <t t-if="notification and notification.is_displacement_involved">
-                                <div style="margin-top: 10px;">
-                                    <div style="text-align: center; font-weight: bold; margin: 15px 0; text-decoration: underline; font-size: 18px !important;">अथवा</div>
-                                    <div style="margin-top: 10px; font-size: 18px !important; line-height: 1.6 !important;">
-                                        उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित
-                                        <span style="text-decoration: underline;">........................</span>
-                                        व्यक्तियों को पुनर्वासित किया जाना प्रस्तावित है। पुनर्वासन तथा पुनर्व्यवस्थापन हेतु ग्राम
-                                        <span t-if="notification.rehab_village_id" t-esc="notification.rehab_village_id.name"/>
-                                        <span t-if="not notification.rehab_village_id" style="text-decoration: underline;">........................</span>
-                                        तहसील
-                                        <span t-if="notification.rehab_tehsil_id" t-esc="notification.rehab_tehsil_id.name"/>
-                                        <span t-if="not notification.rehab_tehsil_id" style="text-decoration: underline;">........................</span>
-                                        जिला
-                                        <span t-if="notification.rehab_district_id" t-esc="notification.rehab_district_id.name"/>
-                                        <span t-if="not notification.rehab_district_id" style="text-decoration: underline;">........................</span>
-                                        की भूमि खसरा नम्बर
-                                        <span t-if="notification.rehab_khasra_number" t-esc="notification.rehab_khasra_number"/>
-                                        <span t-if="not notification.rehab_khasra_number" style="text-decoration: underline;">........................</span>
-                                        रकबा
-                                        <span t-if="notification.rehab_area_hectares" t-esc="'{:.4f}'.format(notification.rehab_area_hectares)"/>
-                                        <span t-if="not notification.rehab_area_hectares" style="text-decoration: underline;">........................</span>
-                                        हेक्टेयर का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व)
-                                        <span t-if="notification.rehab_officer_office_location" t-esc="notification.rehab_officer_office_location"/>
-                                        <span t-if="not notification.rehab_officer_office_location" style="text-decoration: underline;">........................</span>
-                                        के कार्यालय में किया जा सकता है।
-                                    </div>
+                            <div style="margin-top: 10px;">
+                                <div style="text-align: center; font-weight: bold; margin: 15px 0; text-decoration: underline; font-size: 18px !important; padding: 5px;">अथवा</div>
+                                <div style="margin-top: 10px; font-size: 18px !important; line-height: 1.6 !important; padding: 10px;">
+                                    उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित
+                                    <span t-if="notification and notification.affected_persons_count and notification.affected_persons_count > 0" t-esc="notification.affected_persons_count"/>
+                                    <span t-if="not notification or not notification.affected_persons_count or notification.affected_persons_count == 0" style="text-decoration: underline;">........................</span>
+                                    व्यक्तियों को पुनर्वासित किया जाना प्रस्तावित है। पुनर्वासन तथा पुनर्व्यवस्थापन हेतु ग्राम
+                                    <span t-if="notification and notification.rehab_village_id" t-esc="notification.rehab_village_id.name"/>
+                                    <span t-if="not notification or not notification.rehab_village_id" style="text-decoration: underline;">........................</span>
+                                    तहसील
+                                    <span t-if="notification and notification.rehab_tehsil_id" t-esc="notification.rehab_tehsil_id.name"/>
+                                    <span t-if="not notification or not notification.rehab_tehsil_id" style="text-decoration: underline;">........................</span>
+                                    जिला
+                                    <span t-if="notification and notification.rehab_district_id" t-esc="notification.rehab_district_id.name"/>
+                                    <span t-if="not notification or not notification.rehab_district_id" style="text-decoration: underline;">........................</span>
+                                    की भूमि खसरा नम्बर
+                                    <span t-if="notification and notification.rehab_khasra_number" t-esc="notification.rehab_khasra_number"/>
+                                    <span t-if="not notification or not notification.rehab_khasra_number" style="text-decoration: underline;">........................</span>
+                                    रकबा
+                                    <span t-if="notification and notification.rehab_area_hectares" t-esc="'{:.4f}'.format(notification.rehab_area_hectares)"/>
+                                    <span t-if="not notification or not notification.rehab_area_hectares" style="text-decoration: underline;">........................</span>
+                                    हेक्टेयर का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व)
+                                    <span t-if="notification and notification.rehab_officer_office_location" t-esc="notification.rehab_officer_office_location"/>
+                                    <span t-if="not notification or not notification.rehab_officer_office_location" style="text-decoration: underline;">........................</span>
+                                    के कार्यालय में किया जा सकता है।
                                 </div>
-                            </t>
+                            </div>
                         </span>
                     </div>
 

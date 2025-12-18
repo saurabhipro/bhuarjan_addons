@@ -137,7 +137,9 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.survey', state.stats &amp;&amp; state.stats.survey_info ? state.stats.survey_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.survey_info &amp;&amp; state.stats.survey_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button class="btn btn-sm btn-success" 

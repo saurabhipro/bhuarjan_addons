@@ -199,7 +199,9 @@
                                 <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.sia_info &amp;&amp; state.stats.sia_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
@@ -248,7 +250,9 @@
                                 <button t-if="!state.isCollector &amp;&amp; !state.isProjectExempt" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
+                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section4_info &amp;&amp; state.stats.section4_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
@@ -297,7 +301,9 @@
                                 <button t-if="!state.isCollector &amp;&amp; !state.isProjectExempt" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
+                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.expert_info &amp;&amp; state.stats.expert_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
@@ -374,7 +380,9 @@
                                 <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
@@ -412,7 +420,9 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button class="btn btn-sm btn-success" 
@@ -461,7 +471,9 @@
                                 <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
                                     <i class="fa fa-bolt"/> Action
                                 </button>
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section15_info &amp;&amp; state.stats.section15_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
@@ -539,7 +551,9 @@
                                 <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section19_info &amp;&amp; state.stats.section19_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 
@@ -588,7 +602,9 @@
                                 <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.draft.award')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openFirstDocument('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)">
+                                <button class="btn btn-sm btn-info" 
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
+                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.draft_award_info &amp;&amp; state.stats.draft_award_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                                 <button t-if="state.isCollector" class="btn btn-sm btn-success" 

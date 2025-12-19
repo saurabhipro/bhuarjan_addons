@@ -350,6 +350,43 @@ class Section21Notification(models.Model):
         landowner_ids = surveys.mapped('landowner_ids')
         return landowner_ids
     
+    def _get_khasra_landowner_mapping(self):
+        """Get mapping of khasra numbers to landowners from surveys"""
+        self.ensure_one()
+        if not self.land_parcel_ids or not self.village_id or not self.project_id:
+            return []
+        
+        # Get all khasra numbers from land parcels
+        khasra_numbers = self.land_parcel_ids.mapped('khasra_number')
+        
+        # Find all surveys with these khasra numbers
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('khasra_number', 'in', khasra_numbers),
+            ('state', 'in', ['approved', 'locked'])
+        ])
+        
+        # Create mapping: khasra_number -> list of landowners
+        khasra_landowner_map = {}
+        for survey in surveys:
+            khasra = survey.khasra_number
+            if khasra:
+                if khasra not in khasra_landowner_map:
+                    khasra_landowner_map[khasra] = []
+                # Add all landowners from this survey
+                for landowner in survey.landowner_ids:
+                    if landowner.id not in [lo.id for lo in khasra_landowner_map[khasra]]:
+                        khasra_landowner_map[khasra].append(landowner)
+        
+        # Convert to list of tuples: (khasra_number, landowner)
+        result = []
+        for khasra, landowners in khasra_landowner_map.items():
+            for landowner in landowners:
+                result.append((khasra, landowner))
+        
+        return result
+    
     # Override mixin method to generate Section 21 Public Notice PDF
     def action_download_unsigned_file(self):
         """Generate and download Section 21 Public Notice PDF (unsigned) - Override mixin"""
@@ -362,20 +399,21 @@ class Section21Notification(models.Model):
         return self.action_download_unsigned_file()
     
     def action_generate_personal_notices(self):
-        """Generate Section 21 Personal Notices PDF - One for each landowner"""
+        """Generate Section 21 Personal Notices PDF - One for each khasra (khasra-wise)"""
         self.ensure_one()
-        landowners = self._get_landowners_from_parcels()
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
         
-        if not landowners:
+        if not khasra_landowner_mapping:
             raise ValidationError(_('No landowners found for the land parcels. Please ensure surveys are linked to the khasra numbers.'))
         
-        # Create transient records linking landowners with notification
+        # Create transient records - one per khasra with its landowner
         personal_notices = self.env['bhu.section21.personal.notice'].create([
             {
                 'notification_id': self.id,
                 'landowner_id': landowner.id,
+                'khasra_number': khasra,
             }
-            for landowner in landowners
+            for khasra, landowner in khasra_landowner_mapping
         ])
         
         # Generate PDF for all personal notices
@@ -383,27 +421,28 @@ class Section21Notification(models.Model):
         return report_action.report_action(personal_notices)
     
     def action_generate_section21_all(self):
-        """Generate Section 21 - Public notice first, then personal notices for each landowner"""
+        """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
         self.ensure_one()
         
         # Validate village is selected
         if not self.village_id:
             raise ValidationError(_('Please select a village before generating Section 21 notices.'))
         
-        # Get landowners for personal notices
-        landowners = self._get_landowners_from_parcels()
+        # Get khasra-landowner mapping for personal notices
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
         
-        if not landowners:
+        if not khasra_landowner_mapping:
             # If no landowners, just generate public notice
             return self.action_generate_public_notice()
         
-        # Create transient records for personal notices
+        # Create transient records - one per khasra with its landowner
         personal_notices = self.env['bhu.section21.personal.notice'].create([
             {
                 'notification_id': self.id,
                 'landowner_id': landowner.id,
+                'khasra_number': khasra,
             }
-            for landowner in landowners
+            for khasra, landowner in khasra_landowner_mapping
         ])
         
         # Generate personal notices with context flag to include public notice first
@@ -476,10 +515,11 @@ class Section21LandParcel(models.Model):
 
 
 class Section21PersonalNotice(models.TransientModel):
-    """Transient model to link landowners with Section 21 notification for personal notice generation"""
+    """Transient model to link landowners with Section 21 notification for personal notice generation - one per khasra"""
     _name = 'bhu.section21.personal.notice'
     _description = 'Section 21 Personal Notice'
 
     notification_id = fields.Many2one('bhu.section21.notification', string='Notification', required=True)
     landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=True)
+    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, help='Khasra number for this personal notice')
 

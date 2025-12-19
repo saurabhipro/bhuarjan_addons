@@ -253,6 +253,7 @@
             <t t-set="personal_notice" t-value="object or (docs and docs[0]) or None"/>
             <t t-set="landowner" t-value="personal_notice and personal_notice.landowner_id or None"/>
             <t t-set="notification" t-value="personal_notice and personal_notice.notification_id or None"/>
+            <t t-set="khasra_number" t-value="personal_notice and personal_notice.khasra_number or None"/>
             
             <!-- Include Public Notice First if flag is set and this is the first record -->
             <t t-if="include_public_first and public_notification and docs and len(docs) > 0 and docs[0].id == personal_notice.id">
@@ -393,11 +394,14 @@
                             </div>
                         </div>
 
-                        <!-- Land Parcels Table - Filtered for this landowner -->
-                        <t t-set="landowner_khasras" t-value="[]"/>
-                        <t t-if="landowner and notification">
-                            <t t-set="surveys" t-value="request.env['bhu.survey'].search([('village_id', '=', notification.village_id.id), ('project_id', '=', notification.project_id.id), ('landowner_ids', 'in', [landowner.id]), ('state', 'in', ['approved', 'locked'])])"/>
-                            <t t-set="landowner_khasras" t-value="surveys.mapped('khasra_number')"/>
+                        <!-- Land Parcels Table - Show only the specific khasra for this personal notice -->
+                        <t t-set="parcel_data" t-value="None"/>
+                        <t t-if="notification and notification.land_parcel_ids and khasra_number">
+                            <t t-foreach="notification.land_parcel_ids" t-as="parcel">
+                                <t t-if="parcel.khasra_number == khasra_number">
+                                    <t t-set="parcel_data" t-value="parcel"/>
+                                </t>
+                            </t>
                         </t>
                         <table class="schedule-table">
                             <thead>
@@ -408,31 +412,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-if="notification and notification.land_parcel_ids and landowner_khasras">
-                                    <t t-foreach="notification.land_parcel_ids" t-as="parcel">
-                                        <t t-if="parcel.khasra_number in landowner_khasras">
-                                            <tr>
-                                                <td style="font-size: 18px !important; text-align: center;">
-                                                    <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
-                                                    <t t-if="not parcel.khasra_number">........................</t>
-                                                </td>
-                                                <td style="font-size: 18px !important; text-align: center;">
-                                                    <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
-                                                    <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
-                                                </td>
-                                                <td style="font-size: 18px !important; text-align: center;">
-                                                    <t t-if="parcel.remark" t-esc="parcel.remark"/>
-                                                    <t t-if="not parcel.remark" style="text-decoration: underline;">........................</t>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                    </t>
-                                </t>
-                                <t t-if="not notification or not notification.land_parcel_ids or not landowner_khasras">
+                                <t t-if="parcel_data">
                                     <tr>
+                                        <td style="font-size: 18px !important; text-align: center;">
+                                            <t t-if="parcel_data.khasra_number" t-esc="parcel_data.khasra_number"/>
+                                            <t t-if="not parcel_data.khasra_number">........................</t>
+                                        </td>
+                                        <td style="font-size: 18px !important; text-align: center;">
+                                            <t t-if="parcel_data.area_hectares and parcel_data.area_hectares > 0" t-esc="'{:.4f}'.format(parcel_data.area_hectares)"/>
+                                            <t t-if="not parcel_data.area_hectares or parcel_data.area_hectares == 0">........................</t>
+                                        </td>
+                                        <td style="font-size: 18px !important; text-align: center;">
+                                            <t t-if="parcel_data.remark" t-esc="parcel_data.remark"/>
+                                            <t t-if="not parcel_data.remark">--</t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="not parcel_data">
+                                    <tr>
+                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">
+                                            <t t-if="khasra_number" t-esc="khasra_number"/>
+                                            <t t-if="not khasra_number">........................</t>
+                                        </td>
                                         <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important; text-decoration: underline;">........................</td>
+                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">--</td>
                                     </tr>
                                 </t>
                             </tbody>

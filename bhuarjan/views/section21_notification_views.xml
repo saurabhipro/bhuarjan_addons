@@ -26,11 +26,6 @@
         <field name="arch" type="xml">
             <form string="Section 21 Notification / धारा 21 अधिसूचना">
                 <header>
-                    <!-- Download Sec 21 (Unsigned) Button - Generates Public Notice first, then Personal Notices -->
-                    <button name="action_generate_section21_all" string="Download Sec 21 (Unsigned)" type="object" 
-                            class="btn-primary" icon="fa-file-pdf"
-                            title="Download Section 21 Notices (Unsigned): Public notice first, then personal notices for each landowner"/>
-                    
                     <!-- Download Signed Document Button (visible when signed) -->
                     <button name="action_download_signed_document" string="Download Notification" type="object" 
                             class="btn-secondary" icon="fa-download"
@@ -61,36 +56,17 @@
                     </group>
                     
                     <notebook>
-                        <page string="Surveys / सर्वे" icon="fa-clipboard-list" invisible="not project_id or not village_id">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                                <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
-                                <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked</span>
-                                <span style="color: orange; font-weight: bold; margin-left: 15px;" invisible="survey_count != 0">⚠ No surveys found for selected village</span>
-                            </div>
-                            <field name="survey_ids" readonly="1" nolabel="1">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="user_id" string="Surveyor"/>
-                                    <field name="project_id" string="Project"/>
-                                    <field name="district_name" string="District"/>
-                                    <field name="village_id" string="Village"/>
-                                    <field name="khasra_number" string="Khasra Number"/>
-                                    <field name="total_area" string="Total Area"/>
-                                    <field name="acquired_area" string="Acquired Area"/>
-                                    <field name="state" widget="badge" string="Status"
-                                           decoration-success="state == 'approved'" 
-                                           decoration-info="state == 'submitted'" 
-                                           decoration-warning="state == 'draft'"
-                                           decoration-danger="state == 'rejected'"
-                                           decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date" string="Survey Date"/>
-                                </list>
-                            </field>
-                        </page>
                         <page string="File Uploads / फ़ाइल अपलोड">
                             <group>
                                 <!-- SDM Section -->
                                 <group string="SDM Signed File / एसडीएम हस्ताक्षरित फ़ाइल" col="1">
+                                    <!-- Download Sec 21 (Unsigned) Button - Generates Public Notice first, then Personal Notices -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                                        <button name="action_generate_section21_all" string="Download Sec 21 (Unsigned)" type="object" 
+                                                class="btn-primary" icon="fa-file-pdf"
+                                                title="Download Section 21 Notices (Unsigned): Public notice first, then personal notices for each khasra"/>
+                                    </group>
+                                    
                                     <!-- SDM Upload -->
                                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
                                            invisible="state == 'signed'">
@@ -143,6 +119,32 @@
                                     </group>
                                 </group>
                             </group>
+                        </page>
+                        <page string="Surveys / सर्वे" icon="fa-clipboard-list" invisible="not project_id or not village_id">
+                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
+                                <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
+                                <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked</span>
+                                <span style="color: orange; font-weight: bold; margin-left: 15px;" invisible="survey_count != 0">⚠ No surveys found for selected village</span>
+                            </div>
+                            <field name="survey_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="user_id" string="Surveyor"/>
+                                    <field name="project_id" string="Project"/>
+                                    <field name="district_name" string="District"/>
+                                    <field name="village_id" string="Village"/>
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="total_area" string="Total Area"/>
+                                    <field name="acquired_area" string="Acquired Area"/>
+                                    <field name="state" widget="badge" string="Status"
+                                           decoration-success="state == 'approved'" 
+                                           decoration-info="state == 'submitted'" 
+                                           decoration-warning="state == 'draft'"
+                                           decoration-danger="state == 'rejected'"
+                                           decoration-muted="state == 'locked'"/>
+                                    <field name="survey_date" string="Survey Date"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>

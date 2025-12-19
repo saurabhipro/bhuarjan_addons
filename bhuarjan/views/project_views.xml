@@ -125,15 +125,15 @@
                                     <field name="total_cost" nolabel="1"/>
                                 </group>
                                 <group string="(6) Benefits from the Project / परियोजना से लाभ">
-                                    <field name="project_benefits" widget="html" nolabel="1"/>
+                                    <field name="project_benefits" widget="text" nolabel="1"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="(7) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय">
-                                    <field name="compensation_measures" widget="html" nolabel="1"/>
+                                    <field name="compensation_measures" widget="text" nolabel="1"/>
                                 </group>
                                 <group string="(8) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक">
-                                    <field name="other_components" widget="html" nolabel="1"/>
+                                    <field name="other_components" widget="text" nolabel="1"/>
                                 </group>
                             </group>
                             <group>

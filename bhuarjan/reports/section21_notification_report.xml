@@ -275,7 +275,7 @@
                 </t>
                 
                 <t t-if="landowner and notification">
-                <t t-call="web.basic_layout">
+                    <t t-call="web.basic_layout">
                 <style>
                     body, html, .container, .page {
                         font-size: 18px !important;
@@ -460,7 +460,7 @@
                         </div>
                     </div>
                 </div>
-                </t>
+                    </t>
                 </t>
             </t>
         </t>

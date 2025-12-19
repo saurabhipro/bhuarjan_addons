@@ -176,11 +176,46 @@
                                     <strong>विषय:</strong> भूमि अधिग्रहण अधिनियम, 2013 की धारा 21 (1) के अधीन सूचना।
                                 </p>
                                 <p style="margin: 5px 0; text-align: justify;">
-                                    आपको सूचित किया जाता है कि <t t-esc="notification.project_id.department_id.name if (notification.project_id and notification.project_id.department_id) else '........................'"/> द्वारा <t t-esc="notification.project_id.name if notification.project_id else '........................'"/> के लिए आपकी भूमि का अधिग्रहण किया जा रहा है।
+                                    भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
+                                    <span t-if="notification and notification.project_id and notification.project_id.department_id" t-esc="notification.project_id.department_id.name"/>
+                                    <span t-if="not notification or not notification.project_id or not notification.project_id.department_id" style="text-decoration: underline;">........................</span>
+                                    (छ.ग.) के
+                                    <span t-if="notification and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/>
+                                    <span t-if="not notification or not notification.project_id or not notification.project_id.name" style="text-decoration: underline;">........................</span>
+                                    प्रयोजन हेतु।
                                 </p>
                                 <p style="margin: 5px 0; text-align: justify;">
-                                    दिनांक <t t-esc="notification.notice_date.strftime('%d/%m/%Y') if notification.notice_date else '........................'"/> को जारी की गई सूचना के अनुसार, निम्नलिखित भूमि का अधिग्रहण किया जा रहा है:
+                                    राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन
+                                    (<span t-if="notification and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/><span t-if="not notification or not notification.project_id or not notification.project_id.name" style="text-decoration: underline;">........................</span>)
+                                    हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
                                 </p>
+                            </div>
+
+                            <!-- Schedule Separator -->
+                            <div style="text-align: center; margin: 10px 0; font-size: 18px; font-weight: bold;">
+                                <strong>// अनुसूची //</strong>
+                            </div>
+
+                            <!-- Land Details heading -->
+                            <div style="margin: 10px 0; font-size: 18px; font-weight: bold;">
+                                <strong>1) भूमि का विवरण :-</strong>
+                            </div>
+                            <div style="margin-bottom: 8px; font-size: 18px;">
+                                <div style="margin-bottom: 3px;">
+                                    <strong>(क) जिला :-</strong>
+                                    <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
+                                    <span t-if="not notification or not notification.district_id">रायगढ़</span>
+                                </div>
+                                <div style="margin-bottom: 3px;">
+                                    <strong>(ख) तहसील :-</strong>
+                                    <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
+                                    <span t-if="not notification or not notification.tehsil_id" style="text-decoration: underline;">........................</span>
+                                </div>
+                                <div style="margin-bottom: 3px;">
+                                    <strong>(ग) ग्राम :-</strong>
+                                    <span t-if="notification and notification.village_id" t-esc="notification.village_id.name"/>
+                                    <span t-if="not notification or not notification.village_id" style="text-decoration: underline;">........................</span>
+                                </div>
                             </div>
                             
                             <!-- Land Parcels Table - Filter by khasra_number -->

@@ -164,6 +164,14 @@
             <field name="domain_force">[('sdm_ids', 'in', [user.id])]</field>            
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_sdm'))]"/>
         </record>
+
+        <!-- Project Rule for Collector / Additional Collector -->
+        <record id="record_bhu_project_rule_collector" model="ir.rule">
+            <field name="name">Collector can see all projects</field>
+            <field name="model_id" ref="model_bhu_project"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_collector')), (4, ref('bhuarjan.group_bhuarjan_additional_collector'))]"/>
+        </record>
         
         <!-- SIA TEAM -->
         <record id="record_bhu_sia_team_rule" model="ir.rule">

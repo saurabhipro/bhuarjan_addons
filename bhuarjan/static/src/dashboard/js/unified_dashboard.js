@@ -381,13 +381,11 @@ export class UnifiedDashboard extends Component {
         }
         
         // Load projects
-        // For department users, load all projects immediately (no department filter required)
+        // For department and collector dashboards, allow all projects without department selection
         // For others, only load if department is selected (when showDepartmentFilter is true)
-        if (this.dashboardType === 'department') {
-            // Department users can see all projects without selecting department
+        if (this.dashboardType === 'department' || this.dashboardType === 'collector') {
             await this.loadProjects();
         } else if (this.state.selectedDepartment || !this.config.showDepartmentFilter) {
-            // Other dashboards: load projects if department selected or no department filter
             await this.loadProjects();
         }
         
@@ -454,9 +452,9 @@ export class UnifiedDashboard extends Component {
         
         console.log(`loadProjects called - departmentId: ${departmentId}, dashboardType: ${this.dashboardType}, showDepartmentFilter: ${this.config.showDepartmentFilter}`);
         
-        // For department dashboard type, allow loading all projects even without department selection
+        // For department and collector dashboards, allow loading all projects even without department selection
         // For other dashboards, if department filter is shown and no department is selected, clear projects
-        if (departmentId === null && this.config.showDepartmentFilter && this.dashboardType !== 'department') {
+        if (departmentId === null && this.config.showDepartmentFilter && !['department', 'collector'].includes(this.dashboardType)) {
             console.log('No department selected, clearing projects');
             this.state.projects = [];
             return;

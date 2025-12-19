@@ -140,13 +140,13 @@
                                     <group string="Download SIA Documents">
                                         <!-- Download Unsigned SIA -->
                                         <button name="action_download_sia_file" string="Download SIA (Unsigned)" type="object" 
-                                                class="btn-success" icon="fa-file-pdf"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download SIA Proposal (Unsigned)"
                                                 invisible="is_sia_exempt == 'yes'"/>
                                         
                                         <!-- Download SDM Signed SIA -->
                                         <button name="action_download_sdm_signed_file" string="Download SDM Signed SIA" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download SDM Signed Proposal"
                                                 invisible="not sdm_signed_file"/>
                                     </group>

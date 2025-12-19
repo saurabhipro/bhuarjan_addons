@@ -72,28 +72,28 @@
                                     <group string="Download Section 21 Documents">
                                         <!-- Download Public Section 21 -->
                                         <button name="action_generate_public_notice" type="object" 
-                                                class="btn-success" 
+                                                class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download Public Sec 21"
                                                 title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
                                         
                                         <!-- Download Personal Section 21 -->
                                         <button name="action_generate_personal_notices_only" type="object" 
-                                                class="btn-success" 
+                                                class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download Personal Sec 21"
                                                 title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
                                         
                                         <!-- Download All Section 21 -->
                                         <button name="action_generate_section21_all" type="object" 
-                                                class="btn-info" 
+                                                class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download All Sec 21"
                                                 title="Download Both Public and Personal Section 21 Notices in one PDF"/>
                                         
                                         <!-- Download SDM Signed Section 21 -->
                                         <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 21" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download SDM Signed File"
                                                 invisible="not sdm_signed_file"/>
                                     </group>

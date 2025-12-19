@@ -120,12 +120,12 @@
                                     <group string="Download Section 19 Documents">
                                         <!-- Download Unsigned Section 19 -->
                                         <button name="action_download_unsigned_file" string="Download Section 19 (Unsigned)" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download Section 19 Notification (Unsigned)"/>
                                         
                                         <!-- Download SDM Signed Section 19 -->
                                         <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 19" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download SDM Signed Notification"
                                                 invisible="not sdm_signed_file"/>
                                     </group>

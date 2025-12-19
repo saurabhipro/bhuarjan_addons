@@ -94,12 +94,12 @@
                                     <group string="Download Section 11 Documents">
                                         <!-- Download Unsigned Section 11 -->
                                         <button name="action_download_unsigned_file" string="Download Section 11 (Unsigned)" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download Section 11 Report (Unsigned)"/>
                                         
                                         <!-- Download SDM Signed Section 11 -->
                                         <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 11" type="object" 
-                                                class="btn-success" icon="fa-download"
+                                                class="btn-primary" icon="fa-download"
                                                 title="Download SDM Signed Report"
                                                 invisible="not sdm_signed_file"/>
                                     </group>

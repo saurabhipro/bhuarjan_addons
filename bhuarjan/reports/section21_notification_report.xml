@@ -251,7 +251,7 @@
             <t t-set="public_notification" t-value="notification_id and request.env['bhu.section21.notification'].sudo().browse(notification_id) or None"/>
             
             <!-- Include Public Notice First if flag is set - only once at the beginning -->
-            <t t-if="include_public_first and public_notification"></t>
+            <t t-if="include_public_first and public_notification">
                 <!-- Render Public Notice Template - pass the notification as object -->
                 <t t-call="web.html_container">
                     <meta charset="utf-8"/>

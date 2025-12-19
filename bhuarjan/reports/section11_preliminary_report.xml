@@ -18,11 +18,7 @@
             <t t-foreach="docs" t-as="report">
                 <t t-call="web.basic_layout">
                 <style>
-                    /* Override basic_layout styles aggressively */
-                    body, html, .container, .page {
-                        font-size: 18px !important;
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
+                    
                     .letter_space{
                         letter-spacing: 1px !important;
                     }
@@ -37,10 +33,10 @@
                     }
                     /* Normal Text */
                     .normal-text {
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     .normal-text p, .normal-text span, .normal-text strong {
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     /* Global Font Settings - More aggressive */
                     body, .header-section, h2, h3, strong, span, td, th, p, div, .container, .page {
@@ -49,8 +45,8 @@
                     /* Watermark with Logo - Centered on Page */
                     .watermark {
                         position: absolute;
-                        top: 50%;
-                        left: 50%;
+                        top: 25%;
+                        left: 25%;
                         transform: translate(-50%, -50%);
                         opacity: 0.1;
                         z-index: 0;
@@ -65,7 +61,7 @@
                         justify-content: center;
                     }
                     .watermark img {
-                        width: 500px;
+                        width: 600px;
                         height: 500px;
                         object-fit: contain;
                     }
@@ -80,33 +76,26 @@
                         transform: translate(-50%, -50%);
                         z-index: -1;
                     }
-                    /* Ensure content is above watermark */
-                    .container {
-                        position: relative;
-                        z-index: 1;
-                        background: transparent;
-                        box-sizing: border-box;
-                    }
-                    /* Schedule table styling */
+                    
                     .schedule-table {
                         width: 100% !important;
                         border-collapse: collapse !important;
                         margin: 20px 0 !important;
                         border: 2px solid #000 !important;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     .schedule-table th,
                     .schedule-table td {
                         border: 1px solid #000 !important;
                         padding: 6px 8px !important;
                         text-align: center !important;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                         vertical-align: middle !important;
                     }
                     .schedule-table th {
                         background-color: #f5f5f5 !important;
                         font-weight: bold !important;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                         padding: 7px 8px !important;
                     }
                     .schedule-table td {
@@ -118,7 +107,7 @@
                     /* Paragraph sections */
                     .paragraph-section {
                         margin: 15px 0 !important;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                         line-height: 1.6 !important;
                     }
                     .paragraph-number {
@@ -126,13 +115,10 @@
                         display: inline !important;
                         margin-right: 8px !important;
                     }
-                    @page {
-                        size: A4;
-                        margin: 0;
-                    }
+                    
                 </style>
 
-                <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
+                <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative;  height: 100%;">
                     <!-- Watermark with Logo - Centered on Page -->
                     <div class="watermark">
                         <div class="watermark-circle"></div>
@@ -216,36 +202,35 @@
                     </div>
 
                     <!-- Notification Number and Date -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 18px !important;">
-                        <div>
-                            <strong>भू-अर्जन प्रकरण क्रमांक</strong> 
-                            <span t-if="report.notification_number" t-esc="report.notification_number"/>
-                            <span t-if="not report.notification_number">./अ-82/वर्श.</span>
-                        </div>
-                        <div>
+                        <div class="" style="width:100%;text-align:right;">
                             <strong>दिनांक</strong> 
                             <span t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
                             <span t-if="not report.create_date">/ /2025</span>
                         </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 21px !important;">
+                        
+                        <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
+                            <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
+                                <strong>भू-अर्जन प्रकरण क्रमांक</strong>
+                                <span t-if="report.notification_number" t-esc="report.notification_number"/>
+                                <span t-if="not report.notification_number">./अ-82/वर्श.</span>
+                                 चूँकि राज्य शासन को यह प्रतीत होता है कि नीचे अनुसूची के कॉलम (1) से (5) में दर्शित भूमि की, अनुसूची के कॉलम (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वास तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 11 की उपधारा (1) के प्रावधानों के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है कि राज्य शासन, एतद् द्वारा, अनुसूची के कॉलम (6) में उल्लिखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :–
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Main Body Text -->
-                    <div style="font-size: 18px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.6 !important;">
-                            चूंकि राज्य शासन को यह प्रतीत होता है, कि नीचे अनुसूची के कॉलम (1) से (5) में दुर्शित भूमि की, अनुसूची के कॉलम् (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पुड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वासन तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतदू पश्चात अधिनियम, 2013 कुहा जायेगा) की धारा 11 की उपधारा (1) के उपबंधो के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है, कि राज्य शासन, एतदुद्वारा, अनुसूची के कॉलम (6) में उल्लेखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :-
-                        </p>
-                    </div>
                     
                     <!-- Schedule Table -->
                     <div style="margin: 20px 0;">
-                        <div style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
+                        <div style="text-align: center; font-size: 21px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
                             //अनुसूची//
                         </div>
                         <table class="schedule-table">
                             <thead>
                                 <tr>
                                     <th colspan="2" style="width: 20%;"></th>
-                                    <th colspan="3" style="text-align: center; font-size: 18px !important; font-weight: bold !important;">
+                                    <th colspan="3" style="text-align: center; font-size: 21px !important; font-weight: bold !important;">
                                         भूमि का प्रकार
                                     </th>
                                     <th colspan="2" style="width: 40%;"></th>
@@ -264,19 +249,19 @@
                                 <t t-if="report.land_parcel_ids and len(report.land_parcel_ids) > 0">
                                     <t t-foreach="report.land_parcel_ids" t-as="parcel">
                                         <tr>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.khasra_number or '........................'"/>
-                                            <td style="font-size: 18px !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.authorized_officer or '........................'"/>
-                                            <td style="font-size: 18px !important;" t-esc="parcel.public_purpose_description or '........................'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.khasra_number or '........................'"/>
+                                            <td style="font-size: 21px !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.authorized_officer or '........................'"/>
+                                            <td style="font-size: 21px !important;" t-esc="parcel.public_purpose_description or '........................'"/>
                                         </tr>
                                     </t>
                                 </t>
                                 <t t-if="not report.land_parcel_ids or len(report.land_parcel_ids) == 0">
                                     <tr>
-                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 18px !important;">
+                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 21px !important;">
                                             कोई भूमि खंड जोड़ा नहीं गया है
                                         </td>
                                     </tr>
@@ -288,75 +273,62 @@
                     <!-- Paragraphs below table -->
                     <div class="paragraph-section">
                         <span class="paragraph-number">2.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            यह भी सूचित किया जाता है, कि उपर्युक्त भूमि में कोई भी हितधारी व्यक्ति इस अधिसूचना के प्रकाशन की तिथि के 60 दिवस के भीतर अर्जित की जाने वाली भूमि के क्षेत्रफल एवं उपयुक्तता, लोक प्रयोजन के औचित्य तथा सामाजिक समाघात निर्धारण के निष्कर्षों के बारे में अपने दावा/ आपत्ति लिखित में कलेक्टर को स्वयं अथवा अपने अधिकृत व्यक्ति के माध्यम से अधिनियम, 2013 की धारा 15 उपधारा (1) के अंतर्गत प्रस्तुत कर सकेगा।
+                        <span style="font-size: 21px !important; line-height: 1.6 !important;">
+                            यह भी सूचित किया जाता है कि उपरोक्त भूमि में कोई भी हितबद्ध व्यक्ति इस अधिसूचना के प्रकाशन की तिथि के 60 दिवस के भीतर अर्जित की जाने वाली भूमि के क्षेत्रफल एवं उपयुक्तता, लोक प्रयोजन के औचित्य तथा सामाजिक समाघात निर्धारण के निष्कर्षों के बारे में अपना दावा/आपत्ति लिखित में कलेक्टर को स्वयं अथवा अपने द्वारा अधिकृत व्यक्ति के माध्यम से अधिनियम, 2013 की धारा 15 उपधारा (1) के अंतर्गत प्रस्तुत कर सकेगा।
+
                         </span>
                     </div>
 
                     <div class="paragraph-section">
                         <span class="paragraph-number">3.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            भूमि का नक्शा (प्लान) निरीक्षण अनुविभागीय अधिकारी (राजस्व) 
-                            <span t-if="report.map_inspection_location" t-esc="report.map_inspection_location"/>
+                        <span style="font-size: 21px !important; line-height: 1.6 !important;">
+                            भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व) --------------------- के कार्यालय में किया जा सकता है।
+                            <!-- <span t-if="report.map_inspection_location" t-esc="report.map_inspection_location"/>
                             <span t-if="not report.map_inspection_location">........................</span>
-                            के कार्यालय में किया जा सकता है।
+                            के कार्यालय में किया जा सकता है। -->
                         </span>
                     </div>
 
                     <div class="paragraph-section">
                         <span class="paragraph-number">4.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
+                        <span style="font-size: 21px !important; line-height: 1.6 !important;">
                             <t t-if="not report.is_displacement">
-                                प्रस्तावित भू-अर्जन से किसी भी प्रभावित परिवार का विस्थापन निश्चित नहीं है।
+                                प्रस्तावित भू-अर्जन से किसी भी प्रभावित परिवार का विस्थापन निहित नहीं है।
                             </t>
                             <t t-if="report.is_displacement">
                                 प्रस्तावित भू-अर्जन से 
                                 <span t-if="report.affected_families_count" t-esc="report.affected_families_count"/>
                                 <span t-if="not report.affected_families_count">........................</span>
-                                प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
-                            </t>
+                                प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।                            </t>
                         </span>
                     </div>
 
-                    <div class="paragraph-section" style="text-align: center; font-weight: bold; margin: 10px 0; font-size: 18px !important;">
-                        अथवा
-                    </div>
-
-                    <div class="paragraph-section">
-                        <span class="paragraph-number"></span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
-                            प्रस्तावित भू-अर्जन से 
-                            <span t-if="report.affected_families_count" t-esc="report.affected_families_count"/>
-                            <span t-if="not report.affected_families_count">........................</span>
-                            प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
-                        </span>
-                    </div>
+              
+                
 
                     <div class="paragraph-section">
                         <span class="paragraph-number">5.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
+                        <span style="font-size: 21px !important; line-height: 1.6 !important;">
                             <t t-if="report.is_exemption">
                                 <t t-if="report.exemption_details">
                                     <t t-raw="report.exemption_details"/>
                                 </t>
                                 <t t-if="not report.exemption_details">
-                                    प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनांक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।
-                                </t>
+                                    प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग की अधिसूचना क्रमांक एफ 4–28/सात–1/2014, दिनांक 02-03-2015 के द्वारा अधिनियम, 2013 के अध्याय “दो” एवं “तीन” के प्रावधानों से छूट प्रदान की गई है।                                </t>
                             </t>
                             <t t-if="not report.is_exemption">
                                 <t t-if="report.sia_justification">
                                     <t t-raw="report.sia_justification"/>
                                 </t>
                                 <t t-if="not report.sia_justification">
-                                    प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।
-                                </t>
+                                    प्रस्तावित प्रयोजन के भू-अर्जन के लिए कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।                                </t>
                             </t>
                         </span>
                     </div>
 
                     <div class="paragraph-section">
                         <span class="paragraph-number">6.</span>
-                        <span style="font-size: 18px !important; line-height: 1.6 !important;">
+                        <span style="font-size: 21px !important; line-height: 1.6 !important;">
                             प्रस्तावित भू-अर्जन के लिए अधिनियम, 2013 की धारा 43 के तहत अनुविभागीय अधिकारी (राजस्व) 
                             <span t-if="report.rehab_admin_name" t-esc="report.rehab_admin_name"/>
                             <span t-if="not report.rehab_admin_name">........................</span>
@@ -366,11 +338,11 @@
                     
                     <!-- Footer -->
                     <div style="margin-top: 30px; text-align: right;">
-                        <div style="margin: 10px 0; font-size: 18px !important;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
-                        <div style="margin: 10px 0; font-size: 18px !important;">तथा आदेशानुसार</div>
-                        <div style="margin: 20px 0; font-size: 18px !important;">(........................)</div>
+                        <div style="margin: 10px 0; font-size: 21px !important;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
+                        <div style="margin: 10px 0; font-size: 21px !important;">तथा आदेशानुसार</div>
+                        <div style="margin: 20px 0; font-size: 21px !important;">(........................)</div>
                         <div style="margin: 10px 0; font-size: 20px !important; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">कलेक्टर रायगढ़ एवं पदेन उप सचिव</div>
-                        <div style="margin: 5px 0; font-size: 18px !important; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">छ.ग.शासन, राजस्व एवं आपदा प्रबंधन विभाग</div>
+                        <div style="margin: 5px 0; font-size: 21px !important; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">छ.ग.शासन, राजस्व एवं आपदा प्रबंधन विभाग</div>
                     </div>
                 </div>
                 </t>

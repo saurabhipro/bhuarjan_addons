@@ -20,11 +20,6 @@
             <t t-foreach="docs" t-as="sia_team">
                 <t t-call="web.basic_layout">
                 <style>
-                    /* Override basic_layout styles aggressively */
-                    body, html, .container, .page {
-                        font-size: 21px !important;
-                        font-family: 'Noto Sans Devanagari', sans-serif !important;
-                    }
                     .header-info-table { 
                         width: 100% !important; 
                         border-collapse: collapse !important; 
@@ -134,39 +129,19 @@
                         transform: translate(-50%, -50%);
                         z-index: -1;
                     }
-                    /* Ensure content is above watermark */
-                    .container {
-                        position: relative;
-                        z-index: 1;
-                        background: transparent;
-                        box-sizing: border-box;
-                    }
-                    /* Ensure page takes full height */
-                    body, html {
-                        height: 100%;
-                        margin: 0;
-                        padding: 0;
-                        font-size: 21px !important;
-                    }
-                    /* Force font sizes on all text elements */
                     p, span, div, td, th, strong, h2, h3 {
                         font-size: inherit !important;
                     }
-                    /* Table cells */
                     table td, table th {
                         font-size: 21px !important;
                     }
-                    /* Subject and body paragraphs */
                     .subject-section, .body-section {
                         font-size: 21px !important;
                     }
                     .subject-section p, .body-section p {
                         font-size: 21px !important;
                     }
-                    @page {
-                        size: A4;
-                        margin: 0;
-                    }
+                    
                 </style>
 
                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">

@@ -140,6 +140,34 @@ class Section21Notification(models.Model):
                 record.khasra_numbers = ''
                 record.khasra_count = 0
     
+    # Survey-related fields (similar to Section 4)
+    survey_ids = fields.Many2many('bhu.survey', compute='_compute_survey_ids', string='Surveys', readonly=True)
+    survey_count = fields.Integer(string='Survey Count', compute='_compute_survey_ids', readonly=True)
+    approved_survey_count = fields.Integer(string='Approved Survey Count', compute='_compute_survey_ids', readonly=True)
+    all_surveys_approved = fields.Boolean(string='All Surveys Approved', compute='_compute_survey_ids', readonly=True)
+    
+    @api.depends('project_id', 'village_id')
+    def _compute_survey_ids(self):
+        """Compute surveys for selected village and project"""
+        for record in self:
+            if record.project_id and record.village_id:
+                surveys = self.env['bhu.survey'].search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id)
+                ])
+                record.survey_ids = [(6, 0, surveys.ids)]
+                record.survey_count = len(surveys)
+                # Treat both 'approved' and 'locked' as approved
+                approved_or_locked_surveys = surveys.filtered(lambda s: s.state in ('approved', 'locked'))
+                record.approved_survey_count = len(approved_or_locked_surveys)
+                # Check if all surveys are approved or locked (and there are surveys)
+                record.all_surveys_approved = len(surveys) > 0 and len(approved_or_locked_surveys) == len(surveys)
+            else:
+                record.survey_ids = [(5, 0, 0)]
+                record.survey_count = 0
+                record.approved_survey_count = 0
+                record.all_surveys_approved = False
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain to only show project villages"""

@@ -250,13 +250,8 @@
             <t t-set="notification_id" t-value="request.env.context.get('section21_notification_id')"/>
             <t t-set="public_notification" t-value="notification_id and request.env['bhu.section21.notification'].sudo().browse(notification_id) or None"/>
             
-            <t t-set="personal_notice" t-value="object or (docs and docs[0]) or None"/>
-            <t t-set="landowner" t-value="personal_notice and personal_notice.landowner_id or None"/>
-            <t t-set="notification" t-value="personal_notice and personal_notice.notification_id or None"/>
-            <t t-set="khasra_number" t-value="personal_notice and personal_notice.khasra_number or None"/>
-            
-            <!-- Include Public Notice First if flag is set and this is the first record -->
-            <t t-if="include_public_first and public_notification and docs and len(docs) > 0 and docs[0].id == personal_notice.id">
+            <!-- Include Public Notice First if flag is set - only once at the beginning -->
+            <t t-if="include_public_first and public_notification">
                 <!-- Render Public Notice Template - pass the notification as object -->
                 <t t-call="web.html_container">
                     <meta charset="utf-8"/>
@@ -267,7 +262,19 @@
                 <div style="page-break-before: always;"></div>
             </t>
             
-            <t t-if="landowner and notification">
+            <!-- Render all personal notices - iterate through all docs -->
+            <t t-set="all_personal_notices" t-value="docs if docs else (object and [object] or [])"/>
+            <t t-foreach="all_personal_notices" t-as="personal_notice">
+                <t t-set="landowner" t-value="personal_notice and personal_notice.landowner_id or None"/>
+                <t t-set="notification" t-value="personal_notice and personal_notice.notification_id or None"/>
+                <t t-set="khasra_number" t-value="personal_notice and personal_notice.khasra_number or None"/>
+                
+                <!-- Page break between personal notices (not before the first one) -->
+                <t t-if="personal_notice_index > 0">
+                    <div style="page-break-before: always;"></div>
+                </t>
+                
+                <t t-if="landowner and notification">
                 <t t-call="web.basic_layout">
                 <style>
                     body, html, .container, .page {
@@ -453,6 +460,7 @@
                         </div>
                     </div>
                 </div>
+                </t>
                 </t>
             </t>
         </t>

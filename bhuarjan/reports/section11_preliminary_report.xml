@@ -308,6 +308,9 @@
                                 <span t-if="report.affected_families_count" t-esc="report.affected_families_count"/>
                                 <span t-if="not report.affected_families_count">........................</span>
                                 प्रभावित परिवारों का आवास परियोजना क्षेत्र में आ जाने के कारण उनका विस्थापन किया जाना प्रस्तावित है।
+                                लोक प्रयोजन: 
+                                <span t-if="report.project_id and report.project_id.name" t-esc="report.project_id.name"/>
+                                <span t-if="not report.project_id or not report.project_id.name">........................</span>
                             </t>
                         </span>
                     </div>

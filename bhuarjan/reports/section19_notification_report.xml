@@ -295,12 +295,15 @@
                         </span>
                     </div>
 
-                    <!-- Paragraph 3: Displacement -->
+                    <!-- Paragraph 3: Displacement (show either simple line or detailed rehab paragraph based on project flag) -->
+                    <t t-set="is_displacement" t-value="notification.project_id and notification.project_id.is_displacement"/>
                     <div style="margin: 15px 0; font-size: 18px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">3.</span>
                         <span style="margin-left: 8px;">
-                            <div style="margin-top: 10px;">
-                                <div style="text-align: center; font-weight: bold; margin: 15px 0; text-decoration: underline; font-size: 18px !important; padding: 5px;">अथवा</div>
+                            <t t-if="not is_displacement">
+                                उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निश्चित नहीं है।
+                            </t>
+                            <t t-if="is_displacement">
                                 <div style="margin-top: 10px; font-size: 18px !important; line-height: 1.6 !important; padding: 10px;">
                                     उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित
                                     <span t-if="notification and notification.affected_persons_count and notification.affected_persons_count > 0" t-esc="notification.affected_persons_count"/>
@@ -325,7 +328,7 @@
                                     <span t-if="not notification or not notification.rehab_officer_office_location" style="text-decoration: underline;">........................</span>
                                     के कार्यालय में किया जा सकता है।
                                 </div>
-                            </div>
+                            </t>
                         </span>
                     </div>
 

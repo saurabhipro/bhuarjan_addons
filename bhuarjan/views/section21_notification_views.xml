@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 21 Notification List View -->
+    <record id="view_section21_notification_list" model="ir.ui.view">
+        <field name="name">bhu.section21.notification.list</field>
+        <field name="model">bhu.section21.notification</field>
+        <field name="arch" type="xml">
+            <list string="Section 21 Notifications" delete="1">
+                <field name="name" string="Notification Name"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="khasra_numbers" string="Khasra Numbers"/>
+                <field name="khasra_count" string="Khasra Count"/>
+                <field name="notice_date" string="Notice Date"/>
+                <field name="last_date_for_claims" string="Last Date for Claims"/>
+                <field name="state" widget="badge" string="Status" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="signed_date" string="Signed Date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Section 21 Notification Form View -->
+    <record id="view_section21_notification_form" model="ir.ui.view">
+        <field name="name">bhu.section21.notification.form</field>
+        <field name="model">bhu.section21.notification</field>
+        <field name="arch" type="xml">
+            <form string="Section 21 Notification / धारा 21 अधिसूचना">
+                <header>
+                    <!-- Download PDF Button (always visible) -->
+                    <button name="action_download_unsigned_file" string="Download Section 21 PDF" type="object" 
+                            class="btn-primary" icon="fa-file-pdf"
+                            title="Download Section 21 Notification PDF"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed" options="{'clickable': True}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
+                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                            <i class="fa fa-bullhorn" style="margin-right: 10px;"></i>Section 21 Notification / धारा 21 अधिसूचना
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1" 
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="village_id" required="1" 
+                                   options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                                   placeholder="Select village from project..."/>
+                        </group>
+                        <group>
+                            <field name="district_id" readonly="1"/>
+                            <field name="tehsil_id" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Notice Details / नोटिस विवरण">
+                        <field name="notice_date"/>
+                        <field name="last_date_for_claims"/>
+                    </group>
+                    
+                    <group string="Land Parcels / भूमि खंड (Auto-populated from Section 19)">
+                        <field name="land_parcel_ids" nolabel="1">
+                            <list string="Khasra Details">
+                                <field name="khasra_number" string="Khasra Number / खसरा क्रमाक"/>
+                                <field name="area_hectares" string="Area (Hectares) / अर्जित रकबा"/>
+                                <field name="remark" string="Remark / रिमार्क"/>
+                            </list>
+                        </field>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
+                            <group>
+                                <field name="has_signed_document" readonly="1"/>
+                                <field name="signed_document_file" filename="signed_document_filename"/>
+                                <field name="signed_document_filename" invisible="1"/>
+                                <field name="signed_date"/>
+                                <field name="collector_signature" filename="collector_signature_filename"/>
+                                <field name="collector_signature_filename" invisible="1"/>
+                                <field name="collector_name"/>
+                                <field name="additional_collector_name"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 21 Notification Search View -->
+    <record id="view_section21_notification_search" model="ir.ui.view">
+        <field name="name">bhu.section21.notification.search</field>
+        <field name="model">bhu.section21.notification</field>
+        <field name="arch" type="xml">
+            <search string="Section 21 Notifications">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+                <field name="district_id"/>
+                <field name="tehsil_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
+                <separator/>
+                <filter string="With Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Section 21 Notification Action -->
+    <record id="action_section21_notification" model="ir.actions.act_window">
+        <field name="name">Section 21 Notifications / धारा 21 अधिसूचना</field>
+        <field name="res_model">bhu.section21.notification</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Section 21 Notification
+            </p>
+            <p>
+                Section 21 Notification is a public notice inviting claims and objections for land acquisition.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

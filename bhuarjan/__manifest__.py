@@ -38,6 +38,7 @@
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
         'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
+        'reports/report_common_styles.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',
         'reports/section4_notification_report.xml',

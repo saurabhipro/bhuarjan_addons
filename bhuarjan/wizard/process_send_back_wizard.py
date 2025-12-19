@@ -31,5 +31,9 @@ class ProcessSendBackWizard(models.TransientModel):
             body=_('Sent back by %s\n\nReason: %s') % (self.env.user.name, self.reason)
         )
         
+        # Create activity for SDM users
+        if hasattr(record, '_create_send_back_activity'):
+            record._create_send_back_activity()
+        
         return {'type': 'ir.actions.act_window_close'}
 

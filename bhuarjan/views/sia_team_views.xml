@@ -25,72 +25,6 @@
         <field name="arch" type="xml">
             <form string="SIA Team / SIA टीम" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <header>
-                    <!-- File Upload Section for SDM (editable only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                           invisible="state != 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload Signed SIA Proposal"
-                               invisible="is_sia_exempt == 'yes'"/>
-                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                icon="fa-paper-plane"
-                                invisible="(not sdm_signed_file and is_sia_exempt != 'yes')"
-                                confirm="Are you sure want to submit this record."
-                                />
-                    </group>
-                    
-                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file or state == 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="SDM Signed Proposal (Uploaded)"/>
-                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Proposal" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download SDM Signed Proposal"/>
-                    </group>
-                    
-                    <!-- File Upload Section for Collector (editable only in submitted state) -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                           invisible="state != 'submitted'">                        
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload SIA Approval Letter"/>
-                    </group>
-                    
-                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not collector_signed_file or state == 'draft'">
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="Collector Signed Approval (Uploaded)"/>
-                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download Collector Signed Approval"/>
-                    </group>
-                    
-                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file and not collector_signed_file">
-                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                class="btn-primary" icon="fa-file-pdf"
-                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
-                    </group>
-                    
-                    <!-- Download Unsigned PDF Button (visible in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                        <button name="action_download_sia_file" string="Download SIA Proposal (Unsigned)" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download SIA Proposal (Unsigned)"/>
-                    </group>
-                    
                     <!-- Action Buttons Row: Approve, Send Back, Create Section 4 -->
                     <group>
                         <!-- Approve Button (Collector only) -->
@@ -199,42 +133,73 @@
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
                         </page>
-                        <page string="SIA Team Report / SIA टीम रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                            <group>
-                                <group string="Upload SIA Team Report">
-                                    <field name="sia_team_report_file" filename="sia_team_report_filename" 
-                                           string="Upload SIA Team Report" 
-                                           widget="binary"
-                                           nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                                           placeholder="Upload SIA Team Report"/>
-                                    <field name="sia_team_report_filename" invisible="1"/>
+                        <page string="SIA Report / SIA रिपोर्ट">
+                            <!-- SDM Section -->
+                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download SIA Documents">
+                                        <!-- Download Unsigned SIA -->
+                                        <button name="action_download_sia_file" string="Download SIA (Unsigned)" type="object" 
+                                                class="btn-success" icon="fa-file-pdf"
+                                                title="Download SIA Proposal (Unsigned)"
+                                                invisible="is_sia_exempt == 'yes'"/>
+                                        
+                                        <!-- Download SDM Signed SIA -->
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed SIA" type="object" 
+                                                class="btn-success" icon="fa-download"
+                                                title="Download SDM Signed Proposal"
+                                                invisible="not sdm_signed_file"/>
+                                    </group>
+                                    <group string="Upload SDM Signed SIA">
+                                        <!-- Upload SDM Signed File (editable only in draft state) -->
+                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                               string="Upload SDM Signed SIA"
+                                               widget="binary"
+                                               readonly="state != 'draft' or is_sia_exempt == 'yes'"
+                                               placeholder="Upload Signed SIA Proposal"
+                                               invisible="is_sia_exempt == 'yes'"
+                                               help="Upload the signed SIA document from SDM"/>
+                                        <field name="sdm_signed_filename" invisible="1"/>
+                                        
+                                        <!-- Submit Button -->
+                                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-success" 
+                                                icon="fa-paper-plane"
+                                                invisible="(not sdm_signed_file and is_sia_exempt != 'yes') or state != 'draft'"
+                                                confirm="Are you sure want to submit this record."/>
+                                    </group>
                                 </group>
                             </group>
-                            <group invisible="not sia_team_report_file">
-                                <button name="action_download_sia_team_report" string="Download SIA Team Report" type="object" 
-                                        class="btn-primary" icon="fa-download"
-                                        title="Download SIA Team Report"
-                                        groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
+                            
+                            <!-- Collector Section -->
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download SIA Documents">
+                                        <!-- Download Collector Signed SIA -->
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed SIA" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download Collector Signed Approval"
+                                                invisible="not collector_signed_file"/>
+                                        
+                                        <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
+                                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
+                                                class="btn-info" icon="fa-file-pdf"
+                                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                invisible="not sdm_signed_file and not collector_signed_file"/>
+                                    </group>
+                                    <group string="Upload Collector Signed SIA">
+                                        <!-- Upload Collector Signed File (editable only in submitted state) -->
+                                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                                               string="Upload Collector Signed SIA"
+                                               widget="binary"
+                                               readonly="state != 'submitted'"
+                                               placeholder="Upload SIA Approval Letter"
+                                               help="Upload the signed SIA approval document from Collector"/>
+                                        <field name="collector_signed_filename" invisible="1"/>
+                                    </group>
+                                </group>
                             </group>
                         </page>
                     </notebook>
-                        <group>
-                            <div style="text-align:right; padding:2rem;">
-                                <!-- Submit button - only visible to SDM and Admin -->
-                                <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                    icon="fa-paper-plane"
-                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                    invisible="(not sdm_signed_file and is_sia_exempt != 'yes') or state != 'draft'"
-                                    confirm="Are you sure want to submit this record."
-                                    />
-
-                                <!-- Save As Draft button - only visible to SDM and Admin when in draft/send_back state -->
-                                <button name="action_bottom_save" type="object" class="btn btn-primary" 
-                                        groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                        invisible="state not in ('draft', 'send_back')">Save As Draft</button>
-                            </div>
-                        </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

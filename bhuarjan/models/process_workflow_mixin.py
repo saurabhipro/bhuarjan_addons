@@ -126,6 +126,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
                     
                     # If validation passes, post message
                     record._post_state_change_message(old_state, new_state)
+                    
+                    # Create activities based on state transition
+                    if new_state == 'submitted' and old_state == 'draft':
+                        # SDM submitted to Collector
+                        record._create_submission_activity()
+                    elif new_state == 'send_back' and old_state == 'submitted':
+                        # Collector sent back to SDM
+                        record._create_send_back_activity()
+                    elif new_state == 'approved':
+                        # Mark related activities as done
+                        record._mark_activities_done()
         
         return super().write(vals)
     
@@ -174,6 +185,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         self.state = 'submitted'
         self.submitted_date = fields.Datetime.now()
         self.message_post(body=_('Submitted for Collector approval by %s') % self.env.user.name)
+        
+        # Create activity for Collector users
+        self._create_submission_activity()
     
     def action_approve(self):
         """Approve (Collector action)"""
@@ -309,6 +323,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
             self.state = 'submitted'
             self.submitted_date = fields.Datetime.now()
             self.message_post(body=_('Status changed to Submitted by %s') % self.env.user.name)
+            # Create activity for Collector users
+            self._create_submission_activity()
         elif self.state == 'submitted':
             # Already in submitted state
             pass
@@ -330,6 +346,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
             self.state = 'approved'
             self.approved_date = fields.Datetime.now()
             self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
+            # Mark activities as done
+            self._mark_activities_done()
         elif self.state == 'approved':
             # Already in approved state
             pass
@@ -464,4 +482,156 @@ class ProcessWorkflowMixin(models.AbstractModel):
                     record.pending_with = _('SDM / उप-विभागीय मजिस्ट्रेट%s') % days_text
             else:
                 record.pending_with = ''
+    
+    def _create_submission_activity(self):
+        """Create activity for Collector users when SDM submits"""
+        self.ensure_one()
+        
+        # Get all Collector users
+        collector_group = self.env.ref('bhuarjan.group_bhuarjan_collector', raise_if_not_found=False)
+        if not collector_group:
+            return
+        
+        collector_users = self.env['res.users'].search([
+            ('groups_id', 'in', collector_group.id)
+        ])
+        
+        if not collector_users:
+            return
+        
+        # Get model display name
+        model_name = self._name
+        try:
+            model_record = self.env['ir.model'].search([('model', '=', model_name)], limit=1)
+            model_display_name = model_record.name if model_record else model_name
+        except:
+            model_display_name = model_name
+        
+        # Get record name for activity summary
+        record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
+        
+        # Create activity for each Collector user
+        activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
+        if not activity_type:
+            # Fallback: search for 'To Do' activity type
+            activity_type = self.env['mail.activity.type'].search([('name', '=', 'To Do')], limit=1)
+        
+        if not activity_type:
+            return
+        
+        # Get form view action to link activity
+        form_view = self.env['ir.ui.view'].search([
+            ('model', '=', model_name),
+            ('type', '=', 'form')
+        ], limit=1, order='priority desc, id desc')
+        
+        activity_summary = _('%s submitted for approval') % record_name
+        activity_note = _('Please review and approve: %s\n\nProject: %s') % (
+            record_name,
+            getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
+        )
+        
+        # Add village info if available
+        if hasattr(self, 'village_id') and self.village_id:
+            activity_note += _('\nVillage: %s') % self.village_id.name
+        
+        for collector_user in collector_users:
+            # Check if activity already exists for this user and record
+            existing_activity = self.env['mail.activity'].search([
+                ('res_model', '=', model_name),
+                ('res_id', '=', self.id),
+                ('user_id', '=', collector_user.id),
+                ('activity_type_id', '=', activity_type.id),
+                ('summary', '=', activity_summary),
+            ], limit=1)
+            
+            if not existing_activity:
+                self.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    summary=activity_summary,
+                    note=activity_note,
+                    user_id=collector_user.id,
+                )
+    
+    def _create_send_back_activity(self):
+        """Create activity for SDM users when Collector sends back"""
+        self.ensure_one()
+        
+        # Get SDM users - try to get from project first
+        sdm_users = self.env['res.users']
+        
+        if hasattr(self, 'project_id') and self.project_id and self.project_id.sdm_ids:
+            sdm_users = self.project_id.sdm_ids
+        else:
+            # Fallback: get all SDM users
+            sdm_group = self.env.ref('bhuarjan.group_bhuarjan_sdm', raise_if_not_found=False)
+            if sdm_group:
+                sdm_users = self.env['res.users'].search([
+                    ('groups_id', 'in', sdm_group.id)
+                ])
+        
+        if not sdm_users:
+            return
+        
+        # Get model display name
+        model_name = self._name
+        try:
+            model_record = self.env['ir.model'].search([('model', '=', model_name)], limit=1)
+            model_display_name = model_record.name if model_record else model_name
+        except:
+            model_display_name = model_name
+        
+        # Get record name for activity summary
+        record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
+        
+        # Create activity for each SDM user
+        activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
+        if not activity_type:
+            # Fallback: search for 'To Do' activity type
+            activity_type = self.env['mail.activity.type'].search([('name', '=', 'To Do')], limit=1)
+        
+        if not activity_type:
+            return
+        
+        activity_summary = _('%s sent back for revision') % record_name
+        activity_note = _('Please review and resubmit: %s\n\nProject: %s') % (
+            record_name,
+            getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
+        )
+        
+        # Add village info if available
+        if hasattr(self, 'village_id') and self.village_id:
+            activity_note += _('\nVillage: %s') % self.village_id.name
+        
+        for sdm_user in sdm_users:
+            # Check if activity already exists for this user and record
+            existing_activity = self.env['mail.activity'].search([
+                ('res_model', '=', model_name),
+                ('res_id', '=', self.id),
+                ('user_id', '=', sdm_user.id),
+                ('activity_type_id', '=', activity_type.id),
+                ('summary', '=', activity_summary),
+            ], limit=1)
+            
+            if not existing_activity:
+                self.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    summary=activity_summary,
+                    note=activity_note,
+                    user_id=sdm_user.id,
+                )
+    
+    def _mark_activities_done(self):
+        """Mark all pending activities as done when record is approved"""
+        self.ensure_one()
+        
+        # Get all pending activities for this record (activities without date_done are pending)
+        activities = self.env['mail.activity'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('date_done', '=', False),
+        ])
+        
+        if activities:
+            activities.action_done()
 

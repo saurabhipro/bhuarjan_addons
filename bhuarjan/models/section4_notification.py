@@ -551,6 +551,72 @@ class Section4Notification(models.Model):
         """Generate and download Section 4 Notification PDF (unsigned) - Override mixin"""
         return self.action_generate_pdf()
     
+    def action_delete_sdm_signed_file(self):
+        """Delete SDM signed file"""
+        self.ensure_one()
+        if not self.sdm_signed_file:
+            raise ValidationError(_('No SDM signed file to delete.'))
+        
+        # Only allow deletion in draft or send_back state
+        if self.state not in ('draft', 'send_back'):
+            raise ValidationError(_('Cannot delete SDM signed file in current state. Only allowed in Draft or Sent Back state.'))
+        
+        # Check if user is SDM or Admin
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can delete SDM signed file.'))
+        
+        # Clear the binary fields using write to ensure proper update
+        self.write({
+            'sdm_signed_file': False,
+            'sdm_signed_filename': False,
+        })
+        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('SDM signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_delete_collector_signed_file(self):
+        """Delete Collector signed file"""
+        self.ensure_one()
+        if not self.collector_signed_file:
+            raise ValidationError(_('No Collector signed file to delete.'))
+        
+        # Only allow deletion in submitted state
+        if self.state != 'submitted':
+            raise ValidationError(_('Cannot delete Collector signed file in current state. Only allowed in Submitted state.'))
+        
+        # Check if user is Collector or Admin
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only Collector can delete Collector signed file.'))
+        
+        # Clear the binary fields using write to ensure proper update
+        self.write({
+            'collector_signed_file': False,
+            'collector_signed_filename': False,
+        })
+        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Collector signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
     def action_download_pdf(self):
         """Download Section 4 Notification PDF (for generated/signed/notification_11 notifications)"""
         self.ensure_one()

@@ -31,71 +31,15 @@
         <field name="arch" type="xml">
             <form string="Section 4 Notification" edit="not id or not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                 <header>
-                    <!-- File Upload Section for SDM (editable only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload Signed Section 4 Notification"/>
-                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                icon="fa-paper-plane"
-                                invisible="not sdm_signed_file"/>
-                    </group>
-                    
-                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file or state == 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="SDM Signed Notification (Uploaded)"/>
-                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Notification" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download SDM Signed Notification"/>
-                    </group>
-                    
-                    <!-- File Upload Section for Collector (editable only in submitted state) -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'submitted'">
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload Section 4 Approval Letter"/>
-                    </group>
-                    
-                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not collector_signed_file or state == 'draft'">
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="Collector Signed Approval (Uploaded)"/>
-                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download Collector Signed Approval"/>
-                    </group>
-                    
-                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file and not collector_signed_file">
-                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                class="btn-primary" icon="fa-file-pdf"
-                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
-                    </group>
-                    
-                    <!-- Download Unsigned PDF Button (visible in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                        <button name="action_download_unsigned_file" string="Download PDF (Unsigned)" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download Section 4 Notification (Unsigned)"/>
-                    </group>
-                    
-                    <!-- Action Buttons: Approve, Send Back -->
                     <group>
+                        <!-- Submit Button for SDM (in draft state) -->
+                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-success" 
+                                icon="fa-paper-plane"
+                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                invisible="not sdm_signed_file or state != 'draft'"
+                                confirm="Are you sure want to submit this record."/>
+                        
+                        <!-- Action Buttons: Approve, Send Back -->
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                 icon="fa-check"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
@@ -104,13 +48,13 @@
                                 icon="fa-arrow-left"
                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                 invisible="state != 'submitted'"/>
+                        
+                        <!-- Resubmit button (for sent back records) -->
+                        <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                                icon="fa-refresh"
+                                groups="bhuarjan.group_bhuarjan_sdm"
+                                invisible="state != 'send_back'"/>
                     </group>
-                    
-                     <!-- Resubmit button (for sent back records) -->
-                     <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                             icon="fa-refresh"
-                             groups="bhuarjan.group_bhuarjan_sdm"
-                             invisible="state != 'send_back'"/>
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
@@ -157,6 +101,98 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Section 4 Documents / धारा 4 दस्तावेज़">
+                            <!-- SDM Section -->
+                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download Section 4 Documents">
+                                        <!-- Download Unsigned Section 4 -->
+                                        <button name="action_download_unsigned_file" string="Download Section 4 (Unsigned)" type="object" 
+                                                class="btn-success" icon="fa-file-pdf"
+                                                title="Download Section 4 Notification (Unsigned)"/>
+                                        
+                                        <!-- Download SDM Signed Section 4 -->
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 4" type="object" 
+                                                class="btn-success" icon="fa-download"
+                                                title="Download SDM Signed Notification"
+                                                invisible="not sdm_signed_file"/>
+                                    </group>
+                                    <group string="Upload SDM Signed Section 4">
+                                        <!-- Upload SDM Signed File (editable only in draft state) -->
+                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                               string="Upload SDM Signed Section 4"
+                                               widget="binary"
+                                               readonly="state != 'draft'"
+                                               placeholder="Upload Signed Section 4 Notification"
+                                               help="Upload the signed Section 4 document from SDM"
+                                               invisible="sdm_signed_file"/>
+                                        <field name="sdm_signed_filename" invisible="1"/>
+                                        
+                                        <!-- Show uploaded file with delete option -->
+                                        <group invisible="not sdm_signed_file or state != 'draft'">
+                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                       widget="binary"
+                                                       readonly="1"
+                                                       nolabel="1"
+                                                       style="flex: 1;"/>
+                                                <button name="action_delete_sdm_signed_file" string="" type="object" 
+                                                        class="btn btn-sm btn-danger" icon="fa-trash"
+                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
+                                                        title="Delete current file and upload a new one"
+                                                        style="margin-left: 10px;"/>
+                                            </div>
+                                        </group>
+                                    </group>
+                                </group>
+                            </group>
+                            
+                            <!-- Collector Section -->
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download Section 4 Documents">
+                                        <!-- Download Collector Signed Section 4 -->
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed Section 4" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download Collector Signed Approval"
+                                                invisible="not collector_signed_file"/>
+                                        
+                                        <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
+                                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
+                                                class="btn-info" icon="fa-file-pdf"
+                                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                invisible="not sdm_signed_file and not collector_signed_file"/>
+                                    </group>
+                                    <group string="Upload Collector Signed Section 4">
+                                        <!-- Upload Collector Signed File (editable only in submitted state) -->
+                                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                                               string="Upload Collector Signed Section 4"
+                                               widget="binary"
+                                               readonly="state != 'submitted'"
+                                               placeholder="Upload Section 4 Approval Letter"
+                                               help="Upload the signed Section 4 approval document from Collector"
+                                               invisible="collector_signed_file"/>
+                                        <field name="collector_signed_filename" invisible="1"/>
+                                        
+                                        <!-- Show uploaded file with delete option -->
+                                        <group invisible="not collector_signed_file or state != 'submitted'">
+                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                       widget="binary"
+                                                       readonly="1"
+                                                       nolabel="1"
+                                                       style="flex: 1;"/>
+                                                <button name="action_delete_collector_signed_file" string="" type="object" 
+                                                        class="btn btn-sm btn-danger" icon="fa-trash"
+                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
+                                                        title="Delete current file and upload a new one"
+                                                        style="margin-left: 10px;"/>
+                                            </div>
+                                        </group>
+                                    </group>
+                                </group>
+                            </group>
+                        </page>
                         <page string="Surveys" icon="fa-clipboard-list" invisible="not project_id or not village_id">
                             <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
                                 <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>

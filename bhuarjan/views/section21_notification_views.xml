@@ -74,15 +74,47 @@
                                         <group col="2">
                                             <button name="action_generate_public_notice" type="object" 
                                                     class="oe_highlight" 
-                                                    icon="fa-file-pdf"
+                                                    icon="fa-download"
                                                     string="Download Public Sec 21"
-                                                    title="Download Section 21 Public Notice Only"/>
+                                                    style="width: 100%; min-width: 200px;"
+                                                    title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
                                             <button name="action_generate_personal_notices_only" type="object" 
                                                     class="btn-secondary" 
-                                                    icon="fa-file-pdf"
+                                                    icon="fa-download"
                                                     string="Download Personal Sec 21"
-                                                    title="Download Personal Section 21 Notices: One page per khasra"/>
+                                                    style="width: 100%; min-width: 200px;"
+                                                    title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
                                         </group>
+                                    </group>
+                                    
+                                    <!-- Personal Section 21 Upload Section -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                                           string="Personal Section 21 Signed File / व्यक्तिगत धारा 21 हस्ताक्षरित फ़ाइल"
+                                           invisible="state == 'signed'">
+                                        <field name="personal_signed_file" filename="personal_signed_filename" 
+                                               widget="binary"
+                                               nolabel="1"
+                                               placeholder="Select Personal Section 21 Signed PDF to upload"/>
+                                        <button name="action_upload_personal_file" string="Upload Personal Sec 21" type="object" 
+                                                class="btn-primary" icon="fa-upload"
+                                                invisible="not personal_signed_file"
+                                                style="width: 100%; min-width: 200px;"
+                                                title="Upload Personal Section 21 Signed File"/>
+                                    </group>
+                                    
+                                    <!-- Personal Section 21 Download Section -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                           string="Personal Section 21 Signed File / व्यक्तिगत धारा 21 हस्ताक्षरित फ़ाइल"
+                                           invisible="not personal_signed_file">
+                                        <field name="personal_signed_file" filename="personal_signed_filename" 
+                                               widget="binary"
+                                               readonly="1"
+                                               nolabel="1"
+                                               string="Personal Signed File (Uploaded) / व्यक्तिगत हस्ताक्षरित फ़ाइल (अपलोड की गई)"/>
+                                        <button name="action_download_personal_signed_file" string="Download Personal Sec 21" type="object" 
+                                                class="btn-secondary" icon="fa-download"
+                                                style="width: 100%; min-width: 200px;"
+                                                title="Download Personal Section 21 Signed File"/>
                                     </group>
                                     
                                     <!-- SDM Upload -->

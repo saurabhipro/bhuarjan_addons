@@ -65,6 +65,10 @@ class Section21Notification(models.Model):
     collector_signed_file = fields.Binary(string='Collector Signed File / कलेक्टर हस्ताक्षरित फ़ाइल')
     collector_signed_filename = fields.Char(string='Collector Signed File Name / कलेक्टर हस्ताक्षरित फ़ाइल नाम')
     
+    # Personal Section 21 Signed File
+    personal_signed_file = fields.Binary(string='Personal Section 21 Signed File / व्यक्तिगत धारा 21 हस्ताक्षरित फ़ाइल')
+    personal_signed_filename = fields.Char(string='Personal Signed File Name / व्यक्तिगत हस्ताक्षरित फ़ाइल नाम')
+    
     # Collector signature (for reports)
     collector_signature = fields.Binary(string='Collector Signature / कलेक्टर हस्ताक्षर')
     collector_signature_filename = fields.Char(string='Signature File Name')
@@ -412,15 +416,26 @@ class Section21Notification(models.Model):
         if not self.village_id:
             raise ValidationError(_('Please select a village before generating personal notices.'))
         
-        if not self.land_parcel_ids:
-            raise ValidationError(_('No land parcels found. Please populate land parcels first.'))
+        if not self.project_id:
+            raise ValidationError(_('Please select a project before generating personal notices.'))
         
-        # Get all unique khasra numbers from land parcels
-        khasra_numbers = list(set(self.land_parcel_ids.mapped('khasra_number')))
+        # Get khasra numbers directly from surveys (don't check land parcels)
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked']),
+            ('khasra_number', '!=', False)
+        ])
+        
+        if not surveys:
+            raise ValidationError(_('No approved or locked surveys found for the selected village and project.'))
+        
+        # Get all unique khasra numbers directly from surveys
+        khasra_numbers = list(set(surveys.mapped('khasra_number')))
         khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
         
         if not khasra_numbers:
-            raise ValidationError(_('No khasra numbers found in land parcels.'))
+            raise ValidationError(_('No khasra numbers found in surveys. Please ensure surveys have khasra numbers.'))
         
         # Get khasra-landowner mapping for personal notices (if available)
         khasra_landowner_mapping = self._get_khasra_landowner_mapping()
@@ -445,23 +460,35 @@ class Section21Notification(models.Model):
         report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
         return report_action.with_context(
             include_public_notice_first=False,
-            section21_notification_id=self.id
+            section21_notification_id=self.id,
+            active_id=self.id
         ).report_action(personal_notices)
     
     def action_generate_section21_all(self):
         """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
         self.ensure_one()
         
-        # Validate village is selected
+        # Validate village and project are selected
         if not self.village_id:
             raise ValidationError(_('Please select a village before generating Section 21 notices.'))
         
-        if not self.land_parcel_ids:
-            # If no land parcels, just generate public notice
+        if not self.project_id:
+            raise ValidationError(_('Please select a project before generating Section 21 notices.'))
+        
+        # Get khasra numbers directly from surveys (don't check land parcels)
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked']),
+            ('khasra_number', '!=', False)
+        ])
+        
+        if not surveys:
+            # If no surveys, just generate public notice
             return self.action_generate_public_notice()
         
-        # Get all unique khasra numbers from land parcels
-        khasra_numbers = list(set(self.land_parcel_ids.mapped('khasra_number')))
+        # Get all unique khasra numbers directly from surveys
+        khasra_numbers = list(set(surveys.mapped('khasra_number')))
         khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
         
         if not khasra_numbers:
@@ -530,6 +557,18 @@ class Section21Notification(models.Model):
             'target': 'self',
         }
     
+    def action_download_personal_signed_file(self):
+        """Download Personal Section 21 signed file"""
+        self.ensure_one()
+        if not self.personal_signed_file:
+            raise ValidationError(_('No Personal Section 21 signed file available for download.'))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.section21.notification/{self.id}/personal_signed_file/{self.personal_signed_filename or "section21_personal_signed.pdf"}?download=true',
+            'target': 'self',
+        }
+    
     def action_generate_pdf(self):
         """Generate Section 21 Notification PDF - Legacy method (defaults to public)"""
         return self.action_download_unsigned_file()
@@ -542,6 +581,22 @@ class Section21Notification(models.Model):
         self.state = 'signed'
         if not self.signed_date:
             self.signed_date = fields.Date.today()
+    
+    def action_upload_personal_file(self):
+        """Handle upload of Personal Section 21 signed file"""
+        self.ensure_one()
+        if not self.personal_signed_file:
+            raise ValidationError(_('Please select a Personal Section 21 signed file to upload.'))
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Personal Section 21 signed file uploaded successfully.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
 
 class Section21LandParcel(models.Model):

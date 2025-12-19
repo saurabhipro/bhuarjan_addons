@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Document Template PDF Report -->
+    <record id="action_report_document_template_pdf" model="ir.actions.report">
+        <field name="name">Document Template PDF / दस्तावेज़ टेम्पलेट PDF</field>
+        <field name="model">bhu.document.template.master</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.document_template_pdf_report</field>
+        <field name="report_file">bhuarjan.document_template_pdf_report</field>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
+        <field name="print_report_name">'Document_Template_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'Template')</field>
+    </record>
+
+    <!-- Document Template PDF Report Template -->
+    <template id="document_template_pdf_report">
+        <t t-call="web.html_container">
+            <meta charset="utf-8"/>
+            <t t-call="web.basic_layout">
+                <t t-foreach="docs" t-as="object">
+                    <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">
+                                <t t-esc="object.name or 'Document Template'"/>
+                            </h1>
+                            <div style="font-size: 16px; margin-bottom: 5px;">
+                                <strong>Category / श्रेणी:</strong> 
+                                <span t-esc="dict(object._fields['category'].selection).get(object.category, 'N/A')"/>
+                            </div>
+                            <div style="font-size: 16px;">
+                                <strong>District / जिला:</strong> 
+                                <span t-esc="object.district_id.name or 'N/A'"/>
+                            </div>
+                        </div>
+                        
+                        <div style="border-top: 2px solid #000; padding-top: 20px; margin-top: 20px;">
+                            <div t-raw="object.template_content or ''"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
+

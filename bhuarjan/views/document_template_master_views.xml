@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Document Template Master Tree View -->
+    <record id="view_document_template_master_tree" model="ir.ui.view">
+        <field name="name">bhu.document.template.master.tree</field>
+        <field name="model">bhu.document.template.master</field>
+        <field name="arch" type="xml">
+            <list string="Document Templates">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="district_id"/>
+                <field name="user_role_ids" widget="many2many_tags"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Document Template Master Form View -->
+    <record id="view_document_template_master_form" model="ir.ui.view">
+        <field name="name">bhu.document.template.master.form</field>
+        <field name="model">bhu.document.template.master</field>
+        <field name="arch" type="xml">
+            <form string="Document Template Master">
+                <header>
+                    <button name="action_download_word" type="object" class="btn-primary" icon="fa-file-word-o" string="Download Word"/>
+                    <button name="action_download_pdf" type="object" class="btn-secondary" icon="fa-file-pdf-o" string="Download PDF"/>
+                    <button name="action_edit_template" type="object" class="oe_highlight" icon="fa-edit" string="Edit Template"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_download_word" type="object" class="oe_stat_button" icon="fa-file-word-o">
+                            <field name="word_filename" widget="statinfo" string="Word"/>
+                        </button>
+                        <button name="action_download_pdf" type="object" class="oe_stat_button" icon="fa-file-pdf-o">
+                            <field name="pdf_filename" widget="statinfo" string="PDF"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Enter template name..."/>
+                            <field name="category" widget="radio" options="{'horizontal': true}"/>
+                            <field name="district_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="user_role_ids" widget="many2many_tags" 
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   placeholder="Select user roles..."/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Template Content / टेम्पलेट सामग्री" name="template_content">
+                            <field name="template_content" widget="html" 
+                                   placeholder="Enter template content in Hindi here... (Rich text editor)"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Document Template Master Search View -->
+    <record id="view_document_template_master_search" model="ir.ui.view">
+        <field name="name">bhu.document.template.master.search</field>
+        <field name="model">bhu.document.template.master</field>
+        <field name="arch" type="xml">
+            <search string="Document Templates">
+                <field name="name" string="Template Name"/>
+                <field name="category"/>
+                <field name="district_id"/>
+                <field name="user_role_ids"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Section 4" name="section4" domain="[('category', '=', 'section4')]"/>
+                <filter string="Section 11" name="section11" domain="[('category', '=', 'section11')]"/>
+                <filter string="Section 19" name="section19" domain="[('category', '=', 'section19')]"/>
+                <filter string="Section 21" name="section21" domain="[('category', '=', 'section21')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="User Role" name="group_user_role" context="{'group_by': 'user_role_ids'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Document Template Master Action -->
+    <record id="action_bhu_document_template_master" model="ir.actions.act_window">
+        <field name="name">Document Template Master</field>
+        <field name="res_model">bhu.document.template.master</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first document template!
+            </p>
+            <p>
+                Document templates allow you to create reusable templates for various sections (Section 4, 11, 19, 21, etc.)
+                with rich text content in Hindi. You can download templates as Word or PDF files.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+

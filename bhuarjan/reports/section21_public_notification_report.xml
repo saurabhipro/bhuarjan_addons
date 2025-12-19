@@ -26,28 +26,86 @@
                 </t>
                 <t t-call="web.basic_layout">
                 <style>
+                    /* Override basic_layout styles aggressively */
                     body, html, .container, .page {
                         font-size: 18px !important;
                         font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                     }
+                    .letter_space {
+                        letter-spacing: 1px !important;
+                    }
+                    /* Global Font Settings */
                     body, .header-section, h2, h3, strong, span, td, th, p, div, .container, .page {
                         font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                     }
+                    /* Schedule table styling */
                     .schedule-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 15px 0;
+                        width: 100% !important;
+                        border-collapse: collapse !important;
+                        margin: 8px 0 !important;
+                        border: 2px solid #000 !important;
                         font-size: 18px !important;
                     }
                     .schedule-table th, .schedule-table td {
-                        border: 1px solid #000;
-                        padding: 8px;
-                        text-align: center;
+                        border: 1px solid #000 !important;
+                        padding: 6px !important;
+                        text-align: center !important;
                         font-size: 18px !important;
+                        vertical-align: middle !important;
                     }
                     .schedule-table th {
-                        background-color: #f0f0f0;
-                        font-weight: bold;
+                        background-color: #f5f5f5 !important;
+                        font-weight: bold !important;
+                        font-size: 18px !important;
+                        padding: 7px 8px !important;
+                    }
+                    /* Watermark with Logo - Centered on Page */
+                    .watermark {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        opacity: 0.1;
+                        z-index: 0;
+                        pointer-events: none;
+                        width: 600px;
+                        height: 600px;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .watermark img {
+                        width: 500px;
+                        height: 500px;
+                        object-fit: contain;
+                    }
+                    .watermark-circle {
+                        position: absolute;
+                        width: 550px;
+                        height: 550px;
+                        border: 2px solid rgba(0, 0, 0, 0.1);
+                        border-radius: 50%;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        z-index: -1;
+                    }
+                    /* Ensure content is above watermark */
+                    .container {
+                        position: relative;
+                        z-index: 1;
+                        background: transparent;
+                        box-sizing: border-box;
+                    }
+                    /* Ensure page takes full height */
+                    body, html {
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        font-size: 18px !important;
                     }
                     @page {
                         size: A4;
@@ -55,16 +113,24 @@
                     }
                 </style>
 
-                <div class="container" style="padding: 15px; margin: 10px; position: relative;">
+                <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
+                    <!-- Watermark with Logo - Centered on Page -->
+                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
+                    <div class="watermark">
+                        <div class="watermark-circle"></div>
+                        <t t-if="base_url">
+                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark" style="max-width: 100%; height: auto;"/>
+                        </t>
+                    </div>
                     <!-- Header: Collector's Court -->
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h2 style="margin: 0; padding: 0; font-size: 24px; font-weight: bold;">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <h2 style="margin: 0; padding: 0; font-size: 22px; font-weight: bold;">
                             <strong>न्यायालय कलेक्टर, जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span> (छ.ग.)</strong>
                         </h2>
                     </div>
 
                     <!-- Public Notice Header with Date -->
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; font-size: 18px !important;">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 18px !important;">
                         <div>
                             <strong>रायगढ़ दिनाँक</strong>
                             <span t-if="notification and notification.notice_date" t-esc="notification.notice_date.strftime('%d/%m/%Y')"/>
@@ -73,8 +139,8 @@
                     </div>
 
                     <!-- Main Body Text - Paragraph 1 -->
-                    <div style="font-size: 18px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.6 !important;">
+                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
                             भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
                             <span t-if="notification and notification.requisitioning_body" t-esc="notification.requisitioning_body"/>
                             <span t-if="not notification or not notification.requisitioning_body" style="text-decoration: underline;">........................</span>
@@ -86,8 +152,8 @@
                     </div>
 
                     <!-- Main Body Text - Paragraph 2 -->
-                    <div style="font-size: 18px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.6 !important;">
+                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
                             राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                             <span t-if="notification and notification.public_purpose" t-esc="notification.public_purpose"/>
                             <span t-if="not notification or not notification.public_purpose" style="text-decoration: underline;">........................</span>
@@ -96,27 +162,27 @@
                     </div>
 
                     <!-- Schedule Separator -->
-                    <div style="text-align: center; margin: 20px 0; font-size: 18px !important; font-weight: bold;">
+                    <div style="text-align: center; margin: 10px 0; font-size: 18px !important; font-weight: bold;">
                         <strong>// अनूसूची //</strong>
                     </div>
 
                     <!-- Land Details Section -->
-                    <div style="margin: 20px 0;">
-                        <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                    <div style="margin: 10px 0;">
+                        <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 6px;">
                             <strong>1) भूमि का विवरण :-</strong>
                         </div>
-                        <div style="margin-bottom: 15px; font-size: 18px !important;">
-                            <div style="margin-bottom: 5px;">
+                        <div style="margin-bottom: 8px; font-size: 18px !important;">
+                            <div style="margin-bottom: 3px;">
                                 <strong>(क) जिला :-</strong>
                                 <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
                                 <span t-if="not notification or not notification.district_id">रायगढ़</span>
                             </div>
-                            <div style="margin-bottom: 5px;">
+                            <div style="margin-bottom: 3px;">
                                 <strong>(ख) तहसील :-</strong>
                                 <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
                                 <span t-if="not notification or not notification.tehsil_id" style="text-decoration: underline;">........................</span>
                             </div>
-                            <div style="margin-bottom: 5px;">
+                            <div style="margin-bottom: 3px;">
                                 <strong>(ग) ग्राम :-</strong>
                                 <span t-if="notification and notification.village_id" t-esc="notification.village_id.name"/>
                                 <span t-if="not notification or not notification.village_id" style="text-decoration: underline;">........................</span>
@@ -153,9 +219,9 @@
                                 </t>
                                 <t t-if="not land_parcels or len(land_parcels) == 0">
                                     <tr>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">--</td>
+                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
+                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
+                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">--</td>
                                     </tr>
                                 </t>
                             </tbody>
@@ -163,24 +229,24 @@
                     </div>
 
                     <!-- Collector Signature -->
-                    <div style="text-align: right; margin-top: 30px; margin-right: 0;">
-                        <div style="margin: 10px 0; font-size: 18px !important;">
+                    <div style="text-align: right; margin-top: 15px; margin-right: 0;">
+                        <div style="margin: 5px 0; font-size: 18px !important;">
                             <span t-if="notification and notification.collector_name" t-esc="notification.collector_name"/>
                             <span t-if="not notification or not notification.collector_name">कलेक्टर</span>
                         </div>
-                        <div style="margin: 5px 0; font-size: 18px !important;">
+                        <div style="margin: 3px 0; font-size: 18px !important;">
                             जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span>
                         </div>
                     </div>
 
 
                     <!-- Additional Collector Signature -->
-                    <div style="text-align: right; margin-top: 30px; margin-right: 0;">
-                        <div style="margin: 10px 0; font-size: 18px !important;">
+                    <div style="text-align: right; margin-top: 15px; margin-right: 0;">
+                        <div style="margin: 5px 0; font-size: 18px !important;">
                             <span t-if="notification and notification.additional_collector_name" t-esc="notification.additional_collector_name"/>
                             <span t-if="not notification or not notification.additional_collector_name">अपर कलेक्टर</span>
                         </div>
-                        <div style="margin: 5px 0; font-size: 18px !important;">
+                        <div style="margin: 3px 0; font-size: 18px !important;">
                             जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span>
                         </div>
                     </div>

@@ -412,20 +412,32 @@ class Section21Notification(models.Model):
         if not self.village_id:
             raise ValidationError(_('Please select a village before generating personal notices.'))
         
-        # Get khasra-landowner mapping for personal notices
+        if not self.land_parcel_ids:
+            raise ValidationError(_('No land parcels found. Please populate land parcels first.'))
+        
+        # Get all unique khasra numbers from land parcels
+        khasra_numbers = list(set(self.land_parcel_ids.mapped('khasra_number')))
+        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
+        
+        if not khasra_numbers:
+            raise ValidationError(_('No khasra numbers found in land parcels.'))
+        
+        # Get khasra-landowner mapping for personal notices (if available)
         khasra_landowner_mapping = self._get_khasra_landowner_mapping()
+        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
+        khasra_to_landowner = {}
+        for khasra, landowner in khasra_landowner_mapping:
+            if khasra not in khasra_to_landowner:
+                khasra_to_landowner[khasra] = landowner.id if landowner else False
         
-        if not khasra_landowner_mapping:
-            raise ValidationError(_('No landowners found for the selected village. Please ensure surveys are approved and have landowners assigned.'))
-        
-        # Create transient records - one per khasra with its landowner
+        # Create transient records - one per khasra (even if no landowner)
         personal_notices = self.env['bhu.section21.personal.notice'].create([
             {
                 'notification_id': self.id,
-                'landowner_id': landowner.id,
+                'landowner_id': khasra_to_landowner.get(khasra, False),
                 'khasra_number': khasra,
             }
-            for khasra, landowner in khasra_landowner_mapping
+            for khasra in khasra_numbers
         ])
         
         # Generate personal notices WITHOUT public notice first
@@ -444,21 +456,34 @@ class Section21Notification(models.Model):
         if not self.village_id:
             raise ValidationError(_('Please select a village before generating Section 21 notices.'))
         
-        # Get khasra-landowner mapping for personal notices
-        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
-        
-        if not khasra_landowner_mapping:
-            # If no landowners, just generate public notice
+        if not self.land_parcel_ids:
+            # If no land parcels, just generate public notice
             return self.action_generate_public_notice()
         
-        # Create transient records - one per khasra with its landowner
+        # Get all unique khasra numbers from land parcels
+        khasra_numbers = list(set(self.land_parcel_ids.mapped('khasra_number')))
+        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
+        
+        if not khasra_numbers:
+            # If no khasras, just generate public notice
+            return self.action_generate_public_notice()
+        
+        # Get khasra-landowner mapping for personal notices (if available)
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
+        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
+        khasra_to_landowner = {}
+        for khasra, landowner in khasra_landowner_mapping:
+            if khasra not in khasra_to_landowner:
+                khasra_to_landowner[khasra] = landowner.id if landowner else False
+        
+        # Create transient records - one per khasra (even if no landowner)
         personal_notices = self.env['bhu.section21.personal.notice'].create([
             {
                 'notification_id': self.id,
-                'landowner_id': landowner.id,
+                'landowner_id': khasra_to_landowner.get(khasra, False),
                 'khasra_number': khasra,
             }
-            for khasra, landowner in khasra_landowner_mapping
+            for khasra in khasra_numbers
         ])
         
         # Generate personal notices with context flag to include public notice first
@@ -536,6 +561,6 @@ class Section21PersonalNotice(models.TransientModel):
     _description = 'Section 21 Personal Notice'
 
     notification_id = fields.Many2one('bhu.section21.notification', string='Notification', required=True)
-    landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=True)
+    landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=False, help='Landowner (optional - notice can be generated even without landowner)')
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, help='Khasra number for this personal notice')
 

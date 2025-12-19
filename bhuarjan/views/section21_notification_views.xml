@@ -75,13 +75,13 @@
                                             <button name="action_generate_public_notice" type="object" 
                                                     class="oe_highlight" 
                                                     icon="fa-download"
-                                                    string="Download Public Sec 21"
+                                                    string="Public Sec 21"
                                                     style="width: 100%; min-width: 200px;"
                                                     title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
                                             <button name="action_generate_personal_notices_only" type="object" 
                                                     class="btn-secondary" 
                                                     icon="fa-download"
-                                                    string="Download Personal Sec 21"
+                                                    string="Personal Sec 21"
                                                     style="width: 100%; min-width: 200px;"
                                                     title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
                                         </group>

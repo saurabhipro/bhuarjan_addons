@@ -341,39 +341,41 @@ class Section21Notification(models.Model):
         return landowner_ids
     
     def _get_khasra_landowner_mapping(self):
-        """Get mapping of khasra numbers to landowners from surveys"""
+        """Get mapping of khasra numbers to landowners directly from surveys (no land parcel dependency)"""
         self.ensure_one()
-        if not self.land_parcel_ids or not self.village_id or not self.project_id:
+        if not self.village_id or not self.project_id:
             return []
         
-        # Get all khasra numbers from land parcels
-        khasra_numbers = self.land_parcel_ids.mapped('khasra_number')
-        
-        # Find all surveys with these khasra numbers
+        # Find all approved/locked surveys for this village/project with khasra numbers
         surveys = self.env['bhu.survey'].search([
             ('village_id', '=', self.village_id.id),
             ('project_id', '=', self.project_id.id),
-            ('khasra_number', 'in', khasra_numbers),
-            ('state', 'in', ['approved', 'locked'])
+            ('khasra_number', '!=', False),
+            ('state', 'in', ['approved', 'locked']),
         ])
         
-        # Create mapping: khasra_number -> list of landowners
+        # Create mapping: khasra_number -> list of landowners (ensure at least one entry per khasra)
         khasra_landowner_map = {}
         for survey in surveys:
             khasra = survey.khasra_number
-            if khasra:
-                if khasra not in khasra_landowner_map:
-                    khasra_landowner_map[khasra] = []
-                # Add all landowners from this survey
-                for landowner in survey.landowner_ids:
-                    if landowner.id not in [lo.id for lo in khasra_landowner_map[khasra]]:
-                        khasra_landowner_map[khasra].append(landowner)
+            if not khasra:
+                continue
+            if khasra not in khasra_landowner_map:
+                khasra_landowner_map[khasra] = []
+            for landowner in survey.landowner_ids:
+                if landowner.id not in [lo.id for lo in khasra_landowner_map[khasra]]:
+                    khasra_landowner_map[khasra].append(landowner)
+            # If no landowner linked, keep an empty list (handled below)
         
-        # Convert to list of tuples: (khasra_number, landowner)
+        # Convert to list of tuples: (khasra_number, landowner or False)
         result = []
         for khasra, landowners in khasra_landowner_map.items():
-            for landowner in landowners:
-                result.append((khasra, landowner))
+            if landowners:
+                for landowner in landowners:
+                    result.append((khasra, landowner))
+            else:
+                # No landowner for this khasra, still return a placeholder to generate notice
+                result.append((khasra, False))
         
         return result
     

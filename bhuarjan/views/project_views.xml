@@ -97,8 +97,8 @@
                                             string="Surveys"
                                             icon="fa-list-alt"
                                             class="oe_stat_button"
-                                            context="{'default_project_id': parent.id, 'active_id': parent.id, 'active_model': 'bhu.project'}">
-                                        <field name="survey_count_in_project" widget="statinfo" string="Surveys"/>
+                                            context="{'default_project_id': parent.id, 'active_id': parent.id, 'active_model': 'bhu.project', 'compute_survey_count': True}">
+                                        <field name="survey_count_in_project" widget="statinfo" string="Surveys" options="{'no_open': True}"/>
                                     </button>
                                 </list>
                             </field>

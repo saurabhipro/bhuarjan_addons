@@ -60,9 +60,14 @@ class ResUsers(models.Model):
         store=False
     )
     
-    @api.depends('bhuarjan_role')
     def _compute_survey_count_in_project(self):
-        """Compute survey count for patwari in the current project context"""
+        """Compute survey count for patwari in the current project context
+        Counts surveys where:
+        1. Survey was created by this patwari (user_id), OR
+        2. Survey is in a village assigned to this patwari
+        
+        Note: This field is context-dependent and recomputes on every read
+        """
         project_id = self.env.context.get('default_project_id') or self.env.context.get('active_id')
         if not project_id:
             # Try to get from parent record if in Many2many view
@@ -73,12 +78,34 @@ class ResUsers(models.Model):
         
         for user in self:
             if user.bhuarjan_role == 'patwari' and project_id:
-                user.survey_count_in_project = self.env['bhu.survey'].search_count([
+                # Count surveys where:
+                # 1. Created by this patwari, OR
+                # 2. In villages assigned to this patwari
+                village_ids = user.village_ids.ids if user.village_ids else []
+                domain = [
+                    ('project_id', '=', project_id),
+                    '|',
                     ('user_id', '=', user.id),
-                    ('project_id', '=', project_id)
-                ])
+                    ('village_id', 'in', village_ids)
+                ]
+                user.survey_count_in_project = self.env['bhu.survey'].search_count(domain)
             else:
                 user.survey_count_in_project = 0
+    
+    def read(self, fields=None, load='_classic_read'):
+        """Override read to recompute survey_count_in_project when context has project"""
+        result = super().read(fields=fields, load=load)
+        # Force recomputation if survey_count_in_project is being read and context has project
+        if fields is None or 'survey_count_in_project' in fields:
+            project_id = self.env.context.get('default_project_id') or self.env.context.get('active_id')
+            if project_id:
+                # Recompute for all records
+                self._compute_survey_count_in_project()
+                # Update result with recomputed values
+                for record, res in zip(self, result):
+                    if 'survey_count_in_project' in res:
+                        res['survey_count_in_project'] = record.survey_count_in_project
+        return result
 
 
     assigned_project_ids = fields.Many2many(

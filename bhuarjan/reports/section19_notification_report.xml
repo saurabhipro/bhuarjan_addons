@@ -19,15 +19,10 @@
             <t t-if="notification">
                 <t t-call="web.basic_layout">
                 <style>
-                    /* Override basic_layout styles aggressively */
-                    body, html, .container, .page {
-                        font-size: 18px !important;
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
+                    
                     .letter_space{
                         letter-spacing: 1px !important;
                     }
-                    /* Header Text - Bold and Big */
                     .header-text {
                         font-size: 30px !important;
                         font-weight: bold !important;
@@ -36,12 +31,11 @@
                         font-size: 26px !important;
                         font-weight: bold !important;
                     }
-                    /* Normal Text */
                     .normal-text {
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     .normal-text p, .normal-text span, .normal-text strong {
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     /* Global Font Settings - More aggressive */
                     body, .header-section, h2, h3, strong, span, td, th, p, div, .container, .page {
@@ -50,8 +44,8 @@
                     /* Watermark with Logo - Centered on Page */
                     .watermark {
                         position: absolute;
-                        top: 50%;
-                        left: 50%;
+                        top: 25%;
+                        left: 25%;
                         transform: translate(-50%, -50%);
                         opacity: 0.1;
                         z-index: 0;
@@ -66,7 +60,7 @@
                         justify-content: center;
                     }
                     .watermark img {
-                        width: 500px;
+                        width: 600px;
                         height: 500px;
                         object-fit: contain;
                     }
@@ -81,34 +75,25 @@
                         transform: translate(-50%, -50%);
                         z-index: -1;
                     }
-                    /* Ensure content is above watermark */
-                    .container {
-                        position: relative;
-                        z-index: 1;
-                        background: transparent;
-                        box-sizing: border-box;
-                    }
+                    
                     /* Schedule Table */
                     .schedule-table {
                         width: 100%;
                         border-collapse: collapse;
                         margin: 15px 0;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     .schedule-table th, .schedule-table td {
                         border: 1px solid #000;
                         padding: 8px;
                         text-align: center;
-                        font-size: 18px !important;
+                        font-size: 21px !important;
                     }
                     .schedule-table th {
                         background-color: #f0f0f0;
                         font-weight: bold;
                     }
-                    @page {
-                        size: A4;
-                        margin: 0;
-                    }
+                
                 </style>
 
                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
@@ -188,7 +173,7 @@
                     </div>
 
                     <!-- Case Number and Date -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 18px !important;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 21px !important;width:100%">
                         <div>
                             <strong>भू-अर्जन प्रकरण क्रमांक</strong>
                             <span t-if="notification.name and notification.name != 'New'" t-esc="notification.name"/>
@@ -197,7 +182,7 @@
                             <span t-if="notification.create_date" t-esc="notification.create_date.strftime('%Y')"/>
                             <span t-if="not notification.create_date">2025</span>
                         </div>
-                        <div>
+                        <div style="width:100%;text-align:right;">
                             <strong>दिनांक</strong>
                             <span t-if="notification.create_date" t-esc="notification.create_date.strftime('%d/%m/%Y')"/>
                             <span t-if="not notification.create_date"> / /2025</span>
@@ -205,24 +190,24 @@
                     </div>
 
                     <!-- Main Body Text -->
-                    <div style="font-size: 18px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.6 !important;">
-                            चूंकि राज्य शासन को यह प्रतीत होता है, कि नीचे अनुसूची में वर्णित भूमि की
-                            <span t-if="notification and notification.public_purpose" t-esc="notification.public_purpose"/>
+                    <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
+                        <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
+                            चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की
+                            <span t-if="notification and notification.project_id.name" t-esc="notification.project_id.name"/>
                             <span t-if="not notification or not notification.public_purpose">सार्वजनिक प्रयोजन</span>
-                            के लिये आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 19 के तहत यह घोषित किया जाता है कि इस भूमि का उक्त प्रयोजन के लिये आवश्यकता है :-
+                            के लिए आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जाएगा) की धारा 19 के अंतर्गत यह घोषित किया जाता है कि इस भूमि की उक्त प्रयोजन के लिए आवश्यकता है :–
                         </p>
                     </div>
 
                     <!-- Schedule Section -->
                     <div style="margin: 20px 0;">
-                        <div style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
+                        <div style="text-align: center; font-size: 21px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
                             अनुसूची
                         </div>
-                        <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
-                            भूमि का वर्णन :-
+                        <div style="text-align: left; font-size: 21px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
+                            भूमि का विवरण :-
                         </div>
-                        <div style="margin-bottom: 15px; font-size: 18px !important;">
+                        <div style="margin-bottom: 15px; font-size: 21px !important;">
                             <ol style="margin: 0; padding-left: 20px;">
                                 <li style="margin-bottom: 5px;">
                                     जिला
@@ -263,11 +248,11 @@
                                 <t t-if="notification and notification.land_parcel_ids and len(notification.land_parcel_ids) > 0">
                                     <t t-foreach="notification.land_parcel_ids" t-as="parcel">
                                         <tr>
-                                            <td style="font-size: 18px !important; text-align: center;">
+                                            <td style="font-size: 21px !important; text-align: center;">
                                                 <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
                                                 <t t-if="not parcel.khasra_number">........................</t>
                                             </td>
-                                            <td style="font-size: 18px !important; text-align: center;">
+                                            <td style="font-size: 21px !important; text-align: center;">
                                                 <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
                                                 <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
                                             </td>
@@ -276,8 +261,8 @@
                                 </t>
                                 <t t-if="not notification or not notification.land_parcel_ids or len(notification.land_parcel_ids) == 0">
                                     <tr>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
-                                        <td style="text-align: center; padding: 10px; font-size: 18px !important;">........................</td>
+                                        <td style="text-align: center; padding: 10px; font-size: 21px !important;">........................</td>
+                                        <td style="text-align: center; padding: 10px; font-size: 21px !important;">........................</td>
                                     </tr>
                                 </t>
                             </tbody>
@@ -285,26 +270,26 @@
                     </div>
 
                     <!-- Paragraph 2: Map Inspection -->
-                    <div style="margin: 15px 0; font-size: 18px !important; line-height: 1.6 !important;">
+                    <div style="margin: 15px 0; font-size: 21px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">2.</span>
                         <span style="margin-left: 8px;">
                             भूमि का नक्शा (योजना)
                             <span t-if="notification and notification.sdo_office_location" t-esc="notification.sdo_office_location"/>
                             <span t-if="not notification or not notification.sdo_office_location">अनुविभागीय अधिकारी (राजस्व) ........................</span>
-                            के कार्यालय में निरीक्षण किया जा सकता है।
+                            के कार्यालय में किया जा सकता है।
                         </span>
                     </div>
 
                     <!-- Paragraph 3: Displacement (show either simple line or detailed rehab paragraph based on project flag) -->
                     <t t-set="is_displacement" t-value="notification.project_id and notification.project_id.is_displacement"/>
-                    <div style="margin: 15px 0; font-size: 18px !important; line-height: 1.6 !important;">
+                    <div style="margin: 15px 0; font-size: 21px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">3.</span>
                         <span style="margin-left: 8px;">
                             <t t-if="not is_displacement">
-                                उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निश्चित नहीं है।
+                               उक्त भूमि अर्जन में किसी भी व्यक्ति का विस्थापन निहित नहीं है।
                             </t>
                             <t t-if="is_displacement">
-                                <div style="margin-top: 10px; font-size: 18px !important; line-height: 1.6 !important; padding: 10px;">
+                                <div style="margin-top: 10px; font-size: 21px !important; line-height: 1.6 !important; padding: 10px;">
                                     उक्त योजना के लिए अनुमोदित पुनर्वास योजना के अनुसार प्रस्तावित भू-अर्जन से प्रभावित
                                     <span t-if="notification and notification.affected_persons_count and notification.affected_persons_count > 0" t-esc="notification.affected_persons_count"/>
                                     <span t-if="not notification or not notification.affected_persons_count or notification.affected_persons_count == 0" style="text-decoration: underline;">........................</span>
@@ -334,11 +319,11 @@
 
                     <!-- Footer -->
                     <div style="text-align: right; margin-top: 30px; margin-right: 0;">
-                        <div style="margin: 10px 0; font-size: 18px !important;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
-                        <div style="margin: 10px 0; font-size: 18px !important;">तथा आदेशानुसार</div>
-                        <div style="margin: 20px 0; font-size: 18px !important;">(........................)</div>
+                        <div style="margin: 10px 0; font-size: 21px !important;">छत्तीसगढ़ के राज्यपाल के नाम से</div>
+                        <div style="margin: 10px 0; font-size: 21px !important;">तथा आदेशानुसार</div>
+                        <div style="margin: 20px 0; font-size: 21px !important;">(........................)</div>
                         <div style="margin: 10px 0; font-size: 20px !important; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">कलेक्टर रायगढ़ एवं पदेन उप सचिव</div>
-                        <div style="margin: 5px 0; font-size: 18px !important; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग</div>
+                        <div style="margin: 5px 0; font-size: 21px !important; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग</div>
                     </div>
                 </div>
                 </t>

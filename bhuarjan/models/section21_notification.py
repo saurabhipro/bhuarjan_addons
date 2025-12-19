@@ -475,6 +475,17 @@ class Section21Notification(models.Model):
             active_id=self.id
         ).report_action(personal_notices)
     
+
+
+    def action_generate_both_notices(self):
+        self.ensure_one()
+        report_action = self.env.ref(
+            'bhuarjan.action_report_section21_personal_and_public_notification'
+        )
+
+        return report_action.report_action(self)
+        
+
     def action_generate_section21_all(self):
         """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
         self.ensure_one()

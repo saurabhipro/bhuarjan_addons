@@ -84,6 +84,13 @@
                                                     string="Personal Sec 21"
                                                     style="width: 100%; min-width: 200px;"
                                                     title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
+                                            <button name="action_generate_both_notices" type="object" 
+                                                    class="btn-secondary" 
+                                                    icon="fa-download"
+                                                    string="Personal and Public Sec 21"
+                                                    style="width: 100%; min-width: 200px;"
+                                                    title="Download Personal and Public Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
+                                        
                                         </group>
                                     </group>
                                     

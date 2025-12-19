@@ -45,6 +45,7 @@
         'reports/section19_notification_report.xml',
         'reports/section21_public_notification_report.xml',
         'reports/section21_personal_notification_report.xml',
+        'reports/section21_personal_and_public_notification_report.xml',
         'reports/draft_award_report.xml',
         'reports/sia_order_report.xml',
         'reports/expert_committee_proposal_report.xml',

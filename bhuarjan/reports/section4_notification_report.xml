@@ -380,6 +380,9 @@
                             </p>
                         </div>
                         
+                        <!-- Project name for reuse -->
+                        <t t-set="project_name" t-value="wizard.project_id.name if wizard and wizard.project_id and wizard.project_id.name else '........................'"/>
+
                         <div class="questions-section" style="margin-top: 10px !important;">
                             <div class="question-item">
                                 <span class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण :-</span>
@@ -387,7 +390,7 @@
                                     <span class="question-answer"><t t-raw="wizard.brief_description"/></span>
                                 </t>
                                 <t t-if="not wizard.brief_description">
-                                    <span class="question-answer">........................</span>
+                                    <span class="question-answer"><t t-esc="project_name"/></span>
                                 </t>
                             </div>
                             

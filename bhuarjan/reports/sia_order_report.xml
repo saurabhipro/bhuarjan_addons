@@ -19,118 +19,24 @@
             <meta charset="utf-8"/>
             <t t-foreach="docs" t-as="sia_team">
                 <t t-call="web.basic_layout">
+                <!-- Include centralized CSS styles -->
+                <t t-call="bhuarjan.report_common_styles"/>
+                <!-- Report-specific overrides for SIA -->
                 <style>
-                    .header-info-table { 
-                        width: 100% !important; 
-                        border-collapse: collapse !important; 
-                        font-size: 20px !important; 
-                        border: 2px solid #000 !important; 
-                        margin-bottom: 0 !important; 
-                    }
-                    .header-info-table td { 
-                        border: 1px solid #000 !important; 
-                        padding: 6px !important; 
-                        vertical-align: middle !important;
-                        font-size: 20px !important;
-                    }
-                    .letter_space{
-                        letter-spacing: 1px !important;
-                    }
-                    /* Header Text - Bold and Big */
-                    .header-text {
-                        font-size: 30px !important;
-                        font-weight: bold !important;
-                    }
-                    .header-text h3 {
-                        font-size: 26px !important;
-                        font-weight: bold !important;
-                    }
-                    /* Normal Text */
                     .normal-text {
                         font-size: 21px !important;
                     }
                     .normal-text p, .normal-text span, .normal-text strong {
                         font-size: 21px !important;
                     }
-                    /* Table Header - Bold */
                     .table-header {
                         font-size: 21px !important;
-                        font-weight: bold !important;
                     }
-                    /* Legacy class for backward compatibility */
-                    .fsc{
+                    .fsc {
                         font-size: 21px !important;
-                    }
-                    /* Global Font Settings - More aggressive - Use Noto Sans Devanagari for Hindi text */
-                    body, .header-section, .header-info-table, h2, h3, strong, span, td, th, p, div, .container, .page {
-                        font-family: 'Noto Sans Devanagari', sans-serif !important;
-                    }
-                    /* Date and Reference Section - Force layout */
-                    .date-reference-section {
-                        display: flex !important;
-                        justify-content: space-between !important;
-                        align-items: baseline !important;
-                        width: 100% !important;
-                        margin: 4px 0 !important;
                     }
                     .date-reference-section span {
                         font-size: 21px !important;
-                        font-weight: 500 !important;
-                    }
-                    .date-reference-section span:first-child {
-                        text-align: left !important;
-                    }
-                    .date-reference-section span:last-child {
-                        text-align: right !important;
-                        margin-left: auto !important;
-                    }
-                    /* Footer alignment - Force right */
-                    .footer-section {
-                        text-align: right !important;
-                        margin-top: 20px !important;
-                        margin-bottom: 15px !important;
-                    }
-                    .footer-section p {
-                        text-align: right !important;
-                        margin: 5px 0 !important;
-                        line-height: 1.5 !important;
-                    }
-                    /* Watermark with Logo - Centered on Page */
-                    .watermark {
-                        position: absolute;
-                        top: 25%;
-                        left: 25%;
-                        transform: translate(-50%, -50%);
-                        opacity: 0.1;
-                        z-index: 0;
-                        pointer-events: none;
-                        width: 800px;
-                        height: 500px;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .watermark img {
-                        width: 600px;
-                        height: 500px;
-                        object-fit: contain;
-                    }
-                    .watermark-circle {
-                        position: absolute;
-                        width: 550px;
-                        height: 550px;
-                        border: 2px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 50%;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        z-index: -1;
-                    }
-                    p, span, div, td, th, strong, h2, h3 {
-                        font-size: inherit !important;
                     }
                     table td, table th {
                         font-size: 21px !important;
@@ -141,7 +47,19 @@
                     .subject-section p, .body-section p {
                         font-size: 21px !important;
                     }
-                    
+                    .watermark {
+                        top: 25%;
+                        left: 25%;
+                        width: 800px;
+                        height: 500px;
+                    }
+                    .watermark img {
+                        width: 600px;
+                        height: 500px;
+                    }
+                    body, .header-section, .header-info-table, h2, h3, strong, span, td, th, p, div, .container, .page {
+                        font-family: 'Noto Sans Devanagari', sans-serif !important;
+                    }
                 </style>
 
                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">

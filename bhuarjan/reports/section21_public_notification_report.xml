@@ -25,91 +25,12 @@
                     <t t-set="project" t-value="notification.project_id"/>
                 </t>
                 <t t-call="web.basic_layout">
+                <!-- Include centralized CSS styles -->
+                <t t-call="bhuarjan.report_common_styles"/>
+                <!-- Report-specific overrides for Section 21 Public -->
                 <style>
-                    /* Override basic_layout styles aggressively */
-                    body, html, .container, .page {
-                        font-size: 18px !important;
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
-                    .letter_space {
-                        letter-spacing: 1px !important;
-                    }
-                    /* Global Font Settings */
-                    body, .header-section, h2, h3, strong, span, td, th, p, div, .container, .page {
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
-                    /* Schedule table styling */
                     .schedule-table {
-                        width: 100% !important;
-                        border-collapse: collapse !important;
                         margin: 8px 0 !important;
-                        border: 2px solid #000 !important;
-                        font-size: 18px !important;
-                    }
-                    .schedule-table th, .schedule-table td {
-                        border: 1px solid #000 !important;
-                        padding: 6px !important;
-                        text-align: center !important;
-                        font-size: 18px !important;
-                        vertical-align: middle !important;
-                    }
-                    .schedule-table th {
-                        background-color: #f5f5f5 !important;
-                        font-weight: bold !important;
-                        font-size: 18px !important;
-                        padding: 7px 8px !important;
-                    }
-                    /* Watermark with Logo - Centered on Page */
-                    .watermark {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        opacity: 0.1;
-                        z-index: 0;
-                        pointer-events: none;
-                        width: 600px;
-                        height: 600px;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .watermark img {
-                        width: 500px;
-                        height: 500px;
-                        object-fit: contain;
-                    }
-                    .watermark-circle {
-                        position: absolute;
-                        width: 550px;
-                        height: 550px;
-                        border: 2px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 50%;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        z-index: -1;
-                    }
-                    /* Ensure content is above watermark */
-                    .container {
-                        position: relative;
-                        z-index: 1;
-                        background: transparent;
-                        box-sizing: border-box;
-                    }
-                    /* Ensure page takes full height */
-                    body, html {
-                        height: 100%;
-                        margin: 0;
-                        padding: 0;
-                        font-size: 18px !important;
-                    }
-                    @page {
-                        size: A4;
-                        margin: 0;
                     }
                 </style>
 

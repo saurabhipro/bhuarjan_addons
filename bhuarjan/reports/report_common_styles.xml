@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Centralized CSS Styles for All Reports -->
+    <template id="report_common_styles">
+        <style>
+            /* ============================================
+               GLOBAL FONT SETTINGS
+               ============================================ */
+            body, html, .container, .page {
+                font-size: 18px !important;
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+            }
+            
+            body, .header-section, .header-info-table, h2, h3, strong, span, td, th, p, div, .container, .page {
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+            }
+            
+            /* Ensure page takes full height */
+            body, html {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                font-size: 18px !important;
+            }
+            
+            /* Force font sizes on all text elements */
+            p, span, div, td, th, strong, h2, h3 {
+                font-size: inherit !important;
+            }
+            
+            /* Table cells */
+            table td, table th {
+                font-size: 18px !important;
+            }
+            
+            /* ============================================
+               LETTER SPACING
+               ============================================ */
+            .letter_space {
+                letter-spacing: 1px !important;
+            }
+            
+            /* ============================================
+               HEADER TEXT STYLES
+               ============================================ */
+            .header-text {
+                font-size: 30px !important;
+                font-weight: bold !important;
+            }
+            
+            .header-text h3 {
+                font-size: 26px !important;
+                font-weight: bold !important;
+            }
+            
+            /* ============================================
+               NORMAL TEXT STYLES
+               ============================================ */
+            .normal-text {
+                font-size: 18px !important;
+            }
+            
+            .normal-text p, .normal-text span, .normal-text strong {
+                font-size: 18px !important;
+            }
+            
+            /* ============================================
+               TABLE HEADER
+               ============================================ */
+            .table-header {
+                font-size: 18px !important;
+                font-weight: bold !important;
+            }
+            
+            /* Legacy class for backward compatibility */
+            .fsc {
+                font-size: 18px !important;
+            }
+            
+            /* ============================================
+               HEADER INFO TABLE
+               ============================================ */
+            .header-info-table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+                font-size: 20px !important; 
+                border: 2px solid #000 !important; 
+                margin-bottom: 0 !important; 
+            }
+            
+            .header-info-table td { 
+                border: 1px solid #000 !important; 
+                padding: 6px !important; 
+                vertical-align: middle !important;
+                font-size: 20px !important;
+            }
+            
+            /* ============================================
+               DATE AND REFERENCE SECTION
+               ============================================ */
+            .date-reference-section {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: baseline !important;
+                width: 100% !important;
+                margin: 4px 0 !important;
+            }
+            
+            .date-reference-section span {
+                font-size: 18px !important;
+                font-weight: 500 !important;
+            }
+            
+            .date-reference-section span:first-child {
+                text-align: left !important;
+            }
+            
+            .date-reference-section span:last-child {
+                text-align: right !important;
+                margin-left: auto !important;
+            }
+            
+            /* ============================================
+               FOOTER SECTION
+               ============================================ */
+            .footer-section {
+                text-align: right !important;
+                margin-top: 20px !important;
+                margin-bottom: 15px !important;
+            }
+            
+            .footer-section p {
+                text-align: right !important;
+                margin: 5px 0 !important;
+                line-height: 1.5 !important;
+            }
+            
+            /* ============================================
+               WATERMARK WITH LOGO
+               ============================================ */
+            .watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0.1;
+                z-index: 0;
+                pointer-events: none;
+                width: 600px;
+                height: 600px;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .watermark img {
+                width: 500px;
+                height: 500px;
+                object-fit: contain;
+            }
+            
+            .watermark-circle {
+                position: absolute;
+                width: 550px;
+                height: 550px;
+                border: 2px solid rgba(0, 0, 0, 0.1);
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
+            }
+            
+            /* ============================================
+               CONTAINER STYLES
+               ============================================ */
+            .container {
+                position: relative;
+                z-index: 1;
+                background: transparent;
+                box-sizing: border-box;
+            }
+            
+            /* ============================================
+               SUBJECT AND BODY SECTIONS
+               ============================================ */
+            .subject-section, .body-section {
+                font-size: 18px !important;
+            }
+            
+            .subject-section p, .body-section p {
+                font-size: 18px !important;
+            }
+            
+            /* ============================================
+               NOTIFICATION TABLE STYLING
+               ============================================ */
+            .notification-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin: 20px 0 !important;
+                border: 2px solid #000 !important;
+            }
+            
+            .notification-table th,
+            .notification-table td {
+                border: 1px solid #000 !important;
+                padding: 6px 8px !important;
+                text-align: center !important;
+                font-size: 18px !important;
+                vertical-align: middle !important;
+            }
+            
+            .notification-table th {
+                background-color: #f5f5f5 !important;
+                font-weight: bold !important;
+                font-size: 18px !important;
+                padding: 7px 8px !important;
+            }
+            
+            .notification-table td:nth-child(5) {
+                text-align: left !important;
+                padding-left: 10px !important;
+            }
+            
+            /* ============================================
+               SCHEDULE TABLE STYLING
+               ============================================ */
+            .schedule-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin: 8px 0 !important;
+                border: 2px solid #000 !important;
+                font-size: 18px !important;
+            }
+            
+            .schedule-table th, .schedule-table td {
+                border: 1px solid #000 !important;
+                padding: 6px !important;
+                text-align: center !important;
+                font-size: 18px !important;
+                vertical-align: middle !important;
+            }
+            
+            .schedule-table th {
+                background-color: #f5f5f5 !important;
+                font-weight: bold !important;
+                font-size: 18px !important;
+                padding: 7px 8px !important;
+            }
+            
+            /* ============================================
+               QUESTION ITEMS
+               ============================================ */
+            .question-item {
+                margin-bottom: 12px !important;
+                padding: 0 !important;
+                page-break-inside: avoid !important;
+                line-height: 1.8 !important;
+                font-size: 18px !important;
+            }
+            
+            .question-label {
+                font-weight: bold !important;
+                font-size: 18px !important;
+                display: inline !important;
+                text-align: left !important;
+                margin-right: 8px !important;
+                vertical-align: top !important;
+            }
+            
+            .question-answer {
+                display: inline !important;
+                margin-left: 0 !important;
+                text-align: left !important;
+                font-size: 18px !important;
+                line-height: 1.8 !important;
+                padding: 0 !important;
+                vertical-align: top !important;
+            }
+            
+            /* ============================================
+               SECTION DIVIDER
+               ============================================ */
+            .section-divider {
+                border-top: 2px solid #000 !important;
+                margin: 20px 0 !important;
+                width: 100% !important;
+            }
+            
+            /* ============================================
+               SIGNATURE BLOCK
+               ============================================ */
+            .signature-block {
+                margin-top: 80px !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .signature-line {
+                border-top: 2px solid #000 !important;
+                width: 300px !important;
+                margin: 0 auto !important;
+                display: block !important;
+            }
+            
+            .signature-label {
+                font-weight: bold !important;
+                font-size: 20px !important;
+                text-align: center !important;
+                margin-top: 10px !important;
+                letter-spacing: 0.5px !important;
+            }
+            
+            /* ============================================
+               PARAGRAPH SECTIONS
+               ============================================ */
+            .paragraph-section {
+                margin: 15px 0 !important;
+                font-size: 21px !important;
+                line-height: 1.6 !important;
+            }
+            
+            .paragraph-number {
+                font-weight: bold !important;
+                display: inline !important;
+                margin-right: 8px !important;
+            }
+            
+            /* ============================================
+               PAGE SETTINGS
+               ============================================ */
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        </style>
+    </template>
+</odoo>
+

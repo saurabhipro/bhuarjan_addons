@@ -280,7 +280,7 @@ class ReportWizard(models.TransientModel):
                 # Well type
                 well_str = "नहीं"
                 if survey.has_well == 'yes':
-                    if survey.well_type == 'kachcha':
+                    if survey.well_type == 'kaccha':
                         well_str = "हाँ-कच्चा"
                     elif survey.well_type == 'pakka':
                         well_str = "हाँ-पक्का"

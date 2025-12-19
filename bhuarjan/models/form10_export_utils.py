@@ -291,7 +291,7 @@ class Form10ExportUtils(models.AbstractModel):
             well_str = "नहीं"
             if survey.has_well == 'yes':
                 well_count = survey.well_count or 1
-                if survey.well_type == 'kachcha':
+                if survey.well_type == 'kaccha':
                     well_str = f"हाँ-कच्चा ({well_count})" if well_count > 1 else "हाँ-कच्चा"
                 elif survey.well_type == 'pakka':
                     well_str = f"हाँ-पक्का ({well_count})" if well_count > 1 else "हाँ-पक्का"

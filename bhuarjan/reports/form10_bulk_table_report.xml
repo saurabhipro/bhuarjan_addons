@@ -496,7 +496,7 @@
                                                 </td>
                                                 <td style="text-align:center">
                                                     <t t-set="well_count" t-value="s.well_count or 1"/>
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'">
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kaccha'">
                                                         <span style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                         <span t-if="well_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="well_count"/>)</span>
                                                     </span>
@@ -806,7 +806,7 @@
                                                 </td>
                                                 <td style="text-align:center">
                                                     <t t-set="well_count" t-value="s.well_count or 1"/>
-                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kachcha'">
+                                                    <span t-if="s.has_well == 'yes' and s.well_type == 'kaccha'">
                                                         <span style="color:#28a745;font-weight:bold">हाँ-कच्चा</span>
                                                         <span t-if="well_count > 1" style="color:#28a745;font-weight:bold"> (<t t-esc="well_count"/>)</span>
                                                     </span>

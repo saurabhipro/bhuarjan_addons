@@ -12,7 +12,6 @@
                 <field name="khasra_numbers" string="Khasra Numbers"/>
                 <field name="khasra_count" string="Khasra Count"/>
                 <field name="notice_date" string="Notice Date"/>
-                <field name="last_date_for_claims" string="Last Date for Claims"/>
                 <field name="state" widget="badge" string="Status" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
                 <field name="signed_date" string="Signed Date"/>
             </list>
@@ -55,16 +54,35 @@
                         </group>
                     </group>
                     
+                    <group string="Notice Details / नोटिस विवरण">
+                        <group>
+                            <field name="requisitioning_body" readonly="1"/>
+                            <field name="public_purpose" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="notice_date"/>
+                        </group>
+                    </group>
+                    
                     <notebook>
                         <page string="File Uploads / फ़ाइल अपलोड">
                             <group>
                                 <!-- SDM Section -->
                                 <group string="SDM Signed File / एसडीएम हस्ताक्षरित फ़ाइल" col="1">
-                                    <!-- Download Sec 21 (Unsigned) Button - Generates Public Notice first, then Personal Notices -->
+                                    <!-- Download Sec 21 Buttons - Separate buttons for Public and Personal -->
                                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                        <button name="action_generate_section21_all" string="Download Sec 21 (Unsigned)" type="object" 
-                                                class="btn-primary" icon="fa-file-pdf"
-                                                title="Download Section 21 Notices (Unsigned): Public notice first, then personal notices for each khasra"/>
+                                        <group col="2">
+                                            <button name="action_generate_public_notice" type="object" 
+                                                    class="oe_highlight" 
+                                                    icon="fa-file-pdf"
+                                                    string="Download Public Sec 21"
+                                                    title="Download Section 21 Public Notice Only"/>
+                                            <button name="action_generate_personal_notices_only" type="object" 
+                                                    class="btn-secondary" 
+                                                    icon="fa-file-pdf"
+                                                    string="Download Personal Sec 21"
+                                                    title="Download Personal Section 21 Notices: One page per khasra"/>
+                                        </group>
                                     </group>
                                     
                                     <!-- SDM Upload -->

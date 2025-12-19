@@ -30,39 +30,17 @@ class Section21Notification(models.Model):
                               default=fields.Date.today,
                               help='Date of issue of the public notice')
     
-    # Issued Date (for header)
-    issued_date = fields.Date(string='Issued Date / जारी दिनाँक', tracking=True,
-                              default=fields.Date.today,
-                              help='Date when the notice was issued')
+    # Requisitioning Body - Related from project's department
+    requisitioning_body = fields.Char(string='Requisitioning Body / अपेक्षक निकाय', 
+                                     related='project_id.department_id.name', 
+                                     readonly=True, store=True, tracking=True,
+                                     help='Name of the requisitioning body from project department')
     
-    # Requisitioning Body
-    requisitioning_body = fields.Char(string='Requisitioning Body / अपेक्षक निकाय', tracking=True,
-                                      help='Name of the requisitioning body')
-    
-    # Public Purpose
-    public_purpose = fields.Text(string='Public Purpose / सार्वजनिक प्रयोजन', tracking=True,
-                                 help='Description of public purpose for land acquisition')
-    
-    # Last Date for Claims and Objections
-    last_date_for_claims = fields.Date(string='Last Date for Claims / दावे के लिए अंतिम दिनांक', tracking=True,
-                                       help='Last date for submitting claims and objections')
-    
-    # Page Number (for copy recipients section)
-    page_number = fields.Char(string='Page Number / पृ. क्रमांक', tracking=True,
-                              help='Page number for the document')
-    
-    # Copy Recipients Date
-    copy_date = fields.Date(string='Copy Date / दिनांक', tracking=True,
-                           default=fields.Date.today,
-                           help='Date for copy recipients section')
-    
-    # SDO Officer Name (for copy recipients)
-    sdo_officer_name = fields.Char(string='SDO Officer Name / अनुविभागीय अधिकारी का नाम', tracking=True,
-                                   help='Name of Sub-Divisional Officer (Revenue) cum Land Acquisition Officer')
-    
-    # Landowner Name (for copy recipients)
-    landowner_name = fields.Char(string='Landowner Name / भूमिस्वामी का नाम', tracking=True,
-                                 help='Name of landowner for copy recipients section')
+    # Public Purpose - Related from project name
+    public_purpose = fields.Char(string='Public Purpose / सार्वजनिक प्रयोजन', 
+                                 related='project_id.name', 
+                                 readonly=True, store=True, tracking=True,
+                                 help='Public purpose from project name')
     
     # Land Parcels (One2many)
     land_parcel_ids = fields.One2many('bhu.section21.land.parcel', 'notification_id', 
@@ -170,52 +148,60 @@ class Section21Notification(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset village when project changes and set domain to only show project villages"""
-        if self.project_id and self.project_id.village_ids:
-            if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
-                pass
+        """Reset village when project changes and set domain to only show project villages."""
+        if self.project_id:
+            if self.project_id.village_ids:
+                if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
+                    pass
+                else:
+                    self.village_id = False
+                return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
             else:
                 self.village_id = False
-            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+                return {'domain': {'village_id': [('id', '=', False)]}}
         else:
             self.village_id = False
             return {'domain': {'village_id': [('id', '=', False)]}}
     
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_land_parcels(self):
-        """Auto-populate land parcels from Section 19 or Draft Award when village is selected"""
+        """Auto-populate land parcels from surveys when village is selected"""
         if self.village_id and self.project_id:
             self._populate_land_parcels_from_section19()
     
     def _populate_land_parcels_from_section19(self):
-        """Helper method to populate land parcels from Section 19 notification"""
+        """Helper method to populate land parcels directly from approved/locked surveys"""
         self.ensure_one()
         if not self.village_id or not self.project_id:
             return
         
-        # Get Section 19 notification for this village and project
-        section19 = self.env['bhu.section19.notification'].search([
+        # Clear existing land parcels
+        self.land_parcel_ids = [(5, 0, 0)]
+        
+        # Populate directly from approved/locked surveys
+        surveys = self.env['bhu.survey'].search([
             ('village_id', '=', self.village_id.id),
             ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['generated', 'signed'])
-        ], limit=1, order='create_date desc')
+            ('state', 'in', ['approved', 'locked'])
+        ], order='khasra_number')
         
-        if section19 and section19.land_parcel_ids:
-            # Clear existing land parcels
-            self.land_parcel_ids = [(5, 0, 0)]
-            
-            # Create land parcel records from Section 19
-            parcel_vals = []
-            for parcel in section19.land_parcel_ids:
+        # Use a set to track unique khasra numbers to avoid duplicates
+        seen_khasras = set()
+        parcel_vals = []
+        for survey in surveys:
+            if survey.khasra_number and survey.khasra_number not in seen_khasras:
+                seen_khasras.add(survey.khasra_number)
+                # Sum up area for this khasra from all surveys with the same khasra
+                total_area = sum(s.acquired_area or 0.0 for s in surveys if s.khasra_number == survey.khasra_number)
                 parcel_vals.append((0, 0, {
-                    'khasra_number': parcel.khasra_number or '',
-                    'area_hectares': parcel.area_hectares or 0.0,
+                    'khasra_number': survey.khasra_number,
+                    'area_hectares': total_area,
                     'remark': '',  # Default empty remark
                 }))
-            
-            # Set the land parcels
-            if parcel_vals:
-                self.land_parcel_ids = parcel_vals
+        
+        # Set the land parcels
+        if parcel_vals:
+            self.land_parcel_ids = parcel_vals
     
     @api.model
     def default_get(self, fields_list):
@@ -419,6 +405,36 @@ class Section21Notification(models.Model):
         # Generate PDF for all personal notices
         report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
         return report_action.report_action(personal_notices)
+    
+    def action_generate_personal_notices_only(self):
+        """Generate Personal Section 21 Notices Only - One page per khasra (without public notice)"""
+        self.ensure_one()
+        if not self.village_id:
+            raise ValidationError(_('Please select a village before generating personal notices.'))
+        
+        # Get khasra-landowner mapping for personal notices
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
+        
+        if not khasra_landowner_mapping:
+            raise ValidationError(_('No landowners found for the selected village. Please ensure surveys are approved and have landowners assigned.'))
+        
+        # Create transient records - one per khasra with its landowner
+        personal_notices = self.env['bhu.section21.personal.notice'].create([
+            {
+                'notification_id': self.id,
+                'landowner_id': landowner.id,
+                'khasra_number': khasra,
+            }
+            for khasra, landowner in khasra_landowner_mapping
+        ])
+        
+        # Generate personal notices WITHOUT public notice first
+        # This will generate one page per khasra using only the personal template
+        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        return report_action.with_context(
+            include_public_notice_first=False,
+            section21_notification_id=self.id
+        ).report_action(personal_notices)
     
     def action_generate_section21_all(self):
         """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""

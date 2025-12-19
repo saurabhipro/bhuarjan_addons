@@ -59,13 +59,13 @@ class DashboardStats(models.AbstractModel):
         'bhu.section11.preliminary.report',
         'bhu.section15.objection',
         'bhu.section19.notification',
+        'bhu.section21.notification',
     ]
 
     # Models that don't have village_id field (only project filtering)
     MODELS_WITHOUT_VILLAGE = [
         'bhu.expert.committee.report',
         'bhu.sia.team',
-        'bhu.draft.award',
     ]
 
     # ========== Helper Methods ==========
@@ -392,12 +392,12 @@ class DashboardStats(models.AbstractModel):
             'sia': self._get_section_counts('bhu.sia.team', domain_without_village),
         }
         
-        # Draft Award uses 'signed' state instead of 'approved'
+        # Section 21 Notification uses 'signed' state instead of 'approved'
         counts['draft_award'] = {
-            'total': self._get_model_count_by_status('bhu.draft.award', domain_without_village, None),
-            'approved': self._get_model_count_by_status('bhu.draft.award', domain_without_village, 'signed'),
-            'draft': self._get_model_count_by_status('bhu.draft.award', domain_without_village, 'draft'),
-            'generated': self._get_model_count_by_status('bhu.draft.award', domain_without_village, 'generated'),
+            'total': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, None),
+            'approved': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'signed'),
+            'draft': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'draft'),
+            'generated': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'generated'),
         }
         
         return counts

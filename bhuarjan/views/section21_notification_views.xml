@@ -26,10 +26,16 @@
         <field name="arch" type="xml">
             <form string="Section 21 Notification / धारा 21 अधिसूचना">
                 <header>
-                    <!-- Download PDF Button (always visible) -->
-                    <button name="action_download_unsigned_file" string="Download Section 21 PDF" type="object" 
+                    <!-- Download Sec 21 (Unsigned) Button - Generates Public Notice first, then Personal Notices -->
+                    <button name="action_generate_section21_all" string="Download Sec 21 (Unsigned)" type="object" 
                             class="btn-primary" icon="fa-file-pdf"
-                            title="Download Section 21 Notification PDF"/>
+                            title="Download Section 21 Notices (Unsigned): Public notice first, then personal notices for each landowner"/>
+                    
+                    <!-- Download Signed Document Button (visible when signed) -->
+                    <button name="action_download_signed_document" string="Download Notification" type="object" 
+                            class="btn-secondary" icon="fa-download"
+                            invisible="not signed_document_file or state != 'signed'"
+                            title="Download Signed Section 21 Notification PDF"/>
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed" options="{'clickable': True}"/>
                 </header>
@@ -39,6 +45,7 @@
                             <i class="fa fa-bullhorn" style="margin-right: 10px;"></i>Section 21 Notification / धारा 21 अधिसूचना
                         </h1>
                     </div>
+                    
                     <group>
                         <group>
                             <field name="project_id" required="1" 
@@ -53,32 +60,62 @@
                         </group>
                     </group>
                     
-                    <group string="Notice Details / नोटिस विवरण">
-                        <field name="notice_date"/>
-                        <field name="last_date_for_claims"/>
-                    </group>
-                    
-                    <group string="Land Parcels / भूमि खंड (Auto-populated from Section 19)">
-                        <field name="land_parcel_ids" nolabel="1">
-                            <list string="Khasra Details">
-                                <field name="khasra_number" string="Khasra Number / खसरा क्रमाक"/>
-                                <field name="area_hectares" string="Area (Hectares) / अर्जित रकबा"/>
-                                <field name="remark" string="Remark / रिमार्क"/>
-                            </list>
-                        </field>
-                    </group>
-                    
                     <notebook>
-                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
+                        <page string="File Uploads / फ़ाइल अपलोड">
                             <group>
-                                <field name="has_signed_document" readonly="1"/>
-                                <field name="signed_document_file" filename="signed_document_filename"/>
-                                <field name="signed_document_filename" invisible="1"/>
-                                <field name="signed_date"/>
-                                <field name="collector_signature" filename="collector_signature_filename"/>
-                                <field name="collector_signature_filename" invisible="1"/>
-                                <field name="collector_name"/>
-                                <field name="additional_collector_name"/>
+                                <!-- SDM Section -->
+                                <group string="SDM Signed File / एसडीएम हस्ताक्षरित फ़ाइल" col="1">
+                                    <!-- SDM Upload -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
+                                           invisible="state == 'signed'">
+                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                               widget="binary"
+                                               nolabel="1"
+                                               placeholder="Select SDM Signed Section 21 PDF to upload"/>
+                                        <button name="action_mark_signed" string="Upload SDM File" type="object" 
+                                                class="btn-primary" icon="fa-upload"
+                                                invisible="not sdm_signed_file"
+                                                title="Upload and mark notification as signed"/>
+                                    </group>
+                                    
+                                    <!-- SDM Download -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                           invisible="not sdm_signed_file">
+                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                               widget="binary"
+                                               readonly="1"
+                                               nolabel="1"
+                                               string="SDM Signed File (Uploaded) / एसडीएम हस्ताक्षरित फ़ाइल (अपलोड की गई)"/>
+                                        <button name="action_download_sdm_signed_file" string="Download SDM File" type="object" 
+                                                class="btn-secondary" icon="fa-download"
+                                                title="Download SDM Signed File"/>
+                                    </group>
+                                </group>
+                                
+                                <!-- Collector Section -->
+                                <group string="Collector Signed File / कलेक्टर हस्ताक्षरित फ़ाइल" col="1">
+                                    <!-- Collector Upload -->
+                                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                                           invisible="state != 'generated' and state != 'signed'">
+                                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                                               widget="binary"
+                                               nolabel="1"
+                                               placeholder="Select Collector Signed Section 21 PDF to upload"/>
+                                    </group>
+                                    
+                                    <!-- Collector Download -->
+                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                           invisible="not collector_signed_file">
+                                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                                               widget="binary"
+                                               readonly="1"
+                                               nolabel="1"
+                                               string="Collector Signed File (Uploaded) / कलेक्टर हस्ताक्षरित फ़ाइल (अपलोड की गई)"/>
+                                        <button name="action_download_collector_signed_file" string="Download Collector File" type="object" 
+                                                class="btn-secondary" icon="fa-download"
+                                                title="Download Collector Signed File"/>
+                                    </group>
+                                </group>
                             </group>
                         </page>
                     </notebook>

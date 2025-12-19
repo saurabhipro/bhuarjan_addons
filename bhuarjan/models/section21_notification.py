@@ -13,6 +13,10 @@ class Section21Notification(models.Model):
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     
+    # Title field
+    title = fields.Char(string='Title / शीर्षक', tracking=True,
+                       help='Title for the Section 21 notification')
+    
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id())
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
@@ -26,9 +30,39 @@ class Section21Notification(models.Model):
                               default=fields.Date.today,
                               help='Date of issue of the public notice')
     
+    # Issued Date (for header)
+    issued_date = fields.Date(string='Issued Date / जारी दिनाँक', tracking=True,
+                              default=fields.Date.today,
+                              help='Date when the notice was issued')
+    
+    # Requisitioning Body
+    requisitioning_body = fields.Char(string='Requisitioning Body / अपेक्षक निकाय', tracking=True,
+                                      help='Name of the requisitioning body')
+    
+    # Public Purpose
+    public_purpose = fields.Text(string='Public Purpose / सार्वजनिक प्रयोजन', tracking=True,
+                                 help='Description of public purpose for land acquisition')
+    
     # Last Date for Claims and Objections
     last_date_for_claims = fields.Date(string='Last Date for Claims / दावे के लिए अंतिम दिनांक', tracking=True,
                                        help='Last date for submitting claims and objections')
+    
+    # Page Number (for copy recipients section)
+    page_number = fields.Char(string='Page Number / पृ. क्रमांक', tracking=True,
+                              help='Page number for the document')
+    
+    # Copy Recipients Date
+    copy_date = fields.Date(string='Copy Date / दिनांक', tracking=True,
+                           default=fields.Date.today,
+                           help='Date for copy recipients section')
+    
+    # SDO Officer Name (for copy recipients)
+    sdo_officer_name = fields.Char(string='SDO Officer Name / अनुविभागीय अधिकारी का नाम', tracking=True,
+                                   help='Name of Sub-Divisional Officer (Revenue) cum Land Acquisition Officer')
+    
+    # Landowner Name (for copy recipients)
+    landowner_name = fields.Char(string='Landowner Name / भूमिस्वामी का नाम', tracking=True,
+                                 help='Name of landowner for copy recipients section')
     
     # Land Parcels (One2many)
     land_parcel_ids = fields.One2many('bhu.section21.land.parcel', 'notification_id', 
@@ -38,14 +72,22 @@ class Section21Notification(models.Model):
     khasra_numbers = fields.Char(string='Khasra Numbers / खसरा नंबर', compute='_compute_khasra_info', store=False)
     khasra_count = fields.Integer(string='Khasra Count / खसरा संख्या', compute='_compute_khasra_info', store=False)
     
-    # Signed document fields
+    # Signed document fields (legacy - kept for backward compatibility)
     signed_document_file = fields.Binary(string='Signed Notification / हस्ताक्षरित अधिसूचना')
     signed_document_filename = fields.Char(string='Signed File Name / हस्ताक्षरित फ़ाइल नाम')
     signed_date = fields.Date(string='Signed Date / हस्ताक्षर दिनांक', tracking=True)
     has_signed_document = fields.Boolean(string='Has Signed Document / हस्ताक्षरित दस्तावेज़ है', 
                                          compute='_compute_has_signed_document', store=True)
     
-    # Collector signature
+    # SDM Signed File
+    sdm_signed_file = fields.Binary(string='SDM Signed File / एसडीएम हस्ताक्षरित फ़ाइल')
+    sdm_signed_filename = fields.Char(string='SDM Signed File Name / एसडीएम हस्ताक्षरित फ़ाइल नाम')
+    
+    # Collector Signed File
+    collector_signed_file = fields.Binary(string='Collector Signed File / कलेक्टर हस्ताक्षरित फ़ाइल')
+    collector_signed_filename = fields.Char(string='Collector Signed File Name / कलेक्टर हस्ताक्षरित फ़ाइल नाम')
+    
+    # Collector signature (for reports)
     collector_signature = fields.Binary(string='Collector Signature / कलेक्टर हस्ताक्षर')
     collector_signature_filename = fields.Char(string='Signature File Name')
     collector_name = fields.Char(string='Collector Name / कलेक्टर का नाम', tracking=True,
@@ -173,6 +215,9 @@ class Section21Notification(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
+            # Validate village is required
+            if not vals.get('village_id'):
+                raise ValidationError(_('Please select a village before creating Section 21 notification.'))
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 project_id = vals.get('project_id')
@@ -256,21 +301,136 @@ class Section21Notification(models.Model):
         except Exception as e:
             return None
     
-    # Override mixin method to generate Section 21 PDF
-    def action_download_unsigned_file(self):
-        """Generate and download Section 21 Notification PDF (unsigned) - Override mixin"""
+    def _get_landowners_from_parcels(self):
+        """Get all unique landowners from land parcels by finding surveys with matching khasra numbers"""
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_section21_notification').report_action(self)
+        if not self.land_parcel_ids or not self.village_id or not self.project_id:
+            return self.env['bhu.landowner']
+        
+        # Get all khasra numbers from land parcels
+        khasra_numbers = self.land_parcel_ids.mapped('khasra_number')
+        
+        # Find all surveys with these khasra numbers
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('khasra_number', 'in', khasra_numbers),
+            ('state', 'in', ['approved', 'locked'])
+        ])
+        
+        # Get all unique landowners from these surveys
+        landowner_ids = surveys.mapped('landowner_ids')
+        return landowner_ids
+    
+    # Override mixin method to generate Section 21 Public Notice PDF
+    def action_download_unsigned_file(self):
+        """Generate and download Section 21 Public Notice PDF (unsigned) - Override mixin"""
+        self.ensure_one()
+        return self.env.ref('bhuarjan.action_report_section21_public_notification').report_action(self)
+    
+    def action_generate_public_notice(self):
+        """Generate Section 21 Public Notice PDF"""
+        self.ensure_one()
+        return self.action_download_unsigned_file()
+    
+    def action_generate_personal_notices(self):
+        """Generate Section 21 Personal Notices PDF - One for each landowner"""
+        self.ensure_one()
+        landowners = self._get_landowners_from_parcels()
+        
+        if not landowners:
+            raise ValidationError(_('No landowners found for the land parcels. Please ensure surveys are linked to the khasra numbers.'))
+        
+        # Create transient records linking landowners with notification
+        personal_notices = self.env['bhu.section21.personal.notice'].create([
+            {
+                'notification_id': self.id,
+                'landowner_id': landowner.id,
+            }
+            for landowner in landowners
+        ])
+        
+        # Generate PDF for all personal notices
+        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        return report_action.report_action(personal_notices)
+    
+    def action_generate_section21_all(self):
+        """Generate Section 21 - Public notice first, then personal notices for each landowner"""
+        self.ensure_one()
+        
+        # Validate village is selected
+        if not self.village_id:
+            raise ValidationError(_('Please select a village before generating Section 21 notices.'))
+        
+        # Get landowners for personal notices
+        landowners = self._get_landowners_from_parcels()
+        
+        if not landowners:
+            # If no landowners, just generate public notice
+            return self.action_generate_public_notice()
+        
+        # Create transient records for personal notices
+        personal_notices = self.env['bhu.section21.personal.notice'].create([
+            {
+                'notification_id': self.id,
+                'landowner_id': landowner.id,
+            }
+            for landowner in landowners
+        ])
+        
+        # Generate personal notices with context flag to include public notice first
+        # The report template will check this context and render public notice as first page
+        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        return report_action.with_context(
+            include_public_notice_first=True,
+            section21_notification_id=self.id
+        ).report_action(personal_notices)
+    
+    def action_download_signed_document(self):
+        """Download signed Section 21 notification document"""
+        self.ensure_one()
+        if not self.signed_document_file:
+            raise ValidationError(_('No signed document available for download.'))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.section21.notification/{self.id}/signed_document_file/{self.signed_document_filename or "section21_signed_notification.pdf"}?download=true',
+            'target': 'self',
+        }
+    
+    def action_download_sdm_signed_file(self):
+        """Download SDM signed file"""
+        self.ensure_one()
+        if not self.sdm_signed_file:
+            raise ValidationError(_('No SDM signed file available for download.'))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.section21.notification/{self.id}/sdm_signed_file/{self.sdm_signed_filename or "section21_sdm_signed.pdf"}?download=true',
+            'target': 'self',
+        }
+    
+    def action_download_collector_signed_file(self):
+        """Download Collector signed file"""
+        self.ensure_one()
+        if not self.collector_signed_file:
+            raise ValidationError(_('No Collector signed file available for download.'))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/bhu.section21.notification/{self.id}/collector_signed_file/{self.collector_signed_filename or "section21_collector_signed.pdf"}?download=true',
+            'target': 'self',
+        }
     
     def action_generate_pdf(self):
-        """Generate Section 21 Notification PDF - Legacy method"""
+        """Generate Section 21 Notification PDF - Legacy method (defaults to public)"""
         return self.action_download_unsigned_file()
     
     def action_mark_signed(self):
-        """Mark notification as signed"""
+        """Mark notification as signed after SDM uploads file"""
         self.ensure_one()
-        if not self.signed_document_file:
-            raise ValidationError(_('Please upload signed document first.'))
+        if not self.sdm_signed_file:
+            raise ValidationError(_('Please upload SDM signed file first.'))
         self.state = 'signed'
         if not self.signed_date:
             self.signed_date = fields.Date.today()
@@ -285,4 +445,13 @@ class Section21LandParcel(models.Model):
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True)
     area_hectares = fields.Float(string='Area (Hectares) / अर्जित रकबा (हेक्टेयर में)', required=True, digits=(16, 4))
     remark = fields.Char(string='Remark / रिमार्क', help='Additional remarks for this land parcel')
+
+
+class Section21PersonalNotice(models.TransientModel):
+    """Transient model to link landowners with Section 21 notification for personal notice generation"""
+    _name = 'bhu.section21.personal.notice'
+    _description = 'Section 21 Personal Notice'
+
+    notification_id = fields.Many2one('bhu.section21.notification', string='Notification', required=True)
+    landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=True)
 

@@ -501,7 +501,7 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.draft.award', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section21.notification', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.draft_award_info &amp;&amp; state.stats.draft_award_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>

@@ -707,11 +707,23 @@ export class UnifiedDashboard extends Component {
     }
 
     // Helper methods for domain building
-    getDomain() {
+    getDomain(model = null) {
         const domain = [];
-        if (this.state.selectedDepartment) {
+        
+        // Models that have department_id field
+        const modelsWithDepartment = [
+            'bhu.project',
+            'bhu.section4.notification',
+            'bhu.survey',
+            'bhu.section23.award',
+            'bhu.draft.award',  // Legacy, keeping for compatibility
+        ];
+        
+        // Only add department_id if model has this field
+        if (this.state.selectedDepartment && (!model || modelsWithDepartment.includes(model))) {
             domain.push(['department_id', '=', parseInt(this.state.selectedDepartment)]);
         }
+        
         if (this.state.selectedProject) {
             domain.push(['project_id', '=', parseInt(this.state.selectedProject)]);
         }
@@ -753,7 +765,7 @@ export class UnifiedDashboard extends Component {
             return;
         }
         
-        const domain = this.getDomain();
+        const domain = this.getDomain(model);
         await this.action.doAction({
             type: 'ir.actions.act_window',
             name: this.getSectionName(model),
@@ -847,7 +859,7 @@ export class UnifiedDashboard extends Component {
             'bhu.section4.notification': 'Section 4 Notification',
             'bhu.section11.preliminary.report': 'Section 11 Preliminary Report',
             'bhu.section19.notification': 'Section 19 Notification',
-            'bhu.draft.award': 'Section 21 Notice (Draft Award)',
+            'bhu.section21.notification': 'Section 21 Notification',
             'bhu.section23.award': 'Section 23 Award'
         };
         
@@ -964,7 +976,7 @@ export class UnifiedDashboard extends Component {
 
     // Open surveys filtered by state (for department dashboard)
     async openSurveysByState(state) {
-        let domain = this.getDomain();
+        let domain = this.getDomain('bhu.survey');  // Survey has department_id
         
         // Add state filter if provided
         if (state === 'draft') {
@@ -1004,7 +1016,7 @@ export class UnifiedDashboard extends Component {
             'bhu.expert.committee.report': 'Expert Committee Reports',
             'bhu.sia.team': 'SIA Teams',
             'bhu.section18.rr.scheme': 'Section 18 R and R Scheme',
-            'bhu.draft.award': 'Draft Awards',
+            'bhu.section21.notification': 'Section 21 Notifications',
             'bhu.section23.award': 'Section 23 Awards',
         };
         return names[model] || model;

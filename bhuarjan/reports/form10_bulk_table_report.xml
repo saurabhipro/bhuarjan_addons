@@ -170,16 +170,13 @@
                     <td style="width: 40%;">
                         <strong>ग्राम का नाम</strong>
                         <span t-if="first" t-field="first.village_id.name"/>
+                        <br/>
+                        <strong>सर्वे दिनाँक</strong>
+                        <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                     </td>
                     <td style="width: 40%;">
                         <strong>तहसील का नाम</strong>
                         <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <strong>सर्वे दिनाँक</strong>
-                        <span t-if="first" t-field="first.survey_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                     </td>
                 </tr>
             </table>

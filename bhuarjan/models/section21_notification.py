@@ -458,6 +458,8 @@ class Section21Notification(models.Model):
         # Generate personal notices WITHOUT public notice first
         # This will generate one page per khasra using only the personal template
         report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        # Invalidate report cache to force fresh generation
+        report_action.invalidate_recordset(['report_name', 'report_file'])
         return report_action.with_context(
             include_public_notice_first=False,
             section21_notification_id=self.id,
@@ -516,6 +518,8 @@ class Section21Notification(models.Model):
         # Generate personal notices with context flag to include public notice first
         # The report template will check this context and render public notice as first page
         report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        # Invalidate report cache to force fresh generation
+        report_action.invalidate_recordset(['report_name', 'report_file'])
         return report_action.with_context(
             include_public_notice_first=True,
             section21_notification_id=self.id

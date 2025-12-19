@@ -16,34 +16,47 @@
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
             
-            <!-- Get notification directly from context (same as public template gets from object) -->
-            <t t-set="notification_id" t-value="request.env.context.get('section21_notification_id') or request.env.context.get('active_id')"/>
-            <t t-set="notification" t-value="notification_id and request.env['bhu.section21.notification'].sudo().browse(notification_id) or None"/>
-            
             <!-- Get all personal notices from docs (transient records) -->
             <t t-set="all_personal_notices" t-value="docs if docs else (object and [object] or [])"/>
             
-            <!-- If notification exists, render personal notices -->
-            <t t-if="notification">
-                <!-- Reload notification to ensure all fields are loaded (same as public template) -->
-                <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification.id)"/>
-                <t t-set="land_parcels" t-value="notification.land_parcel_ids or []"/>
-                
-                <!-- Render each personal notice - one per khasra -->
-                <t t-set="notice_index" t-value="0"/>
-                <t t-foreach="all_personal_notices" t-as="personal_notice">
-                    <!-- Page break between notices (not before first) -->
-                    <t t-if="notice_index > 0">
-                        <div style="page-break-before: always;"></div>
-                    </t>
-                    <t t-set="notice_index" t-value="notice_index + 1"/>
+            <!-- Get notification from first personal notice (it always has notification_id) -->
+            <t t-set="notification" t-value="all_personal_notices and all_personal_notices[0].notification_id or None"/>
+            <!-- Fallback: try context if needed -->
+            <t t-if="not notification">
+                <t t-set="notification_id" t-value="request.env.context.get('section21_notification_id') or request.env.context.get('active_id')"/>
+                <t t-if="notification_id">
+                    <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification_id)"/>
+                </t>
+            </t>
+            
+            <!-- Always render via basic_layout to avoid empty PDFs -->
+            <t t-call="web.basic_layout">
+                <t t-if="not all_personal_notices or not notification">
+                    <div style="padding: 20px; text-align: center; font-size: 18px; color: red;">
+                        <p><strong>No personal notices found or notification missing.</strong></p>
+                        <p>Please ensure surveys exist and personal notices were generated.</p>
+                    </div>
+                </t>
+                <t t-if="all_personal_notices and notification">
+                    <!-- Reload notification to ensure all fields are loaded (same as public template) -->
+                    <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification.id)"/>
+                    <t t-set="land_parcels" t-value="notification.land_parcel_ids or []"/>
                     
-                    <!-- Get khasra and landowner from personal notice -->
-                    <t t-set="khasra_number" t-value="personal_notice.khasra_number or ''"/>
-                    <t t-set="landowner" t-value="personal_notice.landowner_id or None"/>
-                    
-                    <!-- Render this personal notice -->
-                    <t t-call="web.basic_layout">
+                    <!-- Render each personal notice - one per khasra -->
+                    <t t-set="notice_index" t-value="0"/>
+                    <t t-foreach="all_personal_notices" t-as="personal_notice">
+                        <!-- Page break between notices (not before first) -->
+                        <t t-if="notice_index > 0">
+                            <div style="page-break-before: always;"></div>
+                        </t>
+                        <t t-set="notice_index" t-value="notice_index + 1"/>
+                        
+                        <!-- Get khasra and landowner from personal notice -->
+                        <t t-set="khasra_number" t-value="personal_notice.khasra_number or ''"/>
+                        <t t-set="landowner" t-value="personal_notice.landowner_id or None"/>
+                        
+                        <!-- Render this personal notice -->
+                        <div>
                         <style>
                             body, html, .container, .page {
                                 font-size: 18px !important;
@@ -242,20 +255,8 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
                     </t>
-                </t>
-            </t>
-            
-            <!-- Show error if notification not found -->
-            <t t-if="not notification">
-                <t t-call="web.basic_layout">
-                    <div style="padding: 20px; text-align: center; font-size: 18px; color: red;">
-                        <p><strong>Error: Section 21 notification not found.</strong></p>
-                        <p>Please ensure:</p>
-                        <p>1. Section 21 notification exists</p>
-                        <p>2. Village and project are selected</p>
-                        <p>3. Land parcels are populated from surveys</p>
-                    </div>
                 </t>
             </t>
         </t>

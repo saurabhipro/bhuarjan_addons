@@ -597,6 +597,66 @@ class Section21Notification(models.Model):
         """Generate Section 21 Notification PDF - Legacy method (defaults to public)"""
         return self.action_download_unsigned_file()
     
+    def action_delete_sdm_signed_file(self):
+        """Delete SDM signed file"""
+        self.ensure_one()
+        if not self.sdm_signed_file:
+            raise ValidationError(_('No SDM signed file to delete.'))
+        
+        if self.state == 'signed':
+            raise ValidationError(_('Cannot delete SDM signed file when notification is already marked as signed.'))
+        
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can delete SDM signed file.'))
+        
+        self.write({
+            'sdm_signed_file': False,
+            'sdm_signed_filename': False,
+        })
+        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('SDM signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_delete_collector_signed_file(self):
+        """Delete Collector signed file"""
+        self.ensure_one()
+        if not self.collector_signed_file:
+            raise ValidationError(_('No Collector signed file to delete.'))
+        
+        if self.state == 'signed':
+            raise ValidationError(_('Cannot delete Collector signed file when notification is already marked as signed.'))
+        
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only Collector can delete Collector signed file.'))
+        
+        self.write({
+            'collector_signed_file': False,
+            'collector_signed_filename': False,
+        })
+        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Collector signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
     def action_mark_signed(self):
         """Mark notification as signed after SDM uploads file"""
         self.ensure_one()

@@ -108,7 +108,7 @@
                                     <group string="Download Section 4 Documents">
                                         <!-- Download Unsigned Section 4 -->
                                         <button name="action_download_unsigned_file" string="Download Section 4 (Unsigned)" type="object" 
-                                                class="btn-success" icon="fa-file-pdf"
+                                                class="btn-success" icon="fa-download"
                                                 title="Download Section 4 Notification (Unsigned)"/>
                                         
                                         <!-- Download SDM Signed Section 4 -->
@@ -159,7 +159,7 @@
                                         
                                         <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                         <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                                class="btn-info" icon="fa-file-pdf"
+                                                class="btn-info" icon="fa-download"
                                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                 invisible="not sdm_signed_file and not collector_signed_file"/>
                                     </group>

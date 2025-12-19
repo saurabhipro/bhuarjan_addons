@@ -65,84 +65,110 @@
                     </group>
                     
                     <notebook>
-                        <page string="File Uploads / फ़ाइल अपलोड">
-                            <group>
-                                <!-- SDM Section -->
-                                <group string="SDM Signed File / एसडीएम हस्ताक्षरित फ़ाइल" col="1">
-                                    <!-- Download Sec 21 Buttons - Separate buttons for Public and Personal -->
-                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                        <group col="2">
-                                            <button name="action_generate_public_notice" type="object" 
-                                                    class="oe_highlight" 
-                                                    icon="fa-download"
-                                                    string="Public Sec 21"
-                                                    style="width: 100%; min-width: 200px;"
-                                                    title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
-                                            <button name="action_generate_personal_notices_only" type="object" 
-                                                    class="btn-secondary" 
-                                                    icon="fa-download"
-                                                    string="Personal Sec 21"
-                                                    style="width: 100%; min-width: 200px;"
-                                                    title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
-                                            <button name="action_generate_both_notices" type="object" 
-                                                    class="btn-secondary" 
-                                                    icon="fa-download"
-                                                    string="Personal and Public Sec 21"
-                                                    style="width: 100%; min-width: 200px;"
-                                                    title="Download Personal and Public Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
+                        <page string="Section 21 Documents / धारा 21 दस्तावेज़">
+                            <!-- SDM Section -->
+                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download Section 21 Documents">
+                                        <!-- Download Public Section 21 -->
+                                        <button name="action_generate_public_notice" type="object" 
+                                                class="btn-success" 
+                                                icon="fa-download"
+                                                string="Download Public Sec 21"
+                                                title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
                                         
+                                        <!-- Download Personal Section 21 -->
+                                        <button name="action_generate_personal_notices_only" type="object" 
+                                                class="btn-success" 
+                                                icon="fa-download"
+                                                string="Download Personal Sec 21"
+                                                title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
+                                        
+                                        <!-- Download All Section 21 -->
+                                        <button name="action_generate_section21_all" type="object" 
+                                                class="btn-info" 
+                                                icon="fa-download"
+                                                string="Download All Sec 21"
+                                                title="Download Both Public and Personal Section 21 Notices in one PDF"/>
+                                        
+                                        <!-- Download SDM Signed Section 21 -->
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 21" type="object" 
+                                                class="btn-success" icon="fa-download"
+                                                title="Download SDM Signed File"
+                                                invisible="not sdm_signed_file"/>
+                                    </group>
+                                    <group string="Upload SDM Signed Section 21">
+                                        <!-- Upload SDM Signed File -->
+                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                               string="Upload SDM Signed Section 21"
+                                               widget="binary"
+                                               readonly="state == 'signed'"
+                                               placeholder="Select SDM Signed Section 21 PDF to upload"
+                                               help="Upload the signed Section 21 document from SDM"
+                                               invisible="sdm_signed_file"/>
+                                        <field name="sdm_signed_filename" invisible="1"/>
+                                        
+                                        <!-- Show uploaded file with delete option -->
+                                        <group invisible="not sdm_signed_file or state == 'signed'">
+                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                       widget="binary"
+                                                       readonly="1"
+                                                       nolabel="1"
+                                                       style="flex: 1;"/>
+                                                <button name="action_delete_sdm_signed_file" string="" type="object" 
+                                                        class="btn btn-sm btn-danger" icon="fa-trash"
+                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
+                                                        title="Delete current file and upload a new one"
+                                                        style="margin-left: 10px;"/>
+                                            </div>
                                         </group>
-                                    </group>
-                                    
-                                    <!-- SDM Upload -->
-                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
-                                           invisible="state == 'signed'">
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               widget="binary"
-                                               nolabel="1"
-                                               placeholder="Select SDM Signed Section 21 PDF to upload"/>
-                                        <button name="action_mark_signed" string="Upload SDM File" type="object" 
-                                                class="btn-primary" icon="fa-upload"
-                                                invisible="not sdm_signed_file"
-                                                title="Upload and mark notification as signed"/>
-                                    </group>
-                                    
-                                    <!-- SDM Download -->
-                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                           invisible="not sdm_signed_file">
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               widget="binary"
-                                               readonly="1"
-                                               nolabel="1"
-                                               string="SDM Signed File (Uploaded) / एसडीएम हस्ताक्षरित फ़ाइल (अपलोड की गई)"/>
-                                        <button name="action_download_sdm_signed_file" string="Download SDM File" type="object" 
-                                                class="btn-secondary" icon="fa-download"
-                                                title="Download SDM Signed File"/>
+                                        
+                                        <!-- Mark as Signed Button -->
+                                        <button name="action_mark_signed" string="Mark as Signed" type="object" 
+                                                class="btn-success" icon="fa-check"
+                                                invisible="not sdm_signed_file or state == 'signed'"
+                                                title="Mark notification as signed after uploading SDM file"/>
                                     </group>
                                 </group>
-                                
-                                <!-- Collector Section -->
-                                <group string="Collector Signed File / कलेक्टर हस्ताक्षरित फ़ाइल" col="1">
-                                    <!-- Collector Upload -->
-                                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
-                                           invisible="state != 'generated' and state != 'signed'">
-                                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                                               widget="binary"
-                                               nolabel="1"
-                                               placeholder="Select Collector Signed Section 21 PDF to upload"/>
+                            </group>
+                            
+                            <!-- Collector Section -->
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                                <group col="2">
+                                    <group string="Download Section 21 Documents">
+                                        <!-- Download Collector Signed Section 21 -->
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed Section 21" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download Collector Signed File"
+                                                invisible="not collector_signed_file"/>
                                     </group>
-                                    
-                                    <!-- Collector Download -->
-                                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                           invisible="not collector_signed_file">
+                                    <group string="Upload Collector Signed Section 21">
+                                        <!-- Upload Collector Signed File -->
                                         <field name="collector_signed_file" filename="collector_signed_filename" 
+                                               string="Upload Collector Signed Section 21"
                                                widget="binary"
-                                               readonly="1"
-                                               nolabel="1"
-                                               string="Collector Signed File (Uploaded) / कलेक्टर हस्ताक्षरित फ़ाइल (अपलोड की गई)"/>
-                                        <button name="action_download_collector_signed_file" string="Download Collector File" type="object" 
-                                                class="btn-secondary" icon="fa-download"
-                                                title="Download Collector Signed File"/>
+                                               readonly="state != 'generated' and state != 'signed'"
+                                               placeholder="Select Collector Signed Section 21 PDF to upload"
+                                               help="Upload the signed Section 21 approval document from Collector"
+                                               invisible="collector_signed_file"/>
+                                        <field name="collector_signed_filename" invisible="1"/>
+                                        
+                                        <!-- Show uploaded file with delete option -->
+                                        <group invisible="not collector_signed_file or (state != 'generated' and state != 'signed')">
+                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                       widget="binary"
+                                                       readonly="1"
+                                                       nolabel="1"
+                                                       style="flex: 1;"/>
+                                                <button name="action_delete_collector_signed_file" string="" type="object" 
+                                                        class="btn btn-sm btn-danger" icon="fa-trash"
+                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
+                                                        title="Delete current file and upload a new one"
+                                                        style="margin-left: 10px;"/>
+                                            </div>
+                                        </group>
                                     </group>
                                 </group>
                             </group>

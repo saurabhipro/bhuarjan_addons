@@ -166,18 +166,22 @@
                                 <div class="responsive-sia-group">
                                     <group string="Download SIA Documents">
                                         <!-- Download Unsigned SIA -->
-                                        <button name="action_download_sia_file" string="Download SIA" type="object" 
+                                        <button name="action_download_sia_file" string="SIA" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download SIA Proposal (Unsigned)"
                                                 invisible="is_sia_exempt == 'yes'"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed SIA -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
                                                 title="Download SDM Signed Proposal"
                                                 invisible="not sdm_signed_file"
-                                                style="width: 100%;"/>
+                                                style="width: 100%;">
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            SIA SDM Signed
+                                        </button>
                                     </group>
                                     <group string="Upload SDM Signed SIA">
                                         <!-- Upload SDM Signed File (editable only in draft state) -->
@@ -204,36 +208,42 @@
 
                             <div class="responsive-sia-group row"  groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" >
                                 <div class="col" string="Download SIA Documents">
-                                    <div class="row">
-                                        <div class="col">
-                                            <!-- Download SDM Signed SIA -->
-                                            <button name="action_download_sdm_signed_file" 
-                                                    string="SDM Signed" type="object" 
-                                                    class="btn-primary" icon="fa-download"
-                                                    title="Download SDM Signed Proposal"
-                                                    invisible="not sdm_signed_file"
-                                                    style="width: 100%;"/>
-                                        </div>
-                                        <div class="col">
-                                            <!-- Download Collector Signed SIA -->
-                                            <button name="action_download_collector_signed_file"
-                                                    string="Collector Signed" type="object" 
-                                                    class="btn-primary" icon="fa-download"
-                                                    title="Download Collector Signed SIA"
-                                                    invisible="not collector_signed_file"
-                                                    style="width: 100%; margin-bottom: 10px;"/>
-                                            
-                                        </div>
-                                        <div class="col">
+                                    <div class="row" style="padding: 10px 0;">
+                                        <div class="col" style="padding: 0 10px;">
                                             <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                             <button name="action_download_latest_pdf" 
-                                                    string="Latest PDF Report" type="object" 
+                                                    string="SIA" type="object" 
                                                     class="btn-info" icon="fa-download"
                                                     title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                     invisible="not sdm_signed_file and not collector_signed_file"
                                                     style="width: 100%;"/>
                                         </div>
-
+                                        <div class="col" style="padding: 0 10px;">
+                                            <!-- Download SDM Signed SIA -->
+                                            <button name="action_download_sdm_signed_file" 
+                                                    type="object" 
+                                                    class="btn-primary"
+                                                    title="Download SDM Signed Proposal"
+                                                    invisible="not sdm_signed_file"
+                                                    style="width: 100%;">
+                                                <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                SIA SDM Signed
+                                            </button>
+                                        </div>
+                                        <div class="col" style="padding: 0 10px;">
+                                            <!-- Download Collector Signed SIA -->
+                                            <button name="action_download_collector_signed_file"
+                                                    type="object" 
+                                                    class="btn-primary"
+                                                    title="Download Collector Signed SIA"
+                                                    invisible="not collector_signed_file"
+                                                    style="width: 100%;">
+                                                <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                SIA Collector Signed
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 

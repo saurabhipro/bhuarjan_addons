@@ -34,9 +34,6 @@ class BhuProject(models.Model):
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True,
                                     help='Select the department for this project')
     description = fields.Text(string='Description', tracking=True)
-    budget = fields.Float(string='Budget', tracking=True)
-    start_date = fields.Date(string='Start Date', tracking=True)
-    end_date = fields.Date(string='End Date', tracking=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -161,6 +158,19 @@ class BhuProject(models.Model):
                                                 help='SIA justification details (last resort, social benefits)')
     rehab_admin_name = fields.Char(string='Rehabilitation Administrator / पुनर्वास प्रशासक', tracking=True,
                                                help='Name/Designation of Rehabilitation and Resettlement Administrator')
+    
+    # Rehabilitation Allocation Fields (shown when is_displacement is True)
+    allocated_village = fields.Char(string='Allocated Village / आवंटित ग्राम', tracking=True,
+                                     help='Village allocated for rehabilitation and resettlement')
+    allocated_tehsil = fields.Char(string='Allocated Tehsil / आवंटित तहसील', tracking=True,
+                                  help='Tehsil allocated for rehabilitation and resettlement')
+    allocated_district = fields.Char(string='Allocated District / आवंटित जिला', tracking=True,
+                                     help='District allocated for rehabilitation and resettlement')
+    allocated_khasra_number = fields.Char(string='Allocated Khasra Number / आवंटित खसरा नंबर', tracking=True,
+                                         help='Khasra number of the allocated land for rehabilitation')
+    allocated_area_hectares = fields.Float(string='Allocated Area (Hectares) / आवंटित रकबा (हेक्टेयर)', 
+                                          digits=(16, 4), tracking=True,
+                                          help='Area in hectares allocated for rehabilitation and resettlement')
     
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):

@@ -209,6 +209,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         self.state = 'approved'
         self.approved_date = fields.Datetime.now()
         self.message_post(body=_('Approved by %s') % self.env.user.name)
+        
+        # Create activity notification for SDM users
+        self._create_approval_activity()
     
     def action_send_back(self):
         """Open wizard to send back (Collector action)"""
@@ -510,6 +513,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Get record name for activity summary
         record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
         
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
         # Create activity for each Collector user
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
@@ -525,7 +531,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
             ('type', '=', 'form')
         ], limit=1, order='priority desc, id desc')
         
-        activity_summary = _('%s submitted for approval') % record_name
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s submitted for approval') % (project_name, record_name)
+        else:
+            activity_summary = _('%s submitted for approval') % record_name
         activity_note = _('Please review and approve: %s\n\nProject: %s') % (
             record_name,
             getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
@@ -584,6 +594,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Get record name for activity summary
         record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
         
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
         # Create activity for each SDM user
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
@@ -593,10 +606,90 @@ class ProcessWorkflowMixin(models.AbstractModel):
         if not activity_type:
             return
         
-        activity_summary = _('%s sent back for revision') % record_name
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s sent back for revision') % (project_name, record_name)
+        else:
+            activity_summary = _('%s sent back for revision') % record_name
         activity_note = _('Please review and resubmit: %s\n\nProject: %s') % (
             record_name,
             getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
+        )
+        
+        # Add village info if available
+        if hasattr(self, 'village_id') and self.village_id:
+            activity_note += _('\nVillage: %s') % self.village_id.name
+        
+        for sdm_user in sdm_users:
+            # Check if activity already exists for this user and record
+            existing_activity = self.env['mail.activity'].search([
+                ('res_model', '=', model_name),
+                ('res_id', '=', self.id),
+                ('user_id', '=', sdm_user.id),
+                ('activity_type_id', '=', activity_type.id),
+                ('summary', '=', activity_summary),
+            ], limit=1)
+            
+            if not existing_activity:
+                self.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    summary=activity_summary,
+                    note=activity_note,
+                    user_id=sdm_user.id,
+                )
+    
+    def _create_approval_activity(self):
+        """Create activity for SDM users when Collector approves"""
+        self.ensure_one()
+        
+        # Get SDM users - try to get from project first
+        sdm_users = self.env['res.users']
+        
+        if hasattr(self, 'project_id') and self.project_id and self.project_id.sdm_ids:
+            sdm_users = self.project_id.sdm_ids
+        else:
+            # Fallback: get all SDM users
+            sdm_group = self.env.ref('bhuarjan.group_bhuarjan_sdm', raise_if_not_found=False)
+            if sdm_group:
+                sdm_users = self.env['res.users'].search([
+                    ('groups_id', 'in', sdm_group.id)
+                ])
+        
+        if not sdm_users:
+            return
+        
+        # Get model display name
+        model_name = self._name
+        try:
+            model_record = self.env['ir.model'].search([('model', '=', model_name)], limit=1)
+            model_display_name = model_record.name if model_record else model_name
+        except:
+            model_display_name = model_name
+        
+        # Get record name for activity summary
+        record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
+        
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
+        # Create activity for each SDM user
+        activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
+        if not activity_type:
+            # Fallback: search for 'To Do' activity type
+            activity_type = self.env['mail.activity.type'].search([('name', '=', 'To Do')], limit=1)
+        
+        if not activity_type:
+            return
+        
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s approved by Collector') % (project_name, record_name)
+        else:
+            activity_summary = _('%s approved by Collector') % record_name
+        activity_note = _('The following has been approved: %s\n\nProject: %s\n\nApproved by: %s') % (
+            record_name,
+            getattr(self, 'project_id', False) and self.project_id.name or 'N/A',
+            self.env.user.name
         )
         
         # Add village info if available

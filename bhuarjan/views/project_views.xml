@@ -16,7 +16,6 @@
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'completed'"
                        decoration-danger="state == 'cancelled'"/>
-                <field name="budget"/>
             </list>
         </field>
     </record>
@@ -49,10 +48,38 @@
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
                         </group>
                         <group>
-                            <field name="budget"/>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
                             <field name="is_sia_exempt"/>
+                            <field name="is_displacement"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Affected Families and Persons (shown when is_displacement is True) -->
+                    <group invisible="not is_displacement">
+                        <group>
+                            <field name="affected_families_count" 
+                                   string="Number of Families / परिवारों की संख्या"/>
+                            <field name="affected_persons_count" 
+                                   string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Rehabilitation Allocation Fields (shown when is_displacement is True) -->
+                    <group invisible="not is_displacement">
+                        <group col="2">
+                            <group>
+                                <field name="allocated_village" 
+                                       placeholder="Enter allocated village name..."/>
+                                <field name="allocated_tehsil" 
+                                       placeholder="Enter allocated tehsil name..."/>
+                                <field name="allocated_district" 
+                                       placeholder="Enter allocated district name..."/>
+                            </group>
+                            <group>
+                                <field name="allocated_khasra_number"
+                                       placeholder="Enter allocated khasra number..."/>
+                                <field name="allocated_area_hectares"
+                                       placeholder="0.0000"/>
+                            </group>
                         </group>
                     </group>
                     <notebook>
@@ -147,15 +174,6 @@
                             <group>
                                 <group string="(11) Rehabilitation Administrator / पुनर्वास प्रशासक">
                                     <field name="rehab_admin_name" nolabel="1"/>
-                                </group>
-                                <group string="(12) Is Displacement Involved? / कितने परिवारों का विस्थापन निहित है।">
-                                    <field name="is_displacement" nolabel="1"/>
-                                    <field name="affected_families_count" 
-                                           invisible="not is_displacement"
-                                           string="Number of Families / परिवारों की संख्या"/>
-                                    <field name="affected_persons_count" 
-                                           invisible="not is_displacement"
-                                           string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
                                 </group>
                             </group>
                             <group string="(13) Section 5 Text / धारा 5 पाठ">

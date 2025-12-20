@@ -569,6 +569,9 @@ class Survey(models.Model):
                 body=_('Survey submitted for approval by %s') % self.env.user.name,
                 message_type='notification'
             )
+            
+            # Create activity notification for department users
+            record._create_department_user_activity()
 
             # Send email notification to the user
             template = self.env.ref("bhuarjan.email_bhuarjan_survey_submit_form", raise_if_not_found=False)
@@ -638,6 +641,68 @@ class Survey(models.Model):
                 body=_('Survey rejected by %s') % self.env.user.name,
                 message_type='notification'
             )
+    
+    def _create_department_user_activity(self):
+        """Create activity for department users when survey is submitted"""
+        self.ensure_one()
+        
+        # Get department users from project
+        dept_users = self.env['res.users']
+        
+        if self.project_id and self.project_id.department_user_ids:
+            dept_users = self.project_id.department_user_ids
+        else:
+            # Fallback: get all department users
+            dept_group = self.env.ref('bhuarjan.group_bhuarjan_department_user', raise_if_not_found=False)
+            if dept_group:
+                dept_users = self.env['res.users'].search([
+                    ('groups_id', 'in', dept_group.id)
+                ])
+        
+        if not dept_users:
+            return
+        
+        # Get activity type
+        activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
+        if not activity_type:
+            activity_type = self.env['mail.activity.type'].search([('name', '=', 'To Do')], limit=1)
+        
+        if not activity_type:
+            return
+        
+        # Include project name in summary
+        project_name = self.project_id.name if self.project_id else ''
+        survey_name = self.name or f"#{self.id}"
+        if project_name:
+            activity_summary = _('%s - Survey %s submitted for approval') % (project_name, survey_name)
+        else:
+            activity_summary = _('Survey %s submitted for approval') % survey_name
+        
+        activity_note = _('Survey submitted for approval: %s\n\nProject: %s\n\nVillage: %s\n\nKhasra Number: %s\n\nSubmitted by: %s') % (
+            self.name or f"#{self.id}",
+            self.project_id.name if self.project_id else 'N/A',
+            self.village_id.name if self.village_id else 'N/A',
+            self.khasra_number or 'N/A',
+            self.env.user.name
+        )
+        
+        for dept_user in dept_users:
+            # Check if activity already exists for this user and record
+            existing_activity = self.env['mail.activity'].search([
+                ('res_model', '=', 'bhu.survey'),
+                ('res_id', '=', self.id),
+                ('user_id', '=', dept_user.id),
+                ('activity_type_id', '=', activity_type.id),
+                ('summary', '=', activity_summary),
+            ], limit=1)
+            
+            if not existing_activity:
+                self.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    summary=activity_summary,
+                    note=activity_note,
+                    user_id=dept_user.id,
+                )
 
     def action_reset_to_submitted(self):
         """Reset survey to submitted (from rejected state) - Only Department Users can reset"""

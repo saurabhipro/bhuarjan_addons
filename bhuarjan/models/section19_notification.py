@@ -55,12 +55,12 @@ class Section19Notification(models.Model):
                                              help='Number of persons affected by the proposed land acquisition who will be rehabilitated')
     
     # Rehabilitation land details (conditional)
-    rehab_village_id = fields.Many2one('bhu.village', string='Rehabilitation Village / पुनर्वास ग्राम',
-                                       tracking=True)
-    rehab_tehsil_id = fields.Many2one('bhu.tehsil', string='Rehabilitation Tehsil / पुनर्वास तहसील',
-                                      tracking=True)
-    rehab_district_id = fields.Many2one('bhu.district', string='Rehabilitation District / पुनर्वास जिला',
-                                        tracking=True)
+    rehab_village = fields.Char(string='Rehabilitation Village / पुनर्वास ग्राम',
+                                tracking=True)
+    rehab_tehsil = fields.Char(string='Rehabilitation Tehsil / पुनर्वास तहसील',
+                               tracking=True)
+    rehab_district = fields.Char(string='Rehabilitation District / पुनर्वास जिला',
+                                  tracking=True)
     rehab_khasra_number = fields.Char(string='Rehabilitation Khasra Number / पुनर्वास खसरा नंबर',
                                       tracking=True)
     rehab_area_hectares = fields.Float(string='Rehabilitation Area (Hectares) / पुनर्वास क्षेत्रफल (हेक्टेयर)',
@@ -167,7 +167,8 @@ class Section19Notification(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset village when project changes and set domain to only show project villages"""
+        """Reset village when project changes and set domain to only show project villages.
+        Also auto-populate rehabilitation fields from project allocated fields."""
         # Only reset village if it's not valid for the new project
         if self.project_id and self.project_id.village_ids:
             # If village is already set and is in the project's villages, keep it
@@ -177,6 +178,19 @@ class Section19Notification(models.Model):
             else:
                 # Village is not valid for this project, reset it
                 self.village_id = False
+            # Auto-populate rehabilitation fields from project allocated fields
+            if self.project_id.allocated_village:
+                self.rehab_village = self.project_id.allocated_village
+            if self.project_id.allocated_tehsil:
+                self.rehab_tehsil = self.project_id.allocated_tehsil
+            if self.project_id.allocated_district:
+                self.rehab_district = self.project_id.allocated_district
+            if self.project_id.allocated_khasra_number:
+                self.rehab_khasra_number = self.project_id.allocated_khasra_number
+            if self.project_id.allocated_area_hectares:
+                self.rehab_area_hectares = self.project_id.allocated_area_hectares
+            if self.project_id.allocated_officer_name:
+                self.rehab_officer_office_location = self.project_id.allocated_officer_name
             return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
             # No villages in project, reset village

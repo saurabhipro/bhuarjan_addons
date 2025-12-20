@@ -80,7 +80,9 @@
                                    context="{'default_project_id': project_id}"
                                    placeholder="Select one village..."
                                    domain="village_domain"/>
-                            <field name="notification_number" readonly="1"/>
+                            <field name="notification_number" invisible="1"/>
+                            <field name="prakaran_kramank" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                         </group>
                         <group>
                             <field name="total_area_acquired" readonly="1"/>

@@ -28,17 +28,20 @@
                         font-size: 21px !important;
                     }
                     .schedule-table {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
                     }
                     .schedule-table th,
                     .schedule-table td {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table th {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table td {
                         text-align: left !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table td:nth-child(5) {
                         text-align: right !important;
@@ -143,7 +146,7 @@
                     
                     <!-- Schedule Table -->
                     <div style="margin: 20px 0;">
-                        <div style="text-align: center; font-size: 21px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
+                        <div style="text-align: center; font-size: 16.8px; font-weight: normal; margin-bottom: 10px; text-decoration: underline;">
                             //अनुसूची//
                         </div>
                         <table class="schedule-table">
@@ -151,7 +154,7 @@
                                 <tr>
                                     <th rowspan="2" style="width: 10%;">जिला</th>
                                     <th rowspan="2" style="width: 10%;">तहसील</th>
-                                    <th colspan="3" style="text-align: center; font-size: 21px !important; font-weight: bold !important;">
+                                    <th colspan="3" style="text-align: center; font-size: 16.8px !important; font-weight: normal !important;">
                                         भूमि का प्रकार
                                     </th>
                                     <th rowspan="2" style="width: 20%;">धारा 12 द्वारा प्राधिकृत अधिकारी</th>
@@ -176,19 +179,19 @@
                                 <t t-if="report.land_parcel_ids and len(report.land_parcel_ids) > 0">
                                     <t t-foreach="report.land_parcel_ids" t-as="parcel">
                                         <tr>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.khasra_number or '........................'"/>
-                                            <td style="font-size: 21px !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.authorized_officer or '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.public_purpose_description or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.khasra_number or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.authorized_officer or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.public_purpose_description or '........................'"/>
                                         </tr>
                                     </t>
                                 </t>
                                 <t t-if="not report.land_parcel_ids or len(report.land_parcel_ids) == 0">
                                     <tr>
-                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 21px !important;">
+                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 16.8px !important; font-weight: normal !important;">
                                             कोई भूमि खंड जोड़ा नहीं गया है
                                         </td>
                                     </tr>

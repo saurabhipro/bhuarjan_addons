@@ -8,7 +8,7 @@
         <field name="report_name">bhuarjan.section19_notification_report</field>
         <field name="report_file">bhuarjan.section19_notification_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'Section19_Notification_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+        <field name="print_report_name">'Section19_' + ((object and object.village_id and object.village_id.name.replace(' ', '_') if object.village_id.name else '') or (docs and docs[0] and docs[0].village_id and docs[0].village_id.name.replace(' ', '_') if docs[0].village_id.name else '') or '') + '_' + ((object and object.create_date and object.create_date.strftime('%Y%m%d')) or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d')) or '')</field>
     </record>
 
     <!-- Section 19 Notification Report Template -->

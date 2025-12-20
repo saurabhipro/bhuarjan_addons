@@ -149,22 +149,18 @@
                         <table class="schedule-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 10%;">जिला</th>
-                                    <th style="width: 10%;">तहसील</th>
+                                    <th rowspan="2" style="width: 10%;">जिला</th>
+                                    <th rowspan="2" style="width: 10%;">तहसील</th>
                                     <th colspan="3" style="text-align: center; font-size: 21px !important; font-weight: bold !important;">
                                         भूमि का प्रकार
                                     </th>
-                                    <th style="width: 20%;">धारा 12 द्वारा प्राधिकृत अधिकारी</th>
-                                    <th style="width: 20%;">सार्वजनिक प्रयोजन का विवरण</th>
+                                    <th rowspan="2" style="width: 20%;">धारा 12 द्वारा प्राधिकृत अधिकारी</th>
+                                    <th rowspan="2" style="width: 20%;">सार्वजनिक प्रयोजन का विवरण</th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 10%;"></th>
-                                    <th style="width: 10%;"></th>
                                     <th style="width: 15%;">ग्राम/प.हु.नं.</th>
                                     <th style="width: 15%;">खसरा नं.</th>
                                     <th style="width: 10%;">अर्जन हेतु प्रस्तावित रकबा (हे.में)</th>
-                                    <th style="width: 20%;"></th>
-                                    <th style="width: 20%;"></th>
                                 </tr>
                                 <tr>
                                     <th style="width: 10%;">(1)</th>

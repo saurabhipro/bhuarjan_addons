@@ -30,8 +30,8 @@ class ResUsers(models.Model):
                         f'Mobile number {record.mobile} is already assigned to user "{duplicate.name}". '
                         f'Each user must have a unique mobile number.'
                     )
-    state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain())
-    district_id = fields.Many2one('bhu.district', string='District / जिला')
+    state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain(), default=lambda self: self.env.user.state_id.id)
+    district_id = fields.Many2one('bhu.district', string='District / जिला', default=lambda self: self.env.user.district_id.id)
     sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
     bhu_department_id = fields.Many2one(

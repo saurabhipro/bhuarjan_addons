@@ -276,11 +276,6 @@
             <t t-call="bhuarjan.report_custom_external_layout">  
                 <div class="page" style="position: relative;">
                     <!-- Watermark with Logo - Centered on Page -->
-                    <div class="watermark">
-                        <div class="watermark-circle"></div>
-                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
-                    </div>
                     <style>
                         .bulk-form10-table {
                             border-collapse: collapse;

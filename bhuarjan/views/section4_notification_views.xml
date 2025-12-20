@@ -237,8 +237,8 @@
                             <!-- Section 4 Questions -->
                             <group>
                                 <group string="(1) Brief Description of Public Purpose / लोक प्रयोजन का संक्षिप्त विवरण">
-                                    <field name="brief_description" widget="html" nolabel="1"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                    <field name="project_id" readonly="1" nolabel="1" 
+                                           options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
                                 </group>
                                 <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या (From Project Master)">
                                     <field name="directly_affected" nolabel="1" readonly="1"/>

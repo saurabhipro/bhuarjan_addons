@@ -62,7 +62,7 @@ class Section4Notification(models.Model):
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
     
     # 11 Questions from the template
-    brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose', tracking=True)
+    # brief_description removed - using project_id.name instead
     # Fields 2, 3, 4, 5, 8, 9, 10, 11 are read-only and come from project master (not stored)
     directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families', 
                                       related='project_id.directly_affected', readonly=True, tracking=True)
@@ -530,7 +530,6 @@ class Section4Notification(models.Model):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'brief_description': self.brief_description,
             'directly_affected': self.directly_affected,
             'indirectly_affected': self.indirectly_affected,
             'private_assets': self.private_assets,
@@ -639,7 +638,6 @@ class Section4Notification(models.Model):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'brief_description': self.brief_description,
             'directly_affected': self.directly_affected,
             'indirectly_affected': self.indirectly_affected,
             'private_assets': self.private_assets,
@@ -671,7 +669,7 @@ class Section4NotificationWizard(models.TransientModel):
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान')
     
     # 11 Questions from the template
-    brief_description = fields.Text(string='(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose')
+    # brief_description removed - using project_id.name instead
     directly_affected = fields.Char(string='(दो) प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of directly affected families')
     indirectly_affected = fields.Char(string='(तीन) अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या / Number of indirectly affected families')
     private_assets = fields.Char(string='(चार) प्रभावित क्षेत्र में निजी मकानों तथा अन्य परिसंपत्तियों की अनुमानित संख्या / Estimated number of private houses and other assets')
@@ -791,42 +789,6 @@ class Section4NotificationWizard(models.TransientModel):
             'public_purpose': self.public_purpose,
             'public_hearing_datetime': self.public_hearing_datetime,
             'public_hearing_place': self.public_hearing_place,
-            'q1_brief_description': self.q1_brief_description,
-            'q2_directly_affected': self.q2_directly_affected,
-            'q3_indirectly_affected': self.q3_indirectly_affected,
-            'q4_private_assets': self.q4_private_assets,
-            'q5_government_assets': self.q5_government_assets,
-            'q6_minimal_acquisition': 'yes',  # Always yes
-            'q7_alternatives_considered': 'yes',  # Always yes
-            'q8_total_cost': self.q8_total_cost,
-            'q9_project_benefits': self.q9_project_benefits,
-            'q10_compensation_measures': self.q10_compensation_measures,
-            'q11_other_components': self.q11_other_components,
-            'state': 'generated',
-        })
-        
-        # Generate PDF report - pass the wizard recordset
-        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
-        return report_action.report_action(self)
-
-
-        notification = self.env['bhu.section4.notification'].create({
-            'project_id': self.project_id.id,
-            'village_id': self.village_id.id,
-            'public_purpose': self.public_purpose,
-            'public_hearing_datetime': self.public_hearing_datetime,
-            'public_hearing_place': self.public_hearing_place,
-            'brief_description': self.brief_description,
-            'directly_affected': self.directly_affected,
-            'indirectly_affected': self.indirectly_affected,
-            'private_assets': self.private_assets,
-            'government_assets': self.government_assets,
-            'minimal_acquisition': self.minimal_acquisition,
-            'alternatives_considered': self.alternatives_considered,
-            'total_cost': self.total_cost,
-            'project_benefits': self.project_benefits,
-            'compensation_measures': self.compensation_measures,
-            'other_components': self.other_components,
             'state': 'generated',
         })
         

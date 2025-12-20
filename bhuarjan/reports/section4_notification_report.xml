@@ -167,12 +167,7 @@
                         <div class="questions-section" style="margin-top: 10px !important;">
                             <div class="question-item">
                                 <span class="question-label">(एक) लोक प्रयोजन का संक्षिप्त विवरण :-</span>
-                                <t t-if="wizard.brief_description">
-                                    <span class="question-answer"><t t-raw="wizard.brief_description"/></span>
-                                </t>
-                                <t t-if="not wizard.brief_description">
-                                    <span class="question-answer"><t t-esc="project_name"/></span>
-                                </t>
+                                <span class="question-answer"><t t-esc="project_name"/></span>
                             </div>
                             
                             <div class="question-item">

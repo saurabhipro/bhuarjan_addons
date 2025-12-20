@@ -272,7 +272,7 @@ class Form10PDFController(http.Controller):
                 'public_purpose': notification.public_purpose,
                 'public_hearing_datetime': notification.public_hearing_datetime,
                 'public_hearing_place': notification.public_hearing_place,
-                'q1_brief_description': notification.q1_brief_description,
+                'q1_brief_description': notification.project_id.name if notification.project_id else '',
                 'q2_directly_affected': notification.q2_directly_affected,
                 'q3_indirectly_affected': notification.q3_indirectly_affected,
                 'q4_private_assets': notification.q4_private_assets,

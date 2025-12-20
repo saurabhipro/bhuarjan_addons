@@ -39,7 +39,6 @@ class ProcessReportPdfDownload(models.AbstractModel):
                         'public_purpose': record.public_purpose,
                         'public_hearing_datetime': record.public_hearing_datetime,
                         'public_hearing_place': record.public_hearing_place,
-                        'brief_description': record.brief_description,
                         'directly_affected': record.directly_affected,
                         'indirectly_affected': record.indirectly_affected,
                         'private_assets': record.private_assets,

@@ -169,18 +169,18 @@
                         <page string="Survey / सर्वे">
                             <field name="survey_ids" readonly="1" nolabel="1">
                                 <list>
-                                    <field name="name" string="Survey Number / सर्वे नंबर"/>
-                                    <field name="user_id" string="Surveyor / सर्वेक्षक"/>
-                                    <field name="khasra_number" string="Khasra Number / खसरा नंबर"/>
-                                    <field name="total_area" string="Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)"/>
-                                    <field name="acquired_area" string="Acquired Area (Hectares) / अर्जित रकबा (हेक्टेयर)"/>
-                                    <field name="state" widget="badge" string="Status / स्थिति"
+                                    <field name="name" string="Survey Number"/>
+                                    <field name="user_id" string="Surveyor"/>
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="total_area" string="Total Area (Hectares)"/>
+                                    <field name="acquired_area" string="Acquired Area (Hectares)"/>
+                                    <field name="state" widget="badge" string="Status"
                                            decoration-success="state == 'approved'" 
                                            decoration-info="state == 'submitted'" 
                                            decoration-warning="state == 'draft'"
                                            decoration-danger="state == 'rejected'"
                                            decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date" string="Survey Date / सर्वे दिनांक"/>
+                                    <field name="survey_date" string="Survey Date"/>
                                 </list>
                             </field>
                         </page>

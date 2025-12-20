@@ -90,83 +90,120 @@
                     </group>
                     <notebook>
                         <page string="Section 11 Documents / धारा 11 दस्तावेज़">
+                            <style>
+                                @media (max-width: 768px) {
+                                    .responsive-section11-group {
+                                        flex-direction: column !important;
+                                    }
+                                    .responsive-section11-group > * {
+                                        width: 100% !important;
+                                        margin-bottom: 15px !important;
+                                    }
+                                }
+                                .responsive-section11-group {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 50px;
+                                }
+                                .responsive-section11-group > * {
+                                    flex: 1;
+                                    min-width: 300px;
+                                }
+                            </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
-                                    <group string="Download Section 11 Documents" style="margin-right: 50px; padding-right: 20px;">
+                                <div class="responsive-section11-group">
+                                    <group string="Download Section 11 Documents">
                                         <!-- Download Unsigned Section 11 -->
-                                        <button name="action_download_unsigned_file" string="Download Section 11 (Unsigned)" type="object" 
+                                        <button name="action_download_unsigned_file" string="Section 11" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download Section 11 Report (Unsigned)"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed Section 11 -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
                                                 title="Download SDM Signed Section 11"
                                                 invisible="not sdm_signed_file"
-                                                style="width: 100%;"/>
+                                                style="width: 100%;">
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            Section 11 SDM Signed
+                                        </button>
                                     </group>
-                                    <group string="Upload SDM Signed Section 11" style="margin-left: 50px; padding-left: 20px;">
+                                    <group string="Upload SDM Signed Section 11">
                                         <!-- Upload SDM Signed File (editable only in draft state) -->
                                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                                string="Upload SDM Signed Section 11"
                                                widget="binary"
                                                readonly="state != 'draft'"
                                                placeholder="Upload Signed Section 11 Report"
-                                               help="Upload the signed Section 11 document from SDM"
-                                               invisible="sdm_signed_file"/>
+                                               help="Upload the signed Section 11 document from SDM"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
-                                        
-                                        <!-- Show uploaded file -->
-                                        <group invisible="not sdm_signed_file or state != 'draft'">
-                                            <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                                   widget="binary"
-                                                   readonly="1"
-                                                   nolabel="1"/>
-                                        </group>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
-                                <group col="2">
-                                    <group string="Download Section 11 Documents" style="margin-right: 50px; padding-right: 20px;">
-                                        <!-- Download Collector Signed Section 11 -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed Section 11"
-                                                invisible="not collector_signed_file"
-                                                style="width: 100%; margin-bottom: 10px;"/>
-                                        
-                                        <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
-                                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                                class="btn-info" icon="fa-download"
-                                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                invisible="not sdm_signed_file and not collector_signed_file"
-                                                style="width: 100%;"/>
-                                    </group>
-                                    <group string="Upload Collector Signed Section 11" style="margin-left: 50px; padding-left: 20px;">
-                                        <!-- Upload Collector Signed File (editable only in submitted state) -->
-                                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                                               string="Upload Collector Signed Section 11"
-                                               widget="binary"
-                                               readonly="state != 'submitted'"
-                                               placeholder="Upload Section 11 Approval Letter"
-                                               help="Upload the signed Section 11 approval document from Collector"
-                                               invisible="collector_signed_file"/>
-                                        <field name="collector_signed_filename" invisible="1"/>
-                                        
-                                        <!-- Show uploaded file -->
-                                        <group invisible="not collector_signed_file or state != 'submitted'">
-                                            <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                   widget="binary"
-                                                   readonly="1"
-                                                   nolabel="1"/>
-                                        </group>
-                                    </group>
-                                </group>
+                                <div class="responsive-section11-group row">
+                                    <div class="col" string="Download Section 11 Documents">
+                                        <div class="row" style="padding: 10px 0;">
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
+                                                <button name="action_download_latest_pdf" 
+                                                        string="Section 11" type="object" 
+                                                        class="btn-info" icon="fa-download"
+                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                        invisible="not sdm_signed_file and not collector_signed_file"
+                                                        style="width: 100%;"/>
+                                            </div>
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download SDM Signed Section 11 -->
+                                                <button name="action_download_sdm_signed_file" 
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download SDM Signed Section 11"
+                                                        invisible="not sdm_signed_file"
+                                                        style="width: 100%;">
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 11 SDM Signed
+                                                </button>
+                                            </div>
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download Collector Signed Section 11 -->
+                                                <button name="action_download_collector_signed_file"
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download Collector Signed Section 11"
+                                                        invisible="not collector_signed_file"
+                                                        style="width: 100%;">
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 11 Collector Signed
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col" string="">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <!-- Upload Collector Signed File (editable only in submitted state) -->
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                    string="Upload Collector Signed Section 11"
+                                                    widget="binary"
+                                                    readonly="state != 'submitted'"
+                                                    placeholder="Upload Section 11 Approval Letter"
+                                                    help="Upload the signed Section 11 approval document from Collector"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="collector_signed_filename" invisible="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </group>
                         </page>
                         <page string="Questions / प्रश्न">
@@ -204,22 +241,21 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Villages / ग्राम">
-                            <field name="land_parcel_ids" nolabel="1">
-                                <list string="Villages">
-                                    <field name="khasra_number" string="Khasra Number / खसरा नंबर"/>
-                                    <field name="area_in_hectares" string="Area (Hectares) / क्षेत्रफल (हेक्टेयर)"/>
-                                    <field name="survey_number" string="Survey Number / सर्वे नंबर"/>
-                                    <field name="survey_date" string="Survey Date / सर्वे दिनांक"/>
-                                    <field name="district_id" string="District / जिला"/>
-                                    <field name="village_id" string="Village / ग्राम"/>
-                                    <field name="project_id" string="Project / परियोजना"/>
-                                    <field name="survey_state" string="Status / स्थिति" widget="badge"
-                                           decoration-success="survey_state == 'approved'"
-                                           decoration-info="survey_state == 'submitted'"
-                                           decoration-warning="survey_state == 'draft'"
-                                           decoration-danger="survey_state == 'rejected'"
-                                           decoration-muted="survey_state == 'locked'"/>
+                        <page string="Surveys / सर्वे" invisible="not project_id or not village_id">
+                            <field name="survey_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="name" string="Survey Number"/>
+                                    <field name="user_id" string="Surveyor"/>
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="total_area" string="Total Area (Hectares)"/>
+                                    <field name="acquired_area" string="Acquired Area (Hectares)"/>
+                                    <field name="state" widget="badge" string="Status"
+                                           decoration-success="state == 'approved'"
+                                           decoration-info="state == 'submitted'"
+                                           decoration-warning="state == 'draft'"
+                                           decoration-danger="state == 'rejected'"
+                                           decoration-muted="state == 'locked'"/>
+                                    <field name="survey_date" string="Survey Date"/>
                                 </list>
                             </field>
                         </page>

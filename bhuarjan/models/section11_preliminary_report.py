@@ -93,6 +93,9 @@ class Section11PreliminaryReport(models.Model):
     survey_numbers = fields.Char(string='Survey Numbers', compute='_compute_survey_info', store=False)
     survey_date = fields.Date(string='Survey Date', compute='_compute_survey_info', store=False)
     
+    # Survey IDs for read-only display
+    survey_ids = fields.Many2many('bhu.survey', string='Approved Surveys', compute='_compute_survey_ids', store=False)
+    
     @api.depends('project_id', 'village_id')
     def _compute_project_statistics(self):
         """Compute total khasras count and total area acquired from Form 10 surveys"""
@@ -147,6 +150,20 @@ class Section11PreliminaryReport(models.Model):
             else:
                 record.survey_numbers = ''
                 record.survey_date = False
+    
+    @api.depends('village_id', 'project_id')
+    def _compute_survey_ids(self):
+        """Compute related surveys (approved/locked) for the village and project"""
+        for record in self:
+            if record.village_id and record.project_id:
+                surveys = self.env['bhu.survey'].search([
+                    ('village_id', '=', record.village_id.id),
+                    ('project_id', '=', record.project_id.id),
+                    ('state', 'in', ['approved', 'locked'])
+                ], order='khasra_number')
+                record.survey_ids = surveys
+            else:
+                record.survey_ids = False
     
     # Paragraph 2: Claims/Objections Information - REMOVED (not needed)
     # paragraph_2_claims_info removed as per user request

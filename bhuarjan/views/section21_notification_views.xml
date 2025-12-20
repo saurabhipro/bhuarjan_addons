@@ -66,15 +66,35 @@
                     
                     <notebook>
                         <page string="Section 21 Documents / धारा 21 दस्तावेज़">
+                            <style>
+                                @media (max-width: 768px) {
+                                    .responsive-section21-group {
+                                        flex-direction: column !important;
+                                    }
+                                    .responsive-section21-group > * {
+                                        width: 100% !important;
+                                        margin-bottom: 15px !important;
+                                    }
+                                }
+                                .responsive-section21-group {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 50px;
+                                }
+                                .responsive-section21-group > * {
+                                    flex: 1;
+                                    min-width: 300px;
+                                }
+                            </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
-                                    <group string="Download Section 21 Documents" style="margin-right: 50px; padding-right: 20px;">
+                                <div class="responsive-section21-group">
+                                    <group string="Download Section 21 Documents">
                                         <!-- Download Public Section 21 -->
                                         <button name="action_generate_public_notice" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
-                                                string="Download Public Sec 21"
+                                                string="Section 21 Public"
                                                 title="Download Section 21 Public Notice Only (Always generates fresh PDF)"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
@@ -82,7 +102,7 @@
                                         <button name="action_generate_personal_notices_only" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
-                                                string="Download Personal Sec 21"
+                                                string="Section 21 Personal"
                                                 title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
@@ -90,76 +110,100 @@
                                         <button name="action_generate_section21_all" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
-                                                string="Download All Sec 21"
+                                                string="Section 21 All"
                                                 title="Download Both Public and Personal Section 21 Notices in one PDF"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed Section 21 -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
                                                 title="Download SDM Signed Section 21"
                                                 invisible="not sdm_signed_file"
-                                                style="width: 100%;"/>
+                                                style="width: 100%;">
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            Section 21 SDM Signed
+                                        </button>
                                     </group>
-                                    <group string="Upload SDM Signed Section 21" style="margin-left: 50px; padding-left: 20px;">
+                                    <group string="Upload SDM Signed Section 21">
                                         <!-- Upload SDM Signed File -->
                                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                                string="Upload SDM Signed Section 21"
                                                widget="binary"
                                                readonly="state == 'signed'"
                                                placeholder="Select SDM Signed Section 21 PDF to upload"
-                                               help="Upload the signed Section 21 document from SDM"
-                                               invisible="sdm_signed_file"/>
+                                               help="Upload the signed Section 21 document from SDM"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
-                                        
-                                        <!-- Show uploaded file -->
-                                        <group invisible="not sdm_signed_file or state == 'signed'">
-                                            <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                                   widget="binary"
-                                                   readonly="1"
-                                                   nolabel="1"/>
-                                        </group>
                                         
                                         <!-- Mark as Signed Button -->
                                         <button name="action_mark_signed" string="Mark as Signed" type="object" 
                                                 class="btn-success" icon="fa-check"
                                                 invisible="not sdm_signed_file or state == 'signed'"
-                                                title="Mark notification as signed after uploading SDM file"/>
+                                                title="Mark notification as signed after uploading SDM file"
+                                                style="width: 100%; margin-top: 10px;"/>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
-                                <group col="2">
-                                    <group string="Download Section 21 Documents" style="margin-right: 50px; padding-right: 20px;">
-                                        <!-- Download Collector Signed Section 21 -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed Section 21"
-                                                invisible="not collector_signed_file"
-                                                style="width: 100%;"/>
-                                    </group>
-                                    <group string="Upload Collector Signed Section 21" style="margin-left: 50px; padding-left: 20px;">
-                                        <!-- Upload Collector Signed File -->
-                                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                                               string="Upload Collector Signed Section 21"
-                                               widget="binary"
-                                               readonly="state != 'generated' and state != 'signed'"
-                                               placeholder="Select Collector Signed Section 21 PDF to upload"
-                                               help="Upload the signed Section 21 approval document from Collector"
-                                               invisible="collector_signed_file"/>
-                                        <field name="collector_signed_filename" invisible="1"/>
-                                        
-                                        <!-- Show uploaded file -->
-                                        <group invisible="not collector_signed_file or (state != 'generated' and state != 'signed')">
-                                            <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                   widget="binary"
-                                                   readonly="1"
-                                                   nolabel="1"/>
-                                        </group>
-                                    </group>
-                                </group>
+                                <div class="responsive-section21-group row">
+                                    <div class="col" string="Download Section 21 Documents">
+                                        <div class="row" style="padding: 10px 0;">
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download All Section 21 (Latest) -->
+                                                <button name="action_generate_section21_all" 
+                                                        string="Section 21" type="object" 
+                                                        class="btn-info" icon="fa-download"
+                                                        title="Download Both Public and Personal Section 21 Notices in one PDF"
+                                                        style="width: 100%;"/>
+                                            </div>
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download SDM Signed Section 21 -->
+                                                <button name="action_download_sdm_signed_file" 
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download SDM Signed Section 21"
+                                                        invisible="not sdm_signed_file"
+                                                        style="width: 100%;">
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 21 SDM Signed
+                                                </button>
+                                            </div>
+                                            <div class="col" style="padding: 0 10px;">
+                                                <!-- Download Collector Signed Section 21 -->
+                                                <button name="action_download_collector_signed_file"
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download Collector Signed Section 21"
+                                                        invisible="not collector_signed_file"
+                                                        style="width: 100%;">
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 21 Collector Signed
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col" string="">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <!-- Upload Collector Signed File -->
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                    string="Upload Collector Signed Section 21"
+                                                    widget="binary"
+                                                    readonly="state != 'generated' and state != 'signed'"
+                                                    placeholder="Select Collector Signed Section 21 PDF to upload"
+                                                    help="Upload the signed Section 21 approval document from Collector"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="collector_signed_filename" invisible="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </group>
                         </page>
                         <page string="Surveys / सर्वे" icon="fa-clipboard-list" invisible="not project_id or not village_id">

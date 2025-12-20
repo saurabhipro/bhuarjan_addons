@@ -3,12 +3,12 @@
     <!-- Section 21 Personal Notification Report -->
     <record id="action_report_section21_personal_and_public_notification" model="ir.actions.report">
         <field name="name">Section 21 Personal Notice / धारा 21 व्यक्तिगत सूचना</field>
-        <field name="model">bhu.section21.personal.notice</field>
+        <field name="model">bhu.section21.notification</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.section21_personal_and_public_notification_report</field>
         <field name="report_file">bhuarjan.section21_personal_and_public_notification_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'Section21_Personal_and_public_Notice_' + ((object and object.khasra_number) or (docs and docs[0] and docs[0].khasra_number) or 'All')</field>
+        <field name="print_report_name">'Section21_Personal_and_public_Notice'</field>
     </record>
 
     <!-- Section 21 Personal Notification Report Template -->
@@ -22,123 +22,20 @@
                     <div class="oe_structure"/>
 
                     <t t-if="o">
-                        <style>
-                             /* Override basic_layout styles aggressively */
-                    body, html, .container, .page {
-                        font-size: 18px !important;
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
-                    .letter_space {
-                        letter-spacing: 1px !important;
-                    }
-                    /* Global Font Settings */
-                    body, .header-section, h2, h3, strong, span, td, th, p, div, .container, .page {
-                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                    }
-                    /* Schedule table styling */
-                    .schedule-table {
-                        width: 100% !important;
-                        border-collapse: collapse !important;
-                        margin: 8px 0 !important;
-                        border: 2px solid #000 !important;
-                        font-size: 18px !important;
-                    }
-                    .schedule-table th, .schedule-table td {
-                        border: 1px solid #000 !important;
-                        padding: 6px !important;
-                        text-align: center !important;
-                        font-size: 18px !important;
-                        vertical-align: middle !important;
-                    }
-                    .schedule-table th {
-                        background-color: #f5f5f5 !important;
-                        font-weight: bold !important;
-                        font-size: 18px !important;
-                        padding: 7px 8px !important;
-                    }
-                    /* Watermark with Logo - Centered on Page */
-                    .watermark {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        opacity: 0.1;
-                        z-index: 0;
-                        pointer-events: none;
-                        width: 600px;
-                        height: 600px;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .watermark img {
-                        width: 500px;
-                        height: 500px;
-                        object-fit: contain;
-                    }
-                    .watermark-circle {
-                        position: absolute;
-                        width: 550px;
-                        height: 550px;
-                        border: 2px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 50%;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        z-index: -1;
-                    }
-                    /* Ensure content is above watermark */
-                    .container {
-                        position: relative;
-                        z-index: 1;
-                        background: transparent;
-                        box-sizing: border-box;
-                    }
-                    /* Ensure page takes full height */
-                    body, html {
-                        height: 100%;
-                        margin: 0;
-                        padding: 0;
-                        font-size: 18px !important;
-                    }
-                    @page {
-                        size: A4;
-                        margin: 0;
-                    }
-                        </style>
-                        <!-- ************************* private *********************** -->
-                        <t t-set="all_personal_notices" t-value="docs if docs else (object and [object] or [])"/>
-            
-                        <t t-set="notification" t-value="all_personal_notices and all_personal_notices[0].notification_id or None"/>
-                        <t t-if="not notification">
-                            <t t-set="notification_id" t-value="request.env.context.get('section21_notification_id') or request.env.context.get('active_id')"/>
-                            <t t-if="notification_id">
-                                <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification_id)"/>
-                            </t>
-                        </t>
-                        <!-- ************************* Public ************************ -->
-                        <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification.id) if notification and notification.id else None"/>
-                        <t t-set="land_parcels" t-value="notification and notification.land_parcel_ids or []"/>
-                        <t t-if="notification and notification.project_id">
-                            <t t-set="project" t-value="notification.project_id"/>
-                        </t>
-                        <!-- **************************************** public ****************************************-->
+                        <!-- PUBLIC -->
                         <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
                             <!-- Watermark with Logo - Centered on Page -->
-                            <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
+                            <!-- <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
                             <div class="watermark">
                                 <div class="watermark-circle"></div>
                                 <t t-if="base_url">
                                     <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark" style="max-width: 100%; height: auto;"/>
                                 </t>
-                            </div>
+                            </div> -->
                             <!-- Header: Collector's Court -->
                             <div style="text-align: center; margin-bottom: 8px;">
                                 <h2 style="margin: 0; padding: 0; font-size: 22px; font-weight: bold;">
-                                    <strong>न्यायालय कलेक्टर, जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span> (छ.ग.)</strong>
+                                    <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                 </h2>
                             </div>
 
@@ -146,8 +43,8 @@
                             <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 18px !important;">
                                 <div>
                                     <strong>रायगढ़ दिनाँक</strong>
-                                    <span t-if="notification and notification.notice_date" t-esc="notification.notice_date.strftime('%d/%m/%Y')"/>
-                                    <span t-if="not notification or not notification.notice_date" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
+                                    <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
                                 </div>
                             </div>
 
@@ -155,11 +52,11 @@
                             <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                 <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
                                     भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
-                                    <span t-if="notification and notification.requisitioning_body" t-esc="notification.requisitioning_body"/>
-                                    <span t-if="not notification or not notification.requisitioning_body" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
+                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
                                     (छ.ग.) के
-                                    <span t-if="notification and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/>
-                                    <span t-if="not notification or not notification.project_id or not notification.project_id.name" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
                                     प्रयोजन हेतु।
                                 </p>
                             </div>
@@ -168,8 +65,8 @@
                             <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                 <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
                                     राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
-                                    <span t-if="notification and notification.public_purpose" t-esc="notification.public_purpose"/>
-                                    <span t-if="not notification or not notification.public_purpose" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
+                                    <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
                                     ) हेतु आवश्यकता है एवं राज्य शासन का आशय उवत भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वंय अथवा अपने अधिकृत प्रतिनिधि या अधिववत्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
                                 </p>
                             </div>
@@ -187,50 +84,51 @@
                                 <div style="margin-bottom: 8px; font-size: 18px !important;">
                                     <div style="margin-bottom: 3px;">
                                         <strong>(क) जिला :-</strong>
-                                        <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
-                                        <span t-if="not notification or not notification.district_id">रायगढ़</span>
+                                        <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                        <span t-if="not o or not o.district_id">रायगढ़</span>
                                     </div>
                                     <div style="margin-bottom: 3px;">
                                         <strong>(ख) तहसील :-</strong>
-                                        <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
-                                        <span t-if="not notification or not notification.tehsil_id" style="text-decoration: underline;">........................</span>
+                                        <span t-if="o and o.tehsil_id" t-esc="o.tehsil_id.name"/>
+                                        <span t-if="not o or not o.tehsil_id" style="text-decoration: underline;">........................</span>
                                     </div>
                                     <div style="margin-bottom: 3px;">
                                         <strong>(ग) ग्राम :-</strong>
-                                        <span t-if="notification and notification.village_id" t-esc="notification.village_id.name"/>
-                                        <span t-if="not notification or not notification.village_id" style="text-decoration: underline;">........................</span>
+                                        <span t-if="o and o.village_id" t-esc="o.village_id.name"/>
+                                        <span t-if="not o or not o.village_id" style="text-decoration: underline;">........................</span>
                                     </div>
                                 </div>
 
                                 <!-- Land Parcels Table -->
-                                <table class="schedule-table">
+                                <table class="schedule-table w-100 border border-black">
                                     <thead>
                                         <tr>
-                                            <th style="width: 33.33%;">खसरा क्रमांक</th>
-                                            <th style="width: 33.33%;">अर्जित रकबा</th>
-                                            <th style="width: 33.33%;">रिमार्क</th>
+                                            <th class="border border-black bg-secondary" style="width: 33.33%;">खसरा क्रमांक</th>
+                                            <th class="border border-black bg-secondary" style="width: 33.33%;">अर्जित रकबा</th>
+                                            <th class="border border-black bg-secondary" style="width: 33.33%;">रिमार्क</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <t t-if="land_parcels and len(land_parcels) > 0">
-                                            <t t-foreach="land_parcels" t-as="parcel">
+                                        <t t-if="o.action_generate_section21_public_for_all()">
+                                            <t t-foreach="o.action_generate_section21_public_for_all()" t-as="parcel">
+                                            <!-- <p> <t t-esc="parcel"/></p> -->
                                                 <tr>
-                                                    <td style="font-size: 18px !important; text-align: center;">
+                                                    <td class="border border-black" style="font-size: 18px !important; text-align: center;">
                                                         <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
                                                         <t t-if="not parcel.khasra_number">........................</t>
                                                     </td>
-                                                    <td style="font-size: 18px !important; text-align: center;">
+                                                    <!-- <td style="font-size: 18px !important; text-align: center;">
                                                         <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
                                                         <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
                                                     </td>
                                                     <td style="font-size: 18px !important; text-align: center;">
                                                         <t t-if="parcel.remark" t-esc="parcel.remark"/>
-                                                        <t t-if="not parcel.remark">--</t>
-                                                    </td>
+                                                        <t t-if="not parcel.remark"></t>
+                                                    </td> -->
                                                 </tr>
                                             </t>
                                         </t>
-                                        <t t-if="not land_parcels or len(land_parcels) == 0">
+                                        <t t-if="not o.action_generate_section21_public_for_all()">
                                             <tr>
                                                 <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
                                                 <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
@@ -244,11 +142,11 @@
                             <!-- Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
                                 <div style="margin: 5px 0; font-size: 18px !important;">
-                                    <span t-if="notification and notification.collector_name" t-esc="notification.collector_name"/>
-                                    <span t-if="not notification or not notification.collector_name">कलेक्टर</span>
+                                    <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
+                                    <span t-if="not o or not o.collector_name">कलेक्टर</span>
                                 </div>
                                 <div style="margin: 3px 0; font-size: 18px !important;">
-                                    जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span>
+                                    जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
 
@@ -256,249 +154,154 @@
                             <!-- Additional Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
                                 <div style="margin: 5px 0; font-size: 18px !important;">
-                                    <span t-if="notification and notification.additional_collector_name" t-esc="notification.additional_collector_name"/>
-                                    <span t-if="not notification or not notification.additional_collector_name">अपर कलेक्टर</span>
+                                    <span t-if="o and o.additional_collector_name" t-esc="o.additional_collector_name"/>
+                                    <span t-if="not o or not o.additional_collector_name">अपर कलेक्टर</span>
                                 </div>
                                 <div style="margin: 3px 0; font-size: 18px !important;">
-                                    जिला-<span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/><span t-if="not notification or not notification.district_id">रायगढ़</span>
+                                    जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
                         </div>
-
-                        <div style="page-break-before: always;"></div>
-                        <!-- ********************** Private *************************** -->
-                        <t t-if="not all_personal_notices or not notification">
-                            <div style="padding: 20px; text-align: center; font-size: 18px; color: red;">
-                                <p><strong>No personal notices found or notification missing.</strong></p>
-                                <p>Please ensure surveys exist and personal notices were generated.</p>
-                            </div>
-                        </t>
-                        <t t-if="all_personal_notices and notification">
-                            <!-- Reload notification to ensure all fields are loaded (same as public template) -->
-                            <t t-set="notification" t-value="request.env['bhu.section21.notification'].sudo().browse(notification.id)"/>
-                            <t t-set="land_parcels" t-value="notification.land_parcel_ids or []"/>
-                            
-                            <!-- Render each personal notice - one per khasra -->
-                            <t t-set="notice_index" t-value="0"/>
-                            <t t-foreach="all_personal_notices" t-as="personal_notice">
-                                <!-- Page break between notices (not before first) -->
-                                <t t-if="notice_index > 0">
-                                    <div style="page-break-before: always;"></div>
-                                </t>
-                                <t t-set="notice_index" t-value="notice_index + 1"/>
-                                
-                                <!-- Get khasra and landowner from personal notice -->
-                                <t t-set="khasra_number" t-value="personal_notice.khasra_number or ''"/>
-                                <t t-set="landowner" t-value="personal_notice.landowner_id or None"/>
-                                <t t-set="landowner_name" t-value="landowner and landowner.name or ''"/>
-                                <t t-set="landowner_father" t-value="landowner and landowner.father_name or ''"/>
-                                <t t-set="landowner_spouse" t-value="landowner and landowner.spouse_name or ''"/>
-                                <t t-set="landowner_address" t-value="landowner and landowner.owner_address or ''"/>
-                                
-                                <!-- Render this personal notice -->
-                                <div>
-                                <style>
-                                    body, html, .container, .page {
-                                        font-size: 18px !important;
-                                        font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                                    }
-                                    .letter_space {
-                                        letter-spacing: 1px !important;
-                                    }
-                                    .schedule-table {
-                                        width: 100% !important;
-                                        border-collapse: collapse !important;
-                                        margin: 8px 0 !important;
-                                        border: 2px solid #000 !important;
-                                        font-size: 18px !important;
-                                    }
-                                    .schedule-table th, .schedule-table td {
-                                        border: 1px solid #000 !important;
-                                        padding: 6px !important;
-                                        text-align: center !important;
-                                        font-size: 18px !important;
-                                        vertical-align: middle !important;
-                                    }
-                                    .schedule-table th {
-                                        background-color: #f5f5f5 !important;
-                                        font-weight: bold !important;
-                                        font-size: 18px !important;
-                                        padding: 7px 8px !important;
-                                    }
-                                    .watermark {
-                                        position: absolute;
-                                        top: 50%;
-                                        left: 50%;
-                                        transform: translate(-50%, -50%);
-                                        opacity: 0.1;
-                                        z-index: 0;
-                                        pointer-events: none;
-                                        width: 600px;
-                                        height: 600px;
-                                        display: flex;
-                                        flex-direction: column;
-                                        align-items: center;
-                                        justify-content: center;
-                                    }
-                                    .watermark img {
-                                        width: 500px;
-                                        height: 500px;
-                                        object-fit: contain;
-                                    }
-                                    .watermark-circle {
-                                        position: absolute;
-                                        width: 550px;
-                                        height: 550px;
-                                        border: 2px solid rgba(0, 0, 0, 0.1);
-                                        border-radius: 50%;
-                                        top: 50%;
-                                        left: 50%;
-                                        transform: translate(-50%, -50%);
-                                        z-index: -1;
-                                    }
-                                    .container {
-                                        position: relative;
-                                        z-index: 1;
-                                        background: transparent;
-                                        box-sizing: border-box;
-                                    }
-                                    body, html {
-                                        height: 100%;
-                                        margin: 0;
-                                        padding: 0;
-                                    }
-                                    @page {
-                                        size: A4;
-                                        margin: 0;
-                                    }
-                                </style>
-                                
-                                <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px);">
-                                    <!-- Watermark -->
-                                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
+                        
+                        <!-- Private -->
+                        <div style="page-break-before: always;"/>
+                        <t t-if="o.action_generate_section21_public_for_all()">
+                            <t t-foreach="o.action_generate_section21_public_for_all()" t-as="parcel">
+                                <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
+                                    <!-- Watermark with Logo - Centered on Page -->
+                                    <!-- <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
                                     <div class="watermark">
                                         <div class="watermark-circle"></div>
                                         <t t-if="base_url">
-                                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo" style="max-width: 100%; height: auto;"/>
+                                            <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark" style="max-width: 100%; height: auto;"/>
                                         </t>
-                                    </div>
-                                    
-                                    <!-- Header -->
+                                    </div> -->
+                                    <!-- Header: Collector's Court -->
                                     <div style="text-align: center; margin-bottom: 8px;">
                                         <h2 style="margin: 0; padding: 0; font-size: 22px; font-weight: bold;">
-                                            <strong>न्यायालय कलेक्टर, जिला-<span t-esc="notification.district_id.name if notification.district_id else 'रायगढ़'"/> (छ.ग.)</strong>
+                                            <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                         </h2>
                                     </div>
-                                    
-                                    <!-- Notice Title -->
-                                    <div style="text-align: center; margin-bottom: 10px;">
-                                        <h3 style="margin: 0; padding: 0; font-size: 20px; font-weight: bold;">
-                                            <strong>धारा 21 (1) के अधीन सूचना</strong>
-                                        </h3>
+
+                                    <!-- Public Notice Header with Date -->
+                                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 18px !important;">
+                                        <div>
+                                            <strong>रायगढ़ दिनाँक</strong>
+                                            <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
+                                            <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                        </div>
                                     </div>
-                                    
-                                    <!-- Notice Content -->
-                                    <div style="margin-bottom: 12px; font-size: 18px; line-height: 1.6;">
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            <strong>प्रिय</strong> <t t-esc="landowner_name or 'श्री/श्रीमती ........................'"/>,
-                                        </p>
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            पिता/पति: <t t-esc="landowner_father or landowner_spouse or '........................'"/>,
-                                        </p>
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            पता: <t t-esc="landowner_address or '........................'"/>
-                                        </p>
-                                        <p style="margin: 10px 0; text-align: justify;">
-                                            <strong>विषय:</strong> भूमि अधिग्रहण अधिनियम, 2013 की धारा 21 (1) के अधीन सूचना।
-                                        </p>
-                                        <p style="margin: 5px 0; text-align: justify;">
+                                     <p style="margin: 5px 0; text-align: justify;">
+                                        <strong>प्रिय</strong>
+                                        
+                                         <t t-esc="landowner_name or 'श्री/श्रीमती ........................'"/>,
+                                    </p>
+                                    <p style="margin: 5px 0; text-align: justify;">
+                                        पिता/पति: <t t-esc="landowner_father or landowner_spouse or '........................'"/>,
+                                    </p>
+                                    <p style="margin: 5px 0; text-align: justify;">
+                                        पता: <t t-esc="landowner_address or '........................'"/>
+                                    </p>
+                                    <p style="margin: 10px 0; text-align: justify;">
+                                        <strong>विषय:</strong> भूमि अधिग्रहण अधिनियम, 2013 की धारा 21 (1) के अधीन सूचना।
+                                    </p>
+
+                                    <!-- Main Body Text - Paragraph 1 -->
+                                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
                                             भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
-                                            <span t-if="notification and notification.project_id and notification.project_id.department_id" t-esc="notification.project_id.department_id.name"/>
-                                            <span t-if="not notification or not notification.project_id or not notification.project_id.department_id" style="text-decoration: underline;">........................</span>
+                                            <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
+                                            <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
                                             (छ.ग.) के
-                                            <span t-if="notification and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/>
-                                            <span t-if="not notification or not notification.project_id or not notification.project_id.name" style="text-decoration: underline;">........................</span>
+                                            <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                            <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
                                             प्रयोजन हेतु।
                                         </p>
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन
-                                            (<span t-if="notification and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/><span t-if="not notification or not notification.project_id or not notification.project_id.name" style="text-decoration: underline;">........................</span>)
-                                            हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
+                                    </div>
+
+                                    <!-- Main Body Text - Paragraph 2 -->
+                                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
+                                            राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
+                                            <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
+                                            <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
+                                            ) हेतु आवश्यकता है एवं राज्य शासन का आशय उवत भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वंय अथवा अपने अधिकृत प्रतिनिधि या अधिववत्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
                                         </p>
                                     </div>
 
                                     <!-- Schedule Separator -->
-                                    <div style="text-align: center; margin: 10px 0; font-size: 18px; font-weight: bold;">
-                                        <strong>// अनुसूची //</strong>
+                                    <div style="text-align: center; margin: 10px 0; font-size: 18px !important; font-weight: bold;">
+                                        <strong>// अनूसूची //</strong>
                                     </div>
 
-                                    <!-- Land Details heading -->
-                                    <div style="margin: 10px 0; font-size: 18px; font-weight: bold;">
-                                        <strong>1) भूमि का विवरण :-</strong>
-                                    </div>
-                                    <div style="margin-bottom: 8px; font-size: 18px;">
-                                        <div style="margin-bottom: 3px;">
-                                            <strong>(क) जिला :-</strong>
-                                            <span t-if="notification and notification.district_id" t-esc="notification.district_id.name"/>
-                                            <span t-if="not notification or not notification.district_id">रायगढ़</span>
+                                    <!-- Land Details Section -->
+                                    <div style="margin: 10px 0;">
+                                        <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 6px;">
+                                            <strong>1) भूमि का विवरण :-</strong>
                                         </div>
-                                        <div style="margin-bottom: 3px;">
-                                            <strong>(ख) तहसील :-</strong>
-                                            <span t-if="notification and notification.tehsil_id" t-esc="notification.tehsil_id.name"/>
-                                            <span t-if="not notification or not notification.tehsil_id" style="text-decoration: underline;">........................</span>
+                                        <div style="margin-bottom: 8px; font-size: 18px !important;">
+                                            <div style="margin-bottom: 3px;">
+                                                <strong>(क) जिला :-</strong>
+                                                <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                                <span t-if="not o or not o.district_id">रायगढ़</span>
+                                            </div>
+                                            <div style="margin-bottom: 3px;">
+                                                <strong>(ख) तहसील :-</strong>
+                                                <span t-if="o and o.tehsil_id" t-esc="o.tehsil_id.name"/>
+                                                <span t-if="not o or not o.tehsil_id" style="text-decoration: underline;">........................</span>
+                                            </div>
+                                            <div style="margin-bottom: 3px;">
+                                                <strong>(ग) ग्राम :-</strong>
+                                                <span t-if="o and o.village_id" t-esc="o.village_id.name"/>
+                                                <span t-if="not o or not o.village_id" style="text-decoration: underline;">........................</span>
+                                            </div>
                                         </div>
-                                        <div style="margin-bottom: 3px;">
-                                            <strong>(ग) ग्राम :-</strong>
-                                            <span t-if="notification and notification.village_id" t-esc="notification.village_id.name"/>
-                                            <span t-if="not notification or not notification.village_id" style="text-decoration: underline;">........................</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Land Parcels Table - Filter by khasra_number -->
-                                    <table style="width: 100%; border-collapse: collapse; margin: 12px 0; border: 2px solid #000; font-size: 18px; text-align: center;">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 25%; border: 1px solid #000; padding: 6px; background: #f5f5f5; font-weight: bold;">खसरा क्रमांक</th>
-                                                <th style="width: 25%; border: 1px solid #000; padding: 6px; background: #f5f5f5; font-weight: bold;">अर्जित रकबा</th>
-                                                <th style="width: 25%; border: 1px solid #000; padding: 6px; background: #f5f5f5; font-weight: bold;">रिमार्क</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <t t-set="row_num" t-value="0"/>
-                                            <t t-set="parcel_found" t-value="False"/>
-                                            <t t-foreach="land_parcels" t-as="parcel">
-                                                <t t-set="parcel_khasra" t-value="str(parcel.khasra_number) if parcel.khasra_number else ''"/>
-                                                <t t-set="target_khasra" t-value="str(khasra_number) if khasra_number else ''"/>
-                                                <t t-if="parcel_khasra == target_khasra">
-                                                    <t t-set="parcel_found" t-value="True"/>
-                                                    <t t-set="row_num" t-value="row_num + 1"/>
+
+                                        <!-- Land Parcels Table -->
+                                        <table class="schedule-table  w-100 border border-black">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 33.33%;" class="border border-black bg-secondary"><b>खसरा क्रमांक</b></th>
+                                                    <th style="width: 33.33%;" class="border border-black bg-secondary"><b>अर्जित रकबा</b></th>
+                                                    <th style="width: 33.33%;" class="border border-black bg-secondary"><b>रिमार्क</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    <!-- <p> <t t-esc="parcel"/></p> -->
+                                                        <tr>
+                                                            <td style="font-size: 18px !important; text-align: center;">
+                                                                <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
+                                                                <t t-if="not parcel.khasra_number">........................</t>
+                                                            </td>
+                                                            <!-- <td style="font-size: 18px !important; text-align: center;">
+                                                                <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
+                                                                <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
+                                                            </td>
+                                                            <td style="font-size: 18px !important; text-align: center;">
+                                                                <t t-if="parcel.remark" t-esc="parcel.remark"/>
+                                                                <t t-if="not parcel.remark"></t>
+                                                            </td> -->
+                                                        </tr>
+                                                <t t-if="not o.action_generate_section21_public_for_all()">
                                                     <tr>
-                                                        <td style="border: 1px solid #000; padding: 6px;"><t t-esc="parcel.khasra_number or '........................'"/></td>
-                                                        <t t-set="area_str" t-value="'{:.3f}'.format(parcel.area_hectares) if parcel.area_hectares else '........................'"/>
-                                                        <td style="border: 1px solid #000; padding: 6px;"><t t-esc="area_str"/></td>
-                                                        <td style="border: 1px solid #000; padding: 6px;"><t t-esc="parcel.remark or ''"/></td>
+                                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
+                                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
+                                                        <td style="text-align: center; padding: 8px; font-size: 18px !important;">--</td>
                                                     </tr>
                                                 </t>
-                                            </t>
-                                            <t t-if="not parcel_found">
-                                                <tr>
-                                                    <td style="border: 1px solid #000; padding: 6px;"><t t-esc="khasra_number or '........................'"/></td>
-                                                    <td style="border: 1px solid #000; padding: 6px;">........................</td>
-                                                    <td style="border: 1px solid #000; padding: 6px;"></td>
-                                                </tr>
-                                            </t>
-                                        </tbody>
-                                    </table>
-                                    
-                                    <!-- Additional Information -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                     <!-- Additional Information -->
                                     <div style="margin-top: 12px; font-size: 18px; line-height: 1.6;">
                                         <p style="margin: 5px 0; text-align: justify;">
-                                            जिला: <t t-esc="notification.district_id.name if notification.district_id else 'रायगढ़'"/> | 
-                                            तहसील: <t t-esc="notification.tehsil_id.name if notification.tehsil_id else '........................'"/> | 
-                                            ग्राम: <t t-esc="notification.village_id.name if notification.village_id else '........................'"/>
+                                            जिला: <t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/> | 
+                                            तहसील: <t t-esc="o.tehsil_id.name if o.tehsil_id else '........................'"/> | 
+                                            ग्राम: <t t-esc="o.village_id.name if o.village_id else '........................'"/>
                                         </p>
                                         <p style="margin: 5px 0; text-align: justify;">
-                                            परियोजना: <t t-esc="notification.project_id.name if notification.project_id else '........................'"/>
+                                            परियोजना: <t t-esc="o.project_id.name if o.project_id else '........................'"/>
                                         </p>
                                     </div>
                                     
@@ -506,15 +309,15 @@
                                     <div style="margin-top: 20px;">
                                         <div style="text-align: left; margin-top: 15px;">
                                             <div style="margin: 5px 0; font-size: 18px;">
-                                                <span t-esc="notification.collector_name if notification.collector_name else 'कलेक्टर'"/>
+                                                <span t-esc="o.collector_name if o.collector_name else 'कलेक्टर'"/>
                                             </div>
                                             <div style="margin: 3px 0; font-size: 18px;">
-                                                जिला-<t t-esc="notification.district_id.name if notification.district_id else 'रायगढ़'"/>
+                                                जिला-<t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/>
                                             </div>
                                         </div>
                                         <div style="text-align: right; margin-top: 15px;">
                                             <div style="margin: 5px 0; font-size: 18px;">
-                                                <span t-esc="notification.additional_collector_name if notification.additional_collector_name else 'अपर कलेक्टर'"/>
+                                                <span t-esc="o.additional_collector_name if o.additional_collector_name else 'अपर कलेक्टर'"/>
                                             </div>
                                         </div>
                                     </div>
@@ -526,17 +329,14 @@
                                         </div>
                                         <div style="font-size: 18px; line-height: 1.8;">
                                             <p style="margin: 3px 0;">1. <t t-if="landowner and landowner.name"><t t-esc="landowner.name"/></t><t t-if="not landowner or not landowner.name">श्री/श्रीमती ........................</t></p>
-                                            <p style="margin: 3px 0;">2. दिनांक: <t t-esc="notification.notice_date.strftime('%d/%m/%Y') if notification.notice_date else '........................'"/></p>
+                                            <p style="margin: 3px 0;">2. दिनांक: <t t-esc="o.notice_date.strftime('%d/%m/%Y') if o.notice_date else '........................'"/></p>
                                         </div>
                                     </div>
                                 </div>
-                                </div>
+                                <div style="page-break-before: always;"/>
                             </t>
                         </t>
-                        <div>
-                        </div>
-                    </t>
-
+                     </t>
                 </div>
             </t>
         </t>

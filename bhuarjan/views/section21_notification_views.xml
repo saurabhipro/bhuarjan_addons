@@ -87,7 +87,7 @@
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download All Section 21 -->
-                                        <button name="action_generate_section21_all" type="object" 
+                                        <button name="action_generate_both_notices" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download All Sec 21"

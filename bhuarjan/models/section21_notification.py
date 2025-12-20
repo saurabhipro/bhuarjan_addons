@@ -475,7 +475,58 @@ class Section21Notification(models.Model):
             active_id=self.id
         ).report_action(personal_notices)
     
-
+    def action_generate_section21_public_for_all(self):
+        print("\n\n function is working work ")
+        """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
+        self.ensure_one()
+        
+        # Validate village and project are selected
+        if not self.village_id:
+            raise ValidationError(_('Please select a village before generating Section 21 notices.'))
+        
+        if not self.project_id:
+            raise ValidationError(_('Please select a project before generating Section 21 notices.'))
+        
+        # Get khasra numbers directly from surveys (don't check land parcels)
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked']),
+            ('khasra_number', '!=', False)
+        ])
+        
+        if not surveys:
+            # If no surveys, just generate public notice
+            return self.action_generate_public_notice()
+        
+        # Get all unique khasra numbers directly from surveys
+        khasra_numbers = list(set(surveys.mapped('khasra_number')))
+        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
+        
+        if not khasra_numbers:
+            # If no khasras, just generate public notice
+            return self.action_generate_public_notice()
+        
+        # Get khasra-landowner mapping for personal notices (if available)
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
+        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
+        khasra_to_landowner = {}
+        for khasra, landowner in khasra_landowner_mapping:
+            if khasra not in khasra_to_landowner:
+                khasra_to_landowner[khasra] = landowner.id if landowner else False
+        
+        # Create transient records - one per khasra (even if no landowner)
+        personal_notices = self.env['bhu.section21.personal.notice'].create([
+            {
+                'notification_id': self.id,
+                'landowner_id': khasra_to_landowner.get(khasra, False),
+                'khasra_number': khasra,
+            }
+            for khasra in khasra_numbers
+        ])
+        print("\n\n personal_notices - ", personal_notices)
+        return personal_notices
+    
 
     def action_generate_both_notices(self):
         self.ensure_one()

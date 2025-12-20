@@ -150,6 +150,11 @@ class BhuProject(models.Model):
     is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
                                                default=False, tracking=True,
                                                help='Whether exemption is granted from Chapters Two and Three of Act 2013')
+    section5_text_type = fields.Selection([
+        ('exemption', 'प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनाँक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।'),
+        ('sia_justification', 'प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।')
+    ], string='Section 5 Text / धारा 5 पाठ', default='exemption', tracking=True,
+       help='Select which text to display in Section 5 of the report')
     exemption_details = fields.Text(string='Exemption Details / छूट विवरण', tracking=True,
                                                  help='Details of exemption notification (number, date, exempted chapters)')
     sia_justification = fields.Text(string='SIA Justification / SIA औचित्य', tracking=True,

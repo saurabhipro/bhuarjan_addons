@@ -193,11 +193,11 @@
                             <group string="(नौ) क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय &quot;दो&quot; एवं &quot;तीन&quot; के प्रावधानों से छूट प्रदान की गई है। / Has exemption been granted from the provisions of Chapters &quot;Two&quot; and &quot;Three&quot; of the Act 2013 for the proposed project? (From Project Master)">
                                 <field name="is_exemption" nolabel="1" readonly="1"/>
                                 <group string="Exemption Details / छूट विवरण" 
-                                       invisible="not is_exemption">
+                                       invisible="section5_text_type != 'exemption'">
                                     <field name="exemption_details" widget="text" nolabel="1" readonly="1"/>
                                 </group>
                                 <group string="SIA Justification / SIA औचित्य" 
-                                       invisible="is_exemption">
+                                       invisible="section5_text_type != 'sia_justification'">
                                     <field name="sia_justification" widget="text" nolabel="1" readonly="1"/>
                                 </group>
                             </group>

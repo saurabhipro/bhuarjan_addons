@@ -175,6 +175,12 @@ class Section11PreliminaryReport(models.Model):
     is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
                                                related='project_id.is_exemption', readonly=True,
                                                default=False, tracking=True)
+    section5_text_type = fields.Selection([
+        ('exemption', 'प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनाँक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।'),
+        ('sia_justification', 'प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।')
+    ], string='Section 5 Text / धारा 5 पाठ',
+       related='project_id.section5_text_type', readonly=True, tracking=True,
+       help='Select which text to display in Section 5 of the report')
     exemption_details = fields.Text(string='Exemption Details / छूट विवरण',
                                                  related='project_id.exemption_details', readonly=True,
                                                  help='Details of exemption notification (number, date, exempted chapters)',
@@ -189,6 +195,21 @@ class Section11PreliminaryReport(models.Model):
                                                related='project_id.rehab_admin_name', readonly=True,
                                                help='Name/Designation of Rehabilitation and Resettlement Administrator',
                                                tracking=True)
+    
+    def get_section5_text(self):
+        """Get the text for section 5 based on the selected type"""
+        self.ensure_one()
+        if not self.section5_text_type:
+            return ''
+        # Get the selection label
+        field = self._fields.get('section5_text_type')
+        if field and field.selection:
+            selection = field.selection
+            if callable(selection):
+                selection = selection(self)
+            selection_dict = dict(selection) if selection else {}
+            return selection_dict.get(self.section5_text_type, '')
+        return ''
     
     # Signed document fields
     signed_document_file = fields.Binary(string='Signed Report')

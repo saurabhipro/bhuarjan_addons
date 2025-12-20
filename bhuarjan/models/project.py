@@ -171,8 +171,6 @@ class BhuProject(models.Model):
     allocated_area_hectares = fields.Float(string='Allocated Area (Hectares) / आवंटित रकबा (हेक्टेयर)', 
                                           digits=(16, 4), tracking=True,
                                           help='Area in hectares allocated for rehabilitation and resettlement')
-    allocated_officer_name = fields.Char(string='Allocated Officer / आवंटित अधिकारी', tracking=True,
-                                        help='Name/Designation of the officer responsible for allocated rehabilitation land')
     
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):

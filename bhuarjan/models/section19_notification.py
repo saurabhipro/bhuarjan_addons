@@ -189,8 +189,6 @@ class Section19Notification(models.Model):
                 self.rehab_khasra_number = self.project_id.allocated_khasra_number
             if self.project_id.allocated_area_hectares:
                 self.rehab_area_hectares = self.project_id.allocated_area_hectares
-            if self.project_id.allocated_officer_name:
-                self.rehab_officer_office_location = self.project_id.allocated_officer_name
             return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
         else:
             # No villages in project, reset village

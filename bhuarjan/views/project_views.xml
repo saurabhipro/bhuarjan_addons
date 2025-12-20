@@ -52,8 +52,19 @@
                             <field name="is_displacement"/>
                         </group>
                     </group>
+                    
+                    <!-- Affected Families and Persons (shown when is_displacement is True) -->
+                    <group invisible="not is_displacement">
+                        <group>
+                            <field name="affected_families_count" 
+                                   string="Number of Families / परिवारों की संख्या"/>
+                            <field name="affected_persons_count" 
+                                   string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
+                        </group>
+                    </group>
+                    
                     <!-- Rehabilitation Allocation Fields (shown when is_displacement is True) -->
-                    <group invisible="not is_displacement" string="Rehabilitation Allocation / पुनर्वास आवंटन" class="oe_title" style="margin-top: 30px;">
+                    <group invisible="not is_displacement">
                         <group col="2">
                             <group>
                                 <field name="allocated_village" 
@@ -68,8 +79,6 @@
                                        placeholder="Enter allocated khasra number..."/>
                                 <field name="allocated_area_hectares"
                                        placeholder="0.0000"/>
-                                <field name="allocated_officer_name"
-                                       placeholder="Enter allocated officer name/designation..."/>
                             </group>
                         </group>
                     </group>
@@ -165,14 +174,6 @@
                             <group>
                                 <group string="(11) Rehabilitation Administrator / पुनर्वास प्रशासक">
                                     <field name="rehab_admin_name" nolabel="1"/>
-                                </group>
-                                <group string="(12) Affected Families and Persons / प्रभावित परिवार और व्यक्ति">
-                                    <field name="affected_families_count" 
-                                           invisible="not is_displacement"
-                                           string="Number of Families / परिवारों की संख्या"/>
-                                    <field name="affected_persons_count" 
-                                           invisible="not is_displacement"
-                                           string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
                                 </group>
                             </group>
                             <group string="(13) Section 5 Text / धारा 5 पाठ">

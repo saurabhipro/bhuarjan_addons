@@ -10,6 +10,7 @@ class SiaTeam(models.Model):
     _description = 'SIA Team'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
+    _rec_name = 'name'
     
     _sql_constraints = [
         ('unique_project', 'UNIQUE(project_id)', 

@@ -197,34 +197,63 @@
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
-                                <div class="responsive-sia-group">
-                                    <group string="Download SIA Documents">
-                                        <!-- Download Collector Signed SIA -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
-                                                class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed SIA"
-                                                invisible="not collector_signed_file"
-                                                style="width: 100%; margin-bottom: 10px;"/>
-                                        
-                                        <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
-                                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                                class="btn-info" icon="fa-download"
-                                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                invisible="not sdm_signed_file and not collector_signed_file"
-                                                style="width: 100%;"/>
-                                    </group>
-                                    <group string="Upload Collector Signed SIA">
-                                        <!-- Upload Collector Signed File (editable only in submitted state) -->
-                                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                                               string="Upload Collector Signed SIA"
-                                               widget="binary"
-                                               readonly="state != 'submitted'"
-                                               placeholder="Upload SIA Approval Letter"
-                                               help="Upload the signed SIA approval document from Collector"/>
-                                        <field name="collector_signed_filename" invisible="1"/>
-                                    </group>
-                                </div>
+                                 <group string="Download SIA Documents"></group>
+                                 <group string="Upload Collector Signed SIA"></group>
                             </group>
+
+
+                            <div class="responsive-sia-group row"  groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" >
+                                <div class="col" string="Download SIA Documents">
+                                    <div class="row">
+                                        <div class="col">
+                                            <!-- Download SDM Signed SIA -->
+                                            <button name="action_download_sdm_signed_file" 
+                                                    string="SDM Signed" type="object" 
+                                                    class="btn-primary" icon="fa-download"
+                                                    title="Download SDM Signed Proposal"
+                                                    invisible="not sdm_signed_file"
+                                                    style="width: 100%;"/>
+                                        </div>
+                                        <div class="col">
+                                            <!-- Download Collector Signed SIA -->
+                                            <button name="action_download_collector_signed_file"
+                                                    string="Collector Signed" type="object" 
+                                                    class="btn-primary" icon="fa-download"
+                                                    title="Download Collector Signed SIA"
+                                                    invisible="not collector_signed_file"
+                                                    style="width: 100%; margin-bottom: 10px;"/>
+                                            
+                                        </div>
+                                        <div class="col">
+                                            <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
+                                            <button name="action_download_latest_pdf" 
+                                                    string="Latest PDF Report" type="object" 
+                                                    class="btn-info" icon="fa-download"
+                                                    title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                    invisible="not sdm_signed_file and not collector_signed_file"
+                                                    style="width: 100%;"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                
+                                <div class="col" string="">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <!-- Upload Collector Signed File (editable only in submitted state) -->
+                                            <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                string="Upload Collector Signed SIA"
+                                                widget="binary"
+                                                readonly="state != 'submitted'"
+                                                placeholder="Upload SIA Approval Letter"
+                                                help="Upload the signed SIA approval document from Collector"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <field name="collector_signed_filename" invisible="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </page>
                     </notebook>
                 </sheet>

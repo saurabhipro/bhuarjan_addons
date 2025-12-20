@@ -513,6 +513,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Get record name for activity summary
         record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
         
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
         # Create activity for each Collector user
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
@@ -528,7 +531,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
             ('type', '=', 'form')
         ], limit=1, order='priority desc, id desc')
         
-        activity_summary = _('%s submitted for approval') % record_name
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s submitted for approval') % (project_name, record_name)
+        else:
+            activity_summary = _('%s submitted for approval') % record_name
         activity_note = _('Please review and approve: %s\n\nProject: %s') % (
             record_name,
             getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
@@ -587,6 +594,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Get record name for activity summary
         record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
         
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
         # Create activity for each SDM user
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
@@ -596,7 +606,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
         if not activity_type:
             return
         
-        activity_summary = _('%s sent back for revision') % record_name
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s sent back for revision') % (project_name, record_name)
+        else:
+            activity_summary = _('%s sent back for revision') % record_name
         activity_note = _('Please review and resubmit: %s\n\nProject: %s') % (
             record_name,
             getattr(self, 'project_id', False) and self.project_id.name or 'N/A'
@@ -655,6 +669,9 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Get record name for activity summary
         record_name = getattr(self, 'name', False) or getattr(self, 'notification_seq_number', False) or f"{model_display_name} #{self.id}"
         
+        # Get project name
+        project_name = getattr(self, 'project_id', False) and self.project_id.name or ''
+        
         # Create activity for each SDM user
         activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
         if not activity_type:
@@ -664,7 +681,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
         if not activity_type:
             return
         
-        activity_summary = _('%s approved by Collector') % record_name
+        # Include project name in summary
+        if project_name:
+            activity_summary = _('%s - %s approved by Collector') % (project_name, record_name)
+        else:
+            activity_summary = _('%s approved by Collector') % record_name
         activity_note = _('The following has been approved: %s\n\nProject: %s\n\nApproved by: %s') % (
             record_name,
             getattr(self, 'project_id', False) and self.project_id.name or 'N/A',

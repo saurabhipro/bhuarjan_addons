@@ -670,7 +670,14 @@ class Survey(models.Model):
         if not activity_type:
             return
         
-        activity_summary = _('Survey %s submitted for approval') % (self.name or f"#{self.id}")
+        # Include project name in summary
+        project_name = self.project_id.name if self.project_id else ''
+        survey_name = self.name or f"#{self.id}"
+        if project_name:
+            activity_summary = _('%s - Survey %s submitted for approval') % (project_name, survey_name)
+        else:
+            activity_summary = _('Survey %s submitted for approval') % survey_name
+        
         activity_note = _('Survey submitted for approval: %s\n\nProject: %s\n\nVillage: %s\n\nKhasra Number: %s\n\nSubmitted by: %s') % (
             self.name or f"#{self.id}",
             self.project_id.name if self.project_id else 'N/A',

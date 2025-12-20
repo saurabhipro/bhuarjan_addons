@@ -64,22 +64,6 @@
                         <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
                     </div>
                     
-                    <!-- Form Title -->
-                    <div style="text-align: center; margin-bottom: 12px;">
-                        <!-- Form Title - Line 1 -->
-                        <div style="margin-bottom: 8px;">
-                            <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                <strong>प्ररूप-एक</strong>
-                            </h2>
-                        </div>
-                        <!-- Form Title - Line 2 (Rule reference) -->
-                        <div style="margin-bottom: 12px;">
-                            <p style="margin: 0; padding: 0; font-size: 20px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                (नियम 11 देखिये)
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- Header with Logo and QR Code -->
                     <div style="margin-bottom: 15px; padding-bottom: 8px;">
                         <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">

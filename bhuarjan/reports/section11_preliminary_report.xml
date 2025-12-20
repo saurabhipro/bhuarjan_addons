@@ -123,22 +123,19 @@
                         </table>
                     </div>
 
-                    <!-- Notification Number and Date -->
-                        <div class="" style="width:100%;text-align:right;">
-                            <strong>दिनांक</strong> 
+                    <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
+                        <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
+                            <strong>भू-अर्जन प्रकरण क्रमांक</strong>
+                            <span t-if="report.notification_number" t-esc="report.notification_number"/>
+                            <span t-if="not report.notification_number">........................</span>
+                            <t t-set="report_year" t-value="report.create_date.year if report.create_date else ''"/>
+                            / अ-82/ वर्ष <span t-if="report_year" t-esc="report_year"/>
+                            <span t-if="not report_year">........................</span>
+                            <strong>दिनांक-</strong>
                             <span t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
-                            <span t-if="not report.create_date">/ /2025</span>
-                        </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 21px !important;">
-                        
-                        <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                            <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
-                                <strong>भू-अर्जन प्रकरण क्रमांक</strong>
-                                <span t-if="report.notification_number" t-esc="report.notification_number"/>
-                                <span t-if="not report.notification_number">./अ-82/वर्श.</span>
-                                 चूँकि राज्य शासन को यह प्रतीत होता है कि नीचे अनुसूची के कॉलम (1) से (5) में दर्शित भूमि की, अनुसूची के कॉलम (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वास तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 11 की उपधारा (1) के प्रावधानों के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है कि राज्य शासन, एतद् द्वारा, अनुसूची के कॉलम (6) में उल्लिखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :–
-                            </p>
-                        </div>
+                            <span t-if="not report.create_date">........................</span>
+                            चूँकि राज्य शासन को यह प्रतीत होता है कि नीचे अनुसूची के कॉलम (1) से (5) में दर्शित भूमि की, अनुसूची के कॉलम (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वास तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 11 की उपधारा (1) के प्रावधानों के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है कि राज्य शासन, एतद् द्वारा, अनुसूची के कॉलम (6) में उल्लिखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :–
+                        </p>
                     </div>
 
                     <!-- Main Body Text -->

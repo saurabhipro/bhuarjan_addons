@@ -208,15 +208,10 @@
                     <div style="margin: 15px 0; font-size: 21px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">2.</span>
                         <span style="margin-left: 8px;">
-                            भूमि का नक्शा (योजना)
+                            भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व)
                             <t t-set="sub_division_name" t-value="notification.village_id.sub_division_id.name if notification and notification.village_id and notification.village_id.sub_division_id else (notification.tehsil_id.sub_division_id.name if notification and notification.tehsil_id and notification.tehsil_id.sub_division_id else '')"/>
-                            <t t-set="sdo_location" t-value="notification.sdo_office_location if notification and notification.sdo_office_location else (notification.project_id.map_inspection_location if notification and notification.project_id and notification.project_id.map_inspection_location else '')"/>
-                            <span t-if="sdo_location" t-esc="sdo_location"/>
-                            <span t-if="not sdo_location">
-                                अनुविभागीय अधिकारी (राजस्व)
-                                <span t-if="sub_division_name" t-esc="sub_division_name"/>
-                                <span t-if="not sub_division_name">........................</span>
-                            </span>
+                            <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                            <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
                             के कार्यालय में किया जा सकता है।
                         </span>
                     </div>

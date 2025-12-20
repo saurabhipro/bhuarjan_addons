@@ -23,18 +23,21 @@ class Section19Notification(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला', compute='_compute_location', store=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_location', store=True)
     
+    # Prakaran Kramank
+    prakaran_kramank = fields.Char(string='Prakaran Kramank / प्रकरण क्रमांक', tracking=True,
+                                   help='Case number to be displayed in the report (optional)')
+    
     # Public Purpose
     public_purpose = fields.Text(string='Public Purpose / लोक प्रयोजन', 
                                  help='Description of public purpose for land acquisition', tracking=True)
     
-    # Schedule/Table - Land Parcels (One2many)
-    land_parcel_ids = fields.One2many('bhu.section19.land.parcel', 'notification_id', 
-                                      string='Land Parcels / भूमि खंड', tracking=True)
-    
-    
     # Computed fields for list view
     khasra_numbers = fields.Char(string='Khasra Numbers / खसरा नंबर', compute='_compute_khasra_info', store=False)
     khasra_count = fields.Integer(string='Khasra Count / खसरा संख्या', compute='_compute_khasra_info', store=False)
+    
+    # Related surveys (approved/locked) for the village and project
+    survey_ids = fields.Many2many('bhu.survey', string='Surveys / सर्वे', 
+                                   compute='_compute_survey_ids', store=False, readonly=True)
     
     # Paragraph 2: Map Inspection
     sdo_revenue_name = fields.Char(string='SDO (Revenue) Name / अनुविभागीय अधिकारी (राजस्व) का नाम',
@@ -42,9 +45,9 @@ class Section19Notification(models.Model):
     sdo_office_location = fields.Char(string='SDO Office Location / अनुविभागीय अधिकारी कार्यालय स्थान',
                                       tracking=True)
     
-    # Paragraph 3: Displacement and Rehabilitation
+    # Paragraph 3: Displacement and Rehabilitation - Related from project
     is_displacement_involved = fields.Boolean(string='Is Displacement Involved? / क्या विस्थापन शामिल है?',
-                                              default=False, tracking=True)
+                                              related='project_id.is_displacement', readonly=True, tracking=True)
     
     # Number of affected persons for rehabilitation - Related from project
     affected_persons_count = fields.Integer(string='Affected Persons Count / प्रभावित व्यक्तियों की संख्या',
@@ -105,17 +108,62 @@ class Section19Notification(models.Model):
                 record.district_id = False
                 record.tehsil_id = False
     
-    @api.depends('land_parcel_ids.khasra_number')
+    def _get_approved_surveys_data(self):
+        """Get grouped survey data (khasra_number and total area) from approved surveys"""
+        self.ensure_one()
+        if not self.village_id or not self.project_id:
+            return []
+        
+        # Get all approved/locked surveys for the village and project
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked'])
+        ], order='khasra_number')
+        
+        # Group by khasra_number and sum areas
+        khasra_data = {}
+        for survey in surveys:
+            if survey.khasra_number:
+                if survey.khasra_number not in khasra_data:
+                    khasra_data[survey.khasra_number] = 0.0
+                khasra_data[survey.khasra_number] += survey.acquired_area or 0.0
+        
+        # Convert to list of dicts
+        return [{'khasra_number': k, 'area': v} for k, v in sorted(khasra_data.items())]
+    
+    def _get_total_area_from_surveys(self):
+        """Get total area from approved surveys"""
+        self.ensure_one()
+        surveys_data = self._get_approved_surveys_data()
+        return sum(item['area'] for item in surveys_data)
+    
+    @api.depends('village_id', 'project_id')
     def _compute_khasra_info(self):
-        """Compute khasra numbers and count for list view"""
+        """Compute khasra numbers and count from approved surveys"""
         for record in self:
-            if record.land_parcel_ids:
-                khasras = record.land_parcel_ids.mapped('khasra_number')
-                record.khasra_numbers = ', '.join([k for k in khasras if k])
-                record.khasra_count = len([k for k in khasras if k])
+            surveys_data = record._get_approved_surveys_data()
+            if surveys_data:
+                khasras = [item['khasra_number'] for item in surveys_data]
+                record.khasra_numbers = ', '.join(khasras)
+                record.khasra_count = len(khasras)
             else:
                 record.khasra_numbers = ''
                 record.khasra_count = 0
+    
+    @api.depends('village_id', 'project_id')
+    def _compute_survey_ids(self):
+        """Compute related surveys (approved/locked) for the village and project"""
+        for record in self:
+            if record.village_id and record.project_id:
+                surveys = self.env['bhu.survey'].search([
+                    ('village_id', '=', record.village_id.id),
+                    ('project_id', '=', record.project_id.id),
+                    ('state', 'in', ['approved', 'locked'])
+                ], order='khasra_number')
+                record.survey_ids = surveys
+            else:
+                record.survey_ids = False
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -134,172 +182,6 @@ class Section19Notification(models.Model):
             # No villages in project, reset village
             self.village_id = False
             return {'domain': {'village_id': [('id', '=', False)]}}
-    
-    @api.onchange('village_id', 'project_id')
-    def _onchange_village_populate_surveys(self):
-        """Auto-populate land parcels from Section 11 approved khasras (excluding objections) when village is selected"""
-        if self.village_id and self.project_id:
-            self._populate_land_parcels_from_surveys()
-    
-    def _populate_land_parcels_from_surveys(self):
-        """Helper method to populate land parcels from Section 11 approved khasras, excluding those with objections"""
-        self.ensure_one()
-        if not self.village_id or not self.project_id:
-            return
-        
-        # Get all Section 11 Preliminary Reports for selected village and project (approved/generated)
-        section11_reports = self.env['bhu.section11.preliminary.report'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['generated', 'signed'])
-        ])
-        
-        # If no Section 11 reports or no land parcels in reports, try to populate from approved surveys directly
-        if not section11_reports or not any(report.land_parcel_ids for report in section11_reports):
-            # Fallback: Populate directly from approved surveys
-            self._populate_land_parcels_from_surveys_direct()
-            return
-        
-        # Get all khasra numbers from Section 11 land parcels with full details
-        section11_parcels_map = {}
-        for report in section11_reports:
-            for parcel in report.land_parcel_ids:
-                if parcel.khasra_number:
-                    # Get survey info directly from survey if computed fields are not available
-                    survey_number = parcel.survey_number or ''
-                    survey_date = parcel.survey_date or False
-                    survey_state = parcel.survey_state or False
-                    
-                    # If computed fields are empty, try to get from survey directly
-                    if not survey_number and parcel.khasra_number and parcel.village_id and report.project_id:
-                        survey = self.env['bhu.survey'].search([
-                            ('khasra_number', '=', parcel.khasra_number),
-                            ('village_id', '=', parcel.village_id.id),
-                            ('project_id', '=', report.project_id.id),
-                            ('state', 'in', ('locked', 'approved'))
-                        ], limit=1, order='create_date desc')
-                        if survey:
-                            survey_number = survey.name or ''
-                            survey_date = survey.survey_date or False
-                            survey_state = survey.state or False
-                    
-                    # Store full parcel details (use the latest one if duplicate khasras exist)
-                    section11_parcels_map[parcel.khasra_number] = {
-                        'area_hectares': parcel.area_in_hectares or 0.0,
-                        'survey_number': survey_number,
-                        'survey_date': survey_date,
-                        'survey_state': survey_state,
-                        'authorized_officer': parcel.authorized_officer or '',
-                        'public_purpose_description': parcel.public_purpose_description or '',
-                        'district_id': parcel.district_id.id if parcel.district_id else False,
-                        'tehsil_id': parcel.tehsil_id.id if parcel.tehsil_id else False,
-                        'village_id': parcel.village_id.id if parcel.village_id else False,
-                        'project_id': parcel.project_id.id if parcel.project_id else False,
-                    }
-        
-        # Get all khasra numbers that have objections (Section 15)
-        # Exclude resolved objections (those with resolved_date set)
-        objections = self.env['bhu.section15.objection'].search([
-            ('project_id', '=', self.project_id.id),
-            ('village_id', '=', self.village_id.id),
-            ('resolved_date', '=', False)  # Exclude resolved objections
-        ])
-        
-        objection_khasras = set()
-        for objection in objections:
-            if objection.survey_id and objection.survey_id.khasra_number:
-                objection_khasras.add(objection.survey_id.khasra_number)
-        
-        # Filter out khasras with objections
-        approved_khasras = set(section11_parcels_map.keys()) - objection_khasras
-        
-        # Clear existing land parcels
-        self.land_parcel_ids = [(5, 0, 0)]
-        
-        # Create land parcel records from approved khasras with all details
-        parcel_vals = []
-        for khasra_number in sorted(approved_khasras):
-            parcel_data = section11_parcels_map[khasra_number]
-            parcel_vals.append((0, 0, {
-                'khasra_number': khasra_number,
-                'area_hectares': parcel_data['area_hectares'],
-                'survey_number': parcel_data['survey_number'],
-                'survey_date': parcel_data['survey_date'],
-                'survey_state': parcel_data['survey_state'],
-                'authorized_officer': parcel_data['authorized_officer'],
-                'public_purpose_description': parcel_data['public_purpose_description'],
-                'district_id': parcel_data['district_id'] or self.district_id.id if self.district_id else False,
-                'tehsil_id': parcel_data['tehsil_id'] or self.tehsil_id.id if self.tehsil_id else False,
-                'village_id': parcel_data['village_id'] or self.village_id.id if self.village_id else False,
-                'project_id': parcel_data['project_id'] or self.project_id.id if self.project_id else False,
-            }))
-        
-        # Set the land parcels
-        if parcel_vals:
-            self.land_parcel_ids = parcel_vals
-    
-    def _populate_land_parcels_from_surveys_direct(self):
-        """Fallback method to populate land parcels directly from approved surveys if Section 11 reports don't exist"""
-        self.ensure_one()
-        if not self.village_id or not self.project_id:
-            return
-        
-        # Get all approved/locked surveys for the selected village and project
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['approved', 'locked']),
-            ('khasra_number', '!=', False)
-        ], order='create_date desc')
-        
-        if not surveys:
-            # No approved surveys found, clear land parcels
-            self.land_parcel_ids = [(5, 0, 0)]
-            return
-        
-        # Get all khasra numbers that have objections (Section 15)
-        # Exclude resolved objections (those with resolved_date set)
-        objections = self.env['bhu.section15.objection'].search([
-            ('project_id', '=', self.project_id.id),
-            ('village_id', '=', self.village_id.id),
-            ('resolved_date', '=', False)  # Exclude resolved objections
-        ])
-        
-        objection_khasras = set()
-        for objection in objections:
-            if objection.survey_id and objection.survey_id.khasra_number:
-                objection_khasras.add(objection.survey_id.khasra_number)
-        
-        # Group surveys by khasra number (use latest survey for each khasra)
-        survey_map = {}
-        for survey in surveys:
-            if survey.khasra_number and survey.khasra_number not in objection_khasras:
-                # Use the latest survey for each khasra
-                if survey.khasra_number not in survey_map:
-                    survey_map[survey.khasra_number] = survey
-        
-        # Clear existing land parcels
-        self.land_parcel_ids = [(5, 0, 0)]
-        
-        # Create land parcel records from surveys
-        parcel_vals = []
-        for khasra_number in sorted(survey_map.keys()):
-            survey = survey_map[khasra_number]
-            parcel_vals.append((0, 0, {
-                'khasra_number': khasra_number,
-                'area_hectares': survey.acquired_area or 0.0,
-                'survey_number': survey.name or '',
-                'survey_date': survey.survey_date or False,
-                'survey_state': survey.state or False,
-                'district_id': self.district_id.id if self.district_id else False,
-                'tehsil_id': self.tehsil_id.id if self.tehsil_id else False,
-                'village_id': self.village_id.id if self.village_id else False,
-                'project_id': self.project_id.id if self.project_id else False,
-            }))
-        
-        # Set the land parcels
-        if parcel_vals:
-            self.land_parcel_ids = parcel_vals
     
     @api.model
     def default_get(self, fields_list):
@@ -355,22 +237,7 @@ class Section19Notification(models.Model):
                 project_id = self._default_project_id()
                 if project_id:
                     vals['project_id'] = project_id
-        records = super().create(vals_list)
-        # Auto-populate land parcels after creation
-        for record in records:
-            if record.village_id and record.project_id:
-                record._populate_land_parcels_from_surveys()
-        return records
-    
-    def write(self, vals):
-        """Override write to repopulate land parcels when village or project changes"""
-        result = super().write(vals)
-        # If village_id or project_id changed, repopulate land parcels
-        if 'village_id' in vals or 'project_id' in vals:
-            for record in self:
-                if record.village_id and record.project_id:
-                    record._populate_land_parcels_from_surveys()
-        return result
+        return super().create(vals_list)
     
     def get_qr_code_data(self):
         """Generate QR code data for the notification"""
@@ -499,38 +366,6 @@ class Section19Notification(models.Model):
             'view_mode': 'form',
             'target': 'new',
         }
-
-
-class Section19LandParcel(models.Model):
-    _name = 'bhu.section19.land.parcel'
-    _description = 'Section 19 Land Parcel'
-    _order = 'khasra_number'
-
-    notification_id = fields.Many2one('bhu.section19.notification', string='Notification', required=True, ondelete='cascade')
-    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True)
-    area_hectares = fields.Float(string='Area (Hectares) / रकबा (हेक्टेयर में)', required=True, digits=(16, 4))
-    
-    # Additional fields from Section 11
-    survey_number = fields.Char(string='Survey Number / सर्वे नंबर')
-    survey_date = fields.Date(string='Survey Date / सर्वे दिनांक')
-    survey_state = fields.Selection([
-        ('draft', 'Draft'),
-        ('submitted', 'Submitted'),
-        ('approved', 'Approved'),
-        ('locked', 'Locked'),
-        ('rejected', 'Rejected'),
-    ], string='Survey Status / सर्वे स्थिति')
-    
-    # Location fields
-    district_id = fields.Many2one('bhu.district', string='District / जिला')
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील')
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना')
-    
-    # Additional details
-    authorized_officer = fields.Char(string='Authorized Officer / प्राधिकृत अधिकारी',
-                                    help='Officer authorized by Section 12')
-    public_purpose_description = fields.Text(string='Public Purpose Description / लोक प्रयोजन विवरण')
 
 
 class Section19NotificationWizard(models.TransientModel):

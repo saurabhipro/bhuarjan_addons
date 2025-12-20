@@ -258,9 +258,8 @@
                                 <span t-if="rehab_area > 0" t-esc="'{:.4f}'.format(rehab_area)"/>
                                 <span t-if="rehab_area == 0" style="text-decoration: underline;">........................</span>
                                 हेक्टेयर का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व)
-                                <span t-if="rehab_sub_division" t-esc="rehab_sub_division"/>
-                                <span t-if="not rehab_sub_division and not rehab_officer_location">........................</span>
                                 <span t-if="rehab_officer_location" t-esc="rehab_officer_location"/>
+                                <span t-if="not rehab_officer_location" style="text-decoration: underline;">........................</span>
                                 के कार्यालय में किया जा सकता है।
                             </t>
                         </span>

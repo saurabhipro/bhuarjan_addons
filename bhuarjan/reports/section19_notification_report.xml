@@ -231,7 +231,7 @@
                     <t t-set="rehab_khasra" t-value="notification.rehab_khasra_number if notification and notification.rehab_khasra_number else (notification.project_id.allocated_khasra_number if notification and notification.project_id and notification.project_id.allocated_khasra_number else '')"/>
                     <t t-set="rehab_area" t-value="notification.rehab_area_hectares if notification and notification.rehab_area_hectares else (notification.project_id.allocated_area_hectares if notification and notification.project_id and notification.project_id.allocated_area_hectares else 0.0)"/>
                     <t t-set="rehab_officer_location" t-value="notification.rehab_officer_office_location if notification and notification.rehab_officer_office_location else (notification.project_id.rehab_admin_name if notification and notification.project_id and notification.project_id.rehab_admin_name else '')"/>
-                    <t t-set="rehab_sub_division" t-value="''"/>
+                    <t t-set="rehab_sub_division" t-value="notification.village_id.sub_division_id.name if notification and notification.village_id and notification.village_id.sub_division_id else (notification.tehsil_id.sub_division_id.name if notification and notification.tehsil_id and notification.tehsil_id.sub_division_id else '')"/>
                     <div style="margin: 15px 0; font-size: 21px !important; line-height: 1.6 !important;">
                         <span style="font-weight: bold;">3.</span>
                         <span style="margin-left: 8px;">
@@ -258,8 +258,8 @@
                                 <span t-if="rehab_area > 0" t-esc="'{:.4f}'.format(rehab_area)"/>
                                 <span t-if="rehab_area == 0" style="text-decoration: underline;">........................</span>
                                 हेक्टेयर का चयन किया गया है। पुनर्वास योजना का अवलोकन प्रशासक/अनुविभागीय अधिकारी (राजस्व)
-                                <span t-if="rehab_officer_location" t-esc="rehab_officer_location"/>
-                                <span t-if="not rehab_officer_location" style="text-decoration: underline;">........................</span>
+                                <span t-if="rehab_sub_division" t-esc="rehab_sub_division"/>
+                                <span t-if="not rehab_sub_division" style="text-decoration: underline;">........................</span>
                                 के कार्यालय में किया जा सकता है।
                             </t>
                         </span>

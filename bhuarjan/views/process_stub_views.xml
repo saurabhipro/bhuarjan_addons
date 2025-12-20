@@ -29,7 +29,8 @@
                         </page>
                         <page string="Section 4 Questions / धारा 4 प्रश्न">
                             <group string="(एक) लोक प्रयोजन का संक्षिप्त विवरण / Brief description of public purpose">
-                                <field name="brief_description" widget="html" nolabel="1"/>
+                                <field name="project_id" readonly="1" nolabel="1" 
+                                       options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
                             </group>
                             <field name="directly_affected"/>
                             <field name="indirectly_affected"/>

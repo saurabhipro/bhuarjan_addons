@@ -10,7 +10,6 @@
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
-        'security/secrurity.xml',
         'security/ir.model.access.csv',
         'data/land_type_data.xml',
         'data/tree_master_data.xml',
@@ -38,6 +37,7 @@
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
         'data/kharsiyan_rate_master_data.xml',
         'data/qweb_report_paper_format.xml',
+        'security/secrurity.xml',
         'reports/report_common_styles.xml',
         'reports/form10_bulk_table_report.xml',
         'reports/award_letter_report.xml',

@@ -50,9 +50,9 @@
     
     <!-- Document Vault Menu - Moved to Process -->
     <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault" parent="menu_bhu_process" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>   
-    <!-- Users Menu - visible to Admin and System -->
-    <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <!-- Users Menu - visible to Admin, System, and District Administrator -->
+    <menuitem id="menu_bhu_users_maai_menu" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_root" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_users" name="Users" action="action_accres_users_bhuarjan_view_form_action" parent="menu_bhu_users_maai_menu" sequence="7"  groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_sia_team_members" name="SIA Team Members" action="action_sia_team_member" parent="menu_bhu_users_maai_menu" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" />

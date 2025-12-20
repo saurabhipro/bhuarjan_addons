@@ -87,7 +87,7 @@
         <record id="record_bhu_project_rule_admin" model="ir.rule">
             <field name="name">Admin can see all projects</field>
             <field name="model_id" ref="model_bhu_project"/>
-            <field name="domain_force">[(1, '=', 1)]</field>            
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
         </record>
         
@@ -380,6 +380,14 @@
             <field name="model_id" ref="model_bhu_payment_reconciliation"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+        
+        <!-- District Administrator User Rule -->
+        <record id="record_res_users_rule_district_administrator" model="ir.rule">
+            <field name="name">District Administrator can see users from their district</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="domain_force">[('district_id', '=', user.district_id.id)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
         </record>
         
         

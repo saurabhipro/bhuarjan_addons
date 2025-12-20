@@ -69,35 +69,39 @@
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                                 <group col="2">
-                                    <group string="Download Section 21 Documents">
+                                    <group string="Download Section 21 Documents" style="margin-right: 50px; padding-right: 20px;">
                                         <!-- Download Public Section 21 -->
                                         <button name="action_generate_public_notice" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download Public Sec 21"
-                                                title="Download Section 21 Public Notice Only (Always generates fresh PDF)"/>
+                                                title="Download Section 21 Public Notice Only (Always generates fresh PDF)"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download Personal Section 21 -->
                                         <button name="action_generate_personal_notices_only" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download Personal Sec 21"
-                                                title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"/>
+                                                title="Download Personal Section 21 Notices: One page per khasra (Always generates fresh PDF for all khasras in village)"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download All Section 21 -->
                                         <button name="action_generate_section21_all" type="object" 
                                                 class="btn-primary" 
                                                 icon="fa-download"
                                                 string="Download All Sec 21"
-                                                title="Download Both Public and Personal Section 21 Notices in one PDF"/>
+                                                title="Download Both Public and Personal Section 21 Notices in one PDF"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed Section 21 -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 21" type="object" 
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download SDM Signed File"
-                                                invisible="not sdm_signed_file"/>
+                                                title="Download SDM Signed Section 21"
+                                                invisible="not sdm_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
-                                    <group string="Upload SDM Signed Section 21">
+                                    <group string="Upload SDM Signed Section 21" style="margin-left: 50px; padding-left: 20px;">
                                         <!-- Upload SDM Signed File -->
                                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                                string="Upload SDM Signed Section 21"
@@ -108,20 +112,12 @@
                                                invisible="sdm_signed_file"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not sdm_signed_file or state == 'signed'">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_sdm_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                         
                                         <!-- Mark as Signed Button -->
@@ -134,16 +130,17 @@
                             </group>
                             
                             <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
                                 <group col="2">
-                                    <group string="Download Section 21 Documents">
+                                    <group string="Download Section 21 Documents" style="margin-right: 50px; padding-right: 20px;">
                                         <!-- Download Collector Signed Section 21 -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed Section 21" type="object" 
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed File"
-                                                invisible="not collector_signed_file"/>
+                                                title="Download Collector Signed Section 21"
+                                                invisible="not collector_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
-                                    <group string="Upload Collector Signed Section 21">
+                                    <group string="Upload Collector Signed Section 21" style="margin-left: 50px; padding-left: 20px;">
                                         <!-- Upload Collector Signed File -->
                                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                                string="Upload Collector Signed Section 21"
@@ -154,20 +151,12 @@
                                                invisible="collector_signed_file"/>
                                         <field name="collector_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not collector_signed_file or (state != 'generated' and state != 'signed')">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_collector_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                     </group>
                                 </group>

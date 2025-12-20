@@ -15,8 +15,16 @@
     <template id="expert_committee_order_report">
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
+            <!-- Include centralized CSS styles -->
+            <t t-call="bhuarjan.report_common_styles"/>
             <t t-foreach="docs" t-as="report">
-                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 20px; font-size: 14px;">
+                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 20px; font-size: 14px; position: relative;">
+                    <!-- Watermark with Logo - Centered on Page -->
+                    <div class="watermark">
+                        <div class="watermark-circle"></div>
+                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
+                    </div>
                     <style>
                         body, .page, table, td, th, p, span {
                             font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;

@@ -25,6 +25,7 @@
                         direction: ltr;
                         font-size: 12px;
                         line-height: 1.4;
+                        position: relative;
                     }
                     .hindi-text {
                         font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif;
@@ -80,10 +81,50 @@
                     .font-bold {
                         font-weight: bold;
                     }
+                    /* Watermark styles */
+                    .watermark {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        opacity: 0.1;
+                        z-index: 0;
+                        pointer-events: none;
+                        width: 600px;
+                        height: 600px;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .watermark img {
+                        width: 500px;
+                        height: 500px;
+                        object-fit: contain;
+                    }
+                    .watermark-circle {
+                        position: absolute;
+                        width: 550px;
+                        height: 550px;
+                        border: 2px solid rgba(0, 0, 0, 0.1);
+                        border-radius: 50%;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
                 </style>
                 
+                <!-- Watermark with Logo - Centered on Page -->
+                <div class="watermark">
+                    <div class="watermark-circle"></div>
+                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                    <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
+                </div>
+                
                 <!-- Header -->
-                <div style="text-align: center; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 20px; position: relative; z-index: 1;">
                     <h2 class="hindi-text font-bold" style="text-decoration: underline; font-size: 16px;">
                         भू-अर्जन पुरस्कार पत्र
                     </h2>

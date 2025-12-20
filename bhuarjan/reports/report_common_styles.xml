@@ -108,7 +108,7 @@
             
             .date-reference-section span {
                 font-size: 18px !important;
-                font-weight: 500 !important;
+                font-weight: 500 !important;    
             }
             
             .date-reference-section span:first-child {

@@ -86,30 +86,7 @@
                     <group string="Public Purpose / लोक प्रयोजन">
                         <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                               widget="html" nolabel="1"/>
-                    </group>
-                    
-                    <group string="Land Parcels Schedule / भूमि खंड अनुसूची (Auto-populated from Section 11, excluding objections)">
-                        <field name="land_parcel_ids" nolabel="1">
-                            <list string="Khasra Details">
-                                <field name="khasra_number" string="Khasra Number"/>
-                                <field name="area_hectares" string="Area (Hectares)"/>
-                                <field name="survey_number" string="Survey Number"/>
-                                <field name="survey_date" string="Survey Date"/>
-                                <field name="survey_state" string="Status" widget="badge"
-                                       decoration-success="survey_state == 'approved'"
-                                       decoration-info="survey_state == 'submitted'"
-                                       decoration-warning="survey_state == 'draft'"
-                                       decoration-danger="survey_state == 'rejected'"
-                                       decoration-muted="survey_state == 'locked'"/>
-                                <field name="district_id" string="District"/>
-                                <field name="tehsil_id" string="Tehsil"/>
-                                <field name="village_id" string="Village"/>
-                                <field name="project_id" string="Project"/>
-                                <field name="authorized_officer" string="Authorized Officer"/>
-                                <field name="public_purpose_description" string="Public Purpose" widget="text"/>
-                            </list>
-                        </field>
+                               widget="text" nolabel="1"/>
                     </group>
                     
                     <notebook>
@@ -117,19 +94,21 @@
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                                 <group col="2">
-                                    <group string="Download Section 19 Documents">
+                                    <group string="Download Section 19 Documents" style="margin-right: 50px; padding-right: 20px;">
                                         <!-- Download Unsigned Section 19 -->
                                         <button name="action_download_unsigned_file" string="Download Section 19 (Unsigned)" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Section 19 Notification (Unsigned)"/>
+                                                title="Download Section 19 Notification (Unsigned)"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed Section 19 -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Section 19" type="object" 
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download SDM Signed Notification"
-                                                invisible="not sdm_signed_file"/>
+                                                title="Download SDM Signed Section 19"
+                                                invisible="not sdm_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
-                                    <group string="Upload SDM Signed Section 19">
+                                    <group string="Upload SDM Signed Section 19" style="margin-left: 50px; padding-left: 20px;">
                                         <!-- Upload SDM Signed File (editable only in draft state) -->
                                         <field name="sdm_signed_file" filename="sdm_signed_filename" 
                                                string="Upload SDM Signed Section 19"
@@ -140,42 +119,36 @@
                                                invisible="sdm_signed_file"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not sdm_signed_file or state != 'draft'">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_sdm_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                     </group>
                                 </group>
                             </group>
                             
                             <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
                                 <group col="2">
-                                    <group string="Download Section 19 Documents">
+                                    <group string="Download Section 19 Documents" style="margin-right: 50px; padding-right: 20px;">
                                         <!-- Download Collector Signed Section 19 -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed Section 19" type="object" 
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed Approval"
-                                                invisible="not collector_signed_file"/>
+                                                title="Download Collector Signed Section 19"
+                                                invisible="not collector_signed_file"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                         <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
                                                 class="btn-info" icon="fa-download"
                                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                invisible="not sdm_signed_file and not collector_signed_file"/>
+                                                invisible="not sdm_signed_file and not collector_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
-                                    <group string="Upload Collector Signed Section 19">
+                                    <group string="Upload Collector Signed Section 19" style="margin-left: 50px; padding-left: 20px;">
                                         <!-- Upload Collector Signed File (editable only in submitted state) -->
                                         <field name="collector_signed_file" filename="collector_signed_filename" 
                                                string="Upload Collector Signed Section 19"
@@ -186,20 +159,12 @@
                                                invisible="collector_signed_file"/>
                                         <field name="collector_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not collector_signed_file or state != 'submitted'">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_collector_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                     </group>
                                 </group>

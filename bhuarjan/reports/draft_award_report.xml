@@ -166,7 +166,16 @@
                     }
                 </style>
 
-                <div class="page" style="font-size: 14px; color: #333; padding: 15px;">
+                <!-- Include centralized CSS styles -->
+                <t t-call="bhuarjan.report_common_styles"/>
+
+                <div class="page" style="font-size: 14px; color: #333; padding: 15px; position: relative;">
+                    <!-- Watermark with Logo - Centered on Page -->
+                    <div class="watermark">
+                        <div class="watermark-circle"></div>
+                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
+                    </div>
 
                 <!-- Subject/Reference Line -->
                 <p class="report-paragraph" style="text-align: left; margin-bottom: 15px;">

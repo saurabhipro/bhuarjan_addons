@@ -94,20 +94,42 @@
                     </group>
                     <notebook>
                         <page string="Expert Group Report / विशेषज्ञ समूह रिपोर्ट">
+                            <style>
+                                @media (max-width: 768px) {
+                                    .responsive-expert-group {
+                                        flex-direction: column !important;
+                                    }
+                                    .responsive-expert-group > * {
+                                        width: 100% !important;
+                                        margin-bottom: 15px !important;
+                                    }
+                                }
+                                .responsive-expert-group {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 50px;
+                                }
+                                .responsive-expert-group > * {
+                                    flex: 1;
+                                    min-width: 300px;
+                                }
+                            </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
+                                <div class="responsive-expert-group">
                                     <group string="Download Expert Committee Documents">
                                         <!-- Download Unsigned Expert Committee Report -->
                                         <button name="action_download_unsigned_file" string="Download Expert Committee (Unsigned)" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Expert Committee Report (Unsigned)"/>
+                                                title="Download Expert Committee Report (Unsigned)"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed Expert Committee Report -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Expert Committee" type="object" 
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download SDM Signed Report"
-                                                invisible="not sdm_signed_file"/>
+                                                title="Download SDM Signed Expert Committee Report"
+                                                invisible="not sdm_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
                                     <group string="Upload SDM Signed Expert Committee">
                                         <!-- Upload SDM Signed File (editable only in draft state) -->
@@ -120,46 +142,41 @@
                                                invisible="sdm_signed_file"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not sdm_signed_file or state != 'draft'">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_sdm_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                             
                             <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
+                                <div class="responsive-expert-group">
                                     <group string="Download Expert Committee Documents">
                                         <!-- Download Collector Signed Expert Committee -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed Expert Committee" type="object" 
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed Approval"
-                                                invisible="not collector_signed_file"/>
+                                                title="Download Collector Signed Expert Committee"
+                                                invisible="not collector_signed_file"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                         <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
                                                 class="btn-info" icon="fa-download"
                                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                invisible="not sdm_signed_file and not collector_signed_file"/>
+                                                invisible="not sdm_signed_file and not collector_signed_file"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download Expert Committee Order -->
                                         <button name="action_download_expert_committee_order" string="Download Expert Committee Order" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download Expert Committee Approval Order PDF"
-                                                invisible="state not in ('submitted', 'approved')"/>
+                                                invisible="state not in ('submitted', 'approved')"
+                                                style="width: 100%;"/>
                                     </group>
                                     <group string="Upload Collector Signed Expert Committee">
                                         <!-- Upload Collector Signed File (editable only in submitted state) -->
@@ -172,28 +189,20 @@
                                                invisible="collector_signed_file"/>
                                         <field name="collector_signed_filename" invisible="1"/>
                                         
-                                        <!-- Show uploaded file with delete option -->
+                                        <!-- Show uploaded file -->
                                         <group invisible="not collector_signed_file or state != 'submitted'">
-                                            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                                <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                       widget="binary"
-                                                       readonly="1"
-                                                       nolabel="1"
-                                                       style="flex: 1;"/>
-                                                <button name="action_delete_collector_signed_file" string="" type="object" 
-                                                        class="btn btn-sm btn-danger" icon="fa-trash"
-                                                        confirm="Are you sure you want to delete the current file? You can upload a new file after deletion."
-                                                        title="Delete current file and upload a new one"
-                                                        style="margin-left: 10px;"/>
-                                            </div>
+                                            <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                   widget="binary"
+                                                   readonly="1"
+                                                   nolabel="1"/>
                                         </group>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                             
                             <!-- Expert Group Report Section -->
                             <group string="Expert Group Report / विशेषज्ञ समूह रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
+                                <div class="responsive-expert-group">
                                     <group string="Upload Expert Group Report">
                                         <field name="expert_group_report_file" filename="expert_group_report_filename" 
                                                string="Upload Expert Group Report" 
@@ -206,9 +215,10 @@
                                     <group string="Download Expert Group Report" invisible="not expert_group_report_file">
                                         <button name="action_download_expert_group_report" string="Download Expert Group Report" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Expert Group Report"/>
+                                                title="Download Expert Group Report"
+                                                style="width: 100%;"/>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                         </page>
                         <page string="Report Information / रिपोर्ट जानकारी">

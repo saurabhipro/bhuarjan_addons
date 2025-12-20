@@ -134,21 +134,43 @@
                             </group>
                         </page>
                         <page string="SIA Report / SIA रिपोर्ट">
+                            <style>
+                                @media (max-width: 768px) {
+                                    .responsive-sia-group {
+                                        flex-direction: column !important;
+                                    }
+                                    .responsive-sia-group > * {
+                                        width: 100% !important;
+                                        margin-bottom: 15px !important;
+                                    }
+                                }
+                                .responsive-sia-group {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 50px;
+                                }
+                                .responsive-sia-group > * {
+                                    flex: 1;
+                                    min-width: 300px;
+                                }
+                            </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
+                                <div class="responsive-sia-group">
                                     <group string="Download SIA Documents">
                                         <!-- Download Unsigned SIA -->
-                                        <button name="action_download_sia_file" string="Download SIA (Unsigned)" type="object" 
+                                        <button name="action_download_sia_file" string="Download SIA" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download SIA Proposal (Unsigned)"
-                                                invisible="is_sia_exempt == 'yes'"/>
+                                                invisible="is_sia_exempt == 'yes'"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download SDM Signed SIA -->
-                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed SIA" type="object" 
+                                        <button name="action_download_sdm_signed_file" string="Download SDM Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download SDM Signed Proposal"
-                                                invisible="not sdm_signed_file"/>
+                                                invisible="not sdm_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
                                     <group string="Upload SDM Signed SIA">
                                         <!-- Upload SDM Signed File (editable only in draft state) -->
@@ -165,26 +187,29 @@
                                         <button name="action_submit" string="Submit to Collector" type="object" class="btn-success" 
                                                 icon="fa-paper-plane"
                                                 invisible="(not sdm_signed_file and is_sia_exempt != 'yes') or state != 'draft'"
-                                                confirm="Are you sure want to submit this record."/>
+                                                confirm="Are you sure want to submit this record."
+                                                style="width: 100%; margin-top: 10px;"/>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                             
                             <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
-                                <group col="2">
+                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
+                                <div class="responsive-sia-group">
                                     <group string="Download SIA Documents">
                                         <!-- Download Collector Signed SIA -->
-                                        <button name="action_download_collector_signed_file" string="Download Collector Signed SIA" type="object" 
+                                        <button name="action_download_collector_signed_file" string="Download Collector Signed" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Collector Signed Approval"
-                                                invisible="not collector_signed_file"/>
+                                                title="Download Collector Signed SIA"
+                                                invisible="not collector_signed_file"
+                                                style="width: 100%; margin-bottom: 10px;"/>
                                         
                                         <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                         <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                                class="btn-info" icon="fa-file-pdf"
+                                                class="btn-info" icon="fa-download"
                                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                invisible="not sdm_signed_file and not collector_signed_file"/>
+                                                invisible="not sdm_signed_file and not collector_signed_file"
+                                                style="width: 100%;"/>
                                     </group>
                                     <group string="Upload Collector Signed SIA">
                                         <!-- Upload Collector Signed File (editable only in submitted state) -->
@@ -196,7 +221,7 @@
                                                help="Upload the signed SIA approval document from Collector"/>
                                         <field name="collector_signed_filename" invisible="1"/>
                                     </group>
-                                </group>
+                                </div>
                             </group>
                         </page>
                     </notebook>

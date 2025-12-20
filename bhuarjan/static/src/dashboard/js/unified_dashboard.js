@@ -440,6 +440,13 @@ export class UnifiedDashboard extends Component {
     async loadDepartments() {
         try {
             this.state.departments = await this.orm.call("bhuarjan.dashboard", "get_all_departments", []);
+            // Auto-select department for department users (they only have one department)
+            if (this.dashboardType === 'department' && this.state.departments.length === 1) {
+                this.state.selectedDepartment = this.state.departments[0].id;
+                // Save to localStorage
+                const prefix = this.config.localStoragePrefix;
+                localStorage.setItem(`${prefix}_department`, String(this.state.selectedDepartment));
+            }
         } catch (error) {
             console.error("Error loading departments:", error);
             this.state.departments = [];

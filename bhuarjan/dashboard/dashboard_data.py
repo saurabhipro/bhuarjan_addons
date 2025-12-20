@@ -15,14 +15,20 @@ class DashboardData(models.AbstractModel):
     def get_all_departments(self):
         """Get all departments for dropdown - merged from sdm_dashboard with SDM filtering"""
         user = self.env.user
-        # Admin, system users, collectors, district administrators, and department users see all departments
-        if (user.has_group('bhuarjan.group_bhuarjan_admin') or 
-            user.has_group('base.group_system') or
-            user.has_group('bhuarjan.group_bhuarjan_collector') or
-            user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
-            user.has_group('bhuarjan.group_bhuarjan_district_administrator') or
-            user.has_group('bhuarjan.group_bhuarjan_department_user')):
-            # Show all departments for admin/system/collector/district admin/department users
+        # Department users see only their mapped department
+        if user.has_group('bhuarjan.group_bhuarjan_department_user'):
+            if user.bhu_department_id:
+                departments = self.env['bhu.department'].search([('id', '=', user.bhu_department_id.id)])
+            else:
+                # No department mapped, return empty list
+                return []
+        # Admin, system users, collectors, district administrators see all departments
+        elif (user.has_group('bhuarjan.group_bhuarjan_admin') or 
+              user.has_group('base.group_system') or
+              user.has_group('bhuarjan.group_bhuarjan_collector') or
+              user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
+              user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+            # Show all departments for admin/system/collector/district admin
             departments = self.env['bhu.department'].search([])
         else:
             # For SDM/Tehsildar users, only show departments where they have assigned projects

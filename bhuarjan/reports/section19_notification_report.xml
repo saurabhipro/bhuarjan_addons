@@ -8,7 +8,7 @@
         <field name="report_name">bhuarjan.section19_notification_report</field>
         <field name="report_file">bhuarjan.section19_notification_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'Section19_Notification_' + ((object and object.name) or (docs and docs[0] and docs[0].name) or 'All')</field>
+        <field name="print_report_name">'Section19_' + ((object and object.village_id and object.village_id.name.replace(' ', '_') if object.village_id.name else '') or (docs and docs[0] and docs[0].village_id and docs[0].village_id.name.replace(' ', '_') if docs[0].village_id.name else '') or '') + '_' + ((object and object.create_date and object.create_date.strftime('%Y%m%d')) or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d')) or '')</field>
     </record>
 
     <!-- Section 19 Notification Report Template -->
@@ -125,29 +125,16 @@
                         </table>
                     </div>
 
-                    <!-- Case Number and Date -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 21px !important;width:100%">
-                        <div>
-                            <strong>भू-अर्जन प्रकरण क्रमांक</strong>
-                            <span t-if="notification.name and notification.name != 'New'" t-esc="notification.name"/>
-                            <span t-if="not notification.name or notification.name == 'New'">.......................</span>
-                            <span>/अ-82/वर्श.</span>
-                            <span t-if="notification.create_date" t-esc="notification.create_date.strftime('%Y')"/>
-                            <span t-if="not notification.create_date">2025</span>
-                        </div>
-                        <div style="width:100%;text-align:right;">
-                            <strong>दिनांक</strong>
-                            <span t-if="notification.create_date" t-esc="notification.create_date.strftime('%d/%m/%Y')"/>
-                            <span t-if="not notification.create_date"> / /2025</span>
-                        </div>
-                    </div>
-
-                    <!-- Main Body Text -->
+                    <!-- Case Number and Main Body Text -->
                     <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
                         <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
+                            <strong>भू-अर्जन प्रकरण क्रमांक</strong>
+                            <span t-if="notification.prakaran_kramank" t-esc="notification.prakaran_kramank"/>
+                            <span t-if="not notification.prakaran_kramank">........................</span>
                             चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की
-                            <span t-if="notification and notification.project_id.name" t-esc="notification.project_id.name"/>
-                            <span t-if="not notification or not notification.public_purpose">सार्वजनिक प्रयोजन</span>
+                            <span t-if="notification and notification.public_purpose" t-esc="notification.public_purpose"/>
+                            <span t-if="notification and not notification.public_purpose and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/>
+                            <span t-if="not notification or (not notification.public_purpose and (not notification.project_id or not notification.project_id.name))">सार्वजनिक प्रयोजन</span>
                             के लिए आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जाएगा) की धारा 19 के अंतर्गत यह घोषित किया जाता है कि इस भूमि की उक्त प्रयोजन के लिए आवश्यकता है :–
                         </p>
                     </div>
@@ -179,12 +166,7 @@
                                 </li>
                                 <li style="margin-bottom: 5px;">
                                     भूमि का क्षेत्रफल
-                                    <t t-set="total_area" t-value="0.0"/>
-                                    <t t-if="notification and notification.land_parcel_ids">
-                                        <t t-foreach="notification.land_parcel_ids" t-as="parcel">
-                                            <t t-set="total_area" t-value="total_area + (parcel.area_hectares or 0.0)"/>
-                                        </t>
-                                    </t>
+                                    <t t-set="total_area" t-value="notification._get_total_area_from_surveys() if notification else 0.0"/>
                                     <span t-if="total_area > 0" t-esc="'{:.4f}'.format(total_area) + ' हेक्टेयर'"/>
                                     <span t-if="total_area == 0">........................</span>
                                 </li>
@@ -198,21 +180,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-if="notification and notification.land_parcel_ids and len(notification.land_parcel_ids) > 0">
-                                    <t t-foreach="notification.land_parcel_ids" t-as="parcel">
+                                <t t-set="surveys_data" t-value="notification._get_approved_surveys_data() if notification else []"/>
+                                <t t-if="surveys_data and len(surveys_data) > 0">
+                                    <t t-foreach="surveys_data" t-as="item">
                                         <tr>
                                             <td style="font-size: 21px !important; text-align: center;">
-                                                <t t-if="parcel.khasra_number" t-esc="parcel.khasra_number"/>
-                                                <t t-if="not parcel.khasra_number">........................</t>
+                                                <t t-esc="item['khasra_number']"/>
                                             </td>
                                             <td style="font-size: 21px !important; text-align: center;">
-                                                <t t-if="parcel.area_hectares and parcel.area_hectares > 0" t-esc="'{:.4f}'.format(parcel.area_hectares)"/>
-                                                <t t-if="not parcel.area_hectares or parcel.area_hectares == 0">........................</t>
+                                                <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
+                                                <t t-if="item['area'] == 0">........................</t>
                                             </td>
                                         </tr>
                                     </t>
                                 </t>
-                                <t t-if="not notification or not notification.land_parcel_ids or len(notification.land_parcel_ids) == 0">
+                                <t t-if="not surveys_data or len(surveys_data) == 0">
                                     <tr>
                                         <td style="text-align: center; padding: 10px; font-size: 21px !important;">........................</td>
                                         <td style="text-align: center; padding: 10px; font-size: 21px !important;">........................</td>

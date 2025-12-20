@@ -158,16 +158,8 @@
                                            string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
                                 </group>
                             </group>
-                            <group string="(13) Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय &quot;दो&quot; एवं &quot;तीन&quot; के प्रावधानों से छूट प्रदान की गई है।">
-                                <field name="is_exemption" nolabel="1"/>
-                                <group string="Exemption Details / छूट विवरण" 
-                                       invisible="not is_exemption">
-                                    <field name="exemption_details" widget="text" nolabel="1"/>
-                                </group>
-                                <group string="SIA Justification / SIA औचित्य" 
-                                       invisible="is_exemption">
-                                    <field name="sia_justification" widget="text" nolabel="1"/>
-                                </group>
+                            <group string="(13) Section 5 Text / धारा 5 पाठ">
+                                <field name="section5_text_type" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>

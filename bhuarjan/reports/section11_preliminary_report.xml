@@ -28,17 +28,20 @@
                         font-size: 21px !important;
                     }
                     .schedule-table {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
                     }
                     .schedule-table th,
                     .schedule-table td {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table th {
-                        font-size: 21px !important;
+                        font-size: 16.8px !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table td {
                         text-align: left !important;
+                        font-weight: normal !important;
                     }
                     .schedule-table td:nth-child(5) {
                         text-align: right !important;
@@ -64,22 +67,6 @@
                         <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
                     </div>
                     
-                    <!-- Form Title -->
-                    <div style="text-align: center; margin-bottom: 12px;">
-                        <!-- Form Title - Line 1 -->
-                        <div style="margin-bottom: 8px;">
-                            <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                <strong>प्ररूप-एक</strong>
-                            </h2>
-                        </div>
-                        <!-- Form Title - Line 2 (Rule reference) -->
-                        <div style="margin-bottom: 12px;">
-                            <p style="margin: 0; padding: 0; font-size: 20px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                (नियम 11 देखिये)
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- Header with Logo and QR Code -->
                     <div style="margin-bottom: 15px; padding-bottom: 8px;">
                         <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
@@ -139,67 +126,72 @@
                         </table>
                     </div>
 
-                    <!-- Notification Number and Date -->
-                        <div class="" style="width:100%;text-align:right;">
-                            <strong>दिनांक</strong> 
-                            <span t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
-                            <span t-if="not report.create_date">/ /2025</span>
-                        </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 21px !important;">
-                        
-                        <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
-                            <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
-                                <strong>भू-अर्जन प्रकरण क्रमांक</strong>
-                                <span t-if="report.notification_number" t-esc="report.notification_number"/>
-                                <span t-if="not report.notification_number">./अ-82/वर्श.</span>
-                                 चूँकि राज्य शासन को यह प्रतीत होता है कि नीचे अनुसूची के कॉलम (1) से (5) में दर्शित भूमि की, अनुसूची के कॉलम (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वास तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 11 की उपधारा (1) के प्रावधानों के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है कि राज्य शासन, एतद् द्वारा, अनुसूची के कॉलम (6) में उल्लिखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :–
-                            </p>
-                        </div>
+                    <!-- Date in top right corner -->
+                    <div style="width:100%;text-align:right; margin-bottom: 10px; font-size: 21px !important;">
+                        <strong>दिनांक-</strong> 
+                        <span t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
+                        <span t-if="not report.create_date">........................</span>
+                    </div>
+
+                    <div style="font-size: 21px !important; line-height: 1.6 !important; text-align: justify; margin-bottom: 15px;">
+                        <p style="margin: 0; padding: 0; font-size: 21px !important; line-height: 1.6 !important;">
+                            <strong>भू-अर्जन प्रकरण क्रमांक</strong>
+                            <span t-if="report.prakaran_kramank" t-esc="report.prakaran_kramank"/>
+                            <span t-if="not report.prakaran_kramank">........................</span>
+                            चूँकि राज्य शासन को यह प्रतीत होता है कि नीचे अनुसूची के कॉलम (1) से (5) में दर्शित भूमि की, अनुसूची के कॉलम (7) में दर्शित सार्वजनिक प्रयोजन के लिए आवश्यकता है अथवा पड़ने की संभावना है, अतः भूमि अर्जन, पुनर्वास तथा पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 11 की उपधारा (1) के प्रावधानों के अनुसार सभी संबंधित व्यक्तियों को इस आशय की सूचना दी जाती है कि राज्य शासन, एतद् द्वारा, अनुसूची के कॉलम (6) में उल्लिखित प्राधिकारी को उक्त भूमि के संबंध में धारा 12 के अंतर्गत दी गई शक्तियों का प्रयोग करने के लिए प्राधिकृत करता है :–
+                        </p>
                     </div>
 
                     <!-- Main Body Text -->
                     
                     <!-- Schedule Table -->
                     <div style="margin: 20px 0;">
-                        <div style="text-align: center; font-size: 21px; font-weight: bold; margin-bottom: 10px; text-decoration: underline;">
+                        <div style="text-align: center; font-size: 16.8px; font-weight: normal; margin-bottom: 10px; text-decoration: underline;">
                             //अनुसूची//
                         </div>
                         <table class="schedule-table">
                             <thead>
                                 <tr>
-                                    <th colspan="2" style="width: 20%;"></th>
-                                    <th colspan="3" style="text-align: center; font-size: 21px !important; font-weight: bold !important;">
+                                    <th rowspan="2" style="width: 10%;">जिला</th>
+                                    <th rowspan="2" style="width: 10%;">तहसील</th>
+                                    <th colspan="3" style="text-align: center; font-size: 16.8px !important; font-weight: normal !important;">
                                         भूमि का प्रकार
                                     </th>
-                                    <th colspan="2" style="width: 40%;"></th>
+                                    <th rowspan="2" style="width: 20%;">धारा 12 द्वारा प्राधिकृत अधिकारी</th>
+                                    <th rowspan="2" style="width: 20%;">सार्वजनिक प्रयोजन का विवरण</th>
                                 </tr>
                                 <tr>
-                                    <th style="width: 10%;">(1) जिला</th>
-                                    <th style="width: 10%;">(2) तहसील</th>
-                                    <th style="width: 15%;">(3) ग्राम/प.हु.नं.</th>
-                                    <th style="width: 15%;">(4) खसरा नं.</th>
-                                    <th style="width: 10%;">(5) अर्जन हेतु प्रस्तावित रकबा (हे.में)</th>
-                                    <th style="width: 20%;">(6) धारा 12 द्वारा प्राधिकृत अधिकारी</th>
-                                    <th style="width: 20%;">(7) सार्वजनिक प्रयोजन का विवरण</th>
+                                    <th style="width: 15%;">ग्राम/प.हु.नं.</th>
+                                    <th style="width: 15%;">खसरा नं.</th>
+                                    <th style="width: 10%;">अर्जन हेतु प्रस्तावित रकबा (हे.में)</th>
+                                </tr>
+                                <tr>
+                                    <th style="width: 10%;">(1)</th>
+                                    <th style="width: 10%;">(2)</th>
+                                    <th style="width: 15%;">(3)</th>
+                                    <th style="width: 15%;">(4)</th>
+                                    <th style="width: 10%;">(5)</th>
+                                    <th style="width: 20%;">(6)</th>
+                                    <th style="width: 20%;">(7)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-if="report.land_parcel_ids and len(report.land_parcel_ids) > 0">
                                     <t t-foreach="report.land_parcel_ids" t-as="parcel">
                                         <tr>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.khasra_number or '........................'"/>
-                                            <td style="font-size: 21px !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.authorized_officer or '........................'"/>
-                                            <td style="font-size: 21px !important;" t-esc="parcel.public_purpose_description or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.district_id.name if parcel.village_id and parcel.village_id.district_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.tehsil_id.name if parcel.village_id and parcel.village_id.tehsil_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.village_id.name if parcel.village_id else '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.khasra_number or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important; text-align: right !important;" t-esc="'{:.4f}'.format(parcel.area_in_hectares) if parcel.area_in_hectares else '0.0000'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.authorized_officer or '........................'"/>
+                                            <td style="font-size: 16.8px !important; font-weight: normal !important;" t-esc="parcel.public_purpose_description or '........................'"/>
                                         </tr>
                                     </t>
                                 </t>
                                 <t t-if="not report.land_parcel_ids or len(report.land_parcel_ids) == 0">
                                     <tr>
-                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 21px !important;">
+                                        <td colspan="7" style="text-align: center; padding: 20px; font-size: 16.8px !important; font-weight: normal !important;">
                                             कोई भूमि खंड जोड़ा नहीं गया है
                                         </td>
                                     </tr>
@@ -220,10 +212,10 @@
                     <div class="paragraph-section">
                         <span class="paragraph-number">3.</span>
                         <span style="font-size: 21px !important; line-height: 1.6 !important;">
-                            भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व) --------------------- के कार्यालय में किया जा सकता है।
-                            <!-- <span t-if="report.map_inspection_location" t-esc="report.map_inspection_location"/>
-                            <span t-if="not report.map_inspection_location">........................</span>
-                            के कार्यालय में किया जा सकता है। -->
+                            भूमि का नक्शा (प्लान) का निरीक्षण अनुविभागीय अधिकारी (राजस्व) 
+                            <span t-if="report.village_id and report.village_id.sub_division_id" t-esc="report.village_id.sub_division_id.name"/>
+                            <span t-if="not report.village_id or not report.village_id.sub_division_id">........................</span>
+                            के कार्यालय में किया जा सकता है।
                         </span>
                     </div>
 
@@ -247,20 +239,7 @@
                     <div class="paragraph-section">
                         <span class="paragraph-number">5.</span>
                         <span style="font-size: 21px !important; line-height: 1.6 !important;">
-                            <t t-if="report.is_exemption">
-                                <t t-if="report.exemption_details">
-                                    <t t-raw="report.exemption_details"/>
-                                </t>
-                                <t t-if="not report.exemption_details">
-                                    प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग की अधिसूचना क्रमांक एफ 4–28/सात–1/2014, दिनांक 02-03-2015 के द्वारा अधिनियम, 2013 के अध्याय “दो” एवं “तीन” के प्रावधानों से छूट प्रदान की गई है।                                </t>
-                            </t>
-                            <t t-if="not report.is_exemption">
-                                <t t-if="report.sia_justification">
-                                    <t t-raw="report.sia_justification"/>
-                                </t>
-                                <t t-if="not report.sia_justification">
-                                    प्रस्तावित प्रयोजन के भू-अर्जन के लिए कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।                                </t>
-                            </t>
+                            <t t-raw="report.get_section5_text()"/>
                         </span>
                     </div>
 

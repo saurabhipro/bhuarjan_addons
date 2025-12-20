@@ -184,7 +184,14 @@
                                 <i class="fa fa-users"/>
                             </div>
                             <div class="o_section_list_content">
-                                <div class="o_section_list_title">(Sec 4) Create SIA Team</div>
+                                <div class="o_section_list_title">
+                                    (Sec 4) Create SIA Team
+                                    <t t-if="state.stats &amp;&amp; state.stats.sia_info &amp;&amp; state.stats.sia_info.is_completed">
+                                        <span class="o_completion_tick" title="All SIA teams completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.sia_completion_percent || 0) : 0"/>% Complete</div>
                                     <div class="o_section_list_count">

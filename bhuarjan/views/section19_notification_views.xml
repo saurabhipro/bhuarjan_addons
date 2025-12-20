@@ -76,17 +76,13 @@
                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
                                    placeholder="Select village from project..."/>
+                            <field name="prakaran_kramank" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                         </group>
                         <group>
                             <field name="district_id" readonly="1"/>
                             <field name="tehsil_id" readonly="1"/>
                         </group>
-                    </group>
-                    
-                    <group string="Public Purpose / लोक प्रयोजन">
-                        <field name="public_purpose" placeholder="Enter description of public purpose for land acquisition..." 
-                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                               widget="text" nolabel="1"/>
                     </group>
                     
                     <notebook>
@@ -170,33 +166,23 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Additional Information / अतिरिक्त जानकारी">
-                            <group string="Map Inspection / नक्शा निरीक्षण">
-                                <field name="sdo_revenue_name"/>
-                                <field name="sdo_office_location"/>
-                            </group>
-                            <group string="Displacement &amp; Rehabilitation / विस्थापन और पुनर्वास">
-                                <field name="is_displacement_involved"/>
-                                <field name="affected_persons_count" invisible="not is_displacement_involved"/>
-                                <field name="rehab_village_id" invisible="not is_displacement_involved"/>
-                                <field name="rehab_tehsil_id" invisible="not is_displacement_involved"/>
-                                <field name="rehab_district_id" invisible="not is_displacement_involved"/>
-                                <field name="rehab_khasra_number" invisible="not is_displacement_involved"/>
-                                <field name="rehab_area_hectares" invisible="not is_displacement_involved"/>
-                                <field name="rehab_officer_name" invisible="not is_displacement_involved"/>
-                                <field name="rehab_officer_office_location" invisible="not is_displacement_involved"/>
-                            </group>
-                        </page>
-                        <page string="Signed Document / हस्ताक्षरित दस्तावेज़">
-                            <group>
-                                <field name="has_signed_document" readonly="1"/>
-                                <field name="signed_document_file" filename="signed_document_filename"/>
-                                <field name="signed_document_filename" invisible="1"/>
-                                <field name="signed_date"/>
-                                <field name="collector_signature" filename="collector_signature_filename"/>
-                                <field name="collector_signature_filename" invisible="1"/>
-                                <field name="collector_name"/>
-                            </group>
+                        <page string="Survey / सर्वे">
+                            <field name="survey_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="name" string="Survey Number"/>
+                                    <field name="user_id" string="Surveyor"/>
+                                    <field name="khasra_number" string="Khasra Number"/>
+                                    <field name="total_area" string="Total Area (Hectares)"/>
+                                    <field name="acquired_area" string="Acquired Area (Hectares)"/>
+                                    <field name="state" widget="badge" string="Status"
+                                           decoration-success="state == 'approved'" 
+                                           decoration-info="state == 'submitted'" 
+                                           decoration-warning="state == 'draft'"
+                                           decoration-danger="state == 'rejected'"
+                                           decoration-muted="state == 'locked'"/>
+                                    <field name="survey_date" string="Survey Date"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>

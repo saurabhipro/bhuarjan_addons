@@ -208,8 +208,8 @@
 
                             <div class="responsive-sia-group row"  groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" >
                                 <div class="col" string="Download SIA Documents">
-                                    <div class="row">
-                                        <div class="col">
+                                    <div class="row" style="padding: 10px 0;">
+                                        <div class="col" style="padding: 0 10px;">
                                             <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
                                             <button name="action_download_latest_pdf" 
                                                     string="SIA" type="object" 
@@ -217,7 +217,9 @@
                                                     title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                     invisible="not sdm_signed_file and not collector_signed_file"
                                                     style="width: 100%;"/>
-                                      
+                                        </div>
+                                        <div class="col" style="padding: 0 10px;">
+                                            <!-- Download SDM Signed SIA -->
                                             <button name="action_download_sdm_signed_file" 
                                                     type="object" 
                                                     class="btn-primary"
@@ -228,7 +230,10 @@
                                                 <i class="fa fa-check-circle" style="margin-right: 5px;"/>
                                                 SIA SDM Signed
                                             </button>
-<button name="action_download_collector_signed_file"
+                                        </div>
+                                        <div class="col" style="padding: 0 10px;">
+                                            <!-- Download Collector Signed SIA -->
+                                            <button name="action_download_collector_signed_file"
                                                     type="object" 
                                                     class="btn-primary"
                                                     title="Download Collector Signed SIA"
@@ -238,14 +243,6 @@
                                                 <i class="fa fa-check-circle" style="margin-right: 5px;"/>
                                                 SIA Collector Signed
                                             </button>
-
-                                        </div>
-                                        <div class="col">
-                                            <!-- Download SDM Signed SIA -->
-                                        </div>
-                                        <div class="col">
-                                            <!-- Download Collector Signed SIA -->
-                                            
                                         </div>
                                     </div>
                                 </div>

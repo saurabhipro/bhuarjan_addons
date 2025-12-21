@@ -379,6 +379,18 @@
                 border-color: #000 !important;
             }
             
+            /* Ensure all header cells have light grey background */
+            .bulk-form10-table thead th,
+            .bulk-form10-table-landscape thead th,
+            .bulk-form10-table thead th.table_th_1,
+            .bulk-form10-table thead th.table_th_2,
+            .bulk-form10-table-landscape thead th.table_th_1,
+            .bulk-form10-table-landscape thead th.table_th_2 {
+                background-color: #D3D3D3 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
             .bulk-form10-table thead,
             .bulk-form10-table-landscape thead {
                 display: table-header-group;
@@ -521,8 +533,8 @@
             .table_th_2 {
                 text-align: center;
                 border: 2px solid #000;
-                background-color: #D3D3D3;
-                color: #000000;
+                background-color: #D3D3D3 !important;
+                color: #000000 !important;
                 padding: 6px;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
             }

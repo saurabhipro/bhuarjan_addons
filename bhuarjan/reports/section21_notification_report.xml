@@ -38,6 +38,14 @@
                     .schedule-table th {
                         background-color: #f0f0f0;
                     }
+                    .watermark {
+                        top: 25%;
+                        left: 25%;
+                    }
+                    .watermark img {
+                        width: 600px;
+                        height: 500px;
+                    }
                 </style>
                 <div class="page">
                     <div class="oe_structure"/>
@@ -45,9 +53,16 @@
                     <t t-if="o">
                         <!-- PUBLIC -->
                         <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
+                            <!-- Watermark with Logo - Centered on Page -->
+                            <div class="watermark">
+                                <div class="watermark-circle"></div>
+                                <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
+                            </div>
+                            
                             <!-- Header: Collector's Court -->
                             <div style="text-align: center; margin-bottom: 8px;">
-                                <h2 style="margin: 0; padding: 0; font-size: 22px; font-weight: bold;">
+                                <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                     <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                 </h2>
                             </div>
@@ -148,6 +163,78 @@
                                 </table>
                             </div>
 
+                            <!-- Letter Text After Table -->
+                            <div style="margin-top: 20px; font-size: 18px !important; line-height: 1.6 !important;">
+                                <!-- Reference and Copy Details -->
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <div>
+                                        <span>पु. क्रमांक/</span>
+                                        <span style="text-decoration: underline;">........................</span>
+                                        <span>प्रतिलिपि :-</span>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <span>भू-अर्जन/</span>
+                                        <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%Y')"/>
+                                        <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                        <span>,</span>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div>
+                                            <span>रायगढ़ दिनाँक</span>
+                                            <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
+                                            <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                        </div>
+                                        <div>
+                                            <span>कलेक्टर</span>
+                                        </div>
+                                        <div>
+                                            <span>जिला-</span>
+                                            <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                            <span t-if="not o or not o.district_id">रायगढ़</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Point 1: To Sub-Divisional Officer -->
+                                <div style="margin-bottom: 15px; text-align: justify;">
+                                    <div style="margin-bottom: 5px;">
+                                        <strong>1.</strong>
+                                        <span style="margin-left: 8px;">
+                                            अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                            <t t-set="sub_division_name" t-value="o.village_id.sub_division_id.name if o and o.village_id and o.village_id.sub_division_id else (o.tehsil_id.sub_division_id.name if o and o.tehsil_id and o.tehsil_id.sub_division_id else '')"/>
+                                            <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                            <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                            जिला
+                                            <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                            <span t-if="not o or not o.district_id">रायगढ़</span>
+                                            की ओर
+                                        </span>
+                                    </div>
+                                    <div style="margin-left: 20px; margin-bottom: 5px;">
+                                        सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
+                                    </div>
+                                    <div style="margin-left: 20px;">
+                                        आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
+                                    </div>
+                                </div>
+
+                                <!-- Point 2: To Landowner -->
+                                <div style="margin-bottom: 15px; text-align: justify;">
+                                    <div style="margin-bottom: 5px;">
+                                        <strong>2.</strong>
+                                        <span style="margin-left: 8px;">
+                                            भूमिस्वामी.
+                                        </span>
+                                    </div>
+                                    <div style="margin-left: 20px;">
+                                        की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                        <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                        <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                        के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
                                 <div style="margin: 5px 0; font-size: 18px !important;">
@@ -177,9 +264,16 @@
                             <t t-foreach="surveys_data" t-as="item">
                                 <div style="page-break-before: always;"/>
                                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
+                                    <!-- Watermark with Logo - Centered on Page -->
+                                    <div class="watermark">
+                                        <div class="watermark-circle"></div>
+                                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
+                                    </div>
+                                    
                                     <!-- Header: Collector's Court -->
                                     <div style="text-align: center; margin-bottom: 8px;">
-                                        <h2 style="margin: 0; padding: 0; font-size: 22px; font-weight: bold;">
+                                        <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                             <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                         </h2>
                                     </div>

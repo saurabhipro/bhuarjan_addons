@@ -200,13 +200,9 @@
                                         <span>पु. क्रमांक/</span>
                                         <span t-if="o and o.kramank" t-esc="o.kramank"/>
                                         <span t-if="not o or not o.kramank" style="text-decoration: underline;">........................</span>
-                                        <span> प्रतिलिपि :-</span>
+                                 
                                     </div>
-                                    <div style="text-align: right;">
-                                        <span>भू-अर्जन/</span>
-                                        <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%Y')"/>
-                                        <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
-                                        <span>,</span>
+                                    <div style="text-align: right;">                                                                            
                                         <span style="margin-left: 10px;">रायगढ़ दिनाँक</span>
                                         <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
                                         <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
@@ -216,6 +212,7 @@
                                 <!-- Point 1: To Sub-Divisional Officer -->
                                 <div style="margin-bottom: 15px; text-align: justify;">
                                     <div style="margin-bottom: 5px;">
+                                        <span> प्रतिलिपि :-</span>
                                         <strong>1.</strong>
                                         <span style="margin-left: 8px;">
                                             अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
@@ -405,12 +402,10 @@
                                                 <span>पु. क्रमांक/</span>
                                                 <span t-if="o and o.kramank" t-esc="o.kramank"/>
                                                 <span t-if="not o or not o.kramank" style="text-decoration: underline;">........................</span>
-                                                <span> प्रतिलिपि :-</span>
+                                          
                                             </div>
                                             <div style="text-align: right;">
-                                                <span>भू-अर्जन/</span>
-                                                <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%Y')"/>
-                                                <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                
                                                 <span>,</span>
                                                 <span style="margin-left: 10px;">रायगढ़ दिनाँक</span>
                                                 <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
@@ -421,6 +416,7 @@
                                         <!-- Point 1: To Sub-Divisional Officer -->
                                         <div style="margin-bottom: 15px; text-align: justify;">
                                             <div style="margin-bottom: 5px;">
+                                                <span> प्रतिलिपि :-</span>
                                                 <strong>1.</strong>
                                                 <span style="margin-left: 8px;">
                                                     अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,

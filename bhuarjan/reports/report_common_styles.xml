@@ -330,6 +330,191 @@
             }
             
             /* ============================================
+               FORM 10 SPECIFIC STYLES
+               ============================================ */
+            /* Form 10 Table Base Styles */
+            .bulk-form10-table,
+            .bulk-form10-table-landscape {
+                border-collapse: collapse;
+                width: 100%;
+                table-layout: fixed;
+            }
+            
+            .bulk-form10-table td, 
+            .bulk-form10-table th,
+            .bulk-form10-table-landscape td,
+            .bulk-form10-table-landscape th {
+                border: 1px solid #000;
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                padding: 3px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                vertical-align: top;
+            }
+            
+            .bulk-form10-table thead,
+            .bulk-form10-table-landscape thead {
+                display: table-header-group;
+                -fs-table-paginate: paginate;
+            }
+            
+            .bulk-form10-table thead tr,
+            .bulk-form10-table-landscape thead tr {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+            
+            .bulk-form10-table thead th,
+            .bulk-form10-table-landscape thead th {
+                background-color: #D3D3D3;
+                color: #000000;
+                font-weight: bold;
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                position: relative;
+                page-break-inside: avoid;
+                border: 2px solid #000;
+                padding: 6px;
+                line-height: 1.2;
+            }
+            
+            .bulk-form10-table thead th {
+                font-size: 14px !important;
+            }
+            
+            .bulk-form10-table-landscape thead th {
+                font-size: 12px !important;
+            }
+            
+            .bulk-form10-table tbody,
+            .bulk-form10-table-landscape tbody {
+                display: table-row-group;
+            }
+            
+            .bulk-form10-table,
+            .bulk-form10-table tr,
+            .bulk-form10-table td,
+            .bulk-form10-table tbody,
+            .bulk-form10-table-landscape,
+            .bulk-form10-table-landscape tr,
+            .bulk-form10-table-landscape td,
+            .bulk-form10-table-landscape tbody {
+                page-break-inside: avoid !important;
+            }
+            
+            .bulk-form10-table tbody td:nth-child(5),
+            .bulk-form10-table-landscape tbody td:nth-child(5) {
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+                orphans: 2;
+                widows: 2;
+            }
+            
+            /* Form 10 Table Header Classes */
+            .table_th_1,
+            .table_th_2 {
+                text-align: center;
+                border: 2px solid #000;
+                background-color: #D3D3D3;
+                color: #000000;
+                padding: 6px;
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+            }
+            
+            .table_th_1 {
+                font-size: 14px !important;
+            }
+            
+            .table_th_2 {
+                font-size: 14px !important;
+            }
+            
+            /* Form 10 Title */
+            .form10-title {
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                font-weight: normal !important;
+            }
+            
+            /* Form 10 Header Info Table */
+            .form10-header-info-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                border: 2px solid #000;
+                margin-bottom: 0;
+                table-layout: fixed;
+            }
+            
+            .form10-header-info-table td {
+                border: 1px solid #000;
+                padding: 6px;
+                vertical-align: middle;
+            }
+            
+            /* Fix for parentheses rendering - use Arial font for wkhtmltopdf */
+            .paren-fix {
+                font-family: "Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", sans-serif !important;
+                font-size: inherit !important;
+                display: inline !important;
+                unicode-bidi: embed !important;
+                direction: ltr !important;
+            }
+            
+            .table_th_2 .paren-fix,
+            .table_th_1 .paren-fix,
+            .table_th_2 strong .paren-fix,
+            .table_th_1 strong .paren-fix {
+                font-family: "Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", sans-serif !important;
+                font-weight: normal !important;
+            }
+            
+            /* Force Arial for parentheses in table headers */
+            .table_th_2 strong,
+            .table_th_1 strong {
+                font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+            }
+            
+            /* Form 10 Column Widths - Portrait */
+            .bulk-form10-table thead th:nth-child(1),
+            .bulk-form10-table tbody td:nth-child(1) { width: 2%; }
+            .bulk-form10-table thead th:nth-child(2),
+            .bulk-form10-table tbody td:nth-child(2) { width: 4%; }
+            .bulk-form10-table thead th:nth-child(3),
+            .bulk-form10-table tbody td:nth-child(3) { width: 3%; }
+            .bulk-form10-table thead th:nth-child(4),
+            .bulk-form10-table tbody td:nth-child(4) { width: 4%; }
+            .bulk-form10-table thead th:nth-child(5),
+            .bulk-form10-table tbody td:nth-child(5) { width: 10%; }
+            .bulk-form10-table thead th:nth-child(6),
+            .bulk-form10-table thead th:nth-child(7),
+            .bulk-form10-table thead th:nth-child(8),
+            .bulk-form10-table thead th:nth-child(9) {
+                width: auto;
+                min-width: 3%;
+                max-width: 4%;
+            }
+            
+            /* Form 10 Column Widths - Landscape */
+            .bulk-form10-table-landscape thead th:nth-child(1),
+            .bulk-form10-table-landscape tbody td:nth-child(1) { width: 2%; }
+            .bulk-form10-table-landscape thead th:nth-child(2),
+            .bulk-form10-table-landscape tbody td:nth-child(2) { width: 4%; }
+            .bulk-form10-table-landscape thead th:nth-child(3),
+            .bulk-form10-table-landscape tbody td:nth-child(3) { width: 3%; }
+            .bulk-form10-table-landscape thead th:nth-child(4),
+            .bulk-form10-table-landscape tbody td:nth-child(4) { width: 4%; }
+            .bulk-form10-table-landscape thead th:nth-child(5),
+            .bulk-form10-table-landscape tbody td:nth-child(5) { width: 10%; }
+            .bulk-form10-table-landscape thead th:nth-child(6),
+            .bulk-form10-table-landscape thead th:nth-child(7),
+            .bulk-form10-table-landscape thead th:nth-child(8),
+            .bulk-form10-table-landscape thead th:nth-child(9) {
+                width: auto;
+                min-width: 3%;
+                max-width: 4%;
+            }
+            
+            /* ============================================
                PAGE SETTINGS
                ============================================ */
             @page {

@@ -86,6 +86,8 @@
                             <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->
                             <field name="project_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="requiring_body_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_open': True}"/>
+                            <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="village_ids" widget="many2many_tags" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                    placeholder="Affected villages (auto-populated from project)..."
                                    options="{'no_create_edit': True}"

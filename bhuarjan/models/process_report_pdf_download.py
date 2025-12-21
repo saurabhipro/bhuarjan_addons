@@ -115,9 +115,20 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     _logger.error(f"Error generating PDF for Section 19 record {record.id}: {str(e)}", exc_info=True)
                     continue
             
-            # Generate Section 21 PDFs
-            section21_counter = 0
+            # Generate Section 21 PDFs - One PDF per village (contains public notice + all personal notices)
+            # Group by (project, village) to ensure only one PDF per village per project
+            # Note: Section 21 has unique constraint on (project_id, village_id), so there should be max one per combination
+            section21_by_key = {}
             for record in records.get('section21', []):
+                if record.village_id and record.project_id:
+                    # Create unique key from project and village
+                    key = (record.project_id.id, record.village_id.id)
+                    # Only keep the first record per (project, village) combination
+                    if key not in section21_by_key:
+                        section21_by_key[key] = record
+            
+            # Generate one PDF per village (each PDF contains public notice + all personal notices)
+            for key, record in section21_by_key.items():
                 try:
                     report_action = self.env.ref('bhuarjan.action_report_section21_notification')
                     pdf_result = report_action.sudo()._render_qweb_pdf(
@@ -131,9 +142,8 @@ class ProcessReportPdfDownload(models.AbstractModel):
                         if isinstance(pdf_data, bytes):
                             project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
                             village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
-                            section21_counter += 1
-                            # Use record ID to ensure uniqueness
-                            filename = f'Section21_{project_name}_{village_name}_ID{record.id}_{section21_counter}.pdf'
+                            # One PDF per village - filename includes village name only
+                            filename = f'Section21_{project_name}_{village_name}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:

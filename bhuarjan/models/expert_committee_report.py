@@ -17,6 +17,9 @@ class ExpertCommitteeReport(models.Model):
     name = fields.Char(string='Report Name / रिपोर्ट का नाम', required=True, default='New', tracking=True)
     expert_committee_uuid = fields.Char(string='Expert Committee UUID', readonly=True, copy=False, index=True,
                                         help='Unique identifier for QR code download')
+    # Kramank (Reference Number)
+    kramank = fields.Char(string='Kramank / क्रमांक', tracking=True,
+                          help='Reference number to be displayed in the report (optional)')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True,
                                   domain="[('is_sia_exempt', '=', False)]")

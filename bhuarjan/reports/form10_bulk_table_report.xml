@@ -212,6 +212,14 @@
                                     <th colspan="4" class="table_th_1" style="border: 1px solid #000;padding-left:2px;"><strong>भूमि का प्रकार</strong></th>
                                     <th colspan="3" class="table_th_1" style="border: 1px solid #000;padding-left:2px;"><strong>भूमि पर स्थित वृक्ष की संख्या <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>प्रजातिवार<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th colspan="6" class="table_th_1" style="border: 1px solid #000;padding-left:2px;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 3%; border: 1px solid #000;"><strong>क्र.</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;"><strong>कुल रकबा <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हे.में.<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हेक्टेयर<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 18%; border: 1px solid #000;"><strong>भूमिस्वामी का नाम</strong></th>
+                                    <th colspan="4" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि का प्रकार</strong></th>
+                                    <th colspan="3" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि पर स्थित वृक्ष की संख्या <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>प्रजातिवार<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
+                                    <th colspan="6" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                                 </tr>
                                 <tr>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;"><strong>एक फसली</strong></th>
@@ -261,7 +269,7 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="width: 17%; border: 1px solid #000;">
+                                                <td style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
@@ -446,11 +454,11 @@
                             <thead>
                                 <!-- Repeat headers on each page -->
                                 <tr>
-                                    <th rowspan="2" class="table_th_1" style="width: 2%; border: 1px solid #000;"><strong>क्र.</strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 3%; border: 1px solid #000;"><strong>कुल रकबा <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हे.में.<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हेक्टेयर<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 17%; border: 1px solid #000;"><strong>भूमिस्वामी का नाम</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 3%; border: 1px solid #000;"><strong>क्र.</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;"><strong>प्रभावित खसरा क्रमांक</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;"><strong>कुल रकबा <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हे.में.<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हेक्टेयर<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 18%; border: 1px solid #000;"><strong>भूमिस्वामी का नाम</strong></th>
                                     <th colspan="4" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि का प्रकार</strong></th>
                                     <th colspan="3" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि पर स्थित वृक्ष की संख्या <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>प्रजातिवार<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th colspan="6" class="table_th_1" style="border: 1px solid #000;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
@@ -503,7 +511,7 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="width: 17%; border: 1px solid #000;">
+                                                <td style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">

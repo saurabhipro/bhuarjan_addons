@@ -335,16 +335,17 @@
             /* Form 10 Table Base Styles */
             .bulk-form10-table,
             .bulk-form10-table-landscape {
-                border-collapse: collapse;
+                border-collapse: collapse !important;
                 width: 100%;
                 table-layout: fixed;
+                border: 2px solid #000 !important;
             }
             
             .bulk-form10-table td, 
             .bulk-form10-table th,
             .bulk-form10-table-landscape td,
             .bulk-form10-table-landscape th {
-                border: 1px solid #000;
+                border: 1px solid #000 !important;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 padding: 3px;
                 word-wrap: break-word;
@@ -366,15 +367,20 @@
             
             .bulk-form10-table thead th,
             .bulk-form10-table-landscape thead th {
-                background-color: #D3D3D3;
-                color: #000000;
+                background-color: #D3D3D3 !important;
+                color: #000000 !important;
                 font-weight: bold;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 position: relative;
                 page-break-inside: avoid;
-                border: 2px solid #000;
+                border: 1px solid #000 !important;
                 padding: 6px;
                 line-height: 1.2;
+            }
+            
+            .bulk-form10-table tbody td,
+            .bulk-form10-table-landscape tbody td {
+                border: 1px solid #000 !important;
             }
             
             .bulk-form10-table thead th {

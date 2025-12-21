@@ -72,8 +72,7 @@
                         <!-- Logo - Left Header Box -->
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
                         <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
-                             height="65"
-                             width="80"/>
+                             style="width: 80px; height: auto; object-fit: contain;"/>
                     </td>
                     <td style="width: 40%; font-size: 14px;">
                         <strong>परियोजना का नाम :</strong>
@@ -174,7 +173,7 @@
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
                     </div>
 
                 <!-- Subject/Reference Line -->

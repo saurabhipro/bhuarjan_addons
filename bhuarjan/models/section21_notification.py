@@ -129,6 +129,43 @@ class Section21Notification(models.Model):
                 record.khasra_numbers = ''
                 record.khasra_count = 0
     
+    def _get_approved_surveys_data(self):
+        """Get approved/locked survey data grouped by khasra number with total area and landowner info"""
+        self.ensure_one()
+        if not self.village_id or not self.project_id:
+            return []
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.village_id.id),
+            ('project_id', '=', self.project_id.id),
+            ('state', 'in', ['approved', 'locked'])
+        ], order='khasra_number')
+        khasra_data = {}
+        for survey in surveys:
+            if survey.khasra_number:
+                if survey.khasra_number not in khasra_data:
+                    khasra_data[survey.khasra_number] = {
+                        'area': 0.0,
+                        'landowner': False,
+                        'landowner_name': '',
+                        'landowner_father': '',
+                        'landowner_address': ''
+                    }
+                khasra_data[survey.khasra_number]['area'] += survey.acquired_area or 0.0
+                # Get first landowner if available
+                if survey.landowner_ids and not khasra_data[survey.khasra_number]['landowner']:
+                    landowner = survey.landowner_ids[0]
+                    khasra_data[survey.khasra_number]['landowner'] = landowner
+                    khasra_data[survey.khasra_number]['landowner_name'] = landowner.name or ''
+                    khasra_data[survey.khasra_number]['landowner_father'] = landowner.father_name or landowner.spouse_name or ''
+                    khasra_data[survey.khasra_number]['landowner_address'] = landowner.owner_address or ''
+        return [{
+            'khasra_number': k,
+            'area': v['area'],
+            'landowner_name': v['landowner_name'],
+            'landowner_father': v['landowner_father'],
+            'landowner_address': v['landowner_address']
+        } for k, v in sorted(khasra_data.items())]
+    
     # Survey-related fields (similar to Section 4)
     survey_ids = fields.Many2many('bhu.survey', compute='_compute_survey_ids', string='Surveys', readonly=True)
     survey_count = fields.Integer(string='Survey Count', compute='_compute_survey_ids', readonly=True)
@@ -386,11 +423,11 @@ class Section21Notification(models.Model):
         
         return result
     
-    # Override mixin method to generate Section 21 Public Notice PDF
+    # Override mixin method to generate Section 21 Notification PDF
     def action_download_unsigned_file(self):
-        """Generate and download Section 21 Public Notice PDF (unsigned) - Override mixin"""
+        """Generate and download Section 21 Notification PDF (unsigned) - Override mixin"""
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_section21_public_notification').report_action(self)
+        return self.env.ref('bhuarjan.action_report_section21_notification').report_action(self)
     
     def action_generate_public_notice(self):
         """Generate Section 21 Public Notice PDF"""
@@ -416,7 +453,7 @@ class Section21Notification(models.Model):
         ])
         
         # Generate PDF for all personal notices
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        report_action = self.env.ref('bhuarjan.action_report_section21_notification')
         return report_action.report_action(personal_notices)
     
     def action_generate_personal_notices_only(self):
@@ -466,7 +503,7 @@ class Section21Notification(models.Model):
         
         # Generate personal notices WITHOUT public notice first
         # This will generate one page per khasra using only the personal template
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        report_action = self.env.ref('bhuarjan.action_report_section21_notification')
         # Invalidate report cache to force fresh generation
         report_action.invalidate_recordset(['report_name', 'report_file'])
         return report_action.with_context(
@@ -530,10 +567,7 @@ class Section21Notification(models.Model):
 
     def action_generate_both_notices(self):
         self.ensure_one()
-        report_action = self.env.ref(
-            'bhuarjan.action_report_section21_personal_and_public_notification'
-        )
-
+        report_action = self.env.ref('bhuarjan.action_report_section21_notification')
         return report_action.report_action(self)
         
 
@@ -588,7 +622,7 @@ class Section21Notification(models.Model):
         
         # Generate personal notices with context flag to include public notice first
         # The report template will check this context and render public notice as first page
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
+        report_action = self.env.ref('bhuarjan.action_report_section21_notification')
         # Invalidate report cache to force fresh generation
         report_action.invalidate_recordset(['report_name', 'report_file'])
         return report_action.with_context(

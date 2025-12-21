@@ -612,42 +612,42 @@
             
             /* Form 10 Column Widths - Portrait */
             .bulk-form10-table thead th:nth-child(1),
-            .bulk-form10-table tbody td:nth-child(1) { width: 2%; }
+            .bulk-form10-table tbody td:nth-child(1) { width: 3%; }
             .bulk-form10-table thead th:nth-child(2),
-            .bulk-form10-table tbody td:nth-child(2) { width: 4%; }
+            .bulk-form10-table tbody td:nth-child(2) { width: 5%; }
             .bulk-form10-table thead th:nth-child(3),
-            .bulk-form10-table tbody td:nth-child(3) { width: 3%; }
+            .bulk-form10-table tbody td:nth-child(3) { width: 4%; }
             .bulk-form10-table thead th:nth-child(4),
-            .bulk-form10-table tbody td:nth-child(4) { width: 4%; }
+            .bulk-form10-table tbody td:nth-child(4) { width: 5%; }
             .bulk-form10-table thead th:nth-child(5),
-            .bulk-form10-table tbody td:nth-child(5) { width: 10%; }
+            .bulk-form10-table tbody td:nth-child(5) { width: 11%; }
             .bulk-form10-table thead th:nth-child(6),
             .bulk-form10-table thead th:nth-child(7),
             .bulk-form10-table thead th:nth-child(8),
             .bulk-form10-table thead th:nth-child(9) {
                 width: auto;
-                min-width: 3%;
-                max-width: 4%;
+                min-width: 4%;
+                max-width: 5%;
             }
             
             /* Form 10 Column Widths - Landscape */
             .bulk-form10-table-landscape thead th:nth-child(1),
-            .bulk-form10-table-landscape tbody td:nth-child(1) { width: 2%; }
+            .bulk-form10-table-landscape tbody td:nth-child(1) { width: 3%; }
             .bulk-form10-table-landscape thead th:nth-child(2),
-            .bulk-form10-table-landscape tbody td:nth-child(2) { width: 4%; }
+            .bulk-form10-table-landscape tbody td:nth-child(2) { width: 5%; }
             .bulk-form10-table-landscape thead th:nth-child(3),
-            .bulk-form10-table-landscape tbody td:nth-child(3) { width: 3%; }
+            .bulk-form10-table-landscape tbody td:nth-child(3) { width: 4%; }
             .bulk-form10-table-landscape thead th:nth-child(4),
-            .bulk-form10-table-landscape tbody td:nth-child(4) { width: 4%; }
+            .bulk-form10-table-landscape tbody td:nth-child(4) { width: 5%; }
             .bulk-form10-table-landscape thead th:nth-child(5),
-            .bulk-form10-table-landscape tbody td:nth-child(5) { width: 10%; }
+            .bulk-form10-table-landscape tbody td:nth-child(5) { width: 11%; }
             .bulk-form10-table-landscape thead th:nth-child(6),
             .bulk-form10-table-landscape thead th:nth-child(7),
             .bulk-form10-table-landscape thead th:nth-child(8),
             .bulk-form10-table-landscape thead th:nth-child(9) {
                 width: auto;
-                min-width: 3%;
-                max-width: 4%;
+                min-width: 4%;
+                max-width: 5%;
             }
             
             /* ============================================

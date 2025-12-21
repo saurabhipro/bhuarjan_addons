@@ -201,11 +201,11 @@
                         <th class="table_th_2"><strong>अविकसित</strong></th>
                         <th class="table_th_2"><strong>अर्द्ध विकसित</strong></th>
                         <th class="table_th_2"><strong>पूर्ण विकसित</strong></th>
-                        <th class="table_th_2"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
-                        <th class="table_th_2"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
-                        <th class="table_th_2"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
-                        <th class="table_th_2"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
-                        <th class="table_th_2"><strong>तालाब (हाँ/नहीं)</strong></th>
+                        <th class="table_th_2"><strong>मकान <span style="font-family: Arial, sans-serif;">(</span>कच्चा/पक्का<span style="font-family: Arial, sans-serif;">)</span> क्षेत्रफल वर्गफुट में</strong></th>
+                        <th class="table_th_2"><strong>शेड <span style="font-family: Arial, sans-serif;">(</span>क्षेत्रफल वर्गफुट में<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                        <th class="table_th_2"><strong>कुँआ <span style="font-family: Arial, sans-serif;">(</span>कच्चा/पक्का<span style="font-family: Arial, sans-serif;">)</span> <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                        <th class="table_th_2"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                        <th class="table_th_2"><strong>तालाब <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                         <th class="table_th_2"><strong>रिमार्क</strong></th>
                     </tr>
                 </thead>
@@ -691,11 +691,11 @@
                                     <th class="table_th_2"><strong>अविकसित</strong></th>
                                     <th class="table_th_2"><strong>अर्द्ध विकसित</strong></th>
                                     <th class="table_th_2"><strong>पूर्ण विकसित</strong></th>
-                                    <th class="table_th_2"><strong>मकान (कच्चा/पक्का) क्षेत्रफल वर्गफुट में</strong></th>
-                                    <th class="table_th_2"><strong>शेड (क्षेत्रफल वर्गफुट में)</strong></th>
-                                    <th class="table_th_2"><strong>कुँआ (कच्चा/पक्का) (हाँ/नहीं)</strong></th>
-                                    <th class="table_th_2"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)</strong></th>
-                                    <th class="table_th_2"><strong>तालाब (हाँ/नहीं)</strong></th>
+                                    <th class="table_th_2"><strong>मकान <span style="font-family: Arial, sans-serif;">(</span>कच्चा/पक्का<span style="font-family: Arial, sans-serif;">)</span> क्षेत्रफल वर्गफुट में</strong></th>
+                                    <th class="table_th_2"><strong>शेड <span style="font-family: Arial, sans-serif;">(</span>क्षेत्रफल वर्गफुट में<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                                    <th class="table_th_2"><strong>कुँआ <span style="font-family: Arial, sans-serif;">(</span>कच्चा/पक्का<span style="font-family: Arial, sans-serif;">)</span> <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                                    <th class="table_th_2"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                                    <th class="table_th_2"><strong>तालाब <span style="font-family: Arial, sans-serif;">(</span>हाँ/नहीं<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                                     <th class="table_th_2"><strong>रिमार्क</strong></th>
                                 </tr>
                             </thead>

@@ -44,6 +44,10 @@
                     margin: 0 0 5px 0;
                     text-align: center;
                 }
+                .header-logo-form10{
+                    width: 120px;
+                    height: auto; 
+                }
             </style>
             <h2 class="form10-title" style="text-decoration: underline; margin: 0 0 5px 0; text-align: center; font-size: 28px;">भू अर्जन प्रारंभिक सर्वे प्रपत्र</h2>
 
@@ -53,7 +57,7 @@
                         <!-- Logo -->
                         <img src="/bhuarjan/static/img/logo.png" 
                              alt="Logo" 
-                             class="header-logo"/>
+                             class="header-logo-form10"/>
                     </td>
                     <td style="width: 42%;">
                         <strong>परियोजना का नाम :</strong>

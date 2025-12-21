@@ -7,7 +7,7 @@ import json
 class Section11PreliminaryReport(models.Model):
     _name = 'bhu.section11.preliminary.report'
     _description = 'Section 11 Preliminary Report'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
 
     # Note: Removed unique project constraint to allow one Section 11 per village per project
@@ -449,43 +449,7 @@ class Section11PreliminaryReport(models.Model):
                 record.section4_notification_id.write({'state': 'notification_11'})
         return records
     
-    def get_qr_code_data(self):
-        """Generate QR code data for the report"""
-        try:
-            import qrcode
-            import io
-            import base64
-            
-            # Ensure UUID exists
-            if not self.report_uuid:
-                self.write({'report_uuid': str(uuid.uuid4())})
-            
-            # Generate QR code URL - using report UUID
-            qr_url = f"https://bhuarjan.com/bhuarjan/section11/{self.report_uuid}/download"
-            
-            # Create QR code
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=3,
-                border=2,
-            )
-            qr.add_data(qr_url)
-            qr.make(fit=True)
-            
-            # Generate image
-            img = qr.make_image(fill_color="black", back_color="white")
-            
-            # Convert to base64
-            buffer = io.BytesIO()
-            img.save(buffer, format='PNG')
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            
-            return img_str
-        except ImportError:
-            return None
-        except Exception as e:
-            return None
+    # QR code generation is now handled by bhu.qr.code.mixin
     
     def action_populate_from_surveys(self):
         """Manually populate land parcels from surveys"""

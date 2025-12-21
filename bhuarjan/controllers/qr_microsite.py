@@ -550,3 +550,141 @@ class Section4DownloadController(http.Controller):
         except Exception as e:
             _logger.error(f"Error in download_section11_pdf: {str(e)}", exc_info=True)
             return request.not_found(f"Error: {str(e)}")
+    
+    @http.route('/bhuarjan/section19/<path:notification_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_section19_pdf(self, notification_uuid, **kwargs):
+        """Download Section 19 Notification PDF using notification UUID - serves signed document if exists, else unsigned PDF"""
+        _logger.info(f"Section 19 PDF download route called: notification_uuid={notification_uuid}")
+        try:
+            # Find notification by UUID
+            notification = request.env['bhu.section19.notification'].sudo().with_context({}).search([('notification_uuid', '=', notification_uuid)], limit=1)
+            
+            if not notification:
+                _logger.error(f"Notification not found with UUID: {notification_uuid}")
+                return request.not_found("Notification not found")
+            
+            _logger.info(f"Notification found: id={notification.id}, name={notification.name}, has_signed={bool(notification.signed_document_file)}")
+            
+            # If signed document exists, serve it
+            if notification.signed_document_file:
+                _logger.info("Serving signed document")
+                pdf_data = base64.b64decode(notification.signed_document_file)
+                filename = notification.signed_document_filename or f"Section19_Notification_{notification.name}_Signed.pdf"
+                
+                response = request.make_response(
+                    pdf_data,
+                    headers=[
+                        ('Content-Type', 'application/pdf'),
+                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Length', str(len(pdf_data))),
+                    ]
+                )
+                return response
+            
+            # Otherwise, generate unsigned PDF
+            _logger.info("Generating unsigned PDF")
+            report_action = request.env.ref('bhuarjan.action_report_section19_notification')
+            
+            # Generate PDF directly from notification record
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [notification.id], data={})
+            
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
+            
+            # Extract PDF bytes
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+            
+            if not isinstance(pdf_data, bytes):
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                else:
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
+                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
+            
+            # Return PDF response
+            filename = f"Section19_Notification_{notification.name}.pdf"
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data))),
+                ]
+            )
+            return response
+        
+        except Exception as e:
+            _logger.error(f"Error in download_section19_pdf: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")
+    
+    @http.route('/bhuarjan/section21/<path:notification_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
+    def download_section21_pdf(self, notification_uuid, **kwargs):
+        """Download Section 21 Notification PDF using notification UUID - serves signed document if exists, else unsigned PDF"""
+        _logger.info(f"Section 21 PDF download route called: notification_uuid={notification_uuid}")
+        try:
+            # Find notification by UUID
+            notification = request.env['bhu.section21.notification'].sudo().with_context({}).search([('notification_uuid', '=', notification_uuid)], limit=1)
+            
+            if not notification:
+                _logger.error(f"Notification not found with UUID: {notification_uuid}")
+                return request.not_found("Notification not found")
+            
+            _logger.info(f"Notification found: id={notification.id}, name={notification.name}, has_signed={bool(notification.signed_document_file)}")
+            
+            # If signed document exists, serve it
+            if notification.signed_document_file:
+                _logger.info("Serving signed document")
+                pdf_data = base64.b64decode(notification.signed_document_file)
+                filename = notification.signed_document_filename or f"Section21_Notification_{notification.name}_Signed.pdf"
+                
+                response = request.make_response(
+                    pdf_data,
+                    headers=[
+                        ('Content-Type', 'application/pdf'),
+                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Length', str(len(pdf_data))),
+                    ]
+                )
+                return response
+            
+            # Otherwise, generate unsigned PDF
+            _logger.info("Generating unsigned PDF")
+            report_action = request.env.ref('bhuarjan.action_report_section21_notification')
+            
+            # Generate PDF directly from notification record
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [notification.id], data={})
+            
+            if not pdf_result:
+                return request.not_found("Error: PDF rendering returned empty result")
+            
+            # Extract PDF bytes
+            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
+                pdf_data = pdf_result[0]
+            else:
+                pdf_data = pdf_result
+            
+            if not isinstance(pdf_data, bytes):
+                if isinstance(pdf_data, str):
+                    pdf_data = pdf_data.encode('utf-8')
+                else:
+                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
+                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
+            
+            # Return PDF response
+            filename = f"Section21_Notification_{notification.name}.pdf"
+            response = request.make_response(
+                pdf_data,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', str(len(pdf_data))),
+                ]
+            )
+            return response
+        
+        except Exception as e:
+            _logger.error(f"Error in download_section21_pdf: {str(e)}", exc_info=True)
+            return request.not_found(f"Error: {str(e)}")

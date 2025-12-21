@@ -10,7 +10,7 @@ import json
 class Section19Notification(models.Model):
     _name = 'bhu.section19.notification'
     _description = 'Section 19 Notification'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
@@ -251,43 +251,7 @@ class Section19Notification(models.Model):
                     vals['project_id'] = project_id
         return super().create(vals_list)
     
-    def get_qr_code_data(self):
-        """Generate QR code data for the notification"""
-        try:
-            import qrcode
-            import io
-            import base64
-            
-            # Ensure UUID exists
-            if not self.notification_uuid:
-                self.write({'notification_uuid': str(uuid.uuid4())})
-            
-            # Generate QR code URL - using notification UUID
-            qr_url = f"https://bhuarjan.com/bhuarjan/section19/{self.notification_uuid}/download"
-            
-            # Create QR code
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=3,
-                border=2,
-            )
-            qr.add_data(qr_url)
-            qr.make(fit=True)
-            
-            # Generate image
-            img = qr.make_image(fill_color="black", back_color="white")
-            
-            # Convert to base64
-            buffer = io.BytesIO()
-            img.save(buffer, format='PNG')
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            
-            return img_str
-        except ImportError:
-            return None
-        except Exception as e:
-            return None
+    # QR code generation is now handled by bhu.qr.code.mixin
     
     # Override mixin method to generate Section 19 PDF
     def action_delete_sdm_signed_file(self):

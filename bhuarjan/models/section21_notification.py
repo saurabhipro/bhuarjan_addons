@@ -8,7 +8,7 @@ import uuid
 class Section21Notification(models.Model):
     _name = 'bhu.section21.notification'
     _description = 'Section 21 Notification / धारा 21 अधिसूचना'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
     _sql_constraints = [
         (
@@ -342,43 +342,7 @@ class Section21Notification(models.Model):
             return deadline.strftime('%d/%m/%Y')
         return None
     
-    def get_qr_code_data(self):
-        """Generate QR code data for the notification"""
-        try:
-            import qrcode
-            import io
-            import base64
-            
-            # Ensure UUID exists
-            if not self.notification_uuid:
-                self.write({'notification_uuid': str(uuid.uuid4())})
-            
-            # Generate QR code URL - using notification UUID
-            qr_url = f"https://bhuarjan.com/bhuarjan/section21/{self.notification_uuid}/download"
-            
-            # Create QR code
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=3,
-                border=2,
-            )
-            qr.add_data(qr_url)
-            qr.make(fit=True)
-            
-            # Generate image
-            img = qr.make_image(fill_color="black", back_color="white")
-            
-            # Convert to base64
-            buffer = io.BytesIO()
-            img.save(buffer, format='PNG')
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            
-            return img_str
-        except ImportError:
-            return None
-        except Exception as e:
-            return None
+    # QR code generation is now handled by bhu.qr.code.mixin
     
     def _get_landowners_from_parcels(self):
         """Get all unique landowners from land parcels by finding surveys with matching khasra numbers"""

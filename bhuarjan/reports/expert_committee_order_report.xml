@@ -18,66 +18,72 @@
             <!-- Include centralized CSS styles -->
             <t t-call="bhuarjan.report_common_styles"/>
             <t t-foreach="docs" t-as="report">
-                <div class="page" style="font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; padding: 20px; font-size: 14px; position: relative;">
-                    <!-- Watermark with Logo - Centered on Page -->
+                <div class="page container" style="padding: 20px; position: relative;">
+                    <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
-                    <style>
-                        body, .page, table, td, th, p, span {
-                            font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                        }
-                        .header-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 15px;
-                        }
-                        .header-table td {
-                            padding: 8px;
-                            vertical-align: top;
-                        }
-                        .expert-list-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin: 15px 0;
-                            border: 1px solid #000;
-                        }
-                        .expert-list-table td {
-                            border: 1px solid #000;
-                            padding: 8px;
-                            vertical-align: top;
-                        }
-                        .signatory-section {
-                            margin-top: 30px;
-                        }
-                        .copy-section {
-                            margin-top: 40px;
-                            border-top: 1px solid #000;
-                            padding-top: 15px;
-                        }
-                    </style>
-
-                    <!-- Office Header -->
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h3 style="margin: 0; font-size: 16px; font-weight: bold;">
-                            कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
-                        </h3>
-                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">//आदेश//</p>
+                    
+                    <!-- Header with Logo and QR Code -->
+                    <div style="margin-bottom: 15px; padding-bottom: 8px;">
+                        <table style="width: 100%; border:1px solid white; margin-bottom: 8px;">
+                            <tr>
+                                <!-- Logo on Left -->
+                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" class="header-logo" alt="Logo"/>
+                                </td>
+                                <!-- Header Text - Line 1 -->
+                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
+                                        कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
+                                    </h3>
+                                </td>
+                                <!-- QR Code on Right -->
+                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                    <t t-set="qr_code_img" t-value="report.get_qr_code_data()"/>
+                                    <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/expert/' + str(report.expert_committee_uuid or '') + '/download'"/>
+                                    <t t-if="qr_code_img">
+                                        <a t-att-href="qr_download_url" class="qr-code-container">
+                                            <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                 alt="QR Code - Click to download PDF"/>
+                                        </a>
+                                    </t>
+                                    <t t-if="not qr_code_img">
+                                        <a t-att-href="qr_download_url" class="qr-code-container">
+                                            <div style="width: 80px; height: 80px; position: relative; border: 1px solid #ccc; background: white; margin: 0;">
+                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                    <div style="text-align: center; font-size: 8px;">
+                                                        <div style="font-weight: bold;">QR Code</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <!-- Header Text - Line 2 -->
+                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                    <p style="margin: 5px 0; font-weight: bold;">//आदेश//</p>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                     <!-- Reference Number and Date -->
                     <div style="margin-bottom: 15px;">
-                        <table class="header-table">
+                        <table class="header-info-table">
                             <tr>
                                 <td style="width: 50%;">
-                                    <p style="margin: 5px 0; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
                                         <strong>क्रमांक/</strong> ../भू-अर्जन/2025
                                     </p>
                                 </td>
                                 <td style="width: 50%; text-align: right;">
-                                    <p style="margin: 5px 0; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
                                         रायगढ़, <strong>दिनांक /</strong> 
                                         <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
                                         <t t-if="not report.create_date">/ /2025</t>
@@ -88,8 +94,8 @@
                     </div>
 
                     <!-- Main Body - Context and Purpose -->
-                    <div style="margin-bottom: 20px;">
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
+                    <div class="body-section" style="margin-bottom: 20px;">
+                        <p style="margin: 5px 0; text-align: justify; line-height: 1.6;">
                             छ.ग. भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर एवं पारदर्शिता का अधिकार (सामाजिक समाघात सहमति एवं जनसुनवाई) नियम 2016 के अंतर्गत विभाग
                             <t t-if="report.requiring_body_id">
                                 <span t-esc="report.requiring_body_id.name or ''"/>
@@ -125,14 +131,14 @@
                     <div style="margin-bottom: 20px;">
                         <!-- (क) Non-Government Social Scientist -->
                         <div style="margin-bottom: 10px;">
-                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                            <p style="margin: 5px 0; font-weight: bold;">
                                 <strong>(क) गैर शासकीय सामाजिक वैज्ञानिक</strong>
                             </p>
                             <t t-if="report.non_govt_social_scientist_ids">
                                 <t t-set="counter" t-value="0"/>
                                 <t t-foreach="report.non_govt_social_scientist_ids" t-as="member">
                                     <t t-set="counter" t-value="counter + 1"/>
-                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                    <p style="margin: 3px 0; padding-left: 20px;">
                                         <span t-esc="counter"/>.
                                         <span t-esc="member.name or ''"/>
                                         <t t-if="member.post">, <span t-esc="member.post"/></t>
@@ -141,20 +147,20 @@
                                 </t>
                             </t>
                             <t t-if="not report.non_govt_social_scientist_ids">
-                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                                <p style="margin: 3px 0; padding-left: 20px;">........................</p>
                             </t>
                         </div>
 
                         <!-- (ख) Representatives of Local Bodies -->
                         <div style="margin-bottom: 10px;">
-                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                            <p style="margin: 5px 0; font-weight: bold;">
                                 <strong>(ख) स्थानीय निकायों के प्रतिनिधि</strong>
                             </p>
                             <t t-if="report.local_bodies_representative_ids">
                                 <t t-set="counter" t-value="0"/>
                                 <t t-foreach="report.local_bodies_representative_ids" t-as="member">
                                     <t t-set="counter" t-value="counter + 1"/>
-                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                    <p style="margin: 3px 0; padding-left: 20px;">
                                         <span t-esc="counter"/>.
                                         <span t-esc="member.name or ''"/>
                                         <t t-if="member.post">, <span t-esc="member.post"/></t>
@@ -163,20 +169,20 @@
                                 </t>
                             </t>
                             <t t-if="not report.local_bodies_representative_ids">
-                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                                <p style="margin: 3px 0; padding-left: 20px;">........................</p>
                             </t>
                         </div>
 
                         <!-- (ग) Resettlement Expert -->
                         <div style="margin-bottom: 10px;">
-                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                            <p style="margin: 5px 0; font-weight: bold;">
                                 <strong>(ग) पुनर्व्यवस्थापन विशेषज्ञ</strong>
                             </p>
                             <t t-if="report.resettlement_expert_ids">
                                 <t t-set="counter" t-value="0"/>
                                 <t t-foreach="report.resettlement_expert_ids" t-as="member">
                                     <t t-set="counter" t-value="counter + 1"/>
-                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                    <p style="margin: 3px 0; padding-left: 20px;">
                                         <span t-esc="counter"/>.
                                         <span t-esc="member.name or ''"/>
                                         <t t-if="member.post">, <span t-esc="member.post"/></t>
@@ -185,20 +191,20 @@
                                 </t>
                             </t>
                             <t t-if="not report.resettlement_expert_ids">
-                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                                <p style="margin: 3px 0; padding-left: 20px;">........................</p>
                             </t>
                         </div>
 
                         <!-- (घ) Technical Expert on Project Related Subject -->
                         <div style="margin-bottom: 10px;">
-                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                            <p style="margin: 5px 0; font-weight: bold;">
                                 <strong>(घ) परियोजना से संबंधित विषय का तकनीकी विशेषज्ञ</strong>
                             </p>
                             <t t-if="report.technical_expert_ids">
                                 <t t-set="counter" t-value="0"/>
                                 <t t-foreach="report.technical_expert_ids" t-as="member">
                                     <t t-set="counter" t-value="counter + 1"/>
-                                    <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">
+                                    <p style="margin: 3px 0; padding-left: 20px;">
                                         <span t-esc="counter"/>.
                                         <span t-esc="member.name or ''"/>
                                         <t t-if="member.post">, <span t-esc="member.post"/></t>
@@ -207,39 +213,39 @@
                                 </t>
                             </t>
                             <t t-if="not report.technical_expert_ids">
-                                <p style="margin: 3px 0; font-size: 14px; padding-left: 20px;">........................</p>
+                                <p style="margin: 3px 0; padding-left: 20px;">........................</p>
                             </t>
                         </div>
                     </div>
 
                     <!-- Concluding Paragraph -->
-                    <div style="margin-bottom: 20px;">
-                        <p style="margin: 5px 0; font-size: 14px; text-align: justify; line-height: 1.6;">
+                    <div class="body-section" style="margin-bottom: 20px;">
+                        <p style="margin: 5px 0; text-align: justify; line-height: 1.6;">
                             उपरोक्त विशेषज्ञ समूह समाजिक समाघात निर्धारण अध्ययन दल द्वारा प्रस्तुत सामाजिक समाघात निर्धारण रिपोर्ट एवं सामाजिक समाघात प्रबंधन योजना का मूल्यांकन उपरांत अभिमत सहित प्रतिवेदन अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी जिला रायगढ़ (छ.ग.) को प्रस्तुत करेंगे।
                         </p>
                     </div>
 
                     <!-- Main Signatory (Collector) -->
-                    <div class="signatory-section" style="text-align: right;">
-                        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                    <div class="signature-block" style="text-align: right;">
+                        <p style="margin: 5px 0; font-weight: bold;">
                             <strong>कलेक्टर</strong>
                         </p>
-                        <p style="margin: 5px 0; font-size: 14px;">
+                        <p style="margin: 5px 0;">
                             रायगढ़ (छ.ग.)
                         </p>
                     </div>
 
                     <!-- Footer/Copy to Section -->
-                    <div class="copy-section">
-                        <table class="header-table">
+                    <div style="margin-top: 40px; border-top: 1px solid #000; padding-top: 15px;">
+                        <table class="header-info-table">
                             <tr>
                                 <td style="width: 50%;">
-                                    <p style="margin: 5px 0; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
                                         <strong>पृ.क्रमांक/</strong> -/भू-अर्जन/2025
                                     </p>
                                 </td>
                                 <td style="width: 50%; text-align: right;">
-                                    <p style="margin: 5px 0; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
                                         रायगढ़, <strong>दिनांक /</strong> 
                                         <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
                                         <t t-if="not report.create_date">/ /2025</t>
@@ -248,25 +254,25 @@
                             </tr>
                         </table>
 
-                        <p style="margin: 10px 0 5px 0; font-size: 14px; font-weight: bold;">
+                        <p style="margin: 10px 0 5px 0; font-weight: bold;">
                             <strong>प्रतिलिपिः-</strong>
                         </p>
 
                         <div style="margin-top: 10px;">
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 1. सचिव, छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग, मंत्रालय महानदी भवन, रायपुर की ओर सादर सूचनार्थ।
                             </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 2. आयुक्त, बिलासपुर संभाग बिलासपुर की ओर सादर सूचनार्थ।
                             </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी
                                 <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
                                     <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
                                 </t>
                                 की ओर सूचनार्थ। उपरोक्त विशेषज्ञ समिति के समक्ष सामाजिक समाघात निर्धारण अध्ययन दल द्वारा प्रस्तुत प्रतिवेदन को प्रस्तुत करते हुये नियमानुसार आवश्यक कार्यवाही सुनिश्चित करें।
                             </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 4. विभाग
                                 <t t-if="report.requiring_body_id">
                                     <span t-esc="report.requiring_body_id.name or ''"/>
@@ -274,24 +280,24 @@
                                 <t t-if="not report.requiring_body_id">........................</t>
                                 रायगढ़ (छ.ग.) की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
                             </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 5. तहसीलदार
                                 <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
                                     <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
                                 </t>
                                 की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
                             </p>
-                            <p style="margin: 3px 0; font-size: 14px;">
+                            <p style="margin: 3px 0;">
                                 6. समिति के सर्व संबंधित पदाधिकारी को सूचनार्थ एवं आवश्यक कार्यवाही हेतु प्रेषित।
                             </p>
                         </div>
 
                         <!-- Secondary Signatory (Additional Collector) -->
-                        <div class="signatory-section" style="text-align: right; margin-top: 20px;">
-                            <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">
+                        <div class="signature-block" style="text-align: right; margin-top: 20px;">
+                            <p style="margin: 5px 0; font-weight: bold;">
                                 <strong>अपर कलेक्टर</strong>
                             </p>
-                            <p style="margin: 5px 0; font-size: 14px;">
+                            <p style="margin: 5px 0;">
                                 रायगढ़ (छ.ग.)
                             </p>
                         </div>
@@ -299,6 +305,8 @@
                 </div>
             </t>
         </t>
+        <!-- Footer Section Name -->
+        <div class="footer-section-name">Expert Committee Order / विशेषज्ञ समिति आदेश</div>
     </template>
 </odoo>
 

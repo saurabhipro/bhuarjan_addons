@@ -329,6 +329,19 @@ class Section21Notification(models.Model):
                     record._populate_land_parcels_from_section19()
         return result
     
+    def get_deadline_date(self):
+        """Calculate deadline date (30 days from notice_date)"""
+        if not self.notice_date:
+            return None
+        return self.notice_date + relativedelta(days=30)
+    
+    def get_deadline_date_formatted(self):
+        """Get deadline date formatted as dd/mm/yyyy"""
+        deadline = self.get_deadline_date()
+        if deadline:
+            return deadline.strftime('%d/%m/%Y')
+        return None
+    
     def get_qr_code_data(self):
         """Generate QR code data for the notification"""
         try:

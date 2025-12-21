@@ -49,22 +49,14 @@
                     .paragraph-section {
                         font-size: 21px !important;
                     }
-                    .watermark {
-                        top: 25%;
-                        left: 25%;
-                    }
-                    .watermark img {
-                        width: 600px;
-                        height: 500px;
-                    }
                 </style>
 
                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative;  height: 100%;">
-                    <!-- Watermark with Logo - Centered on Page -->
+                    <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
                     
                     <!-- Header with Logo and QR Code -->
@@ -74,8 +66,7 @@
                                 <!-- Logo on Left -->
                                 <td rowspan="3" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
                                     <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
-                                         style="display: block; margin: 0 auto; object-fit: contain; width: 90%; max-width: 90%; height: auto;"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" class="header-logo" alt="Logo"/>
                                 </td>
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
@@ -88,10 +79,9 @@
                                     <t t-set="qr_code_img" t-value="report.get_qr_code_data() if report else None"/>
                                     <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section11/' + str(report.report_uuid or '') + '/download' if report else '#'"/>
                                     <t t-if="qr_code_img">
-                                        <a t-att-href="qr_download_url" style="display: block; width: 90%; margin: 0 auto; padding: 0; text-decoration: none;">
+                                        <a t-att-href="qr_download_url" class="qr-code-container">
                                             <img t-att-src="'data:image/png;base64,' + qr_code_img" 
-                                                 alt="QR Code - Click to download PDF" 
-                                                 style="width: 90%; max-width: 90%; height: auto; aspect-ratio: 1; border: none; display: block; margin: 0; padding: 0; object-fit: contain;"/>
+                                                 alt="QR Code - Click to download PDF"/>
                                         </a>
                                     </t>
                                     <t t-if="not qr_code_img">

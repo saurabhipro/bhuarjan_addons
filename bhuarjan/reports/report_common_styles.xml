@@ -135,8 +135,21 @@
                 line-height: 1.5 !important;
             }
             
+            /* Footer section name reference */
+            .footer-section-name {
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 12px !important;
+                color: #999999 !important;
+                opacity: 0.6;
+                z-index: 100;
+                text-align: center;
+            }
+            
             /* ============================================
-               WATERMARK WITH LOGO
+               WATERMARK WITH LOGO (Centered, 50% larger)
                ============================================ */
             .watermark {
                 position: absolute;
@@ -146,8 +159,8 @@
                 opacity: 0.1;
                 z-index: 0;
                 pointer-events: none;
-                width: 600px;
-                height: 600px;
+                width: 900px;
+                height: 900px;
                 margin: 0;
                 padding: 0;
                 display: flex;
@@ -157,21 +170,58 @@
             }
             
             .watermark img {
-                width: 500px;
-                height: 500px;
+                width: 750px;
+                height: 750px;
                 object-fit: contain;
             }
             
             .watermark-circle {
                 position: absolute;
-                width: 550px;
-                height: 550px;
+                width: 825px;
+                height: 825px;
                 border: 2px solid rgba(0, 0, 0, 0.1);
                 border-radius: 50%;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 z-index: -1;
+            }
+            
+            /* ============================================
+               HEADER LOGO STYLES (Top Left)
+               ============================================ */
+            .header-logo {
+                display: block;
+                margin: 0 auto;
+                object-fit: contain;
+                width: 80px;
+                height: 80px;
+                max-width: 80px;
+                max-height: 80px;
+            }
+            
+            /* ============================================
+               QR CODE STYLES
+               ============================================ */
+            .qr-code-container {
+                display: block;
+                width: 80px;
+                height: 80px;
+                margin: 0 auto;
+                padding: 0;
+                text-decoration: none;
+            }
+            
+            .qr-code-container img {
+                width: 80px;
+                height: 80px;
+                max-width: 80px;
+                max-height: 80px;
+                border: none;
+                display: block;
+                margin: 0;
+                padding: 0;
+                object-fit: contain;
             }
             
             /* ============================================

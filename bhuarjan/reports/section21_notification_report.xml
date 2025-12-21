@@ -28,70 +28,63 @@
                     <t t-set="item" t-value="personal_data"/>
                     <!-- Include centralized CSS styles -->
                     <t t-call="bhuarjan.report_common_styles"/>
-                    <!-- Report-specific overrides for Section 21 -->
-                    <style>
-                        .normal-text {
-                            font-size: 16px !important;
-                        }
-                        .normal-text p, .normal-text span, .normal-text strong {
-                            font-size: 16px !important;
-                        }
-                        .schedule-table {
-                            margin: 15px 0;
-                            font-size: 16px !important;
-                        }
-                        .schedule-table th, .schedule-table td {
-                            padding: 8px;
-                            font-size: 16px !important;
-                        }
-                        .schedule-table th {
-                            background-color: #f0f0f0;
-                        }
-                        .watermark {
-                            position: absolute;
-                            top: 25%;
-                            left: 25%;
-                            width: 50%;
-                            height: 50%;
-                            opacity: 0.1;
-                            z-index: 0;
-                            pointer-events: none;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        .watermark-circle {
-                            position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 3px solid rgba(0, 0, 0, 0.1);
-                        }
-                        .watermark img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                            opacity: 0.15;
-                        }
-                    </style>
                     <div class="page">
                         <div class="oe_structure"/>
                         <!-- Personal Notice for personal notice records -->
                         <t t-if="is_personal_notice and o and item">
                             <div style="page-break-before: always;"/>
                             <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
-                                <!-- Watermark with Logo - Centered on Page -->
+                                <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                                 <div class="watermark">
                                     <div class="watermark-circle"></div>
                                     <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                                 </div>
                                 
-                                <!-- Header: Collector's Court -->
-                                <div style="text-align: center; margin-bottom: 8px;">
-                                    <h1 style="margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                        <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
-                                    </h1>
+                                <!-- Header with Logo and QR Code -->
+                                <div style="margin-bottom: 15px; padding-bottom: 8px;">
+                                    <table style="width: 100%; border:1px solid white; margin-bottom: 8px;">
+                                        <tr>
+                                            <!-- Logo on Left -->
+                                            <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                                <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" class="header-logo" alt="Logo"/>
+                                            </td>
+                                            <!-- Header Text -->
+                                            <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                                <h1 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
+                                                    <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
+                                                </h1>
+                                            </td>
+                                            <!-- QR Code on Right -->
+                                            <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                                <t t-set="qr_code_img" t-value="o.get_qr_code_data()"/>
+                                                <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section21/' + str(o.notification_uuid or '') + '/download'"/>
+                                                <t t-if="qr_code_img">
+                                                    <a t-att-href="qr_download_url" class="qr-code-container">
+                                                        <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                             alt="QR Code - Click to download PDF"/>
+                                                    </a>
+                                                </t>
+                                                <t t-if="not qr_code_img">
+                                                    <a t-att-href="qr_download_url" class="qr-code-container">
+                                                        <div style="width: 80px; height: 80px; position: relative; border: 1px solid #ccc; background: white; margin: 0;">
+                                                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                                <div style="text-align: center; font-size: 8px;">
+                                                                    <div style="font-weight: bold;">QR Code</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                                <!-- Additional header info if needed -->
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
 
                                 
@@ -107,12 +100,18 @@
                                     <strong>पता: </strong> <span t-if="item.get('landowner_address')" t-esc="item.get('landowner_address')"/><span t-if="not item.get('landowner_address')">........................</span>
                                 </p>
                                 <p style="margin: 10px 0; text-align: justify;">
-                                    <strong>विषय: </strong> अपेक्षक निकाय : _______ (छ.ग.) के _______ प्रयोजन हेतु 
+                                    <strong>विषय: </strong> अपेक्षक निकाय : 
+                                    <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
+                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
+                                    (छ.ग.) के 
+                                    <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
+                                    प्रयोजन हेतु 
                                 </p>
 
                                 <!-- Main Body Text - Paragraph 1 -->
-                                <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                    <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
+                                <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
+                                    <p style="margin: 0; padding: 0; line-height: 1.5;">
                                         भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत व्यक्ति-नोटिस। :-
                                         <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
                                         <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
@@ -124,27 +123,37 @@
                                 </div>
 
                                 <!-- Main Body Text - Paragraph 2 -->
-                                <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                    <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
+                                <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
+                                    <p style="margin: 0; padding: 0; line-height: 1.5;">
                                         राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                         <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                         <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
                                         ) हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वास और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत आपको सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकर, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम से संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप/आपत्ति/कथन यदि कोई हों, 
-                                        तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू–अर्जन शाखा में उपस्थित होकर ____ दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
+                                        तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
+                                        <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                        <span t-if="not o or not o.district_id">रायगढ़</span>
+                                        के भू–अर्जन शाखा में उपस्थित होकर 
+                                        <t t-if="o and o.get_deadline_date_formatted()">
+                                            <span t-esc="o.get_deadline_date_formatted()"/>
+                                        </t>
+                                        <t t-if="not o or not o.get_deadline_date_formatted()">
+                                            <span style="text-decoration: underline;">____</span>
+                                        </t>
+                                        दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                     </p>
                                 </div>
 
                                 <!-- Schedule Separator -->
-                                <div style="text-align: center; margin: 10px 0; font-size: 16px !important; font-weight: bold;">
+                                <div style="text-align: center; margin: 10px 0; font-weight: bold;">
                                     <strong>// अनूसूची //</strong>
                                 </div>
 
                                 <!-- Land Details Section -->
                                 <div style="margin: 10px 0;">
-                                    <div style="text-align: left; font-size: 16px; font-weight: bold; margin-bottom: 6px;">
+                                    <div style="text-align: left; font-weight: bold; margin-bottom: 6px;">
                                         <strong>1) भूमि का विवरण :-</strong>
                                     </div>
-                                    <div style="margin-bottom: 8px; font-size: 16px !important;">
+                                    <div style="margin-bottom: 8px;">
                                         <div style="margin-bottom: 3px;">
                                             <strong>(क) जिला :-</strong>
                                             <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -163,42 +172,42 @@
                                     </div>
 
                                     <!-- Land Parcels Table -->
-                                    <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
+                                    <table class="schedule-table">
                                         <thead>
                                             <tr>
-                                                <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
-                                                <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">अर्जित रकबा</th>
-                                                <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">रिमार्क</th>
+                                                <th style="width: 33.33%; text-align: center;">खसरा क्रमांक</th>
+                                                <th style="width: 33.33%; text-align: center;">अर्जित रकबा</th>
+                                                <th style="width: 33.33%; text-align: center;">रिमार्क</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                <td style="text-align: center;">
                                                     <t t-esc="item['khasra_number']"/>
                                                 </td>
-                                                <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                <td style="text-align: center;">
                                                     <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                     <t t-if="item['area'] == 0">........................</t>
                                                 </td>
-                                                <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">--</td>
+                                                <td style="text-align: center;">--</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
 
                                 <!-- Collector Signature -->
-                                <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                    <div style="margin: 5px 0; font-size: 16px !important;">
+                                <div class="signature-block" style="text-align: right; margin-top: 15px; margin-right: 0;">
+                                    <div style="margin: 5px 0;">
                                         <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
                                         <span t-if="not o or not o.collector_name">कलेक्टर</span>
                                     </div>
-                                    <div style="margin: 3px 0; font-size: 16px !important;">
+                                    <div style="margin: 3px 0;">
                                         जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                     </div>
                                 </div>
 
                                 <!-- Letter Text After Table -->
-                                <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
+                                <div class="body-section" style="margin-top: 20px; line-height: 1.6;">
                                     <!-- Reference and Copy Details -->
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center;">
                                         <div>
@@ -249,12 +258,12 @@
                                     </div>
                                 </div>
                                 <!-- Signatures -->
-                                <div style="margin-top: 20px;">
+                                <div class="signature-block" style="margin-top: 20px;">
                                     <div style="text-align: right; margin-top: 15px;">
-                                        <div style="margin: 5px 0; font-size: 16px;">
+                                        <div style="margin: 5px 0;">
                                             <span t-esc="o.additional_collector_name if o.additional_collector_name else 'अपर कलेक्टर'"/>
                                         </div>
-                                        <div style="margin: 3px 0; font-size: 16px;">
+                                        <div style="margin: 3px 0;">
                                             जिला-<t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/>
                                         </div>
                                     </div>
@@ -269,52 +278,6 @@
                 <t t-call="web.basic_layout">
                     <!-- Include centralized CSS styles -->
                     <t t-call="bhuarjan.report_common_styles"/>
-                    <!-- Report-specific overrides for Section 21 -->
-                    <style>
-                        .normal-text {
-                            font-size: 16px !important;
-                        }
-                        .normal-text p, .normal-text span, .normal-text strong {
-                            font-size: 16px !important;
-                        }
-                        .schedule-table {
-                            margin: 15px 0;
-                            font-size: 16px !important;
-                        }
-                        .schedule-table th, .schedule-table td {
-                            padding: 8px;
-                            font-size: 16px !important;
-                        }
-                        .schedule-table th {
-                            background-color: #f0f0f0;
-                        }
-                        .watermark {
-                            position: absolute;
-                            top: 25%;
-                            left: 25%;
-                            width: 50%;
-                            height: 50%;
-                            opacity: 0.1;
-                            z-index: 0;
-                            pointer-events: none;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        .watermark-circle {
-                            position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 3px solid rgba(0, 0, 0, 0.1);
-                        }
-                        .watermark img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                            opacity: 0.15;
-                        }
-                        </style>
                     <div class="page">
                         <div class="oe_structure"/>
 
@@ -322,23 +285,66 @@
                             <!-- PUBLIC notice - only show if NOT a personal notice record -->
                             <t t-if="not is_personal_notice">
                                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
-                                    <!-- Watermark with Logo - Centered on Page -->
+                                    <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                                     <div class="watermark">
                                         <div class="watermark-circle"></div>
                                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                                     </div>
                                     
-                                    <!-- Header: Collector's Court -->
-                                    <div style="text-align: center; margin-bottom: 8px;">
-                                        <h1 style="margin: 0; padding: 0;font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                            <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
-                                        </h1>
-                                        <h2>लोक सूचना :— जारी दिनांक ____</h2>
+                                    <!-- Header with Logo and QR Code -->
+                                    <div style="margin-bottom: 15px; padding-bottom: 8px;">
+                                        <table style="width: 100%; border:1px solid white; margin-bottom: 8px;">
+                                            <tr>
+                                                <!-- Logo on Left -->
+                                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                                    <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
+                                                         style="display: block; margin: 0 auto; object-fit: contain; width: 80px; height: 80px; max-width: 80px; max-height: 80px;"/>
+                                                </td>
+                                                <!-- Header Text -->
+                                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                                    <h1 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
+                                                        <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
+                                                    </h1>
+                                                </td>
+                                                <!-- QR Code on Right -->
+                                                <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
+                                                    <t t-set="qr_code_img" t-value="o.get_qr_code_data()"/>
+                                                    <t t-set="qr_download_url" t-value="'https://bhuarjan.com/bhuarjan/section21/' + str(o.notification_uuid or '') + '/download'"/>
+                                                    <t t-if="qr_code_img">
+                                                        <a t-att-href="qr_download_url" class="qr-code-container">
+                                                            <img t-att-src="'data:image/png;base64,' + qr_code_img" 
+                                                                 alt="QR Code - Click to download PDF"/>
+                                                        </a>
+                                                    </t>
+                                                    <t t-if="not qr_code_img">
+                                                        <a t-att-href="qr_download_url" class="qr-code-container">
+                                                            <div style="width: 80px; height: 80px; position: relative; border: 1px solid #ccc; background: white; margin: 0;">
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                                    <div style="text-align: center; font-size: 8px;">
+                                                                        <div style="font-weight: bold;">QR Code</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
+                                                    <h2 style="margin: 0; padding: 0;">
+                                                        लोक सूचना :— जारी दिनांक 
+                                                        <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
+                                                        <span t-if="not o or not o.notice_date">____</span>
+                                                    </h2>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
 
                                     <!-- Public Notice Header with Date -->
-                            <div style="width:100;display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
+                            <div style="width:100;display: flex; justify-content: flex-end; margin-bottom: 8px;">
                                 <div style="width:100%;text-align:right;">
                                     <p><strong>रायगढ़ दिनाँक</strong>
                                     <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
@@ -347,8 +353,8 @@
                             </div>
 
                             <!-- Main Body Text - Paragraph 1 -->
-                            <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
+                            <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
+                                <p style="margin: 0; padding: 0; line-height: 1.5;">
 
                                     भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत अपेक्षक निकाय :-
                                     <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
@@ -361,27 +367,37 @@
                             </div>
 
                             <!-- Main Body Text - Paragraph 2 -->
-                            <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
+                            <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
+                                <p style="margin: 0; padding: 0; line-height: 1.5;">
                                     राज्य शासन को नीचे दी गई अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                     <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                     <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
                                     ) हेतु आवश्यकता है तथा राज्य शासन का आशय उक्त भूमि का कब्जा लिए जाने का है।
-                                    अतः भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत समस्त हितबद्ध व्यक्तियों को सूचित किया जाता है कि भूमि में सभी हितों के लिए प्रतिकर, पुनर्वास तथा पुनर्स्थापन के दावे, ऐसे हितों के लिए प्रतिकर की राशि से संबंधित दावे, धारा–20 के अधीन किए गए मापदंडों के दावे एवं आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ की भूमि-अर्जन शाखा में उपस्थित होकर ---------------- दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
+                                    अतः भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत समस्त हितबद्ध व्यक्तियों को सूचित किया जाता है कि भूमि में सभी हितों के लिए प्रतिकर, पुनर्वास तथा पुनर्स्थापन के दावे, ऐसे हितों के लिए प्रतिकर की राशि से संबंधित दावे, धारा–20 के अधीन किए गए मापदंडों के दावे एवं आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
+                                    <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                    <span t-if="not o or not o.district_id">रायगढ़</span>
+                                    की भूमि-अर्जन शाखा में उपस्थित होकर 
+                                    <t t-if="o and o.get_deadline_date_formatted()">
+                                        <span t-esc="o.get_deadline_date_formatted()"/>
+                                    </t>
+                                    <t t-if="not o or not o.get_deadline_date_formatted()">
+                                        <span style="text-decoration: underline;">----------------</span>
+                                    </t>
+                                    दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                 </p>
                             </div>
 
                             <!-- Schedule Separator -->
-                            <div style="text-align: center; margin: 10px 0; font-size: 16px !important; font-weight: bold;">
+                            <div style="text-align: center; margin: 10px 0; font-weight: bold;">
                                 <strong>// अनूसूची //</strong>
                             </div>
 
                             <!-- Land Details Section -->
                             <div style="margin: 10px 0;">
-                                <div style="text-align: left; font-size: 16px; font-weight: bold; margin-bottom: 6px;">
+                                <div style="text-align: left; font-weight: bold; margin-bottom: 6px;">
                                     <strong>1) भूमि का विवरण :-</strong>
                                 </div>
-                                <div style="margin-bottom: 8px; font-size: 16px !important;">
+                                <div style="margin-bottom: 8px;">
                                     <div style="margin-bottom: 3px;">
                                         <strong>(क) जिला :-</strong>
                                         <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -400,7 +416,7 @@
                                 </div>
 
                                 <!-- Land Parcels Table -->
-                                <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
+                                <table class="schedule-table">
                                     <thead>
                                         <tr>
                                             <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
@@ -413,14 +429,14 @@
                                         <t t-if="surveys_data and len(surveys_data) > 0">
                                             <t t-foreach="surveys_data" t-as="item">
                                                 <tr>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                    <td style="text-align: center;">
                                                         <t t-esc="item['khasra_number']"/>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                    <td style="text-align: center;">
                                                         <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                         <t t-if="item['area'] == 0">........................</t>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">--</td>
+                                                    <td style="text-align: center;">--</td>
                                                 </tr>
                                             </t>
                                         </t>
@@ -438,17 +454,17 @@
 
                             <!-- Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                <div style="margin: 5px 0; font-size: 16px !important;">
+                                <div style="margin: 5px 0;">
                                     <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
                                     <span t-if="not o or not o.collector_name">कलेक्टर</span>
                                 </div>
-                                <div style="margin: 3px 0; font-size: 16px !important;">
+                                <div style="margin: 3px 0;">
                                     जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
 
                             <!-- Letter Text After Table -->
-                            <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;width:100%">
+                            <div class="body-section" style="margin-top: 20px; line-height: 1.6;width:100%">
                                 <!-- Reference and Copy Details -->
                                 <div class="row w-100">
                                     <div class="col w-100">
@@ -510,11 +526,11 @@
 
                             <!-- Additional Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                <div style="margin: 5px 0; font-size: 16px !important;">
+                                <div style="margin: 5px 0;">
                                     <span t-if="o and o.additional_collector_name" t-esc="o.additional_collector_name"/>
                                     <span t-if="not o or not o.additional_collector_name">अपर कलेक्टर</span>
                                 </div>
-                                <div style="margin: 3px 0; font-size: 16px !important;">
+                                <div style="margin: 3px 0;">
                                     जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
@@ -528,11 +544,11 @@
                                     <t t-foreach="surveys_data" t-as="item">
                                         <div style="page-break-before: always;"/>
                                         <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
-                                            <!-- Watermark with Logo - Centered on Page -->
+                                            <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                                             <div class="watermark">
                                                 <div class="watermark-circle"></div>
                                                 <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                                             </div>
                                             
                                             <!-- Header: Collector's Court -->
@@ -578,7 +594,17 @@
                                                     <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                                     <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
                                                     ) हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वास और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत आपको सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकर, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम से संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप/आपत्ति/कथन यदि कोई हों, 
-                                                    तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू–अर्जन शाखा में उपस्थित होकर ____ दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
+                                                    तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
+                                        <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                        <span t-if="not o or not o.district_id">रायगढ़</span>
+                                        के भू–अर्जन शाखा में उपस्थित होकर 
+                                        <t t-if="o and o.get_deadline_date_formatted()">
+                                            <span t-esc="o.get_deadline_date_formatted()"/>
+                                        </t>
+                                        <t t-if="not o or not o.get_deadline_date_formatted()">
+                                            <span style="text-decoration: underline;">____</span>
+                                        </t>
+                                        दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                                 </p>
                                             </div>
 
@@ -621,14 +647,14 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                            <td style="text-align: center;">
                                                                 <t t-esc="item['khasra_number']"/>
                                                             </td>
-                                                            <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
+                                                            <td style="text-align: center;">
                                                                 <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                                 <t t-if="item['area'] == 0">........................</t>
                                                             </td>
-                                                            <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">--</td>
+                                                            <td style="text-align: center;">--</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -636,11 +662,11 @@
 
                                             <!-- Collector Signature -->
                                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                                <div style="margin: 5px 0; font-size: 16px !important;">
+                                                <div style="margin: 5px 0;">
                                                     <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
                                                     <span t-if="not o or not o.collector_name">कलेक्टर</span>
                                                 </div>
-                                                <div style="margin: 3px 0; font-size: 16px !important;">
+                                                <div style="margin: 3px 0;">
                                                     जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                                 </div>
                                             </div>
@@ -716,6 +742,8 @@
                 </t>
             </t>
         </t>
+        <!-- Footer Section Name -->
+        <div class="footer-section-name">Section 21 Notification / धारा 21 अधिसूचना</div>
     </t>
 </template>
 </odoo>

@@ -19,7 +19,7 @@
                 <t t-call="web.basic_layout">
                 <!-- Include centralized CSS styles -->
                 <t t-call="bhuarjan.report_common_styles"/>
-                <!-- Report-specific overrides for SIA -->
+                <!-- Report-specific overrides for SIA Proposal -->
                 <style>
                     .normal-text {
                         font-size: 21px !important;
@@ -45,27 +45,14 @@
                     .subject-section p, .body-section p {
                         font-size: 21px !important;
                     }
-                    .watermark {
-                        top: 25%;
-                        left: 25%;
-                        width: 800px;
-                        height: 500px;
-                    }
-                    .watermark img {
-                        width: 600px;
-                        height: 500px;
-                    }
-                    body, .header-section, .header-info-table, h2, h3, strong, span, td, th, p, div, .container, .page {
-                        font-family: 'Noto Sans Devanagari', sans-serif !important;
-                    }
                 </style>
 
                 <div class="container letter_space" style="border: 2px dotted #000; padding: 15px; margin: 10px; position: relative; min-height: calc(100vh - 20px); height: 100%;">
-                    <!-- Watermark with Logo - Centered on Page -->
+                    <!-- Watermark with Logo - Centered on Page (using common CSS) -->
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
                     <!-- Header with Logo and QR Code -->
                     <div style="margin-bottom: 15px; padding-bottom: 8px;">
@@ -74,8 +61,7 @@
                                 <!-- Logo on Left -->
                                 <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
                                     <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
-                                         style="display: block; margin: 0 auto; object-fit: contain; width: 90%; max-width: 90%; height: auto;"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" class="header-logo" alt="Logo"/>
                                 </td>
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
@@ -448,6 +434,8 @@
                 </t>
             </t>
         </t>
+        <!-- Footer Section Name -->
+        <div class="footer-section-name">SIA Proposal / SIA प्रस्ताव</div>
     </template>
 </odoo>
 

@@ -101,8 +101,8 @@
                                 </p>
                                 <p style="margin: 10px 0; text-align: justify;">
                                     <strong>विषय: </strong> अपेक्षक निकाय : 
-                                    <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
-                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.project_id and o.project_id.department_id and o.project_id.department_id.name" t-esc="o.project_id.department_id.name"/>
+                                    <span t-if="not o or not o.project_id or not o.project_id.department_id or not o.project_id.department_id.name" style="text-decoration: underline;">........................</span>
                                     (छ.ग.) के 
                                     <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
                                     <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
@@ -113,8 +113,8 @@
                                 <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
                                     <p style="margin: 0; padding: 0; line-height: 1.5;">
                                         भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत व्यक्ति-नोटिस। :-
-                                        <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
-                                        <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
+                                        <span t-if="o and o.project_id and o.project_id.department_id and o.project_id.department_id.name" t-esc="o.project_id.department_id.name"/>
+                                        <span t-if="not o or not o.project_id or not o.project_id.department_id or not o.project_id.department_id.name" style="text-decoration: underline;">........................</span>
                                         (छ.ग.) के
                                         <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
                                         <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
@@ -357,8 +357,8 @@
                                 <p style="margin: 0; padding: 0; line-height: 1.5;">
 
                                     भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत अपेक्षक निकाय :-
-                                    <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
-                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................ </span>
+                                    <span t-if="o and o.project_id and o.project_id.department_id and o.project_id.department_id.name" t-esc="o.project_id.department_id.name"/>
+                                    <span t-if="not o or not o.project_id or not o.project_id.department_id or not o.project_id.department_id.name" style="text-decoration: underline;">........................ </span>
                                     (छ.ग.) के
                                     <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
                                     <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................ </span>

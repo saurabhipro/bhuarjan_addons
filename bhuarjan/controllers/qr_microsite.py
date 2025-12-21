@@ -339,56 +339,28 @@ class Section4DownloadController(http.Controller):
             # Generate PDF
             _logger.info("Generating SIA PDF")
             try:
-                # Use sudo() to bypass access rights when getting the report action
-                report_action = request.env['ir.actions.report'].sudo().search([
-                    ('report_name', '=', 'bhuarjan.sia_order_report')
-                ], limit=1)
-                
-                if not report_action:
-                    # Fallback: try using ir.model.data
-                    _logger.info("SIA download: Report not found by name, trying ir.model.data")
-                    try:
-                        report_data = request.env['ir.model.data'].sudo().search([
-                            ('module', '=', 'bhuarjan'),
-                            ('name', '=', 'action_report_sia_order')
-                        ], limit=1)
-                        if report_data and report_data.res_id:
-                            report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
-                    except Exception as e:
-                        _logger.error(f"SIA download: Error in fallback: {str(e)}", exc_info=True)
-                
-                if not report_action or not report_action.exists():
-                    _logger.error("SIA download: Report action not found")
-                    return request.not_found("Report not found")
-                
-                _logger.info(f"SIA download: Report action found: {report_action.id}, report_name: {report_action.report_name}")
-            except Exception as e:
-                _logger.error(f"SIA download: Error getting report action: {str(e)}", exc_info=True)
-                return request.not_found(f"Error accessing report: {str(e)}")
+                report_action = request.env.ref('bhuarjan.action_report_sia_order').sudo()
+            except ValueError:
+                _logger.error("SIA download: Report action not found")
+                return request.not_found("Report not found")
+            
+            if not report_action.exists():
+                _logger.error("SIA download: Report action does not exist")
+                return request.not_found("Report not found")
             
             # Generate PDF directly from SIA team record
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [sia_team.id], data={})
+            pdf_data, _ = report_action._render_qweb_pdf(
+                report_action.report_name,
+                res_ids=[sia_team.id],
+                data={}
+            )
             
-            if not pdf_result:
+            if not pdf_data:
                 return request.not_found("Error: PDF rendering returned empty result")
             
-            # Extract PDF bytes
-            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
-                pdf_data = pdf_result[0]
-            else:
-                pdf_data = pdf_result
+            filename = f"SIA_{sia_team.name or sia_team.id}.pdf"
             
-            if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, str):
-                    pdf_data = pdf_data.encode('utf-8')
-                else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
-                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
-            
-            # Return PDF response
-            project_name = (sia_team.project_id.name or 'Project').replace(' ', '_')
-            filename = f"SIA_{project_name}_{sia_team.create_date.strftime('%Y%m%d') if sia_team.create_date else 'Date'}.pdf"
-            response = request.make_response(
+            return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
@@ -396,7 +368,6 @@ class Section4DownloadController(http.Controller):
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
-            return response
         
         except Exception as e:
             _logger.error(f"Error in download_sia_pdf: {str(e)}", exc_info=True)
@@ -419,56 +390,28 @@ class Section4DownloadController(http.Controller):
             # Generate PDF
             _logger.info("Generating Expert Committee PDF")
             try:
-                # Use sudo() to bypass access rights when getting the report action
-                report_action = request.env['ir.actions.report'].sudo().search([
-                    ('report_name', '=', 'bhuarjan.expert_committee_proposal_report')
-                ], limit=1)
-                
-                if not report_action:
-                    # Fallback: try using ir.model.data
-                    _logger.info("Expert Committee download: Report not found by name, trying ir.model.data")
-                    try:
-                        report_data = request.env['ir.model.data'].sudo().search([
-                            ('module', '=', 'bhuarjan'),
-                            ('name', '=', 'action_report_expert_committee_proposal')
-                        ], limit=1)
-                        if report_data and report_data.res_id:
-                            report_action = request.env['ir.actions.report'].sudo().browse(report_data.res_id)
-                    except Exception as e:
-                        _logger.error(f"Expert Committee download: Error in fallback: {str(e)}", exc_info=True)
-                
-                if not report_action or not report_action.exists():
-                    _logger.error("Expert Committee download: Report action not found")
-                    return request.not_found("Report not found")
-                
-                _logger.info(f"Expert Committee download: Report action found: {report_action.id}, report_name: {report_action.report_name}")
-            except Exception as e:
-                _logger.error(f"Expert Committee download: Error getting report action: {str(e)}", exc_info=True)
-                return request.not_found(f"Error accessing report: {str(e)}")
+                report_action = request.env.ref('bhuarjan.action_report_expert_committee_proposal').sudo()
+            except ValueError:
+                _logger.error("Expert Committee download: Report action not found")
+                return request.not_found("Report not found")
+            
+            if not report_action.exists():
+                _logger.error("Expert Committee download: Report action does not exist")
+                return request.not_found("Report not found")
             
             # Generate PDF directly from Expert Committee Report record
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [expert_report.id], data={})
+            pdf_data, _ = report_action._render_qweb_pdf(
+                report_action.report_name,
+                res_ids=[expert_report.id],
+                data={}
+            )
             
-            if not pdf_result:
+            if not pdf_data:
                 return request.not_found("Error: PDF rendering returned empty result")
             
-            # Extract PDF bytes
-            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
-                pdf_data = pdf_result[0]
-            else:
-                pdf_data = pdf_result
+            filename = f"Expert_Committee_{expert_report.name or expert_report.id}.pdf"
             
-            if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, str):
-                    pdf_data = pdf_data.encode('utf-8')
-                else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
-                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
-            
-            # Return PDF response
-            project_name = (expert_report.project_id.name or 'Project').replace(' ', '_')
-            filename = f"Expert_Committee_{project_name}_{expert_report.create_date.strftime('%Y%m%d') if expert_report.create_date else 'Date'}.pdf"
-            response = request.make_response(
+            return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
@@ -476,7 +419,6 @@ class Section4DownloadController(http.Controller):
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
-            return response
         
         except Exception as e:
             _logger.error(f"Error in download_expert_committee_pdf: {str(e)}", exc_info=True)
@@ -514,30 +456,24 @@ class Section4DownloadController(http.Controller):
             
             # Otherwise, generate unsigned PDF
             _logger.info("Generating unsigned PDF")
-            report_action = request.env.ref('bhuarjan.action_report_section11_preliminary')
+            try:
+                report_action = request.env.ref('bhuarjan.action_report_section11_preliminary').sudo()
+            except ValueError:
+                return request.not_found("Report not found")
             
             # Generate PDF directly from report record
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [report.id], data={})
+            pdf_data, _ = report_action._render_qweb_pdf(
+                report_action.report_name,
+                res_ids=[report.id],
+                data={}
+            )
             
-            if not pdf_result:
+            if not pdf_data:
                 return request.not_found("Error: PDF rendering returned empty result")
             
-            # Extract PDF bytes
-            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
-                pdf_data = pdf_result[0]
-            else:
-                pdf_data = pdf_result
-            
-            if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, str):
-                    pdf_data = pdf_data.encode('utf-8')
-                else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
-                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
-            
-            # Return PDF response
             filename = f"Section11_Preliminary_Report_{report.name}.pdf"
-            response = request.make_response(
+            
+            return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
@@ -545,7 +481,6 @@ class Section4DownloadController(http.Controller):
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
-            return response
         
         except Exception as e:
             _logger.error(f"Error in download_section11_pdf: {str(e)}", exc_info=True)
@@ -583,30 +518,24 @@ class Section4DownloadController(http.Controller):
             
             # Otherwise, generate unsigned PDF
             _logger.info("Generating unsigned PDF")
-            report_action = request.env.ref('bhuarjan.action_report_section19_notification')
+            try:
+                report_action = request.env.ref('bhuarjan.action_report_section19_notification').sudo()
+            except ValueError:
+                return request.not_found("Report not found")
             
             # Generate PDF directly from notification record
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [notification.id], data={})
+            pdf_data, _ = report_action._render_qweb_pdf(
+                report_action.report_name,
+                res_ids=[notification.id],
+                data={}
+            )
             
-            if not pdf_result:
+            if not pdf_data:
                 return request.not_found("Error: PDF rendering returned empty result")
             
-            # Extract PDF bytes
-            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
-                pdf_data = pdf_result[0]
-            else:
-                pdf_data = pdf_result
-            
-            if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, str):
-                    pdf_data = pdf_data.encode('utf-8')
-                else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
-                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
-            
-            # Return PDF response
             filename = f"Section19_Notification_{notification.name}.pdf"
-            response = request.make_response(
+            
+            return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
@@ -614,7 +543,6 @@ class Section4DownloadController(http.Controller):
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
-            return response
         
         except Exception as e:
             _logger.error(f"Error in download_section19_pdf: {str(e)}", exc_info=True)
@@ -652,30 +580,24 @@ class Section4DownloadController(http.Controller):
             
             # Otherwise, generate unsigned PDF
             _logger.info("Generating unsigned PDF")
-            report_action = request.env.ref('bhuarjan.action_report_section21_notification')
+            try:
+                report_action = request.env.ref('bhuarjan.action_report_section21_notification').sudo()
+            except ValueError:
+                return request.not_found("Report not found")
             
             # Generate PDF directly from notification record
-            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.report_name, [notification.id], data={})
+            pdf_data, _ = report_action._render_qweb_pdf(
+                report_action.report_name,
+                res_ids=[notification.id],
+                data={}
+            )
             
-            if not pdf_result:
+            if not pdf_data:
                 return request.not_found("Error: PDF rendering returned empty result")
             
-            # Extract PDF bytes
-            if isinstance(pdf_result, (tuple, list)) and len(pdf_result) > 0:
-                pdf_data = pdf_result[0]
-            else:
-                pdf_data = pdf_result
-            
-            if not isinstance(pdf_data, bytes):
-                if isinstance(pdf_data, str):
-                    pdf_data = pdf_data.encode('utf-8')
-                else:
-                    _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
-                    return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
-            
-            # Return PDF response
             filename = f"Section21_Notification_{notification.name}.pdf"
-            response = request.make_response(
+            
+            return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
@@ -683,7 +605,6 @@ class Section4DownloadController(http.Controller):
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
-            return response
         
         except Exception as e:
             _logger.error(f"Error in download_section21_pdf: {str(e)}", exc_info=True)

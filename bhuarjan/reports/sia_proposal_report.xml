@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- SIA Order Report Action (Collector's Order) -->
-    <record id="action_report_sia_order" model="ir.actions.report">
-        <field name="name">SIA Order</field>
+    <!-- SIA Proposal Report Action (SDM's Proposal) -->
+    <record id="action_report_sia_proposal" model="ir.actions.report">
+        <field name="name">SIA Proposal</field>
         <field name="model">bhu.sia.team</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">bhuarjan.sia_order_report</field>
-        <field name="report_file">bhuarjan.sia_order_report</field>
+        <field name="report_name">bhuarjan.sia_proposal_report</field>
+        <field name="report_file">bhuarjan.sia_proposal_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'SIA_Order_' + ((object and object.project_id and object.project_id.name) or (docs and docs[0] and docs[0].project_id and docs[0].project_id.name) or 'Project') + '_' + ((object and object.create_date and object.create_date.strftime('%Y%m%d')) or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d')) or 'Date')</field>
+        <field name="print_report_name">'SIA_Proposal_' + ((object and object.project_id and object.project_id.name) or (docs and docs[0] and docs[0].project_id and docs[0].project_id.name) or 'Project') + '_' + ((object and object.create_date and object.create_date.strftime('%Y%m%d')) or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d')) or 'Date')</field>
     </record>
 
-    <!-- SIA Order Report Template (Collector's Order) -->
-    <template id="sia_order_report">
+    <!-- SIA Proposal Report Template (SDM's Proposal) -->
+    <template id="sia_proposal_report">
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
             <t t-foreach="docs" t-as="sia_team">
                 <t t-call="web.basic_layout">
                 <!-- Include centralized CSS styles -->
                 <t t-call="bhuarjan.report_common_styles"/>
-                <!-- Report-specific overrides for SIA Order (Collector's Order) -->
+                <!-- Report-specific overrides for SIA -->
                 <style>
                     .normal-text {
                         font-size: 21px !important;
@@ -67,7 +67,6 @@
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
                         <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
                     </div>
-                    
                     <!-- Header with Logo and QR Code -->
                     <div style="margin-bottom: 15px; padding-bottom: 8px;">
                         <table style="width: 100%; border:1px solid white; margin-bottom: 8px;">
@@ -81,7 +80,17 @@
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
                                     <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
-                                        कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
+                                        <t t-set="header_subdivision_name" t-value="''"/>
+                                        <t t-if="sia_team.sub_division_id">
+                                            <t t-set="header_subdivision_name" t-value="sia_team.sub_division_id.name"/>
+                                        </t>
+                                        <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
+                                            <t t-set="first_sdm_header" t-value="sia_team.project_id.sdm_ids[0]"/>
+                                            <t t-if="first_sdm_header.sub_division_ids and len(first_sdm_header.sub_division_ids) > 0">
+                                                <t t-set="header_subdivision_name" t-value="first_sdm_header.sub_division_ids[0].name"/>
+                                            </t>
+                                        </t>
+                                        कार्यालय अनुविभागीय अधिकारी (राजस्व), <span t-esc="header_subdivision_name if header_subdivision_name else '........................'"/>
                                     </h3>
                                 </td>
                                 <!-- QR Code on Right -->
@@ -112,7 +121,7 @@
                                 <!-- Header Text - Line 2 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
                                     <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
-                                        //आदेश//
+                                        जिला-रायगढ़ (छ.ग.)
                                     </h3>
                                 </td>
                             </tr>
@@ -125,8 +134,20 @@
                                 <strong>क्रमांक /</strong>................./&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
                         </div>
                         <div class="col normal-text letter_space text-right w-100" style="text-align:right! important;">
-                                <strong>रायगढ़, दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
+                                <strong>दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
                         </div>
+                    </div>
+
+                    <!-- Recipient -->
+                    <div style="margin-bottom: 12px !important; margin-top: 5px !important;">
+                        <p class="normal-text letter_space" style="margin: 4px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <strong style="font-size: 21px !important;">प्रति,</strong>
+                        </p>
+                        <p class="normal-text letter_space" style="margin: 4px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <strong style="font-size: 21px !important;">कलेक्टर</strong><br/>
+                            <strong style="font-size: 21px !important;">(भू-अर्जन शाखा)</strong><br/>
+                            <strong style="font-size: 21px !important;">जिला-रायगढ़ (छ.ग.)</strong>
+                        </p>
                     </div>
 
                     <!-- Subject -->
@@ -207,7 +228,7 @@
                             <t t-if="not sia_team.total_area_acquired or sia_team.total_area_acquired == 0">
                                 ........................
                             </t>
-                            <strong>हेक्टेयर </strong>भूमि के भू-अर्जन प्रस्ताव पर, सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदित किया जाता है। अनुमोदित दल का विवरण निम्नानुसार है :-
+                            <strong>हेक्टेयर </strong>भूमि के भू-अर्जन प्रस्ताव पर, सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव कलेक्टर महोदय की ओर अनुमोदन हेतु सादर प्रस्तुत है :-
                         </p>
                     </div>
 
@@ -359,10 +380,11 @@
                         </table>
                     </div>
 
-                    <!-- Team Roles and Responsibilities -->
-                    <div class="body-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
-                            उपरोक्त दल के सदस्यों में से क्रमांक (क) के सदस्य को अध्यक्ष तथा क्रमांक (ख) से (घ) तक के सदस्यों को सदस्य के रूप में निर्धारित किया जाता है। यह दल अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, 
+                    <!-- Issuing Authority -->
+                    <div class="footer-section" style="margin-top: 80px !important; margin-bottom: 15px !important;">
+                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <strong style="font-size: 21px !important;">अनुविभागीय अधिकारी (राजस्व)</strong><br/>
+                            <strong style="font-size: 21px !important;">सह भू-अर्जन अधिकारी,</strong> 
                             <t t-set="subdivision_name" t-value="''"/>
                             <t t-if="sia_team.sub_division_id">
                                 <t t-set="subdivision_name" t-value="sia_team.sub_division_id.name"/>
@@ -373,14 +395,8 @@
                                     <t t-set="subdivision_name" t-value="first_sdm.sub_division_ids[0].name"/>
                                 </t>
                             </t>
-                            <span t-esc="subdivision_name if subdivision_name else '........................'"/> जिला रायगढ़ (छ.ग.) जो पुनर्वास प्रशासक भी है, के मार्गदर्शन में कार्य करेगा। दल नियमानुसार सामाजिक समाघात निर्धारण की कार्यवाही पूर्ण कर अपनी रिपोर्ट निर्धारित समय सीमा के अंदर पुनर्वास प्रशासक को प्रस्तुत करेगा।
-                        </p>
-                    </div>
-
-                    <!-- Issuing Authority -->
-                    <div class="footer-section" style="margin-top: 80px !important; margin-bottom: 15px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 21px !important;">
-                            <strong style="font-size: 21px !important;">कलेक्टर रायगढ़ (छ.ग.)</strong>
+                            <span style="font-size: 21px !important;" t-esc="subdivision_name if subdivision_name else '........................'"/><br/>
+                            <strong style="font-size: 21px !important;">जिला रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
 
@@ -389,10 +405,10 @@
                         <!-- क्रमांक and दिनांक Section -->
                         <div class="date-reference-section" style="margin-bottom: 10px !important;">
                             <span class="normal-text letter_space" style="font-weight: bold !important; font-size: 21px !important; text-align: left !important;">
-                                <strong>पृ. क्रमांक /</strong>........................../भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
+                                <strong>क्रमांक /</strong>........................../भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
                             </span>
                             <span class="normal-text letter_space" style="text-align: right !important; font-weight: bold !important; font-size: 21px !important; margin-left: auto !important;">
-                                <strong>रायगढ़, दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
+                                <strong>दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
                             </span>
                         </div>
                         
@@ -403,39 +419,29 @@
                             </p>
                         </div>
                         
-                        <!-- Copy Distribution List -->
+                        <!-- विभाग Section -->
                         <div style="margin-bottom: 10px !important;">
                             <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                1. सचिव, छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग, मंत्रालय महानदी भवन, रायपुर की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
-                            </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                2. आयुक्त, बिलासपुर संभाग बिलासपुर की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
-                            </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, 
-                            <t t-set="subdivision_name_copy" t-value="''"/>
-                            <t t-if="sia_team.sub_division_id">
-                                <t t-set="subdivision_name_copy" t-value="sia_team.sub_division_id.name"/>
-                            </t>
-                            <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
-                                <t t-set="first_sdm_copy" t-value="sia_team.project_id.sdm_ids[0]"/>
-                                <t t-if="first_sdm_copy.sub_division_ids and len(first_sdm_copy.sub_division_ids) > 0">
-                                    <t t-set="subdivision_name_copy" t-value="first_sdm_copy.sub_division_ids[0].name"/>
-                                </t>
-                            </t>
-                            <span t-esc="subdivision_name_copy if subdivision_name_copy else '........................'"/> जिला रायगढ़ (छ.ग.) की ओर रिपोर्ट प्रस्तुत करने पर आवश्यक कार्यवाही सुनिश्चित करने हेतु।
-                            </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                4. विभाग. <span style="font-size: 21px !important;" t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> रायगढ़ (छ.ग.) की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
-                            </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                5. दल के सभी संबंधित अधिकारियों की ओर।
+                                <strong style="font-size: 21px !important;">विभाग.</strong> <span style="font-size: 21px !important;" t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> <strong style="font-size: 21px !important;">की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।</strong>
                             </p>
                         </div>
                         
                         <!-- Signature Block -->
                         <p class="normal-text letter_space footer-section" style="margin: 10px 0 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 21px !important;">
-                            <strong style="font-size: 21px !important;">अपर कलेक्टर रायगढ़ (छ.ग.)</strong>
+                            <strong style="font-size: 21px !important;">अनुविभागीय अधिकारी (राजस्व)</strong><br/>
+                            <strong style="font-size: 21px !important;">सह भू-अर्जन अधिकारी,</strong> 
+                            <t t-set="subdivision_name_footer" t-value="''"/>
+                            <t t-if="sia_team.sub_division_id">
+                                <t t-set="subdivision_name_footer" t-value="sia_team.sub_division_id.name"/>
+                            </t>
+                            <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
+                                <t t-set="first_sdm_footer" t-value="sia_team.project_id.sdm_ids[0]"/>
+                                <t t-if="first_sdm_footer.sub_division_ids and len(first_sdm_footer.sub_division_ids) > 0">
+                                    <t t-set="subdivision_name_footer" t-value="first_sdm_footer.sub_division_ids[0].name"/>
+                                </t>
+                            </t>
+                            <span style="font-size: 21px !important;" t-esc="subdivision_name_footer if subdivision_name_footer else '........................'"/><br/>
+                            <strong style="font-size: 21px !important;">जिला रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
                 </div>
@@ -444,4 +450,6 @@
         </t>
     </template>
 </odoo>
+
+
 

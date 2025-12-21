@@ -165,10 +165,10 @@
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                                 <div class="responsive-sia-group">
                                     <group string="Download SIA Documents">
-                                        <!-- Download Unsigned SIA -->
-                                        <button name="action_download_sia_file" string="SIA" type="object" 
+                                        <!-- Download SIA Proposal (Collector's Order Template) -->
+                                        <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download SIA Proposal (Unsigned)"
+                                                title="Download SIA Proposal (Collector's Order Template)"
                                                 invisible="is_sia_exempt == 'yes'"
                                                 style="width: 100%; margin-bottom: 10px;"/>
                                         
@@ -210,13 +210,13 @@
                                 <div class="col" string="Download SIA Documents">
                                     <div class="row" style="padding: 10px 0;">
                                         <div class="col" style="padding: 0 10px;">
-                                            <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
-                                            <button name="action_download_latest_pdf" 
-                                                    string="SIA" type="object" 
-                                                    class="btn-info" icon="fa-download"
-                                                    title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                    invisible="not sdm_signed_file and not collector_signed_file"
-                                                    style="width: 100%;"/>
+                                            <!-- Download SIA Order (SDM's Proposal) -->
+                                            <button name="action_download_sia_order" 
+                                                    string="SIA Order" type="object" 
+                                                    class="btn-primary" icon="fa-download"
+                                                    title="Download SIA Order (SDM's Proposal)"
+                                                    invisible="is_sia_exempt == 'yes'"
+                                                    style="width: 100%; margin-bottom: 10px;"/>
                                         </div>
                                         <div class="col" style="padding: 0 10px;">
                                             <!-- Download SDM Signed SIA -->

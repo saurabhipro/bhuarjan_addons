@@ -262,8 +262,7 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
-                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.sia_info &amp;&amp; state.stats.sia_info.total > 0)">
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
@@ -298,8 +297,7 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
-                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section4_info &amp;&amp; state.stats.section4_info.total > 0)">
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
@@ -334,8 +332,7 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
-                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.expert_info &amp;&amp; state.stats.expert_info.total > 0)">
+                                        t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>

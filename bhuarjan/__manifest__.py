@@ -48,6 +48,7 @@
         'reports/document_template_pdf_report.xml',
         'reports/draft_award_report.xml',
         'reports/sia_order_report.xml',
+        'reports/sia_proposal_report.xml',
         'reports/expert_committee_proposal_report.xml',
         'reports/expert_committee_order_report.xml',
         'views/district_views.xml',

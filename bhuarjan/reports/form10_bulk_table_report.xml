@@ -36,7 +36,7 @@
             </t>
         </t>
         <!-- Custom Header -->
-        <div class="header o_clearfix" style="width: 100%; margin-bottom: 20px;">
+        <div class="header o_clearfix" style="width: 100%; margin-bottom: 0;">
             <style>
                 /* All styles are now in report_common_styles.xml */
                 /* Only minimal local overrides remain here if needed */
@@ -177,8 +177,10 @@
                             margin-right: 1cm;
                         }
                         .content-wrapper {
-                            margin-top: 0;
-                            padding-top: 0;
+                            margin-top: 0 !important;
+                            padding-top: 0 !important;
+                            margin-bottom: 0 !important;
+                            padding-bottom: 0 !important;
                         }
                     </style>
                     <div class="content-wrapper">

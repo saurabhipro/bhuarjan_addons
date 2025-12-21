@@ -336,21 +336,42 @@
             .bulk-form10-table,
             .bulk-form10-table-landscape {
                 border-collapse: collapse !important;
+                border-spacing: 0 !important;
                 width: 100%;
                 table-layout: fixed;
                 border: 2px solid #000 !important;
+                margin: 0 !important;
+                margin-top: 0 !important;
             }
             
+            /* Ensure all cells have visible borders - Grid style */
             .bulk-form10-table td, 
             .bulk-form10-table th,
             .bulk-form10-table-landscape td,
             .bulk-form10-table-landscape th {
                 border: 1px solid #000 !important;
+                border-collapse: collapse !important;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 padding: 3px;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
                 vertical-align: top;
+            }
+            
+            /* Explicit borders for all table elements */
+            .bulk-form10-table tr,
+            .bulk-form10-table-landscape tr {
+                border: none !important;
+            }
+            
+            .bulk-form10-table tr td,
+            .bulk-form10-table tr th,
+            .bulk-form10-table-landscape tr td,
+            .bulk-form10-table-landscape tr th {
+                border-left: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
             }
             
             .bulk-form10-table thead,
@@ -373,14 +394,35 @@
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 position: relative;
                 page-break-inside: avoid;
-                border: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
                 padding: 6px;
                 line-height: 1.2;
             }
             
             .bulk-form10-table tbody td,
             .bulk-form10-table-landscape tbody td {
-                border: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+            }
+            
+            /* First and last columns - ensure outer borders */
+            .bulk-form10-table tr td:first-child,
+            .bulk-form10-table tr th:first-child,
+            .bulk-form10-table-landscape tr td:first-child,
+            .bulk-form10-table-landscape tr th:first-child {
+                border-left: 1px solid #000 !important;
+            }
+            
+            .bulk-form10-table tr td:last-child,
+            .bulk-form10-table tr th:last-child,
+            .bulk-form10-table-landscape tr td:last-child,
+            .bulk-form10-table-landscape tr th:last-child {
+                border-right: 1px solid #000 !important;
             }
             
             .bulk-form10-table thead th {
@@ -447,7 +489,9 @@
                 border-collapse: collapse;
                 font-size: 14px;
                 border: 2px solid #000;
-                margin-bottom: 0;
+                margin-bottom: 0 !important;
+                margin-top: 0 !important;
+                padding-bottom: 0 !important;
                 table-layout: fixed;
             }
             
@@ -455,6 +499,22 @@
                 border: 1px solid #000;
                 padding: 6px;
                 vertical-align: middle;
+            }
+            
+            /* Remove gap between header info table and main table */
+            .header-info-table {
+                margin-bottom: 0 !important;
+            }
+            
+            /* Remove gap between header and article sections */
+            .header.o_clearfix {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .article.o_report_layout_standard {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
             }
             
             /* Fix for parentheses rendering - use Arial font for wkhtmltopdf */

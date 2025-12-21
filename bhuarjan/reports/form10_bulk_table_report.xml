@@ -182,9 +182,33 @@
                             height: 80px !important;
                             max-width: 80px !important;
                             max-height: 80px !important;
-                            object-fit: contain;
-                            display: block;
-                            margin: 0 auto;
+                            min-width: 80px !important;
+                            min-height: 80px !important;
+                            object-fit: contain !important;
+                            display: block !important;
+                            margin: 0 auto !important;
+                            aspect-ratio: 1 / 1 !important;
+                            image-rendering: -webkit-optimize-contrast !important;
+                            image-rendering: crisp-edges !important;
+                            image-rendering: auto !important;
+                            -ms-interpolation-mode: nearest-neighbor !important;
+                            object-position: center center !important;
+                            /* Prevent skewing and maintain aspect ratio */
+                            transform: none !important;
+                            transform-origin: center center !important;
+                            /* Prevent any stretching or distortion */
+                            flex-shrink: 0 !important;
+                            flex-grow: 0 !important;
+                            box-sizing: border-box !important;
+                        }
+                        
+                        /* Ensure table cell containing Form 10 logo doesn't cause distortion */
+                        .form10-header-info-table td:has(.header-logo),
+                        .form10-header-info-table td[rowspan]:has(.header-logo) {
+                            overflow: visible !important;
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                            padding: 5px !important;
                         }
                         .content-wrapper {
                             margin-top: 0 !important;

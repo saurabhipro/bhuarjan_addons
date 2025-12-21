@@ -476,24 +476,43 @@
                 display: table-row-group;
             }
             
-            .bulk-form10-table,
+            /* Allow table rows to break across pages */
             .bulk-form10-table tr,
-            .bulk-form10-table td,
-            .bulk-form10-table tbody,
-            .bulk-form10-table-landscape,
-            .bulk-form10-table-landscape tr,
-            .bulk-form10-table-landscape td,
-            .bulk-form10-table-landscape tbody {
-                page-break-inside: avoid !important;
+            .bulk-form10-table-landscape tr {
+                page-break-inside: auto !important;
             }
             
+            /* Allow table body to break across pages */
+            .bulk-form10-table tbody,
+            .bulk-form10-table-landscape tbody {
+                page-break-inside: auto !important;
+            }
+            
+            /* Allow table to break across pages */
+            .bulk-form10-table,
+            .bulk-form10-table-landscape {
+                page-break-inside: auto !important;
+            }
+            
+            /* Allow individual cells to break, except specific ones */
+            .bulk-form10-table td,
+            .bulk-form10-table-landscape td {
+                page-break-inside: auto !important;
+            }
+            
+            /* Only prevent breaking for landowner column (column 5) - keep it together */
             .bulk-form10-table tbody td:nth-child(5),
             .bulk-form10-table-landscape tbody td:nth-child(5) {
                 page-break-inside: avoid !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
                 orphans: 2;
                 widows: 2;
+            }
+            
+            /* Allow rows to break across pages */
+            .bulk-form10-table tbody tr,
+            .bulk-form10-table-landscape tbody tr {
+                page-break-inside: auto !important;
+                page-break-after: auto !important;
             }
             
             /* Form 10 Table Header Classes */

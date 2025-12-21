@@ -350,7 +350,9 @@
             .bulk-form10-table-landscape td,
             .bulk-form10-table-landscape th {
                 border: 1px solid #000 !important;
-                border-collapse: collapse !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+                border-color: #000 !important;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
                 padding: 3px;
                 word-wrap: break-word;
@@ -358,7 +360,7 @@
                 vertical-align: top;
             }
             
-            /* Explicit borders for all table elements */
+            /* Explicit borders for all table elements - Force grid */
             .bulk-form10-table tr,
             .bulk-form10-table-landscape tr {
                 border: none !important;
@@ -372,6 +374,9 @@
                 border-right: 1px solid #000 !important;
                 border-top: 1px solid #000 !important;
                 border-bottom: 1px solid #000 !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+                border-color: #000 !important;
             }
             
             .bulk-form10-table thead,
@@ -398,6 +403,9 @@
                 border-right: 1px solid #000 !important;
                 border-top: 1px solid #000 !important;
                 border-bottom: 1px solid #000 !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+                border-color: #000 !important;
                 padding: 6px;
                 line-height: 1.2;
             }
@@ -408,6 +416,36 @@
                 border-right: 1px solid #000 !important;
                 border-top: 1px solid #000 !important;
                 border-bottom: 1px solid #000 !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+                border-color: #000 !important;
+            }
+            
+            /* Force borders on all cells - override any other styles */
+            .bulk-form10-table td,
+            .bulk-form10-table th,
+            .bulk-form10-table tbody td,
+            .bulk-form10-table tbody th,
+            .bulk-form10-table thead td,
+            .bulk-form10-table thead th,
+            .bulk-form10-table-landscape td,
+            .bulk-form10-table-landscape th,
+            .bulk-form10-table-landscape tbody td,
+            .bulk-form10-table-landscape tbody th,
+            .bulk-form10-table-landscape thead td,
+            .bulk-form10-table-landscape thead th {
+                border: 1px solid #000000 !important;
+                border-width: 1px 1px 1px 1px !important;
+                border-style: solid solid solid solid !important;
+                border-color: #000000 #000000 #000000 #000000 !important;
+            }
+            
+            /* Ensure no border: none is applied */
+            .bulk-form10-table td[style*="border"],
+            .bulk-form10-table th[style*="border"],
+            .bulk-form10-table-landscape td[style*="border"],
+            .bulk-form10-table-landscape th[style*="border"] {
+                border: 1px solid #000000 !important;
             }
             
             /* First and last columns - ensure outer borders */

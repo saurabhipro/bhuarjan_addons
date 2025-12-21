@@ -491,11 +491,41 @@ class SiaTeam(models.Model):
     def action_download_unsigned_file(self):
         """Generate and download SIA Order Report PDF (unsigned) - Override mixin"""
         self.ensure_one()
+        # SDM downloads the order report (SDM's proposal to Collector)
         return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
     
     def action_download_sia_file(self):
         """Alias for action_download_unsigned_file - for backward compatibility with views"""
         return self.action_download_unsigned_file()
+    
+    def action_download_proposal_report(self):
+        """Generate and download SIA Proposal Report PDF (Collector's Order)"""
+        self.ensure_one()
+        # Download the SIA Proposal report (Collector's order template)
+        return self.env.ref('bhuarjan.action_report_sia_proposal').report_action(self)
+    
+    def action_download_sia_order(self):
+        """Generate and download SIA Order Report PDF (SDM's Proposal) - For Collector"""
+        self.ensure_one()
+        return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
+    
+    def action_download_latest_pdf(self):
+        """Download the latest available PDF - Override mixin to use proposal report for Collector"""
+        self.ensure_one()
+        user = self.env.user
+        # Priority: Collector signed > SDM signed > Unsigned
+        # For unsigned, Collector gets proposal report, others get order report
+        if self.collector_signed_file:
+            return self.action_download_collector_signed_file()
+        elif self.sdm_signed_file:
+            return self.action_download_sdm_signed_file()
+        else:
+            # If Collector, download proposal report (Collector's order template)
+            # Otherwise, download order report (SDM's proposal)
+            if user.has_group('bhuarjan.group_bhuarjan_collector'):
+                return self.action_download_proposal_report()
+            else:
+                return self.action_download_unsigned_file()
     
     def action_download_sia_team_report(self):
         """Download SIA Team Report file"""

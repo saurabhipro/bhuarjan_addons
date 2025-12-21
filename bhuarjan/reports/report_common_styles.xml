@@ -537,14 +537,17 @@
                 color: #000000 !important;
                 padding: 6px;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
+                font-weight: bold !important;
             }
             
             .table_th_1 {
                 font-size: 14px !important;
+                font-weight: bold !important;
             }
             
             .table_th_2 {
                 font-size: 14px !important;
+                font-weight: bold !important;
             }
             
             /* Form 10 Title */

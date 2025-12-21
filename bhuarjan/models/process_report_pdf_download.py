@@ -6,7 +6,7 @@ import io
 import base64
 import logging
 import zipfile
-from datetime import datetime
+from datetime import datetime, date
 
 _logger = logging.getLogger(__name__)
 
@@ -27,6 +27,8 @@ class ProcessReportPdfDownload(models.AbstractModel):
         zip_file = zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED)
         
         pdf_count = 0
+        # Get current date for filename
+        current_date = date.today().strftime("%Y%m%d")
         
         try:
             # Generate Section 4 PDFs
@@ -62,9 +64,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_')
-                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_')
-                            filename = f'Section4_{project_name}_{village_name}_{record.name or record.id}.pdf'
+                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                            filename = f'{project_name}_Section4_{village_name}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -84,9 +86,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
-                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
-                            filename = f'Section11_{project_name}_{village_name}_{record.name or record.id}.pdf'
+                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.project_id else 'Unknown'
+                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.village_id else 'Unknown'
+                            filename = f'{project_name}_Section11_{village_name}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -106,9 +108,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
-                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
-                            filename = f'Section19_{project_name}_{village_name}_{record.name or record.id}.pdf'
+                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.project_id else 'Unknown'
+                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.village_id else 'Unknown'
+                            filename = f'{project_name}_Section19_{village_name}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -140,10 +142,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
-                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
-                            # One PDF per village - filename includes village name only
-                            filename = f'Section21_{project_name}_{village_name}.pdf'
+                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.project_id else 'Unknown'
+                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if record.village_id else 'Unknown'
+                            filename = f'{project_name}_Section21_{village_name}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -164,8 +165,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if sia_team.project_id else 'Unknown'
-                            filename = f'SIA_Proposal_{project_name}_{sia_team.name or sia_team.id}.pdf'
+                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
+                            # SIA is project-level, use "All" for village
+                            filename = f'{project_name}_SIA_Proposal_All_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -186,8 +188,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if sia_team.project_id else 'Unknown'
-                            filename = f'SIA_Order_{project_name}_{sia_team.name or sia_team.id}.pdf'
+                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
+                            # SIA is project-level, use "All" for village
+                            filename = f'{project_name}_SIA_Order_All_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -207,8 +210,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if expert_committee.project_id else 'Unknown'
-                            filename = f'Expert_Committee_Proposal_{project_name}_{expert_committee.name or expert_committee.id}.pdf'
+                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if expert_committee.project_id else 'Unknown'
+                            # Expert Committee is project-level, use "All" for village
+                            filename = f'{project_name}_Expert_Committee_Proposal_All_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -228,8 +232,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if expert_committee.project_id else 'Unknown'
-                            filename = f'Expert_Committee_Order_{project_name}_{expert_committee.name or expert_committee.id}.pdf'
+                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if expert_committee.project_id else 'Unknown'
+                            # Expert Committee is project-level, use "All" for village
+                            filename = f'{project_name}_Expert_Committee_Order_All_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -276,9 +281,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     if pdf_result:
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
-                            project_name = (first_survey.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if first_survey.project_id else 'Unknown'
-                            village_name = (village.name or 'Unknown').replace('/', '_').replace('\\', '_')
-                            filename = f'Form10_{project_name}_{village_name}.pdf'
+                            project_name = (first_survey.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if first_survey.project_id else 'Unknown'
+                            village_name = (village.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_')
+                            filename = f'{project_name}_Form10_{village_name}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:

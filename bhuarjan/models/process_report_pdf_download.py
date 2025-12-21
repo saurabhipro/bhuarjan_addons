@@ -116,6 +116,7 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     continue
             
             # Generate Section 21 PDFs
+            section21_counter = 0
             for record in records.get('section21', []):
                 try:
                     report_action = self.env.ref('bhuarjan.action_report_section21_notification')
@@ -130,7 +131,9 @@ class ProcessReportPdfDownload(models.AbstractModel):
                         if isinstance(pdf_data, bytes):
                             project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
                             village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
-                            filename = f'Section21_{project_name}_{village_name}_{record.name or record.id}.pdf'
+                            section21_counter += 1
+                            # Use record ID to ensure uniqueness
+                            filename = f'Section21_{project_name}_{village_name}_ID{record.id}_{section21_counter}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:

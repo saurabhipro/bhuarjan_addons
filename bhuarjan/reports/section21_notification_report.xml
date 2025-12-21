@@ -126,8 +126,8 @@
                                 <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
                                     <p style="margin: 0; padding: 0; line-height: 1.5;">
                                         राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
-                                        <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
-                                        <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
+                                        <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                        <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
                                         ) हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वास और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत आपको सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकर, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम से संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप/आपत्ति/कथन यदि कोई हों, 
                                         तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
                                         <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -370,8 +370,8 @@
                             <div class="body-section" style="line-height: 1.5; text-align: justify; margin-bottom: 8px;">
                                 <p style="margin: 0; padding: 0; line-height: 1.5;">
                                     राज्य शासन को नीचे दी गई अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
-                                    <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
-                                    <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
+                                    <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
                                     ) हेतु आवश्यकता है तथा राज्य शासन का आशय उक्त भूमि का कब्जा लिए जाने का है।
                                     अतः भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत समस्त हितबद्ध व्यक्तियों को सूचित किया जाता है कि भूमि में सभी हितों के लिए प्रतिकर, पुनर्वास तथा पुनर्स्थापन के दावे, ऐसे हितों के लिए प्रतिकर की राशि से संबंधित दावे, धारा–20 के अधीन किए गए मापदंडों के दावे एवं आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
                                     <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -591,8 +591,8 @@
                                             <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                                 <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
                                                     राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
-                                                    <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
-                                                    <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
+                                                    <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
+                                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
                                                     ) हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वास और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत आपको सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकर, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम से संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप/आपत्ति/कथन यदि कोई हों, 
                                                     तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला 
                                         <span t-if="o and o.district_id" t-esc="o.district_id.name"/>

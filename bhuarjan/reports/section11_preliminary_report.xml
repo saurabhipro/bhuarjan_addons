@@ -64,7 +64,7 @@
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
                     
                     <!-- Header with Logo and QR Code -->
@@ -74,7 +74,7 @@
                                 <!-- Logo on Left -->
                                 <td rowspan="3" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
                                     <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                    <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'"
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
                                          style="display: block; margin: 0 auto; object-fit: contain; width: 90%; max-width: 90%; height: auto;"/>
                                 </td>
                                 <!-- Header Text - Line 1 -->

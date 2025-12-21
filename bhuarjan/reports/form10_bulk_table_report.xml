@@ -128,7 +128,7 @@
                 <tr>
                     <td rowspan="2" style="width: 8%; padding: 5px; text-align: center; vertical-align: middle;">
                         <!-- Logo -->
-                        <img src="/bhuarjan/static/description/logo.png" 
+                        <img src="/bhuarjan/static/img/logo.png" 
                              alt="Logo" 
                              style="width: 80px; height: 80px; max-width: 80px; max-height: 80px; display: block; margin: 0 auto; padding: 0; object-fit: contain;"/>
                     </td>
@@ -176,7 +176,7 @@
                     </td>
                     <td style="width: 40%;">
                         <strong>तहसील का नाम</strong>
-                        <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ (छ.ग.)</strong>
+                        <span t-if="first" t-field="first.tehsil_id.name"/> <strong>जिला-रायगढ़ <span style="font-family: Arial, sans-serif;">(</span>छ.ग.<span style="font-family: Arial, sans-serif;">)</span></strong>
                     </td>
                 </tr>
             </table>
@@ -186,11 +186,11 @@
                     <tr>
                         <th rowspan="2" class="table_th_1" style="width: 2%;"><strong>क्र.</strong></th>
                         <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                        <th rowspan="2" class="table_th_1" style="width: 3%;"><strong>कुल रकबा (हे.में.)</strong></th>
-                        <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                        <th rowspan="2" class="table_th_1" style="width: 3%;"><strong>कुल रकबा <span style="font-family: Arial, sans-serif;">(</span>हे.में.<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                        <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span style="font-family: Arial, sans-serif;">(</span>हेक्टेयर<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                         <th rowspan="2" class="table_th_1" style="width: 17%;"><strong>भूमिस्वामी का नाम</strong></th>
                         <th colspan="4" class="table_th_1"><strong>भूमि का प्रकार</strong></th>
-                        <th colspan="3" class="table_th_1"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                        <th colspan="3" class="table_th_1"><strong>भूमि पर स्थित वृक्ष की संख्या <span style="font-family: Arial, sans-serif;">(</span>प्रजातिवार<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                         <th colspan="6" class="table_th_1"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                     </tr>
                     <tr>
@@ -576,7 +576,7 @@
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/description/logo.png'" alt="Logo Watermark"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
                     <style>
                         .bulk-form10-table-landscape {
@@ -676,11 +676,11 @@
                                 <tr>
                                     <th rowspan="2" class="table_th_1" style="width: 2%;"><strong>क्र.</strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>प्रभावित खसरा क्रमांक</strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 3%;"><strong>कुल रकबा (हे.में.)</strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)</strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 3%;"><strong>कुल रकबा <span style="font-family: Arial, sans-serif;">(</span>हे.में.<span style="font-family: Arial, sans-serif;">)</span></strong></th>
+                                    <th rowspan="2" class="table_th_1" style="width: 4%;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span style="font-family: Arial, sans-serif;">(</span>हेक्टेयर<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 17%;"><strong>भूमिस्वामी का नाम</strong></th>
                                     <th colspan="4" class="table_th_1"><strong>भूमि का प्रकार</strong></th>
-                                    <th colspan="3" class="table_th_1"><strong>भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)</strong></th>
+                                    <th colspan="3" class="table_th_1"><strong>भूमि पर स्थित वृक्ष की संख्या <span style="font-family: Arial, sans-serif;">(</span>प्रजातिवार<span style="font-family: Arial, sans-serif;">)</span></strong></th>
                                     <th colspan="6" class="table_th_1"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                                 </tr>
                                 <tr>

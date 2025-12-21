@@ -176,6 +176,16 @@
                             margin-left: 1cm;
                             margin-right: 1cm;
                         }
+                        /* Form 10 specific logo size - match QR code size (80px x 80px) */
+                        .form10-header-info-table .header-logo {
+                            width: 80px !important;
+                            height: 80px !important;
+                            max-width: 80px !important;
+                            max-height: 80px !important;
+                            object-fit: contain;
+                            display: block;
+                            margin: 0 auto;
+                        }
                         .content-wrapper {
                             margin-top: 0 !important;
                             padding-top: 0 !important;
@@ -421,12 +431,6 @@
             <t t-call="bhuarjan.report_common_styles"/>
             <t t-call="bhuarjan.report_custom_external_layout">  
                 <div class="page" style="position: relative;">
-                    <!-- Watermark with Logo - Centered on Page (using common CSS) -->
-                    <div class="watermark">
-                        <div class="watermark-circle"></div>
-                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
-                    </div>
                     <style>
                         /* All table styles are now in report_common_styles.xml */
                         /* Only page-specific settings remain here */

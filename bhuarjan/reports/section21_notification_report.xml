@@ -80,40 +80,43 @@
                             
                             <!-- Header: Collector's Court -->
                             <div style="text-align: center; margin-bottom: 8px;">
-                                <h2 style="margin: 0; padding: 0; font-size: 25px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                <h1 style="margin: 0; padding: 0;font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                     <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
-                                </h2>
+                                </h1>
+                                <h2>लोक सूचना :— जारी दिनांक ____</h2>
                             </div>
 
                             <!-- Public Notice Header with Date -->
-                            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
-                                <div>
-                                    <strong>रायगढ़ दिनाँक</strong>
+                            <div style="width:100;display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
+                                <div style="width:100%;text-align:right;">
+                                    <p><strong>रायगढ़ दिनाँक</strong>
                                     <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
                                     <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
-                                </div>
+                                </p></div>
                             </div>
 
                             <!-- Main Body Text - Paragraph 1 -->
                             <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                 <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
-                                    भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
+
+                                    भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत अपेक्षक निकाय :-
                                     <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
-                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
+                                    <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................ </span>
                                     (छ.ग.) के
                                     <span t-if="o and o.project_id and o.project_id.name" t-esc="o.project_id.name"/>
-                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................</span>
-                                    प्रयोजन हेतु।
+                                    <span t-if="not o or not o.project_id or not o.project_id.name" style="text-decoration: underline;">........................ </span>
+                                     प्रयोजन हेतु।
                                 </p>
                             </div>
 
                             <!-- Main Body Text - Paragraph 2 -->
                             <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                 <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
-                                    राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
+                                    राज्य शासन को नीचे दी गई अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                     <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                     <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
-                                    ) हेतु आवश्यकता है एवं राज्य शासन का आशय उवत भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वंय अथवा अपने अधिकृत प्रतिनिधि या अधिववत्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
+                                    ) हेतु आवश्यकता है तथा राज्य शासन का आशय उक्त भूमि का कब्जा लिए जाने का है।
+                                    अतः भूमि अर्जन, पुनर्वास एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत समस्त हितबद्ध व्यक्तियों को सूचित किया जाता है कि भूमि में सभी हितों के लिए प्रतिकर, पुनर्वास तथा पुनर्स्थापन के दावे, ऐसे हितों के लिए प्रतिकर की राशि से संबंधित दावे, धारा–20 के अधीन किए गए मापदंडों के दावे एवं आपत्ति/कथन यदि कोई हों, तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ की भूमि-अर्जन शाखा में उपस्थित होकर ---------------- दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                 </p>
                             </div>
 
@@ -180,6 +183,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <br/>
 
                             <!-- Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
@@ -193,16 +197,16 @@
                             </div>
 
                             <!-- Letter Text After Table -->
-                            <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
+                            <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;width:100%">
                                 <!-- Reference and Copy Details -->
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center;">
-                                    <div>
+                                <div class="row w-100">
+                                    <div class="col w-100">
                                         <span>पु. क्रमांक/</span>
                                         <span t-if="o and o.kramank" t-esc="o.kramank"/>
                                         <span t-if="not o or not o.kramank" style="text-decoration: underline;">........................</span>
                                  
                                     </div>
-                                    <div style="text-align: right;">                                                                            
+                                    <div class="col w-100" style="text-align: right;">                                                                            
                                         <span style="margin-left: 10px;">रायगढ़ दिनाँक</span>
                                         <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
                                         <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
@@ -280,39 +284,31 @@
                                     
                                     <!-- Header: Collector's Court -->
                                     <div style="text-align: center; margin-bottom: 8px;">
-                                        <h2 style="margin: 0; padding: 0; font-size: 25px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                        <h1 style="margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                             <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
-                                        </h2>
+                                        </h1>
                                     </div>
 
-                                    <!-- Public Notice Header with Date -->
-                                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
-                                        <div>
-                                            <strong>रायगढ़ दिनाँक</strong>
-                                            <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
-                                            <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
-                                        </div>
-                                    </div>
                                     
                                     <p style="margin: 5px 0; text-align: justify;">
-                                        <strong>प्रिय</strong>
-                                        <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/>
+                                        <strong>प्रति,</strong><br/>
+                                        <strong>भूमिस्वामी: </strong><span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/>
                                         <span t-if="not item.get('landowner_name')">श्री/श्रीमती ........................</span>,
                                     </p>
                                     <p style="margin: 5px 0; text-align: justify;">
-                                        पिता/पति: <span t-if="item.get('landowner_father')" t-esc="item.get('landowner_father')"/><span t-if="not item.get('landowner_father')">........................</span>,
+                                        <strong>पिता/पति: </strong> <span t-if="item.get('landowner_father')" t-esc="item.get('landowner_father')"/><span t-if="not item.get('landowner_father')">........................</span>,
                                     </p>
                                     <p style="margin: 5px 0; text-align: justify;">
-                                        पता: <span t-if="item.get('landowner_address')" t-esc="item.get('landowner_address')"/><span t-if="not item.get('landowner_address')">........................</span>
+                                        <strong>पता: </strong> <span t-if="item.get('landowner_address')" t-esc="item.get('landowner_address')"/><span t-if="not item.get('landowner_address')">........................</span>
                                     </p>
                                     <p style="margin: 10px 0; text-align: justify;">
-                                        <strong>विषय:</strong> भूमि अधिग्रहण अधिनियम, 2013 की धारा 21 (1) के अधीन सूचना।
+                                        <strong>विषय: </strong> अपेक्षक निकाय : _______ (छ.ग.) के _______ प्रयोजन हेतु 
                                     </p>
 
                                     <!-- Main Body Text - Paragraph 1 -->
                                     <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
                                         <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
-                                            भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
+                                            भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत व्यक्ति-नोटिस। :-
                                             <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
                                             <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
                                             (छ.ग.) के
@@ -328,7 +324,8 @@
                                             राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                             <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                             <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
-                                            ) हेतु आवश्यकता है एवं राज्य शासन का आशय उवत भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा-21 (1) के तहत सभी हितबद्ध व्यवित्तयों को सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकरों, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप आपत्ति/कथन यदि कोई हों, तो स्वंय अथवा अपने अधिकृत प्रतिनिधि या अधिववत्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू-अर्जन शाखा में उपस्थित होकर प्रस्तुत कर सकते हैं।
+                                            ) हेतु आवश्यकता है एवं राज्य शासन का आशय उक्त भूमि का कब्जा लिये जाने का है। अतः भूमि अर्जन, पुनर्वास और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 की धारा–21 (1) के तहत आपको सूचित किया जाता है कि भूमि में सभी हितों के लिये प्रतिकर, पुनर्वास तथा प्रतिस्थापन के दावे, ऐसे हितों के लिये प्रतिकर के रकम से संबंधित दावे, धारा 20 के अधीन किये गये मापमानों के दावे एवं आक्षेप/आपत्ति/कथन यदि कोई हों, 
+                                            तो स्वयं अथवा अपने अधिकृत प्रतिनिधि या अधिवक्ता के माध्यम से कार्यालय कलेक्टर, जिला रायगढ़ के भू–अर्जन शाखा में उपस्थित होकर ____ दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                         </p>
                                     </div>
 

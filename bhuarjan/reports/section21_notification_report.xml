@@ -181,6 +181,17 @@
                                 </table>
                             </div>
 
+                            <!-- Collector Signature -->
+                            <div style="text-align: right; margin-top: 15px; margin-right: 0;">
+                                <div style="margin: 5px 0; font-size: 16px !important;">
+                                    <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
+                                    <span t-if="not o or not o.collector_name">कलेक्टर</span>
+                                </div>
+                                <div style="margin: 3px 0; font-size: 16px !important;">
+                                    जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
+                                </div>
+                            </div>
+
                             <!-- Letter Text After Table -->
                             <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
                                 <!-- Reference and Copy Details -->
@@ -201,14 +212,6 @@
                                             <span>रायगढ़ दिनाँक</span>
                                             <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
                                             <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
-                                        </div>
-                                        <div>
-                                            <span>कलेक्टर</span>
-                                        </div>
-                                        <div>
-                                            <span>जिला-</span>
-                                            <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
-                                            <span t-if="not o or not o.district_id">रायगढ़</span>
                                         </div>
                                     </div>
                                 </div>
@@ -252,17 +255,6 @@
                                             के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                         </span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Collector Signature -->
-                            <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                <div style="margin: 5px 0; font-size: 16px !important;">
-                                    <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
-                                    <span t-if="not o or not o.collector_name">कलेक्टर</span>
-                                </div>
-                                <div style="margin: 3px 0; font-size: 16px !important;">
-                                    जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
 
@@ -397,6 +389,17 @@
                                         </table>
                                     </div>
 
+                                    <!-- Collector Signature -->
+                                    <div style="text-align: right; margin-top: 15px; margin-right: 0;">
+                                        <div style="margin: 5px 0; font-size: 16px !important;">
+                                            <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
+                                            <span t-if="not o or not o.collector_name">कलेक्टर</span>
+                                        </div>
+                                        <div style="margin: 3px 0; font-size: 16px !important;">
+                                            जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
+                                        </div>
+                                    </div>
+
                                     <!-- Letter Text After Table -->
                                     <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
                                         <!-- Reference and Copy Details -->
@@ -417,14 +420,6 @@
                                                     <span>रायगढ़ दिनाँक</span>
                                                     <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
                                                     <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
-                                                </div>
-                                                <div>
-                                                    <span>कलेक्टर</span>
-                                                </div>
-                                                <div>
-                                                    <span>जिला-</span>
-                                                    <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
-                                                    <span t-if="not o or not o.district_id">रायगढ़</span>
                                                 </div>
                                             </div>
                                         </div>

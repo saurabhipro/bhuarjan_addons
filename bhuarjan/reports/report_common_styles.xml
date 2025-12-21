@@ -168,50 +168,15 @@
                 align-items: center;
                 justify-content: center;
             }
-            
-            <!-- .watermark img {
-                width: 750px;
-                height: 750px;
-                object-fit: contain;
-            } -->
-            
-            <!-- .watermark-circle { -->
-                <!-- position: absolute;
-                width: 825px;
-                height: 825px;
-                border: 2px solid rgba(0, 0, 0, 0.1);
-                border-radius: 50%; -->
-                <!-- top: 25%; -->
-                <!-- left: 25%;
-                transform: translate(-50%, -50%);
-                z-index: -1; -->
-            <!-- } -->
+      
             
             /* ============================================
                HEADER LOGO STYLES (Top Left)
                ============================================ */
             .header-logo {
-                display: block !important;
-                margin: 0 auto !important;
-                object-fit: contain !important;
-                width: 120px !important;
-                height: 120px !important;
-                max-width: 120px !important;
-                max-height: 120px !important;
-                min-width: 120px !important;
-                min-height: 120px !important;
-                aspect-ratio: 1 / 1 !important;
-                image-rendering: -webkit-optimize-contrast !important;
-                image-rendering: crisp-edges !important;
-                image-rendering: auto !important;
-                -ms-interpolation-mode: nearest-neighbor !important;
-                object-position: center center !important;
-                /* Prevent skewing and maintain aspect ratio */
-                transform: none !important;
-                transform-origin: center center !important;
-                /* Prevent any stretching or distortion */
-                flex-shrink: 0 !important;
-                flex-grow: 0 !important;
+                 width: 120px;
+                    height: auto;
+               
             }
             
             /* Ensure table cells containing logos don't cause distortion */

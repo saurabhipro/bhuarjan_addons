@@ -461,17 +461,12 @@
                                     </div>
                                     <!-- Signatures -->
                                     <div style="margin-top: 20px;">
-                                        <div style="text-align: left; margin-top: 15px;">
-                                            <div style="margin: 5px 0; font-size: 16px;">
-                                                <span t-esc="o.collector_name if o.collector_name else 'कलेक्टर'"/>
-                                            </div>
-                                            <div style="margin: 3px 0; font-size: 16px;">
-                                                जिला-<t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/>
-                                            </div>
-                                        </div>
                                         <div style="text-align: right; margin-top: 15px;">
                                             <div style="margin: 5px 0; font-size: 16px;">
                                                 <span t-esc="o.additional_collector_name if o.additional_collector_name else 'अपर कलेक्टर'"/>
+                                            </div>
+                                            <div style="margin: 3px 0; font-size: 16px;">
+                                                जिला-<t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/>
                                             </div>
                                         </div>
                                     </div>                                    

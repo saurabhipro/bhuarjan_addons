@@ -8,7 +8,7 @@
         <field name="report_name">bhuarjan.section21_notification_report</field>
         <field name="report_file">bhuarjan.section21_notification_report</field>
         <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
-        <field name="print_report_name">'Section21_Notification'</field>
+        <field name="print_report_name">'Section21_' + ((object and object.village_id and object.village_id.name.replace(' ', '_') if object.village_id.name else '') or (docs and docs[0] and docs[0].village_id and docs[0].village_id.name.replace(' ', '_') if docs[0].village_id.name else '') or '') + '_' + ((object and object.notice_date and object.notice_date.strftime('%Y%m%d') if object.notice_date else '') or (docs and docs[0] and docs[0].notice_date and docs[0].notice_date.strftime('%Y%m%d') if docs[0].notice_date else '') or (object and object.create_date and object.create_date.strftime('%Y%m%d') if object.create_date else '') or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d') if docs[0].create_date else '') or '')</field>
     </record>
 
     <!-- Section 21 Notification Report Template -->
@@ -39,12 +39,30 @@
                         background-color: #f0f0f0;
                     }
                     .watermark {
+                        position: absolute;
                         top: 25%;
                         left: 25%;
+                        width: 50%;
+                        height: 50%;
+                        opacity: 0.1;
+                        z-index: 0;
+                        pointer-events: none;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .watermark-circle {
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                        border: 3px solid rgba(0, 0, 0, 0.1);
                     }
                     .watermark img {
-                        width: 600px;
-                        height: 500px;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                        opacity: 0.15;
                     }
                 </style>
                 <div class="page">
@@ -375,6 +393,80 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                    <!-- Letter Text After Table -->
+                                    <div style="margin-top: 20px; font-size: 18px !important; line-height: 1.6 !important;">
+                                        <!-- Reference and Copy Details -->
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                            <div>
+                                                <span>पु. क्रमांक/</span>
+                                                <span style="text-decoration: underline;">........................</span>
+                                                <span>प्रतिलिपि :-</span>
+                                            </div>
+                                            <div style="text-align: center;">
+                                                <span>भू-अर्जन/</span>
+                                                <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%Y')"/>
+                                                <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                                <span>,</span>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div>
+                                                    <span>रायगढ़ दिनाँक</span>
+                                                    <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
+                                                    <span t-if="not o or not o.notice_date" style="text-decoration: underline;">........................</span>
+                                                </div>
+                                                <div>
+                                                    <span>कलेक्टर</span>
+                                                </div>
+                                                <div>
+                                                    <span>जिला-</span>
+                                                    <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                                    <span t-if="not o or not o.district_id">रायगढ़</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Point 1: To Sub-Divisional Officer -->
+                                        <div style="margin-bottom: 15px; text-align: justify;">
+                                            <div style="margin-bottom: 5px;">
+                                                <strong>1.</strong>
+                                                <span style="margin-left: 8px;">
+                                                    अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                                    <t t-set="sub_division_name" t-value="o.village_id.sub_division_id.name if o and o.village_id and o.village_id.sub_division_id else (o.tehsil_id.sub_division_id.name if o and o.tehsil_id and o.tehsil_id.sub_division_id else '')"/>
+                                                    <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                                    <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                                    जिला
+                                                    <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
+                                                    <span t-if="not o or not o.district_id">रायगढ़</span>
+                                                    की ओर
+                                                </span>
+                                            </div>
+                                            <div style="margin-left: 20px; margin-bottom: 5px;">
+                                                सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
+                                            </div>
+                                            <div style="margin-left: 20px;">
+                                                आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
+                                            </div>
+                                        </div>
+
+                                        <!-- Point 2: To Landowner -->
+                                        <div style="margin-bottom: 15px; text-align: justify;">
+                                            <div style="margin-bottom: 5px;">
+                                                <strong>2.</strong>
+                                                <span style="margin-left: 8px;">
+                                                    भूमिस्वामी
+                                                    <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/>
+                                                    <span t-if="not item.get('landowner_name')" style="text-decoration: underline;">........................</span>
+                                                </span>
+                                            </div>
+                                            <div style="margin-left: 20px;">
+                                                की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                                <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                                <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                                के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Additional Information -->

@@ -131,11 +131,14 @@
                             <strong>भू-अर्जन प्रकरण क्रमांक</strong>
                             <span t-if="notification.prakaran_kramank" t-esc="notification.prakaran_kramank"/>
                             <span t-if="not notification.prakaran_kramank">........................</span>
-                            चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की
+                           चूँकि राज्य शासन को यह समाधान हो गया है कि नीचे दी गई अनुसूची में वर्णित भूमि की
                             <span t-if="notification and notification.public_purpose" t-esc="notification.public_purpose"/>
                             <span t-if="notification and not notification.public_purpose and notification.project_id and notification.project_id.name" t-esc="notification.project_id.name"/>
-                            <span t-if="not notification or (not notification.public_purpose and (not notification.project_id or not notification.project_id.name))">सार्वजनिक प्रयोजन</span>
-                            के लिए आवश्यकता है। अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जाएगा) की धारा 19 के अंतर्गत यह घोषित किया जाता है कि इस भूमि की उक्त प्रयोजन के लिए आवश्यकता है :–
+                            <span t-if="not notification or (not notification.public_purpose and (not notification.project_id or not notification.project_id.name))">सार्वजनिक प्रयोजन </span>
+                            के लिए आवश्यकता है। 
+                            अतः भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता अधिकार
+                            अधिनियम, 2013 (जिसे एतद् पश्चात् अधिनियम, 2013 कहा जायेगा) की धारा 19 के तहत
+                            यह घोषित किया जाता है कि इस भूमि की उक्त प्रयोजन के लिए आवश्यकता है :–
                         </p>
                     </div>
 

@@ -445,10 +445,7 @@
                                                 </span>
                                             </div>
                                             <div style="margin-left: 20px; margin-bottom: 5px;">
-                                                सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
-                                            </div>
-                                            <div style="margin-left: 20px;">
-                                                आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
+                                                सूचनार्थ एवं आवश्यक कार्यवाही हेतु। आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
                                             </div>
                                         </div>
 
@@ -463,17 +460,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Additional Information -->
-                                    <div style="margin-top: 12px; font-size: 16px; line-height: 1.6;">
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            जिला: <t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/> | 
-                                            तहसील: <t t-esc="o.tehsil_id.name if o.tehsil_id else '........................'"/> | 
-                                            ग्राम: <t t-esc="o.village_id.name if o.village_id else '........................'"/>
-                                        </p>
-                                        <p style="margin: 5px 0; text-align: justify;">
-                                            परियोजना: <t t-esc="o.project_id.name if o.project_id else '........................'"/>
-                                        </p>
-                                    </div>
                                     
                                     <!-- Signatures -->
                                     <div style="margin-top: 20px;">

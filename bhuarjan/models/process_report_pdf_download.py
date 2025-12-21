@@ -115,6 +115,114 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     _logger.error(f"Error generating PDF for Section 19 record {record.id}: {str(e)}", exc_info=True)
                     continue
             
+            # Generate Section 21 PDFs
+            for record in records.get('section21', []):
+                try:
+                    report_action = self.env.ref('bhuarjan.action_report_section21_notification')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        [record.id],
+                        data={}
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (record.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.project_id else 'Unknown'
+                            village_name = (record.village_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if record.village_id else 'Unknown'
+                            filename = f'Section21_{project_name}_{village_name}_{record.name or record.id}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating PDF for Section 21 record {record.id}: {str(e)}", exc_info=True)
+                    continue
+            
+            # Generate SIA Proposal PDFs (project level)
+            for sia_team in records.get('sia_teams', []):
+                try:
+                    # Generate SIA Proposal (Collector's Order template)
+                    report_action = self.env.ref('bhuarjan.action_report_sia_proposal')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        [sia_team.id],
+                        data={}
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if sia_team.project_id else 'Unknown'
+                            filename = f'SIA_Proposal_{project_name}_{sia_team.name or sia_team.id}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating SIA Proposal PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
+                    continue
+            
+            # Generate SIA Order PDFs (project level)
+            for sia_team in records.get('sia_teams', []):
+                try:
+                    # Generate SIA Order (SDM's Proposal template)
+                    report_action = self.env.ref('bhuarjan.action_report_sia_order')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        [sia_team.id],
+                        data={}
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if sia_team.project_id else 'Unknown'
+                            filename = f'SIA_Order_{project_name}_{sia_team.name or sia_team.id}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating SIA Order PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
+                    continue
+            
+            # Generate Expert Committee Proposal PDFs (project level)
+            for expert_committee in records.get('expert_committees', []):
+                try:
+                    report_action = self.env.ref('bhuarjan.action_report_expert_committee_proposal')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        [expert_committee.id],
+                        data={}
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if expert_committee.project_id else 'Unknown'
+                            filename = f'Expert_Committee_Proposal_{project_name}_{expert_committee.name or expert_committee.id}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating Expert Committee Proposal PDF for record {expert_committee.id}: {str(e)}", exc_info=True)
+                    continue
+            
+            # Generate Expert Committee Order PDFs (project level)
+            for expert_committee in records.get('expert_committees', []):
+                try:
+                    report_action = self.env.ref('bhuarjan.action_report_expert_committee_order')
+                    pdf_result = report_action.sudo()._render_qweb_pdf(
+                        report_action.report_name,
+                        [expert_committee.id],
+                        data={}
+                    )
+                    
+                    if pdf_result:
+                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                        if isinstance(pdf_data, bytes):
+                            project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_') if expert_committee.project_id else 'Unknown'
+                            filename = f'Expert_Committee_Order_{project_name}_{expert_committee.name or expert_committee.id}.pdf'
+                            zip_file.writestr(filename, pdf_data)
+                            pdf_count += 1
+                except Exception as e:
+                    _logger.error(f"Error generating Expert Committee Order PDF for record {expert_committee.id}: {str(e)}", exc_info=True)
+                    continue
+            
             # Generate Form 10 PDFs (grouped by village)
             for village_id in records.get('form10', []):
                 try:

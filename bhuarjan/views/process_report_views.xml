@@ -15,7 +15,9 @@
                             <field name="project_id" 
                                    options="{'no_create': True, 'no_open': True}"
                                    placeholder="Select Project..."/>
+                            <field name="allowed_village_ids" invisible="1"/>
                             <field name="village_id" 
+                                   domain="[('id', 'in', allowed_village_ids)]"
                                    options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"
                                    placeholder="Select Village..."/>
                         </group>

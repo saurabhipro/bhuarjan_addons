@@ -52,6 +52,12 @@ class ProcessReportWizard(models.TransientModel):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', 
                                 domain="[('department_id', '=', department_id)]")
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम')
+    allowed_village_ids = fields.Many2many(
+        'bhu.village',
+        string='Allowed Villages',
+        compute='_compute_allowed_village_ids',
+        store=False,
+    )
     status_type = fields.Selection([
         ('sec4', 'Sec-4'),
         ('sec11', 'Sec-11'),
@@ -61,6 +67,15 @@ class ProcessReportWizard(models.TransientModel):
         ('form10', 'Form-10'),
         ('all', 'All'),
     ], string='Status Wise / स्टेटस वाइज', default='all')
+    
+    @api.depends('project_id')
+    def _compute_allowed_village_ids(self):
+        """Compute allowed villages based on project"""
+        for wizard in self:
+            if wizard.project_id and wizard.project_id.village_ids:
+                wizard.allowed_village_ids = [(6, 0, wizard.project_id.village_ids.ids)]
+            else:
+                wizard.allowed_village_ids = [(6, 0, [])]
 
     @api.onchange('department_id')
     def _onchange_department_id(self):
@@ -333,6 +348,9 @@ class ProcessReportWizard(models.TransientModel):
             'section4': [],
             'section11': [],
             'section19': [],
+            'section21': [],
+            'sia_teams': [],  # SIA teams (project level)
+            'expert_committees': [],  # Expert Committee reports (project level)
             'form10': [],  # Will store village IDs for Form 10
         }
         
@@ -350,6 +368,29 @@ class ProcessReportWizard(models.TransientModel):
         if self.status_type in ('sec19', 'all'):
             section19_domain = domain.copy()
             records['section19'] = self.env['bhu.section19.notification'].search(section19_domain)
+        
+        # Section 21 Notifications
+        if self.status_type in ('sec21', 'all'):
+            section21_domain = domain.copy()
+            records['section21'] = self.env['bhu.section21.notification'].search(section21_domain)
+        
+        # SIA Teams (project level - filter by project only)
+        # Always include SIA teams when project is selected (they're project-level documents)
+        sia_domain = []
+        if project_ids:
+            sia_domain.append(('project_id', 'in', project_ids))
+        elif self.project_id:
+            sia_domain.append(('project_id', '=', self.project_id.id))
+        records['sia_teams'] = self.env['bhu.sia.team'].search(sia_domain) if sia_domain else []
+        
+        # Expert Committee Reports (project level - filter by project only)
+        # Always include Expert Committee reports when project is selected (they're project-level documents)
+        expert_domain = []
+        if project_ids:
+            expert_domain.append(('project_id', 'in', project_ids))
+        elif self.project_id:
+            expert_domain.append(('project_id', '=', self.project_id.id))
+        records['expert_committees'] = self.env['bhu.expert.committee.report'].search(expert_domain) if expert_domain else []
         
         # Form 10 (surveys grouped by village)
         if self.status_type in ('form10', 'all'):

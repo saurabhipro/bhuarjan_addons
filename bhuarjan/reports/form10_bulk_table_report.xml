@@ -41,11 +41,11 @@
                 /* All styles are now in report_common_styles.xml */
                 /* Only minimal local overrides remain here if needed */
                 .header h2 {
-                    margin: 0 0 12px 0;
+                    margin: 0 0 5px 0;
                     text-align: center;
                 }
             </style>
-            <h2 class="form10-title" style="text-decoration: underline; margin: 0 0 12px 0; text-align: center; font-size: 28px;">भू अर्जन प्रारंभिक सर्वे प्रपत्र</h2>
+            <h2 class="form10-title" style="text-decoration: underline; margin: 0 0 5px 0; text-align: center; font-size: 28px;">भू अर्जन प्रारंभिक सर्वे प्रपत्र</h2>
 
             <table class="header-info-table form10-header-info-table table1" >
                 <tr>
@@ -181,6 +181,22 @@
                             padding-top: 0 !important;
                             margin-bottom: 0 !important;
                             padding-bottom: 0 !important;
+                        }
+                        /* Remove all gaps between header and table */
+                        .header-info-table.form10-header-info-table {
+                            margin-bottom: 0 !important;
+                        }
+                        .header.o_clearfix {
+                            margin-bottom: 0 !important;
+                            padding-bottom: 0 !important;
+                        }
+                        .article.o_report_layout_standard {
+                            margin-top: 0 !important;
+                            padding-top: 0 !important;
+                        }
+                        .content-wrapper {
+                            margin-top: 0 !important;
+                            padding-top: 0 !important;
                         }
                     </style>
                     <div class="content-wrapper">

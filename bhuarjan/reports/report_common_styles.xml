@@ -555,6 +555,18 @@
                 padding-top: 0 !important;
             }
             
+            /* Reduce gap after header info table */
+            .header-info-table.form10-header-info-table {
+                margin-bottom: 0 !important;
+            }
+            
+            /* Ensure no gap between sections */
+            .header + .article,
+            .header ~ .article {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
             /* Fix for parentheses rendering - use Arial font for wkhtmltopdf */
             .paren-fix {
                 font-family: "Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", sans-serif !important;

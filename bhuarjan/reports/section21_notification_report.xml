@@ -225,14 +225,8 @@
                                             जिला
                                             <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
                                             <span t-if="not o or not o.district_id">रायगढ़</span>
-                                            की ओर
+                                            की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु। आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
                                         </span>
-                                    </div>
-                                    <div style="margin-left: 20px; margin-bottom: 5px;">
-                                        सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
-                                    </div>
-                                    <div style="margin-left: 20px;">
-                                        आप प्रभावित भू-स्वामियों को सूचना तामिली कराकर प्राप्ति अभिस्वीकृति इस कार्यालय को उपलब्ध कराना सुनिश्चित करें।
                                     </div>
                                 </div>
 
@@ -458,13 +452,11 @@
                                                     भूमिस्वामी
                                                     <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/>
                                                     <span t-if="not item.get('landowner_name')" style="text-decoration: underline;">........................</span>
+                                                    की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                                    <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                                    <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                                    के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                                 </span>
-                                            </div>
-                                            <div style="margin-left: 20px;">
-                                                की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
-                                                <span t-if="sub_division_name" t-esc="sub_division_name"/>
-                                                <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
-                                                के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                             </div>
                                         </div>
                                     </div>

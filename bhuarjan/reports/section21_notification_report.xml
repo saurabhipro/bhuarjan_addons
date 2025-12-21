@@ -22,18 +22,18 @@
                 <!-- Report-specific overrides for Section 21 -->
                 <style>
                     .normal-text {
-                        font-size: 18px !important;
+                        font-size: 16px !important;
                     }
                     .normal-text p, .normal-text span, .normal-text strong {
-                        font-size: 18px !important;
+                        font-size: 16px !important;
                     }
                     .schedule-table {
                         margin: 15px 0;
-                        font-size: 18px !important;
+                        font-size: 16px !important;
                     }
                     .schedule-table th, .schedule-table td {
                         padding: 8px;
-                        font-size: 18px !important;
+                        font-size: 16px !important;
                     }
                     .schedule-table th {
                         background-color: #f0f0f0;
@@ -80,13 +80,13 @@
                             
                             <!-- Header: Collector's Court -->
                             <div style="text-align: center; margin-bottom: 8px;">
-                                <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                <h2 style="margin: 0; padding: 0; font-size: 25px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                     <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                 </h2>
                             </div>
 
                             <!-- Public Notice Header with Date -->
-                            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 18px !important;">
+                            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
                                 <div>
                                     <strong>रायगढ़ दिनाँक</strong>
                                     <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
@@ -95,8 +95,8 @@
                             </div>
 
                             <!-- Main Body Text - Paragraph 1 -->
-                            <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
+                            <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
                                     भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
                                     <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
                                     <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
@@ -108,8 +108,8 @@
                             </div>
 
                             <!-- Main Body Text - Paragraph 2 -->
-                            <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
+                            <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
                                     राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                     <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                     <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
@@ -118,16 +118,16 @@
                             </div>
 
                             <!-- Schedule Separator -->
-                            <div style="text-align: center; margin: 10px 0; font-size: 18px !important; font-weight: bold;">
+                            <div style="text-align: center; margin: 10px 0; font-size: 16px !important; font-weight: bold;">
                                 <strong>// अनूसूची //</strong>
                             </div>
 
                             <!-- Land Details Section -->
                             <div style="margin: 10px 0;">
-                                <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 6px;">
+                                <div style="text-align: left; font-size: 16px; font-weight: bold; margin-bottom: 6px;">
                                     <strong>1) भूमि का विवरण :-</strong>
                                 </div>
-                                <div style="margin-bottom: 8px; font-size: 18px !important;">
+                                <div style="margin-bottom: 8px; font-size: 16px !important;">
                                     <div style="margin-bottom: 3px;">
                                         <strong>(क) जिला :-</strong>
                                         <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -146,7 +146,7 @@
                                 </div>
 
                                 <!-- Land Parcels Table -->
-                                <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 18px !important;">
+                                <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
                                     <thead>
                                         <tr>
                                             <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
@@ -159,22 +159,22 @@
                                         <t t-if="surveys_data and len(surveys_data) > 0">
                                             <t t-foreach="surveys_data" t-as="item">
                                                 <tr>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
                                                         <t t-esc="item['khasra_number']"/>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
                                                         <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                         <t t-if="item['area'] == 0">........................</t>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">--</td>
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">--</td>
                                                 </tr>
                                             </t>
                                         </t>
                                         <t t-if="not surveys_data or len(surveys_data) == 0">
                                             <tr>
-                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
-                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 18px !important;">........................</td>
-                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 18px !important;">--</td>
+                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">........................</td>
+                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">........................</td>
+                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">--</td>
                                             </tr>
                                         </t>
                                     </tbody>
@@ -182,7 +182,7 @@
                             </div>
 
                             <!-- Letter Text After Table -->
-                            <div style="margin-top: 20px; font-size: 18px !important; line-height: 1.6 !important;">
+                            <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
                                 <!-- Reference and Copy Details -->
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                                     <div>
@@ -249,22 +249,22 @@
 
                             <!-- Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                <div style="margin: 5px 0; font-size: 18px !important;">
+                                <div style="margin: 5px 0; font-size: 16px !important;">
                                     <span t-if="o and o.collector_name" t-esc="o.collector_name"/>
                                     <span t-if="not o or not o.collector_name">कलेक्टर</span>
                                 </div>
-                                <div style="margin: 3px 0; font-size: 18px !important;">
+                                <div style="margin: 3px 0; font-size: 16px !important;">
                                     जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
 
                             <!-- Additional Collector Signature -->
                             <div style="text-align: right; margin-top: 15px; margin-right: 0;">
-                                <div style="margin: 5px 0; font-size: 18px !important;">
+                                <div style="margin: 5px 0; font-size: 16px !important;">
                                     <span t-if="o and o.additional_collector_name" t-esc="o.additional_collector_name"/>
                                     <span t-if="not o or not o.additional_collector_name">अपर कलेक्टर</span>
                                 </div>
-                                <div style="margin: 3px 0; font-size: 18px !important;">
+                                <div style="margin: 3px 0; font-size: 16px !important;">
                                     जिला-<span t-if="o and o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span>
                                 </div>
                             </div>
@@ -285,13 +285,13 @@
                                     
                                     <!-- Header: Collector's Court -->
                                     <div style="text-align: center; margin-bottom: 8px;">
-                                        <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                        <h2 style="margin: 0; padding: 0; font-size: 25px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                             <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
                                         </h2>
                                     </div>
 
                                     <!-- Public Notice Header with Date -->
-                                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 18px !important;">
+                                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; font-size: 16px !important;">
                                         <div>
                                             <strong>रायगढ़ दिनाँक</strong>
                                             <span t-if="o and o.notice_date" t-esc="o.notice_date.strftime('%d/%m/%Y')"/>
@@ -315,8 +315,8 @@
                                     </p>
 
                                     <!-- Main Body Text - Paragraph 1 -->
-                                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
+                                    <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                        <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
                                             भूमि अर्जन, पुनर्वासन और पुनर्व्यवस्थापन में उचित प्रतिकर और पारदर्शिता का अधिकार अधिनियम, 2013 के धारा-21 (1) के तहत अपेक्षक निकाय :-
                                             <span t-if="o and o.requisitioning_body" t-esc="o.requisitioning_body"/>
                                             <span t-if="not o or not o.requisitioning_body" style="text-decoration: underline;">........................</span>
@@ -328,8 +328,8 @@
                                     </div>
 
                                     <!-- Main Body Text - Paragraph 2 -->
-                                    <div style="font-size: 18px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
-                                        <p style="margin: 0; padding: 0; font-size: 18px !important; line-height: 1.5 !important;">
+                                    <div style="font-size: 16px !important; line-height: 1.5 !important; text-align: justify; margin-bottom: 8px;">
+                                        <p style="margin: 0; padding: 0; font-size: 16px !important; line-height: 1.5 !important;">
                                             राज्य शासन को नीचे दी गयी अनुसूची में दर्शित भूमि की सार्वजनिक प्रयोजन (
                                             <span t-if="o and o.public_purpose" t-esc="o.public_purpose"/>
                                             <span t-if="not o or not o.public_purpose" style="text-decoration: underline;">........................</span>
@@ -338,16 +338,16 @@
                                     </div>
 
                                     <!-- Schedule Separator -->
-                                    <div style="text-align: center; margin: 10px 0; font-size: 18px !important; font-weight: bold;">
+                                    <div style="text-align: center; margin: 10px 0; font-size: 16px !important; font-weight: bold;">
                                         <strong>// अनूसूची //</strong>
                                     </div>
 
                                     <!-- Land Details Section -->
                                     <div style="margin: 10px 0;">
-                                        <div style="text-align: left; font-size: 18px; font-weight: bold; margin-bottom: 6px;">
+                                        <div style="text-align: left; font-size: 16px; font-weight: bold; margin-bottom: 6px;">
                                             <strong>1) भूमि का विवरण :-</strong>
                                         </div>
-                                        <div style="margin-bottom: 8px; font-size: 18px !important;">
+                                        <div style="margin-bottom: 8px; font-size: 16px !important;">
                                             <div style="margin-bottom: 3px;">
                                                 <strong>(क) जिला :-</strong>
                                                 <span t-if="o and o.district_id" t-esc="o.district_id.name"/>
@@ -366,7 +366,7 @@
                                         </div>
 
                                         <!-- Land Parcels Table -->
-                                        <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 18px !important;">
+                                        <table class="schedule-table" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px !important;">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 33.33%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
@@ -376,21 +376,21 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
                                                         <t t-esc="item['khasra_number']"/>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">
                                                         <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                         <t t-if="item['area'] == 0">........................</t>
                                                     </td>
-                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 18px !important; text-align: center;">--</td>
+                                                    <td style="border: 1px solid #000; padding: 8px; font-size: 16px !important; text-align: center;">--</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
 
                                     <!-- Letter Text After Table -->
-                                    <div style="margin-top: 20px; font-size: 18px !important; line-height: 1.6 !important;">
+                                    <div style="margin-top: 20px; font-size: 16px !important; line-height: 1.6 !important;">
                                         <!-- Reference and Copy Details -->
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                                             <div>
@@ -446,23 +446,17 @@
 
                                         <!-- Point 2: To Landowner -->
                                         <div style="margin-bottom: 15px; text-align: justify;">
-                                            <div style="margin-bottom: 5px;">
+                                            <div>
                                                 <strong>2.</strong>
                                                 <span style="margin-left: 8px;">
-                                                    भूमिस्वामी
-                                                    <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/>
-                                                    <span t-if="not item.get('landowner_name')" style="text-decoration: underline;">........................</span>
-                                                    की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
-                                                    <span t-if="sub_division_name" t-esc="sub_division_name"/>
-                                                    <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
-                                                    के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
+                                                    भूमिस्वामी <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/><span t-if="not item.get('landowner_name')" style="text-decoration: underline;">........................</span> की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, <span t-if="sub_division_name" t-esc="sub_division_name"/><span t-if="not sub_division_name" style="text-decoration: underline;">........................</span> के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Additional Information -->
-                                    <div style="margin-top: 12px; font-size: 18px; line-height: 1.6;">
+                                    <div style="margin-top: 12px; font-size: 16px; line-height: 1.6;">
                                         <p style="margin: 5px 0; text-align: justify;">
                                             जिला: <t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/> | 
                                             तहसील: <t t-esc="o.tehsil_id.name if o.tehsil_id else '........................'"/> | 
@@ -476,15 +470,15 @@
                                     <!-- Signatures -->
                                     <div style="margin-top: 20px;">
                                         <div style="text-align: left; margin-top: 15px;">
-                                            <div style="margin: 5px 0; font-size: 18px;">
+                                            <div style="margin: 5px 0; font-size: 16px;">
                                                 <span t-esc="o.collector_name if o.collector_name else 'कलेक्टर'"/>
                                             </div>
-                                            <div style="margin: 3px 0; font-size: 18px;">
+                                            <div style="margin: 3px 0; font-size: 16px;">
                                                 जिला-<t t-esc="o.district_id.name if o.district_id else 'रायगढ़'"/>
                                             </div>
                                         </div>
                                         <div style="text-align: right; margin-top: 15px;">
-                                            <div style="margin: 5px 0; font-size: 18px;">
+                                            <div style="margin: 5px 0; font-size: 16px;">
                                                 <span t-esc="o.additional_collector_name if o.additional_collector_name else 'अपर कलेक्टर'"/>
                                             </div>
                                         </div>
@@ -492,10 +486,10 @@
                                     
                                     <!-- Copy Recipients -->
                                     <div style="margin-top: 25px; border-top: 1px solid #000; padding-top: 10px;">
-                                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">
+                                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">
                                             <strong>प्रतिलिपि:</strong>
                                         </div>
-                                        <div style="font-size: 18px; line-height: 1.8;">
+                                        <div style="font-size: 16px; line-height: 1.8;">
                                             <p style="margin: 3px 0;">1. <span t-if="item.get('landowner_name')" t-esc="item.get('landowner_name')"/><span t-if="not item.get('landowner_name')">श्री/श्रीमती ........................</span></p>
                                             <p style="margin: 3px 0;">2. दिनांक: <t t-esc="o.notice_date.strftime('%d/%m/%Y') if o.notice_date else '........................'"/></p>
                                         </div>

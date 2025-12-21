@@ -354,7 +354,7 @@
                 border-style: solid !important;
                 border-color: #000 !important;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
-                padding: 3px;
+                padding: 5px 8px !important;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
                 vertical-align: top;
@@ -406,7 +406,7 @@
                 border-width: 1px !important;
                 border-style: solid !important;
                 border-color: #000 !important;
-                padding: 6px;
+                padding: 6px 10px !important;
                 line-height: 1.2;
             }
             
@@ -419,6 +419,7 @@
                 border-width: 1px !important;
                 border-style: solid !important;
                 border-color: #000 !important;
+                padding: 5px 8px !important;
             }
             
             /* Force borders on all cells - override any other styles */

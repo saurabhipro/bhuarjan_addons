@@ -784,11 +784,68 @@ class Section21LandParcel(models.Model):
 
 
 class Section21PersonalNotice(models.TransientModel):
-    """Transient model to link landowners with Section 21 notification for personal notice generation - one per khasra"""
+    """Transient model to link landowners with Section 21 notification for personal notice generation - one per khasra per landowner"""
     _name = 'bhu.section21.personal.notice'
     _description = 'Section 21 Personal Notice'
 
     notification_id = fields.Many2one('bhu.section21.notification', string='Notification', required=True)
     landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=False, help='Landowner (optional - notice can be generated even without landowner)')
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, help='Khasra number for this personal notice')
+    
+    def get_personal_notice_data(self):
+        """Get data for this specific personal notice with landowner and khasra details"""
+        self.ensure_one()
+        if not self.notification_id or not self.khasra_number:
+            return {
+                'khasra_number': self.khasra_number or '',
+                'area': 0.0,
+                'landowner_name': '',
+                'landowner_father': '',
+                'landowner_address': ''
+            }
+        
+        # Get area for this khasra from surveys
+        surveys = self.env['bhu.survey'].search([
+            ('village_id', '=', self.notification_id.village_id.id),
+            ('project_id', '=', self.notification_id.project_id.id),
+            ('khasra_number', '=', self.khasra_number),
+            ('state', 'in', ['approved', 'locked'])
+        ])
+        
+        # Sum up area for this khasra
+        total_area = sum(s.acquired_area or 0.0 for s in surveys)
+        
+        # Get landowner details if available
+        landowner_name = ''
+        landowner_father = ''
+        landowner_address = ''
+        
+        if self.landowner_id:
+            landowner_name = self.landowner_id.name or ''
+            landowner_father = self.landowner_id.father_name or self.landowner_id.spouse_name or ''
+            landowner_address = self.landowner_id.owner_address or ''
+        elif surveys:
+            # If no specific landowner but surveys exist, try to get from surveys
+            # Find survey that has this landowner (if landowner_id is set)
+            for survey in surveys:
+                if self.landowner_id and self.landowner_id in survey.landowner_ids:
+                    landowner_name = self.landowner_id.name or ''
+                    landowner_father = self.landowner_id.father_name or self.landowner_id.spouse_name or ''
+                    landowner_address = self.landowner_id.owner_address or ''
+                    break
+                elif not self.landowner_id and survey.landowner_ids:
+                    # Use first landowner from survey if no specific landowner set
+                    landowner = survey.landowner_ids[0]
+                    landowner_name = landowner.name or ''
+                    landowner_father = landowner.father_name or landowner.spouse_name or ''
+                    landowner_address = landowner.owner_address or ''
+                    break
+        
+        return {
+            'khasra_number': self.khasra_number,
+            'area': total_area,
+            'landowner_name': landowner_name,
+            'landowner_father': landowner_father,
+            'landowner_address': landowner_address
+        }
 

@@ -37,6 +37,10 @@ class Section21Notification(models.Model):
                               default=fields.Date.today,
                               help='Date of issue of the public notice')
     
+    # Kramank (Reference Number)
+    kramank = fields.Char(string='Kramank / क्रमांक', tracking=True,
+                          help='Reference number to be displayed in the report (optional)')
+    
     # Requisitioning Body - Related from project's department
     requisitioning_body = fields.Char(string='Requisitioning Body / अपेक्षक निकाय', 
                                      related='project_id.department_id.name', 

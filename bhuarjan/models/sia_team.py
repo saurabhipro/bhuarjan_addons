@@ -85,6 +85,10 @@ class SiaTeam(models.Model):
     sia_team_uuid = fields.Char(string='SIA Team UUID', copy=False, readonly=True, index=True,
                                  help='Unique identifier for QR code download')
     
+    # Kramank (Reference Number)
+    kramank = fields.Char(string='Kramank / क्रमांक', tracking=True,
+                          help='Reference number to be displayed in the report (optional)')
+    
     # Legacy fields (kept for backward compatibility)
     team_member_ids = fields.Many2many('bhu.sia.team.member', string='Team Members / टीम सदस्य', 
                                       compute='_compute_team_members', store=False)

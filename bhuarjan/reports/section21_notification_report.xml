@@ -232,17 +232,25 @@
 
                                 <!-- Point 2: To Landowner -->
                                 <div style="margin-bottom: 15px; text-align: justify;">
-                                    <div style="margin-bottom: 5px;">
+                                    <div>
                                         <strong>2.</strong>
                                         <span style="margin-left: 8px;">
-                                            भूमिस्वामी.
+                                            भूमिस्वामी
+                                            <t t-set="surveys_data" t-value="o._get_approved_surveys_data() if o else []"/>
+                                            <t t-set="landowner_names" t-value="[item.get('landowner_name') for item in surveys_data if item.get('landowner_name')]"/>
+                                            <t t-if="landowner_names and len(landowner_names) > 0">
+                                                <t t-foreach="landowner_names" t-as="name" t-sep=", ">
+                                                    <t t-esc="name"/>
+                                                </t>
+                                            </t>
+                                            <t t-if="not landowner_names or len(landowner_names) == 0">
+                                                <span style="text-decoration: underline;">........................</span>
+                                            </t>
+                                            की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
+                                            <span t-if="sub_division_name" t-esc="sub_division_name"/>
+                                            <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
+                                            के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                         </span>
-                                    </div>
-                                    <div style="margin-left: 20px;">
-                                        की ओर सूचनार्थ एवं लेख है कि प्रतिकर, पुनर्वासन एवं पुनर्व्यवस्थापन में तय की गई रकम संबंधी जानकारी अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,
-                                        <span t-if="sub_division_name" t-esc="sub_division_name"/>
-                                        <span t-if="not sub_division_name" style="text-decoration: underline;">........................</span>
-                                        के कार्यालय में कार्यालयीन समय में उपस्थित होकर प्राप्त की जा सकती है।
                                     </div>
                                 </div>
                             </div>

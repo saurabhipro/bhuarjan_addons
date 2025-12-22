@@ -311,6 +311,70 @@ class Section15Objection(models.Model):
         self.state = 'rejected'
         self.message_post(body=_('Rejected by %s') % self.env.user.name)
     
+    def set_state_approved(self):
+        """Set state to approved when clicking on approved status button"""
+        self.ensure_one()
+        # Allow going to approved from draft state
+        if self.state == 'draft':
+            # Check if user is SDM
+            if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                    self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+                raise ValidationError(_('Only SDM can approve.'))
+            # Validate that resolution details exist
+            if not self.resolution_details:
+                raise ValidationError(_('Please provide resolution details before approving.'))
+            # Set resolved date
+            self.resolved_date = fields.Date.today()
+            self.state = 'approved'
+            self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
+        elif self.state == 'approved':
+            # Already in approved state
+            pass
+        else:
+            raise ValidationError(_('Cannot change status to Approved from current state. Only draft records can be approved.'))
+    
+    def set_state_rejected(self):
+        """Set state to rejected when clicking on rejected status button"""
+        self.ensure_one()
+        # Allow going to rejected from draft state
+        if self.state == 'draft':
+            # Check if user is SDM
+            if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                    self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+                raise ValidationError(_('Only SDM can reject.'))
+            self.state = 'rejected'
+            self.message_post(body=_('Status changed to Rejected by %s') % self.env.user.name)
+        elif self.state == 'rejected':
+            # Already in rejected state
+            pass
+        else:
+            raise ValidationError(_('Cannot change status to Rejected from current state. Only draft records can be rejected.'))
+    
+    def _validate_state_to_approved(self):
+        """Validate transition to approved state"""
+        self.ensure_one()
+        # Allow going to approved from draft state
+        if self.state != 'draft':
+            raise ValidationError(_('Cannot change status to Approved from current state. Only draft records can be approved.'))
+        # Check if user is SDM
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can approve.'))
+        # Validate that resolution details exist
+        if not self.resolution_details:
+            raise ValidationError(_('Please provide resolution details before approving.'))
+    
+    def _validate_state_to_rejected(self):
+        """Validate transition to rejected state"""
+        self.ensure_one()
+        # Allow going to rejected from draft state
+        if self.state != 'draft':
+            raise ValidationError(_('Cannot change status to Rejected from current state. Only draft records can be rejected.'))
+        # Check if user is SDM
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can reject.'))
+    
     def action_download_unsigned_file(self):
         """Download objection document if available"""
         self.ensure_one()

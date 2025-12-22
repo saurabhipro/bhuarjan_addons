@@ -24,18 +24,19 @@ class ChannelMaster(models.Model):
         ('code_unique', 'unique(code)', 'Channel code must be unique!')
     ]
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate code if not provided"""
-        if not vals.get('code'):
-            # Generate code from name
-            name = vals.get('name', '')
-            code = ''.join([c.upper() for c in name if c.isalnum()])[:10]
-            if code:
-                # Ensure uniqueness
-                existing = self.search([('code', '=', code)])
-                if existing:
-                    code = f"{code}{len(existing) + 1}"
-                vals['code'] = code
-        return super(ChannelMaster, self).create(vals)
+        for vals in vals_list:
+            if not vals.get('code'):
+                # Generate code from name
+                name = vals.get('name', '')
+                code = ''.join([c.upper() for c in name if c.isalnum()])[:10]
+                if code:
+                    # Ensure uniqueness
+                    existing = self.search([('code', '=', code)])
+                    if existing:
+                        code = f"{code}{len(existing) + 1}"
+                    vals['code'] = code
+        return super(ChannelMaster, self).create(vals_list)
 

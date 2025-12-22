@@ -185,7 +185,7 @@ class Section11PreliminaryReport(models.Model):
     # Displacement - Read-only from project (not stored)
     is_displacement = fields.Boolean(string='Is Displacement Involved? / कितने परिवारों का विस्थापन निहित है।',
                                                  related='project_id.is_displacement', readonly=True,
-                                                 default=False, tracking=True)
+                                                 tracking=True)
     affected_families_count = fields.Integer(string='Affected Families Count / प्रभावित परिवारों की संख्या',
                                                          related='project_id.affected_families_count', readonly=True,
                                                          tracking=True)
@@ -193,12 +193,9 @@ class Section11PreliminaryReport(models.Model):
     # Exemption or SIA Justification - Read-only from project (not stored)
     is_exemption = fields.Boolean(string='Is Exemption Granted? / क्या प्रस्तावित परियोजना के लिए अधिनियम 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।',
                                                related='project_id.is_exemption', readonly=True,
-                                               default=False, tracking=True)
-    section5_text_type = fields.Selection([
-        ('exemption', 'प्रस्तावित प्रयोजन के लिए भूमि अर्जन को छत्तीसगढ़ शासन, राजस्व एवं आपदा प्रबंधन विभाग के अधिसूचना क्र. एफ 4-28/सात-1/2014, दिनाँक 02.03.2015 के द्वारा अधिनियम, 2013 के अध्याय "दो" एवं "तीन" के प्रावधानों से छूट प्रदान की गई है।'),
-        ('sia_justification', 'प्रस्तावित प्रयोजन के भू-अर्जन के लिये कराये गये सामाजिक समाघात अध्ययन के अनुसार भूमि का अर्जन अंतिम विकल्प के रूप में किया जाना प्रस्तावित है तथा भूमि अर्जन से सामाजिक समाघात की तुलना में सामाजिक लाभ अधिक होना पाया गया है।')
-    ], string='Section 5 Text / धारा 5 पाठ',
-       related='project_id.section5_text_type', readonly=True, tracking=True,
+                                               tracking=True)
+    section5_text_type = fields.Selection(related='project_id.section5_text_type', readonly=True, tracking=True,
+       string='Section 5 Text / धारा 5 पाठ',
        help='Select which text to display in Section 5 of the report')
     exemption_details = fields.Text(string='Exemption Details / छूट विवरण',
                                                  related='project_id.exemption_details', readonly=True,

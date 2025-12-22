@@ -35,10 +35,9 @@
                 <field name="age_days" string="Age (Days)"/>
                 <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
                 <field name="state" widget="badge" string="Status"
-                       decoration-danger="state == 'send_back'"
                        decoration-warning="state == 'draft'"
-                       decoration-info="state == 'submitted'"
-                       decoration-success="state == 'approved'"/>
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
             </list>
         </field>
     </record>
@@ -48,7 +47,7 @@
         <field name="name">bhu.section15.objection.form</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <form string="Objection / आपत्ति" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
+            <form string="Objection / आपत्ति" edit="not (state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>
@@ -103,50 +102,18 @@
                                 title="Download Collector Signed Approval"/>
                     </group>
                     
-                    <!-- Download Latest PDF Report Button (always visible when any file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file and not collector_signed_file">
-                        <button name="action_download_latest_pdf" string="Download Latest PDF Report" type="object" 
-                                class="btn-primary" icon="fa-file-pdf"
-                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
-                    </group>
-                    
-                    <!-- Download Resolution Report Button -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not resolution_details or state == 'draft'">
-                        <button name="%(action_report_section15_objection_resolution)d" string="Download Resolution Report" type="action" 
-                                class="btn-primary" icon="fa-file-pdf"
-                                title="Download Objection Resolution Report"/>
-                    </group>
-                    
-                    <!-- Download Unsigned PDF Button (visible in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                           invisible="state != 'draft'">
-                        <button name="action_download_unsigned_file" string="Download PDF (Unsigned)" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download Objection Document (Unsigned)"/>
-                    </group>
-                    
-                    <!-- Action Buttons Row: Approve, Send Back, Resolve -->
+                    <!-- Action Buttons Row: Approve, Reject -->
                     <group>
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                 icon="fa-check"
-                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted' or not collector_signed_file"/>
-                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
-                                icon="fa-arrow-left"
-                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted'"/>
-                        <button name="action_resolve" string="Resolve / हल करें" type="object" class="btn-success" 
-                                invisible="state == 'approved'" icon="fa-check"/>
+                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'draft'"/>
+                        <button name="action_reject" string="Reject" type="object" class="btn-danger" 
+                                icon="fa-times"
+                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                invisible="state != 'draft'"/>
                     </group>
-                    
-                     <!-- Resubmit button (for sent back records) -->
-                     <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                             icon="fa-refresh"
-                             groups="bhuarjan.group_bhuarjan_sdm"
-                             invisible="state != 'send_back'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
@@ -161,110 +128,149 @@
                         <group>
                             <field name="name" readonly="1" invisible="1"/>
                             <field name="project_id" required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="available_survey_ids" invisible="1"/>
                             <field name="survey_id" string="Survey (Khasra) / सर्वे (खसरा)" required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    domain="[('id', 'in', available_survey_ids)]"
                                    options="{'no_create': True, 'no_open': True}"
                                    context="{'show_khasra': True}"/>
                         </group>
                         <group>
+                            <field name="objection_type" required="1"
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="objection_date" required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="resolved_date" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Objection &amp; Resolution / आपत्ति और समाधान">
-                            <group>
-                                <group>
-                                    <div style="margin-bottom: 15px;">
-                                        <label for="objection_type" style="font-weight: bold; margin-bottom: 8px; display: block;">
-                                            <i class="fa fa-exclamation-triangle" style="color: #f39c12; margin-right: 8px;"/>
-                                            Objection Type / आपत्ति प्रकार
-                                        </label>
-                                        <field name="objection_type" required="1"
-                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                                    </div>
-                                </group>
+                            <!-- Download Section 15 PDF Button - Prominent placement at top -->
+                            <group string="Download Section 15 Documents" 
+                                   groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                   invisible="not resolution_details or state == 'draft'"
+                                   style="margin-bottom: 20px;">
+                                <button name="%(action_report_section15_objection_resolution)d" string="Download Section 15 PDF" type="action" 
+                                        class="btn-primary" icon="fa-file-pdf"
+                                        title="Download Section 15 Objection Resolution Report"
+                                        style="background-color: #8B4513; border-color: #8B4513; color: white; font-weight: bold; padding: 12px 24px; font-size: 16px; width: 100%;"/>
                             </group>
                             
-                            <group>
-                                <div style="margin-bottom: 10px;">
-                                    <i class="fa fa-comment-o" style="color: #7c7bad; margin-right: 8px; font-size: 16px;"/>
-                                    <span style="font-weight: bold; font-size: 14px;">Objection Details / आपत्ति विवरण</span>
-                                </div>
-                                <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                            </group>
-                            
-                            <group>
-                                <div style="margin-bottom: 10px;">
-                                    <i class="fa fa-check-circle" style="color: #5cb85c; margin-right: 8px; font-size: 16px;"/>
-                                    <span style="font-weight: bold; font-size: 14px;">Resolution Details / समाधान विवरण</span>
-                                    <span style="color: #d9534f; margin-left: 10px;">*</span>
-                                </div>
-                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                            </group>
-                            
-                            <group string="Landowners / भूमिस्वामी" invisible="not survey_id or objection_type != 'remove_landowners'">
-                                <div style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #5cb85c;">
-                                    <i class="fa fa-info-circle" style="color: #5cb85c; margin-right: 8px;"/>
-                                    <span style="font-weight: bold;">Note: You can remove landowners but cannot add new ones. At least one landowner must remain.</span>
+                            <div string="Landowners / भूमिस्वामी" invisible="not survey_id or objection_type != 'remove_landowners'"
+                                 style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
+                                    <i class="fa fa-users" style="margin-right: 8px;"></i>
+                                    Landowners / भूमिस्वामी
+                                </h3>
+                                <div style="margin-bottom: 12px; padding: 12px; background-color: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;">
+                                    <i class="fa fa-info-circle" style="color: #4caf50; margin-right: 8px;"/>
+                                    <span style="font-weight: 600; color: #2e7d32;">Note: You can remove landowners but cannot add new ones. At least one landowner must remain.</span>
                                     <br/>
-                                    <span style="font-size: 12px; color: #666;">नोट: आप भूमिस्वामी हटा सकते हैं लेकिन नए नहीं जोड़ सकते। कम से कम एक भूमिस्वामी रहना चाहिए।</span>
+                                    <span style="font-size: 12px; color: #555; margin-top: 4px; display: inline-block;">नोट: आप भूमिस्वामी हटा सकते हैं लेकिन नए नहीं जोड़ सकते। कम से कम एक भूमिस्वामी रहना चाहिए।</span>
                                 </div>
-                                <group>
+                                <group col="2">
                                     <group>
-                                        <field name="original_landowner_ids" string="Original Landowners / मूल भूमिस्वामी" 
-                                               widget="many2many_tags" readonly="1"/>
+                                        <div class="o_form_label" style="font-weight: 600; color: #555; margin-bottom: 6px; display: block;">
+                                            Original Landowners / मूल भूमिस्वामी
+                                        </div>
+                                        <field name="original_landowner_ids" 
+                                               widget="many2many_tags" readonly="1" nolabel="1"/>
                                     </group>
                                     <group>
-                                        <field name="resolution_landowner_ids" string="Landowners After Resolution / समाधान के बाद भूमिस्वामी"
-                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                        <div class="o_form_label" style="font-weight: 600; color: #555; margin-bottom: 6px; display: block;">
+                                            Landowners After Resolution / समाधान के बाद भूमिस्वामी
+                                        </div>
+                                        <field name="resolution_landowner_ids"
+                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                                widget="many2many_tags"
-                                               domain="[('id', 'in', original_landowner_ids)]"/>
+                                               domain="[('id', 'in', original_landowner_ids)]"
+                                               nolabel="1"/>
                                     </group>
                                 </group>
-                            </group>
+                            </div>
                             
-                            <group string="Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन" invisible="not survey_id or objection_type != 'area_decrease'">
-                                <div style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #5cb85c;">
-                                    <i class="fa fa-info-circle" style="color: #5cb85c; margin-right: 8px;"/>
-                                    <span style="font-weight: bold;">Note: You can decrease acquired area but cannot increase it.</span>
+                            <div string="Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन" invisible="not survey_id or objection_type != 'area_decrease'"
+                                 style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
+                                    <i class="fa fa-area-chart" style="margin-right: 8px;"></i>
+                                    Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन
+                                </h3>
+                                <div style="margin-bottom: 12px; padding: 12px; background-color: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;">
+                                    <i class="fa fa-info-circle" style="color: #4caf50; margin-right: 8px;"/>
+                                    <span style="font-weight: 600; color: #2e7d32;">Note: You can decrease acquired area but cannot increase it.</span>
                                     <br/>
-                                    <span style="font-size: 12px; color: #666;">नोट: आप अर्जन क्षेत्रफल कम कर सकते हैं लेकिन बढ़ा नहीं सकते।</span>
+                                    <span style="font-size: 12px; color: #555; margin-top: 4px; display: inline-block;">नोट: आप अर्जन क्षेत्रफल कम कर सकते हैं लेकिन बढ़ा नहीं सकते।</span>
                                 </div>
                                 <field name="resolution_khasra_ids" 
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                       readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                        nolabel="1"
-                                       context="{'default_objection_id': id, 'default_survey_id': survey_id}">
-                                    <list string="Khasra Resolution" editable="bottom">
+                                       context="{'default_objection_id': id, 'default_survey_id': survey_id}"
+                                       options="{'no_create': True}">
+                                    <list string="Khasra Resolution" decoration-info="resolved_acquired_area &lt; original_acquired_area">
                                         <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
                                         <field name="khasra_number" readonly="1"/>
-                                        <field name="original_acquired_area" readonly="1"/>
-                                        <field name="resolved_acquired_area"/>
+                                        <field name="original_acquired_area" readonly="1" widget="float"/>
+                                        <field name="resolved_acquired_area" widget="float"/>
                                     </list>
                                 </field>
-                            </group>
+                            </div>
+                            
+                            <!-- Objection and Resolution Details in 2 columns -->
+                            <div style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
+                                    <i class="fa fa-file-text" style="margin-right: 8px;"></i>
+                                    Objection &amp; Resolution Details / आपत्ति और समाधान विवरण
+                                </h3>
+                                <group col="2">
+                                    <group>
+                                        <div style="margin-bottom: 8px;">
+                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
+                                                <i class="fa fa-comment-o" style="color: #7c7bad; margin-right: 6px;"/>
+                                                Objection Details / आपत्ति विवरण
+                                            </div>
+                                        </div>
+                                        <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"
+                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
+                                    </group>
+                                    <group>
+                                        <div style="margin-bottom: 8px;">
+                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
+                                                <i class="fa fa-file-text-o" style="color: #5cb85c; margin-right: 6px;"/>
+                                                Resolution Details / समाधान विवरण
+                                                <span style="color: #d9534f; margin-left: 5px;">*</span>
+                                            </div>
+                                        </div>
+                                        <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"
+                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
+                                    </group>
+                                </group>
+                            </div>
                         </page>
                         <page string="Documents / दस्तावेज़">
-                            <group>
-                                <div style="margin-bottom: 10px;">
-                                    <i class="fa fa-file-pdf-o" style="color: #d9534f; margin-right: 8px; font-size: 16px;"/>
-                                    <span style="font-weight: bold; font-size: 14px;">Objection Document / आपत्ति दस्तावेज़</span>
-                                </div>
-                                <field name="objection_document_filename" invisible="1"/>
-                                <field name="objection_document" filename="objection_document_filename"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" 
-                                       widget="binary" 
-                                       options="{'filename': 'objection_document_filename'}"
-                                       placeholder="Upload a PDF, image, or other document related to this objection..."/>
-                            </group>
+                            <div style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <h3 style="margin: 0 0 15px 0; color: #8B4513; font-size: 18px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 10px;">
+                                    <i class="fa fa-file-pdf-o" style="margin-right: 8px; color: #d9534f;"></i>
+                                    Objection Document / आपत्ति दस्तावेज़
+                                </h3>
+                                <group>
+                                    <field name="objection_document_filename" invisible="1"/>
+                                    <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
+                                        <field name="objection_document" filename="objection_document_filename"
+                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
+                                               widget="binary" 
+                                               options="{'filename': 'objection_document_filename'}"
+                                               placeholder="Click here to upload a PDF, image, or other document related to this objection..."
+                                               nolabel="1"/>
+                                        <p style="margin: 10px 0 0 0; color: #666; font-size: 12px;">
+                                            <i class="fa fa-info-circle" style="margin-right: 4px;"></i>
+                                            Supported formats: PDF, Images (JPG, PNG, etc.)
+                                        </p>
+                                    </div>
+                                </group>
+                            </div>
                         </page>
                     </notebook>
                 </sheet>

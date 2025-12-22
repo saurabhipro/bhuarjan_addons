@@ -180,7 +180,7 @@ class PaymentReconciliationBankLine(models.Model):
         ('pending', 'Pending / लंबित'),
         ('settled', 'Settled / निपटाया गया'),
         ('failed', 'Failed / असफल'),
-    ], string='Status / स्थिति', default='pending', tracking=True)
+    ], string='Status / स्थिति', default='pending')
     error = fields.Text(string='Error / त्रुटि')
     payment_id = fields.Char(string='Payment ID / भुगतान आईडी')
     

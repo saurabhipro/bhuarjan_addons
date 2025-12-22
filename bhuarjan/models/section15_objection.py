@@ -82,7 +82,12 @@ class Section15Objection(models.Model):
     # Single attachment file
     objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज़')
     objection_document_filename = fields.Char(string='Document Filename / दस्तावेज़ फ़ाइल नाम')
-    # State field is inherited from bhu.process.workflow.mixin
+    # Override state field for Section 15 - simpler workflow: Draft, Approved, Rejected
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ], string='Status', default='draft', tracking=True)
     
     resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
@@ -268,20 +273,43 @@ class Section15Objection(models.Model):
                     raise ValidationError(_('Resolved acquired area (%.4f) cannot be greater than original area (%.4f) for khasra %s.') % 
                                         (khasra.resolved_acquired_area, khasra.original_acquired_area, khasra.survey_id.khasra_number or ''))
     
-
-
-    def action_resolve(self):
-        """Mark objection as resolved (approved)"""
-        for record in self:
-            # Check if resolution_details is empty or only whitespace
-            if not record.resolution_details or not record.resolution_details.strip():
-                raise ValidationError(_('Please enter resolution details in the "Resolution / समाधान" tab before resolving.'))
-            record.state = 'approved'
-            record.resolved_date = fields.Date.today()
-            record.message_post(
-                body=_('Objection resolved (approved) by %s') % self.env.user.name,
-                message_type='notification'
-            )
+    def action_approve(self):
+        """Approve objection (SDM action)"""
+        self.ensure_one()
+        
+        # Check if user is SDM
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can approve.'))
+        
+        # Validate that resolution details exist
+        if not self.resolution_details:
+            raise ValidationError(_('Please provide resolution details before approving.'))
+        
+        # Validate state is draft
+        if self.state != 'draft':
+            raise ValidationError(_('Only draft records can be approved.'))
+        
+        # Set resolved date
+        self.resolved_date = fields.Date.today()
+        self.state = 'approved'
+        self.message_post(body=_('Approved by %s') % self.env.user.name)
+    
+    def action_reject(self):
+        """Reject objection (SDM action)"""
+        self.ensure_one()
+        
+        # Check if user is SDM
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can reject.'))
+        
+        # Validate state is draft
+        if self.state != 'draft':
+            raise ValidationError(_('Only draft records can be rejected.'))
+        
+        self.state = 'rejected'
+        self.message_post(body=_('Rejected by %s') % self.env.user.name)
     
     def action_download_unsigned_file(self):
         """Download objection document if available"""

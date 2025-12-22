@@ -55,53 +55,6 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
-                    <!-- File Upload Section for SDM (editable only in draft state) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload Signed Objection Response"/>
-                        <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                icon="fa-paper-plane"
-                                invisible="not sdm_signed_file"/>
-                    </group>
-                    
-                    <!-- SDM Signed File Display (readonly, visible in all states after draft when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not sdm_signed_file or state == 'draft'">
-                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="SDM Signed Response (Uploaded)"/>
-                        <button name="action_download_sdm_signed_file" string="Download SDM Signed Response" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download SDM Signed Response"/>
-                    </group>
-                    
-                    <!-- File Upload Section for Collector (editable only in submitted state) -->
-                    <group groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
-                           invisible="state != 'submitted'">                        
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               placeholder="Upload Objection Approval Letter"/>
-                    </group>
-                    
-                    <!-- Collector Signed File Display (readonly, visible in all states after submitted when file exists) -->
-                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="not collector_signed_file or state == 'draft'">
-                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                               nolabel="1"
-                               widget="binary"
-                               readonly="1"
-                               string="Collector Signed Approval (Uploaded)"/>
-                        <button name="action_download_collector_signed_file" string="Download Collector Signed Approval" type="object" 
-                                class="btn-secondary" icon="fa-download"
-                                title="Download Collector Signed Approval"/>
-                    </group>
-                    
                     <!-- Action Buttons Row: Approve, Reject -->
                     <group>
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
@@ -207,10 +160,11 @@
                                 <field name="resolution_khasra_ids" 
                                        readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                        nolabel="1"
-                                       context="{'default_objection_id': id, 'default_survey_id': survey_id}"
+                                       context="{'default_objection_id': id, 'default_survey_id': survey_id, 'default_original_acquired_area': survey_id.acquired_area if survey_id else 0, 'default_resolved_acquired_area': survey_id.acquired_area if survey_id else 0}"
                                        options="{'no_create': True}">
                                     <list string="Khasra Resolution" decoration-info="resolved_acquired_area &lt; original_acquired_area">
-                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
+                                        <field name="objection_id" invisible="1"/>
+                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" default_focus="1"/>
                                         <field name="khasra_number" readonly="1"/>
                                         <field name="original_acquired_area" readonly="1" widget="float"/>
                                         <field name="resolved_acquired_area" widget="float"/>

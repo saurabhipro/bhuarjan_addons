@@ -426,13 +426,38 @@ class Section15ObjectionKhasra(models.Model):
     _description = 'Section 15 Objection Khasra Resolution'
     
     objection_id = fields.Many2one('bhu.section15.objection', string='Objection / आपत्ति', required=True, ondelete='cascade')
-    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', required=True)
+    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', required=True, 
+                               ondelete='restrict')
     khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', related='survey_id.khasra_number', readonly=True, store=True)
     original_acquired_area = fields.Float(string='Original Acquired Area (Hectares) / मूल अर्जन क्षेत्रफल (हेक्टेयर)', 
                                           digits=(10, 4), required=True, readonly=True)
     resolved_acquired_area = fields.Float(string='Resolved Acquired Area (Hectares) / समाधान अर्जन क्षेत्रफल (हेक्टेयर)', 
                                          digits=(10, 4), required=True,
                                          help='Enter the resolved acquired area. Must be less than or equal to original area.')
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from context"""
+        res = super().default_get(fields_list)
+        if 'default_survey_id' in self.env.context:
+            survey_id = self.env.context.get('default_survey_id')
+            if survey_id:
+                survey = self.env['bhu.survey'].browse(survey_id)
+                if survey.exists():
+                    res['survey_id'] = survey_id
+                    if 'original_acquired_area' in fields_list:
+                        res['original_acquired_area'] = survey.acquired_area
+                    if 'resolved_acquired_area' in fields_list:
+                        res['resolved_acquired_area'] = survey.acquired_area
+        return res
+    
+    @api.onchange('survey_id')
+    def _onchange_survey_id(self):
+        """Update area fields when survey changes"""
+        if self.survey_id:
+            self.original_acquired_area = self.survey_id.acquired_area
+            if not self.resolved_acquired_area or self.resolved_acquired_area > self.survey_id.acquired_area:
+                self.resolved_acquired_area = self.survey_id.acquired_area
     
     @api.constrains('resolved_acquired_area', 'original_acquired_area')
     def _check_area_decrease(self):

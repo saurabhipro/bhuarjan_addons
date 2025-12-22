@@ -29,9 +29,7 @@
                 <field name="name" string="Objection Name"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
-                <field name="landowner_id" string="Landowner"/>
-                <field name="survey_id" string="Survey"/>
-                <field name="survey_khasra_number" string="Survey Khasra Number"/>
+                <field name="survey_id" string="Survey (Khasra)"/>
                 <field name="objection_type" string="Objection Type"/>
                 <field name="objection_date" string="Objection Date"/>
                 <field name="age_days" string="Age (Days)"/>
@@ -113,6 +111,14 @@
                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"/>
                     </group>
                     
+                    <!-- Download Resolution Report Button -->
+                    <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                           invisible="not resolution_details or state == 'draft'">
+                        <button name="%(action_report_section15_objection_resolution)d" string="Download Resolution Report" type="action" 
+                                class="btn-primary" icon="fa-file-pdf"
+                                title="Download Objection Resolution Report"/>
+                    </group>
+                    
                     <!-- Download Unsigned PDF Button (visible in draft state) -->
                     <group groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                            invisible="state != 'draft'">
@@ -153,21 +159,17 @@
                     </group>
                     <group>
                         <group>
-                            <field name="name" required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            <field name="name" readonly="1" invisible="1"/>
                             <field name="project_id" required="1"
                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"
                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                            <field name="filtered_landowner_ids" invisible="1"/>
-                            <field name="landowner_id" required="1" 
+                            <field name="available_survey_ids" invisible="1"/>
+                            <field name="survey_id" string="Survey (Khasra) / सर्वे (खसरा)" required="1"
                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                                   domain="[('id', 'in', filtered_landowner_ids)]"/>
-                            <field name="filtered_survey_ids" invisible="1"/>
-                            <field name="survey_id" options="{'no_create': True, 'no_open': True}" 
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                                   context="{'show_khasra': True}"
-                                   domain="[('id', 'in', filtered_survey_ids)]"/>
+                                   domain="[('id', 'in', available_survey_ids)]"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   context="{'show_khasra': True}"/>
                         </group>
                         <group>
                             <field name="objection_date" required="1"
@@ -176,42 +178,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Survey Details / सर्वे विवरण" invisible="not survey_id">
-                            <group>
-                                <group string="Basic Information / मूल जानकारी">
-                                    <field name="survey_khasra_number"/>
-                                    <field name="survey_date"/>
-                                    <field name="survey_state" widget="badge"/>
-                                    <field name="survey_project_id"/>
-                                    <field name="survey_village_id"/>
-                                    <field name="survey_department_id"/>
-                                </group>
-                                <group string="Area Information / क्षेत्रफल जानकारी">
-                                    <field name="survey_total_area"/>
-                                    <field name="survey_acquired_area"/>
-                                    <field name="survey_crop_type"/>
-                                    <field name="survey_irrigation_type"/>
-                                </group>
-                            </group>
-                            <group>
-                                <!-- survey_tree_development_stage field removed - tree details are now in tree_line_ids -->
-                            </group>
-                            <group>
-                                <group string="Property Information / संपत्ति जानकारी">
-                                    <field name="survey_has_house"/>
-                                    <field name="survey_house_type" invisible="survey_has_house != 'yes'"/>
-                                    <field name="survey_house_area" invisible="survey_has_house != 'yes'"/>
-                                    <field name="survey_has_well"/>
-                                    <field name="survey_well_type" invisible="survey_has_well != 'yes'"/>
-                                    <field name="survey_has_tubewell"/>
-                                    <field name="survey_has_pond"/>
-                                </group>
-                            </group>
-                            <group string="Landowners / भूमिस्वामी">
-                                <field name="survey_landowner_ids" widget="many2many_tags" readonly="1"/>
-                            </group>
-                        </page>
-                        <page string="Objection Details / आपत्ति विवरण">
+                        <page string="Objection &amp; Resolution / आपत्ति और समाधान">
                             <group>
                                 <group>
                                     <div style="margin-bottom: 15px;">
@@ -222,34 +189,9 @@
                                         <field name="objection_type" required="1"
                                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                                     </div>
-                                    <field name="new_area" invisible="objection_type != 'area_increase'"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)">
-                                        <label for="new_area" string=""/>
-                                        <div style="margin-bottom: 5px;">
-                                            <i class="fa fa-area-chart" style="color: #7c7bad; margin-right: 8px;"/>
-                                            <span>Expected New Area (Hectares) / अपेक्षित नया क्षेत्रफल (हेक्टेयर)</span>
-                                        </div>
-                                    </field>
-                                    <field name="new_rate" invisible="objection_type != 'rate_increase'"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)">
-                                        <label for="new_rate" string=""/>
-                                        <div style="margin-bottom: 5px;">
-                                            <i class="fa fa-rupee" style="color: #7c7bad; margin-right: 8px;"/>
-                                            <span>Expected New Rate (per Hectare) / अपेक्षित नई दर (प्रति हेक्टेयर)</span>
-                                        </div>
-                                    </field>
-                                    <field name="other_specific_details" 
-                                           invisible="objection_type == 'area_increase' or objection_type == 'rate_increase'"
-                                           readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
-                                           placeholder="Enter specific details (e.g., tree count, boundary description, etc.)...">
-                                        <label for="other_specific_details" string=""/>
-                                        <div style="margin-bottom: 5px;">
-                                            <i class="fa fa-file-text-o" style="color: #7c7bad; margin-right: 8px;"/>
-                                            <span>Specific Details / विशिष्ट विवरण</span>
-                                        </div>
-                                    </field>
                                 </group>
                             </group>
+                            
                             <group>
                                 <div style="margin-bottom: 10px;">
                                     <i class="fa fa-comment-o" style="color: #7c7bad; margin-right: 8px; font-size: 16px;"/>
@@ -258,6 +200,59 @@
                                 <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"
                                        readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                             </group>
+                            
+                            <group>
+                                <div style="margin-bottom: 10px;">
+                                    <i class="fa fa-check-circle" style="color: #5cb85c; margin-right: 8px; font-size: 16px;"/>
+                                    <span style="font-weight: bold; font-size: 14px;">Resolution Details / समाधान विवरण</span>
+                                    <span style="color: #d9534f; margin-left: 10px;">*</span>
+                                </div>
+                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                            </group>
+                            
+                            <group string="Landowners / भूमिस्वामी" invisible="not survey_id or objection_type != 'remove_landowners'">
+                                <div style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #5cb85c;">
+                                    <i class="fa fa-info-circle" style="color: #5cb85c; margin-right: 8px;"/>
+                                    <span style="font-weight: bold;">Note: You can remove landowners but cannot add new ones. At least one landowner must remain.</span>
+                                    <br/>
+                                    <span style="font-size: 12px; color: #666;">नोट: आप भूमिस्वामी हटा सकते हैं लेकिन नए नहीं जोड़ सकते। कम से कम एक भूमिस्वामी रहना चाहिए।</span>
+                                </div>
+                                <group>
+                                    <group>
+                                        <field name="original_landowner_ids" string="Original Landowners / मूल भूमिस्वामी" 
+                                               widget="many2many_tags" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="resolution_landowner_ids" string="Landowners After Resolution / समाधान के बाद भूमिस्वामी"
+                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                               widget="many2many_tags"
+                                               domain="[('id', 'in', original_landowner_ids)]"/>
+                                    </group>
+                                </group>
+                            </group>
+                            
+                            <group string="Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन" invisible="not survey_id or objection_type != 'area_decrease'">
+                                <div style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #5cb85c;">
+                                    <i class="fa fa-info-circle" style="color: #5cb85c; margin-right: 8px;"/>
+                                    <span style="font-weight: bold;">Note: You can decrease acquired area but cannot increase it.</span>
+                                    <br/>
+                                    <span style="font-size: 12px; color: #666;">नोट: आप अर्जन क्षेत्रफल कम कर सकते हैं लेकिन बढ़ा नहीं सकते।</span>
+                                </div>
+                                <field name="resolution_khasra_ids" 
+                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                       nolabel="1"
+                                       context="{'default_objection_id': id, 'default_survey_id': survey_id}">
+                                    <list string="Khasra Resolution" editable="bottom">
+                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
+                                        <field name="khasra_number" readonly="1"/>
+                                        <field name="original_acquired_area" readonly="1"/>
+                                        <field name="resolved_acquired_area"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Documents / दस्तावेज़">
                             <group>
                                 <div style="margin-bottom: 10px;">
                                     <i class="fa fa-file-pdf-o" style="color: #d9534f; margin-right: 8px; font-size: 16px;"/>
@@ -269,16 +264,6 @@
                                        widget="binary" 
                                        options="{'filename': 'objection_document_filename'}"
                                        placeholder="Upload a PDF, image, or other document related to this objection..."/>
-                            </group>
-                        </page>
-                        <page string="Resolution / समाधान">
-                            <group>
-                                <div style="margin-bottom: 10px;">
-                                    <i class="fa fa-check-circle" style="color: #5cb85c; margin-right: 8px; font-size: 16px;"/>
-                                    <span style="font-weight: bold; font-size: 14px;">Resolution Details / समाधान विवरण</span>
-                                    <span style="color: #d9534f; margin-left: 10px;">*</span>
-                                </div>
-                                <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"/>
                             </group>
                         </page>
                     </notebook>
@@ -297,14 +282,14 @@
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
-                <field name="landowner_id"/>
+                <field name="survey_id"/>
                 <field name="objection_type"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                 <filter string="Sent Back" name="send_back" domain="[('state', '=', 'send_back')]"/>
-                <filter string="Area Increase" name="area_increase" domain="[('objection_type', '=', 'area_increase')]"/>
-                <filter string="Rate Increase" name="rate_increase" domain="[('objection_type', '=', 'rate_increase')]"/>
+                <filter string="Area Decrease" name="area_decrease" domain="[('objection_type', '=', 'area_decrease')]"/>
+                <filter string="Remove Landowners" name="remove_landowners" domain="[('objection_type', '=', 'remove_landowners')]"/>
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>

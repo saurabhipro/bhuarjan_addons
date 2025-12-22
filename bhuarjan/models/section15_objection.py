@@ -11,164 +11,70 @@ class Section15Objection(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.process.workflow.mixin']
     _order = 'create_date desc'
 
-    name = fields.Char(string='Objection Reference / आपत्ति संदर्भ', required=True, tracking=True, default='New')
+    name = fields.Char(string='Objection Reference / आपत्ति संदर्भ', required=True, tracking=True, default='New', readonly=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
-    landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=True, tracking=True)
-    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', tracking=True)
-    filtered_landowner_ids = fields.Many2many('bhu.landowner', string='Filtered Landowners', compute='_compute_filtered_landowner_ids', store=False)
-    filtered_survey_ids = fields.Many2many('bhu.survey', string='Filtered Surveys', compute='_compute_filtered_survey_ids', store=False)
+    
+    # Single survey (khasra) selection
+    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', tracking=True,
+                                help='Select a survey (khasra) from the selected village')
+    
+    # Available surveys for selection (computed based on village)
+    available_survey_ids = fields.Many2many('bhu.survey', string='Available Surveys', compute='_compute_available_survey_ids', store=False)
+    
+    # Landowners from selected surveys (can be removed, cannot add new)
+    resolution_landowner_ids = fields.Many2many('bhu.landowner', 
+                                                'section15_objection_landowner_rel',
+                                                'objection_id', 'landowner_id',
+                                                string='Landowners (After Resolution) / भूमिस्वामी (समाधान के बाद)', 
+                                                tracking=True,
+                                                help='Landowners after resolution. You can remove landowners but cannot add new ones.')
+    
+    # Original landowners from surveys (readonly, for comparison)
+    original_landowner_ids = fields.Many2many('bhu.landowner', 
+                                             'section15_objection_original_landowner_rel',
+                                             'objection_id', 'landowner_id',
+                                             string='Original Landowners / मूल भूमिस्वामी', 
+                                             compute='_compute_original_landowner_ids', 
+                                             store=False, readonly=True)
+    
+    # Resolution changes per khasra (One2many to track area decreases per survey)
+    resolution_khasra_ids = fields.One2many('bhu.section15.objection.khasra', 'objection_id',
+                                            string='Khasra Resolution Changes / खसरा समाधान परिवर्तन',
+                                            tracking=True,
+                                            help='Track area decreases per khasra')
     
     @api.depends('village_id')
-    def _compute_filtered_landowner_ids(self):
-        """Compute filtered landowner IDs based on village"""
+    def _compute_available_survey_ids(self):
+        """Compute available survey IDs based on village"""
         for record in self:
             if record.village_id:
                 # Find all surveys for this village
                 surveys = self.env['bhu.survey'].search([('village_id', '=', record.village_id.id)])
-                # Get all unique landowners from these surveys
-                landowner_ids = surveys.mapped('landowner_ids')
-                record.filtered_landowner_ids = landowner_ids
+                record.available_survey_ids = surveys
             else:
-                record.filtered_landowner_ids = False
-    
-    @api.depends('village_id', 'landowner_id')
-    def _compute_filtered_survey_ids(self):
-        """Compute filtered survey IDs based on village and landowner"""
-        for record in self:
-            if record.village_id and record.landowner_id:
-                surveys = self.env['bhu.survey'].search([
-                    ('village_id', '=', record.village_id.id),
-                    ('landowner_ids', 'in', [record.landowner_id.id])
-                ])
-                record.filtered_survey_ids = surveys
-            elif record.village_id:
-                surveys = self.env['bhu.survey'].search([('village_id', '=', record.village_id.id)])
-                record.filtered_survey_ids = surveys
-            else:
-                record.filtered_survey_ids = False
-    
-    # Survey Details (read-only, populated from selected survey)
-    survey_khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', readonly=True, compute='_compute_survey_details', store=False)
-    survey_total_area = fields.Float(string='Total Area / कुल क्षेत्रफल', readonly=True, compute='_compute_survey_details', store=False)
-    survey_acquired_area = fields.Float(string='Acquired Area / अर्जन क्षेत्रफल', readonly=True, compute='_compute_survey_details', store=False)
-    survey_date = fields.Date(string='Survey Date / सर्वे दिनांक', readonly=True, compute='_compute_survey_details', store=False)
-    survey_state = fields.Selection([
-        ('draft', 'Draft'),
-        ('submitted', 'Submitted'),
-        ('approved', 'Approved / स्वीकृत'),
-        ('locked', 'Locked / लॉक'),
-    ], string='Survey Status / सर्वे स्थिति', readonly=True, compute='_compute_survey_details', store=False)
-    survey_project_id = fields.Many2one('bhu.project', string='Survey Project', readonly=True, compute='_compute_survey_details', store=False)
-    survey_village_id = fields.Many2one('bhu.village', string='Survey Village', readonly=True, compute='_compute_survey_details', store=False)
-    survey_department_id = fields.Many2one('bhu.department', string='Survey Department', readonly=True, compute='_compute_survey_details', store=False)
-    survey_crop_type = fields.Selection([
-        ('single', 'Single Crop / एकल फसल'),
-        ('double', 'Double Crop / दोहरी फसल'),
-    ], string='Crop Type / फसल का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
-    survey_irrigation_type = fields.Selection([
-        ('irrigated', 'Irrigated / सिंचित'),
-        ('unirrigated', 'Unirrigated / असिंचित'),
-    ], string='Irrigation Type / सिंचाई का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
-    survey_tree_development_stage = fields.Selection([
-        ('undeveloped', 'Undeveloped / अविकसित'),
-        ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
-        ('fully_developed', 'Fully developed / पूर्ण विकसित')
-    ], string='Tree Development Stage / वृक्ष विकास स्तर', readonly=True, compute='_compute_survey_details', store=False)
-    survey_has_house = fields.Selection([
-        ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
-    ], string='Has House / घर है', readonly=True, compute='_compute_survey_details', store=False)
-    survey_house_type = fields.Selection([
-        ('kachcha', 'कच्चा'),
-        ('pucca', 'पक्का')
-    ], string='House Type / घर का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
-    survey_house_area = fields.Float(string='House Area (Sq. Ft.) / घर का क्षेत्रफल', readonly=True, compute='_compute_survey_details', store=False)
-    survey_has_well = fields.Selection([
-        ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
-    ], string='Has Well / कुआं है', readonly=True, compute='_compute_survey_details', store=False)
-    survey_well_type = fields.Selection([
-        ('kachcha', 'कच्चा'),
-        ('pakka', 'पक्का')
-    ], string='Well Type / कुएं का प्रकार', readonly=True, compute='_compute_survey_details', store=False)
-    survey_has_tubewell = fields.Selection([
-        ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
-    ], string='Has Tubewell / ट्यूबवेल है', readonly=True, compute='_compute_survey_details', store=False)
-    survey_has_pond = fields.Selection([
-        ('yes', 'Yes / हाँ'),
-        ('no', 'No / नहीं'),
-    ], string='Has Pond / तालाब है', readonly=True, compute='_compute_survey_details', store=False)
-    survey_landowner_ids = fields.Many2many('bhu.landowner', string='Survey Landowners', readonly=True, compute='_compute_survey_details', store=False)
+                record.available_survey_ids = False
     
     @api.depends('survey_id')
-    def _compute_survey_details(self):
-        """Compute survey details from selected survey"""
+    def _compute_original_landowner_ids(self):
+        """Compute original landowners from selected survey"""
         for record in self:
             if record.survey_id:
-                record.survey_khasra_number = record.survey_id.khasra_number
-                record.survey_total_area = record.survey_id.total_area
-                record.survey_acquired_area = record.survey_id.acquired_area
-                record.survey_date = record.survey_id.survey_date
-                record.survey_state = record.survey_id.state
-                record.survey_project_id = record.survey_id.project_id
-                record.survey_village_id = record.survey_id.village_id
-                record.survey_department_id = record.survey_id.department_id
-                record.survey_crop_type = record.survey_id.crop_type
-                record.survey_irrigation_type = record.survey_id.irrigation_type
-                # tree_development_stage field removed - set to False or compute from tree_line_ids if needed
-                # For now, set to False as tree details are now in tree_line_ids
-                record.survey_tree_development_stage = False
-                record.survey_has_house = record.survey_id.has_house
-                record.survey_house_type = record.survey_id.house_type
-                record.survey_house_area = record.survey_id.house_area
-                record.survey_has_well = record.survey_id.has_well
-                record.survey_well_type = record.survey_id.well_type
-                record.survey_has_tubewell = record.survey_id.has_tubewell
-                record.survey_has_pond = record.survey_id.has_pond
-                record.survey_landowner_ids = record.survey_id.landowner_ids
+                # Get all landowners from selected survey
+                all_landowners = record.survey_id.landowner_ids
+                record.original_landowner_ids = all_landowners
+                # Initialize resolution_landowner_ids with original if not set
+                if not record.resolution_landowner_ids and all_landowners:
+                    record.resolution_landowner_ids = all_landowners
             else:
-                record.survey_khasra_number = False
-                record.survey_total_area = 0.0
-                record.survey_acquired_area = 0.0
-                record.survey_date = False
-                record.survey_state = False
-                record.survey_project_id = False
-                record.survey_village_id = False
-                record.survey_department_id = False
-                record.survey_crop_type = False
-                record.survey_irrigation_type = False
-                record.survey_tree_development_stage = False
-                record.survey_has_house = False
-                record.survey_house_type = False
-                record.survey_house_area = 0.0
-                record.survey_has_well = False
-                record.survey_well_type = False
-                record.survey_has_tubewell = False
-                record.survey_has_pond = False
-                record.survey_landowner_ids = False
+                record.original_landowner_ids = False
+                record.resolution_landowner_ids = False
+    
     
     objection_type = fields.Selection([
-        ('area_increase', 'Area Increase / क्षेत्रफल वृद्धि'),
-        ('rate_increase', 'Rate Increase / दर वृद्धि'),
-        ('boundary_dispute', 'Boundary Dispute / सीमा विवाद'),
-        ('ownership_dispute', 'Ownership Dispute / स्वामित्व विवाद'),
-        ('compensation_amount', 'Compensation Amount / मुआवजा राशि'),
-        ('survey_errors', 'Survey Errors / सर्वे त्रुटियां'),
-        ('tree_count_issue', 'Tree Count Issue / वृक्ष संख्या समस्या'),
-        ('other', 'Other / अन्य'),
-    ], string='Objection Type / आपत्ति प्रकार', required=True, tracking=True, default='other')
-    
-    # Objection-specific fields
-    new_area = fields.Float(string='Expected New Area (Hectares) / अपेक्षित नया क्षेत्रफल (हेक्टेयर)', 
-                            digits=(10, 4), tracking=True,
-                            help='Enter the new area that the landowner expects')
-    new_rate = fields.Float(string='Expected New Rate (per Hectare) / अपेक्षित नई दर (प्रति हेक्टेयर)', 
-                           digits=(10, 2), tracking=True,
-                           help='Enter the new rate per hectare that the landowner expects')
-    other_specific_details = fields.Text(string='Specific Details / विशिष्ट विवरण', tracking=True,
-                                        help='Enter specific details for this objection type (e.g., tree count, boundary details, etc.)')
+        ('area_decrease', 'Area Decrease / क्षेत्रफल कमी'),
+        ('remove_landowners', 'Remove Landowners / भूमिस्वामी हटाना'),
+    ], string='Objection Type / आपत्ति प्रकार', required=True, tracking=True, default='area_decrease')
     
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
     objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=True, tracking=True)
@@ -217,7 +123,48 @@ class Section15Objection(models.Model):
                     # No project_id, use fallback
                     sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or 'New'
                     vals['name'] = f'OBJ-{sequence}'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        
+        # Initialize resolution khasra if survey_id is set and objection type is area_decrease
+        for record in records:
+            if record.survey_id and record.objection_type == 'area_decrease' and not record.resolution_khasra_ids:
+                record.resolution_khasra_ids = [(0, 0, {
+                    'survey_id': record.survey_id.id,
+                    'original_acquired_area': record.survey_id.acquired_area,
+                    'resolved_acquired_area': record.survey_id.acquired_area,
+                })]
+        return records
+    
+    def write(self, vals):
+        """Override write to ensure resolution_khasra_ids have survey_id set"""
+        result = super().write(vals)
+        
+        # If survey_id or objection_type changed, update resolution_khasra_ids
+        if 'survey_id' in vals or 'objection_type' in vals:
+            for record in self:
+                if record.objection_type == 'area_decrease' and record.survey_id:
+                    # Ensure resolution_khasra_ids exists and has survey_id
+                    if record.resolution_khasra_ids:
+                        for khasra in record.resolution_khasra_ids:
+                            if not khasra.survey_id:
+                                khasra.write({
+                                    'survey_id': record.survey_id.id,
+                                    'original_acquired_area': record.survey_id.acquired_area,
+                                })
+                                if khasra.resolved_acquired_area > record.survey_id.acquired_area:
+                                    khasra.write({'resolved_acquired_area': record.survey_id.acquired_area})
+                    elif record.survey_id:
+                        # Create if doesn't exist
+                        record.resolution_khasra_ids = [(0, 0, {
+                            'survey_id': record.survey_id.id,
+                            'original_acquired_area': record.survey_id.acquired_area,
+                            'resolved_acquired_area': record.survey_id.acquired_area,
+                        })]
+                elif record.objection_type == 'remove_landowners':
+                    # Clear resolution_khasra_ids for remove_landowners type
+                    record.resolution_khasra_ids = [(5, 0, 0)]
+        
+        return result
 
     
 
@@ -234,25 +181,92 @@ class Section15Objection(models.Model):
     
     @api.onchange('village_id')
     def _onchange_village_id(self):
-        """Reset landowner and survey when village changes"""
-        self.landowner_id = False
+        """Reset survey when village changes"""
         self.survey_id = False
-        # Trigger recomputation of filtered fields
-        self._compute_filtered_landowner_ids()
-        self._compute_filtered_survey_ids()
-        if self.filtered_landowner_ids:
-            return {'domain': {'landowner_id': [('id', 'in', self.filtered_landowner_ids.ids)]}}
-        return {'domain': {'landowner_id': [('id', 'in', [])]}}
+        self.resolution_landowner_ids = False
+        self.resolution_khasra_ids = False
+        # Trigger recomputation
+        self._compute_available_survey_ids()
     
-    @api.onchange('landowner_id')
-    def _onchange_landowner_id(self):
-        """Filter surveys by village and landowner when landowner changes"""
-        self.survey_id = False
-        # Trigger recomputation of filtered_survey_ids
-        self._compute_filtered_survey_ids()
-        if self.filtered_survey_ids:
-            return {'domain': {'survey_id': [('id', 'in', self.filtered_survey_ids.ids)]}}
-        return {'domain': {'survey_id': [('id', 'in', [])]}}
+    @api.onchange('survey_id')
+    def _onchange_survey_id(self):
+        """Update original landowners and initialize resolution data when survey changes"""
+        if not self.survey_id:
+            self.resolution_landowner_ids = False
+            # Clear resolution khasra records using One2many command
+            self.resolution_khasra_ids = [(5, 0, 0)]
+            return
+        
+        # Compute original landowners
+        all_landowners = self.survey_id.landowner_ids
+        self.original_landowner_ids = all_landowners
+        # Initialize resolution_landowner_ids with original if not set
+        if not self.resolution_landowner_ids and all_landowners:
+            self.resolution_landowner_ids = all_landowners
+        
+        # Initialize or update resolution khasra record (only for area_decrease objection type)
+        if self.objection_type == 'area_decrease':
+            if self.resolution_khasra_ids and len(self.resolution_khasra_ids) > 0:
+                # Update existing record
+                existing = self.resolution_khasra_ids[0]
+                # Use write to update the record properly
+                if existing.id:
+                    existing.write({
+                        'survey_id': self.survey_id.id,
+                        'original_acquired_area': self.survey_id.acquired_area,
+                    })
+                    if existing.resolved_acquired_area > self.survey_id.acquired_area:
+                        existing.write({'resolved_acquired_area': self.survey_id.acquired_area})
+                else:
+                    # New record, update in place
+                    existing.survey_id = self.survey_id.id
+                    existing.original_acquired_area = self.survey_id.acquired_area
+                    if existing.resolved_acquired_area > self.survey_id.acquired_area:
+                        existing.resolved_acquired_area = self.survey_id.acquired_area
+            else:
+                # Create new record - ensure survey_id is set
+                if self.survey_id.id:
+                    self.resolution_khasra_ids = [(0, 0, {
+                        'survey_id': self.survey_id.id,
+                        'original_acquired_area': self.survey_id.acquired_area,
+                        'resolved_acquired_area': self.survey_id.acquired_area,
+                    })]
+        else:
+            # Clear resolution khasra records for other objection types
+            self.resolution_khasra_ids = [(5, 0, 0)]
+    
+    @api.onchange('objection_type')
+    def _onchange_objection_type(self):
+        """Clear or initialize resolution data when objection type changes"""
+        if self.objection_type == 'area_decrease':
+            # For area decrease, ensure resolution khasra is initialized if survey_id exists
+            if self.survey_id and not self.resolution_khasra_ids:
+                self._onchange_survey_id()
+        elif self.objection_type == 'remove_landowners':
+            # For remove landowners, clear resolution khasra
+            self.resolution_khasra_ids = [(5, 0, 0)]
+    
+    @api.constrains('resolution_landowner_ids')
+    def _check_resolution_landowners(self):
+        """Ensure resolution landowners are subset of original landowners and at least one remains"""
+        for record in self:
+            if record.resolution_landowner_ids and record.original_landowner_ids:
+                removed = record.original_landowner_ids - record.resolution_landowner_ids
+                added = record.resolution_landowner_ids - record.original_landowner_ids
+                if added:
+                    raise ValidationError(_('You cannot add new landowners. You can only remove existing landowners.'))
+                # Ensure at least one landowner remains
+                if not record.resolution_landowner_ids:
+                    raise ValidationError(_('At least one landowner must remain. You cannot remove all landowners.'))
+    
+    @api.constrains('resolution_khasra_ids')
+    def _check_resolution_areas(self):
+        """Ensure resolved areas are not greater than original areas"""
+        for record in self:
+            for khasra in record.resolution_khasra_ids:
+                if khasra.resolved_acquired_area > khasra.original_acquired_area:
+                    raise ValidationError(_('Resolved acquired area (%.4f) cannot be greater than original area (%.4f) for khasra %s.') % 
+                                        (khasra.resolved_acquired_area, khasra.original_acquired_area, khasra.survey_id.khasra_number or ''))
     
 
 
@@ -280,4 +294,59 @@ class Section15Objection(models.Model):
             'url': f'/web/content/{self._name}/{self.id}/objection_document/{filename}?download=true',
             'target': 'self',
         }
+    
+    def get_resolution_changes_summary(self):
+        """Get summary of resolution changes for report"""
+        self.ensure_one()
+        changes = []
+        
+        # Check for removed landowners
+        if self.original_landowner_ids and self.resolution_landowner_ids:
+            removed = self.original_landowner_ids - self.resolution_landowner_ids
+            if removed:
+                removed_names = ', '.join(removed.mapped('name'))
+                changes.append({
+                    'type': 'landowner_removed',
+                    'description': f'Removed landowners: {removed_names}',
+                    'hindi_description': f'हटाए गए भूमिस्वामी: {removed_names}'
+                })
+        
+        # Check for area decreases
+        for khasra in self.resolution_khasra_ids:
+            if khasra.resolved_acquired_area < khasra.original_acquired_area:
+                decrease = khasra.original_acquired_area - khasra.resolved_acquired_area
+                changes.append({
+                    'type': 'area_decreased',
+                    'khasra': khasra.survey_id.khasra_number or '',
+                    'original_area': khasra.original_acquired_area,
+                    'resolved_area': khasra.resolved_acquired_area,
+                    'decrease': decrease,
+                    'description': f'Khasra {khasra.survey_id.khasra_number}: Area decreased from {khasra.original_acquired_area:.4f} to {khasra.resolved_acquired_area:.4f} hectares',
+                    'hindi_description': f'खसरा {khasra.survey_id.khasra_number}: क्षेत्रफल {khasra.original_acquired_area:.4f} से {khasra.resolved_acquired_area:.4f} हेक्टेयर तक कम किया गया'
+                })
+        
+        return changes
+
+
+class Section15ObjectionKhasra(models.Model):
+    """Model to track resolution changes per khasra (survey)"""
+    _name = 'bhu.section15.objection.khasra'
+    _description = 'Section 15 Objection Khasra Resolution'
+    
+    objection_id = fields.Many2one('bhu.section15.objection', string='Objection / आपत्ति', required=True, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', required=True)
+    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', related='survey_id.khasra_number', readonly=True, store=True)
+    original_acquired_area = fields.Float(string='Original Acquired Area (Hectares) / मूल अर्जन क्षेत्रफल (हेक्टेयर)', 
+                                          digits=(10, 4), required=True, readonly=True)
+    resolved_acquired_area = fields.Float(string='Resolved Acquired Area (Hectares) / समाधान अर्जन क्षेत्रफल (हेक्टेयर)', 
+                                         digits=(10, 4), required=True,
+                                         help='Enter the resolved acquired area. Must be less than or equal to original area.')
+    
+    @api.constrains('resolved_acquired_area', 'original_acquired_area')
+    def _check_area_decrease(self):
+        """Ensure resolved area is not greater than original"""
+        for record in self:
+            if record.resolved_acquired_area > record.original_acquired_area:
+                raise ValidationError(_('Resolved acquired area (%.4f) cannot be greater than original area (%.4f) for khasra %s.') % 
+                                    (record.resolved_acquired_area, record.original_acquired_area, record.khasra_number or ''))
 

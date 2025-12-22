@@ -51,6 +51,7 @@
         'reports/sia_proposal_report.xml',
         'reports/expert_committee_proposal_report.xml',
         'reports/expert_committee_order_report.xml',
+        'reports/section15_objection_resolution_report.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',

@@ -218,7 +218,9 @@ class DashboardStats(models.AbstractModel):
             _logger.info(f"Domain Building - No filters")
         
         # Domain for models without village_id (only project filter, no village)
+        # Ensure we use empty list if project_domain is empty or falsy
         domain_without_village = project_domain if project_domain else []
+        _logger.info(f"Domain Building - domain_without_village for Section 8/Expert/SIA: {domain_without_village}")
         
         # Extract project IDs for completion calculations
         project_ids_from_domain = self._extract_project_ids(project_id, project_domain, department_id, user_access)
@@ -390,6 +392,7 @@ class DashboardStats(models.AbstractModel):
             'section19': self._get_section_counts('bhu.section19.notification', domain_with_village),
             'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village),
             'sia': self._get_section_counts('bhu.sia.team', domain_without_village),
+            'section8': self._get_section_counts('bhu.section8', domain_without_village, state_field='state', states=['draft', 'approved', 'rejected']),  # Section 8 is per project, not per village
         }
         
         # Section 21 Notification uses 'signed' state instead of 'approved'
@@ -497,6 +500,15 @@ class DashboardStats(models.AbstractModel):
             # Log survey counts for debugging
             _logger.info(f"Dashboard Stats - Survey counts: total={counts['survey']['total']}, approved={counts['survey']['approved']}, domain={domains['final_domain']}")
             
+            # Debug Section 8 specifically
+            _logger.info(f"Dashboard Stats - Section 8 domain_without_village: {domains['domain_without_village']}")
+            _logger.info(f"Dashboard Stats - Section 8 counts: total={counts.get('section8', {}).get('total', 0)}, draft={counts.get('section8', {}).get('draft', 0)}, approved={counts.get('section8', {}).get('approved', 0)}, rejected={counts.get('section8', {}).get('rejected', 0)}")
+            # Test Section 8 query directly
+            test_section8 = self.env['bhu.section8'].search(domains['domain_without_village'] if domains['domain_without_village'] else [])
+            _logger.info(f"Dashboard Stats - Direct Section 8 query found {len(test_section8)} records with domain {domains['domain_without_village']}")
+            if test_section8:
+                _logger.info(f"Dashboard Stats - Section 8 record IDs: {test_section8.mapped('id')}, projects: {test_section8.mapped('project_id.id')}, states: {test_section8.mapped('state')}")
+            
             # Debug: Test the domain directly to verify it's working
             if domains['final_domain']:
                 test_surveys = self.env['bhu.survey'].search(domains['final_domain'], limit=10)
@@ -591,6 +603,16 @@ class DashboardStats(models.AbstractModel):
                 ),
                 'sia_info': self._get_section_info('bhu.sia.team', domains['domain_without_village']),
                 
+                # Section 8 (NO village_id - use domain_without_village, per project)
+                'section8_total': counts['section8']['total'],
+                'section8_draft': counts['section8']['draft'],
+                'section8_approved': counts['section8']['approved'],
+                'section8_rejected': counts['section8']['rejected'],
+                'section8_completion_percent': self._calculate_completion_percentage(
+                    counts['section8']['approved'], counts['section8']['rejected'], counts['section8']['total'], is_survey=False
+                ),
+                'section8_info': self._get_section_info('bhu.section8', domains['domain_without_village']),
+                
                 # Draft Award
                 'draft_award_total': counts['draft_award']['total'],
                 'draft_award_draft': counts['draft_award']['draft'],
@@ -647,6 +669,8 @@ class DashboardStats(models.AbstractModel):
             'expert_completion_percent': 0, 'expert_info': empty_info.copy(),
             'sia_total': 0, 'sia_draft': 0, 'sia_submitted': 0, 'sia_approved': 0, 'sia_send_back': 0,
             'sia_completion_percent': 0, 'sia_info': empty_info.copy(),
+            'section8_total': 0, 'section8_draft': 0, 'section8_approved': 0, 'section8_rejected': 0,
+            'section8_completion_percent': 0, 'section8_info': empty_info.copy(),
             'draft_award_total': 0, 'draft_award_draft': 0, 'draft_award_generated': 0, 'draft_award_approved': 0,
             'draft_award_completion_percent': 0, 'draft_award_info': empty_info.copy(),
         }

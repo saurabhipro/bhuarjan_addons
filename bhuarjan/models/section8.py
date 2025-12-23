@@ -11,8 +11,20 @@ class Section8(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Section 8 Reference / धारा 8 संदर्भ', required=True, tracking=True, default='New', readonly=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', tracking=True)
+    
+    # Satisfaction fields
+    is_satisfied = fields.Selection([
+        ('yes', 'Yes / हाँ'),
+        ('no', 'No / नहीं'),
+    ], string='Are you satisfied? / क्या आप संतुष्ट हैं?', tracking=True)
+    dissatisfaction_reason = fields.Text(string='Reason for Dissatisfaction / असंतुष्टि का कारण', tracking=True)
+    
+    # File upload (optional)
+    attachment_file = fields.Binary(string='Attachment / अनुलग्नक', tracking=True)
+    attachment_filename = fields.Char(string='Attachment Filename / अनुलग्नक फ़ाइल नाम', tracking=True)
     
     # State for Approve/Reject
     state = fields.Selection([
@@ -31,6 +43,41 @@ class Section8(models.Model):
     notes = fields.Text(string='Notes / नोट्स', tracking=True)
     
     village_domain = fields.Char()
+    project_domain = fields.Char()
+    
+    # Computed field to check if current user is SDM (for readonly)
+    is_sdm_user = fields.Boolean(string='Is SDM User', compute='_compute_is_sdm_user', store=False)
+    
+    @api.depends()
+    def _compute_is_sdm_user(self):
+        """Compute if current user is SDM"""
+        is_sdm = self.env.user.has_group('bhuarjan.group_bhuarjan_sdm')
+        for rec in self:
+            rec.is_sdm_user = is_sdm
+    
+    @api.onchange('department_id')
+    def _onchange_department_id(self):
+        """Filter projects based on selected department"""
+        for rec in self:
+            if rec.department_id:
+                # Get projects that belong to this department
+                # Projects can be linked via department_id (Many2one) or via project_ids (Many2many on department)
+                # Collect project IDs from both sources
+                project_ids_from_department_id = self.env['bhu.project'].search([
+                    ('department_id', '=', rec.department_id.id)
+                ]).ids
+                project_ids_from_m2m = rec.department_id.project_ids.ids
+                # Combine and deduplicate
+                all_project_ids = list(set(project_ids_from_department_id + project_ids_from_m2m))
+                if all_project_ids:
+                    rec.project_domain = json.dumps([('id', 'in', all_project_ids)])
+                else:
+                    rec.project_domain = json.dumps([('id', 'in', [])])
+                # Reset project when department changes
+                rec.project_id = False
+            else:
+                rec.project_domain = json.dumps([('id', 'in', [])])
+                rec.project_id = False
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -52,7 +99,7 @@ class Section8(models.Model):
                 village_id = vals.get('village_id')
                 if project_id:
                     sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'section8', project_id, village_id=village_id
+                        'section8', project_id, village_id=village_id if village_id else None
                     )
                     if sequence_number:
                         vals['name'] = sequence_number

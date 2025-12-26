@@ -76,6 +76,10 @@ const DASHBOARD_CONFIG = {
             'sia_submitted': 'sia_submitted',
             'sia_approved': 'sia_approved',
             'sia_send_back': 'sia_send_back',
+            'section8_total': 'section8_total',
+            'section8_draft': 'section8_draft',
+            'section8_approved': 'section8_approved',
+            'section8_rejected': 'section8_rejected',
         }
     },
     'collector': {
@@ -123,6 +127,10 @@ const DASHBOARD_CONFIG = {
             'sia_submitted': 'sia_submitted',
             'sia_approved': 'sia_approved',
             'sia_send_back': 'sia_send_back',
+            'section8_total': 'section8_total',
+            'section8_draft': 'section8_draft',
+            'section8_approved': 'section8_approved',
+            'section8_rejected': 'section8_rejected',
         }
     },
     'admin': {
@@ -172,6 +180,10 @@ const DASHBOARD_CONFIG = {
             'sia_submitted': 'sia_submitted',
             'sia_approved': 'sia_approved',
             'sia_send_back': 'sia_send_back',
+            'section8_total': 'section8_total',
+            'section8_draft': 'section8_draft',
+            'section8_approved': 'section8_approved',
+            'section8_rejected': 'section8_rejected',
         }
     },
     'department': {
@@ -236,6 +248,10 @@ const DASHBOARD_CONFIG = {
             'sia_submitted': 'sia_submitted',
             'sia_approved': 'sia_approved',
             'sia_send_back': 'sia_send_back',
+            'section8_total': 'section8_total',
+            'section8_draft': 'section8_draft',
+            'section8_approved': 'section8_approved',
+            'section8_rejected': 'section8_rejected',
         }
     },
     'admin': {
@@ -362,6 +378,7 @@ export class UnifiedDashboard extends Component {
             stats.section19_info = null;
             stats.expert_info = null;
             stats.sia_info = null;
+            stats.section8_info = null;
             stats.survey_info = null;
             stats.draft_award_info = null;
         }
@@ -585,6 +602,9 @@ export class UnifiedDashboard extends Component {
         }
         if (backendStats.sia_info) {
             this.state.stats.sia_info = backendStats.sia_info;
+        }
+        if (backendStats.section8_info) {
+            this.state.stats.section8_info = backendStats.section8_info;
         }
         if (backendStats.draft_award_info) {
             this.state.stats.draft_award_info = backendStats.draft_award_info;

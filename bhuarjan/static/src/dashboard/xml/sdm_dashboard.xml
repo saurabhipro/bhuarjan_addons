@@ -157,6 +157,17 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.survey_completion_percent || 0) : 0"/>% Complete</div>
@@ -190,6 +201,11 @@
                                         <span class="o_completion_tick" title="All SIA teams completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                        </div>
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
@@ -241,6 +257,17 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section4_completion_percent || 0) : 0"/>% Complete</div>
@@ -291,6 +318,11 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                    <t t-if="state.selectedProjectName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.expert_completion_percent || 0) : 0"/>% Complete</div>
@@ -336,6 +368,17 @@
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
                                     Section 8
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list">-</div>
@@ -368,6 +411,17 @@
                                         <span class="o_completion_tick" title="All Section 11 Notifications completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
@@ -411,6 +465,17 @@
                                         <span class="o_completion_tick" title="All Section 11 Notifications completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
@@ -460,6 +525,17 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section15_completion_percent || 0) : 0"/>% Complete</div>
@@ -506,6 +582,11 @@
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
                                     Section 18 R and R Scheme
+                                    <t t-if="state.selectedProjectName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list">-</div>
@@ -539,6 +620,17 @@
                                         <span class="o_completion_tick" title="All Section 19 Notifications completed">
                                             <i class="fa fa-check-circle"/>
                                         </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
@@ -591,6 +683,17 @@
                                             <i class="fa fa-check-circle"/>
                                         </span>
                                     </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.draft_award_completion_percent || 0) : 0"/>% Complete</div>
@@ -637,6 +740,17 @@
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
                                     Section 23 Award
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
                                     <div class="o_completion_percent_list">-</div>

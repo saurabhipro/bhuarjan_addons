@@ -25,7 +25,7 @@ class BhuLandowner(models.Model):
                                  default=lambda self: self.env.company, tracking=True)
     
     # Address Information
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
     state = fields.Char(string='State / राज्य', default='Chhattisgarh', readonly=True)

@@ -51,7 +51,7 @@
                     
                     <group>
                         <group string="Address Information">
-                            <field name="village_id" widget="selection" required="1" string="Village *"/>
+                            <field name="village_id" widget="selection"/>
                             <field name="tehsil_id" widget="selection"/>
                             <field name="district_id" widget="selection"/>
                             <field name="state" widget="char"/>

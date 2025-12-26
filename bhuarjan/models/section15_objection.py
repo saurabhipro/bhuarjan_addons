@@ -15,20 +15,20 @@ class Section15Objection(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
-    # Single survey (khasra) selection
+    # Single survey (khasra) selection - multiple objections can be created for the same survey
     survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', tracking=True,
-                                help='Select a survey (khasra) from the selected village')
+                                help='Select a khasra from the selected village. Multiple objections can be created for the same khasra to track different changes (landowner added/removed, area decreased).')
     
     # Available surveys for selection (computed based on village)
     available_survey_ids = fields.Many2many('bhu.survey', string='Available Surveys', compute='_compute_available_survey_ids', store=False)
     
-    # Landowners from selected surveys (can be removed, cannot add new)
+    # Landowners from selected surveys (can be removed or added)
     resolution_landowner_ids = fields.Many2many('bhu.landowner', 
                                                 'section15_objection_landowner_rel',
                                                 'objection_id', 'landowner_id',
                                                 string='Landowners (After Resolution) / भूमिस्वामी (समाधान के बाद)', 
                                                 tracking=True,
-                                                help='Landowners after resolution. You can remove landowners but cannot add new ones.')
+                                                help='Landowners after resolution. You can add or remove landowners. Changes are tracked in the survey.')
     
     # Original landowners from surveys (readonly, for comparison)
     original_landowner_ids = fields.Many2many('bhu.landowner', 
@@ -46,11 +46,15 @@ class Section15Objection(models.Model):
     
     @api.depends('village_id')
     def _compute_available_survey_ids(self):
-        """Compute available survey IDs based on village"""
+        """Compute available survey IDs based on village - show all khasras from that village"""
         for record in self:
             if record.village_id:
-                # Find all surveys for this village
-                surveys = self.env['bhu.survey'].search([('village_id', '=', record.village_id.id)])
+                # Find all surveys (khasras) for this village
+                # Multiple objections can be created for the same survey
+                surveys = self.env['bhu.survey'].search([
+                    ('village_id', '=', record.village_id.id),
+                    ('state', 'in', ['draft', 'submitted', 'approved'])  # Only show valid surveys
+                ])
                 record.available_survey_ids = surveys
             else:
                 record.available_survey_ids = False
@@ -77,11 +81,16 @@ class Section15Objection(models.Model):
     ], string='Objection Type / आपत्ति प्रकार', required=True, tracking=True, default='area_decrease')
     
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
-    objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=True, tracking=True)
+    objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=False, tracking=True)
     
     # Single attachment file
     objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज़')
-    objection_document_filename = fields.Char(string='Document Filename / दस्तावेज़ फ़ाइल नाम')
+    objection_document_filename = fields.Char(string='Objection Document Filename / आपत्ति दस्तावेज़ फ़ाइल नाम')
+    
+    # Resolution document
+    resolution_document = fields.Binary(string='Resolution Document / समाधान दस्तावेज़')
+    resolution_document_filename = fields.Char(string='Resolution Document Filename / समाधान दस्तावेज़ फ़ाइल नाम')
+    
     # Override state field for Section 15 - simpler workflow: Draft, Approved, Rejected
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -89,7 +98,7 @@ class Section15Objection(models.Model):
         ('rejected', 'Rejected'),
     ], string='Status', default='draft', tracking=True)
     
-    resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', tracking=True)
+    resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', required=False, tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
     
     # Age in days since objection date
@@ -131,13 +140,18 @@ class Section15Objection(models.Model):
         records = super().create(vals_list)
         
         # Initialize resolution khasra if survey_id is set and objection type is area_decrease
+        # Also link this objection to the survey
         for record in records:
-            if record.survey_id and record.objection_type == 'area_decrease' and not record.resolution_khasra_ids:
-                record.resolution_khasra_ids = [(0, 0, {
-                    'survey_id': record.survey_id.id,
-                    'original_acquired_area': record.survey_id.acquired_area,
-                    'resolved_acquired_area': record.survey_id.acquired_area,
-                })]
+            if record.survey_id:
+                # Link objection to survey (Many2many)
+                record.survey_id.section15_objection_ids = [(4, record.id)]
+                
+                if record.objection_type == 'area_decrease' and not record.resolution_khasra_ids:
+                    record.resolution_khasra_ids = [(0, 0, {
+                        'survey_id': record.survey_id.id,
+                        'original_acquired_area': record.survey_id.acquired_area,
+                        'resolved_acquired_area': record.survey_id.acquired_area,
+                    })]
         return records
     
     def write(self, vals):
@@ -198,7 +212,6 @@ class Section15Objection(models.Model):
         """Update original landowners and initialize resolution data when survey changes"""
         if not self.survey_id:
             self.resolution_landowner_ids = False
-            # Clear resolution khasra records using One2many command
             self.resolution_khasra_ids = [(5, 0, 0)]
             return
         
@@ -209,69 +222,48 @@ class Section15Objection(models.Model):
         if not self.resolution_landowner_ids and all_landowners:
             self.resolution_landowner_ids = all_landowners
         
-        # Initialize or update resolution khasra record (only for area_decrease objection type)
-        if self.objection_type == 'area_decrease':
-            if self.resolution_khasra_ids and len(self.resolution_khasra_ids) > 0:
-                # Update existing record
-                existing = self.resolution_khasra_ids[0]
-                # Use write to update the record properly
-                if existing.id:
-                    existing.write({
-                        'survey_id': self.survey_id.id,
-                        'original_acquired_area': self.survey_id.acquired_area,
-                    })
-                    if existing.resolved_acquired_area > self.survey_id.acquired_area:
-                        existing.write({'resolved_acquired_area': self.survey_id.acquired_area})
-                else:
-                    # New record, update in place
-                    existing.survey_id = self.survey_id.id
-                    existing.original_acquired_area = self.survey_id.acquired_area
-                    if existing.resolved_acquired_area > self.survey_id.acquired_area:
-                        existing.resolved_acquired_area = self.survey_id.acquired_area
+        # Initialize or update resolution khasra record
+        if self.resolution_khasra_ids and len(self.resolution_khasra_ids) > 0:
+            # Update existing record
+            existing = self.resolution_khasra_ids[0]
+            if existing.id:
+                existing.write({
+                    'survey_id': self.survey_id.id,
+                    'original_acquired_area': self.survey_id.acquired_area,
+                })
+                if existing.resolved_acquired_area > self.survey_id.acquired_area:
+                    existing.write({'resolved_acquired_area': self.survey_id.acquired_area})
             else:
-                # Create new record - ensure survey_id is set
-                if self.survey_id.id:
-                    self.resolution_khasra_ids = [(0, 0, {
-                        'survey_id': self.survey_id.id,
-                        'original_acquired_area': self.survey_id.acquired_area,
-                        'resolved_acquired_area': self.survey_id.acquired_area,
-                    })]
+                existing.survey_id = self.survey_id.id
+                existing.original_acquired_area = self.survey_id.acquired_area
+                if existing.resolved_acquired_area > self.survey_id.acquired_area:
+                    existing.resolved_acquired_area = self.survey_id.acquired_area
         else:
-            # Clear resolution khasra records for other objection types
-            self.resolution_khasra_ids = [(5, 0, 0)]
-    
-    @api.onchange('objection_type')
-    def _onchange_objection_type(self):
-        """Clear or initialize resolution data when objection type changes"""
-        if self.objection_type == 'area_decrease':
-            # For area decrease, ensure resolution khasra is initialized if survey_id exists
-            if self.survey_id and not self.resolution_khasra_ids:
-                self._onchange_survey_id()
-        elif self.objection_type == 'remove_landowners':
-            # For remove landowners, clear resolution khasra
-            self.resolution_khasra_ids = [(5, 0, 0)]
+            # Create new record
+            if self.survey_id.id:
+                self.resolution_khasra_ids = [(0, 0, {
+                    'survey_id': self.survey_id.id,
+                    'original_acquired_area': self.survey_id.acquired_area,
+                    'resolved_acquired_area': self.survey_id.acquired_area,
+                })]
     
     @api.constrains('resolution_landowner_ids')
     def _check_resolution_landowners(self):
-        """Ensure resolution landowners are subset of original landowners and at least one remains"""
+        """Ensure at least one landowner remains"""
         for record in self:
-            if record.resolution_landowner_ids and record.original_landowner_ids:
-                removed = record.original_landowner_ids - record.resolution_landowner_ids
-                added = record.resolution_landowner_ids - record.original_landowner_ids
-                if added:
-                    raise ValidationError(_('You cannot add new landowners. You can only remove existing landowners.'))
-                # Ensure at least one landowner remains
-                if not record.resolution_landowner_ids:
-                    raise ValidationError(_('At least one landowner must remain. You cannot remove all landowners.'))
+            # Ensure at least one landowner remains
+            if not record.resolution_landowner_ids:
+                raise ValidationError(_('At least one landowner must remain. You cannot remove all landowners.'))
     
     @api.constrains('resolution_khasra_ids')
     def _check_resolution_areas(self):
-        """Ensure resolved areas are not greater than original areas"""
+        """Ensure resolved areas are not greater than original areas - SDM can only decrease, not increase"""
         for record in self:
             for khasra in record.resolution_khasra_ids:
-                if khasra.resolved_acquired_area > khasra.original_acquired_area:
-                    raise ValidationError(_('Resolved acquired area (%.4f) cannot be greater than original area (%.4f) for khasra %s.') % 
-                                        (khasra.resolved_acquired_area, khasra.original_acquired_area, khasra.survey_id.khasra_number or ''))
+                if khasra.original_acquired_area and khasra.resolved_acquired_area:
+                    if khasra.resolved_acquired_area > khasra.original_acquired_area:
+                        raise ValidationError(_('Resolved acquired area (%.4f hectares) cannot be greater than original area (%.4f hectares) for khasra %s. You can only decrease the area, not increase it.') % 
+                                            (khasra.resolved_acquired_area, khasra.original_acquired_area, khasra.survey_id.khasra_number or khasra.khasra_number or ''))
     
     def action_approve(self):
         """Approve objection (SDM action)"""
@@ -282,9 +274,7 @@ class Section15Objection(models.Model):
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
             raise ValidationError(_('Only SDM can approve.'))
         
-        # Validate that resolution details exist
-        if not self.resolution_details:
-            raise ValidationError(_('Please provide resolution details before approving.'))
+        # Resolution details is optional, no validation needed
         
         # Validate state is draft
         if self.state != 'draft':
@@ -320,9 +310,7 @@ class Section15Objection(models.Model):
             if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
                     self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
                 raise ValidationError(_('Only SDM can approve.'))
-            # Validate that resolution details exist
-            if not self.resolution_details:
-                raise ValidationError(_('Please provide resolution details before approving.'))
+            # Resolution details is optional, no validation needed
             # Set resolved date
             self.resolved_date = fields.Date.today()
             self.state = 'approved'
@@ -360,9 +348,7 @@ class Section15Objection(models.Model):
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
             raise ValidationError(_('Only SDM can approve.'))
-        # Validate that resolution details exist
-        if not self.resolution_details:
-            raise ValidationError(_('Please provide resolution details before approving.'))
+        # Resolution details is optional, no validation needed
     
     def _validate_state_to_rejected(self):
         """Validate transition to rejected state"""
@@ -418,6 +404,27 @@ class Section15Objection(models.Model):
                 })
         
         return changes
+    
+    def unlink(self):
+        """Remove objection from survey when deleted"""
+        # Store survey_ids and objection_ids before deletion
+        survey_objection_map = {}
+        for record in self:
+            if record.survey_id:
+                if record.survey_id.id not in survey_objection_map:
+                    survey_objection_map[record.survey_id.id] = []
+                survey_objection_map[record.survey_id.id].append(record.id)
+        
+        result = super().unlink()
+        
+        # Remove from survey's objection list
+        for survey_id, objection_ids in survey_objection_map.items():
+            survey = self.env['bhu.survey'].browse(survey_id)
+            if survey.exists():
+                for objection_id in objection_ids:
+                    survey.section15_objection_ids = [(3, objection_id)]
+        
+        return result
 
 
 class Section15ObjectionKhasra(models.Model):
@@ -439,31 +446,133 @@ class Section15ObjectionKhasra(models.Model):
     def default_get(self, fields_list):
         """Set default values from context"""
         res = super().default_get(fields_list)
-        if 'default_survey_id' in self.env.context:
-            survey_id = self.env.context.get('default_survey_id')
-            if survey_id:
-                survey = self.env['bhu.survey'].browse(survey_id)
-                if survey.exists():
+        
+        # Set objection_id from context if available
+        if 'default_objection_id' in self.env.context:
+            objection_id = self.env.context.get('default_objection_id')
+            if objection_id and 'objection_id' in fields_list:
+                res['objection_id'] = objection_id
+        
+        # Try to get survey_id from context
+        survey_id = self.env.context.get('default_survey_id')
+        
+        # If not in context, try to get from objection_id
+        if not survey_id and 'default_objection_id' in self.env.context:
+            objection_id = self.env.context.get('default_objection_id')
+            if objection_id:
+                objection = self.env['bhu.section15.objection'].browse(objection_id)
+                if objection.exists() and objection.survey_id:
+                    survey_id = objection.survey_id.id
+        
+        if survey_id:
+            survey = self.env['bhu.survey'].browse(survey_id)
+            if survey.exists():
+                if 'survey_id' in fields_list:
                     res['survey_id'] = survey_id
-                    if 'original_acquired_area' in fields_list:
-                        res['original_acquired_area'] = survey.acquired_area
-                    if 'resolved_acquired_area' in fields_list:
-                        res['resolved_acquired_area'] = survey.acquired_area
+                if 'original_acquired_area' in fields_list:
+                    res['original_acquired_area'] = survey.acquired_area
+                if 'resolved_acquired_area' in fields_list:
+                    res['resolved_acquired_area'] = survey.acquired_area
+        
         return res
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Ensure survey_id is set from objection if not provided"""
+        # Set survey_id in vals_list before creation
+        for vals in vals_list:
+            if not vals.get('survey_id') and vals.get('objection_id'):
+                objection = self.env['bhu.section15.objection'].browse(vals['objection_id'])
+                if objection.exists() and objection.survey_id:
+                    vals['survey_id'] = objection.survey_id.id
+                    # Also set areas if not set
+                    if not vals.get('original_acquired_area'):
+                        vals['original_acquired_area'] = objection.survey_id.acquired_area
+                    if not vals.get('resolved_acquired_area'):
+                        vals['resolved_acquired_area'] = objection.survey_id.acquired_area
+        
+        records = super().create(vals_list)
+        
+        # After creation, ensure survey_id is set for any records that still don't have it
+        for record in records:
+            if not record.survey_id and record.objection_id and record.objection_id.survey_id:
+                record.write({
+                    'survey_id': record.objection_id.survey_id.id,
+                    'original_acquired_area': record.objection_id.survey_id.acquired_area,
+                    'resolved_acquired_area': record.objection_id.survey_id.acquired_area,
+                })
+            
+            # Update survey's acquired_area when resolved_acquired_area is set
+            if record.survey_id and record.resolved_acquired_area:
+                # Ensure resolved area is valid (not greater than original)
+                if record.original_acquired_area and record.resolved_acquired_area <= record.original_acquired_area:
+                    # Update the survey's acquired_area to match the resolved_acquired_area
+                    record.survey_id.write({'acquired_area': record.resolved_acquired_area})
+        
+        return records
+    
+    def write(self, vals):
+        """Ensure survey_id is set from objection if not provided, and update survey's acquired_area when resolved_acquired_area changes"""
+        # Track which records need survey update
+        records_to_update_survey = []
+        resolved_area_value = None
+        
+        # Check if resolved_acquired_area is being updated
+        if 'resolved_acquired_area' in vals:
+            resolved_area_value = vals['resolved_acquired_area']
+            records_to_update_survey = self
+        
+        result = super().write(vals)
+        
+        # After write, ensure survey_id is set for any records that don't have it
+        for record in self:
+            if not record.survey_id and record.objection_id and record.objection_id.survey_id:
+                record.write({
+                    'survey_id': record.objection_id.survey_id.id,
+                    'original_acquired_area': record.objection_id.survey_id.acquired_area,
+                })
+                if not record.resolved_acquired_area or record.resolved_acquired_area > record.objection_id.survey_id.acquired_area:
+                    record.write({'resolved_acquired_area': record.objection_id.survey_id.acquired_area})
+        
+        # Update survey's acquired_area when resolved_acquired_area is changed
+        for record in records_to_update_survey:
+            if record.survey_id and record.resolved_acquired_area:
+                # Ensure resolved area is valid (not greater than original)
+                if record.original_acquired_area and record.resolved_acquired_area <= record.original_acquired_area:
+                    # Update the survey's acquired_area to match the resolved_acquired_area
+                    record.survey_id.write({'acquired_area': record.resolved_acquired_area})
+        
+        return result
     
     @api.onchange('survey_id')
     def _onchange_survey_id(self):
-        """Update area fields when survey changes"""
+        """Update area fields when survey changes - ensure resolved area doesn't exceed original"""
         if self.survey_id:
             self.original_acquired_area = self.survey_id.acquired_area
+            # If resolved area is greater than original, set it to original (can only decrease)
             if not self.resolved_acquired_area or self.resolved_acquired_area > self.survey_id.acquired_area:
                 self.resolved_acquired_area = self.survey_id.acquired_area
     
+    @api.onchange('resolved_acquired_area')
+    def _onchange_resolved_acquired_area(self):
+        """Ensure resolved area doesn't exceed original area - SDM can only decrease, not increase"""
+        if self.original_acquired_area and self.resolved_acquired_area:
+            if self.resolved_acquired_area > self.original_acquired_area:
+                # Reset to original if user tries to increase
+                self.resolved_acquired_area = self.original_acquired_area
+                return {
+                    'warning': {
+                        'title': _('Area Cannot Be Increased'),
+                        'message': _('You can only decrease the acquired area, not increase it. The resolved area has been set to the original area (%.4f hectares).') % self.original_acquired_area
+                    }
+                }
+    
     @api.constrains('resolved_acquired_area', 'original_acquired_area')
     def _check_area_decrease(self):
-        """Ensure resolved area is not greater than original"""
+        """Ensure resolved area is not greater than original - SDM can only decrease, not increase"""
         for record in self:
-            if record.resolved_acquired_area > record.original_acquired_area:
-                raise ValidationError(_('Resolved acquired area (%.4f) cannot be greater than original area (%.4f) for khasra %s.') % 
-                                    (record.resolved_acquired_area, record.original_acquired_area, record.khasra_number or ''))
+            if record.original_acquired_area and record.resolved_acquired_area:
+                if record.resolved_acquired_area > record.original_acquired_area:
+                    raise ValidationError(_('Resolved acquired area (%.4f hectares) cannot be greater than original area (%.4f hectares) for khasra %s. You can only decrease the area, not increase it.') % 
+                                        (record.resolved_acquired_area, record.original_acquired_area, record.khasra_number or record.survey_id.khasra_number or ''))
 

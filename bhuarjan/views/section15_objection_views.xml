@@ -89,7 +89,8 @@
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    domain="[('id', 'in', available_survey_ids)]"
                                    options="{'no_create': True, 'no_open': True}"
-                                   context="{'show_khasra': True}"/>
+                                   context="{'show_khasra': True}"
+                                   placeholder="Select a khasra from this village..."/>
                         </group>
                         <group>
                             <field name="objection_type" required="1"
@@ -100,8 +101,45 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Objection &amp; Resolution / आपत्ति और समाधान">
-                            <!-- Download Section 15 PDF Button - Prominent placement at top -->
+                        <page string="Survey / सर्वे" invisible="not survey_id">
+                            <div style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
+                                    <i class="fa fa-clipboard" style="margin-right: 8px;"></i>
+                                    Survey Information / सर्वे जानकारी
+                                </h3>
+                                <field name="survey_id" readonly="1" nolabel="1">
+                                    <form>
+                                        <group>
+                                            <group>
+                                                <field name="name" string="Survey Number / सर्वे नंबर" readonly="1"/>
+                                                <field name="user_id" string="User / उपयोगकर्ता" readonly="1"/>
+                                                <field name="project_id" string="Project / परियोजना" readonly="1"/>
+                                                <field name="village_id" string="Village / ग्राम" readonly="1"/>
+                                                <field name="tehsil_id" string="Tehsil / तहसील" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="khasra_number" string="Khasra Number / खसरा नंबर" readonly="1"/>
+                                                <field name="total_area" string="Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)" readonly="1" widget="float"/>
+                                                <field name="acquired_area" string="Acquired Area (Hectares) / अर्जन क्षेत्रफल (हेक्टेयर)" 
+                                                       readonly="0"
+                                                       widget="float"/>
+                                                <field name="landowner_count" string="Landowners / भूमिस्वामी" readonly="1"/>
+                                                <field name="survey_date" string="Survey Date / सर्वे दिनाँक" readonly="1"/>
+                                                <field name="state" string="Status / स्थिति" readonly="1" widget="badge"/>
+                                            </group>
+                                        </group>
+                                        <group string="Landowners / भूमिस्वामी">
+                                            <field name="landowner_ids" 
+                                                   widget="many2many_tags"
+                                                   readonly="0"
+                                                   nolabel="1"
+                                                   context="{'default_village_id': village_id.id if village_id else False}"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </div>
+                            
+                            <!-- Download Section 15 PDF Button -->
                             <group string="Download Section 15 Documents" 
                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                    invisible="not resolution_details or state == 'draft'"
@@ -112,7 +150,8 @@
                                         style="background-color: #8B4513; border-color: #8B4513; color: white; font-weight: bold; padding: 12px 24px; font-size: 16px; width: 100%;"/>
                             </group>
                             
-                            <div string="Landowners / भूमिस्वामी" invisible="not survey_id or objection_type != 'remove_landowners'"
+                            <!-- Landowners Section -->
+                            <div string="Landowners / भूमिस्वामी" invisible="not survey_id"
                                  style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                 <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
                                     <i class="fa fa-users" style="margin-right: 8px;"></i>
@@ -120,9 +159,9 @@
                                 </h3>
                                 <div style="margin-bottom: 12px; padding: 12px; background-color: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;">
                                     <i class="fa fa-info-circle" style="color: #4caf50; margin-right: 8px;"/>
-                                    <span style="font-weight: 600; color: #2e7d32;">Note: You can remove landowners but cannot add new ones. At least one landowner must remain.</span>
+                                    <span style="font-weight: 600; color: #2e7d32;">Note: You can add or remove landowners. At least one landowner must remain. Changes will be tracked in the survey.</span>
                                     <br/>
-                                    <span style="font-size: 12px; color: #555; margin-top: 4px; display: inline-block;">नोट: आप भूमिस्वामी हटा सकते हैं लेकिन नए नहीं जोड़ सकते। कम से कम एक भूमिस्वामी रहना चाहिए।</span>
+                                    <span style="font-size: 12px; color: #555; margin-top: 4px; display: inline-block;">नोट: आप भूमिस्वामी जोड़ या हटा सकते हैं। कम से कम एक भूमिस्वामी रहना चाहिए। परिवर्तन सर्वे में ट्रैक किए जाएंगे।</span>
                                 </div>
                                 <group col="2">
                                     <group>
@@ -139,13 +178,14 @@
                                         <field name="resolution_landowner_ids"
                                                readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                                widget="many2many_tags"
-                                               domain="[('id', 'in', original_landowner_ids)]"
-                                               nolabel="1"/>
+                                               nolabel="1"
+                                               context="{'default_village_id': village_id.id if village_id else False}"/>
                                     </group>
                                 </group>
                             </div>
                             
-                            <div string="Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन" invisible="not survey_id or objection_type != 'area_decrease'"
+                            <!-- Khasra Area Changes Section -->
+                            <div string="Khasra Area Changes / खसरा क्षेत्रफल परिवर्तन" invisible="not survey_id"
                                  style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                 <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
                                     <i class="fa fa-area-chart" style="margin-right: 8px;"></i>
@@ -160,11 +200,11 @@
                                 <field name="resolution_khasra_ids" 
                                        readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                        nolabel="1"
-                                       context="{'default_objection_id': id, 'default_survey_id': survey_id, 'default_original_acquired_area': survey_id.acquired_area if survey_id else 0, 'default_resolved_acquired_area': survey_id.acquired_area if survey_id else 0}"
+                                       context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False}"
                                        options="{'no_create': True}">
                                     <list string="Khasra Resolution" decoration-info="resolved_acquired_area &lt; original_acquired_area">
-                                        <field name="objection_id" invisible="1"/>
-                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" default_focus="1"/>
+                                        <field name="objection_id" string="Objection / आपत्ति" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
                                         <field name="khasra_number" readonly="1"/>
                                         <field name="original_acquired_area" readonly="1" widget="float"/>
                                         <field name="resolved_acquired_area" widget="float"/>
@@ -172,7 +212,7 @@
                                 </field>
                             </div>
                             
-                            <!-- Objection and Resolution Details in 2 columns -->
+                            <!-- Objection and Resolution Details -->
                             <div style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                 <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
                                     <i class="fa fa-file-text" style="margin-right: 8px;"></i>
@@ -186,7 +226,7 @@
                                                 Objection Details / आपत्ति विवरण
                                             </div>
                                         </div>
-                                        <field name="objection_details" required="1" placeholder="Enter objection details..." nolabel="1"
+                                        <field name="objection_details" placeholder="Enter objection details (optional)..." nolabel="1"
                                                readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                                     </group>
                                     <group>
@@ -194,36 +234,60 @@
                                             <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
                                                 <i class="fa fa-file-text-o" style="color: #5cb85c; margin-right: 6px;"/>
                                                 Resolution Details / समाधान विवरण
-                                                <span style="color: #d9534f; margin-left: 5px;">*</span>
                                             </div>
                                         </div>
-                                        <field name="resolution_details" placeholder="Enter resolution details..." nolabel="1" required="1"
+                                        <field name="resolution_details" placeholder="Enter resolution details (optional)..." nolabel="1"
                                                readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                                     </group>
                                 </group>
                             </div>
-                        </page>
-                        <page string="Documents / दस्तावेज़">
-                            <div style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            
+                            <!-- Documents Section -->
+                            <div style="background: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                 <h3 style="margin: 0 0 15px 0; color: #8B4513; font-size: 18px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 10px;">
                                     <i class="fa fa-file-pdf-o" style="margin-right: 8px; color: #d9534f;"></i>
-                                    Objection Document / आपत्ति दस्तावेज़
+                                    Documents / दस्तावेज़
                                 </h3>
-                                <group>
-                                    <field name="objection_document_filename" invisible="1"/>
-                                    <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
-                                        <field name="objection_document" filename="objection_document_filename"
-                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
-                                               widget="binary" 
-                                               options="{'filename': 'objection_document_filename'}"
-                                               placeholder="Click here to upload a PDF, image, or other document related to this objection..."
-                                               nolabel="1"/>
-                                        <p style="margin: 10px 0 0 0; color: #666; font-size: 12px;">
-                                            <i class="fa fa-info-circle" style="margin-right: 4px;"></i>
-                                            Supported formats: PDF, Images (JPG, PNG, etc.)
-                                        </p>
-                                    </div>
+                                <group col="2">
+                                    <group>
+                                        <div style="margin-bottom: 8px;">
+                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
+                                                <i class="fa fa-file-pdf-o" style="color: #d9534f; margin-right: 6px;"></i>
+                                                Objection Document / आपत्ति दस्तावेज़
+                                            </div>
+                                        </div>
+                                        <field name="objection_document_filename" invisible="1"/>
+                                        <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
+                                            <field name="objection_document" filename="objection_document_filename"
+                                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
+                                                   widget="binary" 
+                                                   options="{'filename': 'objection_document_filename'}"
+                                                   placeholder="Click here to upload objection document..."
+                                                   nolabel="1"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <div style="margin-bottom: 8px;">
+                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
+                                                <i class="fa fa-file-pdf-o" style="color: #5cb85c; margin-right: 6px;"></i>
+                                                Resolution Document / समाधान दस्तावेज़
+                                            </div>
+                                        </div>
+                                        <field name="resolution_document_filename" invisible="1"/>
+                                        <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
+                                            <field name="resolution_document" filename="resolution_document_filename"
+                                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
+                                                   widget="binary" 
+                                                   options="{'filename': 'resolution_document_filename'}"
+                                                   placeholder="Click here to upload resolution document..."
+                                                   nolabel="1"/>
+                                        </div>
+                                    </group>
                                 </group>
+                                <p style="margin: 15px 0 0 0; color: #666; font-size: 12px; text-align: center;">
+                                    <i class="fa fa-info-circle" style="margin-right: 4px;"></i>
+                                    Supported formats: PDF, Images (JPG, PNG, etc.)
+                                </p>
                             </div>
                         </page>
                     </notebook>
@@ -257,6 +321,25 @@
                     <filter string="Objection Type" name="group_objection_type" context="{'group_by': 'objection_type'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+
+    <!-- Section 15 Objection Khasra Form View -->
+    <record id="view_section15_objection_khasra_form" model="ir.ui.view">
+        <field name="name">bhu.section15.objection.khasra.form</field>
+        <field name="model">bhu.section15.objection.khasra</field>
+        <field name="arch" type="xml">
+            <form string="Khasra Resolution Changes / खसरा समाधान परिवर्तन">
+                <sheet>
+                    <group>
+                        <field name="objection_id" invisible="1"/>
+                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
+                        <field name="khasra_number" readonly="1"/>
+                        <field name="original_acquired_area" readonly="1" widget="float"/>
+                        <field name="resolved_acquired_area" widget="float"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 

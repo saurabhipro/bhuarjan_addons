@@ -122,6 +122,21 @@ class Survey(models.Model):
     landowner_ids = fields.Many2many('bhu.landowner', 'bhu_survey_landowner_rel', 
                                    'survey_id', 'landowner_id', string='Landowners / भूमिस्वामी', tracking=True)
     
+    # Section 15 Objections - multiple objections can be created for one survey
+    section15_objection_ids = fields.Many2many('bhu.section15.objection',
+                                               'bhu_survey_section15_objection_rel',
+                                               'survey_id', 'objection_id',
+                                               string='Section 15 Objections / धारा 15 आपत्ति',
+                                               readonly=True,
+                                               help='Objections raised for this survey. Multiple objections can track different changes (landowner added/removed, area decreased).')
+    section15_objection_count = fields.Integer(string='Objection Count', compute='_compute_section15_objection_count', store=False)
+    
+    @api.depends('section15_objection_ids')
+    def _compute_section15_objection_count(self):
+        """Compute the count of Section 15 objections"""
+        for record in self:
+            record.section15_objection_count = len(record.section15_objection_ids)
+    
     # Status
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -341,16 +356,37 @@ class Survey(models.Model):
     remarks = fields.Text(string='Remarks / टिप्पणी', tracking=True)
     
     def name_get(self):
-        """Override name_get to include khasra number when called from Section 15 objections"""
+        """Override name_get to show khasra number prominently when called from Section 15 objections"""
         result = []
         show_khasra = self.env.context.get('show_khasra', False)
         
         for record in self:
-            name = record.name or 'New'
             if show_khasra and record.khasra_number:
-                name = f"{name} - Khasra: {record.khasra_number}"
+                # Show khasra number first, then survey number
+                name = f"Khasra: {record.khasra_number} - {record.name or 'New'}"
+            else:
+                name = record.name or 'New'
             result.append((record.id, name))
         return result
+    
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, order=None):
+        """Override name_search to allow searching by khasra number when show_khasra is in context"""
+        args = args or []
+        show_khasra = self.env.context.get('show_khasra', False)
+        
+        if show_khasra and name:
+            # When searching for surveys in Section 15, allow searching by khasra number
+            domain = [
+                '|',  # OR condition
+                ('name', operator, name),  # Search by survey name
+                ('khasra_number', operator, name),  # Search by khasra number
+            ]
+            domain = args + domain
+            return self._search(domain, limit=limit, order=order or self._order)
+        
+        # Default behavior for other contexts
+        return super()._name_search(name, args, operator, limit, order)
     
     @api.model_create_multi
     def create(self, vals_list):

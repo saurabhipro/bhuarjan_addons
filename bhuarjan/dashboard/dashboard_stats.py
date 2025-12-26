@@ -322,14 +322,23 @@ class DashboardStats(models.AbstractModel):
             is_survey: Whether this is a survey (different calculation)
             
         Returns:
-            float: Completion percentage
+            float: Completion percentage (0-100)
         """
         if total == 0:
             return 0.0
+        
         if is_survey:
-            return round(((approved + rejected) / total) * 100, 1)
+            # For surveys: completion = (approved + rejected) / total
+            # If all are approved or rejected, it's 100%
+            completion = ((approved + rejected) / total) * 100
         else:
-            return round((approved / total) * 100, 1)
+            # For other sections: completion = approved / total
+            # If all are approved, it's 100%
+            completion = (approved / total) * 100
+        
+        # Ensure it's between 0 and 100, and round to 1 decimal place
+        completion = max(0.0, min(100.0, completion))
+        return round(completion, 1)
 
     @api.model
     def _calculate_village_based_completion(self, model_name, project_ids_list, total_villages, state_field='state', approved_state='approved'):

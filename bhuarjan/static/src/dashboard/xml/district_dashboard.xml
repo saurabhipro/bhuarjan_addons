@@ -103,7 +103,18 @@
                 <!-- Section Notifications (Read-Only View) -->
                 <div class="o_dashboard_section">
                     <div class="o_stats_grid">
-                        <!-- SIA Team Card -->
+                        <!-- Surveys Card (Menu Order: 1 - First Step) -->
+                        <div class="o_stat_card o_card_survey">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-clipboard"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Surveys</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
+                            </div>
+                        </div>
+
+                        <!-- SIA Team Card (Menu Order: 2) -->
                         <div class="o_stat_card o_card_sia">
                             <div class="o_stat_icon">
                                 <i class="fa fa-users"/>
@@ -114,7 +125,7 @@
                             </div>
                         </div>
 
-                        <!-- Section 4 Card -->
+                        <!-- Section 4 Card (Menu Order: 3) -->
                         <div class="o_stat_card o_card_section4">
                             <div class="o_stat_icon">
                                 <i class="fa fa-bell"/>
@@ -125,7 +136,7 @@
                             </div>
                         </div>
 
-                        <!-- Expert Group Card -->
+                        <!-- Expert Group Card (Menu Order: 4) -->
                         <div class="o_stat_card o_card_expert_committee">
                             <div class="o_stat_icon">
                                 <i class="fa fa-graduation-cap"/>
@@ -136,7 +147,7 @@
                             </div>
                         </div>
 
-                        <!-- Section 11 Card -->
+                        <!-- Section 11 Card (Menu Order: 5) -->
                         <div class="o_stat_card o_card_section11">
                             <div class="o_stat_icon">
                                 <i class="fa fa-file-text"/>
@@ -147,7 +158,7 @@
                             </div>
                         </div>
 
-                        <!-- Section 15 Card -->
+                        <!-- Section 15 Card (Menu Order: 6) -->
                         <div class="o_stat_card o_card_section15">
                             <div class="o_stat_icon">
                                 <i class="fa fa-exclamation-triangle"/>
@@ -158,7 +169,7 @@
                             </div>
                         </div>
 
-                        <!-- Section 19 Card -->
+                        <!-- Section 19 Card (Menu Order: 7) -->
                         <div class="o_stat_card o_card_section19">
                             <div class="o_stat_icon">
                                 <i class="fa fa-bullhorn"/>
@@ -169,7 +180,7 @@
                             </div>
                         </div>
 
-                        <!-- Sec 21 notice Card -->
+                        <!-- Sec 21 notice Card (Menu Order: 8) -->
                         <div class="o_stat_card o_card_draft_award">
                             <div class="o_stat_icon">
                                 <i class="fa fa-gavel"/>
@@ -177,17 +188,6 @@
                             <div class="o_stat_content">
                                 <div class="o_stat_label">Sec 21 notice</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.draft_award_total : 0"/></div>
-                            </div>
-                        </div>
-
-                        <!-- Surveys Card -->
-                        <div class="o_stat_card o_card_survey">
-                            <div class="o_stat_icon">
-                                <i class="fa fa-clipboard"/>
-                            </div>
-                            <div class="o_stat_content">
-                                <div class="o_stat_label">Surveys</div>
-                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.survey_total : 0"/></div>
                             </div>
                         </div>
                     </div>

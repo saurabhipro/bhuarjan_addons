@@ -84,9 +84,13 @@ class DashboardHelpers(models.AbstractModel):
         pending = self._get_model_count_by_status('bhu.survey', base_domain, ['submitted', 'rejected'])
         
         # Calculate completion percentage
+        # For surveys: completion = (approved + rejected) / total
+        # If all are approved or rejected, it's 100%
         completion_percent = 0
         if total > 0:
-            completion_percent = round((approved / total) * 100, 2)
+            completion_percent = round(((approved + rejected) / total) * 100, 1)
+            # Ensure it's between 0 and 100
+            completion_percent = max(0.0, min(100.0, completion_percent))
         
         return {
             'total': total,

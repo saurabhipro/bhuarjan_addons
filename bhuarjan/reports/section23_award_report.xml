@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 23 Award Report Action -->
+    <record id="action_report_section23_award" model="ir.actions.report">
+        <field name="name">Section 23 Award / धारा 23 अवार्ड</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhuarjan.section23_award_report</field>
+        <field name="report_file">bhuarjan.section23_award_report</field>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_sia_paper_format"/>
+        <field name="print_report_name">'Section23_Award_' + ((object and object.village_id and object.village_id.name.replace(' ', '_') if object.village_id.name else '') or (docs and docs[0] and docs[0].village_id and docs[0].village_id.name.replace(' ', '_') if docs[0].village_id.name else '') or '') + '_' + ((object and object.award_date and object.award_date.strftime('%Y%m%d') if object.award_date else '') or (docs and docs[0] and docs[0].award_date and docs[0].award_date.strftime('%Y%m%d') if docs[0].award_date else '') or (object and object.create_date and object.create_date.strftime('%Y%m%d') if object.create_date else '') or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d') if docs[0].create_date else '') or '')</field>
+    </record>
+
+    <!-- Section 23 Award Report Template -->
+    <template id="section23_award_report">
+        <t t-call="web.html_container">
+            <meta charset="utf-8"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <!-- Include centralized CSS styles -->
+                    <t t-call="bhuarjan.report_common_styles"/>
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        
+                        <!-- Get data for both sections -->
+                        <t t-set="land_data" t-value="o.get_land_compensation_data() if o else []"/>
+                        <t t-set="tree_data" t-value="o.get_tree_compensation_data() if o else []"/>
+                        
+                        <!-- Header Information (always show) -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="font-size: 24px; font-weight: bold; margin: 10px 0;">
+                                <strong>Section 23 Award / धारा 23 अवार्ड</strong>
+                            </h1>
+                            <div style="font-size: 14px; margin: 10px 0;">
+                                <p><strong>Project:</strong> <span t-esc="o.project_id.name if o and o.project_id else 'N/A'"/></p>
+                                <p><strong>Village:</strong> <span t-esc="o.village_id.name if o and o.village_id else 'N/A'"/></p>
+                                <p><strong>Award Date:</strong> <span t-esc="o.award_date.strftime('%d/%m/%Y') if o and o.award_date else 'N/A'"/></p>
+                            </div>
+                        </div>
+                        
+                        <!-- PART 1 (A) - LAND COMPENSATION SECTION -->
+                        <t t-if="land_data and len(land_data) > 0">
+                            <div style="page-break-before: always;">
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <h2 style="font-size: 20px; font-weight: bold; margin: 0;">
+                                        <strong>भूमि का मुआवजा पत्रक</strong>
+                                    </h2>
+                                    <h3 style="font-size: 16px; font-weight: bold; margin: 5px 0;">
+                                        <strong>भाग-1 (क)</strong>
+                                    </h3>
+                                </div>
+                                
+                                <!-- Location Information -->
+                                <div style="margin-bottom: 15px; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
+                                        <strong>ग्राम-</strong> <span t-esc="o.village_id.name if o.village_id else ''"/>,
+                                        <strong>ग्राम पंचायत-</strong> <span t-esc="o.village_id.name if o.village_id else ''"/>,
+                                        <strong>प.ह.नं.-</strong> <span t-esc="o.project_id.name if o.project_id else ''"/>,
+                                        <strong>तहसील-</strong> <span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>,
+                                        <strong>जिला-</strong> <span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/> (छ.ग.)
+                                    </p>
+                                    <p style="margin: 5px 0;">
+                                        <strong>उद्देश्य:</strong> <span t-esc="o.project_id.name if o.project_id else ''"/>
+                                    </p>
+                                </div>
+                                
+                                <!-- Land Compensation Table -->
+                                <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px;" border="1">
+                                    <thead>
+                                        <tr style="background-color: #f2f2f2;">
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">क्र.सं.</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">भू-स्वामी का नाम, पिता/पति का नाम, जाति, पता</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">मूल भारित भूमि (हेक्टे में)</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">अर्जित रकबा हेक्टे में</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">लगान</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">पडत</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">असिंचित</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">सिंचित</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">गाईड लाइन 2019-2020 (प्रति हेक्टे.)/वर्ग मीटर गर</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">बाजार मूल्य (कारक = 2)</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">100% सोलेशियन</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">ब्याज</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">कुल मुआवजा की राशि</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="serial" t-value="1"/>
+                                        <t t-set="total_original" t-value="0.0"/>
+                                        <t t-set="total_acquired" t-value="0.0"/>
+                                        <t t-set="total_market_value" t-value="0.0"/>
+                                        <t t-set="total_solatium" t-value="0.0"/>
+                                        <t t-set="total_interest" t-value="0.0"/>
+                                        <t t-set="total_compensation" t-value="0.0"/>
+                                        
+                                        <t t-foreach="land_data" t-as="land">
+                                            <tr>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="serial"/>
+                                                <td style="padding: 3px; text-align: left; border: 1px solid #000;">
+                                                    <span t-esc="land.get('landowner_name', '') or ''"/>
+                                                    <t t-if="land.get('father_name')"> पिता <span t-esc="land.get('father_name', '')"/> </t>
+                                                    <t t-if="land.get('caste')"> जाति <span t-esc="land.get('caste', '')"/> </t>
+                                                    <t t-if="land.get('address')">, <span t-esc="land.get('address', '')"/> </t>
+                                                </td>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.4f' % land.get('original_area', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.4f' % land.get('acquired_area', 0.0)"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="land.get('lagan', '')"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="'✓' if land.get('fallow') else ''"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="'✓' if land.get('unirrigated') else ''"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="'✓' if land.get('irrigated') else ''"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % land.get('guide_line_rate', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % land.get('market_value', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % land.get('solatium', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % land.get('interest', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % land.get('total_compensation', 0.0)"/>
+                                            </tr>
+                                            <t t-set="serial" t-value="serial + 1"/>
+                                            <t t-set="total_original" t-value="total_original + land.get('original_area', 0.0)"/>
+                                            <t t-set="total_acquired" t-value="total_acquired + land.get('acquired_area', 0.0)"/>
+                                            <t t-set="total_market_value" t-value="total_market_value + land.get('market_value', 0.0)"/>
+                                            <t t-set="total_solatium" t-value="total_solatium + land.get('solatium', 0.0)"/>
+                                            <t t-set="total_interest" t-value="total_interest + land.get('interest', 0.0)"/>
+                                            <t t-set="total_compensation" t-value="total_compensation + land.get('total_compensation', 0.0)"/>
+                                        </t>
+                                        
+                                        <!-- Total Row -->
+                                        <tr style="background-color: #f2f2f2; font-weight: bold;">
+                                            <td colspan="2" style="padding: 5px; text-align: center; border: 1px solid #000;"><strong>महायोग</strong></td>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.4f' % total_original"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.4f' % total_acquired"/>
+                                            <td colspan="5" style="padding: 5px; text-align: center; border: 1px solid #000;"></td>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_market_value"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_solatium"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_interest"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_compensation"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <t t-if="not land_data or len(land_data) == 0">
+                            <div style="text-align: center; padding: 20px; margin: 20px 0; border: 1px solid #ccc;">
+                                <p style="font-size: 16px; color: #666;">
+                                    <strong>No land compensation data available.</strong><br/>
+                                    Please ensure there are approved surveys for the selected village and project.
+                                </p>
+                            </div>
+                        </t>
+                        
+                        <!-- PART 1 (C) - TREE COMPENSATION SECTION -->
+                        <t t-if="tree_data and len(tree_data) > 0">
+                            <div style="page-break-before: always;">
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <h2 style="font-size: 20px; font-weight: bold; margin: 0;">
+                                        <strong>वृक्षों का मुआवजा पत्रक</strong>
+                                    </h2>
+                                    <h3 style="font-size: 16px; font-weight: bold; margin: 5px 0;">
+                                        <strong>भाग-1 (ग)</strong>
+                                    </h3>
+                                </div>
+                                
+                                <!-- Location Information -->
+                                <div style="margin-bottom: 15px; font-size: 14px;">
+                                    <p style="margin: 5px 0;">
+                                        <strong>ग्राम-</strong> <span t-esc="o.village_id.name if o.village_id else ''"/>,
+                                        <strong>ग्राम पंचायत-</strong> <span t-esc="o.village_id.name if o.village_id else ''"/>,
+                                        <strong>प.ह.नं.-</strong> <span t-esc="o.project_id.name if o.project_id else ''"/>,
+                                        <strong>तहसील-</strong> <span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>,
+                                        <strong>जिला-</strong> <span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/> (छ.ग.)
+                                    </p>
+                                    <p style="margin: 5px 0;">
+                                        <strong>उद्देश्य:</strong> <span t-esc="o.project_id.name if o.project_id else ''"/>
+                                    </p>
+                                </div>
+                                
+                                <!-- Tree Compensation Table -->
+                                <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 10px;" border="1">
+                                    <thead>
+                                        <tr style="background-color: #f2f2f2;">
+                                            <th rowspan="2" style="padding: 5px; text-align: center; border: 1px solid #000;">क्र.सं.</th>
+                                            <th rowspan="2" style="padding: 5px; text-align: center; border: 1px solid #000;">भूमिस्वामी का नाम, पिता/पति का नाम, जाति</th>
+                                            <th colspan="3" style="padding: 5px; text-align: center; border: 1px solid #000;">अर्जित भुमि का विवरण</th>
+                                            <th colspan="2" style="padding: 5px; text-align: center; border: 1px solid #000;">भूमि जिस पर वृक्ष स्थित है का विवरण तथा मुआवजा</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">गोलाई (से.मी.)</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">दर</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">मूल्य</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">निर्धारित मूल्य</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">100% सोलेशियम</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">ब्याज</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">योग</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">रिमार्क</th>
+                                        </tr>
+                                        <tr style="background-color: #f2f2f2;">
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">कुल खसरा</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">कुल रकबा</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">खसरा नं.</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">वृक्षों का प्रकार</th>
+                                            <th style="padding: 5px; text-align: center; border: 1px solid #000;">(अ) वृक्ष (ब) नग</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="serial" t-value="1"/>
+                                        <t t-set="total_value" t-value="0.0"/>
+                                        <t t-set="total_determined" t-value="0.0"/>
+                                        <t t-set="total_solatium_tree" t-value="0.0"/>
+                                        <t t-set="total_interest_tree" t-value="0.0"/>
+                                        <t t-set="total_tree" t-value="0.0"/>
+                                        
+                                        <t t-foreach="tree_data" t-as="tree">
+                                            <tr>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="serial"/>
+                                                <td style="padding: 3px; text-align: left; border: 1px solid #000;">
+                                                    <span t-esc="tree.get('landowner_name', '') or ''"/>
+                                                    <t t-if="tree.get('father_name')"> पिता <span t-esc="tree.get('father_name', '')"/> </t>
+                                                    <t t-if="tree.get('caste')"> जाति <span t-esc="tree.get('caste', '')"/> </t>
+                                                </td>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="tree.get('total_khasra', '')"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.4f' % tree.get('total_area', 0.0)"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="tree.get('khasra', '')"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="tree.get('tree_type', '')"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="tree.get('tree_count', 0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('girth_cm', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('rate', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('value', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('determined_value', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('solatium', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('interest', 0.0)"/>
+                                                <td style="padding: 3px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % tree.get('total', 0.0)"/>
+                                                <td style="padding: 3px; text-align: center; border: 1px solid #000;" t-esc="tree.get('remark', '')"/>
+                                            </tr>
+                                            <t t-set="serial" t-value="serial + 1"/>
+                                            <t t-set="total_value" t-value="total_value + tree.get('value', 0.0)"/>
+                                            <t t-set="total_determined" t-value="total_determined + tree.get('determined_value', 0.0)"/>
+                                            <t t-set="total_solatium_tree" t-value="total_solatium_tree + tree.get('solatium', 0.0)"/>
+                                            <t t-set="total_interest_tree" t-value="total_interest_tree + tree.get('interest', 0.0)"/>
+                                            <t t-set="total_tree" t-value="total_tree + tree.get('total', 0.0)"/>
+                                        </t>
+                                        
+                                        <!-- Total Row -->
+                                        <tr style="background-color: #f2f2f2; font-weight: bold;">
+                                            <td colspan="9" style="padding: 5px; text-align: center; border: 1px solid #000;"><strong>योग</strong></td>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_value"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_determined"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_solatium_tree"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_interest_tree"/>
+                                            <td style="padding: 5px; text-align: right; border: 1px solid #000;" t-esc="'%.2f' % total_tree"/>
+                                            <td style="padding: 5px; text-align: center; border: 1px solid #000;"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <t t-if="not tree_data or len(tree_data) == 0">
+                            <div style="text-align: center; padding: 20px; margin: 20px 0; border: 1px solid #ccc;">
+                                <p style="font-size: 16px; color: #666;">
+                                    <strong>No tree compensation data available.</strong><br/>
+                                    Please ensure there are approved surveys with trees for the selected village and project.
+                                </p>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

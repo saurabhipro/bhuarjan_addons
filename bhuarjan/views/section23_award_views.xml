@@ -23,7 +23,9 @@
         <field name="arch" type="xml">
             <form string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-                    <button name="action_download_award" string="View / देखें" type="object" class="btn-primary" 
+                    <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" type="object" class="btn-primary" 
+                            icon="fa-file-pdf"/>
+                    <button name="action_download_award" string="View / देखें" type="object" class="btn-secondary" 
                             icon="fa-download" invisible="not award_document"/>
                 </header>
                 <sheet>

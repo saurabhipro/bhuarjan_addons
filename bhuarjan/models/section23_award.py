@@ -232,6 +232,21 @@ class Section23Award(models.Model):
         
         return result
     
+    def format_indian_number(self, value, decimals=2):
+        """Format number with Indian numbering system (commas for thousands)"""
+        if value is None:
+            value = 0.0
+        
+        # Format the number with commas (Indian numbering system)
+        if decimals == 2:
+            formatted = f"{value:,.2f}"
+        elif decimals == 4:
+            formatted = f"{value:,.4f}"
+        else:
+            formatted = f"{value:,.{decimals}f}"
+        
+        return formatted
+    
     def get_tree_compensation_data(self):
         """Get tree compensation data grouped by landowner and khasra"""
         self.ensure_one()

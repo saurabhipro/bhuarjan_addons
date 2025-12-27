@@ -85,9 +85,8 @@
                 <field name="name"/>
                 <field name="district_id"/>
                 <field name="village_id"/>
-                <field name="irrigation_status"/>
-                <field name="road_proximity"/>
-                <field name="rate_per_hectare"/>
+                <field name="main_road_rate"/>
+                <field name="other_road_rate"/>
                 <field name="effective_from"/>
                 <field name="effective_to"/>
                 <field name="state"/>
@@ -105,6 +104,7 @@
                     <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_deactivate" string="Deactivate" type="object" class="btn-secondary" invisible="state != 'active'"/>
                     <button name="action_reset" string="Reset to Draft" type="object" class="btn-warning" invisible="state != 'inactive'"/>
+                    <button name="action_view_permutations" string="View All Rate Permutations / सभी दर क्रमचय देखें" type="object" class="btn-info" icon="fa-table"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive"/>
                 </header>
                 <sheet>
@@ -127,38 +127,56 @@
                             <field name="district_id" widget="many2one_tags"/>
                             <field name="village_id" widget="many2one_tags"/>
                         </group>
-                        <group string="🏞️ Land Classification" class="oe_group_col_2">
-                            <field name="irrigation_status" widget="radio" options="{'horizontal': true}"/>
-                            <field name="road_proximity" widget="radio" options="{'horizontal': true}"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <group string="💰 Rate Information" class="oe_group_col_2">
-                            <field name="rate_per_hectare" widget="monetary"/>
-                            <field name="currency_id" invisible="1"/>
-                        </group>
-                        <group string="🌱 Additional Factors" class="oe_group_col_2">
-                            <field name="soil_quality" widget="radio" options="{'horizontal': true}"/>
-                            <field name="market_demand" widget="radio" options="{'horizontal': true}"/>
-                        </group>
-                    </group>
-                    
-                    <group>
                         <group string="📅 Effective Dates" class="oe_group_col_2">
                             <field name="effective_from" widget="date" options="{'date_format': 'dd/mm/yyyy'}"/>
                             <field name="effective_to" widget="date" options="{'date_format': 'dd/mm/yyyy'}"/>
                         </group>
-                        <group string="🏢 Company Information" class="oe_group_col_2">
-                            <field name="company_id" widget="many2one_tags"/>
-                            <field name="company_name"/>
+                    </group>
+                    
+                    <group>
+                        <group string="💰 Rate Information (One Entry Per Village)" colspan="2">
+                            <div style="background-color: #e7f3ff; padding: 10px; margin-bottom: 10px; border-left: 4px solid #2196F3;">
+                                <p style="margin: 0; font-size: 12px; color: #1976D2;">
+                                    <strong>Note:</strong> Enter base rates for this village. System will automatically calculate:<br/>
+                                    • <strong>Irrigated:</strong> Base Rate + 20%<br/>
+                                    • <strong>Non-Irrigated:</strong> Base Rate - 20%<br/>
+                                    • <strong>Diverted:</strong> Base Rate - 20% (additional adjustment)
+                                </p>
+                            </div>
                         </group>
                     </group>
                     
                     <group>
-                        <group string="📝 Additional Information" class="oe_group_col_2">
-                            <field name="remarks" widget="text" nolabel="1"/>
+                        <group string="Square Meter Rates (वर्ग मीटर दर)" class="oe_group_col_2">
+                            <field name="main_road_rate_sqm" widget="monetary" string="Rate on Main Road (Sq. Meter) / मुख्यमार्ग पर दर (वर्ग मीटर)"/>
+                            <field name="other_road_rate_sqm" widget="monetary" string="Rate Within 20 Meter (Sq. Meter) / 20 मीटर के भीतर दर (वर्ग मीटर)"/>
                         </group>
+                        <group string="Hectare Rates (हेक्टेयर दर)" class="oe_group_col_2">
+                            <field name="main_road_rate_hectare" widget="monetary" string="Rate on Main Road (Hectare) / मुख्यमार्ग पर दर (हेक्टेयर)"/>
+                            <field name="other_road_rate_hectare" widget="monetary" string="Rate Within 20 Meter (Hectare) / 20 मीटर के भीतर दर (हेक्टेयर)"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Calculated Rates - Square Meter (वर्ग मीटर)" class="oe_group_col_2">
+                            <field name="main_road_sqm_irrigated" widget="monetary" readonly="1"/>
+                            <field name="main_road_sqm_non_irrigated" widget="monetary" readonly="1"/>
+                            <field name="other_road_sqm_irrigated" widget="monetary" readonly="1"/>
+                            <field name="other_road_sqm_non_irrigated" widget="monetary" readonly="1"/>
+                        </group>
+                        <group string="Calculated Rates - Hectare (हेक्टेयर)" class="oe_group_col_2">
+                            <field name="main_road_hectare_irrigated" widget="monetary" readonly="1"/>
+                            <field name="main_road_hectare_non_irrigated" widget="monetary" readonly="1"/>
+                            <field name="other_road_hectare_irrigated" widget="monetary" readonly="1"/>
+                            <field name="other_road_hectare_non_irrigated" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group invisible="1">
+                        <field name="company_id"/>
+                        <field name="company_name"/>
+                        <field name="remarks"/>
                     </group>
                 </sheet>
             </form>
@@ -174,9 +192,8 @@
                 <field name="name"/>
                 <field name="district_id"/>
                 <field name="village_id"/>
-                <field name="irrigation_status"/>
-                <field name="road_proximity"/>
-                <field name="rate_per_hectare"/>
+                <field name="main_road_rate"/>
+                <field name="other_road_rate"/>
                 <field name="state"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
@@ -187,8 +204,6 @@
                     <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
-                    <filter string="Irrigation Status" name="group_irrigation" context="{'group_by': 'irrigation_status'}"/>
-                    <filter string="Road Proximity" name="group_road" context="{'group_by': 'road_proximity'}"/>
                 </group>
             </search>
         </field>
@@ -206,8 +221,48 @@
                 Create your first Rate Master record!
             </p>
             <p>
-                Set land valuation rates for villages based on irrigation status and road proximity.
+                Set base rates for villages. System automatically calculates all permutations:<br/>
+                • Main Road (Within 20m) and Other Road (Beyond 20m)<br/>
+                • Irrigated (+20%) and Non-Irrigated (base rate)<br/>
+                • Diverted (-20%) adjustment
             </p>
+        </field>
+    </record>
+
+    <!-- Rate Master Permutation Line List View -->
+    <record id="view_rate_master_permutation_line_list" model="ir.ui.view">
+        <field name="name">bhu.rate.master.permutation.line.list</field>
+        <field name="model">bhu.rate.master.permutation.line</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="road_proximity"/>
+                <field name="irrigation_status"/>
+                <field name="is_diverted"/>
+                <field name="calculated_rate" widget="monetary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Rate Master Permutation Wizard Form View -->
+    <record id="view_rate_master_permutation_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.rate.master.permutation.wizard.form</field>
+        <field name="model">bhu.rate.master.permutation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rate Permutations / दर क्रमचय">
+                <sheet>
+                    <group>
+                        <field name="rate_master_id" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="All Rate Permutations / सभी दर क्रमचय">
+                            <field name="permutation_line_ids" nolabel="1" readonly="1" options="{'no_create': True, 'no_delete': True, 'no_edit': True}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
         </field>
     </record>
 </odoo>

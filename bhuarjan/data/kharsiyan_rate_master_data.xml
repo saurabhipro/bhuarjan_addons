@@ -4,8 +4,7 @@
         <!-- Kharsiyan Block Land Rate Master Data (2019-2020) -->
         <!-- Based on Market Value Guide for Land in Kharsiyan Block -->
         <!-- Using existing Raigarh district and tehsil structure -->
-        <!-- One entry per village with base rates - system calculates all permutations -->
-        
+        <!-- One entry per village with base rates - system calculates all permutations -->        
         <!-- First, create villages from the rate master document -->
         <!-- Village 1: खड़गोव (Khadgov) -->
         <record id="village_khadgov" model="bhu.village">
@@ -37,7 +36,6 @@
             <field name="effective_from">2019-04-01</field>
             <field name="effective_to">2020-03-31</field>
             <field name="remarks">खड़गोव - Base rates (2019-2020). System calculates: Irrigated +20%, Non-Irrigated -20%</field>
-        </record>
-        
+        </record>        
     </data>
 </odoo>

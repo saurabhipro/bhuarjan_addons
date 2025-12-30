@@ -149,11 +149,11 @@
                     <group>
                         <group string="Square Meter Rates (वर्ग मीटर दर)" class="oe_group_col_2">
                             <field name="main_road_rate_sqm" widget="monetary" string="Rate on Main Road (Sq. Meter) / मुख्यमार्ग पर दर (वर्ग मीटर)"/>
-                            <field name="other_road_rate_sqm" widget="monetary" string="Rate Within 20 Meter (Sq. Meter) / 20 मीटर के भीतर दर (वर्ग मीटर)"/>
+                            <field name="other_road_rate_sqm" widget="monetary" string="Rate Within Main Road Range (Sq. Meter) / मुख्यमार्ग सीमा के भीतर दर (वर्ग मीटर)"/>
                         </group>
                         <group string="Hectare Rates (हेक्टेयर दर)" class="oe_group_col_2">
                             <field name="main_road_rate_hectare" widget="monetary" string="Rate on Main Road (Hectare) / मुख्यमार्ग पर दर (हेक्टेयर)"/>
-                            <field name="other_road_rate_hectare" widget="monetary" string="Rate Within 20 Meter (Hectare) / 20 मीटर के भीतर दर (हेक्टेयर)"/>
+                            <field name="other_road_rate_hectare" widget="monetary" string="Rate Within Main Road Range (Hectare) / मुख्यमार्ग सीमा के भीतर दर (हेक्टेयर)"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
@@ -222,7 +222,7 @@
             </p>
             <p>
                 Set base rates for villages. System automatically calculates all permutations:<br/>
-                • Main Road (Within 20m) and Other Road (Beyond 20m)<br/>
+                • Main Road (Within Main Road Range) and Other Road (Beyond Main Road Range)<br/>
                 • Irrigated (+20%) and Non-Irrigated (base rate)<br/>
                 • Diverted (-20%) adjustment
             </p>

@@ -41,26 +41,26 @@ class RateMaster(models.Model):
                                          currency_field='currency_id', required=True, tracking=True,
                                          help='Rate per square meter for land on main road')
     
-    other_road_rate_sqm = fields.Monetary(string='Rate Within 20 Meter (Sq. Meter) / 20 मीटर के भीतर दर (वर्ग मीटर)', 
+    other_road_rate_sqm = fields.Monetary(string='Rate Within Main Road Range (Sq. Meter) / मुख्यमार्ग सीमा के भीतर दर (वर्ग मीटर)', 
                                          currency_field='currency_id', required=True, tracking=True,
-                                         help='Rate per square meter for land within 20 meters')
+                                         help='Rate per square meter for land within main road range')
     
     # Hectare Rates
     main_road_rate_hectare = fields.Monetary(string='Rate on Main Road (Hectare) / मुख्यमार्ग पर दर (हेक्टेयर)', 
                                              currency_field='currency_id', required=True, tracking=True,
                                              help='Rate per hectare for land on main road')
     
-    other_road_rate_hectare = fields.Monetary(string='Rate Within 20 Meter (Hectare) / 20 मीटर के भीतर दर (हेक्टेयर)', 
+    other_road_rate_hectare = fields.Monetary(string='Rate Within Main Road Range (Hectare) / मुख्यमार्ग सीमा के भीतर दर (हेक्टेयर)', 
                                              currency_field='currency_id', required=True, tracking=True,
-                                             help='Rate per hectare for land within 20 meters')
+                                             help='Rate per hectare for land within main road range')
     
     
     # Legacy fields (kept for backward compatibility, will be computed from hectare rates)
-    main_road_rate = fields.Monetary(string='Main Road Rate (Within 20m) / मुख्यमार्ग दर (20 मीटर के भीतर)', 
+    main_road_rate = fields.Monetary(string='Main Road Rate (Within Main Road Range) / मुख्यमार्ग दर (मुख्यमार्ग सीमा के भीतर)', 
                                      currency_field='currency_id', compute='_compute_legacy_rates', store=True,
                                      help='Legacy field - computed from hectare rate')
     
-    other_road_rate = fields.Monetary(string='Other Road Rate (Beyond 20m) / अन्य दर (20 मीटर से अधिक)', 
+    other_road_rate = fields.Monetary(string='Other Road Rate (Beyond Main Road Range) / अन्य दर (मुख्यमार्ग सीमा से अधिक)', 
                                      currency_field='currency_id', compute='_compute_legacy_rates', store=True,
                                      help='Legacy field - computed from hectare rate')
     
@@ -328,10 +328,12 @@ class RateMasterPermutationLine(models.TransientModel):
     _description = 'Rate Master Permutation Line'
     _order = 'road_proximity, irrigation_status, is_diverted'
     
-    wizard_id = fields.Many2one('bhu.rate.master.permutation.wizard', string='Wizard', required=True, ondelete='cascade')
+    wizard_id = fields.Many2one('bhu.rate.master.permutation.wizard', string='Wizard', required=False, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey', required=False, ondelete='cascade')
+    award_id = fields.Many2one('bhu.section23.award', string='Award', required=False, ondelete='cascade')
     road_proximity = fields.Selection([
-        ('within_20m', 'Within 20 meters / 20 मीटर के भीतर'),
-        ('beyond_20m', 'Beyond 20 meters / 20 मीटर से अधिक')
+        ('within_20m', 'Within Distance / दूरी के भीतर'),
+        ('beyond_20m', 'Beyond Distance / दूरी से अधिक')
     ], string='Road Proximity / सड़क निकटता', required=True, readonly=True)
     irrigation_status = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
@@ -356,10 +358,12 @@ class RateMasterPermutationLine(models.TransientModel):
     _description = 'Rate Master Permutation Line'
     _order = 'road_proximity, irrigation_status, is_diverted'
     
-    wizard_id = fields.Many2one('bhu.rate.master.permutation.wizard', string='Wizard', required=True, ondelete='cascade')
+    wizard_id = fields.Many2one('bhu.rate.master.permutation.wizard', string='Wizard', required=False, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey', required=False, ondelete='cascade')
+    award_id = fields.Many2one('bhu.section23.award', string='Award', required=False, ondelete='cascade')
     road_proximity = fields.Selection([
-        ('within_20m', 'Within 20 meters / 20 मीटर के भीतर'),
-        ('beyond_20m', 'Beyond 20 meters / 20 मीटर से अधिक')
+        ('within_20m', 'Within Distance / दूरी के भीतर'),
+        ('beyond_20m', 'Beyond Distance / दूरी से अधिक')
     ], string='Road Proximity / सड़क निकटता', required=True, readonly=True)
     irrigation_status = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),

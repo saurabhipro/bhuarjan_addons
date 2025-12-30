@@ -31,6 +31,89 @@ class Section23Award(models.Model):
     
     village_domain = fields.Char()
     
+    # Survey lines for award generation
+    award_survey_line_ids = fields.One2many('bhu.section23.award.survey.line', 'award_id', 
+                                            string='Approved Surveys / स्वीकृत सर्वेक्षण',
+                                            help='Select type and distance for each approved survey')
+    
+    # Rate Permutations for Village (read-only, computed)
+    rate_permutation_ids = fields.One2many('bhu.rate.master.permutation.line', 'award_id', 
+                                           string='Rate Permutations', readonly=True, 
+                                           compute='_compute_rate_permutations', store=False)
+    
+    # Computed field to check if all surveys have type and distance selected
+    all_surveys_configured = fields.Boolean(string='All Surveys Configured', 
+                                           compute='_compute_all_surveys_configured',
+                                           help='True when all surveys have type and distance selected')
+    
+    @api.depends('village_id')
+    def _compute_rate_permutations(self):
+        """Compute rate permutations for the selected village"""
+        for award in self:
+            # Clear existing
+            award.rate_permutation_ids = [(5, 0, 0)]
+            if award.village_id:
+                # Get active rate master for this village
+                rate_master = self.env['bhu.rate.master'].get_all_rates_for_village(award.village_id.id)
+                if rate_master:
+                    permutations = rate_master.get_all_permutations()
+                    # Create transient records to display
+                    lines = []
+                    for perm in permutations:
+                        line = self.env['bhu.rate.master.permutation.line'].create({
+                            'award_id': award.id,
+                            'road_proximity': perm['road_proximity'],
+                            'irrigation_status': perm['irrigation_status'],
+                            'is_diverted': perm['is_diverted'],
+                            'calculated_rate': perm['rate'],
+                        })
+                        lines.append(line.id)
+                    award.rate_permutation_ids = [(6, 0, lines)]
+    
+    @api.depends('award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance')
+    def _compute_all_surveys_configured(self):
+        """Check if all survey lines have type and distance configured"""
+        for record in self:
+            if not record.award_survey_line_ids:
+                record.all_surveys_configured = False
+            else:
+                # land_type must be set (Village or Residential)
+                # is_within_distance can be True or False (both are valid - checked or unchecked)
+                # We just need to ensure land_type is set
+                record.all_surveys_configured = all(
+                    line.land_type for line in record.award_survey_line_ids
+                )
+    
+    @api.onchange('village_id', 'project_id')
+    def _onchange_village_populate_surveys(self):
+        """Auto-populate approved surveys when village is selected"""
+        if self.project_id and self.village_id:
+            # Get approved surveys for this village and project
+            surveys = self.env['bhu.survey'].search([
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', self.village_id.id),
+                ('state', 'in', ['approved', 'locked']),
+            ])
+            
+            # Create or update survey lines
+            existing_survey_ids = self.award_survey_line_ids.mapped('survey_id').ids
+            new_lines = []
+            
+            for survey in surveys:
+                if survey.id not in existing_survey_ids:
+                    # Create new line - sync existing values from survey if available
+                    new_lines.append((0, 0, {
+                        'survey_id': survey.id,
+                        'khasra_number': survey.khasra_number or '',
+                        'land_type': survey.land_type_for_award or False,
+                        'is_within_distance': survey.is_within_distance_for_award or False,
+                    }))
+            
+            if new_lines:
+                self.award_survey_line_ids = new_lines
+        else:
+            self.award_survey_line_ids = [(5, 0, 0)]
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
@@ -40,6 +123,9 @@ class Section23Award(models.Model):
             else:
                 rec.village_domain = json.dumps([])
                 rec.village_id = False
+            # Trigger survey population if village is already set
+            if rec.village_id:
+                rec._onchange_village_populate_surveys()
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -86,6 +172,19 @@ class Section23Award(models.Model):
         
         if not self.village_id:
             raise ValidationError(_('Please select a village first.'))
+        
+        # Validate that all surveys have type configured
+        # is_within_distance can be True or False (both are valid - checked or unchecked means user has made a choice)
+        missing_lines = self.award_survey_line_ids.filtered(lambda l: not l.land_type)
+        
+        if missing_lines:
+            survey_names = ', '.join([line.survey_id.name for line in missing_lines if line.survey_id][:5])
+            if len(missing_lines) > 5:
+                survey_names += '...'
+            raise ValidationError(_(
+                'Please select type (Village/Residential) for all surveys before generating award.\n'
+                'Missing type selection for surveys: %s'
+            ) % survey_names)
         
         # Get the report action and generate PDF
         report_action = self.env.ref('bhuarjan.action_report_section23_award')
@@ -358,4 +457,152 @@ class Section23Award(models.Model):
         result.sort(key=lambda x: (x['landowner_name'] or '', x['khasra'] or '', x.get('tree_type', '') or ''))
         
         return result
+
+
+class Section23AwardSurveyLine(models.Model):
+    """Survey lines for Section 23 Award - allows selection of type and distance for each survey"""
+    _name = 'bhu.section23.award.survey.line'
+    _description = 'Section 23 Award Survey Line'
+    _order = 'survey_id'
+    
+    award_id = fields.Many2one('bhu.section23.award', string='Award', required=True, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वेक्षण', required=True, ondelete='cascade')
+    
+    # Survey information (readonly, from survey)
+    khasra_number = fields.Char(string='Khasra Number / खसरा संख्या', readonly=True)
+    acquired_area = fields.Float(string='Acquired Area (Hectare) / अधिग्रहित क्षेत्र (हेक्टेयर)', 
+                                 related='survey_id.acquired_area', readonly=True, store=True)
+    survey_name = fields.Char(string='Survey Number', related='survey_id.name', readonly=True, store=True)
+    survey_date = fields.Date(string='Survey Date', related='survey_id.survey_date', readonly=True, store=True)
+    
+    # Type selection (Village or Residential) - radio button
+    # These fields sync with survey model
+    land_type = fields.Selection([
+        ('village', 'Village / ग्राम'),
+        ('residential', 'Residential / आवासीय')
+    ], string='Type / प्रकार', required=False, tracking=True,
+       help='Select whether this is village land or residential land')
+    
+    # Distance checkbox
+    # For village: 20 meters from main road
+    # For residential: 05 meters from main road
+    is_within_distance = fields.Boolean(string='Within Distance / दूरी के भीतर', 
+                                       default=False, tracking=True,
+                                       help='Check if khasra is within distance from main road (20m for village, 5m for residential)')
+    
+    @api.onchange('land_type', 'is_within_distance')
+    def _onchange_type_distance(self):
+        """Sync type and distance to survey model"""
+        for line in self:
+            if line.survey_id:
+                line.survey_id.write({
+                    'land_type_for_award': line.land_type,
+                    'is_within_distance_for_award': line.is_within_distance,
+                })
+    
+    def write(self, vals):
+        """Sync type and distance to survey when updating"""
+        result = super().write(vals)
+        for line in self:
+            if line.survey_id and ('land_type' in vals or 'is_within_distance' in vals):
+                line.survey_id.write({
+                    'land_type_for_award': line.land_type,
+                    'is_within_distance_for_award': line.is_within_distance,
+                })
+        return result
+    
+    # Computed rate per hectare from rate master
+    rate_per_hectare = fields.Monetary(string='Rate per Hectare / हेक्टेयर दर', 
+                                      currency_field='currency_id',
+                                      compute='_compute_rate_per_hectare', store=True,
+                                      help='Rate per hectare fetched from rate master based on type and distance')
+    
+    currency_id = fields.Many2one('res.currency', string='Currency', 
+                                  default=lambda self: self.env.ref('base.INR'), invisible=True)
+    
+    @api.depends('land_type', 'is_within_distance', 'award_id.village_id', 'survey_id.irrigation_type')
+    def _compute_rate_per_hectare(self):
+        """Compute rate per hectare from rate master based on type and distance"""
+        for line in self:
+            rate = 0.0
+            if line.award_id and line.award_id.village_id and line.land_type and line.is_within_distance is not False:
+                # Get active rate master for this village
+                rate_master = self.env['bhu.rate.master'].search([
+                    ('village_id', '=', line.award_id.village_id.id),
+                    ('state', '=', 'active'),
+                ], limit=1, order='effective_from desc')
+                
+                if rate_master:
+                    # Determine which rate to use based on type and distance
+                    if line.land_type == 'village':
+                        # Village: 20 meters
+                        if line.is_within_distance:
+                            # Within 20m - use main_road_rate_hectare
+                            base_rate = rate_master.main_road_rate_hectare
+                        else:
+                            # Beyond 20m - use other_road_rate_hectare
+                            base_rate = rate_master.other_road_rate_hectare
+                    else:
+                        # Residential: 5 meters
+                        if line.is_within_distance:
+                            # Within 5m - use main_road_rate_hectare
+                            base_rate = rate_master.main_road_rate_hectare
+                        else:
+                            # Beyond 5m - use other_road_rate_hectare
+                            base_rate = rate_master.other_road_rate_hectare
+                    
+                    # Apply irrigation adjustment if survey has irrigation type
+                    if line.survey_id and line.survey_id.irrigation_type:
+                        if line.survey_id.irrigation_type == 'irrigated':
+                            rate = base_rate * 1.2  # 20% increase for irrigated
+                        elif line.survey_id.irrigation_type == 'unirrigated':
+                            rate = base_rate * 0.8  # 20% decrease for unirrigated
+                        else:
+                            rate = base_rate
+                    else:
+                        rate = base_rate
+            
+            line.rate_per_hectare = rate
+    
+    @api.onchange('survey_id')
+    def _onchange_survey_id(self):
+        """Update khasra number and sync values when survey is selected"""
+        for line in self:
+            if line.survey_id:
+                line.khasra_number = line.survey_id.khasra_number or ''
+                # Load existing values from survey if available
+                if not line.land_type and line.survey_id.land_type_for_award:
+                    line.land_type = line.survey_id.land_type_for_award
+                if line.is_within_distance is False and line.survey_id.is_within_distance_for_award:
+                    line.is_within_distance = line.survey_id.is_within_distance_for_award
+    
+    @api.model
+    def create(self, vals_list):
+        """Auto-populate khasra number and sync to survey when creating"""
+        if not isinstance(vals_list, list):
+            vals_list = [vals_list]
+        
+        for vals in vals_list:
+            # Auto-populate khasra number from survey
+            if 'survey_id' in vals and 'khasra_number' not in vals:
+                survey = self.env['bhu.survey'].browse(vals['survey_id'])
+                if survey:
+                    vals['khasra_number'] = survey.khasra_number or ''
+                    # Also sync existing values from survey if not provided
+                    if 'land_type' not in vals and survey.land_type_for_award:
+                        vals['land_type'] = survey.land_type_for_award
+                    if 'is_within_distance' not in vals:
+                        vals['is_within_distance'] = survey.is_within_distance_for_award or False
+        
+        lines = super().create(vals_list)
+        
+        # Sync type and distance to survey after creation
+        for line in lines:
+            if line.survey_id and (line.land_type or line.is_within_distance is not False):
+                line.survey_id.write({
+                    'land_type_for_award': line.land_type,
+                    'is_within_distance_for_award': line.is_within_distance,
+                })
+        
+        return lines
 

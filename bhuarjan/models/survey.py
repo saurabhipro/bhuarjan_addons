@@ -68,6 +68,22 @@ class Survey(models.Model):
         ('unirrigated', 'Unirrigated / असिंचित'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
+    # Award-related fields (editable only from award section)
+    land_type_for_award = fields.Selection([
+        ('village', 'Village / ग्राम'),
+        ('residential', 'Residential / आवासीय')
+    ], string='Type for Award / अवार्ड के लिए प्रकार', readonly=True, tracking=True,
+       help='Select whether this is village land or residential land (editable only from Award section)')
+    
+    is_within_distance_for_award = fields.Boolean(string='Within Distance for Award / अवार्ड के लिए दूरी के भीतर', 
+                                                 readonly=True, tracking=True,
+                                                 help='Check if khasra is within distance from main road (20m for village, 5m for residential). Editable only from Award section.')
+    
+    # Rate Permutations for Village (read-only, computed)
+    rate_permutation_ids = fields.One2many('bhu.rate.master.permutation.line', 'survey_id', 
+                                           string='Rate Permutations', readonly=True, 
+                                           compute='_compute_rate_permutations', store=False)
+    
     # Tree Lines - Detailed tree information
     tree_line_ids = fields.One2many('bhu.survey.tree.line', 'survey_id', 
                                     string='Tree Details / वृक्ष विवरण')
@@ -815,6 +831,30 @@ class Survey(models.Model):
                 rec.landowner_aadhar_numbers = ', '.join(aadhar_numbers)
             else:
                 rec.landowner_aadhar_numbers = ''
+
+    @api.depends('village_id')
+    def _compute_rate_permutations(self):
+        """Compute rate permutations for the selected village"""
+        for survey in self:
+            # Clear existing
+            survey.rate_permutation_ids = [(5, 0, 0)]
+            if survey.village_id:
+                # Get active rate master for this village
+                rate_master = self.env['bhu.rate.master'].get_all_rates_for_village(survey.village_id.id)
+                if rate_master:
+                    permutations = rate_master.get_all_permutations()
+                    # Create transient records to display (no wizard needed for survey view)
+                    lines = []
+                    for perm in permutations:
+                        line = self.env['bhu.rate.master.permutation.line'].create({
+                            'survey_id': survey.id,
+                            'road_proximity': perm['road_proximity'],
+                            'irrigation_status': perm['irrigation_status'],
+                            'is_diverted': perm['is_diverted'],
+                            'calculated_rate': perm['rate'],
+                        })
+                        lines.append(line.id)
+                    survey.rate_permutation_ids = [(6, 0, lines)]
 
 
 class SurveyTreeLine(models.Model):

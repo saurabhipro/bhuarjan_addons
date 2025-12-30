@@ -31,12 +31,8 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="project_id" options="{'no_create': True, 'no_create_edit': True}"/>
                             <field name="village_id" domain="village_domain" options="{'no_create': True, 'no_create_edit': True}"/>
-                        </group>
-                        <group>
-                            <field name="award_number"/>
                             <field name="award_date"/>
                         </group>
                     </group>
@@ -45,9 +41,47 @@
                                widget="binary" 
                                string="Upload Award Document / अवार्ड दस्तावेज़ अपलोड करें"/>
                     </group>
-                    <group>
-                        <field name="notes" placeholder="Enter any additional notes..."/>
-                    </group>
+                    <notebook>
+                        <page string="Approved Surveys / स्वीकृत सर्वेक्षण" name="surveys">
+                            <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}">
+                                <list editable="bottom" string="Surveys" default_order="survey_id">
+                                    <field name="survey_id" string="Survey" 
+                                           domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('state', 'in', ['approved', 'locked'])]"
+                                           options="{'no_create': True}"/>
+                                    <field name="survey_name" readonly="1" string="Survey Number" optional="show"/>
+                                    <field name="khasra_number" readonly="1" string="Khasra Number"/>
+                                    <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
+                                    <field name="survey_date" readonly="1" string="Survey Date" optional="show"/>
+                                    <field name="land_type" widget="radio" options="{'horizontal': true}" 
+                                           string="Type (Village/Residential)" 
+                                           help="Select Village for 20m distance check, Residential for 5m distance check"/>
+                                    <field name="is_within_distance" 
+                                           string="Within Distance" 
+                                           help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
+                                    <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
+                                </list>
+                            </field>
+                            <div class="alert alert-info" role="alert" invisible="all_surveys_configured">
+                                <strong>Note:</strong> Please select Type (Village/Residential) and check Distance for all surveys before generating award.
+                            </div>
+                        </page>
+                        
+                        <page string="Rate Permutations / दर क्रमचय" name="rate_permutations" invisible="not village_id">
+                            <group string="Rate Permutations for Village / ग्राम के लिए दर क्रमचय">
+                                <div class="alert alert-info" role="alert" invisible="village_id">
+                                    <strong>Note:</strong> Please select a village to view rate permutations.
+                                </div>
+                                <field name="rate_permutation_ids" nolabel="1" readonly="1">
+                                    <list string="Rate Permutations" default_order="road_proximity,irrigation_status,is_diverted">
+                                        <field name="road_proximity" string="Road Proximity / सड़क निकटता"/>
+                                        <field name="irrigation_status" string="Irrigation Status / सिंचाई स्थिति"/>
+                                        <field name="is_diverted" string="Diverted / विचलित" widget="boolean_toggle"/>
+                                        <field name="calculated_rate" string="Rate per Hectare / हेक्टेयर दर" widget="monetary"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter/>
             </form>

@@ -414,15 +414,23 @@ class DashboardStats(models.AbstractModel):
             'section3d_nh': self._get_simple_section_counts('bhu.section3d.nh', domain_with_village),
             # Mutual Consent Policy (has village_id)
             'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village),
+            # Section 23 Award (has village_id, no workflow - simple count only)
+            'section23_award': self._get_simple_section_counts('bhu.section23.award', domain_with_village),
         }
         
         # Section 21 Notification uses 'signed' state instead of 'approved'
+        section21_total = self._get_model_count_by_status('bhu.section21.notification', domain_with_village, None)
+        _logger.info(f"Section 21 counts - domain: {domain_with_village}, total: {section21_total}")
         counts['draft_award'] = {
-            'total': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, None),
+            'total': section21_total,
             'approved': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'signed'),
             'draft': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'draft'),
             'generated': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'generated'),
         }
+        
+        # Log Section 23 Award counts
+        section23_total = counts['section23_award']['total']
+        _logger.info(f"Section 23 Award counts - domain: {domain_with_village}, total: {section23_total}")
         
         return counts
 
@@ -772,6 +780,26 @@ class DashboardStats(models.AbstractModel):
                     counts['mutual_consent_policy']['approved'], 0, counts['mutual_consent_policy']['total'], is_survey=False
                 ),
                 'mutual_consent_policy_info': self._get_section_info('bhu.mutual.consent.policy', domains['final_domain']),
+                
+                # Section 23 Award (has village_id, no workflow - simple count only)
+                'section23_award_total': counts['section23_award']['total'],
+                'section23_award_draft': 0,
+                'section23_award_submitted': 0,
+                'section23_award_approved': 0,
+                'section23_award_send_back': 0,
+                'section23_award_completion_percent': 0.0,
+                'section23_award_info': {
+                    'total': counts['section23_award']['total'],
+                    'draft_count': 0,
+                    'submitted_count': 0,
+                    'approved_count': 0,
+                    'rejected_count': 0,
+                    'send_back_count': 0,
+                    'all_approved': True,
+                    'is_completed': True,
+                    'first_pending_id': False,
+                    'first_document_id': False,
+                },
             }
             
             return result
@@ -838,6 +866,10 @@ class DashboardStats(models.AbstractModel):
             'mutual_consent_policy_total': 0, 'mutual_consent_policy_draft': 0, 'mutual_consent_policy_submitted': 0,
             'mutual_consent_policy_approved': 0, 'mutual_consent_policy_send_back': 0, 'mutual_consent_policy_completion_percent': 0,
             'mutual_consent_policy_info': empty_info.copy(),
+            # Section 23 Award
+            'section23_award_total': 0, 'section23_award_draft': 0, 'section23_award_submitted': 0,
+            'section23_award_approved': 0, 'section23_award_send_back': 0, 'section23_award_completion_percent': 0,
+            'section23_award_info': empty_info.copy(),
         }
 
     # ========== Generic Data Methods ==========

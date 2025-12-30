@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 23 Award Survey Line Tree View -->
+    <!-- This view will be loaded after the model is recognized -->
+    <record id="view_section23_award_survey_line_tree" model="ir.ui.view">
+        <field name="name">bhu.section23.award.survey.line.tree</field>
+        <field name="model">bhu.section23.award.survey.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" string="Surveys" default_order="survey_id">
+                <field name="survey_id" readonly="1" string="Survey" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                <field name="survey_name" readonly="1" string="Survey Number" optional="show"/>
+                <field name="khasra_number" readonly="1" string="Khasra Number"/>
+                <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
+                <field name="survey_date" readonly="1" string="Survey Date" optional="show"/>
+                <field name="land_type" widget="radio" options="{'horizontal': true}" 
+                       string="Type (Village/Residential)" 
+                       help="Select Village for 20m distance check, Residential for 5m distance check"/>
+                <field name="is_within_distance" 
+                       string="Within Distance" 
+                       help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
+                <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
+            </list>
+        </field>
+    </record>
+</odoo>
+

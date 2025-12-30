@@ -80,6 +80,7 @@
         'views/section18_rr_scheme_views.xml',
         'views/section8_views.xml',
         'views/section23_award_views.xml',
+        # 'views/section23_award_survey_line_views.xml',  # Uncomment after first update to register model
         'views/process_report_views.xml',
         'views/draft_award_views.xml',
         'views/dashboard_views.xml',

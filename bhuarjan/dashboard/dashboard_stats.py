@@ -402,6 +402,18 @@ class DashboardStats(models.AbstractModel):
             'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village),
             'sia': self._get_section_counts('bhu.sia.team', domain_without_village),
             'section8': self._get_section_counts('bhu.section8', domain_without_village, state_field='state', states=['draft', 'approved', 'rejected']),  # Section 8 is per project, not per village
+            # Railway Act Sections (all have village_id)
+            # Sections 20A and 20E have no workflow - simple count only
+            'section20a_railways': self._get_simple_section_counts('bhu.section20a.railways', domain_with_village),
+            'section20d_railways': self._get_section_counts('bhu.section20d.railways', domain_with_village),
+            'section20e_railways': self._get_simple_section_counts('bhu.section20e.railways', domain_with_village),
+            # National Highway Act Sections (all have village_id)
+            # Sections 3A and 3D have no workflow - simple count only
+            'section3a_nh': self._get_simple_section_counts('bhu.section3a.nh', domain_with_village),
+            'section3c_nh': self._get_section_counts('bhu.section3c.nh', domain_with_village),
+            'section3d_nh': self._get_simple_section_counts('bhu.section3d.nh', domain_with_village),
+            # Mutual Consent Policy (has village_id)
+            'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village),
         }
         
         # Section 21 Notification uses 'signed' state instead of 'approved'
@@ -493,12 +505,17 @@ class DashboardStats(models.AbstractModel):
                 if test_surveys:
                     _logger.info(f"Dashboard Stats - Sample survey IDs: {test_surveys.mapped('id')}")
             
-            # Get project exemption status
+            # Get project exemption status and allowed sections
             is_project_exempt = False
+            allowed_section_names = []  # List of section names allowed for this project
             if project_id:
                 project = self.env['bhu.project'].browse(project_id)
                 if project.exists():
                     is_project_exempt = project.is_sia_exempt or False
+                    # Get sections from project's law
+                    if project.law_master_id and project.law_master_id.section_ids:
+                        allowed_section_names = project.law_master_id.section_ids.mapped('name')
+                        _logger.info(f"Dashboard Stats - Project {project_id} has law '{project.law_master_id.name}' with sections: {allowed_section_names}")
             
             # Get total villages for completion calculations
             total_villages = self._get_total_villages(domains['project_ids_from_domain'])
@@ -536,6 +553,7 @@ class DashboardStats(models.AbstractModel):
                 'is_collector': is_collector,
                 'is_project_exempt': is_project_exempt,
                 'user_type': user_access['user_type'],
+                'allowed_section_names': allowed_section_names,  # Sections mapped to project's law
                 
                 # Surveys
                 'survey_total': counts['survey']['total'],
@@ -641,6 +659,119 @@ class DashboardStats(models.AbstractModel):
                     'first_pending_id': False,
                     'first_document_id': False,
                 },
+                
+                # Railway Act Sections (all have village_id)
+                # Section 20A - No workflow, just total count
+                'section20a_railways_total': counts['section20a_railways']['total'],
+                'section20a_railways_draft': 0,
+                'section20a_railways_submitted': 0,
+                'section20a_railways_approved': 0,
+                'section20a_railways_send_back': 0,
+                'section20a_railways_completion_percent': 0.0,
+                'section20a_railways_info': {
+                    'total': counts['section20a_railways']['total'],
+                    'draft_count': 0,
+                    'submitted_count': 0,
+                    'approved_count': 0,
+                    'rejected_count': 0,
+                    'send_back_count': 0,
+                    'all_approved': True,
+                    'is_completed': True,
+                    'first_pending_id': False,
+                    'first_document_id': False,
+                },
+                
+                'section20d_railways_total': counts['section20d_railways']['total'],
+                'section20d_railways_draft': counts['section20d_railways']['draft'],
+                'section20d_railways_submitted': counts['section20d_railways']['submitted'],
+                'section20d_railways_approved': counts['section20d_railways']['approved'],
+                'section20d_railways_send_back': counts['section20d_railways']['send_back'],
+                'section20d_railways_completion_percent': self._calculate_completion_percentage(
+                    counts['section20d_railways']['approved'], 0, counts['section20d_railways']['total'], is_survey=False
+                ),
+                'section20d_railways_info': self._get_section_info('bhu.section20d.railways', domains['final_domain']),
+                
+                # Section 20E - No workflow, just total count
+                'section20e_railways_total': counts['section20e_railways']['total'],
+                'section20e_railways_draft': 0,
+                'section20e_railways_submitted': 0,
+                'section20e_railways_approved': 0,
+                'section20e_railways_send_back': 0,
+                'section20e_railways_completion_percent': 0.0,
+                'section20e_railways_info': {
+                    'total': counts['section20e_railways']['total'],
+                    'draft_count': 0,
+                    'submitted_count': 0,
+                    'approved_count': 0,
+                    'rejected_count': 0,
+                    'send_back_count': 0,
+                    'all_approved': True,
+                    'is_completed': True,
+                    'first_pending_id': False,
+                    'first_document_id': False,
+                },
+                
+                # National Highway Act Sections (all have village_id)
+                # Section 3A - No workflow, just total count
+                'section3a_nh_total': counts['section3a_nh']['total'],
+                'section3a_nh_draft': 0,
+                'section3a_nh_submitted': 0,
+                'section3a_nh_approved': 0,
+                'section3a_nh_send_back': 0,
+                'section3a_nh_completion_percent': 0.0,
+                'section3a_nh_info': {
+                    'total': counts['section3a_nh']['total'],
+                    'draft_count': 0,
+                    'submitted_count': 0,
+                    'approved_count': 0,
+                    'rejected_count': 0,
+                    'send_back_count': 0,
+                    'all_approved': True,
+                    'is_completed': True,
+                    'first_pending_id': False,
+                    'first_document_id': False,
+                },
+                
+                'section3c_nh_total': counts['section3c_nh']['total'],
+                'section3c_nh_draft': counts['section3c_nh']['draft'],
+                'section3c_nh_submitted': counts['section3c_nh']['submitted'],
+                'section3c_nh_approved': counts['section3c_nh']['approved'],
+                'section3c_nh_send_back': counts['section3c_nh']['send_back'],
+                'section3c_nh_completion_percent': self._calculate_completion_percentage(
+                    counts['section3c_nh']['approved'], 0, counts['section3c_nh']['total'], is_survey=False
+                ),
+                'section3c_nh_info': self._get_section_info('bhu.section3c.nh', domains['final_domain']),
+                
+                # Section 3D - No workflow, just total count
+                'section3d_nh_total': counts['section3d_nh']['total'],
+                'section3d_nh_draft': 0,
+                'section3d_nh_submitted': 0,
+                'section3d_nh_approved': 0,
+                'section3d_nh_send_back': 0,
+                'section3d_nh_completion_percent': 0.0,
+                'section3d_nh_info': {
+                    'total': counts['section3d_nh']['total'],
+                    'draft_count': 0,
+                    'submitted_count': 0,
+                    'approved_count': 0,
+                    'rejected_count': 0,
+                    'send_back_count': 0,
+                    'all_approved': True,
+                    'is_completed': True,
+                    'first_pending_id': False,
+                    'first_document_id': False,
+                },
+                
+                # Mutual Consent Policy (has village_id)
+                'mutual_consent_policy_total': counts['mutual_consent_policy']['total'],
+                'mutual_consent_policy_draft': counts['mutual_consent_policy']['draft'],
+                'mutual_consent_policy_submitted': counts['mutual_consent_policy']['submitted'],
+                'mutual_consent_policy_approved': counts['mutual_consent_policy']['approved'],
+                'mutual_consent_policy_send_back': counts['mutual_consent_policy']['send_back'],
+                'mutual_consent_policy_completion_percent': self._calculate_completion_percentage(
+                    counts['mutual_consent_policy']['approved'], 0, counts['mutual_consent_policy']['total'], is_survey=False
+                ),
+                'mutual_consent_policy_info': self._get_section_info('bhu.mutual.consent.policy', domains['final_domain']),
             }
             
             return result
@@ -664,6 +795,7 @@ class DashboardStats(models.AbstractModel):
             'is_collector': is_collector,
             'is_project_exempt': False,
             'user_type': 'other',
+            'allowed_section_names': [],  # Empty list when no project selected
             'survey_total': 0, 'survey_draft': 0, 'survey_submitted': 0, 'survey_approved': 0, 'survey_rejected': 0,
             'survey_completion_percent': 0, 'survey_info': empty_info.copy(),
             'section4_total': 0, 'section4_draft': 0, 'section4_submitted': 0, 'section4_approved': 0, 'section4_send_back': 0,
@@ -682,6 +814,30 @@ class DashboardStats(models.AbstractModel):
             'section8_completion_percent': 0, 'section8_info': empty_info.copy(),
             'draft_award_total': 0, 'draft_award_draft': 0, 'draft_award_generated': 0, 'draft_award_approved': 0,
             'draft_award_completion_percent': 0, 'draft_award_info': empty_info.copy(),
+            # Railway Act Sections
+            'section20a_railways_total': 0, 'section20a_railways_draft': 0, 'section20a_railways_submitted': 0,
+            'section20a_railways_approved': 0, 'section20a_railways_send_back': 0, 'section20a_railways_completion_percent': 0,
+            'section20a_railways_info': empty_info.copy(),
+            'section20d_railways_total': 0, 'section20d_railways_draft': 0, 'section20d_railways_submitted': 0,
+            'section20d_railways_approved': 0, 'section20d_railways_send_back': 0, 'section20d_railways_completion_percent': 0,
+            'section20d_railways_info': empty_info.copy(),
+            'section20e_railways_total': 0, 'section20e_railways_draft': 0, 'section20e_railways_submitted': 0,
+            'section20e_railways_approved': 0, 'section20e_railways_send_back': 0, 'section20e_railways_completion_percent': 0,
+            'section20e_railways_info': empty_info.copy(),
+            # National Highway Act Sections
+            'section3a_nh_total': 0, 'section3a_nh_draft': 0, 'section3a_nh_submitted': 0,
+            'section3a_nh_approved': 0, 'section3a_nh_send_back': 0, 'section3a_nh_completion_percent': 0,
+            'section3a_nh_info': empty_info.copy(),
+            'section3c_nh_total': 0, 'section3c_nh_draft': 0, 'section3c_nh_submitted': 0,
+            'section3c_nh_approved': 0, 'section3c_nh_send_back': 0, 'section3c_nh_completion_percent': 0,
+            'section3c_nh_info': empty_info.copy(),
+            'section3d_nh_total': 0, 'section3d_nh_draft': 0, 'section3d_nh_submitted': 0,
+            'section3d_nh_approved': 0, 'section3d_nh_send_back': 0, 'section3d_nh_completion_percent': 0,
+            'section3d_nh_info': empty_info.copy(),
+            # Mutual Consent Policy
+            'mutual_consent_policy_total': 0, 'mutual_consent_policy_draft': 0, 'mutual_consent_policy_submitted': 0,
+            'mutual_consent_policy_approved': 0, 'mutual_consent_policy_send_back': 0, 'mutual_consent_policy_completion_percent': 0,
+            'mutual_consent_policy_info': empty_info.copy(),
         }
 
     # ========== Generic Data Methods ==========

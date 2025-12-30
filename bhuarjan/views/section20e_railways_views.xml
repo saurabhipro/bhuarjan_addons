@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Section 20 E (Railways) List View -->
+    <record id="view_section20e_railways_list" model="ir.ui.view">
+        <field name="name">bhu.section20e.railways.list</field>
+        <field name="model">bhu.section20e.railways</field>
+        <field name="arch" type="xml">
+            <list string="Section 20 E (Railways)" delete="1" create="not groups='bhuarjan.group_bhuarjan_collector'">
+                <field name="name" string="Reference"/>
+                <field name="department_id" string="Department"/>
+                <field name="project_id" string="Project"/>
+                <field name="village_id" string="Village"/>
+                <field name="create_date" string="Created On"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Section 20 E (Railways) Form View -->
+    <record id="view_section20e_railways_form" model="ir.ui.view">
+        <field name="name">bhu.section20e.railways.form</field>
+        <field name="model">bhu.section20e.railways</field>
+        <field name="arch" type="xml">
+            <form string="Section 20 E (Railways) / धारा 20 ई (रेलवे)" 
+                  edit="not groups='bhuarjan.group_bhuarjan_collector'"
+                  create="not groups='bhuarjan.group_bhuarjan_collector'">
+                <sheet>
+                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
+                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                            <i class="fa fa-file-text-o" style="margin-right: 10px;"></i>Section 20 E (Railways) / धारा 20 ई (रेलवे)
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="village_domain" invisible="1"/>
+                            <field name="project_domain" invisible="1"/>
+                            <field name="department_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="project_id" domain="project_domain or [('id', 'in', [])]" 
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="village_id" domain="village_domain" 
+                                   options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                        </group>
+                    </group>
+                    <group string="Files / फ़ाइलें">
+                        <field name="sdm_signed_file" filename="sdm_signed_filename"/>
+                        <field name="sdm_signed_filename" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Enter any additional notes..."/>
+                    </group>
+                </sheet>
+                <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Section 20 E (Railways) Search View -->
+    <record id="view_section20e_railways_search" model="ir.ui.view">
+        <field name="name">bhu.section20e.railways.search</field>
+        <field name="model">bhu.section20e.railways</field>
+        <field name="arch" type="xml">
+            <search string="Section 20 E (Railways)">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="project_id"/>
+                <field name="village_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Section 20 E (Railways) Action -->
+    <record id="action_section20e_railways" model="ir.actions.act_window">
+        <field name="name">Section 20 E (Railways)</field>
+        <field name="res_model">bhu.section20e.railways</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_section20e_railways_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Section 20 E (Railways) record!
+            </p>
+        </field>
+    </record>
+</odoo>

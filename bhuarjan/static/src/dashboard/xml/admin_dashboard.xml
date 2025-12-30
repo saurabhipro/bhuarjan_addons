@@ -208,6 +208,7 @@
                     </h3>
                     <div class="o_stats_grid">
                         <!-- Section 4 -->
+                        <t t-if="this.isSectionVisible('(Sec 4) Section 4 Notifications')">
                         <div class="o_stat_card o_card_section4" t-on-click="() => this.openAction('action_open_section4')">
                             <div class="o_stat_icon"><i class="fa fa-file-o"/></div>
                             <div class="o_stat_content">
@@ -215,7 +216,9 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section4_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
                         <!-- Section 11 -->
+                        <t t-if="this.isSectionVisible('Section 11 Notifications')">
                         <div class="o_stat_card o_card_section11" t-on-click="() => this.openAction('action_open_section11')">
                             <div class="o_stat_icon"><i class="fa fa-file-text-o"/></div>
                             <div class="o_stat_content">
@@ -223,7 +226,9 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section11_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
                         <!-- Section 19 -->
+                        <t t-if="this.isSectionVisible('(Sec 19) Section 19 Notifications')">
                         <div class="o_stat_card o_card_section19" t-on-click="() => this.openAction('action_open_section19')">
                             <div class="o_stat_icon"><i class="fa fa-file-o"/></div>
                             <div class="o_stat_content">
@@ -231,7 +236,9 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section19_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
                         <!-- Section 15 -->
+                        <t t-if="this.isSectionVisible('(Sec 15) Objections')">
                         <div class="o_stat_card o_card_section15" t-on-click="() => this.openAction('action_open_section15')">
                             <div class="o_stat_icon"><i class="fa fa-exclamation-triangle"/></div>
                             <div class="o_stat_content">
@@ -239,7 +246,9 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section15_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
                         <!-- Expert Group -->
+                        <t t-if="this.isSectionVisible('Expert Group')">
                         <div class="o_stat_card o_card_expert_committee" t-on-click="() => this.openAction('action_open_expert_committee')">
                             <div class="o_stat_icon"><i class="fa fa-users"/></div>
                             <div class="o_stat_content">
@@ -247,7 +256,9 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.expert_committee_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
                         <!-- SIA Teams -->
+                        <t t-if="this.isSectionVisible('(Sec 4) Create SIA Team')">
                         <div class="o_stat_card o_card_sia" t-on-click="() => this.openAction('action_open_sia_teams')">
                             <div class="o_stat_icon"><i class="fa fa-building"/></div>
                             <div class="o_stat_content">
@@ -255,6 +266,77 @@
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.sia_total : 0"/></div>
                             </div>
                         </div>
+                        </t>
+                        <!-- Section 20 A (Railways) -->
+                        <t t-if="this.isSectionVisible('Sec 20 A (Railways)')">
+                        <div class="o_stat_card o_card_section20a_railways" t-on-click="() => this.openAction('action_open_section20a_railways')">
+                            <div class="o_stat_icon"><i class="fa fa-train"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 20 A (RAILWAYS)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section20a_railways_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Section 20 D (Railways) -->
+                        <t t-if="this.isSectionVisible('Sec 20 D (Objection) (Railways)')">
+                        <div class="o_stat_card o_card_section20d_railways" t-on-click="() => this.openAction('action_open_section20d_railways')">
+                            <div class="o_stat_icon"><i class="fa fa-exclamation-triangle"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 20 D (RAILWAYS)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section20d_railways_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Section 20 E (Railways) -->
+                        <t t-if="this.isSectionVisible('Sec 20 E (Railways)')">
+                        <div class="o_stat_card o_card_section20e_railways" t-on-click="() => this.openAction('action_open_section20e_railways')">
+                            <div class="o_stat_icon"><i class="fa fa-train"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 20 E (RAILWAYS)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section20e_railways_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Section 3A (NH) -->
+                        <t t-if="this.isSectionVisible('Sec 3A (NH)')">
+                        <div class="o_stat_card o_card_section3a_nh" t-on-click="() => this.openAction('action_open_section3a_nh')">
+                            <div class="o_stat_icon"><i class="fa fa-road"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 3A (NH)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section3a_nh_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Section 3C (NH) -->
+                        <t t-if="this.isSectionVisible('Sec 3C (Objection) (NH)')">
+                        <div class="o_stat_card o_card_section3c_nh" t-on-click="() => this.openAction('action_open_section3c_nh')">
+                            <div class="o_stat_icon"><i class="fa fa-exclamation-triangle"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 3C (NH)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section3c_nh_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Section 3D (NH) -->
+                        <t t-if="this.isSectionVisible('Sec 3D (NH)')">
+                        <div class="o_stat_card o_card_section3d_nh" t-on-click="() => this.openAction('action_open_section3d_nh')">
+                            <div class="o_stat_icon"><i class="fa fa-road"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SEC 3D (NH)</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section3d_nh_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+                        <!-- Mutual Consent Policy -->
+                        <t t-if="this.isSectionVisible('आपसी सहमति की क्रय नीति (Only in रायगढ़ and पसौर)')">
+                        <div class="o_stat_card o_card_mutual_consent_policy" t-on-click="() => this.openAction('action_open_mutual_consent_policy')">
+                            <div class="o_stat_icon"><i class="fa fa-handshake-o"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">MUTUAL CONSENT</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.mutual_consent_policy_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
                     </div>
                 </div>
             </div>

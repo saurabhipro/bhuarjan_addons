@@ -46,6 +46,13 @@ from . import tree_rate_master
 from . import photo_type_master
 from . import law_master
 from . import section_master
+from . import section20a_railways
+from . import section20d_railways
+from . import section20e_railways
+from . import section3a_nh
+from . import section3c_nh
+from . import section3d_nh
+from . import mutual_consent_policy
 from . import survey_photo
 from . import form10_export_utils
 from . import app_version

@@ -65,6 +65,28 @@ class DashboardHelpers(models.AbstractModel):
         }
     
     @api.model
+    def _get_simple_section_counts(self, model_name, base_domain):
+        """Simple count method for sections without workflow states
+        Args:
+            model_name: Model name (e.g., 'bhu.section20a.railways')
+            base_domain: Base domain to filter by
+        Returns:
+            dict: Dictionary with total count only (no state breakdown)
+        """
+        if not base_domain:
+            base_domain = []
+        
+        total = self.env[model_name].search_count(base_domain)
+        
+        return {
+            'total': total,
+            'draft': 0,
+            'submitted': 0,
+            'approved': 0,
+            'send_back': 0,
+        }
+    
+    @api.model
     def _get_survey_counts(self, base_domain):
         """Get all survey counts with completion percentage
         Args:

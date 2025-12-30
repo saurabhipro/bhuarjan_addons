@@ -343,6 +343,7 @@ export class UnifiedDashboard extends Component {
             isCollector: false,
             isProjectExempt: false,
             isReadOnly: this.config.isReadOnly || false, // District admin is read-only
+            allowedSectionNames: [], // Sections mapped to project's law
             stats: this._getInitialStats(),
             lastUpdate: null,
         };
@@ -559,6 +560,11 @@ export class UnifiedDashboard extends Component {
                 }
                 if (stats.is_project_exempt !== undefined) {
                     this.state.isProjectExempt = stats.is_project_exempt;
+                }
+                // Store allowed section names from project's law
+                if (stats.allowed_section_names !== undefined) {
+                    this.state.allowedSectionNames = stats.allowed_section_names || [];
+                    console.log('Dashboard - Allowed sections for project:', this.state.allowedSectionNames);
                 }
             }
             
@@ -885,7 +891,14 @@ export class UnifiedDashboard extends Component {
             'bhu.section11.preliminary.report': 'Section 11 Preliminary Report',
             'bhu.section19.notification': 'Section 19 Notification',
             'bhu.section21.notification': 'Section 21 Notification',
-            'bhu.section23.award': 'Section 23 Award'
+            'bhu.section23.award': 'Section 23 Award',
+            'bhu.section20a.railways': 'Section 20 A (Railways)',
+            'bhu.section20d.railways': 'Section 20 D (Railways)',
+            'bhu.section20e.railways': 'Section 20 E (Railways)',
+            'bhu.section3a.nh': 'Section 3A (NH)',
+            'bhu.section3c.nh': 'Section 3C (NH)',
+            'bhu.section3d.nh': 'Section 3D (NH)',
+            'bhu.mutual.consent.policy': 'Mutual Consent Policy',
         };
         
         if (villageSpecificSections[sectionModel]) {
@@ -1043,8 +1056,92 @@ export class UnifiedDashboard extends Component {
             'bhu.section18.rr.scheme': 'Section 18 R and R Scheme',
             'bhu.section21.notification': 'Section 21 Notifications',
             'bhu.section23.award': 'Section 23 Awards',
+            'bhu.section20a.railways': 'Section 20 A (Railways)',
+            'bhu.section20d.railways': 'Section 20 D (Railways)',
+            'bhu.section20e.railways': 'Section 20 E (Railways)',
+            'bhu.section3a.nh': 'Section 3A (NH)',
+            'bhu.section3c.nh': 'Section 3C (NH)',
+            'bhu.section3d.nh': 'Section 3D (NH)',
+            'bhu.mutual.consent.policy': 'Mutual Consent Policy',
         };
         return names[model] || model;
+    }
+
+    // Mapping between dashboard section display names and section master names
+    getSectionMasterName(dashboardSectionName) {
+        const mapping = {
+            'Surveys': 'Surveys',
+            '(Sec 4) Create SIA Team': '(Sec 4) Create SIA Team',
+            '(Sec 4) Section 4 Notifications': '(Sec 4) Section 4 Notifications',
+            'Expert Group': 'Expert Group',
+            'Section 8': 'Section 8',
+            'Section 11 Notifications': 'Section 11 Notifications',
+            '(Sec 15) Objections': '(Sec 15) Objections',
+            'Section 18 R and R Scheme': 'Section 18 R and R Scheme',
+            '(Sec 19) Section 19 Notifications': '(Sec 19) Section 19 Notifications',
+            'Sec 21 notice': 'Sec 21 notice',
+            'Section 23 Award': 'Section 23 Award',
+            'Sec 20 A (Railways)': 'Sec 20 A (Railways)',
+            'Sec 20 D (Railways)': 'Sec 20 D (Objection) (Railways)',
+            'Sec 20 E (Railways)': 'Sec 20 E (Railways)',
+            'Sec 3A (NH)': 'Sec 3A (NH)',
+            'Sec 3C (NH)': 'Sec 3C (Objection) (NH)',
+            'Sec 3D (NH)': 'Sec 3D (NH)',
+            'Mutual Consent': 'आपसी सहमति की क्रय नीति (Only in रायगढ़ and पसौर)',
+        };
+        return mapping[dashboardSectionName] || dashboardSectionName;
+    }
+
+    // Check if a section should be visible based on project's law
+    isSectionVisible(dashboardSectionName) {
+        try {
+            // Railway and NH sections require department to be selected
+            // Check both dashboard names and mapped names
+            const railwayNhSections = [
+                'Sec 20 A (Railways)',
+                'Sec 20 D (Railways)',  // Dashboard name
+                'Sec 20 D (Objection) (Railways)',  // Mapped name
+                'Sec 20 E (Railways)',
+                'Sec 3A (NH)',
+                'Sec 3C (NH)',  // Dashboard name
+                'Sec 3C (Objection) (NH)',  // Mapped name
+                'Sec 3D (NH)'
+            ];
+            
+            // Check if this is a Railway or NH section
+            const isRailwayNh = railwayNhSections.includes(dashboardSectionName) || 
+                                dashboardSectionName.includes('Railways') || 
+                                dashboardSectionName.includes('(NH)');
+            
+            if (isRailwayNh) {
+                // For Railway and NH sections, require department to be selected
+                if (!this.state || !this.state.selectedDepartment) {
+                    return false;
+                }
+            }
+            
+            // If no project is selected, show all sections (except Railway/NH which need department)
+            if (!this.state || !this.state.selectedProject || !this.state.allowedSectionNames || this.state.allowedSectionNames.length === 0) {
+                return true;
+            }
+            
+            // Get the section master name for this dashboard section
+            const sectionMasterName = this.getSectionMasterName(dashboardSectionName);
+            
+            // Check if this section is in the allowed list
+            const isVisible = this.state.allowedSectionNames.includes(sectionMasterName);
+            
+            // Debug logging (can be removed later)
+            if (!isVisible) {
+                console.log(`Section "${dashboardSectionName}" (mapped to "${sectionMasterName}") is not in allowed sections:`, this.state.allowedSectionNames);
+            }
+            
+            return isVisible;
+        } catch (error) {
+            console.error('Error in isSectionVisible:', error);
+            // On error, show the section to avoid breaking the UI
+            return true;
+        }
     }
 
     toString(value) {

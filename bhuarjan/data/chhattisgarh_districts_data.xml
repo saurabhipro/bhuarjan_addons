@@ -11,7 +11,5 @@
             <field name="name">Raipur / रायपुर</field>
             <field name="state_id" ref="base.state_in_cg"/>
         </record>
-
-
         </data>
 </odoo>

@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list string="Law Master">
                 <field name="name"/>
+                <field name="section_ids" widget="many2many_tags"/>
                 <field name="active"/>
             </list>
         </field>
@@ -29,6 +30,11 @@
                         <group>
                             <field name="active"/>
                         </group>
+                    </group>
+                    
+                    <!-- Sections in this law -->
+                    <group string="Sections / धाराएं" col="1">
+                        <field name="section_ids" nolabel="1" widget="many2many_tags"/>
                     </group>
                     
                     <!-- Projects using this law -->

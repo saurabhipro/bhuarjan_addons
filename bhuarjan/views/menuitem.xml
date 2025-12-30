@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <data>
     <!-- Surveys menu - NOT visible to Collector (bhuarjan.group_bhuarjan_collector or bhuarjan.group_bhuarjan_additional_collector) -->
     <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_patwari,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
@@ -9,12 +10,13 @@
     <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_land_type" name="Land Types" action="action_bhu_land_type" parent="menu_bhu_master" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_tree_master" name="Tree Master" action="action_bhu_tree_master" parent="menu_bhu_master" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_law_master" name="Law Master" action="action_bhu_law_master" parent="menu_bhu_master" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_section_master" name="Section Master" action="action_bhu_section_master" parent="menu_bhu_master" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_tehsil" name="Tehsils" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_law_master" name="Law Master" action="action_bhu_law_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_rate_master" name="Rate Master" action="action_bhu_rate_master" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_tehsil" name="Tehsils" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
@@ -64,4 +66,5 @@
     <!-- Move Settings Master and Sequence Settings to General Settings section -->
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_sequence_settings" name="Sequence Settings" action="action_bhuarjan_sequence_settings_tree" parent="base.menu_administration" sequence="101" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    </data>
 </odoo>

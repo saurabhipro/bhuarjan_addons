@@ -36,6 +36,7 @@
         # 'data/sample_section11_reports.xml',
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
         'data/kharsiyan_rate_master_data.xml',
+        'data/section_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'security/secrurity.xml',
         'reports/report_common_styles.xml',
@@ -93,6 +94,7 @@
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
         'views/law_master_views.xml',
+        'views/section_master_views.xml',
         'views/photo_type_master_views.xml',
         'views/settings_master_views.xml',
         'views/channel_master_views.xml',

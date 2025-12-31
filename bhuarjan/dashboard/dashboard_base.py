@@ -53,7 +53,7 @@ class BhuarjanDashboard(models.TransientModel):
     total_projects = fields.Integer(string='Total Projects', readonly=True, default=0)
     total_departments = fields.Integer(string='Total Departments', readonly=True, default=0)
     total_landowners = fields.Integer(string='Total Landowners', readonly=True, default=0)
-    total_rate_masters = fields.Integer(string='Total Rate Masters', readonly=True, default=0)
+    total_rate_masters = fields.Integer(string='Total Land Rate Masters', readonly=True, default=0)
     
     # Survey Counts
     total_surveys = fields.Integer(string='Total Surveys', readonly=True, default=0)

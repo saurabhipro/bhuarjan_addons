@@ -76,14 +76,15 @@
         </field>
     </record>
 
-    <!-- Rate Master List View -->
-    <record id="view_bhu_rate_master_list" model="ir.ui.view">
-        <field name="name">bhu.rate.master.list</field>
+    <!-- Land Rate Master List View -->
+    <record id="view_bhu_land_rate_master_list" model="ir.ui.view">
+        <field name="name">bhu.land.rate.master.list</field>
         <field name="model">bhu.rate.master</field>
         <field name="arch" type="xml">
-            <list string="Rate Master" decoration-info="state=='draft'" decoration-success="state=='active'" decoration-muted="state=='inactive'">
+            <list string="Land Rate Master" decoration-info="state=='draft'" decoration-success="state=='active'" decoration-muted="state=='inactive'">
                 <field name="name"/>
                 <field name="district_id"/>
+                <field name="tehsil_id"/>
                 <field name="village_id"/>
                 <field name="main_road_rate"/>
                 <field name="other_road_rate"/>
@@ -94,12 +95,12 @@
         </field>
     </record>
 
-    <!-- Rate Master Form View -->
-    <record id="view_bhu_rate_master_form" model="ir.ui.view">
-        <field name="name">bhu.rate.master.form</field>
+    <!-- Land Rate Master Form View -->
+    <record id="view_bhu_land_rate_master_form" model="ir.ui.view">
+        <field name="name">bhu.land.rate.master.form</field>
         <field name="model">bhu.rate.master</field>
         <field name="arch" type="xml">
-            <form string="Rate Master - Land Valuation Rates">
+            <form string="Land Rate Master - Land Valuation Rates">
                 <header>
                     <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_deactivate" string="Deactivate" type="object" class="btn-secondary" invisible="state != 'active'"/>
@@ -125,6 +126,7 @@
                     <group>
                         <group string="📍 Location Information" class="oe_group_col_2">
                             <field name="district_id" widget="many2one_tags"/>
+                            <field name="tehsil_id" widget="many2one_tags"/>
                             <field name="village_id" widget="many2one_tags"/>
                         </group>
                         <group string="📅 Effective Dates" class="oe_group_col_2">
@@ -148,28 +150,13 @@
                     
                     <group>
                         <group string="Square Meter Rates (वर्ग मीटर दर)" class="oe_group_col_2">
-                            <field name="main_road_rate_sqm" widget="monetary" string="Rate on Main Road (Sq. Meter) / मुख्यमार्ग पर दर (वर्ग मीटर)"/>
-                            <field name="other_road_rate_sqm" widget="monetary" string="Rate Within Main Road Range (Sq. Meter) / मुख्यमार्ग सीमा के भीतर दर (वर्ग मीटर)"/>
+                            <field name="main_road_rate_sqm" widget="monetary" string="Rate on Main Road (Sq. Meter)"/>
+                            <field name="other_road_rate_sqm" widget="monetary" string="Rate Within Main Road Range (Sq. Meter)"/>
                         </group>
                         <group string="Hectare Rates (हेक्टेयर दर)" class="oe_group_col_2">
-                            <field name="main_road_rate_hectare" widget="monetary" string="Rate on Main Road (Hectare) / मुख्यमार्ग पर दर (हेक्टेयर)"/>
-                            <field name="other_road_rate_hectare" widget="monetary" string="Rate Within Main Road Range (Hectare) / मुख्यमार्ग सीमा के भीतर दर (हेक्टेयर)"/>
+                            <field name="main_road_rate_hectare" widget="monetary" string="Rate on Main Road (Hectare)"/>
+                            <field name="other_road_rate_hectare" widget="monetary" string="Rate Within Main Road Range (Hectare)"/>
                             <field name="currency_id" invisible="1"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <group string="Calculated Rates - Square Meter (वर्ग मीटर)" class="oe_group_col_2">
-                            <field name="main_road_sqm_irrigated" widget="monetary" readonly="1"/>
-                            <field name="main_road_sqm_non_irrigated" widget="monetary" readonly="1"/>
-                            <field name="other_road_sqm_irrigated" widget="monetary" readonly="1"/>
-                            <field name="other_road_sqm_non_irrigated" widget="monetary" readonly="1"/>
-                        </group>
-                        <group string="Calculated Rates - Hectare (हेक्टेयर)" class="oe_group_col_2">
-                            <field name="main_road_hectare_irrigated" widget="monetary" readonly="1"/>
-                            <field name="main_road_hectare_non_irrigated" widget="monetary" readonly="1"/>
-                            <field name="other_road_hectare_irrigated" widget="monetary" readonly="1"/>
-                            <field name="other_road_hectare_non_irrigated" widget="monetary" readonly="1"/>
                         </group>
                     </group>
                     
@@ -183,14 +170,15 @@
         </field>
     </record>
 
-    <!-- Rate Master Search View -->
-    <record id="view_bhu_rate_master_search" model="ir.ui.view">
-        <field name="name">bhu.rate.master.search</field>
+    <!-- Land Rate Master Search View -->
+    <record id="view_bhu_land_rate_master_search" model="ir.ui.view">
+        <field name="name">bhu.land.rate.master.search</field>
         <field name="model">bhu.rate.master</field>
         <field name="arch" type="xml">
-            <search string="Search Rate Master">
+            <search string="Search Land Rate Master">
                 <field name="name"/>
                 <field name="district_id"/>
+                <field name="tehsil_id"/>
                 <field name="village_id"/>
                 <field name="main_road_rate"/>
                 <field name="other_road_rate"/>
@@ -203,22 +191,23 @@
                 <group expand="0" string="Group By">
                     <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Tehsil" name="group_tehsil" context="{'group_by': 'tehsil_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
                 </group>
             </search>
         </field>
     </record>
 
-    <!-- Rate Master Action -->
-    <record id="action_bhu_rate_master" model="ir.actions.act_window">
-        <field name="name">Rate Master</field>
+    <!-- Land Rate Master Action -->
+    <record id="action_bhu_land_rate_master" model="ir.actions.act_window">
+        <field name="name">Land Rate Master</field>
         <field name="res_model">bhu.rate.master</field>
         <field name="view_mode">list,form</field>
-        <field name="search_view_id" ref="view_bhu_rate_master_search"/>
+        <field name="search_view_id" ref="view_bhu_land_rate_master_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first Rate Master record!
+                Create your first Land Rate Master record!
             </p>
             <p>
                 Set base rates for villages. System automatically calculates all permutations:<br/>
@@ -229,9 +218,9 @@
         </field>
     </record>
 
-    <!-- Rate Master Permutation Line List View -->
-    <record id="view_rate_master_permutation_line_list" model="ir.ui.view">
-        <field name="name">bhu.rate.master.permutation.line.list</field>
+    <!-- Land Rate Master Permutation Line List View -->
+    <record id="view_land_rate_master_permutation_line_list" model="ir.ui.view">
+        <field name="name">bhu.land.rate.master.permutation.line.list</field>
         <field name="model">bhu.rate.master.permutation.line</field>
         <field name="arch" type="xml">
             <list>
@@ -243,9 +232,9 @@
         </field>
     </record>
 
-    <!-- Rate Master Permutation Wizard Form View -->
-    <record id="view_rate_master_permutation_wizard_form" model="ir.ui.view">
-        <field name="name">bhu.rate.master.permutation.wizard.form</field>
+    <!-- Land Rate Master Permutation Wizard Form View -->
+    <record id="view_land_rate_master_permutation_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.land.rate.master.permutation.wizard.form</field>
         <field name="model">bhu.rate.master.permutation.wizard</field>
         <field name="arch" type="xml">
             <form string="Rate Permutations / दर क्रमचय">
@@ -266,3 +255,4 @@
         </field>
     </record>
 </odoo>
+

@@ -21,7 +21,7 @@ class LandType(models.Model):
 
 class RateMaster(models.Model):
     _name = 'bhu.rate.master'
-    _description = 'Rate Master - Land Valuation Rates'
+    _description = 'Land Rate Master - Land Valuation Rates'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, default=lambda self: _('New'))
@@ -33,24 +33,25 @@ class RateMaster(models.Model):
 
     # Location Information
     district_id = fields.Many2one('bhu.district', string='District / जिला', required=True, tracking=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     
     # Base Rate Information (one entry per village)
     # Square Meter Rates
-    main_road_rate_sqm = fields.Monetary(string='Rate on Main Road (Sq. Meter) / मुख्यमार्ग पर दर (वर्ग मीटर)', 
+    main_road_rate_sqm = fields.Monetary(string='Rate on Main Road (Sq. Meter)', 
                                          currency_field='currency_id', required=True, tracking=True,
                                          help='Rate per square meter for land on main road')
     
-    other_road_rate_sqm = fields.Monetary(string='Rate Within Main Road Range (Sq. Meter) / मुख्यमार्ग सीमा के भीतर दर (वर्ग मीटर)', 
+    other_road_rate_sqm = fields.Monetary(string='Rate Within Main Road Range (Sq. Meter)', 
                                          currency_field='currency_id', required=True, tracking=True,
                                          help='Rate per square meter for land within main road range')
     
     # Hectare Rates
-    main_road_rate_hectare = fields.Monetary(string='Rate on Main Road (Hectare) / मुख्यमार्ग पर दर (हेक्टेयर)', 
+    main_road_rate_hectare = fields.Monetary(string='Rate on Main Road (Hectare)', 
                                              currency_field='currency_id', required=True, tracking=True,
                                              help='Rate per hectare for land on main road')
     
-    other_road_rate_hectare = fields.Monetary(string='Rate Within Main Road Range (Hectare) / मुख्यमार्ग सीमा के भीतर दर (हेक्टेयर)', 
+    other_road_rate_hectare = fields.Monetary(string='Rate Within Main Road Range (Hectare)', 
                                              currency_field='currency_id', required=True, tracking=True,
                                              help='Rate per hectare for land within main road range')
     
@@ -127,6 +128,21 @@ class RateMaster(models.Model):
     # Computed Fields
     display_name = fields.Char(string='Display Name', compute='_compute_display_name', store=True)
     
+    @api.onchange('village_id')
+    def _onchange_village_id(self):
+        """Auto-populate tehsil and district when village is selected"""
+        if self.village_id:
+            if self.village_id.tehsil_id:
+                self.tehsil_id = self.village_id.tehsil_id
+            if self.village_id.district_id:
+                self.district_id = self.village_id.district_id
+    
+    @api.onchange('tehsil_id')
+    def _onchange_tehsil_id(self):
+        """Auto-populate district when tehsil is selected"""
+        if self.tehsil_id and self.tehsil_id.district_id:
+            self.district_id = self.tehsil_id.district_id
+    
     @api.depends('district_id', 'village_id')
     def _compute_display_name(self):
         for record in self:
@@ -146,7 +162,7 @@ class RateMaster(models.Model):
                     ('id', '!=', record.id)
                 ])
                 if existing:
-                    raise ValidationError(_('Only one active rate master entry per village is allowed. Please deactivate the existing active entry for village "%s" first.') % record.village_id.name)
+                    raise ValidationError(_('Only one active land rate master entry per village is allowed. Please deactivate the existing active entry for village "%s" first.') % record.village_id.name)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -319,7 +335,7 @@ class RateMasterPermutationWizard(models.TransientModel):
     _name = 'bhu.rate.master.permutation.wizard'
     _description = 'Rate Master Permutation Wizard'
     
-    rate_master_id = fields.Many2one('bhu.rate.master', string='Rate Master', required=True, readonly=True)
+    rate_master_id = fields.Many2one('bhu.rate.master', string='Land Rate Master', required=True, readonly=True)
     permutation_line_ids = fields.One2many('bhu.rate.master.permutation.line', 'wizard_id', string='Permutations')
 
 
@@ -343,32 +359,3 @@ class RateMasterPermutationLine(models.TransientModel):
     calculated_rate = fields.Monetary(string='Calculated Rate / गणना दर', currency_field='currency_id', readonly=True)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
 
-
-# Transient model for displaying rate permutations
-class RateMasterPermutationWizard(models.TransientModel):
-    _name = 'bhu.rate.master.permutation.wizard'
-    _description = 'Rate Master Permutation Wizard'
-    
-    rate_master_id = fields.Many2one('bhu.rate.master', string='Rate Master', required=True, readonly=True)
-    permutation_line_ids = fields.One2many('bhu.rate.master.permutation.line', 'wizard_id', string='Permutations')
-
-
-class RateMasterPermutationLine(models.TransientModel):
-    _name = 'bhu.rate.master.permutation.line'
-    _description = 'Rate Master Permutation Line'
-    _order = 'road_proximity, irrigation_status, is_diverted'
-    
-    wizard_id = fields.Many2one('bhu.rate.master.permutation.wizard', string='Wizard', required=False, ondelete='cascade')
-    survey_id = fields.Many2one('bhu.survey', string='Survey', required=False, ondelete='cascade')
-    award_id = fields.Many2one('bhu.section23.award', string='Award', required=False, ondelete='cascade')
-    road_proximity = fields.Selection([
-        ('within_20m', 'Within Distance / दूरी के भीतर'),
-        ('beyond_20m', 'Beyond Distance / दूरी से अधिक')
-    ], string='Road Proximity / सड़क निकटता', required=True, readonly=True)
-    irrigation_status = fields.Selection([
-        ('irrigated', 'Irrigated / सिंचित'),
-        ('non_irrigated', 'Non-Irrigated / असिंचित')
-    ], string='Irrigation Status / सिंचाई स्थिति', required=True, readonly=True)
-    is_diverted = fields.Boolean(string='Diverted / विचलित', readonly=True)
-    calculated_rate = fields.Monetary(string='Calculated Rate / गणना दर', currency_field='currency_id', readonly=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)

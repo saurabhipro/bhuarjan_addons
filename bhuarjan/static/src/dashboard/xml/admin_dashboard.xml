@@ -104,7 +104,7 @@
                                 <i class="fa fa-money"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">RATE MASTERS</div>
+                                <div class="o_stat_label">LAND RATE MASTERS</div>
                                 <div class="o_stat_value"><t t-esc="state.stats ? state.stats.total_rate_masters : 0"/></div>
                             </div>
                         </div>

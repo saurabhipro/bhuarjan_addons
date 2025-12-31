@@ -75,7 +75,7 @@
                         <div class="o_stat_card o_card_draft_award" style="cursor: pointer;" t-on-click="() => this.openAction('action_open_rate_masters')">
                             <div class="o_stat_icon"><i class="fa fa-money"/></div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Rate Masters</div>
+                                <div class="o_stat_label">Land Rate Masters</div>
                             </div>
                         </div>
                     </div>

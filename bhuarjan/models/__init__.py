@@ -14,7 +14,7 @@ from . import post_award_payment
 from . import payment_reconciliation
 from . import payment_file
 from . import payment_reconciliation_bank
-from . import rate_master
+from . import land_rate_master
 from . import settings_master
 from . import message_wizard
 from . import survey_bulk_approval_wizard
@@ -41,7 +41,6 @@ from . import ir_attachment
 from . import otp
 from . import token
 from . import channel_master
-from . import tree_master
 from . import tree_rate_master
 from . import photo_type_master
 from . import law_master

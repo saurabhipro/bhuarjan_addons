@@ -161,10 +161,10 @@ class DashboardActions(models.AbstractModel):
     @api.model
     def action_open_rate_masters(self):
         try:
-            action_ref = self.env.ref('bhuarjan.action_bhu_rate_master')
+            action_ref = self.env.ref('bhuarjan.action_bhu_land_rate_master')
             return self._get_action_dict(action_ref)
         except Exception as e:
-            _logger.error(f"Error getting action_bhu_rate_master: {e}", exc_info=True)
+            _logger.error(f"Error getting action_bhu_land_rate_master: {e}", exc_info=True)
             return {
                 'type': 'ir.actions.act_window',
                 'name': 'Rate Masters',

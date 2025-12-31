@@ -91,7 +91,7 @@
         'views/payment_reconciliation_views.xml',
         'views/payment_file_views.xml',
         'views/payment_reconciliation_bank_views.xml',
-        'views/rate_master_views.xml',
+        'views/land_rate_master_views.xml',
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
         'views/law_master_views.xml',

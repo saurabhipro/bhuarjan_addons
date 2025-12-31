@@ -4,107 +4,59 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
+class TreeMaster(models.Model):
+    _name = 'bhu.tree.master'
+    _description = 'Tree Rate Master / वृक्ष दर मास्टर'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'name'
+
+    name = fields.Char(string='Tree Name / वृक्ष का नाम', required=True, tracking=True,
+                      help='Name of the tree species (e.g., Mango, Neem, Banyan)')
+    
+    # Tree Type
+    tree_type = fields.Selection([
+        ('fruit_bearing', 'Fruit-bearing / फलदार'),
+        ('non_fruit_bearing', 'Non-fruit-bearing / गैर-फलदार')
+    ], string='Tree Type / वृक्ष प्रकार', required=True, default='non_fruit_bearing', tracking=True,
+       help='Type of tree. Both types use rate variants based on development stage and girth range.')
+    
+    # One2many for tree rate variants (same structure for both fruit and non-fruit bearing)
+    tree_rate_ids = fields.One2many('bhu.tree.rate.master', 'tree_master_id', 
+                                    string='Rate Variants / दर वेरिएंट',
+                                    help='Rate variants based on development stage and girth range for all tree types')
+
+    _sql_constraints = [
+        ('name_unique', 'unique(name)', 'Tree name must be unique!')
+    ]
+
+
 class TreeRateMaster(models.Model):
     _name = 'bhu.tree.rate.master'
-    _description = 'Tree Rate Master - Rate Variants by Development Stage and Girth Range'
+    _description = 'Tree Rate Master - Rate Variants'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'tree_master_id, girth_range_min, development_stage'
+    _order = 'tree_master_id, development_stage, girth_range_min'
 
-    tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, 
-                                     tracking=True, ondelete='cascade',
-                                     help='Select tree from master')
-    
-    # Girth Range (in cm)
-    girth_range_min = fields.Float(string='Min Girth (cm) / न्यूनतम छाती (से.मी.)', digits=(10, 2), 
-                                   required=True, tracking=True,
-                                   help='Minimum chest girth in centimeters')
-    girth_range_max = fields.Float(string='Max Girth (cm) / अधिकतम छाती (से.मी.)', digits=(10, 2), 
-                                  tracking=True,
-                                  help='Maximum chest girth in centimeters (leave empty for "Above X cm")')
-    
-    # Development Stage
+    tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True, ondelete='cascade', tracking=True)
     development_stage = fields.Selection([
         ('undeveloped', 'Undeveloped / अविकसित'),
         ('semi_developed', 'Semi-developed / अर्ध-विकसित'),
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
-    ], string='Development Stage / विकास स्तर', required=True, tracking=True,
-       help='Sound: Fully developed, Half Sound: Semi-developed, Un Sound: Undeveloped')
+    ], string='Development Stage / विकास स्तर', required=True, tracking=True)
     
-    # Rate
-    rate = fields.Monetary(string='Rate / दर', currency_field='currency_id', 
-                           required=True, tracking=True,
-                           help='Compensation rate for this girth range and development stage')
-    currency_id = fields.Many2one('res.currency', string='Currency / मुद्रा', 
-                                 default=lambda self: self.env.company.currency_id)
+    girth_range_min = fields.Float(string='Min Girth (cm) / न्यूनतम छाती (से.मी.)', required=True, tracking=True,
+                                   help='Minimum girth in centimeters')
+    girth_range_max = fields.Float(string='Max Girth (cm) / अधिकतम छाती (से.मी.)', tracking=True,
+                                   help='Maximum girth in centimeters. Leave empty for "Above X cm"')
     
-    # Additional Info
+    rate = fields.Monetary(string='Rate / दर', currency_field='currency_id', required=True, tracking=True,
+                          help='Compensation rate for this tree variant')
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
+    
     active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
-    description = fields.Text(string='Description / विवरण', tracking=True)
+    description = fields.Text(string='Description / विवरण', tracking=True,
+                              help='Additional description or notes for this rate variant')
 
     _sql_constraints = [
-        ('unique_tree_girth_stage', 'unique(tree_master_id, girth_range_min, girth_range_max, development_stage)', 
-         'Rate already exists for this tree, girth range, and development stage combination!')
+        ('unique_tree_rate', 'unique(tree_master_id, development_stage, girth_range_min, girth_range_max)',
+         'A rate variant with the same tree, development stage, and girth range already exists!')
     ]
-
-    @api.constrains('girth_range_min', 'girth_range_max')
-    def _check_girth_range(self):
-        """Ensure girth range is valid"""
-        for record in self:
-            if record.girth_range_min < 0:
-                raise ValidationError('Minimum girth must be positive or zero.')
-            if record.girth_range_max and record.girth_range_max <= record.girth_range_min:
-                raise ValidationError('Maximum girth must be greater than minimum girth.')
-    
-    @api.constrains('tree_master_id', 'girth_range_min', 'girth_range_max')
-    def _check_girth_overlap(self):
-        """Ensure girth ranges don't overlap for the same tree and development stage"""
-        for record in self:
-            domain = [
-                ('tree_master_id', '=', record.tree_master_id.id),
-                ('development_stage', '=', record.development_stage),
-                ('id', '!=', record.id),
-                ('active', '=', True)
-            ]
-            existing = self.search(domain)
-            for existing_record in existing:
-                # Check for overlap
-                if (record.girth_range_max is False or existing_record.girth_range_max is False):
-                    # One is "Above X cm" - check if they overlap
-                    if record.girth_range_max is False:
-                        # Current is "Above X", existing has max
-                        if existing_record.girth_range_max >= record.girth_range_min:
-                            raise ValidationError(
-                                f'Girth range overlaps with existing range: '
-                                f'{existing_record.girth_range_min}-{existing_record.girth_range_max or "Above"} cm'
-                            )
-                    else:
-                        # Existing is "Above X", current has max
-                        if record.girth_range_max >= existing_record.girth_range_min:
-                            raise ValidationError(
-                                f'Girth range overlaps with existing range: '
-                                f'{existing_record.girth_range_min}-{existing_record.girth_range_max or "Above"} cm'
-                            )
-                else:
-                    # Both have max values - check overlap
-                    if not (record.girth_range_max < existing_record.girth_range_min or 
-                           record.girth_range_min > existing_record.girth_range_max):
-                        raise ValidationError(
-                            f'Girth range overlaps with existing range: '
-                            f'{existing_record.girth_range_min}-{existing_record.girth_range_max} cm'
-                        )
-    
-    @api.model
-    def get_rate_for_tree(self, tree_master_id, girth_cm, development_stage):
-        """Get rate for a tree based on girth and development stage"""
-        domain = [
-            ('tree_master_id', '=', tree_master_id),
-            ('development_stage', '=', development_stage),
-            ('girth_range_min', '<=', girth_cm),
-            '|',
-            ('girth_range_max', '=', False),
-            ('girth_range_max', '>=', girth_cm),
-            ('active', '=', True)
-        ]
-        rate_record = self.search(domain, limit=1, order='girth_range_min desc')
-        return rate_record.rate if rate_record else 0.0
-

@@ -5,7 +5,7 @@
         <field name="name">bhu.tree.master.list</field>
         <field name="model">bhu.tree.master</field>
         <field name="arch" type="xml">
-            <list string="Tree Master">
+            <list string="Tree Rate Master">
                 <field name="name"/>
                 <field name="tree_type"/>
             </list>
@@ -17,7 +17,7 @@
         <field name="name">bhu.tree.master.form</field>
         <field name="model">bhu.tree.master</field>
         <field name="arch" type="xml">
-            <form string="Tree Master">
+            <form string="Tree Rate Master">
                 <sheet>
                     <div class="oe_title">
                         <h1>
@@ -59,7 +59,7 @@
         <field name="name">bhu.tree.master.search</field>
         <field name="model">bhu.tree.master</field>
         <field name="arch" type="xml">
-            <search string="Search Tree Master">
+            <search string="Search Tree Rate Master">
                 <field name="name"/>
                 <field name="tree_type"/>
                 <filter string="Fruit-bearing" name="fruit_bearing" domain="[('tree_type', '=', 'fruit_bearing')]"/>
@@ -70,13 +70,13 @@
 
     <!-- Tree Master Action -->
     <record id="action_bhu_tree_master" model="ir.actions.act_window">
-        <field name="name">Tree Master</field>
+        <field name="name">Tree Rate Master</field>
         <field name="res_model">bhu.tree.master</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_bhu_tree_master_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first Tree Master record!
+                Create your first Tree Rate Master record!
             </p>
             <p>
                 Define tree species with their compensation rates for survey purposes.

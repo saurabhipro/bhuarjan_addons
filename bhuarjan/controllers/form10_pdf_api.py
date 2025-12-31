@@ -21,7 +21,7 @@ class Form10PDFAPIController(http.Controller):
     def download_form10(self, **kwargs):
         """
         Download Form 10 (Bulk Table Report) PDF based on village_id
-        Query params: village_id (required), project_id (optional), limit (optional, max 100)
+        Query params: village_id (required), project_id (optional), limit (optional, no limit by default)
         Returns: PDF file
         """
         try:
@@ -30,7 +30,9 @@ class Form10PDFAPIController(http.Controller):
             # Get query parameters
             village_id = request.httprequest.args.get('village_id', type=int)
             project_id = request.httprequest.args.get('project_id', type=int)
-            limit = min(request.httprequest.args.get('limit', type=int, default=20), 50)  # Default 20, max 50
+            # Get limit if provided, otherwise None (no limit)
+            limit_param = request.httprequest.args.get('limit', type=int)
+            limit = limit_param if limit_param is not None else None
 
             if not village_id:
                 _logger.warning("Form 10 download: village_id is missing")

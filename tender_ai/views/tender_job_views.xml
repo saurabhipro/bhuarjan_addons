@@ -55,7 +55,8 @@
                             </field>
                         </page>
                         <page string="General Information">
-                            <field name="tender_id" readonly="1" nolabel="1">
+                            <field name="tender_id" readonly="1" nolabel="1"
+                                   options="{'no_open': True, 'no_create': True, 'no_create_edit': True}">
                                 <form>
                                     <sheet>
                                         <group>

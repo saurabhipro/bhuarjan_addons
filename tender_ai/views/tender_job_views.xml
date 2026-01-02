@@ -12,8 +12,11 @@
                        decoration-info="state in ('extracting','processing')"
                        decoration-warning="state in ('cancelled',)"/>
                 <field name="tender_reference"/>
-                <field name="processing_time_minutes" string="Processing Time (min)"/>
+                <field name="extraction_time_minutes" string="Extraction Time (min)"/>
+                <field name="evaluation_time_minutes" string="Evaluation Time (min)"/>
+                <field name="processing_time_minutes" string="Total Time (min)"/>
                 <field name="companies_detected"/>
+                <field name="create_uid" string="Created By"/>
                 <field name="create_date"/>
             </list>
         </field>
@@ -29,6 +32,8 @@
                             invisible="state != 'draft'"/>
                     <button name="action_evaluate_tender" string="Evaluate Tender" type="object" class="btn-primary"
                             invisible="state != 'extracted'"/>
+                    <button name="action_export_excel" string="Export to Excel" type="object" class="btn-secondary"
+                            invisible="state in ('draft','extracting')"/>
                     <button name="action_stop_processing" string="Stop" type="object" class="btn-secondary" 
                             invisible="state not in ('extracting','processing')"
                             confirm="Are you sure you want to stop?"/>
@@ -45,6 +50,7 @@
                             <field name="name" readonly="1"/>
                             <field name="tender_reference"/>
                             <field name="companies_detected"/>
+                            <field name="create_uid" string="Created By" readonly="1"/>
                         </group>
                         <group>
                             <field name="zip_filename"/>
@@ -106,6 +112,35 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Payment Details">
+                            <field name="payment_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="company_name, transaction_date desc">
+                                    <field name="company_name" string="Company Name" readonly="1"/>
+                                    <field name="vendor" string="Vendor"/>
+                                    <field name="payment_mode" string="Mode"/>
+                                    <field name="bank_name" string="Bank"/>
+                                    <field name="transaction_id" string="Transaction ID"/>
+                                    <field name="amount_inr" string="Amount (INR)"/>
+                                    <field name="transaction_date" string="Date"/>
+                                    <field name="status" string="Status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Work Experience">
+                            <field name="work_experience_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="vendor_company_name, date_of_start desc">
+                                    <field name="vendor_company_name" string="Vendor"/>
+                                    <field name="name_of_work" string="Project Name"/>
+                                    <field name="employer" string="Employer"/>
+                                    <field name="location" string="Location"/>
+                                    <field name="contract_amount_inr" string="Amount"/>
+                                    <field name="date_of_start" string="Start"/>
+                                    <field name="date_of_completion" string="End"/>
+                                    <field name="completion_certificate" string="Certificate"/>
+                                    <field name="attachment" string="Link"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Eligibility Evaluation">
                             <field name="bidder_check_ids" nolabel="1" readonly="1">
                                 <list create="0" delete="0" default_order="create_date desc">
@@ -121,35 +156,9 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Payment Details">
-                            <field name="payment_ids" nolabel="1" readonly="1">
-                                <list create="0" delete="0" default_order="transaction_date desc">
-                                    <field name="company_name" string="Company Name" readonly="1"/>
-                                    <field name="vendor" string="Vendor"/>
-                                    <field name="payment_mode" string="Mode"/>
-                                    <field name="bank_name" string="Bank"/>
-                                    <field name="transaction_id" string="Transaction ID"/>
-                                    <field name="amount_inr" string="Amount (INR)"/>
-                                    <field name="transaction_date" string="Date"/>
-                                    <field name="status" string="Status"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Work Experience">
-                            <field name="work_experience_ids" nolabel="1" readonly="1">
-                                <list create="0" delete="0" default_order="date_of_start desc">
-                                    <field name="vendor_company_name" string="Vendor"/>
-                                    <field name="name_of_work" string="Project Name"/>
-                                    <field name="employer" string="Employer"/>
-                                    <field name="location" string="Location"/>
-                                    <field name="contract_amount_inr" string="Amount"/>
-                                    <field name="date_of_start" string="Start"/>
-                                    <field name="date_of_completion" string="End"/>
-                                    <field name="completion_certificate" string="Certificate"/>
-                                    <field name="attachment" string="Link"/>
-                                </list>
-                            </field>
-                        </page>
+                    </notebook>
+                    <separator string="Processing" />
+                    <notebook>
                         <page string="Processing Analytics">
                             <field name="analytics_html" widget="html" readonly="1" nolabel="1"/>
                             <separator string="Raw JSON (debug)" />

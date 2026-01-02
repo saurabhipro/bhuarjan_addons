@@ -10,6 +10,7 @@ import logging
 import base64
 import json
 import random
+import io
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from psycopg2.errors import SerializationFailure
 import re
@@ -81,8 +82,27 @@ class TenderJob(models.Model):
     # Analytics
     analytics = fields.Text(string='Analytics (JSON)', readonly=True)
     analytics_html = fields.Html(string='Analytics Summary', compute='_compute_analytics_html', sanitize=False, readonly=True)
+
+    # Timing (separate extraction vs evaluation)
+    extraction_started_on = fields.Datetime(string='Extraction Started On', readonly=True)
+    extraction_finished_on = fields.Datetime(string='Extraction Finished On', readonly=True)
+    evaluation_started_on = fields.Datetime(string='Evaluation Started On', readonly=True)
+    evaluation_finished_on = fields.Datetime(string='Evaluation Finished On', readonly=True)
+
+    extraction_time_minutes = fields.Float(
+        string='Extraction Time (min)',
+        compute='_compute_extraction_time_minutes',
+        store=True,
+        readonly=True,
+    )
+    evaluation_time_minutes = fields.Float(
+        string='Evaluation Time (min)',
+        compute='_compute_evaluation_time_minutes',
+        store=True,
+        readonly=True,
+    )
     processing_time_minutes = fields.Float(
-        string='Processing Time (min)',
+        string='Total Time (min)',
         compute='_compute_processing_time_minutes',
         store=True,
         readonly=True,
@@ -184,10 +204,40 @@ class TenderJob(models.Model):
                 "</div>"
             )
 
-    @api.depends('analytics')
-    def _compute_processing_time_minutes(self):
+    @api.depends('extraction_started_on', 'extraction_finished_on')
+    def _compute_extraction_time_minutes(self):
         for rec in self:
             minutes = 0.0
+            try:
+                if rec.extraction_started_on and rec.extraction_finished_on:
+                    delta = rec.extraction_finished_on - rec.extraction_started_on
+                    seconds = delta.total_seconds()
+                    minutes = round(seconds / 60.0, 2) if seconds else 0.0
+            except Exception:
+                minutes = 0.0
+            rec.extraction_time_minutes = minutes
+
+    @api.depends('evaluation_started_on', 'evaluation_finished_on')
+    def _compute_evaluation_time_minutes(self):
+        for rec in self:
+            minutes = 0.0
+            try:
+                if rec.evaluation_started_on and rec.evaluation_finished_on:
+                    delta = rec.evaluation_finished_on - rec.evaluation_started_on
+                    seconds = delta.total_seconds()
+                    minutes = round(seconds / 60.0, 2) if seconds else 0.0
+            except Exception:
+                minutes = 0.0
+            rec.evaluation_time_minutes = minutes
+
+    @api.depends('analytics', 'extraction_time_minutes', 'evaluation_time_minutes')
+    def _compute_processing_time_minutes(self):
+        for rec in self:
+            # Prefer computed stage durations; fallback to legacy analytics durationSeconds.
+            minutes = round((rec.extraction_time_minutes or 0.0) + (rec.evaluation_time_minutes or 0.0), 2)
+            if minutes:
+                rec.processing_time_minutes = minutes
+                continue
             try:
                 data = json.loads(rec.analytics) if rec.analytics else {}
                 if isinstance(data, dict):
@@ -308,7 +358,15 @@ class TenderJob(models.Model):
 
         # IMPORTANT: commit before starting background thread to avoid concurrent
         # updates on the same job row from two different cursors/transactions.
-        self.write({'state': 'extracting', 'error_message': ''})
+        self.write({
+            'state': 'extracting',
+            'error_message': '',
+            'extraction_started_on': fields.Datetime.now(),
+            'extraction_finished_on': False,
+            # reset evaluation times for a fresh run
+            'evaluation_started_on': False,
+            'evaluation_finished_on': False,
+        })
         try:
             self.env.cr.commit()
         except Exception:
@@ -413,7 +471,12 @@ class TenderJob(models.Model):
         _logger.info("TENDER AI: Starting eligibility evaluation for Job ID: %s (ID: %s)", self.name, self.id)
         _logger.info("=" * 80)
 
-        self.write({'state': 'processing', 'error_message': ''})
+        self.write({
+            'state': 'processing',
+            'error_message': '',
+            'evaluation_started_on': fields.Datetime.now(),
+            'evaluation_finished_on': False,
+        })
         try:
             self.env.cr.commit()
         except Exception:
@@ -531,6 +594,225 @@ class TenderJob(models.Model):
 
         _logger.info("TENDER AI [Job %s]: Job reset to draft - ready for reprocessing", self.name)
         return True
+
+    def action_export_excel(self):
+        """Export tender data (all functional tabs) to a styled Excel workbook.
+
+        Excludes: Processing Analytics, Error Log.
+        """
+        self.ensure_one()
+
+        try:
+            import xlsxwriter  # type: ignore
+        except Exception:
+            raise ValidationError(
+                _("Excel export requires the Python package 'XlsxWriter' installed in the Odoo environment.")
+            )
+
+        def _safe_str(v):
+            if v is None:
+                return ""
+            if isinstance(v, (dict, list)):
+                try:
+                    return json.dumps(v, ensure_ascii=False)
+                except Exception:
+                    return str(v)
+            return str(v)
+
+        def _add_table(ws, headers, data_rows, tab_color="#2F5597", style="Table Style Medium 9"):
+            ws.set_tab_color(tab_color)
+            ws.freeze_panes(1, 0)
+
+            if not data_rows:
+                ws.write(0, 0, "No data")
+                return
+
+            # Ensure rectangular
+            cols = len(headers)
+            data = []
+            for row in data_rows:
+                r = list(row or [])
+                if len(r) < cols:
+                    r += [""] * (cols - len(r))
+                data.append([_safe_str(x) for x in r[:cols]])
+
+            ws.add_table(
+                0, 0,
+                len(data), cols - 1,
+                {
+                    "data": data,
+                    "columns": [{"header": h} for h in headers],
+                    "style": style,
+                },
+            )
+
+            # Column widths (cap to keep nice)
+            for c in range(cols):
+                mx = len(str(headers[c] or "")) if headers else 10
+                for r in data[:2000]:
+                    mx = max(mx, len(str(r[c] or "")))
+                ws.set_column(c, c, min(max(mx + 2, 12), 55))
+
+        out = io.BytesIO()
+        wb = xlsxwriter.Workbook(out, {"in_memory": True})
+
+        fmt_title = wb.add_format({"bold": True, "font_size": 14})
+        fmt_label = wb.add_format({"bold": True, "bg_color": "#F2F2F2", "border": 1})
+        fmt_value = wb.add_format({"border": 1, "text_wrap": True})
+
+        # Sheet: Tender (key/value)
+        ws = wb.add_worksheet("Tender")
+        ws.set_tab_color("#1F4E79")
+        ws.write(0, 0, "Tender Export", fmt_title)
+
+        tender = self.tender_id
+        kv = [
+            ("Job ID", self.name),
+            ("Tender Reference", self.tender_reference),
+            ("Status", self.state),
+            ("Created By", self.create_uid.name if self.create_uid else ""),
+            ("Created On", _safe_str(self.create_date)),
+            ("Companies Detected", _safe_str(self.companies_detected)),
+            ("Extraction Time (min)", _safe_str(self.extraction_time_minutes)),
+            ("Evaluation Time (min)", _safe_str(self.evaluation_time_minutes)),
+            ("Total Time (min)", _safe_str(self.processing_time_minutes)),
+        ]
+
+        if tender:
+            kv.extend([
+                ("Department", tender.department_name),
+                ("Tender ID", tender.tender_id),
+                ("Ref. No.", tender.ref_no),
+                ("Tender Creator", tender.tender_creator),
+                ("Category", tender.procurement_category),
+                ("Tender Type", tender.tender_type),
+                ("Hierarchy", tender.organization_hierarchy),
+                ("Estimated Value (INR)", tender.estimated_value_inr),
+                ("Tender Currency", tender.tender_currency),
+                ("Bidding Currency", tender.bidding_currency),
+                ("Offer Validity (Days)", tender.offer_validity_days),
+                ("Previous Tender No.", tender.previous_tender_no),
+                ("Published On", tender.published_on),
+                ("Bid Submission Start", tender.bid_submission_start),
+                ("Bid Submission End", tender.bid_submission_end),
+                ("Tender Opened On", tender.tender_opened_on),
+                ("Description", tender.description),
+                ("NIT", tender.nit),
+            ])
+
+        row = 2
+        for k, v in kv:
+            ws.write(row, 0, _safe_str(k), fmt_label)
+            ws.write(row, 1, _safe_str(v), fmt_value)
+            row += 1
+        ws.set_column(0, 0, 28)
+        ws.set_column(1, 1, 90)
+
+        # Sheet: Eligibility Criteria
+        criteria = self.eligibility_criteria.sudo().sorted(key=lambda r: (r.sl_no or ""))
+        _add_table(
+            wb.add_worksheet("Eligibility Criteria"),
+            ["Sl No", "Criteria", "Supporting Document"],
+            [[c.sl_no, c.criteria, c.supporting_document] for c in criteria],
+            tab_color="#7030A0",
+        )
+
+        # Sheet: Bidders
+        bidders = self.bidders.sudo().sorted(key=lambda r: (r.vendor_company_name or ""))
+        _add_table(
+            wb.add_worksheet("Bidders"),
+            [
+                "Company Name", "Address", "Email", "Contact Person", "Phone",
+                "PAN", "GSTIN", "Registration", "Validity",
+            ],
+            [[
+                b.vendor_company_name, b.company_address, b.email_id, b.contact_person, b.contact_no,
+                b.pan, b.gstin, b.place_of_registration, b.offer_validity_days,
+            ] for b in bidders],
+            tab_color="#00B0F0",
+        )
+
+        # Sheet: Payments
+        payments = self.payment_ids.sudo().sorted(key=lambda r: ((r.company_name or ""), (r.transaction_date or "")))
+        _add_table(
+            wb.add_worksheet("Payments"),
+            ["Company Name", "Vendor", "Mode", "Bank", "Transaction ID", "Amount (INR)", "Date", "Status"],
+            [[
+                p.company_name, p.vendor, p.payment_mode, p.bank_name, p.transaction_id,
+                p.amount_inr, p.transaction_date, p.status,
+            ] for p in payments],
+            tab_color="#00B050",
+        )
+
+        # Sheet: Work Experience
+        work = self.work_experience_ids.sudo().sorted(key=lambda r: ((r.vendor_company_name or ""), (r.date_of_start or "")))
+        _add_table(
+            wb.add_worksheet("Work Experience"),
+            [
+                "Vendor", "Name of Work", "Employer", "Location", "Amount",
+                "Start", "End", "Certificate", "Attachment",
+            ],
+            [[
+                w.vendor_company_name, w.name_of_work, w.employer, w.location, w.contract_amount_inr,
+                w.date_of_start, w.date_of_completion, w.completion_certificate, w.attachment,
+            ] for w in work],
+            tab_color="#FFC000",
+        )
+
+        # Sheet: Eligibility Evaluation (Summary)
+        checks = self.bidder_check_ids.sudo().sorted(key=lambda r: (r.bidder_id.vendor_company_name or ""))
+        _add_table(
+            wb.add_worksheet("Evaluation Summary"),
+            ["Bidder", "Overall Result", "Passed", "Failed", "Unknown", "Time (sec)", "Processed On"],
+            [[
+                c.bidder_id.vendor_company_name if c.bidder_id else "",
+                c.overall_result,
+                c.passed_criteria,
+                c.failed_criteria,
+                c.unknown_criteria,
+                c.duration_seconds,
+                _safe_str(c.processed_on),
+            ] for c in checks],
+            tab_color="#C00000",
+        )
+
+        # Sheet: Eligibility Evaluation (Details per criterion)
+        lines = self.env["tende_ai.bidder_check_line"].sudo().search([("job_id", "=", self.id)], order="bidder_id, sl_no, id")
+        _add_table(
+            wb.add_worksheet("Evaluation Details"),
+            ["Bidder", "Sl No", "Result", "Criteria", "Supporting Document", "Reason", "Evidence", "Missing Documents"],
+            [[
+                ln.bidder_id.vendor_company_name if ln.bidder_id else "",
+                ln.sl_no,
+                ln.result,
+                ln.criteria,
+                ln.supporting_document,
+                ln.reason,
+                ln.evidence,
+                ln.missing_documents,
+            ] for ln in lines],
+            tab_color="#7F0000",
+        )
+
+        wb.close()
+        out.seek(0)
+        data = out.read()
+
+        filename = f"{self.name or 'tender_job'}_export.xlsx"
+        att = self.env["ir.attachment"].sudo().create({
+            "name": filename,
+            "type": "binary",
+            "datas": base64.b64encode(data),
+            "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "res_model": self._name,
+            "res_id": self.id,
+        })
+
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{att.id}?download=true",
+            "target": "self",
+        }
 
     def _should_stop(self):
         """Check if processing should be stopped"""
@@ -851,7 +1133,10 @@ class TenderJob(models.Model):
                 pass
 
             # Mark extraction done
-            self._safe_job_write({'state': 'extracted'})
+            self._safe_job_write({
+                'state': 'extracted',
+                'extraction_finished_on': fields.Datetime.now(),
+            })
             try:
                 self.env.cr.commit()
             except Exception:
@@ -1234,7 +1519,11 @@ class TenderJob(models.Model):
             except Exception:
                 analytics_json = str(prev)
 
-            self._safe_job_write({'analytics': analytics_json, 'state': 'completed'})
+            self._safe_job_write({
+                'analytics': analytics_json,
+                'state': 'completed',
+                'evaluation_finished_on': fields.Datetime.now(),
+            })
             try:
                 self.env.cr.commit()
             except Exception:

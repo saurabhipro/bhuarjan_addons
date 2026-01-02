@@ -100,7 +100,7 @@ def clean_json_response(raw_text: str) -> dict:
         except (json.JSONDecodeError, ValueError):
             pass
     
-    raise ValueError(f"Failed to parse JSON from Gemini response: {raw_text[:200]}")
+    raise ValueError(f"Failed to parse JSON from AI response: {raw_text[:200]}")
 
 
 def _normalize_criteria(arr: Any) -> List[Dict[str, str]]:
@@ -127,7 +127,7 @@ def _normalize_criteria(arr: Any) -> List[Dict[str, str]]:
 
 def extract_tender_from_pdf_with_gemini(pdf_path: str, model: str = "gemini-3-flash-preview", env=None) -> dict:
     """
-    Uploads tender.pdf to Gemini, extracts structured tender data + eligibility criteria,
+    Uploads tender.pdf to the AI service, extracts structured tender data + eligibility criteria,
     and returns a dictionary with analytics.
 
     Output includes:
@@ -137,7 +137,7 @@ def extract_tender_from_pdf_with_gemini(pdf_path: str, model: str = "gemini-3-fl
     
     Args:
         pdf_path: Path to the tender PDF file
-        model: Gemini model to use
+        model: AI model to use
         env: Optional Odoo environment (api.Environment). Used to get API key from system parameters.
     """
     uploaded_file = upload_file_to_gemini(pdf_path, env=env)

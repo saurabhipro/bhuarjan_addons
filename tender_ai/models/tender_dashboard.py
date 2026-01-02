@@ -39,7 +39,7 @@ class TenderDashboard(models.TransientModel):
     
     # Processing Statistics
     total_pdfs_processed = fields.Integer(string='Total PDFs Processed', compute='_compute_statistics', readonly=True)
-    total_gemini_calls = fields.Integer(string='Total Gemini API Calls', compute='_compute_statistics', readonly=True)
+    total_gemini_calls = fields.Integer(string='Total AI API Calls', compute='_compute_statistics', readonly=True)
     total_tokens_used = fields.Integer(string='Total Tokens Used', compute='_compute_statistics', readonly=True)
     avg_processing_time = fields.Float(string='Avg Processing Time (min)', compute='_compute_statistics', readonly=True)
     

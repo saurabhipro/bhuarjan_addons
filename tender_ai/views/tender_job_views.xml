@@ -171,7 +171,7 @@
             </p>
             <p>
                 Upload a ZIP file containing tender.pdf and company folders with PDFs.
-                The system will process them using Gemini AI.
+                The system will process them using AI.
             </p>
         </field>
     </record>

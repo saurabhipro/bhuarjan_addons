@@ -22,12 +22,12 @@ _logger = logging.getLogger(__name__)
 _thread_local = threading.local()
 
 # Global concurrency cap to avoid 429 when you run parallel PDFs/companies
-# Set env: GEMINI_MAX_CONCURRENCY=8 (recommended 6-12)
-_GEMINI_SEM = threading.BoundedSemaphore(int(os.getenv("GEMINI_MAX_CONCURRENCY", "8")))
+# Set env: AI_MAX_CONCURRENCY=8 (recommended 6-12). Legacy env var is still supported.
+_GEMINI_SEM = threading.BoundedSemaphore(int(os.getenv("AI_MAX_CONCURRENCY") or os.getenv("GEMINI_MAX_CONCURRENCY") or "8"))
 
 # File upload cache: maps file_path -> (file_object, file_name, upload_time)
 # This avoids re-uploading the same file multiple times within a short period
-# Note: The Gemini SDK will still make GET requests to fetch file metadata
+# Note: The SDK will still make GET requests to fetch file metadata
 # before each generate_content() call - this is expected SDK behavior
 _file_cache = {}
 _file_cache_lock = threading.Lock()
@@ -59,7 +59,7 @@ def _cleanup_file_cache(lazy=True):
         for path in expired_paths:
             del _file_cache[path]
         if expired_paths:
-            _logger.debug("GEMINI API: Cleaned up %d expired file cache entries", len(expired_paths))
+            _logger.debug("AI API: Cleaned up %d expired file cache entries", len(expired_paths))
         _last_cleanup_time = current_time
 
 
@@ -70,11 +70,10 @@ _api_key_cache_lock = threading.Lock()
 
 def get_gemini_api_key(env=None):
     """
-    Get Gemini API key from (in priority order):
-    1. Environment variable GEMINI_API_KEY (highest priority)
-       Note: When set in odoo.conf [options] section, Odoo makes it available as env var
-    2. Odoo config file (odoo.conf) - GEMINI_API_KEY parameter
-    3. Odoo system parameter tender_ai.gemini_api_key
+    Get AI API key from (in priority order):
+    1. Odoo config file (odoo.conf): ai_api_key (preferred), then legacy keys
+    2. Odoo system parameter: tender_ai.ai_api_key (preferred), then legacy parameter
+    3. Environment variable: AI_API_KEY (preferred), then legacy environment variable
     4. Raise error if not found
     
     Args:
@@ -90,80 +89,78 @@ def get_gemini_api_key(env=None):
         if _api_key_cache:
             return _api_key_cache
     
-    # First, try environment variable (fastest)
-    api_key = os.getenv("GEMINI_API_KEY")
-    if api_key:
-        _logger.debug("GEMINI API KEY: Found in environment variable")
-        with _api_key_cache_lock:
-            _api_key_cache = api_key
-        return api_key
-    
     # Try Odoo config file (odoo.conf)
     try:
         from odoo import tools
-        if hasattr(tools, 'config') and tools.config:
-            # Try direct attribute access first (most common)
-            if hasattr(tools.config, 'GEMINI_API_KEY'):
-                api_key = getattr(tools.config, 'GEMINI_API_KEY')
+        cfg = getattr(tools, 'config', None)
+        if cfg:
+            # Odoo stores config options in a dict-like object; keys are typically lowercased.
+            candidates = [
+                # Preferred neutral keys
+                "AI_API_KEY",
+                "ai_api_key",
+                "ai_api_key".upper(),
+                # Legacy keys (still supported for backwards compatibility)
+                "GEMINI_API_KEY",
+                "gemini_api_key",
+                "GEMINI_API_KEY".lower(),
+            ]
+            for key in candidates:
+                try:
+                    api_key = cfg.get(key) if hasattr(cfg, "get") else None
+                except Exception:
+                    api_key = None
                 if api_key:
-                    _logger.debug("GEMINI API KEY: Found in odoo.conf")
+                    _logger.debug("AI API KEY: Found in odoo.conf")
                     with _api_key_cache_lock:
                         _api_key_cache = api_key
                     return api_key
-            
-            # Try ConfigParser get() method
-            try:
-                api_key = tools.config.get('options', 'GEMINI_API_KEY', fallback=None)
-                if api_key:
-                    _logger.debug("GEMINI API KEY: Found in odoo.conf")
-                    with _api_key_cache_lock:
-                        _api_key_cache = api_key
-                    return api_key
-            except Exception:
-                pass
     except (ImportError, Exception) as e:
-        _logger.debug("GEMINI API KEY: Could not read from odoo.conf: %s", str(e))
+        _logger.debug("AI API KEY: Could not read from odoo.conf: %s", str(e))
     
     # If env is provided, try system parameter
     if env:
         try:
-            api_key = env['ir.config_parameter'].sudo().get_param('tender_ai.gemini_api_key', '')
+            api_key = env['ir.config_parameter'].sudo().get_param('tender_ai.ai_api_key', '')
+            if not api_key:
+                # Legacy parameter
+                api_key = env['ir.config_parameter'].sudo().get_param('tender_ai.gemini_api_key', '')
             if api_key:
-                _logger.debug("GEMINI API KEY: Found in system parameter")
+                _logger.debug("AI API KEY: Found in system parameter")
                 with _api_key_cache_lock:
                     _api_key_cache = api_key
                 return api_key
         except Exception:
             pass
-    
-    # TEMPORARY: Hardcoded API key as fallback (remove after testing)
-    hardcoded_key = "AIzaSyC3s07mUHLU4kA3pUOucyrT9mn4QG75qYM"
-    if hardcoded_key:
-        _logger.warning("GEMINI API KEY: Using hardcoded API key (TEMPORARY - remove after testing)")
+
+    # Finally, try environment variable (optional fallback)
+    api_key = os.getenv("AI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if api_key:
+        _logger.debug("AI API KEY: Found in environment variable")
         with _api_key_cache_lock:
-            _api_key_cache = hardcoded_key
-        return hardcoded_key
+            _api_key_cache = api_key
+        return api_key
     
     # Final error with helpful message
     error_msg = (
-        "Missing GEMINI_API_KEY. Set it via:\n"
-        "1. Odoo config file (odoo.conf): Add 'GEMINI_API_KEY=your_key' in [options] section\n"
+        "Missing AI API key. Set it via:\n"
+        "1. Odoo config file (odoo.conf): Add 'ai_api_key=your_key' in [options] section\n"
         "   Then RESTART Odoo server for changes to take effect\n"
-        "2. Environment variable: export GEMINI_API_KEY=your_key (before starting Odoo)\n"
+        "2. Environment variable: export AI_API_KEY=your_key (before starting Odoo)\n"
         "3. Odoo System Parameter: Settings > Technical > Parameters > System Parameters\n"
-        "   Create/Edit parameter 'tender_ai.gemini_api_key' with your API key\n\n"
+        "   Create/Edit parameter 'tender_ai.ai_api_key' with your API key\n\n"
         "Note: If you added it to odoo.conf, make sure:\n"
         "  - It's in the [options] section\n"
         "  - There are no spaces around the = sign\n"
         "  - You have RESTARTED the Odoo server"
     )
-    _logger.error("GEMINI API KEY: %s", error_msg)
+    _logger.error("AI API KEY: %s", error_msg)
     raise RuntimeError(error_msg)
 
 
 def _get_client(env=None):
     """
-    Thread-safe Gemini client getter.
+    Thread-safe AI client getter.
     Each thread gets its own client instance.
     
     Args:
@@ -189,10 +186,10 @@ def upload_file_to_gemini(
     use_cache: bool = True,
 ):
     """
-    Upload local file (PDF) to Gemini Files API and return the File object.
+    Upload local file (PDF) to the AI Files API and return the File object.
     If wait_active=True, waits until state becomes ACTIVE (or timeout).
     
-    NOTE: The Gemini SDK will make GET requests to fetch file metadata
+    NOTE: The SDK will make GET requests to fetch file metadata
     before each generate_content() call. This is expected SDK behavior and
     cannot be avoided. The repeated GET requests you see in logs are the SDK
     validating file state before API calls.
@@ -231,7 +228,7 @@ def upload_file_to_gemini(
         raise FileNotFoundError(f"File not found: {file_path}")
 
     file_size_mb = p.stat().st_size / (1024 * 1024)
-    _logger.debug("GEMINI API: Uploading file to Gemini Files API: %s (%.2f MB)", 
+    _logger.debug("AI API: Uploading file to Files API: %s (%.2f MB)", 
                   file_path, file_size_mb)
 
     # Gate uploads too (helps when many threads upload together)
@@ -366,7 +363,7 @@ def _extract_usage(response: Any) -> Dict[str, Any]:
 
 def _sleep_from_retry_message(msg: str, default_sec: int = 10) -> int:
     """
-    Parses retry delay seconds from Gemini quota error messages.
+    Parses retry delay seconds from quota/rate-limit error messages.
     """
     if not msg:
         return default_sec
@@ -430,7 +427,7 @@ def generate_with_gemini(
     env=None,
 ) -> Any:
     """
-    Generic Gemini call.
+    Generic AI call.
 
     Returns (backward compatible):
       - dict: {"text": "...", "usage": {...}, "model": "..."}  (preferred)
@@ -440,13 +437,13 @@ def generate_with_gemini(
       - a string prompt
       - a list like [uploaded_file, prompt] OR [prompt, uploaded_file] OR [file1, file2, prompt]
     
-    NOTE: When contents includes file objects, the Gemini SDK will make GET requests
+    NOTE: When contents includes file objects, the SDK will make GET requests
     to fetch file metadata before each generate_content() call. This is expected SDK
     behavior for file validation. You may see repeated GET requests for the same file
     IDs in logs - this is normal and cannot be avoided without modifying the SDK.
     
     Args:
-        contents: Content to send to Gemini
+        contents: Content to send to the AI service
         model: Model name to use
         max_retries: Maximum retry attempts
         temperature: Temperature for generation
@@ -508,4 +505,4 @@ def generate_with_gemini(
             last_err = e
             time.sleep(1)
 
-    raise RuntimeError(f"Gemini call failed after retries: {last_err}")
+    raise RuntimeError(f"AI call failed after retries: {last_err}")

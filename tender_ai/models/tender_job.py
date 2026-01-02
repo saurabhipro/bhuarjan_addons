@@ -12,6 +12,7 @@ import json
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from psycopg2.errors import SerializationFailure
+import re
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -120,7 +121,7 @@ class TenderJob(models.Model):
                 ("Companies Detected", data.get("companiesDetected")),
                 ("Total PDFs Received", data.get("totalPdfReceived")),
                 ("Total Valid PDFs Processed", data.get("totalValidPdfProcessed")),
-                ("Gemini Calls", data.get("geminiCallsTotal")),
+                ("AI Calls", data.get("geminiCallsTotal")),
                 ("Duration (sec)", data.get("durationSeconds")),
                 ("Tokens (prompt)", (tokens.get("promptTokens") if isinstance(tokens, dict) else "")),
                 ("Tokens (output)", (tokens.get("outputTokens") if isinstance(tokens, dict) else "")),
@@ -208,6 +209,36 @@ class TenderJob(models.Model):
                 if attempt >= max_retries - 1:
                     raise
                 time.sleep(base_delay * (2 ** attempt))
+
+    def _format_failure_reason(self, e: Exception) -> str:
+        """
+        Convert exceptions into a clean, user-friendly reason for Error Log.
+        Especially helpful for AI client error payloads.
+        """
+        msg = str(e) or repr(e)
+
+        # The AI client often includes a JSON-like payload in the exception string
+        # Example: "API key expired. Please renew the API key."
+        if 'API key expired' in msg or 'API_KEY_INVALID' in msg:
+            return (
+                "AI API key is invalid/expired.\n"
+                "Fix: Update the AI API key in odoo.conf [options] and restart Odoo.\n"
+                f"Details: {msg}"
+            )
+
+        if 'INVALID_ARGUMENT' in msg and 'googleapis.com' in msg:
+            return f"AI request rejected (INVALID_ARGUMENT).\nDetails: {msg}"
+
+        # Common Odoo/PG failures
+        if 'could not serialize access' in msg.lower():
+            return f"Database concurrency issue (serialization failure).\nDetails: {msg}"
+
+        # Try to pull a nested 'message' field if present
+        m = re.search(r"'message'\s*:\s*'([^']+)'", msg)
+        if m:
+            return m.group(1)
+
+        return msg
 
     def _attach_company_pdfs_to_bidder(self, bidder, pdf_paths, extract_dir=None):
         """Create ir.attachment records for bidder PDFs so they can be previewed/downloaded."""
@@ -330,10 +361,18 @@ class TenderJob(models.Model):
                         with env.registry.cursor() as cr2:
                             env2 = Environment(cr2, env.uid, env.context)
                             job2 = env2['tende_ai.job'].browse(job_id)
+                            reason = job2._format_failure_reason(e)
                             job2.sudo().write({
                                 'state': 'failed',
-                                'error_message': f'Background processing error: {str(e)}',
+                                'error_message': f'Background processing error:\n{reason}',
                             })
+                            try:
+                                job2.message_post(
+                                    body=f"<b>Tender AI failed</b><br/><pre>{reason}</pre>",
+                                    subtype_xmlid='mail.mt_note',
+                                )
+                            except Exception:
+                                pass
                             cr2.commit()
                     except:
                         pass
@@ -603,15 +642,15 @@ class TenderJob(models.Model):
                 return
 
             # 1️⃣ Tender extraction
-            model = os.getenv("GEMINI_TENDER_MODEL", "gemini-3-flash-preview")
-            _logger.info("TENDER AI [Job %s]: Starting tender extraction with Gemini API", self.name)
-            _logger.info("TENDER AI [Job %s]:   - Model: %s", self.name, model)
+            model = os.getenv("AI_TENDER_MODEL") or os.getenv("GEMINI_TENDER_MODEL") or "gemini-3-flash-preview"
+            _logger.info("TENDER AI [Job %s]: Starting tender extraction with AI service", self.name)
+            _logger.info("TENDER AI [Job %s]:   - Model: configured", self.name)
             _logger.info("TENDER AI [Job %s]:   - PDF Path: %s", self.name, tender_pdf_path)
-            _logger.info("TENDER AI [Job %s]: Calling Gemini API: extract_tender_from_pdf_with_gemini()", self.name)
+            _logger.info("TENDER AI [Job %s]: Calling AI service: tender extraction", self.name)
             tender_start_time = time.time()
             tender_data = extract_tender_from_pdf_with_gemini(tender_pdf_path, model=model, env=self.env) or {}
             tender_duration = time.time() - tender_start_time
-            _logger.info("TENDER AI [Job %s]: ✓ Gemini API call completed for tender extraction", self.name)
+            _logger.info("TENDER AI [Job %s]: ✓ AI call completed for tender extraction", self.name)
             _logger.info("TENDER AI [Job %s]:   - Duration: %.2f seconds", self.name, tender_duration)
             
             # Log tender analytics if available
@@ -694,9 +733,9 @@ class TenderJob(models.Model):
 
             company_workers = int(os.getenv("COMPANY_WORKERS", "4"))
             pdf_workers = int(os.getenv("PDF_WORKERS_PER_COMPANY", "5"))
-            model = os.getenv("GEMINI_COMPANY_MODEL", "gemini-3-flash-preview")
-            _logger.info("TENDER AI [Job %s]: Processing configuration - Company Workers: %d, PDF Workers: %d, Model: %s", 
-                        self.name, company_workers, pdf_workers, model)
+            model = os.getenv("AI_COMPANY_MODEL") or os.getenv("GEMINI_COMPANY_MODEL") or "gemini-3-flash-preview"
+            _logger.info("TENDER AI [Job %s]: Processing configuration - Company Workers: %d, PDF Workers: %d, Model: configured", 
+                        self.name, company_workers, pdf_workers)
 
             bidders = []
             payments_by_company = []
@@ -725,7 +764,7 @@ class TenderJob(models.Model):
                 _logger.info("TENDER AI [Job %s]:   - Companies: %d", self.name, len(jobs))
                 _logger.info("TENDER AI [Job %s]:   - Company Workers: %d", self.name, company_workers)
                 _logger.info("TENDER AI [Job %s]:   - PDF Workers per Company: %d", self.name, pdf_workers)
-                _logger.info("TENDER AI [Job %s]:   - Model: %s", self.name, model)
+                _logger.info("TENDER AI [Job %s]:   - Model: configured", self.name)
                 
                 # Check if processing was stopped before company processing
                 if self._should_stop():
@@ -949,7 +988,7 @@ class TenderJob(models.Model):
                         self.name, overall_duration, overall_duration / 60)
             _logger.info("TENDER AI [Job %s]:   - Companies Processed: %d", self.name, len(jobs))
             _logger.info("TENDER AI [Job %s]:   - Total PDFs Processed: %d", self.name, total_valid_pdfs)
-            _logger.info("TENDER AI [Job %s]:   - Total Gemini API Calls: %d", self.name, total_gemini_calls)
+            _logger.info("TENDER AI [Job %s]:   - Total AI API Calls: %d", self.name, total_gemini_calls)
             _logger.info("TENDER AI [Job %s]:   - Total Tokens Used: %s", self.name, total_tokens)
             _logger.info("=" * 80)
             
@@ -985,16 +1024,24 @@ class TenderJob(models.Model):
             })
 
         except Exception as e:
-            error_msg = f"{str(e)}\n{traceback.format_exc()[:4000]}"
+            reason = self._format_failure_reason(e)
+            error_msg = f"{reason}\n\n{traceback.format_exc()[:4000]}"
             _logger.error("TENDER AI [Job %s]: ✗ Processing failed with error", self.name)
             _logger.error("TENDER AI [Job %s]:   - Error: %s", self.name, str(e))
             _logger.error("TENDER AI [Job %s]:   - Traceback: %s", self.name, traceback.format_exc())
             _logger.info("=" * 80)
             
-            self.sudo().write({
+            self._safe_job_write({
                 'state': 'failed',
                 'error_message': error_msg,
             })
+            try:
+                self.message_post(
+                    body=f"<b>Tender AI failed</b><br/><pre>{reason}</pre>",
+                    subtype_xmlid='mail.mt_note',
+                )
+            except Exception:
+                pass
 
     def _is_company_folder(self, name: str) -> bool:
         """Check if folder name represents a company"""
@@ -1050,11 +1097,11 @@ class TenderJob(models.Model):
         
         _logger.info("TENDER AI [Job %s]: Processing company: %s (%d PDFs)", 
                     self.name, company_name, len(pdf_paths))
-        _logger.info("TENDER AI [Job %s]:   - Calling Gemini API: extract_company_bidder_and_payments()", 
+        _logger.info("TENDER AI [Job %s]:   - Calling AI service: extract_company_bidder_and_payments()", 
                     self.name)
         _logger.info("TENDER AI [Job %s]:   - Company: %s", self.name, company_name)
         _logger.info("TENDER AI [Job %s]:   - PDFs: %d", self.name, len(pdf_paths))
-        _logger.info("TENDER AI [Job %s]:   - Model: %s", self.name, model)
+        _logger.info("TENDER AI [Job %s]:   - Model: configured", self.name)
         _logger.info("TENDER AI [Job %s]:   - Workers: %d", self.name, pdf_workers)
         
         company_start_time = time.time()
@@ -1065,9 +1112,9 @@ class TenderJob(models.Model):
             max_workers=pdf_workers,
             env=self.env,
         )
-        # Keep original PDF paths so we can attach extracted files to the bidder record
-        if isinstance(result, dict):
-            result["_pdf_paths"] = pdf_paths
+        # Ensure we always return a dict (attachments & downstream logic rely on it)
+        if not isinstance(result, dict):
+            result = {}
         company_duration = time.time() - company_start_time
         
         # Log company analytics
@@ -1079,7 +1126,7 @@ class TenderJob(models.Model):
             _logger.info("TENDER AI [Job %s]: ✓ Company processing completed: %s", 
                         self.name, company_name)
             _logger.info("TENDER AI [Job %s]:   - Duration: %.2f seconds", self.name, company_duration)
-            _logger.info("TENDER AI [Job %s]:   - Gemini API Calls: %d", self.name, gemini_calls)
+            _logger.info("TENDER AI [Job %s]:   - AI API Calls: %d", self.name, gemini_calls)
             _logger.info("TENDER AI [Job %s]:   - Valid PDFs Processed: %d", self.name, valid_pdfs)
             _logger.info("TENDER AI [Job %s]:   - Tokens Used: %s", self.name, tokens)
 
@@ -1089,6 +1136,8 @@ class TenderJob(models.Model):
             "payments": result.get("payments") or [],
             "work_experience": result.get("work_experience") or [],
             "analytics": result.get("analytics") or {},
+            # Critical: used by _attach_company_pdfs_to_bidder() to auto-create bidder attachments
+            "_pdf_paths": pdf_paths,
         }
 
     def _safe_write(self, vals):

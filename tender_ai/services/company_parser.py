@@ -240,7 +240,7 @@ def _coerce_schema(data: Dict[str, Any]) -> Dict[str, Any]:
     Normalize into:
       {"bidder": {...}, "payments": [...], "workExperience": [...]}
 
-    Sometimes Gemini may return bidder fields at root instead of inside "bidder".
+    Sometimes the AI service may return bidder fields at root instead of inside "bidder".
     """
     if not isinstance(data, dict):
         return {"bidder": {}, "payments": [], "workExperience": []}
@@ -288,7 +288,7 @@ def _merge_tokens(total: Dict[str, int], usage: Dict[str, Any]) -> Dict[str, int
 # ----------------------------
 def _extract_from_single_pdf(company_name: str, pdf_path: str, model: str, env=None) -> Dict[str, Any]:
     """
-    Upload 1 PDF + call Gemini 1 time.
+    Upload 1 PDF + call the AI service 1 time.
     Returns:
       {
         "bidder": {...}, "payments": [...], "workExperience": [...],
@@ -298,7 +298,7 @@ def _extract_from_single_pdf(company_name: str, pdf_path: str, model: str, env=N
     Args:
         company_name: Name of the company
         pdf_path: Path to the PDF file
-        model: Gemini model to use
+        model: AI model to use
         env: Optional Odoo environment (api.Environment). Used to get API key from system parameters.
     """
     prompt = ONE_PDF_PROMPT_TEMPLATE.format(company_name=company_name)
@@ -379,7 +379,7 @@ def extract_company_bidder_and_payments(
     env=None,
 ) -> Dict[str, Any]:
     """
-    Parallel Gemini calls per PDF inside a company folder.
+    Parallel AI calls per PDF inside a company folder.
 
     Returns:
       {
@@ -482,7 +482,7 @@ def extract_company_bidder_and_payments(
 
     t1 = time.time()
 
-    # Count Gemini calls: 1 per valid PDF (even if fails)
+    # Count AI calls: 1 per valid PDF (even if fails)
     gemini_calls = valid_pdf_count
 
     company_analytics = {

@@ -1,11 +1,11 @@
 {
-    'name': 'Tender AI - Gemini Tender Processing',
+    'name': 'Tender AI - Automated Tender Processing',
     'version': '18.0.1.0.0',
-    'summary': 'AI-powered tender processing using Gemini API',
+    'summary': 'AI-powered tender processing for tender ZIP/PDF documents',
     'description': """
         Tender AI Module
         ================
-        This module processes tender ZIP files using Google Gemini API to extract:
+        This module processes tender ZIP files using an AI extraction service to extract:
         - Tender information from tender.pdf
         - Bidder/company details from company folders
         - Payment records
@@ -15,7 +15,7 @@
         Features:
         - Secure ZIP file upload and extraction
         - Background processing with job tracking
-        - Gemini API integration for PDF extraction
+        - AI API integration for PDF extraction
         - Excel export of processed data
     """,
     'category': 'Tools',
@@ -32,6 +32,7 @@
         'views/bidder_views.xml',
         'views/payment_views.xml',
         'views/work_experience_views.xml',
+        'views/ir_attachment_views.xml',
         'views/menu_views.xml',
     ],
     'assets': {

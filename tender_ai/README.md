@@ -1,11 +1,11 @@
 # Tender AI Module
 
-Odoo module for processing tender ZIP files using Google Gemini API.
+Odoo module for processing tender ZIP files using an AI extraction service.
 
 ## Features
 
 - **ZIP File Upload**: Upload ZIP files containing tender.pdf and company folders
-- **AI-Powered Extraction**: Uses Google Gemini API to extract structured data from PDFs
+- **AI-Powered Extraction**: Uses an AI API to extract structured data from PDFs
 - **Background Processing**: Processes files asynchronously in the background
 - **Comprehensive Data Extraction**:
   - Tender information (department, reference, dates, etc.)
@@ -36,22 +36,22 @@ Odoo module for processing tender ZIP files using Google Gemini API.
 
 3. **Set environment variable:**
    ```bash
-   export GEMINI_API_KEY=your_api_key_here
+   export AI_API_KEY=your_api_key_here
    ```
    
    Or add to your Odoo configuration file:
    ```ini
    [options]
-   GEMINI_API_KEY=your_api_key_here
+   ai_api_key=your_api_key_here
    ```
 
 ## Configuration
 
 Set the following environment variables (optional):
-- `GEMINI_API_KEY`: Your Google Gemini API key (required)
-- `GEMINI_TENDER_MODEL`: Model for tender extraction (default: `gemini-3-flash-preview`)
-- `GEMINI_COMPANY_MODEL`: Model for company extraction (default: `gemini-3-flash-preview`)
-- `GEMINI_MAX_CONCURRENCY`: Max concurrent Gemini calls (default: `8`)
+- `AI_API_KEY`: Your AI API key (required)
+- `AI_TENDER_MODEL`: Model for tender extraction (optional; provider-specific)
+- `AI_COMPANY_MODEL`: Model for company extraction (optional; provider-specific)
+- `AI_MAX_CONCURRENCY`: Max concurrent AI calls (default: `8`)
 - `COMPANY_WORKERS`: Number of company processing workers (default: `4`)
 - `PDF_WORKERS_PER_COMPANY`: Number of PDF workers per company (default: `5`)
 
@@ -154,7 +154,7 @@ tender.zip
 
 ### Module won't install
 - Ensure `google-genai` and `openpyxl` are installed in your Odoo Python environment
-- Check that `GEMINI_API_KEY` is set
+- Check that `AI_API_KEY` is set (or `ai_api_key` is present in `odoo.conf`)
 
 ### File size limit error (134MB limit)
 If you encounter "file is larger than the maximum allowed file size (134MB)":
@@ -190,11 +190,11 @@ LimitRequestBody 2147483648
 ### Processing fails
 - Check the error message in the job form
 - Verify ZIP file structure (must contain tender.pdf)
-- Ensure Gemini API key is valid and has quota
+- Ensure AI API key is valid and has quota
 
 ### Slow processing
 - Adjust `COMPANY_WORKERS` and `PDF_WORKERS_PER_COMPANY` environment variables
-- Check Gemini API rate limits
+- Check AI API rate limits
 
 ## License
 

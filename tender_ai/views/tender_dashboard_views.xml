@@ -95,8 +95,8 @@
                             </div>
                             <div class="dashboard-kpi-card kpi-card-green" style="cursor: default;">
                                 <div class="kpi-header">
-                                    <div class="kpi-label">Gemini API Calls</div>
-                                    <div class="kpi-icon"><i class="fa fa-cloud" title="Gemini API Calls"/></div>
+                                    <div class="kpi-label">AI API Calls</div>
+                                    <div class="kpi-icon"><i class="fa fa-cloud" title="AI API Calls"/></div>
                                 </div>
                                 <div class="kpi-value"><field name="total_gemini_calls" nolabel="1" readonly="1"/></div>
                             </div>

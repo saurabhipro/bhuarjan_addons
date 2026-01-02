@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+import base64
+import os
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class Bidder(models.Model):
@@ -37,8 +41,10 @@ class Bidder(models.Model):
         store=False,
     )
 
+    @api.depends('message_ids')
     def _compute_attachment_ids(self):
-        Attachment = self.env['ir.attachment'].sudo()
+        # Do NOT sudo here; we want to respect attachment access rules in UI.
+        Attachment = self.env['ir.attachment']
         for rec in self:
             if not rec.id:
                 rec.attachment_ids = False
@@ -47,4 +53,90 @@ class Bidder(models.Model):
                 ('res_model', '=', 'tende_ai.bidder'),
                 ('res_id', '=', rec.id),
             ])
+
+    def action_open_attachments(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Attachments'),
+            'res_model': 'ir.attachment',
+            'view_mode': 'list,form',
+            'domain': [('res_model', '=', 'tende_ai.bidder'), ('res_id', '=', self.id)],
+            'context': {
+                'default_res_model': 'tende_ai.bidder',
+                'default_res_id': self.id,
+            },
+            'target': 'current',
+        }
+
+    def action_generate_attachments(self):
+        """Create one ir.attachment per extracted PDF for this bidder (downloadable)."""
+        self.ensure_one()
+        if not self.job_id or not self.job_id.extract_dir:
+            raise ValidationError(_("No extracted folder found for this bidder's job. Please reprocess the ZIP."))
+
+        extract_dir = self.job_id.extract_dir
+        if not os.path.isdir(extract_dir):
+            raise ValidationError(_("Extract directory not found on server. Please reprocess the ZIP."))
+
+        # Find company folder in extract_dir (best effort, case-insensitive)
+        wanted = (self.vendor_company_name or '').strip().lower()
+        company_dir = None
+        for name in os.listdir(extract_dir):
+            p = os.path.join(extract_dir, name)
+            if os.path.isdir(p) and name.strip().lower() == wanted:
+                company_dir = p
+                break
+        if not company_dir:
+            raise ValidationError(_("Company folder not found in extracted ZIP for this bidder."))
+
+        pdf_paths = []
+        for root, _, files in os.walk(company_dir):
+            for fn in files:
+                if fn.lower().endswith('.pdf') and fn.lower() != 'tender.pdf':
+                    pdf_paths.append(os.path.join(root, fn))
+
+        if not pdf_paths:
+            raise ValidationError(_("No PDF files found for this bidder in the extracted folder."))
+
+        Attachment = self.env['ir.attachment'].sudo()
+        # Use relative path for deterministic names
+        names = []
+        for p in pdf_paths:
+            try:
+                rel = os.path.relpath(p, extract_dir)
+            except Exception:
+                rel = os.path.basename(p)
+            names.append(rel)
+
+        existing = set(Attachment.search([
+            ('res_model', '=', 'tende_ai.bidder'),
+            ('res_id', '=', self.id),
+            ('name', 'in', names),
+        ]).mapped('name'))
+
+        to_create = []
+        for p, name in zip(pdf_paths, names):
+            if name in existing:
+                continue
+            try:
+                with open(p, 'rb') as f:
+                    content = f.read()
+            except Exception:
+                continue
+            if not content:
+                continue
+            to_create.append({
+                'name': name,
+                'res_model': 'tende_ai.bidder',
+                'res_id': self.id,
+                'type': 'binary',
+                'mimetype': 'application/pdf',
+                'datas': base64.b64encode(content),
+            })
+
+        if to_create:
+            Attachment.create(to_create)
+
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
 

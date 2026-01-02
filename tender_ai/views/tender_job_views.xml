@@ -56,31 +56,34 @@
                             </field>
                         </page>
                         <page string="General Information">
-                            <field name="tender_id" readonly="1" nolabel="1"
-                                   options="{'no_open': True, 'no_create': True, 'no_create_edit': True}">
-                                <form>
-                                    <sheet>
-                                        <group>
-                                            <group>
-                                                <field name="department_name"/>
-                                                <field name="tender_id"/>
-                                                <field name="ref_no"/>
-                                                <field name="tender_creator"/>
-                                            </group>
-                                            <group>
-                                                <field name="procurement_category"/>
-                                                <field name="tender_type"/>
-                                                <field name="organization_hierarchy"/>
-                                                <field name="estimated_value_inr"/>
-                                            </group>
-                                        </group>
-                                        <group>
-                                            <field name="description"/>
-                                            <field name="nit"/>
-                                        </group>
-                                    </sheet>
-                                </form>
-                            </field>
+                            <group>
+                                <group>
+                                    <field name="tender_tender_id"/>
+                                    <field name="tender_ref_no"/>
+                                    <field name="tender_tender_creator"/>
+                                    <field name="tender_procurement_category"/>
+                                    <field name="tender_estimated_value_inr"/>
+                                    <field name="tender_offer_validity_days"/>
+                                    <field name="tender_bid_submission_start"/>
+                                </group>
+                                <group>
+                                    <field name="tender_department_name"/>
+                                    <field name="tender_tender_type"/>
+                                    <field name="tender_organization_hierarchy"/>
+                                    <field name="tender_tender_currency"/>
+                                    <field name="tender_bidding_currency"/>
+                                    <field name="tender_previous_tender_no"/>
+                                    <field name="tender_bid_submission_end"/>
+                                </group>
+                                <group>
+                                    <field name="tender_published_on"/>
+                                    <field name="tender_opened_on"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="tender_description_text"/>
+                                <field name="tender_nit"/>
+                            </group>
                         </page>
                         <page string="Bidder Details">
                             <field name="bidders" nolabel="1" readonly="1">

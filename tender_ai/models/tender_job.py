@@ -189,6 +189,52 @@ class TenderJob(models.Model):
                     raise
                 time.sleep(base_delay * (2 ** attempt))
 
+    def _attach_company_pdfs_to_bidder(self, bidder, pdf_paths, extract_dir=None):
+        """Create ir.attachment records for bidder PDFs so they can be previewed/downloaded."""
+        if not bidder or not bidder.id or not pdf_paths:
+            return 0
+
+        Attachment = self.env['ir.attachment'].sudo()
+
+        # Build deterministic names (keep company folder structure) to avoid collisions
+        names = []
+        for p in pdf_paths:
+            try:
+                rel = os.path.relpath(p, extract_dir) if extract_dir else os.path.basename(p)
+            except Exception:
+                rel = os.path.basename(p)
+            names.append(rel)
+
+        existing = set(Attachment.search([
+            ('res_model', '=', 'tende_ai.bidder'),
+            ('res_id', '=', bidder.id),
+            ('name', 'in', names),
+        ]).mapped('name'))
+
+        to_create = []
+        for p, name in zip(pdf_paths, names):
+            if name in existing:
+                continue
+            try:
+                with open(p, 'rb') as f:
+                    content = f.read()
+            except Exception:
+                continue
+            if not content:
+                continue
+            to_create.append({
+                'name': name,
+                'res_model': 'tende_ai.bidder',
+                'res_id': bidder.id,
+                'type': 'binary',
+                'mimetype': 'application/pdf',
+                'datas': base64.b64encode(content),
+            })
+
+        if to_create:
+            Attachment.create(to_create)
+        return len(to_create)
+
     @api.model
     def create(self, vals):
         if vals.get('name', _('New')) == _('New'):
@@ -566,6 +612,7 @@ class TenderJob(models.Model):
             # Create tender record
             tender = self.env['tende_ai.tender'].sudo().create({
                 'job_id': self.id,
+                'state': 'draft',
                 'department_name': tender_data.get('departmentName', ''),
                 'tender_id': tender_data.get('tenderId', ''),
                 'ref_no': tender_data.get('refNo', ''),
@@ -585,6 +632,7 @@ class TenderJob(models.Model):
                 'description': tender_data.get('description', ''),
                 'nit': tender_data.get('nit', ''),
                 'analytics': str(tender_data.get('tenderAnalytics', {})),
+                'details_html': tender_data.get('description', '') or '',
             })
 
             # Batch create eligibility criteria
@@ -701,6 +749,7 @@ class TenderJob(models.Model):
                             bidder_data = result.get("bidder") or {}
                             payments = result.get("payments") or []
                             work_exp = result.get("work_experience") or []
+                            pdf_paths = result.get("_pdf_paths") or []
                             
                             # Check if bidder already exists for this job (by company name)
                             vendor_company_name = bidder_data.get('vendorCompanyName', '') or company_name
@@ -739,6 +788,20 @@ class TenderJob(models.Model):
                                     'offer_validity_days': bidder_data.get('offerValidityDays', ''),
                                 })
                                 _logger.info("TENDER AI [Job %s]: ✓ Created bidder record: %s", self.name, vendor_company_name)
+
+                            # Attach all extracted bidder PDFs (so user can preview/download on bidder form)
+                            attached_count = 0
+                            try:
+                                attached_count = self._attach_company_pdfs_to_bidder(
+                                    bidder, pdf_paths, extract_dir=getattr(self, 'extract_dir', None)
+                                )
+                            except Exception:
+                                attached_count = 0
+                            if attached_count:
+                                _logger.info(
+                                    "TENDER AI [Job %s]: ✓ Attached %d PDF(s) to bidder: %s",
+                                    self.name, attached_count, vendor_company_name
+                                )
 
                             # Batch create payment records (check for duplicates by transaction_id)
                             if payments:
@@ -982,6 +1045,9 @@ class TenderJob(models.Model):
             max_workers=pdf_workers,
             env=self.env,
         )
+        # Keep original PDF paths so we can attach extracted files to the bidder record
+        if isinstance(result, dict):
+            result["_pdf_paths"] = pdf_paths
         company_duration = time.time() - company_start_time
         
         # Log company analytics

@@ -28,3 +28,23 @@ class Bidder(models.Model):
     payments = fields.One2many('tende_ai.payment', 'bidder_id', string='Payments')
     work_experiences = fields.One2many('tende_ai.work_experience', 'bidder_id', string='Work Experiences')
 
+    # Attachments linked via chatter / res_model+res_id
+    attachment_ids = fields.Many2many(
+        'ir.attachment',
+        compute='_compute_attachment_ids',
+        string='Attachments',
+        readonly=True,
+        store=False,
+    )
+
+    def _compute_attachment_ids(self):
+        Attachment = self.env['ir.attachment'].sudo()
+        for rec in self:
+            if not rec.id:
+                rec.attachment_ids = False
+                continue
+            rec.attachment_ids = Attachment.search([
+                ('res_model', '=', 'tende_ai.bidder'),
+                ('res_id', '=', rec.id),
+            ])
+

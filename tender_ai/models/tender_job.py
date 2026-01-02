@@ -56,6 +56,13 @@ class TenderJob(models.Model):
 
     # Analytics
     analytics = fields.Text(string='Analytics (JSON)', readonly=True)
+    analytics_html = fields.Html(string='Analytics Summary', compute='_compute_analytics_html', sanitize=False, readonly=True)
+    processing_time_minutes = fields.Float(
+        string='Processing Time (min)',
+        compute='_compute_processing_time_minutes',
+        store=True,
+        readonly=True,
+    )
 
     # Related Records
     bidders = fields.One2many('tende_ai.bidder', 'job_id', string='Bidders', readonly=True)
@@ -64,6 +71,106 @@ class TenderJob(models.Model):
     # Flat tables for Job tabs (no nesting)
     payment_ids = fields.One2many('tende_ai.payment', 'job_id', string='Payments', readonly=True)
     work_experience_ids = fields.One2many('tende_ai.work_experience', 'job_id', string='Work Experience', readonly=True)
+
+    @api.depends('analytics')
+    def _compute_analytics_html(self):
+        def _esc(v):
+            if v is None:
+                return ''
+            return (str(v)
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;"))
+
+        for rec in self:
+            data = {}
+            try:
+                if rec.analytics:
+                    data = json.loads(rec.analytics) if isinstance(rec.analytics, str) else (rec.analytics or {})
+            except Exception:
+                data = {}
+
+            if not isinstance(data, dict) or not data:
+                rec.analytics_html = "<div class='text-muted'>No analytics yet.</div>"
+                continue
+
+            tokens = data.get("tokensTotal") or {}
+            kpi_rows = [
+                ("Job", data.get("jobId")),
+                ("Companies Detected", data.get("companiesDetected")),
+                ("Total PDFs Received", data.get("totalPdfReceived")),
+                ("Total Valid PDFs Processed", data.get("totalValidPdfProcessed")),
+                ("Gemini Calls", data.get("geminiCallsTotal")),
+                ("Duration (sec)", data.get("durationSeconds")),
+                ("Tokens (prompt)", (tokens.get("promptTokens") if isinstance(tokens, dict) else "")),
+                ("Tokens (output)", (tokens.get("outputTokens") if isinstance(tokens, dict) else "")),
+                ("Tokens (total)", (tokens.get("totalTokens") if isinstance(tokens, dict) else "")),
+            ]
+
+            kpi_html = "".join(
+                f"<tr><td style='padding:6px 10px; font-weight:600; white-space:nowrap;'>{_esc(k)}</td>"
+                f"<td style='padding:6px 10px;'>{_esc(v)}</td></tr>"
+                for k, v in kpi_rows
+            )
+
+            per_company = data.get("perCompany") or []
+            company_rows = ""
+            if isinstance(per_company, list) and per_company:
+                for c in per_company[:25]:
+                    if not isinstance(c, dict):
+                        continue
+                    ct = c.get("tokens") or {}
+                    company_rows += (
+                        "<tr>"
+                        f"<td style='padding:6px 10px;'>{_esc(c.get('companyName'))}</td>"
+                        f"<td style='padding:6px 10px; text-align:right;'>{_esc(c.get('pdfCountReceived'))}</td>"
+                        f"<td style='padding:6px 10px; text-align:right;'>{_esc(c.get('validPdfCount'))}</td>"
+                        f"<td style='padding:6px 10px; text-align:right;'>{_esc(c.get('geminiCalls'))}</td>"
+                        f"<td style='padding:6px 10px; text-align:right;'>{_esc(c.get('durationSeconds'))}</td>"
+                        f"<td style='padding:6px 10px; text-align:right;'>{_esc(ct.get('totalTokens') if isinstance(ct, dict) else '')}</td>"
+                        "</tr>"
+                    )
+
+            company_table = ""
+            if company_rows:
+                company_table = (
+                    "<div style='margin-top:16px;'>"
+                    "<div style='font-weight:700; margin-bottom:8px;'>Per-Company Summary</div>"
+                    "<table class='table table-sm table-striped' style='width:100%; border:1px solid #ddd;'>"
+                    "<thead><tr>"
+                    "<th style='padding:6px 10px;'>Company</th>"
+                    "<th style='padding:6px 10px; text-align:right;'>PDFs</th>"
+                    "<th style='padding:6px 10px; text-align:right;'>Valid</th>"
+                    "<th style='padding:6px 10px; text-align:right;'>Calls</th>"
+                    "<th style='padding:6px 10px; text-align:right;'>Sec</th>"
+                    "<th style='padding:6px 10px; text-align:right;'>Tokens</th>"
+                    "</tr></thead>"
+                    f"<tbody>{company_rows}</tbody>"
+                    "</table>"
+                    "</div>"
+                )
+
+            rec.analytics_html = (
+                "<div>"
+                "<table class='table table-sm' style='width:100%; border:1px solid #ddd;'>"
+                f"<tbody>{kpi_html}</tbody>"
+                "</table>"
+                f"{company_table}"
+                "</div>"
+            )
+
+    @api.depends('analytics')
+    def _compute_processing_time_minutes(self):
+        for rec in self:
+            minutes = 0.0
+            try:
+                data = json.loads(rec.analytics) if rec.analytics else {}
+                if isinstance(data, dict):
+                    seconds = float(data.get('durationSeconds') or 0.0)
+                    minutes = round(seconds / 60.0, 2) if seconds else 0.0
+            except Exception:
+                minutes = 0.0
+            rec.processing_time_minutes = minutes
 
     def _safe_job_write(self, vals, max_retries=5, base_delay=0.15):
         """Write on job with savepoint+retry to survive SerializationFailure."""

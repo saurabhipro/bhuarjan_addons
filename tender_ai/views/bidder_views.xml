@@ -62,6 +62,19 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="create_date desc">
+                                    <field name="name"/>
+                                    <field name="mimetype"/>
+                                    <field name="file_size"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                            <div class="text-muted" style="margin-top: 8px;">
+                                Add files from the chatter (paperclip). Clicking a row opens the attachment preview.
+                            </div>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

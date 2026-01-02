@@ -126,6 +126,8 @@
                             </field>
                         </page>
                         <page string="Processing Analytics">
+                            <field name="analytics_html" widget="html" readonly="1" nolabel="1"/>
+                            <separator string="Raw JSON (debug)" />
                             <field name="analytics" widget="text" readonly="1"/>
                         </page>
                         <page string="Error Log">

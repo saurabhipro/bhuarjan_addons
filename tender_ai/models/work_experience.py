@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api
+
+
+class WorkExperience(models.Model):
+    _name = 'tende_ai.work_experience'
+    _description = 'Work Experience Record'
+    _order = 'date_of_start desc'
+
+    bidder_id = fields.Many2one('tende_ai.bidder', string='Bidder', required=True, ondelete='cascade', readonly=True)
+    job_id = fields.Many2one(
+        'tende_ai.job',
+        string='Job',
+        related='bidder_id.job_id',
+        readonly=True,
+        store=True,
+        index=True,
+    )
+    
+    vendor_company_name = fields.Char(string='Vendor Company Name', tracking=True)
+    name_of_work = fields.Char(string='Name of Work', tracking=True)
+    employer = fields.Char(string='Employer', tracking=True)
+    location = fields.Char(string='Location', tracking=True)
+    contract_amount_inr = fields.Char(string='Contract Amount (INR)', tracking=True)
+    date_of_start = fields.Char(string='Date of Start', tracking=True)
+    date_of_completion = fields.Char(string='Date of Completion', tracking=True)
+    completion_certificate = fields.Char(string='Completion Certificate', tracking=True)
+    attachment = fields.Char(string='Attachment', tracking=True)
+

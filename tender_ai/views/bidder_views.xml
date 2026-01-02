@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tende_ai_bidder_list" model="ir.ui.view">
+        <field name="name">tende_ai.bidder.list</field>
+        <field name="model">tende_ai.bidder</field>
+        <field name="arch" type="xml">
+            <list string="Bidders">
+                <field name="vendor_company_name"/>
+                <field name="email_id"/>
+                <field name="contact_person"/>
+                <field name="contact_no"/>
+                <field name="pan"/>
+                <field name="gstin"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tende_ai_bidder_form" model="ir.ui.view">
+        <field name="name">tende_ai.bidder.form</field>
+        <field name="model">tende_ai.bidder</field>
+        <field name="arch" type="xml">
+            <form string="Bidder Information">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vendor_company_name"/>
+                            <field name="company_address"/>
+                            <field name="email_id"/>
+                            <field name="contact_person"/>
+                            <field name="contact_no"/>
+                        </group>
+                        <group>
+                            <field name="pan"/>
+                            <field name="gstin"/>
+                            <field name="place_of_registration"/>
+                            <field name="offer_validity_days"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payments">
+                            <field name="payments" nolabel="1">
+                                <list>
+                                    <field name="vendor"/>
+                                    <field name="payment_mode"/>
+                                    <field name="bank_name"/>
+                                    <field name="transaction_id"/>
+                                    <field name="amount_inr"/>
+                                    <field name="transaction_date"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Work Experience">
+                            <field name="work_experiences" nolabel="1">
+                                <list>
+                                    <field name="name_of_work"/>
+                                    <field name="employer"/>
+                                    <field name="location"/>
+                                    <field name="contract_amount_inr"/>
+                                    <field name="date_of_start"/>
+                                    <field name="date_of_completion"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tende_ai_bidder" model="ir.actions.act_window">
+        <field name="name">Bidders</field>
+        <field name="res_model">tende_ai.bidder</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
+

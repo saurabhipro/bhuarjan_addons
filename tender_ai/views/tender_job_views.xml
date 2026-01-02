@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tende_ai_job_list" model="ir.ui.view">
+        <field name="name">tende_ai.job.list</field>
+        <field name="model">tende_ai.job</field>
+        <field name="arch" type="xml">
+            <list string="Tender Processing Jobs">
+                <field name="name"/>
+                <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-danger="state == 'failed'" decoration-info="state == 'processing'" decoration-warning="state == 'cancelled'"/>
+                <field name="tender_reference"/>
+                <field name="companies_detected"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tende_ai_job_form" model="ir.ui.view">
+        <field name="name">tende_ai.job.form</field>
+        <field name="model">tende_ai.job</field>
+        <field name="arch" type="xml">
+            <form string="Tender Processing Job">
+                <header>
+                    <button name="action_process_zip" string="Process ZIP" type="object" class="btn-primary" 
+                            invisible="state != 'draft'"/>
+                    <button name="action_stop_processing" string="Stop Processing" type="object" class="btn-secondary" 
+                            invisible="state != 'processing'"
+                            confirm="Are you sure you want to stop processing?"/>
+                    <button name="action_reset_and_reprocess" string="Reset &amp; Start Fresh" type="object" 
+                            class="btn-secondary" 
+                            invisible="state not in ('completed', 'failed', 'cancelled')"
+                            confirm="This will delete all processed data and reset the job. Continue?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,completed,failed,cancelled" 
+                           options="{'fold_field': 'fold'}" class="oe_button_box"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="tender_reference"/>
+                            <field name="companies_detected"/>
+                        </group>
+                        <group>
+                            <field name="zip_filename"/>
+                            <field name="zip_file" filename="zip_filename" required="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Eligibility Criteria">
+                            <field name="eligibility_criteria" nolabel="1" readonly="1">
+                                <list string="Qualification Criteria" default_order="sl_no">
+                                    <field name="sl_no" string="Sl."/>
+                                    <field name="criteria" string="Required Criteria"/>
+                                    <field name="supporting_document" string="Supporting Document Required"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="General Information">
+                            <field name="tender_id" readonly="1" nolabel="1">
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="department_name"/>
+                                                <field name="tender_id"/>
+                                                <field name="ref_no"/>
+                                                <field name="tender_creator"/>
+                                            </group>
+                                            <group>
+                                                <field name="procurement_category"/>
+                                                <field name="tender_type"/>
+                                                <field name="organization_hierarchy"/>
+                                                <field name="estimated_value_inr"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="description"/>
+                                            <field name="nit"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Bidder Details">
+                            <field name="bidders" nolabel="1" readonly="1">
+                                <list string="Bidders" default_order="vendor_company_name">
+                                    <field name="vendor_company_name" string="Company Name"/>
+                                    <field name="company_address" string="Address"/>
+                                    <field name="email_id" string="Email"/>
+                                    <field name="contact_person" string="Contact Person"/>
+                                    <field name="contact_no" string="Phone"/>
+                                    <field name="pan" string="PAN"/>
+                                    <field name="gstin" string="GSTIN"/>
+                                    <field name="place_of_registration" string="Registration"/>
+                                    <field name="offer_validity_days" string="Validity"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Payment Details">
+                            <field name="payment_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="transaction_date desc">
+                                    <field name="company_name" string="Company Name" readonly="1"/>
+                                    <field name="vendor" string="Vendor"/>
+                                    <field name="payment_mode" string="Mode"/>
+                                    <field name="bank_name" string="Bank"/>
+                                    <field name="transaction_id" string="Transaction ID"/>
+                                    <field name="amount_inr" string="Amount (INR)"/>
+                                    <field name="transaction_date" string="Date"/>
+                                    <field name="status" string="Status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Work Experience">
+                            <field name="work_experience_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="date_of_start desc">
+                                    <field name="vendor_company_name" string="Vendor"/>
+                                    <field name="name_of_work" string="Project Name"/>
+                                    <field name="employer" string="Employer"/>
+                                    <field name="location" string="Location"/>
+                                    <field name="contract_amount_inr" string="Amount"/>
+                                    <field name="date_of_start" string="Start"/>
+                                    <field name="date_of_completion" string="End"/>
+                                    <field name="completion_certificate" string="Certificate"/>
+                                    <field name="attachment" string="Link"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Processing Analytics">
+                            <field name="analytics" widget="text" readonly="1"/>
+                        </page>
+                        <page string="Error Log">
+                            <field name="error_message" widget="text" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tende_ai_job_search" model="ir.ui.view">
+        <field name="name">tende_ai.job.search</field>
+        <field name="model">tende_ai.job</field>
+        <field name="arch" type="xml">
+            <search string="Tender Processing Jobs">
+                <field name="name"/>
+                <field name="tender_reference"/>
+                <field name="state"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Processing" name="processing" domain="[('state', '=', 'processing')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="Failed" name="failed" domain="[('state', '=', 'failed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_tende_ai_job" model="ir.actions.act_window">
+        <field name="name">Tender Processing Jobs</field>
+        <field name="res_model">tende_ai.job</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new tender processing job
+            </p>
+            <p>
+                Upload a ZIP file containing tender.pdf and company folders with PDFs.
+                The system will process them using Gemini AI.
+            </p>
+        </field>
+    </record>
+
+</odoo>
+    

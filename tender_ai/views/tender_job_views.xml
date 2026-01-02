@@ -8,6 +8,7 @@
                 <field name="name"/>
                 <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-danger="state == 'failed'" decoration-info="state == 'processing'" decoration-warning="state == 'cancelled'"/>
                 <field name="tender_reference"/>
+                <field name="processing_time_minutes" string="Processing Time (min)"/>
                 <field name="companies_detected"/>
                 <field name="create_date"/>
             </list>

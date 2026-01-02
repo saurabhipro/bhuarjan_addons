@@ -84,6 +84,21 @@
                                 Add files from the chatter (paperclip). Clicking a row opens the attachment preview.
                             </div>
                         </page>
+                        <page string="Eligibility">
+                            <field name="check_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="create_date desc">
+                                    <field name="overall_result" widget="badge"
+                                           decoration-success="overall_result == 'pass'"
+                                           decoration-danger="overall_result == 'fail'"/>
+                                    <field name="passed_criteria"/>
+                                    <field name="failed_criteria"/>
+                                    <field name="unknown_criteria"/>
+                                    <field name="duration_seconds" string="Time (sec)"/>
+                                    <field name="processed_on"/>
+                                    <field name="error_message"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

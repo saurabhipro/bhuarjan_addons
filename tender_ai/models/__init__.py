@@ -6,3 +6,4 @@ from . import payment
 from . import work_experience
 from . import eligibility_criteria
 from . import tender_dashboard
+from . import bidder_check

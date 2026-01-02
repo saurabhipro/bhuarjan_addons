@@ -31,6 +31,7 @@ class Bidder(models.Model):
     # Related Records
     payments = fields.One2many('tende_ai.payment', 'bidder_id', string='Payments')
     work_experiences = fields.One2many('tende_ai.work_experience', 'bidder_id', string='Work Experiences')
+    check_ids = fields.One2many('tende_ai.bidder_check', 'bidder_id', string='Eligibility Checks', readonly=True)
 
     # Attachments linked via chatter / res_model+res_id
     attachment_ids = fields.Many2many(

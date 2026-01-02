@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tende_ai_bidder_check_tree" model="ir.ui.view">
+        <field name="name">tende_ai.bidder_check.tree</field>
+        <field name="model">tende_ai.bidder_check</field>
+        <field name="arch" type="xml">
+            <list string="Eligibility Checks" create="0" delete="0">
+                <field name="job_id"/>
+                <field name="bidder_id"/>
+                <field name="overall_result" widget="badge"
+                       decoration-success="overall_result == 'pass'"
+                       decoration-danger="overall_result == 'fail'"/>
+                <field name="passed_criteria"/>
+                <field name="failed_criteria"/>
+                <field name="unknown_criteria"/>
+                <field name="duration_seconds" string="Time (sec)"/>
+                <field name="processed_on"/>
+                <field name="error_message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tende_ai_bidder_check_form" model="ir.ui.view">
+        <field name="name">tende_ai.bidder_check.form</field>
+        <field name="model">tende_ai.bidder_check</field>
+        <field name="arch" type="xml">
+            <form string="Eligibility Check" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <field name="job_id"/>
+                        <field name="bidder_id"/>
+                        <field name="overall_result" widget="badge"/>
+                        <field name="processed_on"/>
+                        <field name="duration_seconds"/>
+                        <field name="error_message"/>
+                    </group>
+                    <notebook>
+                        <page string="Criteria Results">
+                            <field name="line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="sl_no">
+                                    <field name="sl_no" string="Sl."/>
+                                    <field name="result" widget="badge"
+                                           decoration-success="result == 'pass'"
+                                           decoration-danger="result == 'fail'"/>
+                                    <field name="criteria"/>
+                                    <field name="supporting_document"/>
+                                    <field name="missing_documents"/>
+                                    <field name="reason"/>
+                                    <field name="evidence"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tende_ai_bidder_check" model="ir.actions.act_window">
+        <field name="name">Eligibility Checks</field>
+        <field name="res_model">tende_ai.bidder_check</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
+
+

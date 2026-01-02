@@ -21,6 +21,7 @@ from odoo.api import Environment
 from ..services.zip_utils import safe_extract_zip, ZipSecurityError
 from ..services.tender_parser import extract_tender_from_pdf_with_gemini
 from ..services.company_parser import extract_company_bidder_and_payments
+from ..services.eligibility_service import evaluate_bidder_against_criteria
 
 _logger = logging.getLogger(__name__)
 
@@ -34,8 +35,10 @@ class TenderJob(models.Model):
     name = fields.Char(string='Job ID', required=True, copy=False, readonly=True, default=lambda self: _('New'))
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('processing', 'Processing'),
-        ('completed', 'Completed'),
+        ('extracting', 'Extracting'),
+        ('extracted', 'Extracted'),
+        ('processing', 'Evaluating'),
+        ('completed', 'Processed'),
         ('failed', 'Failed'),
         ('cancelled', 'Cancelled'),
     ], string='Status', default='draft', tracking=True, required=True)
@@ -88,6 +91,7 @@ class TenderJob(models.Model):
     # Related Records
     bidders = fields.One2many('tende_ai.bidder', 'job_id', string='Bidders', readonly=True)
     eligibility_criteria = fields.One2many('tende_ai.eligibility_criteria', 'job_id', string='Eligibility Criteria', readonly=True)
+    bidder_check_ids = fields.One2many('tende_ai.bidder_check', 'job_id', string='Eligibility Checks', readonly=True)
 
     # Flat tables for Job tabs (no nesting)
     payment_ids = fields.One2many('tende_ai.payment', 'job_id', string='Payments', readonly=True)
@@ -292,19 +296,19 @@ class TenderJob(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('tende_ai.job') or _('New')
         return super(TenderJob, self).create(vals)
 
-    def action_process_zip(self):
-        """Process the uploaded ZIP file in background"""
+    def action_extract_zip(self):
+        """Extract tender + eligibility criteria from the uploaded ZIP (background)."""
         self.ensure_one()
         if self.state != 'draft':
-            raise ValidationError(_('Only draft jobs can be processed'))
+            raise ValidationError(_('Only draft jobs can be extracted'))
 
         _logger.info("=" * 80)
-        _logger.info("TENDER AI: Starting processing for Job ID: %s (ID: %s)", self.name, self.id)
+        _logger.info("TENDER AI: Starting extraction for Job ID: %s (ID: %s)", self.name, self.id)
         _logger.info("=" * 80)
 
         # IMPORTANT: commit before starting background thread to avoid concurrent
         # updates on the same job row from two different cursors/transactions.
-        self.write({'state': 'processing'})
+        self.write({'state': 'extracting', 'error_message': ''})
         try:
             self.env.cr.commit()
         except Exception:
@@ -315,7 +319,7 @@ class TenderJob(models.Model):
         env = self.env
         job_id = self.id
         
-        def _background_process_with_env():
+        def _background_extract_with_env():
             # Create new environment for background thread with retry logic
             max_retries = 3
             for attempt in range(max_retries):
@@ -324,7 +328,7 @@ class TenderJob(models.Model):
                     cr = env.registry.cursor()
                     env_background = Environment(cr, env.uid, env.context)
                     job = env_background['tende_ai.job'].browse(job_id)
-                    job._background_process()
+                    job._background_extract()
                     cr.commit()
                     break
                 except Exception as e:
@@ -364,11 +368,11 @@ class TenderJob(models.Model):
                             reason = job2._format_failure_reason(e)
                             job2.sudo().write({
                                 'state': 'failed',
-                                'error_message': f'Background processing error:\n{reason}',
+                                'error_message': f'Background extraction error:\n{reason}',
                             })
                             try:
                                 job2.message_post(
-                                    body=f"<b>Tender AI failed</b><br/><pre>{reason}</pre>",
+                                    body=f"<b>Tender AI extraction failed</b><br/><pre>{reason}</pre>",
                                     subtype_xmlid='mail.mt_note',
                                 )
                             except Exception:
@@ -384,20 +388,110 @@ class TenderJob(models.Model):
                         except Exception:
                             pass
 
-        thread = threading.Thread(target=_background_process_with_env, daemon=True)
+        thread = threading.Thread(target=_background_extract_with_env, daemon=True)
         thread.start()
-        _logger.info("TENDER AI [Job %s]: Background processing thread started", self.name)
+        _logger.info("TENDER AI [Job %s]: Background extraction thread started", self.name)
 
+        return True
+
+    # Backward compatibility: existing button may still call this.
+    def action_process_zip(self):
+        """Backward-compatible alias: Extract first."""
+        return self.action_extract_zip()
+
+    def action_process_bidders(self):
+        """Backward-compatible alias: Evaluate Tender."""
+        return self.action_evaluate_tender()
+
+    def action_evaluate_tender(self):
+        """Evaluate tender eligibility for all extracted bidders (background)."""
+        self.ensure_one()
+        if self.state != 'extracted':
+            raise ValidationError(_('First run Extraction. Only extracted jobs can be evaluated.'))
+
+        _logger.info("=" * 80)
+        _logger.info("TENDER AI: Starting eligibility evaluation for Job ID: %s (ID: %s)", self.name, self.id)
+        _logger.info("=" * 80)
+
+        self.write({'state': 'processing', 'error_message': ''})
+        try:
+            self.env.cr.commit()
+        except Exception:
+            self.env.cr.rollback()
+
+        env = self.env
+        job_id = self.id
+
+        def _background_eval_with_env():
+            max_retries = 3
+            for attempt in range(max_retries):
+                cr = None
+                try:
+                    cr = env.registry.cursor()
+                    env_background = Environment(cr, env.uid, env.context)
+                    job = env_background['tende_ai.job'].browse(job_id)
+                    job._background_evaluate_tender()
+                    cr.commit()
+                    break
+                except Exception as e:
+                    error_str = str(e).lower()
+                    error_type = type(e).__name__
+                    is_serialization_error = (
+                        'serialize' in error_str or
+                        'concurrent' in error_str or
+                        'transaction is aborted' in error_str or
+                        'infailedsqltransaction' in error_str or
+                        error_type == 'InFailedSqlTransaction' or
+                        error_type == 'SerializationFailure'
+                    )
+                    if cr:
+                        try:
+                            cr.rollback()
+                        except Exception:
+                            pass
+                    if is_serialization_error and attempt < max_retries - 1:
+                        time.sleep((attempt + 1) * 1.0)
+                        continue
+                    try:
+                        with env.registry.cursor() as cr2:
+                            env2 = Environment(cr2, env.uid, env.context)
+                            job2 = env2['tende_ai.job'].browse(job_id)
+                            reason = job2._format_failure_reason(e)
+                            job2.sudo().write({
+                                'state': 'failed',
+                                'error_message': f'Background processing error:\n{reason}',
+                            })
+                            try:
+                                job2.message_post(
+                                    body=f"<b>Tender AI processing failed</b><br/><pre>{reason}</pre>",
+                                    subtype_xmlid='mail.mt_note',
+                                )
+                            except Exception:
+                                pass
+                            cr2.commit()
+                    except Exception:
+                        pass
+                    break
+                finally:
+                    if cr:
+                        try:
+                            cr.close()
+                        except Exception:
+                            pass
+
+        thread = threading.Thread(target=_background_eval_with_env, daemon=True)
+        thread.start()
+        _logger.info("TENDER AI [Job %s]: Background evaluation thread started", self.name)
         return True
 
     def action_stop_processing(self):
         """Stop the processing of ZIP file"""
         self.ensure_one()
-        if self.state != 'processing':
-            raise ValidationError(_('Only processing jobs can be stopped'))
+        if self.state not in ('extracting', 'processing'):
+            raise ValidationError(_('Only extracting/processing jobs can be stopped'))
 
         _logger.info("=" * 80)
-        _logger.info("TENDER AI: Stopping processing for Job ID: %s (ID: %s)", self.name, self.id)
+        _logger.info("TENDER AI: Stopping current work for Job ID: %s (ID: %s)", self.name, self.id)
         _logger.info("=" * 80)
 
         # Update state to cancelled
@@ -415,13 +509,14 @@ class TenderJob(models.Model):
     def action_reset_and_reprocess(self):
         """Reset job to draft and allow reprocessing"""
         self.ensure_one()
-        if self.state not in ('completed', 'failed', 'cancelled'):
+        if self.state not in ('extracted', 'completed', 'failed', 'cancelled'):
             raise ValidationError(_('Can only reset completed, failed, or cancelled jobs'))
 
         # Delete related records to start fresh
         self.env['tende_ai.tender'].sudo().search([('job_id', '=', self.id)]).unlink()
         self.env['tende_ai.bidder'].sudo().search([('job_id', '=', self.id)]).unlink()
         self.env['tende_ai.eligibility_criteria'].sudo().search([('job_id', '=', self.id)]).unlink()
+        self.env['tende_ai.bidder_check'].sudo().search([('job_id', '=', self.id)]).unlink()
 
         # Reset job to draft
         self.sudo().write({
@@ -445,10 +540,10 @@ class TenderJob(models.Model):
         current_state = self.read(['state'])[0]['state']
         return current_state == 'cancelled'
 
-    def _background_process(self):
-        """Background processing of ZIP file"""
+    def _background_extract(self):
+        """Background extraction: unzip + extract tender + criteria + populate extracted bidder data (no eligibility eval)."""
         overall_t0 = time.time()
-        _logger.info("TENDER AI [Job %s]: Background processing started", self.name)
+        _logger.info("TENDER AI [Job %s]: Background extraction started", self.name)
 
         try:
             # Check if processing was stopped before starting
@@ -724,12 +819,467 @@ class TenderJob(models.Model):
                 _logger.debug("TENDER AI [Job %s]: Commit skipped (will commit later): %s", self.name, str(commit_err))
                 self.env.cr.rollback()
 
-            # 2️⃣ Company parsing
-            _logger.info("TENDER AI [Job %s]: Collecting company folders from extracted ZIP", self.name)
-            jobs = self._collect_company_jobs(extract_dir)
-            # Update companies count (only write once)
-            self._safe_job_write({'companies_detected': len(jobs)})
-            _logger.info("TENDER AI [Job %s]: Found %d company folder(s) to process", self.name, len(jobs))
+            # Precompute company count now (visible before processing)
+            try:
+                jobs = self._collect_company_jobs(extract_dir)
+                self._safe_job_write({'companies_detected': len(jobs)})
+            except Exception:
+                pass
+
+            # 2️⃣ Populate bidder data into DB (bidders/payments/work/attachments). No eligibility evaluation here.
+            parse_metrics = {}
+            try:
+                parse_metrics = self._background_parse_bidders(extract_dir) or {}
+            except Exception as e:
+                # If bidder parsing fails, fail extraction (since user expects all models populated after extraction)
+                raise e
+
+            # Store extraction analytics (parsing only). Evaluation will append/override later.
+            try:
+                analytics = {
+                    "jobId": self.name,
+                    "stage": "extracted",
+                    "companiesDetected": int(parse_metrics.get("companiesDetected") or self.companies_detected or 0),
+                    "totalPdfReceived": int(parse_metrics.get("totalPdfReceived") or 0),
+                    "totalValidPdfProcessed": int(parse_metrics.get("totalValidPdfProcessed") or 0),
+                    "apiCallsTotal": int(parse_metrics.get("apiCallsTotal") or 0),
+                    "tokensTotal": parse_metrics.get("tokensTotal") or {"promptTokens": 0, "outputTokens": 0, "totalTokens": 0},
+                    "perCompany": parse_metrics.get("perCompany") or [],
+                }
+                self._safe_job_write({'analytics': json.dumps(analytics, ensure_ascii=False)})
+            except Exception:
+                pass
+
+            # Mark extraction done
+            self._safe_job_write({'state': 'extracted'})
+            try:
+                self.env.cr.commit()
+            except Exception:
+                self.env.cr.rollback()
+
+            _logger.info("TENDER AI [Job %s]: ✓ Extraction completed (tender + criteria + bidders saved)", self.name)
+            return
+
+        except Exception as e:
+            reason = self._format_failure_reason(e)
+            self.sudo().write({'state': 'failed', 'error_message': reason})
+            try:
+                self.message_post(body=f"<b>Tender AI extraction failed</b><br/><pre>{reason}</pre>", subtype_xmlid='mail.mt_note')
+            except Exception:
+                pass
+            raise
+
+    def _background_parse_bidders(self, extract_dir: str) -> dict:
+        """Populate bidder-related models from extracted ZIP (no eligibility evaluation)."""
+        if not extract_dir or not os.path.isdir(extract_dir):
+            raise ValidationError('Extract directory not found. Run Extraction again.')
+
+        jobs = self._collect_company_jobs(extract_dir)
+        self._safe_job_write({'companies_detected': len(jobs)})
+
+        company_workers = int(os.getenv("COMPANY_WORKERS", "4"))
+        pdf_workers = int(os.getenv("PDF_WORKERS_PER_COMPANY", "5"))
+        model = os.getenv("AI_COMPANY_MODEL") or os.getenv("GEMINI_COMPANY_MODEL") or "gemini-3-flash-preview"
+
+        total_pdfs_received = 0
+        total_valid_pdfs = 0
+        total_calls = 0
+        total_tokens = {"promptTokens": 0, "outputTokens": 0, "totalTokens": 0}
+        per_company_analytics = []
+
+        if jobs:
+            for j in jobs:
+                total_pdfs_received += len(j.get("pdf_paths") or [])
+
+            with ThreadPoolExecutor(max_workers=company_workers) as ex:
+                futures = [ex.submit(self._process_one_company, job, model, pdf_workers) for job in jobs]
+                for fut in as_completed(futures):
+                    if self._should_stop():
+                        for remaining_fut in futures:
+                            if not remaining_fut.done():
+                                remaining_fut.cancel()
+                        self.sudo().write({'state': 'cancelled', 'error_message': 'Processing cancelled by user'})
+                        return {}
+
+                    result = fut.result() or {}
+                    company_name = result.get("companyName", "Unknown")
+                    bidder_data = result.get("bidder") or {}
+                    payments = result.get("payments") or []
+                    work_exp = result.get("work_experience") or []
+                    pdf_paths = result.get("_pdf_paths") or []
+
+                    vendor_company_name = bidder_data.get('vendorCompanyName', '') or company_name
+                    existing_bidder = self.env['tende_ai.bidder'].sudo().search([
+                        ('job_id', '=', self.id),
+                        ('vendor_company_name', '=', vendor_company_name)
+                    ], limit=1)
+
+                    if existing_bidder:
+                        existing_bidder.write({
+                            'company_address': bidder_data.get('companyAddress', '') or existing_bidder.company_address,
+                            'email_id': bidder_data.get('emailId', '') or existing_bidder.email_id,
+                            'contact_person': bidder_data.get('contactPerson', '') or existing_bidder.contact_person,
+                            'contact_no': bidder_data.get('contactNo', '') or existing_bidder.contact_no,
+                            'pan': bidder_data.get('pan', '') or existing_bidder.pan,
+                            'gstin': bidder_data.get('gstin', '') or existing_bidder.gstin,
+                            'place_of_registration': bidder_data.get('placeOfRegistration', '') or existing_bidder.place_of_registration,
+                            'offer_validity_days': bidder_data.get('offerValidityDays', '') or existing_bidder.offer_validity_days,
+                        })
+                        bidder = existing_bidder
+                    else:
+                        bidder = self.env['tende_ai.bidder'].sudo().create({
+                            'job_id': self.id,
+                            'vendor_company_name': vendor_company_name,
+                            'company_address': bidder_data.get('companyAddress', ''),
+                            'email_id': bidder_data.get('emailId', ''),
+                            'contact_person': bidder_data.get('contactPerson', ''),
+                            'contact_no': bidder_data.get('contactNo', ''),
+                            'pan': bidder_data.get('pan', ''),
+                            'gstin': bidder_data.get('gstin', ''),
+                            'place_of_registration': bidder_data.get('placeOfRegistration', ''),
+                            'offer_validity_days': bidder_data.get('offerValidityDays', ''),
+                        })
+
+                    # Attach bidder PDFs automatically
+                    try:
+                        self._attach_company_pdfs_to_bidder(bidder, pdf_paths, extract_dir=extract_dir)
+                    except Exception:
+                        pass
+
+                    # Batch create payments/work exp
+                    if payments:
+                        existing_transaction_ids = set(
+                            self.env['tende_ai.payment'].sudo().search([('bidder_id', '=', bidder.id)]).mapped('transaction_id')
+                        )
+                        payment_records = []
+                        for payment_data in payments:
+                            transaction_id = (payment_data.get('transactionId', '') or '').strip()
+                            if transaction_id and transaction_id in existing_transaction_ids:
+                                continue
+                            payment_records.append({
+                                'bidder_id': bidder.id,
+                                'vendor': payment_data.get('vendor', ''),
+                                'payment_mode': payment_data.get('paymentMode', ''),
+                                'bank_name': payment_data.get('bankName', ''),
+                                'transaction_id': transaction_id,
+                                'amount_inr': payment_data.get('amountINR', ''),
+                                'transaction_date': payment_data.get('transactionDate', ''),
+                                'status': payment_data.get('status', ''),
+                            })
+                        if payment_records:
+                            self.env['tende_ai.payment'].sudo().create(payment_records)
+
+                    if work_exp:
+                        existing_work = self.env['tende_ai.work_experience'].sudo().search([('bidder_id', '=', bidder.id)])
+                        existing_keys = set()
+                        for w in existing_work:
+                            existing_keys.add((w.name_of_work or '', w.employer or '', w.contract_amount_inr or '', w.date_of_start or ''))
+
+                        work_records = []
+                        for work_data in work_exp:
+                            name_of_work = work_data.get('projectName') or work_data.get('nameOfWork') or work_data.get('name_of_work') or ''
+                            employer = work_data.get('clientName') or work_data.get('employer') or ''
+                            location = work_data.get('location') or work_data.get('scopeOfWork') or work_data.get('scope_of_work') or ''
+                            key = (
+                                name_of_work or '',
+                                employer or '',
+                                work_data.get('contractAmountINR', '') or '',
+                                work_data.get('dateOfStart', '') or '',
+                            )
+                            if key in existing_keys:
+                                continue
+                            work_records.append({
+                                'bidder_id': bidder.id,
+                                'vendor_company_name': vendor_company_name,
+                                'name_of_work': name_of_work,
+                                'employer': employer,
+                                'location': location,
+                                'contract_amount_inr': work_data.get('contractAmountINR', ''),
+                                'date_of_start': work_data.get('dateOfStart', ''),
+                                'date_of_completion': work_data.get('dateOfCompletion', ''),
+                                'completion_certificate': work_data.get('completionCertificate', ''),
+                                'attachment': work_data.get('attachment', ''),
+                            })
+                        if work_records:
+                            self.env['tende_ai.work_experience'].sudo().create(work_records)
+
+                    # Commit after each bidder so UI updates
+                    try:
+                        self.env.cr.commit()
+                    except Exception:
+                        self.env.cr.rollback()
+
+                    # Aggregate analytics
+                    c_an = result.get("analytics") or {}
+                    if isinstance(c_an, dict):
+                        per_company_analytics.append(c_an)
+                        total_valid_pdfs += int(c_an.get("validPdfCount") or 0)
+                        total_calls += int(c_an.get("geminiCalls") or 0)
+                        c_tokens = c_an.get("tokens") or {}
+                        if isinstance(c_tokens, dict):
+                            total_tokens = self._merge_tokens_total(total_tokens, c_tokens)
+
+        return {
+            "companiesDetected": len(jobs),
+            "totalPdfReceived": total_pdfs_received,
+            "totalValidPdfProcessed": total_valid_pdfs,
+            "apiCallsTotal": total_calls,
+            "tokensTotal": total_tokens,
+            "perCompany": per_company_analytics,
+        }
+
+    def _background_evaluate_tender(self):
+        """Evaluate eligibility criteria for already-extracted bidders (no bidder re-parsing)."""
+        overall_t0 = time.time()
+        _logger.info("TENDER AI [Job %s]: Background eligibility evaluation started", self.name)
+
+        try:
+            if self._should_stop():
+                self.sudo().write({'state': 'cancelled', 'error_message': 'Processing cancelled by user'})
+                return
+
+            extract_dir = self.extract_dir
+            if not extract_dir or not os.path.isdir(extract_dir):
+                self.sudo().write({'state': 'failed', 'error_message': 'Extract directory not found. Run Extraction again.'})
+                return
+
+            # Eligibility evaluation per bidder (AI)
+            criteria_recs = self.env['tende_ai.eligibility_criteria'].sudo().search([('job_id', '=', self.id)], order='sl_no')
+            criteria = [{
+                "slNo": c.sl_no,
+                "criteria": c.criteria,
+                "supportingDocument": c.supporting_document,
+                "criteria_id": c.id,
+            } for c in criteria_recs]
+
+            Check = self.env['tende_ai.bidder_check'].sudo()
+            Line = self.env['tende_ai.bidder_check_line'].sudo()
+            # Clear old checks for this run
+            Check.search([('job_id', '=', self.id)]).unlink()
+
+            bidders = self.env['tende_ai.bidder'].sudo().search([('job_id', '=', self.id)])
+            for bidder in bidders:
+                if self._should_stop():
+                    self.sudo().write({'state': 'cancelled', 'error_message': 'Processing cancelled by user'})
+                    return
+
+                # Collect bidder PDFs from attachments (preferred) or fallback to folder scan
+                pdf_paths = []
+                try:
+                    # attachment names are relative to extract_dir
+                    for att in bidder.attachment_ids:
+                        name = att.name or ""
+                        if name.lower().endswith(".pdf"):
+                            abs_path = os.path.join(extract_dir, name) if extract_dir else None
+                            if abs_path and os.path.isfile(abs_path):
+                                pdf_paths.append(abs_path)
+                except Exception:
+                    pdf_paths = []
+
+                if not pdf_paths:
+                    # fallback: scan company folder
+                    wanted = (bidder.vendor_company_name or '').strip().lower()
+                    company_dir = None
+                    try:
+                        for name in os.listdir(extract_dir):
+                            p = os.path.join(extract_dir, name)
+                            if os.path.isdir(p) and name.strip().lower() == wanted:
+                                company_dir = p
+                                break
+                        if company_dir:
+                            for root, _, files in os.walk(company_dir):
+                                for fn in files:
+                                    if fn.lower().endswith('.pdf') and fn.lower() != 'tender.pdf':
+                                        pdf_paths.append(os.path.join(root, fn))
+                    except Exception:
+                        pass
+
+                check = Check.create({
+                    'job_id': self.id,
+                    'bidder_id': bidder.id,
+                    'overall_result': 'unknown',
+                    'total_criteria': len(criteria),
+                    'processed_on': fields.Datetime.now(),
+                })
+
+                try:
+                    bidder_facts = {
+                        "companyName": bidder.vendor_company_name or "",
+                        "email": bidder.email_id or "",
+                        "phone": bidder.contact_no or "",
+                        "pan": bidder.pan or "",
+                        "gstin": bidder.gstin or "",
+                        "placeOfRegistration": bidder.place_of_registration or "",
+                        "offerValidityDays": bidder.offer_validity_days or "",
+                        "payments": [
+                            {
+                                "vendor": p.vendor,
+                                "paymentMode": p.payment_mode,
+                                "bankName": p.bank_name,
+                                "transactionId": p.transaction_id,
+                                "amountINR": p.amount_inr,
+                                "transactionDate": p.transaction_date,
+                                "status": p.status,
+                            }
+                            for p in self.env['tende_ai.payment'].sudo().search([('bidder_id', '=', bidder.id)])
+                        ],
+                        "workExperience": [
+                            {
+                                "nameOfWork": w.name_of_work,
+                                "employer": w.employer,
+                                "location": w.location,
+                                "contractAmountINR": w.contract_amount_inr,
+                                "dateOfStart": w.date_of_start,
+                                "dateOfCompletion": w.date_of_completion,
+                                "completionCertificate": w.completion_certificate,
+                                "attachment": w.attachment,
+                            }
+                            for w in self.env['tende_ai.work_experience'].sudo().search([('bidder_id', '=', bidder.id)])
+                        ],
+                        "attachmentNames": [a.name for a in (bidder.attachment_ids or [])],
+                    }
+
+                    eval_out = evaluate_bidder_against_criteria(
+                        bidder_name=bidder.vendor_company_name or '',
+                        bidder_facts=bidder_facts,
+                        criteria=criteria,
+                        pdf_paths=pdf_paths,
+                        env=self.env,
+                    )
+                    res = (eval_out or {}).get("result") or {}
+                    lines = res.get("lines") or []
+
+                    passed = failed = unknown = 0
+                    to_create = []
+                    for ln in lines:
+                        sl = (ln.get("slNo") or "").strip()
+                        result = (ln.get("result") or "unknown").lower()
+                        if result not in ("pass", "fail", "unknown"):
+                            result = "unknown"
+                        if result == "pass":
+                            passed += 1
+                        elif result == "fail":
+                            failed += 1
+                        else:
+                            unknown += 1
+
+                        crit_rec = None
+                        for c in criteria:
+                            if (c.get("slNo") or "").strip() == sl:
+                                crit_rec = c
+                                break
+
+                        to_create.append({
+                            'check_id': check.id,
+                            'criteria_id': (crit_rec.get("criteria_id") if crit_rec else False),
+                            'sl_no': sl,
+                            'criteria': (crit_rec.get("criteria") if crit_rec else ''),
+                            'supporting_document': (crit_rec.get("supportingDocument") if crit_rec else ''),
+                            'result': result,
+                            'reason': ln.get("reason", ''),
+                            'evidence': ln.get("evidence", ''),
+                            'missing_documents': "\n".join(ln.get("missingDocuments") or []) if isinstance(ln.get("missingDocuments"), list) else (ln.get("missingDocuments") or ''),
+                        })
+
+                    if to_create:
+                        Line.create(to_create)
+
+                    overall = res.get("overallResult") or "unknown"
+                    overall = overall.lower()
+                    if overall not in ("pass", "fail", "unknown"):
+                        overall = "unknown"
+
+                    check.write({
+                        'overall_result': overall,
+                        'passed_criteria': passed,
+                        'failed_criteria': failed,
+                        'unknown_criteria': unknown,
+                        'duration_seconds': float((eval_out.get("durationMs") or 0)) / 1000.0,
+                        'error_message': '',
+                    })
+                    try:
+                        self.message_post(
+                            body=f"<b>Eligibility evaluated</b><br/>Bidder: {bidder.vendor_company_name}<br/>Result: <b>{overall.upper()}</b>",
+                            subtype_xmlid='mail.mt_note',
+                        )
+                    except Exception:
+                        pass
+
+                except Exception as e:
+                    check.write({'overall_result': 'unknown', 'error_message': str(e)})
+
+                try:
+                    self.env.cr.commit()
+                except Exception:
+                    self.env.cr.rollback()
+
+            # Update analytics (preserve parse analytics if present)
+            overall_t1 = time.time()
+            prev = {}
+            try:
+                if self.analytics:
+                    prev = json.loads(self.analytics) if isinstance(self.analytics, str) else (self.analytics or {})
+            except Exception:
+                prev = {}
+            if not isinstance(prev, dict):
+                prev = {}
+            prev.update({
+                "stage": "processed",
+                "eligibilityEvaluatedOn": fields.Datetime.now().isoformat(),
+                "durationMs": int((overall_t1 - overall_t0) * 1000),
+                "durationSeconds": round(overall_t1 - overall_t0, 3),
+            })
+            try:
+                analytics_json = json.dumps(prev, ensure_ascii=False)
+            except Exception:
+                analytics_json = str(prev)
+
+            self._safe_job_write({'analytics': analytics_json, 'state': 'completed'})
+            try:
+                self.env.cr.commit()
+            except Exception:
+                self.env.cr.rollback()
+
+        except Exception as e:
+            reason = self._format_failure_reason(e)
+            self.sudo().write({'state': 'failed', 'error_message': reason})
+            try:
+                self.message_post(body=f"<b>Tender AI evaluation failed</b><br/><pre>{reason}</pre>", subtype_xmlid='mail.mt_note')
+            except Exception:
+                pass
+            raise
+
+    def _background_process_bidders(self):
+        """Backward-compatible combined flow: parse bidders + evaluate eligibility."""
+        overall_t0 = time.time()
+        _logger.info("TENDER AI [Job %s]: Background combined processing started", self.name)
+
+        try:
+            if self._should_stop():
+                self.sudo().write({'state': 'cancelled', 'error_message': 'Processing cancelled by user'})
+                return
+
+            extract_dir = self.extract_dir
+            if not extract_dir or not os.path.isdir(extract_dir):
+                self.sudo().write({'state': 'failed', 'error_message': 'Extract directory not found. Run Extraction again.'})
+                return
+
+            parse_metrics = self._background_parse_bidders(extract_dir) or {}
+            # keep parsing analytics too
+            try:
+                self._safe_job_write({'analytics': json.dumps(parse_metrics, ensure_ascii=False)})
+            except Exception:
+                pass
+            self._background_evaluate_tender()
+
+        except Exception as e:
+            reason = self._format_failure_reason(e)
+            self.sudo().write({'state': 'failed', 'error_message': reason})
+            try:
+                self.message_post(body=f"<b>Tender AI processing failed</b><br/><pre>{reason}</pre>", subtype_xmlid='mail.mt_note')
+            except Exception:
+                pass
+            raise
 
             company_workers = int(os.getenv("COMPANY_WORKERS", "4"))
             pdf_workers = int(os.getenv("PDF_WORKERS_PER_COMPANY", "5"))

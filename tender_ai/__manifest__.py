@@ -30,6 +30,7 @@
         'views/tender_job_views.xml',
         'views/tender_views.xml',
         'views/bidder_views.xml',
+        'views/bidder_check_views.xml',
         'views/payment_views.xml',
         'views/work_experience_views.xml',
         'views/ir_attachment_views.xml',

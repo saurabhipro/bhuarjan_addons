@@ -6,7 +6,11 @@
         <field name="arch" type="xml">
             <list string="Tender Processing Jobs">
                 <field name="name"/>
-                <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-danger="state == 'failed'" decoration-info="state == 'processing'" decoration-warning="state == 'cancelled'"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-danger="state == 'failed'"
+                       decoration-info="state in ('extracting','processing')"
+                       decoration-warning="state in ('cancelled',)"/>
                 <field name="tender_reference"/>
                 <field name="processing_time_minutes" string="Processing Time (min)"/>
                 <field name="companies_detected"/>
@@ -21,16 +25,18 @@
         <field name="arch" type="xml">
             <form string="Tender Processing Job">
                 <header>
-                    <button name="action_process_zip" string="Process ZIP" type="object" class="btn-primary" 
+                    <button name="action_extract_zip" string="Extract" type="object" class="btn-primary"
                             invisible="state != 'draft'"/>
-                    <button name="action_stop_processing" string="Stop Processing" type="object" class="btn-secondary" 
-                            invisible="state != 'processing'"
-                            confirm="Are you sure you want to stop processing?"/>
+                    <button name="action_evaluate_tender" string="Evaluate Tender" type="object" class="btn-primary"
+                            invisible="state != 'extracted'"/>
+                    <button name="action_stop_processing" string="Stop" type="object" class="btn-secondary" 
+                            invisible="state not in ('extracting','processing')"
+                            confirm="Are you sure you want to stop?"/>
                     <button name="action_reset_and_reprocess" string="Reset &amp; Start Fresh" type="object" 
                             class="btn-secondary" 
-                            invisible="state not in ('completed', 'failed', 'cancelled')"
+                            invisible="state not in ('extracted','completed', 'failed', 'cancelled')"
                             confirm="This will delete all processed data and reset the job. Continue?"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,completed,failed,cancelled" 
+                    <field name="state" widget="statusbar" statusbar_visible="draft,extracting,extracted,processing,completed,failed,cancelled" 
                            options="{'fold_field': 'fold'}" class="oe_button_box"/>
                 </header>
                 <sheet>
@@ -97,6 +103,21 @@
                                     <field name="gstin" string="GSTIN"/>
                                     <field name="place_of_registration" string="Registration"/>
                                     <field name="offer_validity_days" string="Validity"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Eligibility Evaluation">
+                            <field name="bidder_check_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" default_order="create_date desc">
+                                    <field name="bidder_id"/>
+                                    <field name="overall_result" widget="badge"
+                                           decoration-success="overall_result == 'pass'"
+                                           decoration-danger="overall_result == 'fail'"/>
+                                    <field name="passed_criteria"/>
+                                    <field name="failed_criteria"/>
+                                    <field name="unknown_criteria"/>
+                                    <field name="duration_seconds" string="Time (sec)"/>
+                                    <field name="error_message"/>
                                 </list>
                             </field>
                         </page>

@@ -54,7 +54,8 @@
                         </group>
                         <group>
                             <field name="zip_filename"/>
-                            <field name="zip_file" filename="zip_filename" required="1"/>
+                            <field name="zip_file" filename="zip_filename" required="1"
+                                   readonly="state != 'draft'"/>
                         </group>
                     </group>
                     <notebook>

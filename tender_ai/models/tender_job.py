@@ -70,7 +70,8 @@ class TenderJob(models.Model):
     tender_nit = fields.Text(string='NIT', related='tender_id.nit', store=True, readonly=True)
 
     # File Information
-    zip_file = fields.Binary(string='ZIP File', required=True)
+    # Store large ZIPs as attachments to avoid oversized JSON-RPC payloads (413 Request Entity Too Large)
+    zip_file = fields.Binary(string='ZIP File', required=True, attachment=True)
     zip_filename = fields.Char(string='ZIP Filename')
     zip_path = fields.Char(string='ZIP Path', readonly=True)
     extract_dir = fields.Char(string='Extract Directory', readonly=True)

@@ -19,7 +19,7 @@
         <field name="name">tende_ai.bidder.form</field>
         <field name="model">tende_ai.bidder</field>
         <field name="arch" type="xml">
-            <form string="Bidder Information">
+            <form string="Bidder Information" class="tender_ai_form">
                 <sheet>
                     <group>
                         <group>

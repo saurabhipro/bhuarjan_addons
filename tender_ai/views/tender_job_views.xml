@@ -26,7 +26,7 @@
         <field name="name">tende_ai.job.form</field>
         <field name="model">tende_ai.job</field>
         <field name="arch" type="xml">
-            <form string="Tender Processing Job">
+            <form string="Tender Processing Job" class="tender_ai_form">
                 <header>
                     <button name="action_extract_zip" string="Extract" type="object" class="btn-primary"
                             invisible="state != 'draft'"/>
@@ -74,7 +74,7 @@
                             </field>
                         </page>
                         <page string="General Information">
-                            <group>
+                            <group class="tender_ai_bold_labels">
                                 <group>
                                     <field name="tender_tender_id"/>
                                     <field name="tender_ref_no"/>

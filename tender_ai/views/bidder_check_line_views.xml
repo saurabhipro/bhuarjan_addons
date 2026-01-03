@@ -4,7 +4,7 @@
         <field name="name">tende_ai.bidder_check_line.form</field>
         <field name="model">tende_ai.bidder_check_line</field>
         <field name="arch" type="xml">
-            <form string="Criteria Result" create="0" edit="0" delete="0">
+            <form string="Criteria Result" create="0" edit="0" delete="0" class="tender_ai_form">
                 <sheet>
                     <group>
                         <group>

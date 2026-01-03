@@ -19,4 +19,21 @@
   color: inherit !important;
 }
 
+/* Make labels in Tender Job -> General Information look bolder/clearer */
+.tender_ai_bold_labels .o_form_label,
+.tender_ai_bold_labels label.o_form_label {
+  font-weight: 700 !important;
+}
+
+/* Make labels/titles bold across ALL Tender AI forms (scoped by class on form root) */
+.tender_ai_form .o_form_label,
+.tender_ai_form label.o_form_label {
+  font-weight: 700 !important;
+}
+
+.tender_ai_form .o_horizontal_separator,
+.tender_ai_form .o_group .o_inner_group > tbody > tr > td > label {
+  font-weight: 700 !important;
+}
+
 

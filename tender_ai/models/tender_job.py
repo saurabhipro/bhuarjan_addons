@@ -353,11 +353,12 @@ class TenderJob(models.Model):
             Attachment.create(to_create)
         return len(to_create)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('tende_ai.job') or _('New')
-        return super(TenderJob, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('tende_ai.job') or _('New')
+        return super().create(vals_list)
 
     def action_extract_zip(self):
         """Extract tender + eligibility criteria from the uploaded ZIP (background)."""

@@ -87,6 +87,9 @@
   user-select: none;
   transition: transform 120ms ease, box-shadow 120ms ease;
   min-height: 78px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .tad_card:hover {
@@ -108,11 +111,12 @@
   margin-top: 8px;
 }
 
-.tad_purple { background: linear-gradient(135deg, #e9d5ff, #fce7f3); }
-.tad_green  { background: linear-gradient(135deg, #d1fae5, #ecfdf5); }
-.tad_blue   { background: linear-gradient(135deg, #dbeafe, #eff6ff); }
-.tad_orange { background: linear-gradient(135deg, #ffedd5, #fff7ed); }
-.tad_pink   { background: linear-gradient(135deg, #fde2e4, #fff1f2); }
-.tad_yellow { background: linear-gradient(135deg, #fef3c7, #fffbeb); }
+/* Pattern backgrounds (same feel as Bhuarjan dashboard) */
+.tad_purple { background-image: url('/bhuarjan/static/img/purple_pattern.jpg'); }
+.tad_green  { background-image: url('/bhuarjan/static/img/green_pattern.jpg'); }
+.tad_blue   { background-image: url('/bhuarjan/static/img/blue_pattern.jpg'); }
+.tad_orange { background-image: url('/bhuarjan/static/img/orange_pattern.jpg'); }
+.tad_pink   { background-image: url('/bhuarjan/static/img/pink_pattern.jpg'); }
+.tad_yellow { background-image: url('/bhuarjan/static/img/yellow_pattern.jpg'); }
 
 

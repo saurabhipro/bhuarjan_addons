@@ -37,59 +37,41 @@ export class TenderAIDashboard extends Component {
         }
     }
 
-    openJobs(domain = []) {
+    _openActWindow({ title, resModel, domain = [] }) {
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: _t("Tender Jobs"),
-            res_model: "tende_ai.job",
+            name: title,
+            res_model: resModel,
+            // Odoo web client expects `views` to be set for client-side actions
+            // (otherwise it can crash with: action.views is undefined)
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
             view_mode: "list,form",
             domain,
             target: "current",
         });
+    }
+
+    openJobs(domain = []) {
+        this._openActWindow({ title: _t("Tender Jobs"), resModel: "tende_ai.job", domain });
     }
 
     openBidders() {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: _t("Bidders"),
-            res_model: "tende_ai.bidder",
-            view_mode: "list,form",
-            domain: [],
-            target: "current",
-        });
+        this._openActWindow({ title: _t("Bidders"), resModel: "tende_ai.bidder", domain: [] });
     }
 
     openPayments() {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: _t("Payments"),
-            res_model: "tende_ai.payment",
-            view_mode: "list,form",
-            domain: [],
-            target: "current",
-        });
+        this._openActWindow({ title: _t("Payments"), resModel: "tende_ai.payment", domain: [] });
     }
 
     openWorkExperience() {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: _t("Work Experience"),
-            res_model: "tende_ai.work_experience",
-            view_mode: "list,form",
-            domain: [],
-            target: "current",
-        });
+        this._openActWindow({ title: _t("Work Experience"), resModel: "tende_ai.work_experience", domain: [] });
     }
 
     openTenders(domain = []) {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: _t("Tenders"),
-            res_model: "tende_ai.tender",
-            view_mode: "list,form",
-            domain,
-            target: "current",
-        });
+        this._openActWindow({ title: _t("Tenders"), resModel: "tende_ai.tender", domain });
     }
 }
 

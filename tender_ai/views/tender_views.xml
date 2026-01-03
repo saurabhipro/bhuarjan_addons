@@ -24,7 +24,7 @@
         <field name="name">tende_ai.tender.form</field>
         <field name="model">tende_ai.tender</field>
         <field name="arch" type="xml">
-            <form string="Tender Information">
+            <form string="Tender Information" class="tender_ai_form">
                 <header>
                     <button name="action_submit_for_approval" string="Submit for Approval"
                             type="object" class="btn-primary"

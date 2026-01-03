@@ -21,11 +21,12 @@
     'category': 'Tools',
     'author': 'Bhuarjan',
     'website': 'bhuarjan.com',
-    'depends': ['base', 'mail', 'web'],
+    'depends': ['base', 'mail', 'mail_bot', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
         'data/system_parameter_data.xml',
+        'wizard/tender_ai_chat_wizard.xml',
         'views/tender_dashboard_views.xml',
         'views/tender_job_views.xml',
         'views/tender_views.xml',

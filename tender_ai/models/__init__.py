@@ -7,3 +7,4 @@ from . import work_experience
 from . import eligibility_criteria
 from . import tender_dashboard
 from . import bidder_check
+from . import mail_bot_inherit

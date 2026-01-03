@@ -596,6 +596,18 @@ class TenderJob(models.Model):
         _logger.info("TENDER AI [Job %s]: Job reset to draft - ready for reprocessing", self.name)
         return True
 
+    def action_open_ai_chat_wizard(self):
+        """Open the AI chat wizard for this job (posts Q&A into chatter optionally)."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Ask AI"),
+            "res_model": "tende_ai.job.chat.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {"default_job_id": self.id},
+        }
+
     def action_export_excel(self):
         """Export tender data (all functional tabs) to a styled Excel workbook.
 

@@ -32,6 +32,8 @@
                             invisible="state != 'draft'"/>
                     <button name="action_evaluate_tender" string="Evaluate Tender" type="object" class="btn-primary"
                             invisible="state != 'extracted'"/>
+                    <button name="action_open_ai_chat_wizard" string="Ask AI" type="object" class="btn-secondary"
+                            invisible="state in ('draft','extracting')"/>
                     <button name="action_export_excel" string="Export to Excel" type="object" class="btn-secondary"
                             invisible="state in ('draft','extracting')"/>
                     <button name="action_stop_processing" string="Stop" type="object" class="btn-secondary" 

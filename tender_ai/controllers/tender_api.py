@@ -164,3 +164,76 @@ class TenderAPIController(http.Controller):
                 status=500
             )
 
+    @http.route('/api/tender/chat', type='http', auth='user', methods=['POST'], csrf=False)
+    def chat_about_job(self, **kwargs):
+        """
+        POST /api/tender/chat
+        Body JSON:
+          - job_id: job name (e.g. TENDER_01) OR integer record id
+          - question: required
+          - history: optional list of {role, content}
+          - model: optional (gemini model)
+          - persist: optional bool (post Q&A into chatter)
+        """
+        try:
+            data = json.loads(request.httprequest.data.decode('utf-8') or '{}')
+            job_id = data.get('job_id')
+            question = (data.get('question') or '').strip()
+            history = data.get('history')
+            model = data.get('model')
+            persist = bool(data.get('persist') or False)
+
+            if not job_id:
+                return request.make_response(
+                    json.dumps({'success': False, 'error': 'job_id is required'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=400
+                )
+            if not question:
+                return request.make_response(
+                    json.dumps({'success': False, 'error': 'question is required'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=400
+                )
+
+            # job_id can be either numeric record id or the job "name" (sequence)
+            job = None
+            if isinstance(job_id, int) or (isinstance(job_id, str) and job_id.isdigit()):
+                job = request.env['tende_ai.job'].sudo().browse(int(job_id))
+            if not job or not job.exists():
+                job = request.env['tende_ai.job'].sudo().search([('name', '=', str(job_id))], limit=1)
+            if not job:
+                return request.make_response(
+                    json.dumps({'success': False, 'error': f'Job {job_id} not found'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=404
+                )
+
+            from ..services.tender_chat_service import answer_job_question, post_chat_to_job_chatter
+
+            res = answer_job_question(
+                env=request.env,
+                job_id=job.id,
+                question=question,
+                history=history,
+                model=model,
+            ) or {}
+
+            if persist and res.get('success') and res.get('answer'):
+                post_chat_to_job_chatter(request.env, job_id=job.id, question=question, answer=res.get('answer'))
+
+            status = int(res.pop('status', 200) or 200)
+            return request.make_response(
+                json.dumps(res),
+                headers=[('Content-Type', 'application/json')],
+                status=status
+            )
+
+        except Exception as e:
+            _logger.error(f"Error in tender chat: {str(e)}", exc_info=True)
+            return request.make_response(
+                json.dumps({'success': False, 'error': str(e)}),
+                headers=[('Content-Type', 'application/json')],
+                status=500
+            )
+

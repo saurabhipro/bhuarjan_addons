@@ -47,7 +47,7 @@ class TenderJob(models.Model):
     # Tender Information
     tender_id = fields.Many2one('tende_ai.tender', string='Tender', readonly=True, ondelete='cascade')
     tender_reference = fields.Char(string='Tender Reference', tracking=True)
-    tender_description = fields.Text(string='Description', tracking=True)
+    tender_description = fields.Text(string='Tender Description (Raw)', tracking=True)
 
     # Tender fields exposed directly on Job (so General Information tab never shows a hyperlink)
     tender_department_name = fields.Char(related='tender_id.department_name', store=True, readonly=True)
@@ -66,7 +66,7 @@ class TenderJob(models.Model):
     tender_bid_submission_start = fields.Char(string='Start Date', related='tender_id.bid_submission_start', store=True, readonly=True)
     tender_bid_submission_end = fields.Char(string='End Date', related='tender_id.bid_submission_end', store=True, readonly=True)
     tender_opened_on = fields.Char(string='Opened On', related='tender_id.tender_opened_on', store=True, readonly=True)
-    tender_description_text = fields.Text(string='Description', related='tender_id.description', store=True, readonly=True)
+    tender_description_text = fields.Text(string='Tender Description', related='tender_id.description', store=True, readonly=True)
     tender_nit = fields.Text(string='NIT', related='tender_id.nit', store=True, readonly=True)
 
     # File Information

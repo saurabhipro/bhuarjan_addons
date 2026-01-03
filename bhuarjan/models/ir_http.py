@@ -23,7 +23,8 @@ class IrHttp(models.AbstractModel):
         """Check if server has restarted and invalidate sessions"""
         try:
             if not hasattr(request, 'db') or not request.db:
-                _logger.warning("=== BHUARJAN: No request.db ===")
+                # Don't spam logs for non-db requests (e.g. service worker, /web assets).
+                _logger.debug("BHURAJAN: No request.db on request; skipping PID check.")
                 return
             
             # Get current process ID
@@ -57,8 +58,8 @@ class IrHttp(models.AbstractModel):
                 except Exception as read_err:
                     _logger.warning("Could not read PID: %s", read_err)
                 
-                # Log PID check - ALWAYS log so we can see it
-                _logger.warning("=== BHUARJAN PID CHECK === Current: %s, Stored: %s ===", current_pid, stored_pid)
+                # Log PID check at DEBUG level to avoid noisy logs on every request.
+                _logger.debug("BHURAJAN PID CHECK: current=%s stored=%s", current_pid, stored_pid)
                 
                 # If PIDs don't match, server was restarted - handle session deletion in separate transaction
                 if stored_pid and stored_pid != current_pid:

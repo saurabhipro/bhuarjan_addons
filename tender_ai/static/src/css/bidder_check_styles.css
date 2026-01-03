@@ -36,4 +36,55 @@
   font-weight: 700 !important;
 }
 
+/* Tender Job banner (shows which tender you're working on) */
+.tender_ai_tender_banner {
+  background: linear-gradient(135deg, #7b4b3a, #a36b54);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.tender_ai_tender_banner_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tender_ai_tender_banner_title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+
+.tender_ai_tender_badge {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+}
+
+.tender_ai_tender_banner .o_field_widget {
+  color: #fff;
+}
+
+.tender_ai_tender_ref {
+  opacity: 0.95;
+}
+
+.tender_ai_tender_banner_desc {
+  margin-top: 8px;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.tender_ai_tender_banner_actions .btn {
+  border-radius: 999px;
+}
+
 

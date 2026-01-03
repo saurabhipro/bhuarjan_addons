@@ -69,6 +69,14 @@ class TenderJob(models.Model):
     tender_description_text = fields.Text(string='Tender Description', related='tender_id.description', store=True, readonly=True)
     tender_nit = fields.Text(string='NIT', related='tender_id.nit', store=True, readonly=True)
 
+    tender_pdf_attachment_id = fields.Many2one(
+        "ir.attachment",
+        string="Tender PDF",
+        compute="_compute_tender_pdf_attachment_id",
+        store=False,
+        readonly=True,
+    )
+
     # File Information
     # Store large ZIPs as attachments to avoid oversized JSON-RPC payloads (413 Request Entity Too Large)
     zip_file = fields.Binary(string='ZIP File', required=True, attachment=True)
@@ -125,6 +133,83 @@ class TenderJob(models.Model):
     def _compute_detected_company_ids(self):
         for job in self:
             job.detected_company_ids = job.bidders
+
+    def _compute_tender_pdf_attachment_id(self):
+        Attachment = self.env["ir.attachment"]
+        for job in self:
+            att = Attachment.search([
+                ("res_model", "=", "tende_ai.job"),
+                ("res_id", "=", job.id),
+                ("mimetype", "=", "application/pdf"),
+                ("name", "ilike", "tender.pdf"),
+            ], limit=1)
+            job.tender_pdf_attachment_id = att.id if att else False
+
+    def _find_tender_pdf_path(self, extract_dir: str):
+        if not extract_dir:
+            return None
+        for root, _, files in os.walk(extract_dir):
+            for fn in files:
+                if fn.lower() == "tender.pdf":
+                    return os.path.join(root, fn)
+        return None
+
+    def _ensure_tender_pdf_attachment(self, tender_pdf_path: str, extract_dir: str = None):
+        """Attach tender.pdf to this job as an ir.attachment (so it appears in chatter and can be previewed)."""
+        self.ensure_one()
+        if not tender_pdf_path or not os.path.isfile(tender_pdf_path):
+            return False
+        Attachment = self.env["ir.attachment"].sudo()
+
+        name = "tender.pdf"
+        try:
+            if extract_dir:
+                rel = os.path.relpath(tender_pdf_path, extract_dir)
+                if rel:
+                    name = rel
+        except Exception:
+            pass
+
+        existing = Attachment.search([
+            ("res_model", "=", "tende_ai.job"),
+            ("res_id", "=", self.id),
+            ("mimetype", "=", "application/pdf"),
+            ("name", "=", name),
+        ], limit=1)
+        if existing:
+            return existing
+
+        try:
+            with open(tender_pdf_path, "rb") as f:
+                content = f.read()
+        except Exception:
+            return False
+        if not content:
+            return False
+
+        return Attachment.create({
+            "name": name,
+            "res_model": "tende_ai.job",
+            "res_id": self.id,
+            "type": "binary",
+            "mimetype": "application/pdf",
+            "datas": base64.b64encode(content),
+        })
+
+    def action_download_tender_pdf(self):
+        self.ensure_one()
+        att = self.tender_pdf_attachment_id
+        if not att and self.extract_dir:
+            path = self._find_tender_pdf_path(self.extract_dir)
+            att = self._ensure_tender_pdf_attachment(path, extract_dir=self.extract_dir)
+        if not att:
+            raise ValidationError(_("Tender PDF not found. Please re-extract the ZIP."))
+        filename = att.name or "tender.pdf"
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/ir.attachment/{att.id}/datas/{filename}?download=true",
+            "target": "self",
+        }
 
     # Flat tables for Job tabs (no nesting)
     payment_ids = fields.One2many('tende_ai.payment', 'job_id', string='Payments', readonly=True)
@@ -1034,6 +1119,13 @@ class TenderJob(models.Model):
                 return
             
             _logger.info("TENDER AI [Job %s]: Found tender.pdf at: %s", self.name, tender_pdf_path)
+
+            # Attach tender.pdf to the job so it appears in chatter and can be previewed/downloaded.
+            try:
+                self._ensure_tender_pdf_attachment(tender_pdf_path, extract_dir=extract_dir)
+            except Exception:
+                # Never fail extraction because of attachment UI.
+                _logger.debug("TENDER AI [Job %s]: Failed to attach tender.pdf to job", self.name, exc_info=True)
 
             # Check if processing was stopped
             if self._should_stop():

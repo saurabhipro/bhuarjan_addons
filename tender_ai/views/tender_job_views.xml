@@ -32,19 +32,19 @@
                             invisible="state != 'draft'"/>
                     <button name="action_evaluate_tender" string="Evaluate Tender" type="object" class="btn-primary"
                             invisible="state != 'extracted'"/>
-                    <button name="action_open_ai_chat_wizard" string="Ask AI" type="object" class="btn-secondary"
-                            invisible="state in ('draft','extracting')"/>
                     <button name="action_export_excel" string="Export to Excel" type="object" class="btn-secondary"
+                            icon="fa-download"
                             invisible="state in ('draft','extracting')"/>
                     <button name="action_stop_processing" string="Stop" type="object" class="btn-secondary" 
                             invisible="state not in ('extracting','processing')"
                             confirm="Are you sure you want to stop?"/>
                     <button name="action_reset_and_reprocess" string="Reset &amp; Start Fresh" type="object" 
-                            class="btn-secondary" 
+                            class="btn-secondary"
+                            icon="fa-refresh"
                             invisible="state not in ('extracted','completed', 'failed', 'cancelled')"
                             confirm="This will delete all processed data and reset the job. Continue?"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,extracting,extracted,processing,completed,failed,cancelled" 
-                           options="{'fold_field': 'fold'}" class="oe_button_box"/>
+                           options="{'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
                     <group>

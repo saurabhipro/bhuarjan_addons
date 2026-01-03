@@ -50,7 +50,7 @@ class TreeRateMaster(models.Model):
     
     rate = fields.Monetary(string='Rate / दर', currency_field='currency_id', required=True, tracking=True,
                           help='Compensation rate for this tree variant')
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'))
     
     active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True)
     description = fields.Text(string='Description / विवरण', tracking=True,

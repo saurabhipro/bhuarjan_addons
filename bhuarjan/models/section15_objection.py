@@ -91,12 +91,8 @@ class Section15Objection(models.Model):
     resolution_document = fields.Binary(string='Resolution Document / समाधान दस्तावेज़')
     resolution_document_filename = fields.Char(string='Resolution Document Filename / समाधान दस्तावेज़ फ़ाइल नाम')
     
-    # Override state field for Section 15 - simpler workflow: Draft, Approved, Rejected
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ], string='Status', default='draft', tracking=True)
+    # Extend workflow state with "rejected" without overriding the base workflow selection
+    state = fields.Selection(selection_add=[('rejected', 'Rejected')], tracking=True)
     
     resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', required=False, tracking=True)
     resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)

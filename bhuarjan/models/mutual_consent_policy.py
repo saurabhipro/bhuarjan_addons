@@ -32,7 +32,7 @@ class MutualConsentPolicy(models.Model):
     
     # Purchase details
     purchase_amount = fields.Monetary(string='Purchase Amount / क्रय राशि', currency_field='currency_id', tracking=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'))
     
     # File uploads
     agreement_file = fields.Binary(string='Agreement File / समझौता फ़ाइल', tracking=True)

@@ -480,14 +480,14 @@ class Section23AwardSurveyLine(models.Model):
     land_type = fields.Selection([
         ('village', 'Village / ग्राम'),
         ('residential', 'Residential / आवासीय')
-    ], string='Type / प्रकार', required=False, tracking=True,
+    ], string='Type / प्रकार', required=False,
        help='Select whether this is village land or residential land')
     
     # Distance checkbox
     # For village: 20 meters from main road
     # For residential: 05 meters from main road
     is_within_distance = fields.Boolean(string='Within Distance / दूरी के भीतर', 
-                                       default=False, tracking=True,
+                                       default=False,
                                        help='Check if khasra is within distance from main road (20m for village, 5m for residential)')
     
     @api.onchange('land_type', 'is_within_distance')
@@ -518,7 +518,7 @@ class Section23AwardSurveyLine(models.Model):
                                       help='Rate per hectare fetched from rate master based on type and distance')
     
     currency_id = fields.Many2one('res.currency', string='Currency', 
-                                  default=lambda self: self.env.ref('base.INR'), invisible=True)
+                                  default=lambda self: self.env.ref('base.INR'))
     
     @api.depends('land_type', 'is_within_distance', 'award_id.village_id', 'survey_id.irrigation_type')
     def _compute_rate_per_hectare(self):
@@ -576,12 +576,9 @@ class Section23AwardSurveyLine(models.Model):
                 if line.is_within_distance is False and line.survey_id.is_within_distance_for_award:
                     line.is_within_distance = line.survey_id.is_within_distance_for_award
     
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
         """Auto-populate khasra number and sync to survey when creating"""
-        if not isinstance(vals_list, list):
-            vals_list = [vals_list]
-        
         for vals in vals_list:
             # Auto-populate khasra number from survey
             if 'survey_id' in vals and 'khasra_number' not in vals:

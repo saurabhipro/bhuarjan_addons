@@ -21,11 +21,12 @@ class Payment(models.Model):
     # Related fields for easier display
     company_name = fields.Char(string='Company Name', related='bidder_id.vendor_company_name', readonly=True, store=True)
     
-    vendor = fields.Char(string='Vendor', tracking=True)
-    payment_mode = fields.Char(string='Payment Mode', tracking=True)
-    bank_name = fields.Char(string='Bank Name', tracking=True)
-    transaction_id = fields.Char(string='Transaction ID', tracking=True, index=True)
-    amount_inr = fields.Char(string='Amount (INR)', tracking=True)
-    transaction_date = fields.Char(string='Transaction Date', tracking=True)
-    status = fields.Char(string='Status', tracking=True)
+    # NOTE: do not use field parameter "tracking" unless the model inherits mail.thread
+    vendor = fields.Char(string='Vendor')
+    payment_mode = fields.Char(string='Payment Mode')
+    bank_name = fields.Char(string='Bank Name')
+    transaction_id = fields.Char(string='Transaction ID', index=True)
+    amount_inr = fields.Char(string='Amount (INR)')
+    transaction_date = fields.Char(string='Transaction Date')
+    status = fields.Char(string='Status')
 

@@ -18,13 +18,14 @@ class WorkExperience(models.Model):
         index=True,
     )
     
-    vendor_company_name = fields.Char(string='Vendor Company Name', tracking=True)
-    name_of_work = fields.Char(string='Name of Work', tracking=True)
-    employer = fields.Char(string='Employer', tracking=True)
-    location = fields.Char(string='Location', tracking=True)
-    contract_amount_inr = fields.Char(string='Contract Amount (INR)', tracking=True)
-    date_of_start = fields.Char(string='Date of Start', tracking=True)
-    date_of_completion = fields.Char(string='Date of Completion', tracking=True)
-    completion_certificate = fields.Char(string='Completion Certificate', tracking=True)
-    attachment = fields.Char(string='Attachment', tracking=True)
+    # NOTE: do not use field parameter "tracking" unless the model inherits mail.thread
+    vendor_company_name = fields.Char(string='Vendor Company Name')
+    name_of_work = fields.Char(string='Name of Work')
+    employer = fields.Char(string='Employer')
+    location = fields.Char(string='Location')
+    contract_amount_inr = fields.Char(string='Contract Amount (INR)')
+    date_of_start = fields.Char(string='Date of Start')
+    date_of_completion = fields.Char(string='Date of Completion')
+    completion_certificate = fields.Char(string='Completion Certificate')
+    attachment = fields.Char(string='Attachment')
 

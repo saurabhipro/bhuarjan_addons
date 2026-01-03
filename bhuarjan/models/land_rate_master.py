@@ -65,7 +65,7 @@ class RateMaster(models.Model):
                                      currency_field='currency_id', compute='_compute_legacy_rates', store=True,
                                      help='Legacy field - computed from hectare rate')
     
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'))
     
     @api.depends('main_road_rate_hectare', 'other_road_rate_hectare')
     def _compute_legacy_rates(self):
@@ -357,5 +357,5 @@ class RateMasterPermutationLine(models.TransientModel):
     ], string='Irrigation Status / सिंचाई स्थिति', required=True, readonly=True)
     is_diverted = fields.Boolean(string='Diverted / विचलित', readonly=True)
     calculated_rate = fields.Monetary(string='Calculated Rate / गणना दर', currency_field='currency_id', readonly=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'), invisible=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'))
 

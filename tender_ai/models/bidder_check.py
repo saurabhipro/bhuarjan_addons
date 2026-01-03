@@ -44,6 +44,7 @@ class TenderBidderCheck(models.Model):
     error_message = fields.Text(string='Error', readonly=True)
 
     line_ids = fields.One2many('tende_ai.bidder_check_line', 'check_id', string='Criteria Results', readonly=True)
+    client_query_ids = fields.One2many('tende_ai.client_query', 'check_id', string='Client Queries')
 
     @api.depends("job_id", "bidder_id", "overall_result")
     def _compute_name(self):
@@ -53,6 +54,94 @@ class TenderBidderCheck(models.Model):
             res = rec.overall_result or ""
             parts = [p for p in [job, bidder, res] if p]
             rec.name = " / ".join(parts) if parts else _("Eligibility Check")
+
+    def action_export_issues_excel(self):
+        """Export all criteria lines where Result is Fail/Unknown."""
+        self.ensure_one()
+        try:
+            import xlsxwriter  # type: ignore
+        except Exception:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Excel export"),
+                    "message": _("xlsxwriter is not installed on the server."),
+                    "type": "warning",
+                    "sticky": False,
+                },
+            }
+
+        lines = self.line_ids.filtered(lambda l: l.result in ("fail", "unknown"))
+        out = io.BytesIO()
+        wb = xlsxwriter.Workbook(out, {"in_memory": True})
+        ws = wb.add_worksheet("Issues")
+
+        fmt_head = wb.add_format({"bold": True, "bg_color": "#7b4b3a", "font_color": "#ffffff", "border": 1})
+        fmt_wrap = wb.add_format({"text_wrap": True, "valign": "top", "border": 1})
+        fmt_fail = wb.add_format({"text_wrap": True, "valign": "top", "border": 1, "bg_color": "#fde2e7"})
+        fmt_unk = wb.add_format({"text_wrap": True, "valign": "top", "border": 1, "bg_color": "#fff3cd"})
+
+        headers = [
+            "Sl No",
+            "Result",
+            "Criteria",
+            "Supporting Document",
+            "Missing Documents",
+            "Reason",
+            "Evidence",
+            "Proof Link",
+            "Proof Page",
+            "Proof Excerpt",
+        ]
+        for c, h in enumerate(headers):
+            ws.write(0, c, h, fmt_head)
+
+        ws.set_column(0, 0, 8)
+        ws.set_column(1, 1, 10)
+        ws.set_column(2, 2, 55)
+        ws.set_column(3, 3, 35)
+        ws.set_column(4, 4, 25)
+        ws.set_column(5, 6, 35)
+        ws.set_column(7, 7, 30)
+        ws.set_column(8, 8, 10)
+        ws.set_column(9, 9, 45)
+
+        r = 1
+        for line in lines:
+            fmt = fmt_fail if line.result == "fail" else fmt_unk if line.result == "unknown" else fmt_wrap
+            ws.write(r, 0, line.sl_no or "", fmt)
+            ws.write(r, 1, dict(line._fields["result"].selection).get(line.result, line.result), fmt)
+            ws.write(r, 2, line.criteria or "", fmt)
+            ws.write(r, 3, line.supporting_document or "", fmt)
+            ws.write(r, 4, line.missing_documents or "", fmt)
+            ws.write(r, 5, line.reason or "", fmt)
+            ws.write(r, 6, line.evidence or "", fmt)
+            ws.write(r, 7, line.proof_url or "", fmt)
+            ws.write_number(r, 8, line.proof_page or 0, fmt)
+            ws.write(r, 9, line.proof_excerpt or "", fmt)
+            r += 1
+
+        wb.close()
+        data = out.getvalue()
+        out.close()
+
+        filename = f"{(self.job_id.name or 'JOB')}_{(self.bidder_id.vendor_company_name or 'BIDDER')}_issues.xlsx"
+        Attachment = self.env["ir.attachment"].sudo()
+        att = Attachment.create({
+            "name": filename,
+            "type": "binary",
+            "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "datas": base64.b64encode(data),
+            "res_model": "tende_ai.bidder_check",
+            "res_id": self.id,
+        })
+
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/ir.attachment/{att.id}/datas/{filename}?download=true",
+            "target": "self",
+        }
 
 
 class TenderBidderCheckLine(models.Model):

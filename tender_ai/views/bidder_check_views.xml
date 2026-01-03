@@ -25,6 +25,10 @@
         <field name="model">tende_ai.bidder_check</field>
         <field name="arch" type="xml">
             <form string="Eligibility Check" create="0" edit="0" delete="0" class="tender_ai_form">
+                <header>
+                    <button name="action_export_issues_excel" type="object" string="Export Issues (Excel)"
+                            class="btn-secondary" icon="fa-file-excel-o"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
@@ -54,6 +58,17 @@
                             <field name="proof_url" widget="url" string="Proof Link"/>
                             <field name="proof_page" string="Page" optional="show"/>
                             <field name="proof_excerpt" string="Proof Excerpt" optional="show"/>
+                        </list>
+                    </field>
+
+                    <separator string="Client Queries"/>
+                    <field name="client_query_ids" nolabel="1">
+                        <list editable="bottom" create="1" delete="1" default_order="asked_on desc">
+                            <field name="asked_on" string="Date"/>
+                            <field name="asked_by" string="By"/>
+                            <field name="query" string="Client Query"/>
+                            <field name="state" widget="badge"/>
+                            <field name="internal_note" string="Note/Response"/>
                         </list>
                     </field>
                 </sheet>

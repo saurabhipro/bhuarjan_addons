@@ -389,28 +389,31 @@ class SiaTeam(models.Model):
                 }
             }
     
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Override create to set project exemption status and auto-approve if exempt"""
-        # If is_sia_exempt is 'yes', auto-approve
-        if vals.get('is_sia_exempt') == 'yes' and vals.get('state', 'draft') == 'draft':
-            vals['state'] = 'approved'
-            vals['approved_date'] = fields.Datetime.now()
-        
-        record = super().create(vals)
-        
-        # Update project exemption status
-        if record.is_sia_exempt == 'yes' and record.project_id:
-            record.project_id.write({'is_sia_exempt': True})
-        
-        # Post message if auto-approved
-        if record.is_sia_exempt == 'yes' and record.state == 'approved':
-            record.message_post(
-                body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
-                message_type='notification'
-            )
-        
-        return record
+        now = fields.Datetime.now()
+        for vals in vals_list:
+            # If is_sia_exempt is 'yes', auto-approve
+            if vals.get('is_sia_exempt') == 'yes' and vals.get('state', 'draft') == 'draft':
+                vals['state'] = 'approved'
+                vals['approved_date'] = now
+
+        records = super().create(vals_list)
+
+        for record in records:
+            # Update project exemption status
+            if record.is_sia_exempt == 'yes' and record.project_id:
+                record.project_id.write({'is_sia_exempt': True})
+
+            # Post message if auto-approved
+            if record.is_sia_exempt == 'yes' and record.state == 'approved':
+                record.message_post(
+                    body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
+                    message_type='notification'
+                )
+
+        return records
     
     def _validate_state_transition(self, old_state, new_state):
         """Override to allow direct transition from draft to approved when SIA is exempt"""

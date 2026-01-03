@@ -285,17 +285,18 @@ class BhuarjanSettingsMaster(models.Model):
             else:
                 record.latest_app_version = "No active version found"
     
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Ensure only one settings master exists - return existing if found"""
         existing = self.search([], limit=1)
         if existing:
-            # If a record already exists, return it instead of creating a new one
-            # This handles both data loading (XML import) and normal operation
-            # For data loading with noupdate="1", this allows the XML to reference the existing record
-            # For normal operation, this prevents duplicate creation
+            # If a record already exists, return it instead of creating a new one.
+            # This handles both data loading (XML import) and normal operation.
             return existing
-        return super().create(vals)
+        # If no record exists yet, create ONE record using the first vals dict.
+        # (even if called with multiple vals, we enforce singleton settings)
+        vals = vals_list[0] if vals_list else {}
+        return super().create([vals])
     
     @api.model
     def get_settings_master(self):

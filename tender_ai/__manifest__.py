@@ -34,6 +34,7 @@
         'views/bidder_views.xml',
         'views/bidder_check_views.xml',
         'views/bidder_check_line_views.xml',
+        'views/client_query_views.xml',
         'views/payment_views.xml',
         'views/work_experience_views.xml',
         'views/ir_attachment_views.xml',

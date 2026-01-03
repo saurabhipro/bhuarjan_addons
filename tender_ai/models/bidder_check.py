@@ -143,6 +143,18 @@ class TenderBidderCheck(models.Model):
             "target": "self",
         }
 
+    def action_add_client_query(self):
+        """Open a modal to create a client query even when this check form is read-only."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Add Client Query"),
+            "res_model": "tende_ai.client_query",
+            "view_mode": "form",
+            "target": "new",
+            "context": {"default_check_id": self.id},
+        }
+
 
 class TenderBidderCheckLine(models.Model):
     _name = 'tende_ai.bidder_check_line'

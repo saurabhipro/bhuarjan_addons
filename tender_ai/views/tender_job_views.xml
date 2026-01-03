@@ -52,6 +52,9 @@
                             <field name="name" readonly="1"/>
                             <field name="tender_reference"/>
                             <field name="companies_detected"/>
+                            <field name="detected_company_ids" widget="many2many_tags"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   placeholder="Detected companies..."/>
                             <field name="create_uid" string="Created By" readonly="1"/>
                         </group>
                         <group>
@@ -146,7 +149,9 @@
                         </page>
                         <page string="Eligibility Evaluation">
                             <field name="bidder_check_ids" nolabel="1" readonly="1">
-                                <list create="0" delete="0" default_order="create_date desc">
+                                <list create="0" delete="0" default_order="create_date desc" class="tender_ai_eval_summary"
+                                      decoration-success="overall_result == 'pass'"
+                                      decoration-danger="overall_result == 'fail'">
                                     <field name="bidder_id"/>
                                     <field name="overall_result" widget="badge"
                                            decoration-success="overall_result == 'pass'"

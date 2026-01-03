@@ -111,8 +111,20 @@ class TenderJob(models.Model):
 
     # Related Records
     bidders = fields.One2many('tende_ai.bidder', 'job_id', string='Bidders', readonly=True)
+    detected_company_ids = fields.Many2many(
+        'tende_ai.bidder',
+        string='Detected Companies',
+        compute='_compute_detected_company_ids',
+        store=False,
+        readonly=True,
+    )
     eligibility_criteria = fields.One2many('tende_ai.eligibility_criteria', 'job_id', string='Eligibility Criteria', readonly=True)
     bidder_check_ids = fields.One2many('tende_ai.bidder_check', 'job_id', string='Eligibility Checks', readonly=True)
+
+    @api.depends('bidders')
+    def _compute_detected_company_ids(self):
+        for job in self:
+            job.detected_company_ids = job.bidders
 
     # Flat tables for Job tabs (no nesting)
     payment_ids = fields.One2many('tende_ai.payment', 'job_id', string='Payments', readonly=True)

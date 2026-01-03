@@ -19,7 +19,10 @@ _PDF_TEXT_CACHE_MAX = 32
 class TenderBidderCheck(models.Model):
     _name = 'tende_ai.bidder_check'
     _description = 'Bidder Eligibility Check'
+    _rec_name = 'name'
     _order = 'create_date desc'
+
+    name = fields.Char(string="Name", compute="_compute_name", store=True, readonly=True)
 
     job_id = fields.Many2one('tende_ai.job', string='Job', required=True, ondelete='cascade', readonly=True, index=True)
     tender_id = fields.Many2one('tende_ai.tender', string='Tender', readonly=True, related='job_id.tender_id', store=True)
@@ -41,6 +44,15 @@ class TenderBidderCheck(models.Model):
     error_message = fields.Text(string='Error', readonly=True)
 
     line_ids = fields.One2many('tende_ai.bidder_check_line', 'check_id', string='Criteria Results', readonly=True)
+
+    @api.depends("job_id", "bidder_id", "overall_result")
+    def _compute_name(self):
+        for rec in self:
+            job = rec.job_id.name if rec.job_id else ""
+            bidder = rec.bidder_id.vendor_company_name if rec.bidder_id else ""
+            res = rec.overall_result or ""
+            parts = [p for p in [job, bidder, res] if p]
+            rec.name = " / ".join(parts) if parts else _("Eligibility Check")
 
 
 class TenderBidderCheckLine(models.Model):

@@ -6,4 +6,17 @@
   color: inherit !important;
 }
 
+.tender_ai_eval_summary .o_data_row.text-success td {
+  background-color: #dff7e6 !important; /* light green */
+}
+
+.tender_ai_eval_summary .o_data_row.text-danger td {
+  background-color: #fde2e7 !important; /* light pink */
+}
+
+.tender_ai_eval_summary .o_data_row.text-success,
+.tender_ai_eval_summary .o_data_row.text-danger {
+  color: inherit !important;
+}
+
 

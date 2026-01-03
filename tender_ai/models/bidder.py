@@ -10,6 +10,7 @@ from odoo.exceptions import ValidationError
 class Bidder(models.Model):
     _name = 'tende_ai.bidder'
     _description = 'Bidder/Company Information'
+    _rec_name = 'vendor_company_name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'vendor_company_name'
 

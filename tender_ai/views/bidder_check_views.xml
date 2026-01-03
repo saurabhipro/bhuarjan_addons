@@ -27,17 +27,22 @@
             <form string="Eligibility Check" create="0" edit="0" delete="0">
                 <sheet>
                     <group>
-                        <field name="job_id"/>
-                        <field name="bidder_id"/>
-                        <field name="overall_result" widget="badge"/>
-                        <field name="processed_on"/>
-                        <field name="duration_seconds"/>
-                        <field name="error_message"/>
+                        <group>
+                            <field name="job_id"/>
+                            <field name="bidder_id"/>
+                            <field name="overall_result" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="processed_on"/>
+                            <field name="duration_seconds"/>
+                            <field name="error_message"/>
+                        </group>
                     </group>
                     <notebook>
                         <page string="Criteria Results">
                             <field name="line_ids" nolabel="1" readonly="1">
-                                <list create="0" delete="0" default_order="sl_no">
+                                <list create="0" delete="0" default_order="sl_no" class="tender_ai_criteria_results"
+                                      decoration-danger="result == 'fail'">
                                     <field name="sl_no" string="Sl."/>
                                     <field name="result" widget="badge"
                                            decoration-success="result == 'pass'"
@@ -47,6 +52,9 @@
                                     <field name="missing_documents"/>
                                     <field name="reason"/>
                                     <field name="evidence"/>
+                                    <field name="proof_url" widget="url" string="Proof Link"/>
+                                    <field name="proof_page" string="Page" optional="show"/>
+                                    <field name="proof_excerpt" string="Proof Excerpt" optional="show"/>
                                 </list>
                             </field>
                         </page>

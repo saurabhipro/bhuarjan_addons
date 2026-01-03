@@ -7,7 +7,7 @@
     <menuitem id="menu_tende_ai_dashboard"
               name="Dashboard"
               parent="menu_tende_ai_root"
-              action="action_tende_ai_dashboard"
+              action="action_tende_ai_dashboard_owl"
               sequence="5"/>
 
     <menuitem id="menu_tende_ai_job"

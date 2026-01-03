@@ -24,6 +24,93 @@ class TenderDashboard(models.TransientModel):
         # For TransientModel, we create a new record each time
         return self.create({})
 
+    @api.model
+    def get_stats(self):
+        """
+        Lightweight stats endpoint for OWL dashboard (RPC).
+        Uses search_count/read_group where possible to avoid loading big recordsets.
+        """
+        Job = self.env["tende_ai.job"].sudo()
+        Bidder = self.env["tende_ai.bidder"].sudo()
+        Payment = self.env["tende_ai.payment"].sudo()
+        Work = self.env["tende_ai.work_experience"].sudo()
+        Tender = self.env["tende_ai.tender"].sudo()
+
+        total_jobs = Job.search_count([])
+        completed_jobs = Job.search_count([("state", "=", "completed")])
+        extracting_jobs = Job.search_count([("state", "=", "extracting")])
+        processing_jobs = Job.search_count([("state", "=", "processing")])
+        extracted_jobs = Job.search_count([("state", "=", "extracted")])
+        failed_jobs = Job.search_count([("state", "=", "failed")])
+        cancelled_jobs = Job.search_count([("state", "=", "cancelled")])
+
+        success_rate = (completed_jobs / total_jobs * 100.0) if total_jobs else 0.0
+
+        total_bidders = Bidder.search_count([])
+        # distinct companies (groupby on name)
+        company_groups = Bidder.read_group([("vendor_company_name", "!=", False)], ["vendor_company_name"], ["vendor_company_name"])
+        total_companies = len(company_groups or [])
+
+        total_payments = Payment.search_count([])
+        total_work_experience = Work.search_count([])
+
+        # Tender states
+        approved_tenders = Tender.search_count([("state", "=", "approved")])
+        published_tenders = Tender.search_count([("state", "=", "published")])
+
+        # Processing stats (from stored durations + analytics JSON best-effort)
+        avg_processing_time = 0.0
+        try:
+            # processing_time_minutes is stored; use read_group for average
+            grp = Job.read_group([("processing_time_minutes", ">", 0)], ["processing_time_minutes:avg"], [])
+            avg_processing_time = float((grp[0] or {}).get("processing_time_minutes_avg") or 0.0) if grp else 0.0
+        except Exception:
+            avg_processing_time = 0.0
+
+        total_pdfs = 0
+        total_calls = 0
+        total_tokens = 0
+        # parse analytics for latest N jobs to keep it fast
+        try:
+            jobs = Job.search([("state", "=", "completed"), ("analytics", "!=", False)], order="create_date desc", limit=200)
+            for j in jobs:
+                try:
+                    a = j.analytics
+                    if isinstance(a, str):
+                        a = json.loads(a)
+                    if not isinstance(a, dict):
+                        continue
+                    total_pdfs += int(a.get("totalValidPdfProcessed", 0) or 0)
+                    total_calls += int(a.get("geminiCallsTotal", 0) or 0)
+                    tok = a.get("tokensTotal") or {}
+                    if isinstance(tok, dict):
+                        total_tokens += int(tok.get("totalTokens", 0) or 0)
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+        return {
+            "total_jobs": total_jobs,
+            "completed_jobs": completed_jobs,
+            "extracting_jobs": extracting_jobs,
+            "extracted_jobs": extracted_jobs,
+            "processing_jobs": processing_jobs,
+            "failed_jobs": failed_jobs,
+            "cancelled_jobs": cancelled_jobs,
+            "success_rate": round(success_rate, 2),
+            "total_companies": total_companies,
+            "total_bidders": total_bidders,
+            "total_payments": total_payments,
+            "total_work_experience": total_work_experience,
+            "approved_tenders": approved_tenders,
+            "published_tenders": published_tenders,
+            "total_pdfs_processed": total_pdfs,
+            "total_ai_calls": total_calls,
+            "total_tokens": total_tokens,
+            "avg_processing_time_min": round(avg_processing_time, 2),
+        }
+
     # KPI Fields - Overall Statistics
     total_jobs = fields.Integer(string='Total Jobs', compute='_compute_statistics', readonly=True)
     completed_jobs = fields.Integer(string='Completed Jobs', compute='_compute_statistics', readonly=True)

@@ -78,6 +78,52 @@ class MailBot(models.AbstractModel):
         m = re.search(r"\bfor\s+(.+)$", text or "", flags=re.IGNORECASE)
         return (m.group(1).strip() if m else (text or "").strip())
 
+    @staticmethod
+    def _tokenize_for_attachment_match(text: str):
+        """
+        Extracts tokens likely to appear in filenames:
+        - long numbers (e.g. PO/Ref IDs)
+        - longer words (>=4 chars)
+        """
+        t = (text or "").lower()
+        nums = re.findall(r"\b\d{4,}\b", t)
+        words = re.findall(r"\b[a-z][a-z0-9_-]{3,}\b", t)
+        stop = {
+            "the", "and", "with", "from", "that", "this", "have", "has", "for", "are", "was", "were",
+            "bidder", "document", "documents", "attachment", "attachments", "proof", "evidence",
+            "criteria", "supporting", "required", "format", "prescribed",
+        }
+        words = [w for w in words if w not in stop and not w.startswith("tender_")]
+        # prefer numeric tokens first (often unique)
+        out = []
+        out.extend(nums)
+        out.extend([w for w in words if w not in out])
+        return out[:20]
+
+    def _match_attachments(self, bidder, text: str, limit: int = 8):
+        """
+        Best-effort matching of bidder attachments based on evidence/missing-doc text.
+        """
+        if not bidder:
+            return []
+        atts = bidder.attachment_ids
+        if not atts:
+            return []
+        tokens = self._tokenize_for_attachment_match(text)
+        if not tokens:
+            return atts[:limit]
+        scored = []
+        for a in atts:
+            name = (a.name or "").lower()
+            score = 0
+            for tok in tokens:
+                if tok and tok in name:
+                    score += 3 if tok.isdigit() else 1
+            if score:
+                scored.append((score, a))
+        scored.sort(key=lambda x: (-x[0], x[1].id))
+        return [a for _, a in scored[:limit]] or atts[:limit]
+
     def _get_answer(self, record, body, values, command=False):
         text = (body or "").strip()
         low = text.lower().strip()
@@ -92,6 +138,59 @@ class MailBot(models.AbstractModel):
             if re.search(r"\b(how|who)\s+many\b", low) or re.search(r"\bcount\b", low):
                 cnt = self.env["tende_ai.job"].search_count([])
                 return Markup("<p>%s</p>") % html_escape(_("You currently have access to %s tender jobs.") % cnt)
+
+            # Proof / failed evidence: show likely documents for each failed criterion (best-effort)
+            if re.search(r"\b(fail|failed)\b", low) and re.search(r"\b(proof|evidence|document|documents|attachment|attachments)\b", low):
+                job = self.env["tende_ai.job"].sudo().search(
+                    [("state", "in", ("completed", "processing", "extracted"))],
+                    order="create_date desc",
+                    limit=1,
+                )
+                if not job:
+                    return Markup("<p>%s</p>") % html_escape(_("No tender jobs found."))
+
+                query = self._extract_after_for(text)
+                bidder = None
+                ql = query.lower()
+                for b in (job.bidders or []):
+                    nm = (b.vendor_company_name or "").strip()
+                    if nm and nm.lower() in ql:
+                        bidder = b
+                        break
+                if not bidder and query:
+                    bidder = self.env["tende_ai.bidder"].sudo().search(
+                        [("job_id", "=", job.id), ("vendor_company_name", "ilike", query)],
+                        limit=1,
+                    )
+                if not bidder:
+                    return Markup("<p>%s</p>") % html_escape(
+                        _("Please specify bidder/company name, e.g. “failed proof for APOLLO INFOWAYS”. (Latest job: %s)") % (job.name or "")
+                    )
+
+                Line = self.env["tende_ai.bidder_check_line"].sudo()
+                lines = Line.search(
+                    [("job_id", "=", job.id), ("bidder_id", "=", bidder.id), ("result", "=", "fail")],
+                    order="sl_no, id",
+                    limit=20,
+                )
+                if not lines:
+                    return Markup("<p>%s</p>") % html_escape(
+                        _("No failed eligibility lines found for %s on job %s.") % (bidder.vendor_company_name or "", job.name or "")
+                    )
+
+                rows = []
+                for ln in lines:
+                    evidence = (ln.evidence or ln.reason or ln.missing_documents or "").strip()
+                    excerpt = evidence[:140] + ("…" if len(evidence) > 140 else "")
+                    matched = self._match_attachments(bidder, evidence, limit=6)
+                    links = []
+                    for a in matched:
+                        links.append(self._download_attachment_link(a.id, a.name or _("Download")))
+                    docs_cell = Markup("<br/>").join(links) if links else Markup(html_escape(_("No matching attachment found.")))
+                    rows.append([ln.sl_no or "", (ln.criteria or "")[:120], excerpt, docs_cell])
+
+                title = _("Failed criteria proof documents") + f" — {bidder.vendor_company_name or ''} ({job.name or ''})"
+                return self._html_table(title, ["Sl No (Criteria)", "Criteria", "Evidence excerpt", "Likely documents"], rows, max_rows=20, add_index=True)
 
             # Bidder attachments / documents quick answer
             if re.search(r"\b(attachment|attachments|document|documents|pdf|file|files)\b", low):

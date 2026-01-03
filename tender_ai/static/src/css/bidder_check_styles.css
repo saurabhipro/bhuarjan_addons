@@ -1,0 +1,9 @@
+.tender_ai_criteria_results .o_data_row.text-danger td {
+  background-color: #fde2e7 !important; /* light pink */
+}
+
+.tender_ai_criteria_results .o_data_row.text-danger {
+  color: inherit !important;
+}
+
+

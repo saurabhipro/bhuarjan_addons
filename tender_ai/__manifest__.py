@@ -27,6 +27,7 @@
         'data/ir_sequence_data.xml',
         'data/system_parameter_data.xml',
         'wizard/tender_ai_chat_wizard.xml',
+        'views/tender_dashboard_owl_views.xml',
         'views/tender_dashboard_views.xml',
         'views/tender_job_views.xml',
         'views/tender_views.xml',
@@ -40,6 +41,10 @@
     'assets': {
         'web.assets_backend': [
             'tender_ai/static/src/css/tender_dashboard.css',
+            'tender_ai/static/src/css/bidder_check_styles.css',
+            'tender_ai/static/src/dashboard/css/tender_ai_dashboard.css',
+            'tender_ai/static/src/dashboard/xml/tender_ai_dashboard.xml',
+            'tender_ai/static/src/dashboard/js/tender_ai_dashboard.js',
         ],
     },
     'installable': True,

@@ -1,5 +1,6 @@
 .tender_ai_dashboard {
   padding: 18px;
+  background: linear-gradient(180deg, rgba(123, 75, 58, 0.06), rgba(255, 255, 255, 0) 240px);
 }
 
 .tad_header {
@@ -46,16 +47,25 @@
 }
 
 .tad_section {
-  margin: 16px 0 10px;
+  margin: 16px 0 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  padding: 12px 12px 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.04);
 }
 
 .tad_section_title {
   font-weight: 800;
   letter-spacing: 0.5px;
-  margin: 10px 0;
+  margin: 6px 0 12px;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(123, 75, 58, 0.08);
+  border: 1px solid rgba(123, 75, 58, 0.10);
 }
 
 .tad_grid {
@@ -81,8 +91,8 @@
   padding: 14px 14px 12px;
   color: #111827;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
   cursor: pointer;
   user-select: none;
   transition: transform 120ms ease, box-shadow 120ms ease;
@@ -94,7 +104,11 @@
 
 .tad_card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.tad_card:active {
+  transform: translateY(-1px);
 }
 
 .tad_card_label {

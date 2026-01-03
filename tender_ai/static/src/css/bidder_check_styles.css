@@ -101,23 +101,59 @@
   z-index: 2 !important;
 }
 
-/* Tender AI list/table header styling (scoped) */
-.tender_ai_form .o_list_view thead th,
-.tender_ai_form .o_list_renderer thead th {
+/* List/table header styling (global across backend) */
+.o_list_view thead th,
+.o_list_renderer thead th {
   background-color: #7b4b3a !important;
   color: #ffffff !important;
   font-weight: 800 !important;
   border-bottom: 2px solid rgba(255, 255, 255, 0.25) !important;
 }
 
-.tender_ai_form .o_list_view thead th .o_column_sortable,
-.tender_ai_form .o_list_renderer thead th .o_column_sortable {
+.o_list_view thead th .o_column_sortable,
+.o_list_renderer thead th .o_column_sortable {
   color: #ffffff !important;
 }
 
-.tender_ai_form .o_list_view thead th i,
-.tender_ai_form .o_list_renderer thead th i {
+.o_list_view thead th i,
+.o_list_renderer thead th i {
   color: #ffffff !important;
+}
+
+/* Icons next to key labels (Tender AI Job header fields) */
+.tender_ai_form label.o_form_label[for="name"]::before {
+  content: "\f02b"; /* fa-tag */
+}
+.tender_ai_form label.o_form_label[for="tender_reference"]::before {
+  content: "\f02e"; /* fa-bookmark */
+}
+.tender_ai_form label.o_form_label[for="companies_detected"]::before {
+  content: "\f1ad"; /* fa-building */
+}
+.tender_ai_form label.o_form_label[for="detected_company_ids"]::before {
+  content: "\f0c0"; /* fa-users */
+}
+.tender_ai_form label.o_form_label[for="create_uid"]::before {
+  content: "\f007"; /* fa-user */
+}
+.tender_ai_form label.o_form_label[for="zip_filename"]::before {
+  content: "\f1c6"; /* fa-file-archive-o */
+}
+.tender_ai_form label.o_form_label[for="zip_file"]::before {
+  content: "\f0c6"; /* fa-paperclip */
+}
+
+.tender_ai_form label.o_form_label[for="name"]::before,
+.tender_ai_form label.o_form_label[for="tender_reference"]::before,
+.tender_ai_form label.o_form_label[for="companies_detected"]::before,
+.tender_ai_form label.o_form_label[for="detected_company_ids"]::before,
+.tender_ai_form label.o_form_label[for="create_uid"]::before,
+.tender_ai_form label.o_form_label[for="zip_filename"]::before,
+.tender_ai_form label.o_form_label[for="zip_file"]::before {
+  font-family: FontAwesome;
+  display: inline-block;
+  margin-right: 8px;
+  opacity: 0.9;
 }
 
 

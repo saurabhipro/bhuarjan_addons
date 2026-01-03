@@ -30,8 +30,24 @@
                             <field name="contact_no"/>
                         </group>
                         <group>
-                            <field name="pan"/>
-                            <field name="gstin"/>
+                            <!-- Keep classic 2-column alignment: label (left) + value + icon (right) -->
+                            <label for="pan"/>
+                            <div class="o_row">
+                                <field name="pan" nolabel="1"/>
+                                <button name="action_validate_pan" type="object" class="oe_link" icon="fa-refresh"
+                                        title="Validate PAN (demo)"/>
+                            </div>
+                            <field name="pan_validation_status" invisible="1"/>
+                            <field name="pan_validated_on" invisible="1"/>
+
+                            <label for="gstin"/>
+                            <div class="o_row">
+                                <field name="gstin" nolabel="1"/>
+                                <button name="action_validate_gstin" type="object" class="oe_link" icon="fa-refresh"
+                                        title="Validate GSTIN (demo)"/>
+                            </div>
+                            <field name="gstin_validation_status" invisible="1"/>
+                            <field name="gstin_validated_on" invisible="1"/>
                             <field name="place_of_registration"/>
                             <field name="offer_validity_days"/>
                         </group>

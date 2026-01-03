@@ -2,6 +2,7 @@
 
 import base64
 import os
+import re
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -26,6 +27,22 @@ class Bidder(models.Model):
     # Registration Information
     pan = fields.Char(string='PAN', tracking=True)
     gstin = fields.Char(string='GSTIN', tracking=True)
+    pan_validation_status = fields.Selection(
+        [('unknown', 'Unknown'), ('valid', 'Valid'), ('invalid', 'Invalid')],
+        string="PAN Status",
+        default="unknown",
+        tracking=True,
+        readonly=True,
+    )
+    gstin_validation_status = fields.Selection(
+        [('unknown', 'Unknown'), ('valid', 'Valid'), ('invalid', 'Invalid')],
+        string="GSTIN Status",
+        default="unknown",
+        tracking=True,
+        readonly=True,
+    )
+    pan_validated_on = fields.Datetime(string="PAN Checked On", tracking=True, readonly=True)
+    gstin_validated_on = fields.Datetime(string="GSTIN Checked On", tracking=True, readonly=True)
     place_of_registration = fields.Char(string='Place of Registration', tracking=True)
     offer_validity_days = fields.Char(string='Offer Validity (Days)', tracking=True)
     
@@ -141,4 +158,53 @@ class Bidder(models.Model):
             Attachment.create(to_create)
 
         return {'type': 'ir.actions.client', 'tag': 'reload'}
+
+    @staticmethod
+    def _is_valid_pan(value: str) -> bool:
+        v = (value or "").strip().upper()
+        return bool(re.fullmatch(r"[A-Z]{5}[0-9]{4}[A-Z]", v))
+
+    @staticmethod
+    def _is_valid_gstin(value: str) -> bool:
+        v = (value or "").strip().upper()
+        # 15 chars: 2 digits + PAN + 1 entity + Z + checksum
+        return bool(re.fullmatch(r"\d{2}[A-Z]{5}[0-9]{4}[A-Z][A-Z0-9]Z[A-Z0-9]", v))
+
+    def _notify(self, title: str, message: str, notif_type: str = "info"):
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": title,
+                "message": message,
+                "type": notif_type,  # info/success/warning/danger
+                "sticky": False,
+            },
+        }
+
+    def action_validate_pan(self):
+        self.ensure_one()
+        if not self.pan:
+            self.write({"pan_validation_status": "unknown", "pan_validated_on": fields.Datetime.now()})
+            return self._notify(_("PAN Validation"), _("No PAN found to validate."), "warning")
+        ok = self._is_valid_pan(self.pan)
+        self.write({
+            "pan": (self.pan or "").strip().upper(),
+            "pan_validation_status": "valid" if ok else "invalid",
+            "pan_validated_on": fields.Datetime.now(),
+        })
+        return self._notify(_("PAN Validation"), _("PAN format looks valid.") if ok else _("PAN format looks invalid."), "success" if ok else "danger")
+
+    def action_validate_gstin(self):
+        self.ensure_one()
+        if not self.gstin:
+            self.write({"gstin_validation_status": "unknown", "gstin_validated_on": fields.Datetime.now()})
+            return self._notify(_("GSTIN Validation"), _("No GSTIN found to validate."), "warning")
+        ok = self._is_valid_gstin(self.gstin)
+        self.write({
+            "gstin": (self.gstin or "").strip().upper(),
+            "gstin_validation_status": "valid" if ok else "invalid",
+            "gstin_validated_on": fields.Datetime.now(),
+        })
+        return self._notify(_("GSTIN Validation"), _("GSTIN format looks valid.") if ok else _("GSTIN format looks invalid."), "success" if ok else "danger")
 

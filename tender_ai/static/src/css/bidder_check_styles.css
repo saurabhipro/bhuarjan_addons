@@ -87,4 +87,37 @@
   border-radius: 999px;
 }
 
+/* Fix: PDF/File viewer close button not clickable/visible under some themes.
+   Ensure Odoo's FileViewer header stays above the embedded PDF iframe. */
+.o-FileViewer {
+  z-index: 1 !important;
+}
+
+.o-FileViewer-header {
+  z-index: 3 !important;
+}
+
+.o-FileViewer-main {
+  z-index: 2 !important;
+}
+
+/* Tender AI list/table header styling (scoped) */
+.tender_ai_form .o_list_view thead th,
+.tender_ai_form .o_list_renderer thead th {
+  background-color: #7b4b3a !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+.tender_ai_form .o_list_view thead th .o_column_sortable,
+.tender_ai_form .o_list_renderer thead th .o_column_sortable {
+  color: #ffffff !important;
+}
+
+.tender_ai_form .o_list_view thead th i,
+.tender_ai_form .o_list_renderer thead th i {
+  color: #ffffff !important;
+}
+
 

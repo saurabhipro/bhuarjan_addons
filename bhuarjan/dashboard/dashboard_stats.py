@@ -88,10 +88,20 @@ class DashboardStats(models.AbstractModel):
         can_see_all = any(user.has_group(group) for group in config['can_see_all_projects'])
         
         if can_see_all:
+            # Determine user type in priority order
+            if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+                user_type = 'admin'
+            elif user.has_group('bhuarjan.group_bhuarjan_department_user'):
+                user_type = 'department'
+            elif user.has_group('bhuarjan.group_bhuarjan_district_administrator'):
+                user_type = 'district_admin'
+            else:
+                user_type = 'collector'
+            
             return {
                 'can_see_all': True,
                 'project_ids': None,
-                'user_type': 'admin' if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system') else 'collector',
+                'user_type': user_type,
             }
         
         # Check if user is SDM

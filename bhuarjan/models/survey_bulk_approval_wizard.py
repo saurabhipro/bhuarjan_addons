@@ -8,18 +8,72 @@ class SurveyBulkApprovalWizard(models.TransientModel):
     _name = 'bhu.survey.bulk.approval.wizard'
     _description = 'Survey Bulk Approval Wizard'
 
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
-    village_ids = fields.Many2many('bhu.village', string='Villages / ग्राम',
-                                   help="Select specific villages to approve surveys for. If none selected, all villages in the project will be considered.")
-    approval_remarks = fields.Text(string='Approval Remarks / अनुमोदन टिप्पणी', required=True)
+    project_id = fields.Many2one('bhu.project', string='Project ID', required=True)
+    village_id = fields.Many2one('bhu.village', string='Village ID')
+    project_name = fields.Char(string='Project / परियोजना', readonly=True)
+    village_name = fields.Char(string='Village / ग्राम', readonly=True)
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Override to set default project and village from context or user preferences"""
+        res = super(SurveyBulkApprovalWizard, self).default_get(fields_list)
+        
+        # Try to get from context first
+        project_id = self.env.context.get('default_project_id') or self.env.context.get('active_project_id')
+        village_id = self.env.context.get('default_village_id') or self.env.context.get('active_village_id')
+        
+        # If not in context, try to get from selected records in the list view
+        if not project_id or not village_id:
+            active_ids = self.env.context.get('active_ids', [])
+            if active_ids:
+                survey = self.env['bhu.survey'].browse(active_ids[0])
+                if not project_id and survey.project_id:
+                    project_id = survey.project_id.id
+                if not village_id and survey.village_id:
+                    village_id = survey.village_id.id
+        
+        # If still not found, try to get from saved dashboard selection
+        if not project_id or not village_id:
+            saved_selection = self.env['bhuarjan.dashboard'].get_dashboard_selection()
+            if not project_id and saved_selection.get('project_id'):
+                project_id = saved_selection['project_id']
+            if not village_id and saved_selection.get('village_id'):
+                village_id = saved_selection['village_id']
+        
+        # Final fallback - get from user's department
+        if not project_id:
+            user = self.env.user
+            if hasattr(user, 'bhu_department_id') and user.bhu_department_id:
+                # Get first project from user's department
+                projects = self.env['bhu.project'].search([
+                    ('department_id', '=', user.bhu_department_id.id)
+                ], limit=1)
+                if projects:
+                    project_id = projects[0].id
+        
+        if project_id:
+            # Fetch project to get display name
+            project = self.env['bhu.project'].browse(project_id)
+            if project.exists():
+                res['project_id'] = project_id
+                res['project_name'] = project.name
+        
+        if village_id:
+            # Fetch village to get display name
+            village = self.env['bhu.village'].browse(village_id)
+            if village.exists():
+                res['village_id'] = village_id
+                res['village_name'] = village.name
+            
+        return res
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Reset villages when project changes and set domain"""
-        self.village_ids = False
+        """Reset village when project changes and set domain"""
+        self.village_id = False
         if self.project_id and self.project_id.village_ids:
-            return {'domain': {'village_ids': [('id', 'in', self.project_id.village_ids.ids)]}}
-        return {'domain': {'village_ids': []}}
+            return {'domain': {'village_id': [('id', 'in', self.project_id.village_ids.ids)]}}
+        return {'domain': {'village_id': []}}
 
     def action_approve_surveys(self):
         """Approve surveys based on selected project and villages"""
@@ -31,18 +85,17 @@ class SurveyBulkApprovalWizard(models.TransientModel):
             ('state', 'in', ['draft', 'submitted'])  # Allow approving draft or submitted surveys
         ]
         
-        # Filter by villages if selected
-        if self.village_ids:
-            domain.append(('village_id', 'in', self.village_ids.ids))
+        # Filter by village if selected
+        if self.village_id:
+            domain.append(('village_id', '=', self.village_id.id))
         
         # Find surveys matching criteria
         surveys = self.env['bhu.survey'].search(domain)
         
         if not surveys:
             # Provide helpful error message
-            if self.village_ids:
-                village_names = ', '.join(self.village_ids.mapped('name'))
-                raise ValidationError(_('No draft or submitted surveys found for project "%s" and village(s): %s.\n\nPlease check:\n- Survey state (should be Draft or Submitted)\n- Project and Village selection') % (self.project_id.name, village_names))
+            if self.village_id:
+                raise ValidationError(_('No draft or submitted surveys found for project "%s" and village: %s.\n\nPlease check:\n- Survey state (should be Draft or Submitted)\n- Project and Village selection') % (self.project_id.name, self.village_id.name))
             else:
                 raise ValidationError(_('No draft or submitted surveys found for project "%s".\n\nPlease check:\n- Survey state (should be Draft or Submitted)\n- Project selection') % self.project_id.name)
         
@@ -53,7 +106,7 @@ class SurveyBulkApprovalWizard(models.TransientModel):
                 if survey.state in ['draft', 'submitted']:
                     survey.action_approve()  # Use the existing approve method
                     survey.message_post(
-                        body=_('Bulk approved by %s\n\nApproval Remarks: %s') % (self.env.user.name, self.approval_remarks),
+                        body=_('Bulk approved by %s') % (self.env.user.name),
                         message_type='notification'
                     )
                     approved_count += 1

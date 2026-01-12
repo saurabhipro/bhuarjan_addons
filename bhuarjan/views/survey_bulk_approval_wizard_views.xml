@@ -7,16 +7,16 @@
         <field name="arch" type="xml">
             <form string="Bulk Approval / बल्क अनुमोदन">
                 <sheet>
+                    <div class="alert alert-info" role="alert" style="margin-bottom: 15px;">
+                        <i class="fa fa-info-circle"/> This will approve all draft and submitted surveys for the selected project and village.
+                    </div>
                     <group>
-                        <group>
-                            <field name="project_id" required="1"/>
-                            <field name="village_ids" widget="many2many_tags" 
-                                   options="{'no_create_edit': True}"
-                                   placeholder="Select villages (leave empty for all villages in project)"/>
-                        </group>
+                        <field name="project_name" readonly="1"/>
+                        <field name="village_name" readonly="1"/>
                     </group>
-                    <group>
-                        <field name="approval_remarks" placeholder="Enter approval remarks..." required="1"/>
+                    <group invisible="1">
+                        <field name="project_id" readonly="1" force_save="1"/>
+                        <field name="village_id" readonly="1" force_save="1"/>
                     </group>
                 </sheet>
                 <footer>

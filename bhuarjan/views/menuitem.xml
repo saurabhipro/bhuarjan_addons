@@ -70,8 +70,12 @@
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" />
     <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
 
-    <!-- Dashboard menu - uses role-based routing for all users -->
-    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu" name="Dashboard" action="action_role_based_dashboard" sequence="1"/>
+    <!-- Dashboard menus - Split by role to ensure correct dashboard opens -->
+    <!-- For Department Users -->
+    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu_dept" name="Dashboard" action="action_department_dashboard_owl" groups="bhuarjan.group_bhuarjan_department_user" sequence="1"/>
+
+    <!-- For All Other Roles (Uses role-based routing) -->
+    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu" name="Dashboard" action="action_role_based_dashboard" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_district_administrator,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_patwari"/>
 
     <!-- Move Settings Master and Sequence Settings to General Settings section -->
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

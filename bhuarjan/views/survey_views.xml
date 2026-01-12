@@ -262,7 +262,24 @@
         <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
+# Get project and village from context (passed from dashboard)
+project_id = env.context.get('default_project_id') or env.context.get('active_project_id')
+village_id = env.context.get('default_village_id') or env.context.get('active_village_id')
+
+# If not in context, try to get from selected records
+if not project_id and records:
+    project_id = records[0].project_id.id if records[0].project_id else False
+if not village_id and records:
+    village_id = records[0].village_id.id if records[0].village_id else False
+
+# Build context with default values
+ctx = {
+    'default_project_id': project_id,
+    'default_village_id': village_id,
+}
+
 action = env['ir.actions.act_window']._for_xml_id('bhuarjan.action_survey_bulk_approval_wizard')
+action['context'] = ctx
         </field>
     </record>
 

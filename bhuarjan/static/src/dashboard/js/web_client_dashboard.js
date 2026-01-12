@@ -27,12 +27,19 @@ patch(WebClient.prototype, {
                     logo.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // Use role-based dashboard action that checks user role
-                        window.location.href = '/web#action=bhuarjan.action_role_based_dashboard';
+                        // Use role-based dashboard action that checks user role on server
+                        // The server will route to the correct dashboard based on user's role and groups
+                        if (this.env.services.action) {
+                            this.env.services.action.doAction('bhuarjan.action_role_based_dashboard', {
+                                clearBreadcrumbs: true,
+                            });
+                        } else {
+                            // Fallback to hash if service not found
+                            window.location.href = '/web#action=bhuarjan.action_role_based_dashboard';
+                        }
                     });
                 }
             });
         }, 1500);
     },
 });
-

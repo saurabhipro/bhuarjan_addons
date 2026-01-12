@@ -15,7 +15,7 @@ export class RoleBasedDashboard extends Component {
         onMounted(async () => {
             try {
                 // Call server-side method to get the appropriate dashboard action
-                // This avoids client-side user service availability issues
+                // The server has reliable access to user groups and role information
                 const dashboardAction = await this.orm.call(
                     "bhuarjan.dashboard",
                     "get_role_based_dashboard_action",
@@ -38,7 +38,7 @@ export class RoleBasedDashboard extends Component {
                     });
                 }
             } catch (error) {
-                console.error("Error loading dashboard:", error);
+                console.error("RoleBasedDashboard: Error loading dashboard:", error);
                 // Fallback to SDM dashboard on any error
                 await this.action.doAction({
                     type: "ir.actions.client",
@@ -57,4 +57,3 @@ registry.category("actions").add(
     "bhuarjan.role_based_dashboard",
     RoleBasedDashboard
 );
-

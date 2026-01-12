@@ -155,54 +155,99 @@ class DashboardData(models.AbstractModel):
     # This method is removed to avoid conflicts - dashboard_stats.get_dashboard_stats() will be used
     @api.model
     def get_role_based_dashboard_action(self):
-        """Return the appropriate dashboard action based on user role"""
+        """Return the appropriate dashboard action based on user role.
+        This method is called by RoleBasedDashboard client action to route users.
+        """
+        # Get current user
         user = self.env.user
-        # Check user roles in priority order
-        is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
-        is_collector = user.has_group('bhuarjan.group_bhuarjan_collector') or user.has_group('bhuarjan.group_bhuarjan_additional_collector')
-        is_department = user.has_group('bhuarjan.group_bhuarjan_department_user')
-        is_district_admin = user.has_group('bhuarjan.group_bhuarjan_district_administrator')
-        is_sdm = user.has_group('bhuarjan.group_bhuarjan_sdm')
-        # Use sudo() to bypass permission checks when reading action references
+        # Get sudoed user for field reading if necessary
+        user_sudo = user.sudo()
+        role = getattr(user_sudo, 'bhuarjan_role', False)
+        
+        # 1. Admin / System - Highest priority
+        is_admin = role == 'administrator' or user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
         if is_admin:
-            # Return Admin Dashboard action
-            action_ref = self.env.ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.admin_dashboard'
-            name = 'Admin Dashboard'
-        elif is_collector:
-            # Return Collector Dashboard action
-            action_ref = self.env.ref('bhuarjan.action_collector_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.collector_dashboard'
-            name = 'Collector Dashboard'
-        elif is_department:
-            # Return Department User Dashboard action
-            action_ref = self.env.ref('bhuarjan.action_department_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.department_dashboard'
-            name = 'Department User Dashboard'
-        elif is_district_admin:
-            # Return District Admin Dashboard action
-            action_ref = self.env.ref('bhuarjan.action_district_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.district_dashboard'
-            name = 'District Admin Dashboard'
-        elif is_sdm:
-            # Return SDM Dashboard action
-            action_ref = self.env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.sdm_dashboard_tag'
-            name = 'SDM Dashboard'
-        else:
-            # Fallback to SDM dashboard for other users
-            action_ref = self.env.ref('bhuarjan.action_sdm_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.sdm_dashboard_tag'
-            name = 'SDM Dashboard'
-        if not action_ref:
-            # Fallback to admin dashboard if action not found
-            action_ref = self.env.ref('bhuarjan.action_admin_dashboard_owl', raise_if_not_found=False)
-            tag = 'bhuarjan.admin_dashboard'
-            name = 'Admin Dashboard'
-        # Return a proper client action dictionary instead of reading the record
-        # This avoids issues with action IDs that don't exist
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bhuarjan.admin_dashboard',
+                'name': 'Admin Dashboard',
+            }
+            
+        # 2. Department User - High priority
+        is_dept_by_role = role == 'department_user'
+        is_dept_by_group = user.has_group('bhuarjan.group_bhuarjan_department_user')
+        is_dept_by_field = bool(user_sudo.bhu_department_id)
+        is_dept_by_project = self.env['bhu.project'].sudo().search_count([('department_user_ids', 'in', user.id)], limit=1) > 0
+        
+        if is_dept_by_role or is_dept_by_group or is_dept_by_field or is_dept_by_project:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bhuarjan.department_dashboard',
+                'name': 'Department User Dashboard',
+            }
+            
+        # 3. Collector / Additional Collector
+        is_collector = role in ['collector', 'additional_collector'] or \
+                       user.has_group('bhuarjan.group_bhuarjan_collector') or \
+                       user.has_group('bhuarjan.group_bhuarjan_additional_collector')
+        if is_collector:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bhuarjan.collector_dashboard',
+                'name': 'Collector Dashboard',
+            }
+            
+        # 4. District Admin
+        is_district_admin = role == 'district_administrator' or user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        if is_district_admin:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bhuarjan.district_dashboard',
+                'name': 'District Admin Dashboard',
+            }
+            
+        # 5. SDM / Patwari fallback
+        is_sdm = role == 'sdm' or user.has_group('bhuarjan.group_bhuarjan_sdm')
+        if is_sdm:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'bhuarjan.sdm_dashboard_tag',
+                'name': 'SDM Dashboard',
+            }
+            
+        # Final fallback - Default to SDM dashboard for any other internal user
         return {
             'type': 'ir.actions.client',
-            'tag': tag,
-            'name': name,
+            'tag': 'bhuarjan.sdm_dashboard_tag',
+            'name': 'SDM Dashboard',
+        }
+    
+    @api.model
+    def save_dashboard_selection(self, project_id, village_id):
+        """Save user's last selected project and village for bulk approval"""
+        user = self.env.user
+        
+        # Store in user context or preferences
+        self.env['ir.config_parameter'].sudo().set_param(
+            f'bhuarjan.last_project.user_{user.id}', project_id or ''
+        )
+        self.env['ir.config_parameter'].sudo().set_param(
+            f'bhuarjan.last_village.user_{user.id}', village_id or ''
+        )
+        return True
+    
+    @api.model
+    def get_dashboard_selection(self):
+        """Get user's last selected project and village for bulk approval"""
+        user = self.env.user
+        project_id = self.env['ir.config_parameter'].sudo().get_param(
+            f'bhuarjan.last_project.user_{user.id}', default=False
+        )
+        village_id = self.env['ir.config_parameter'].sudo().get_param(
+            f'bhuarjan.last_village.user_{user.id}', default=False
+        )
+        
+        return {
+            'project_id': int(project_id) if project_id and project_id.isdigit() else False,
+            'village_id': int(village_id) if village_id and village_id.isdigit() else False,
         }

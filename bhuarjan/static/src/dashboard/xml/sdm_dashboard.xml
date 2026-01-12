@@ -300,6 +300,10 @@
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.survey')">
                                     <i class="fa fa-eye"/> View
                                 </button>
+                                <button class="btn btn-sm btn-success" t-on-click.stop="() => this.downloadForm10()" 
+                                        t-att-disabled="!state.selectedVillage">
+                                    <i class="fa fa-download"/> Download Form 10
+                                </button>
                             </div>
                         </div>
                         </t>

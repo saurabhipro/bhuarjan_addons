@@ -8,12 +8,11 @@
                 <group>
                     <field name="form_10" invisible="1"/>
                     <field name="allowed_village_ids" invisible="1"/>
+                    <field name="project_id" invisible="1"/>
+                    <field name="village_id" invisible="1"/>
                     <field name="export_type" string="Export Type" widget="radio" options="{'horizontal': true}"/>
-                    <field name="project_id" string="Project / परियोजना" options="{'no_open': True}"/>
-                    <field name="allowed_village_ids" invisible="1"/>
-                    <field name="village_id" string="Village / ग्राम" 
-                           domain="[('id', 'in', allowed_village_ids)]"
-                           options="{'no_open': True, 'no_create_edit': True}"/>
+                    <field name="project_name" readonly="1"/>
+                    <field name="village_name" readonly="1"/>
                 </group>
                 <footer>
                     <button name="action_print_report"

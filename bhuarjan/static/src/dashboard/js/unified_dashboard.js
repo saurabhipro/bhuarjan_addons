@@ -191,7 +191,7 @@ const DASHBOARD_CONFIG = {
         registryKey: 'bhuarjan.department_dashboard',
         pageTitle: 'Department User Dashboard',
         localStoragePrefix: 'department_dashboard',
-        showDepartmentFilter: true, // Department users can select any department
+        showDepartmentFilter: false, // Department users have only one department - no dropdown needed
         showProjectFilter: true,
         showVillageFilter: true,
         statsMapping: {
@@ -309,7 +309,10 @@ export class UnifiedDashboard extends Component {
 
     setup() {
         // Determine dashboard type from props or context
-        this.dashboardType = this.props.dashboardType || 'sdm';
+        // Only set dashboardType if not already set by child class
+        if (!this.dashboardType) {
+            this.dashboardType = this.props.dashboardType || 'sdm';
+        }
         this.config = DASHBOARD_CONFIG[this.dashboardType] || DASHBOARD_CONFIG['sdm'];
         
         // Set template dynamically
@@ -390,20 +393,25 @@ export class UnifiedDashboard extends Component {
     async loadInitialData() {
         const localStoragePrefix = this.config.localStoragePrefix;
         
-        // Load department if configured
-        if (this.config.showDepartmentFilter) {
+        // For department dashboard, always load department (even if filter is hidden)
+        if (this.dashboardType === 'department') {
+            await this.loadDepartments();
+            // Department should now be auto-selected and projects loaded
+        } else if (this.config.showDepartmentFilter) {
+            // For other dashboards, load departments if filter is shown
             await this.loadDepartments();
         } else if (this.config.initialDataMethod) {
-            // For department dashboard (if auto-select was enabled), load user's department
+            // Custom data loading method
             await this.loadUserDepartment();
         }
         
-        // Load projects
-        // For department and collector dashboards, allow all projects without department selection
-        // For others, only load if department is selected (when showDepartmentFilter is true)
-        if (this.dashboardType === 'department' || this.dashboardType === 'collector') {
+        // Load projects (if not already loaded by loadDepartments for department dashboard)
+        // For department dashboard, projects are already loaded in loadDepartments()
+        // For collector dashboards, allow all projects without department selection
+        // For others, only load if department is selected
+        if (this.dashboardType === 'collector') {
             await this.loadProjects();
-        } else if (this.state.selectedDepartment || !this.config.showDepartmentFilter) {
+        } else if (this.dashboardType !== 'department' && (this.state.selectedDepartment || !this.config.showDepartmentFilter)) {
             await this.loadProjects();
         }
         
@@ -461,9 +469,12 @@ export class UnifiedDashboard extends Component {
             // Auto-select department for department users (they only have one department)
             if (this.dashboardType === 'department' && this.state.departments.length === 1) {
                 this.state.selectedDepartment = this.state.departments[0].id;
+                this.state.selectedDepartmentName = this.state.departments[0].name;
                 // Save to localStorage
                 const prefix = this.config.localStoragePrefix;
                 localStorage.setItem(`${prefix}_department`, String(this.state.selectedDepartment));
+                // Auto-load projects after department selection
+                await this.loadProjects();
             }
         } catch (error) {
             console.error("Error loading departments:", error);
@@ -472,23 +483,18 @@ export class UnifiedDashboard extends Component {
     }
 
     async loadProjects() {
-        // Get department ID from state if department filter is shown
-        const departmentId = this.config.showDepartmentFilter ? this.state.selectedDepartment : null;
+        // Get department ID from state
+        // For department dashboard, use selectedDepartment even if filter is hidden
+        const departmentId = this.state.selectedDepartment || null;
         
-        console.log(`loadProjects called - departmentId: ${departmentId}, dashboardType: ${this.dashboardType}, showDepartmentFilter: ${this.config.showDepartmentFilter}`);
-        
-        // For department and collector dashboards, allow loading all projects even without department selection
-        // For other dashboards, if department filter is shown and no department is selected, clear projects
+        // For most dashboards, if department filter is shown and no department is selected, clear projects
         if (departmentId === null && this.config.showDepartmentFilter && !['department', 'collector'].includes(this.dashboardType)) {
-            console.log('No department selected, clearing projects');
             this.state.projects = [];
             return;
         }
         
         try {
-            // Always pass departmentId (can be null) to get_user_projects
-            // The backend will handle filtering appropriately
-            console.log(`Calling get_user_projects with departmentId: ${departmentId}`);
+            // Pass departmentId to get_user_projects to filter projects by department
             const projects = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_user_projects",
@@ -498,14 +504,6 @@ export class UnifiedDashboard extends Component {
             // Ensure we have an array
             const projectsArray = Array.isArray(projects) ? projects : [];
             this.state.projects = projectsArray;
-            
-            // Log for debugging
-            console.log(`Loaded ${projectsArray.length} projects for department: ${departmentId}`, projectsArray);
-            
-            // Force reactivity update
-            if (this.state.projects.length === 0 && departmentId) {
-                console.warn(`No projects found for department ${departmentId}. Check if projects exist for this department.`);
-            }
         } catch (error) {
             console.error("Error loading projects:", error);
             this.state.projects = [];
@@ -534,12 +532,6 @@ export class UnifiedDashboard extends Component {
         try {
             this.state.loading = true;
             
-            console.log("Loading dashboard data with filters:", {
-                department: this.state.selectedDepartment,
-                project: this.state.selectedProject,
-                village: this.state.selectedVillage
-            });
-            
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
@@ -564,7 +556,6 @@ export class UnifiedDashboard extends Component {
                 // Store allowed section names from project's law
                 if (stats.allowed_section_names !== undefined) {
                     this.state.allowedSectionNames = stats.allowed_section_names || [];
-                    console.log('Dashboard - Allowed sections for project:', this.state.allowedSectionNames);
                 }
             }
             
@@ -623,8 +614,6 @@ export class UnifiedDashboard extends Component {
         const value = ev.target.value;
         const departmentId = value && value !== '' ? parseInt(value, 10) : null;
         
-        console.log(`Department changed to: ${departmentId} (value: ${value})`);
-        
         // Update state
         this.state.selectedDepartment = departmentId;
         
@@ -652,7 +641,6 @@ export class UnifiedDashboard extends Component {
         if (departmentId) {
             try {
                 await this.loadProjects();
-                console.log(`After loadProjects, projects array length: ${this.state.projects.length}`);
             } catch (error) {
                 console.error("Error in loadProjects after department change:", error);
             }
@@ -705,6 +693,9 @@ export class UnifiedDashboard extends Component {
             localStorage.removeItem(`${prefix}_village_name`);
         }
         
+        // Save selection to server for bulk approval
+        await this.saveDashboardSelection();
+        
         await this.loadDashboardData();
     }
 
@@ -730,11 +721,63 @@ export class UnifiedDashboard extends Component {
             this.state.selectedVillageName = null;
         }
         
+        // Save selection to server for bulk approval
+        await this.saveDashboardSelection();
+        
         await this.loadDashboardData();
     }
 
     async onSubmitFilters() {
         await this.loadDashboardData();
+    }
+
+    async saveDashboardSelection() {
+        /**
+         * Save the current dashboard selection (project and village) to the server
+         * This allows the bulk approval wizard to retrieve these values
+         */
+        try {
+            await this.orm.call(
+                "bhuarjan.dashboard",
+                "save_dashboard_selection",
+                [this.state.selectedProject || false, this.state.selectedVillage || false]
+            );
+        } catch (error) {
+            console.error("Error saving dashboard selection:", error);
+        }
+    }
+
+    async downloadForm10() {
+        /**
+         * Open Form 10 download wizard with pre-filled project and village
+         */
+        if (!this.state.selectedProject) {
+            this.notification.add(_t("Please select a project first"), { type: "warning" });
+            return;
+        }
+        
+        if (!this.state.selectedVillage) {
+            this.notification.add(_t("Please select a village first"), { type: "warning" });
+            return;
+        }
+
+        try {
+            await this.action.doAction({
+                type: 'ir.actions.act_window',
+                name: 'Download Form 10',
+                res_model: 'report.wizard',
+                view_mode: 'form',
+                views: [[false, 'form']],
+                target: 'new',
+                context: {
+                    'default_project_id': this.state.selectedProject,
+                    'default_village_id': this.state.selectedVillage,
+                    'default_export_type': 'excel',  // Default to Excel export
+                },
+            });
+        } catch (error) {
+            console.error("Error opening Form 10 download wizard:", error);
+        }
     }
 
     // Helper methods for domain building
@@ -856,6 +899,8 @@ export class UnifiedDashboard extends Component {
                 context: {
                     'default_project_id': this.state.selectedProject || false,
                     'default_village_id': this.state.selectedVillage || false,
+                    'active_project_id': this.state.selectedProject || false,
+                    'active_village_id': this.state.selectedVillage || false,
                 },
             });
         } else {
@@ -1039,6 +1084,8 @@ export class UnifiedDashboard extends Component {
             context: {
                 'default_project_id': this.state.selectedProject || false,
                 'default_village_id': this.state.selectedVillage || false,
+                'active_project_id': this.state.selectedProject || false,
+                'active_village_id': this.state.selectedVillage || false,
             },
         });
     }
@@ -1130,11 +1177,6 @@ export class UnifiedDashboard extends Component {
             
             // Check if this section is in the allowed list
             const isVisible = this.state.allowedSectionNames.includes(sectionMasterName);
-            
-            // Debug logging (can be removed later)
-            if (!isVisible) {
-                console.log(`Section "${dashboardSectionName}" (mapped to "${sectionMasterName}") is not in allowed sections:`, this.state.allowedSectionNames);
-            }
             
             return isVisible;
         } catch (error) {

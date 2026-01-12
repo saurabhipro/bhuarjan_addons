@@ -12,8 +12,44 @@
                 <i class="fa fa-spinner fa-spin fa-2x"/> Loading...
             </div>
 
-            <!-- Dashboard Content -->
+            <!-- Dashboard Content -->  
             <div t-if="!state.loading" class="o_dashboard_content">
+                <!-- Selection gate: Project and Village required -->
+                <div t-if="!state.selectedProject || !state.selectedVillage" style="display: flex; justify-content: center; align-items: center; min-height: 400px; padding: 40px;">
+                    <div style="text-align: center; max-width: 600px; background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 50%, #FAF0E6 100%); border: 2px solid #8B4513; border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px rgba(139, 69, 19, 0.1);">
+                        <div style="font-size: 64px; color: #8B4513; margin-bottom: 20px;">
+                            <i class="fa fa-map-marker" style="margin-right: 10px;"/>
+                            <i class="fa fa-briefcase"/>
+                        </div>
+                        <h3 style="color: #8B4513; margin-bottom: 15px; font-weight: bold;">
+                            <i class="fa fa-info-circle" style="margin-right: 8px;"/>
+                            Selection Required
+                        </h3>
+                        <p style="color: #8B4513; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                            Please select both <strong>Project</strong> and <strong>Village</strong> from the filters above to view the dashboard.
+                        </p>
+                        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+                            <div t-if="!state.selectedProject" style="background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #8B4513;">
+                                <i class="fa fa-briefcase" style="color: #dc3545; margin-right: 8px;"/>
+                                <span style="color: #8B4513; font-weight: 500;">Project: Not Selected</span>
+                            </div>
+                            <div t-if="state.selectedProject" style="background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #28a745;">
+                                <i class="fa fa-check-circle" style="color: #28a745; margin-right: 8px;"/>
+                                <span style="color: #28a745; font-weight: 500;">Project: Selected</span>
+                            </div>
+                            <div t-if="!state.selectedVillage" style="background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #8B4513;">
+                                <i class="fa fa-map-marker" style="color: #dc3545; margin-right: 8px;"/>
+                                <span style="color: #8B4513; font-weight: 500;">Village: Not Selected</span>
+                            </div>
+                            <div t-if="state.selectedVillage" style="background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #28a745;">
+                                <i class="fa fa-check-circle" style="color: #28a745; margin-right: 8px;"/>
+                                <span style="color: #28a745; font-weight: 500;">Village: Selected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <t t-if="state.selectedProject &amp;&amp; state.selectedVillage">
                 <!-- Status Legend Section - At the top -->
                 <div class="o_status_legend_section">
                     <div class="o_status_legend_container">
@@ -158,6 +194,7 @@
                         </div>
                     </div>
                 </div>
+                </t>
             </div>
         </div>
     </t>

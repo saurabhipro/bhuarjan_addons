@@ -24,14 +24,41 @@ class ReportWizard(models.TransientModel):
         ('excel', 'Excel'),
         ('csv', 'CSV')
     ], string='Export Type', default='pdf', required=True)
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
+    project_id = fields.Many2one('bhu.project', string='Project ID')
+    village_id = fields.Many2one('bhu.village', string='Village ID')
+    project_name = fields.Char(string='Project / परियोजना', readonly=True, required=True)
+    village_name = fields.Char(string='Village / ग्राम', readonly=True, required=True)
     allowed_village_ids = fields.Many2many(
         'bhu.village',
         string='Allowed Villages',
         compute='_compute_allowed_village_ids',
         store=False,
     )
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Override to populate project and village names from context"""
+        res = super(ReportWizard, self).default_get(fields_list)
+        
+        # Get project and village from context
+        project_id = self.env.context.get('default_project_id')
+        village_id = self.env.context.get('default_village_id')
+        
+        # Fetch project name
+        if project_id:
+            project = self.env['bhu.project'].browse(project_id)
+            if project.exists():
+                res['project_id'] = project_id
+                res['project_name'] = project.name
+        
+        # Fetch village name
+        if village_id:
+            village = self.env['bhu.village'].browse(village_id)
+            if village.exists():
+                res['village_id'] = village_id
+                res['village_name'] = village.name
+        
+        return res
     
     @api.depends('project_id')
     def _compute_allowed_village_ids(self):
@@ -84,7 +111,29 @@ class ReportWizard(models.TransientModel):
 
     def action_print_report(self):
         """Generate Form 10 report in selected format (PDF/Excel/CSV)"""
-        if self.env.user.bhuarjan_role == 'patwari' and self.village_id and self.village_id.id not in self.env.user.village_ids.ids:
+        # If Many2one fields are empty but we have names, reconstruct them
+        # This can happen when invisible fields don't save properly
+        if not self.project_id and self.project_name:
+            # Try to find project from saved selection or user's department
+            saved_selection = self.env['bhuarjan.dashboard'].get_dashboard_selection()
+            if saved_selection.get('project_id'):
+                self.project_id = saved_selection['project_id']
+        
+        if not self.village_id and self.village_name:
+            # Try to find village from saved selection
+            saved_selection = self.env['bhuarjan.dashboard'].get_dashboard_selection()
+            if saved_selection.get('village_id'):
+                self.village_id = saved_selection['village_id']
+        
+        # Validate that project and village are now set
+        if not self.project_id:
+            raise UserError("Please select a project.")
+        
+        if not self.village_id:
+            raise UserError("Please select a village.")
+        
+        # Role-based validation for patwari
+        if self.env.user.bhuarjan_role == 'patwari' and self.village_id.id not in self.env.user.village_ids.ids:
             raise UserError("You are not allowed to download for this village.")
         
         # Ensure UUIDs exist and are UNIQUE
@@ -103,13 +152,6 @@ class ReportWizard(models.TransientModel):
             if duplicate_villages:
                 _logger.warning(f"Village {self.village_id.id} ({self.village_id.name}) has duplicate UUID! Regenerating...")
                 self.village_id.write({'village_uuid': str(uuid.uuid4())})
-        
-        # STRICT FILTERING: Only get surveys for the EXACT project AND village
-        # Verify village is correctly selected
-        if not self.village_id:
-            raise UserError("Please select a village.")
-        if not self.project_id:
-            raise UserError("Please select a project.")
         
         # Log the exact village being used
         selected_village_id = self.village_id.id

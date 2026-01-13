@@ -56,17 +56,21 @@
                     <group>
                         <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
                     </group>
+                    
+                    <!-- Prakaran Kramank Field - First and Editable -->
                     <group>
+                        <field name="prakaran_kramank" string="Prakaran Kramank / प्रकरण क्रमांक"
+                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                    </group>
+                    
+                    <!-- Rest of fields - All Readonly -->
+                    <group col="2">
                         <group>
-                            <field name="project_id" required="1" 
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                            <field name="project_id" required="1" readonly="1"
                                    options="{'no_create': True, 'no_open': True}"/>
-                            <field name="village_id" required="1" 
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                            <field name="village_id" required="1" readonly="1"
                                    options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
-                                   placeholder="Select village from project..."/>
-                            <field name="prakaran_kramank" 
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                   placeholder="Village"/>
                         </group>
                         <group>
                             <field name="district_id" readonly="1"/>
@@ -192,7 +196,7 @@
                                 </div>
                             </group>
                         </page>
-                        <page string="Survey / सर्वे">
+                        <page string="Survey / सर्वे" invisible="1">
                             <field name="survey_ids" readonly="1" nolabel="1">
                                 <list>
                                     <field name="name" string="Survey Number"/>

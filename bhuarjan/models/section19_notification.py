@@ -24,7 +24,7 @@ class Section19Notification(models.Model):
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_location', store=True)
     
     # Prakaran Kramank
-    prakaran_kramank = fields.Char(string='Prakaran Kramank / प्रकरण क्रमांक', tracking=True,
+    prakaran_kramank = fields.Char(string='Prakaran Kramank / प्रकरण क्रमांक', required=True, tracking=True,
                                    help='Case number to be displayed in the report (optional)')
     
     # Public Purpose

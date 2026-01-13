@@ -72,7 +72,7 @@ class Section11PreliminaryReport(models.Model):
     # Notification Details
     notification_number = fields.Char(string='Notification Number', readonly=True, tracking=True,
                                       help='Auto-generated notification number')
-    prakaran_kramank = fields.Char(string='Prakaran Kramank / प्रकरण क्रमांक', tracking=True,
+    prakaran_kramank = fields.Char(string='Prakaran Kramank / प्रकरण क्रमांक', required=True, tracking=True,
                                    help='Case number to be displayed in the report (optional)')
     publication_date = fields.Date(string='Publication Date', tracking=True)
     

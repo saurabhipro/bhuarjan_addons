@@ -38,8 +38,8 @@ class Section21Notification(models.Model):
                               help='Date of issue of the public notice')
     
     # Kramank (Reference Number)
-    kramank = fields.Char(string='Kramank / क्रमांक', tracking=True,
-                          help='Reference number to be displayed in the report (optional)')
+    kramank = fields.Char(string='Kramank / क्रमांक', required=True, tracking=True,
+                          help='Reference number to be displayed in the report')
     
     # Requisitioning Body - Related from project's department
     requisitioning_body = fields.Char(string='Requisitioning Body / अपेक्षक निकाय', 
@@ -281,9 +281,7 @@ class Section21Notification(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
-            # Validate village is required
-            if not vals.get('village_id'):
-                raise ValidationError(_('Please select a village before creating Section 21 notification.'))
+            # village_id is already required at field level, no need for extra validation
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 project_id = vals.get('project_id')

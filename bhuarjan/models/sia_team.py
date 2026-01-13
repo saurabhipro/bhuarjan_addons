@@ -86,7 +86,7 @@ class SiaTeam(models.Model):
                                  help='Unique identifier for QR code download')
     
     # Kramank (Reference Number)
-    kramank = fields.Char(string='Kramank / क्रमांक', tracking=True,
+    kramank = fields.Char(string='Kramank / क्रमांक', required=True, tracking=True,
                           help='Reference number to be displayed in the report (optional)')
     
     # Legacy fields (kept for backward compatibility)

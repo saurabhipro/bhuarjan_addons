@@ -20,11 +20,14 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
-    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', required=True, tracking=True,
-                                       help='Select the requiring body/department')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(),
                                   domain="[('is_sia_exempt', '=', False)]")
+    
+    # Requiring Body - automatically populated from project's department
+    requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / आवश्यक निकाय', 
+                                       related='project_id.department_id', store=True, readonly=True, tracking=True,
+                                       help='Requiring body/department (automatically populated from project)')
     
     # Department - computed from project (for filtering purposes)
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
@@ -195,7 +198,7 @@ class Section4Notification(models.Model):
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
-        """Auto-populate requiring_body_id and reset village/tehsil when project changes"""
+        """Reset village/tehsil when project changes (requiring_body_id auto-populates via related field)"""
         # If village is already set and is in the project's villages, keep it
         if self.project_id and self.project_id.village_ids:
             if self.village_id and self.village_id.id in self.project_id.village_ids.ids:
@@ -208,14 +211,8 @@ class Section4Notification(models.Model):
             # No villages in project, reset village
             self.village_id = False
         
-        # Reset other fields when project changes
-        self.requiring_body_id = False
+        # Reset tehsil when project changes (requiring_body_id auto-populates via related field)
         self.tehsil_id = False
-        
-        if self.project_id:
-            # Auto-populate requiring_body_id from project's department
-            if self.project_id.department_id:
-                self.requiring_body_id = self.project_id.department_id
     
     @api.onchange('village_id')
     def _onchange_village_id(self):
@@ -316,12 +313,8 @@ class Section4Notification(models.Model):
         # Create new records
         if new_vals_list:
             records = super().create(new_vals_list)
-            # Auto-populate requiring_body_id after creation (village will be selected by user)
-            for record in records:
-                if record.project_id:
-                    if not record.requiring_body_id and record.project_id.department_id:
-                        record.requiring_body_id = record.project_id.department_id
-                    # Tehsil will be computed automatically when village is selected
+            # requiring_body_id is now automatically populated via related field
+            # Tehsil will be computed automatically when village is selected
         else:
             records = self.env['bhu.section4.notification']
         
@@ -331,17 +324,9 @@ class Section4Notification(models.Model):
         return records
     
     def write(self, vals):
-        """Override write to auto-populate requiring_body_id when project is set"""
+        """Override write method"""
         result = super().write(vals)
-        
-        # If project_id is set, auto-populate requiring_body_id
-        for record in self:
-            if 'project_id' in vals or (record.project_id and not record.requiring_body_id):
-                if record.project_id:
-                    # Auto-populate requiring_body_id from project's department
-                    if not record.requiring_body_id and record.project_id.department_id:
-                        record.requiring_body_id = record.project_id.department_id
-        
+        # requiring_body_id is now automatically populated via related field from project
         return result
     
     def _get_consolidated_village_data(self):

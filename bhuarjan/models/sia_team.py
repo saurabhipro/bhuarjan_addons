@@ -557,8 +557,8 @@ class SiaTeam(models.Model):
         if not self.project_id:
             raise ValidationError(_('Please select a project first.'))
         
-        if not self.requiring_body_id:
-            raise ValidationError(_('Please select a requiring body first.'))
+        if not self.project_id.department_id:
+            raise ValidationError(_('Project must have a department/requiring body assigned.'))
         
         if not self.village_ids:
             raise ValidationError(_('Please select at least one village first.'))
@@ -588,11 +588,10 @@ class SiaTeam(models.Model):
                 skipped_villages.append(f"{village.name} (no surveys)")
                 continue
             
-            # Create notification
+            # Create notification (requiring_body_id will be auto-populated from project)
             notification = self.env['bhu.section4.notification'].create({
                 'project_id': self.project_id.id,
                 'village_id': village.id,
-                'requiring_body_id': self.requiring_body_id.id,
             })
             created_notifications.append(notification)
         
@@ -619,7 +618,7 @@ class SiaTeam(models.Model):
                 'target': 'current',
                 'context': {
                     'default_project_id': self.project_id.id,
-                    'default_requiring_body_id': self.requiring_body_id.id,
+                    # requiring_body_id will be auto-populated from project
                 }
             }
         else:

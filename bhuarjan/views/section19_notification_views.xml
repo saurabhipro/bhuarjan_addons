@@ -32,9 +32,6 @@
                 <field name="can_collector_edit" invisible="1"/>
                 <div class="row w-100">
                         <div class="col w-100">
-                                 <!-- Submit Button for SDM (in draft state) -->
-                            <button name="action_submit" string="Submit to Collector" type="object" class="btn-success" icon="fa-paper-plane" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="not sdm_signed_file or state != 'draft'" confirm="Are you sure want to submit this record."/>
-                            
                             <!-- Action Buttons: Approve, Send Back -->
                             <button name="action_approve" string="Approve" type="object" class="btn-primary" icon="fa-check" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted' or not collector_signed_file"/>
                             <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" icon="fa-arrow-left" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted'"/>
@@ -63,158 +60,97 @@
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
-                    <!-- Rest of fields - All Readonly -->
-                    <group col="2">
-                        <group>
-                            <field name="project_id" required="1" readonly="1"
-                                   options="{'no_create': True, 'no_open': True}"/>
-                            <field name="village_id" required="1" readonly="1"
-                                   options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
-                                   placeholder="Village"/>
-                        </group>
-                        <group>
-                            <field name="district_id" readonly="1"/>
-                            <field name="tehsil_id" readonly="1"/>
-                        </group>
+                    <!-- Hidden Fields -->
+                    <group invisible="1">
+                        <field name="project_id" required="1" readonly="1"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="village_id" required="1" readonly="1"
+                               options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                               placeholder="Village"/>
+                        <field name="district_id" readonly="1"/>
+                        <field name="tehsil_id" readonly="1"/>
                     </group>
                     
-                    <notebook>
-                        <page string="Section 19 Documents / धारा 19 दस्तावेज़">
-                            <style>
-                                @media (max-width: 768px) {
-                                    .responsive-section19-group {
-                                        flex-direction: column !important;
-                                    }
-                                    .responsive-section19-group > * {
-                                        width: 100% !important;
-                                        margin-bottom: 15px !important;
-                                    }
-                                }
-                                .responsive-section19-group {
-                                    display: flex;
-                                    flex-wrap: wrap;
-                                    gap: 50px;
-                                }
-                                .responsive-section19-group > * {
-                                    flex: 1;
-                                    min-width: 300px;
-                                }
-                            </style>
-                            <!-- SDM Section -->
-                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <div class="responsive-section19-group">
-                                    <group string="Download Section 19 Documents">
-                                        <!-- Download Unsigned Section 19 -->
-                                        <button name="action_download_unsigned_file" string="Section 19" type="object" 
-                                                class="btn-primary" icon="fa-download"
-                                                title="Download Section 19 Notification (Unsigned)"
-                                                style="width: 100%; margin-bottom: 10px;"/>
-                                        
-                                        <!-- Download SDM Signed Section 19 -->
-                                        <button name="action_download_sdm_signed_file" type="object" 
-                                                class="btn-primary"
-                                                title="Download SDM Signed Section 19"
-                                                invisible="not sdm_signed_file"
-                                                style="width: 100%;">
-                                            <i class="fa fa-download" style="margin-right: 5px;"/>
-                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                            Section 19 SDM Signed
-                                        </button>
-                                    </group>
-                                    <group string="Upload SDM Signed Section 19">
-                                        <!-- Upload SDM Signed File (editable only in draft state) -->
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               string="Upload SDM Signed Section 19"
-                                               widget="binary"
-                                               readonly="state != 'draft'"
-                                               placeholder="Upload Signed Section 19 Notification"
-                                               help="Upload the signed Section 19 document from SDM"/>
-                                        <field name="sdm_signed_filename" invisible="1"/>
-                                    </group>
-                                </div>
-                            </group>
-                            
-                            <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
-                                <div class="responsive-section19-group row">
-                                    <div class="col" string="Download Section 19 Documents">
-                                        <div class="row" style="padding: 10px 0;">
-                                            <div class="col" style="padding: 0 10px;">
-                                                <!-- Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned) -->
-                                                <button name="action_download_latest_pdf" 
-                                                        string="Section 19" type="object" 
-                                                        class="btn-info" icon="fa-download"
-                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                        invisible="not sdm_signed_file and not collector_signed_file"
-                                                        style="width: 100%;"/>
-                                            </div>
-                                            <div class="col" style="padding: 0 10px;">
-                                                <!-- Download SDM Signed Section 19 -->
-                                                <button name="action_download_sdm_signed_file" 
-                                                        type="object" 
-                                                        class="btn-primary"
-                                                        title="Download SDM Signed Section 19"
-                                                        invisible="not sdm_signed_file"
-                                                        style="width: 100%;">
-                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                                    Section 19 SDM Signed
-                                                </button>
-                                            </div>
-                                            <div class="col" style="padding: 0 10px;">
-                                                <!-- Download Collector Signed Section 19 -->
-                                                <button name="action_download_collector_signed_file"
-                                                        type="object" 
-                                                        class="btn-primary"
-                                                        title="Download Collector Signed Section 19"
-                                                        invisible="not collector_signed_file"
-                                                        style="width: 100%;">
-                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                                    Section 19 Collector Signed
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col" string="">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <!-- Upload Collector Signed File (editable only in submitted state) -->
-                                                <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                    string="Upload Collector Signed Section 19"
-                                                    widget="binary"
-                                                    readonly="state != 'submitted'"
-                                                    placeholder="Upload Section 19 Approval Letter"
-                                                    help="Upload the signed Section 19 approval document from Collector"/>
-                                            </div>
-                                            <div class="col-6">
-                                                <field name="collector_signed_filename" invisible="1"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </group>
-                        </page>
-                        <page string="Survey / सर्वे" invisible="1">
-                            <field name="survey_ids" readonly="1" nolabel="1">
-                                <list>
-                                    <field name="name" string="Survey Number"/>
-                                    <field name="user_id" string="Surveyor"/>
-                                    <field name="khasra_number" string="Khasra Number"/>
-                                    <field name="total_area" string="Total Area (Hectares)"/>
-                                    <field name="acquired_area" string="Acquired Area (Hectares)"/>
-                                    <field name="state" widget="badge" string="Status"
-                                           decoration-success="state == 'approved'" 
-                                           decoration-info="state == 'submitted'" 
-                                           decoration-warning="state == 'draft'"
-                                           decoration-danger="state == 'rejected'"
-                                           decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date" string="Survey Date"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
+                    <!-- Section 19 Documents -->
+                    <group string="Section 19 Documents / धारा 19 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                        <!-- Download Section 19 Button -->
+                        <button name="action_download_unsigned_file" string="Section 19" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                title="Download Section 19 Notification (Unsigned)"
+                                style="margin: 5px 0;"/>
+                        
+                        <!-- Upload SDM Signed Section 19 -->
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               string="Upload SDM Signed Sec 19"
+                               widget="binary"
+                               readonly="state != 'draft'"
+                               placeholder="Upload Signed Section 19 Notification"
+                               help="Upload the signed Section 19 document from SDM"/>
+                        <field name="sdm_signed_filename" invisible="1"/>
+                        
+                        <!-- Download SDM Signed Section 19 (appears after upload) -->
+                        <button name="action_download_sdm_signed_file" type="object" 
+                                class="btn-primary"
+                                title="Download SDM Signed Section 19"
+                                invisible="not sdm_signed_file"
+                                style="margin: 5px 0;">
+                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                            SDM Signed
+                        </button>
+                        
+                        <!-- Submit to Collector Button (appears after SDM Signed is uploaded) -->
+                        <button name="action_submit" string="Submit to Collector" type="object" 
+                                class="btn-primary" 
+                                icon="fa-paper-plane"
+                                confirm="Are you sure you want to submit this to Collector?"
+                                invisible="not sdm_signed_file or state != 'draft'"
+                                style="margin: 5px 0;"/>
+                    </group>
+                    
+                    <!-- Collector Section -->
+                    <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                        <!-- Download Latest PDF -->
+                        <button name="action_download_latest_pdf" 
+                                string="Section 19" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                invisible="not sdm_signed_file and not collector_signed_file"
+                                style="margin: 5px 0;"/>
+                        
+                        <!-- Download SDM Signed Section 19 -->
+                        <button name="action_download_sdm_signed_file" 
+                                type="object" 
+                                class="btn-primary"
+                                title="Download SDM Signed Section 19"
+                                invisible="not sdm_signed_file"
+                                style="margin: 5px 0;">
+                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                            SDM Signed
+                        </button>
+                        
+                        <!-- Download Collector Signed Section 19 -->
+                        <button name="action_download_collector_signed_file"
+                                type="object" 
+                                class="btn-primary"
+                                title="Download Collector Signed Section 19"
+                                invisible="not collector_signed_file"
+                                style="margin: 5px 0;">
+                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                            Collector Signed
+                        </button>
+                        
+                        <!-- Upload Collector Signed File -->
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                            string="Upload Collector Signed Sec 19"
+                            widget="binary"
+                            readonly="state != 'submitted'"
+                            placeholder="Upload Section 19 Approval Letter"
+                            help="Upload the signed Section 19 approval document from Collector"/>
+                        <field name="collector_signed_filename" invisible="1"/>
+                    </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

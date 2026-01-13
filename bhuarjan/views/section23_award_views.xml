@@ -35,16 +35,16 @@
                         </h1>
                     </div>
                     
-                    <!-- Fields in 2 columns - All Readonly -->
-                    <group col="2">
-                        <group>
-                            <field name="project_id" readonly="1" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                            <field name="village_domain" invisible="1"/>
-                        </group>
-                        <group>
-                            <field name="village_id" readonly="1" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                            <field name="award_date"/>
-                        </group>
+                    <!-- Award Date - Editable -->
+                    <group>
+                        <field name="award_date"/>
+                    </group>
+                    
+                    <!-- Hidden Fields -->
+                    <group invisible="1">
+                        <field name="project_id" readonly="1" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                        <field name="village_domain"/>
+                        <field name="village_id" readonly="1" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
                     </group>
                     
                     <group>

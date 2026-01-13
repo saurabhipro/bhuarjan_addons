@@ -45,164 +45,92 @@
                         <field name="kramank" placeholder="Enter क्रमांक (Reference Number)"/>
                     </group>
                     
-                    <!-- Rest of fields - All Readonly -->
-                    <group col="2">
-                        <group>
-                            <field name="project_id" required="1" readonly="1"
-                                   options="{'no_create': True, 'no_open': True}"/>
-                            <field name="village_id" required="1" readonly="1"
-                                   options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
-                                   placeholder="Village"/>
-                            <field name="requisitioning_body" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="district_id" readonly="1"/>
-                            <field name="tehsil_id" readonly="1"/>
-                            <field name="public_purpose" readonly="1"/>
-                        </group>
-                    </group>
-                    
-                    <!-- Notice Date -->
+                    <!-- Notice Date - Editable -->
                     <group>
                         <field name="notice_date"/>
                     </group>
                     
-                    <notebook>
-                        <page string="Section 21 Documents / धारा 21 दस्तावेज़">
-                            <style>
-                                @media (max-width: 768px) {
-                                    .responsive-section21-group {
-                                        flex-direction: column !important;
-                                    }
-                                    .responsive-section21-group > * {
-                                        width: 100% !important;
-                                        margin-bottom: 15px !important;
-                                    }
-                                }
-                                .responsive-section21-group {
-                                    display: flex;
-                                    flex-wrap: wrap;
-                                    gap: 50px;
-                                }
-                                .responsive-section21-group > * {
-                                    flex: 1;
-                                    min-width: 300px;
-                                }
-                            </style>
-                            <!-- SDM Section -->
-                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <div class="responsive-section21-group">
-                                    <group string="Download Section 21 Documents">
-                                        <!-- Download Section 21 (All - Public + Personal) -->
-                                        <button name="action_generate_both_notices" type="object" 
-                                                class="btn-primary" 
-                                                icon="fa-download"
-                                                string="Section 21"
-                                                title="Download Both Public and Personal Section 21 Notices in one PDF"
-                                                style="width: 100%; margin-bottom: 10px;"/>
-                                        
-                                        <!-- Download SDM Signed Section 21 -->
-                                        <button name="action_download_sdm_signed_file" type="object" 
-                                                class="btn-primary"
-                                                title="Download SDM Signed Section 21"
-                                                invisible="not sdm_signed_file"
-                                                style="width: 100%;">
-                                            <i class="fa fa-download" style="margin-right: 5px;"/>
-                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                            Section 21 SDM Signed
-                                        </button>
-                                    </group>
-                                    <group string="Upload SDM Signed Section 21">
-                                        <!-- Upload SDM Signed File -->
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               string="Upload SDM Signed Section 21"
-                                               widget="binary"
-                                               readonly="state == 'signed'"
-                                               placeholder="Select SDM Signed Section 21 PDF to upload"
-                                               help="Upload the signed Section 21 document from SDM"/>
-                                        <field name="sdm_signed_filename" invisible="1"/>
-                                        
-                                        <!-- Mark as Signed Button -->
-                                        <button name="action_mark_signed" string="Mark as Signed" type="object" 
-                                                class="btn-success" icon="fa-check"
-                                                invisible="not sdm_signed_file or state == 'signed'"
-                                                title="Mark notification as signed after uploading SDM file"
-                                                style="width: 100%; margin-top: 10px;"/>
-                                    </group>
-                                </div>
-                            </group>
-                            
-                            <!-- Collector Section -->
-                            <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" style="margin-top: 40px;">
-                                <div class="responsive-section21-group row" style="padding: 10px 0;">
-                                    <div class="col" style="padding: 0 10px;">
-                                        <!-- Download Section 21 (All - Public + Personal) -->
-                                        <button name="action_generate_both_notices" 
-                                                string="Section 21" type="object" 
-                                                class="btn-info" icon="fa-download"
-                                                title="Download Both Public and Personal Section 21 Notices in one PDF"
-                                                style="width: 100%;"/>
-                                    </div>
-                                    <div class="col" style="padding: 0 10px;">
-                                        <!-- Download SDM Signed Section 21 -->
-                                        <button name="action_download_sdm_signed_file" 
-                                                type="object" 
-                                                class="btn-primary"
-                                                title="Download SDM Signed Section 21"
-                                                invisible="not sdm_signed_file"
-                                                style="width: 100%;">
-                                            <i class="fa fa-download" style="margin-right: 5px;"/>
-                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                            Section 21 SDM Signed
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="col" string="">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <!-- Upload Collector Signed File -->
-                                            <field name="collector_signed_file" filename="collector_signed_filename" 
-                                                string="Upload Collector Signed Section 21"
-                                                widget="binary"
-                                                readonly="state != 'generated' and state != 'signed'"
-                                                placeholder="Select Collector Signed Section 21 PDF to upload"
-                                                help="Upload the signed Section 21 approval document from Collector"/>
-                                        </div>
-                                        <div class="col-6">
-                                            <field name="collector_signed_filename" invisible="1"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </group>
-                        </page>
-                        <page string="Surveys / सर्वे" icon="fa-clipboard-list" invisible="1">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                                <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
-                                <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked</span>
-                                <span style="color: orange; font-weight: bold; margin-left: 15px;" invisible="survey_count != 0">⚠ No surveys found for selected village</span>
-                            </div>
-                            <field name="survey_ids" readonly="1" nolabel="1">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="user_id" string="Surveyor"/>
-                                    <field name="project_id" string="Project"/>
-                                    <field name="district_name" string="District"/>
-                                    <field name="village_id" string="Village"/>
-                                    <field name="khasra_number" string="Khasra Number"/>
-                                    <field name="total_area" string="Total Area"/>
-                                    <field name="acquired_area" string="Acquired Area"/>
-                                    <field name="state" widget="badge" string="Status"
-                                           decoration-success="state == 'approved'" 
-                                           decoration-info="state == 'submitted'" 
-                                           decoration-warning="state == 'draft'"
-                                           decoration-danger="state == 'rejected'"
-                                           decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date" string="Survey Date"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
+                    <!-- Hidden Fields -->
+                    <group invisible="1">
+                        <field name="project_id" required="1" readonly="1"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="village_id" required="1" readonly="1"
+                               options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                               placeholder="Village"/>
+                        <field name="requisitioning_body" readonly="1"/>
+                        <field name="district_id" readonly="1"/>
+                        <field name="tehsil_id" readonly="1"/>
+                        <field name="public_purpose" readonly="1"/>
+                    </group>
+                    
+                    <!-- Section 21 Documents -->
+                    <group string="Section 21 Documents / धारा 21 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                        <!-- Download Section 21 Button -->
+                        <button name="action_generate_both_notices" type="object" 
+                                class="btn-primary" 
+                                icon="fa-download"
+                                string="Section 21"
+                                title="Download Both Public and Personal Section 21 Notices in one PDF"
+                                style="margin: 5px 0;"/>
+                        
+                        <!-- Upload SDM Signed Section 21 -->
+                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                               string="Upload SDM Signed Sec 21"
+                               widget="binary"
+                               readonly="state == 'signed'"
+                               placeholder="Select SDM Signed Section 21 PDF to upload"
+                               help="Upload the signed Section 21 document from SDM"/>
+                        <field name="sdm_signed_filename" invisible="1"/>
+                        
+                        <!-- Download SDM Signed Section 21 (appears after upload) -->
+                        <button name="action_download_sdm_signed_file" type="object" 
+                                class="btn-primary"
+                                title="Download SDM Signed Section 21"
+                                invisible="not sdm_signed_file"
+                                style="margin: 5px 0;">
+                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                            SDM Signed
+                        </button>
+                        
+                        <!-- Mark as Signed Button -->
+                        <button name="action_mark_signed" string="Mark as Signed" type="object" 
+                                class="btn-success" icon="fa-check"
+                                invisible="not sdm_signed_file or state == 'signed'"
+                                title="Mark notification as signed after uploading SDM file"
+                                style="margin: 5px 0;"/>
+                    </group>
+                    
+                    <!-- Collector Section -->
+                    <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                        <!-- Download Section 21 Button -->
+                        <button name="action_generate_both_notices" 
+                                string="Section 21" type="object" 
+                                class="btn-primary" icon="fa-download"
+                                title="Download Both Public and Personal Section 21 Notices in one PDF"
+                                style="margin: 5px 0;"/>
+                        
+                        <!-- Download SDM Signed Section 21 -->
+                        <button name="action_download_sdm_signed_file" 
+                                type="object" 
+                                class="btn-primary"
+                                title="Download SDM Signed Section 21"
+                                invisible="not sdm_signed_file"
+                                style="margin: 5px 0;">
+                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                            SDM Signed
+                        </button>
+                        
+                        <!-- Upload Collector Signed File -->
+                        <field name="collector_signed_file" filename="collector_signed_filename" 
+                            string="Upload Collector Signed Sec 21"
+                            widget="binary"
+                            readonly="state != 'generated' and state != 'signed'"
+                            placeholder="Select Collector Signed Section 21 PDF to upload"
+                            help="Upload the signed Section 21 approval document from Collector"/>
+                        <field name="collector_signed_filename" invisible="1"/>
+                    </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

@@ -102,30 +102,9 @@
                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                         </group>
                     </group>
-                    <notebook>
-                        <page string="Section 4 Documents / धारा 4 दस्तावेज़">
-                            <style>
-                                @media (max-width: 768px) {
-                                    .responsive-section4-group {
-                                        flex-direction: column !important;
-                                    }
-                                    .responsive-section4-group > * {
-                                        width: 100% !important;
-                                        margin-bottom: 15px !important;
-                                    }
-                                }
-                                .responsive-section4-group {
-                                    display: flex;
-                                    flex-wrap: wrap;
-                                    gap: 50px;
-                                }
-                                .responsive-section4-group > * {
-                                    flex: 1;
-                                    min-width: 300px;
-                                }
-                            </style>
-                            <!-- Section 4 Documents -->
-                            <group string="Section 4 Documents / धारा 4 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                    
+                    <!-- Section 4 Documents -->
+                    <group string="Section 4 Documents / धारा 4 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                                 <!-- Download Section 4 Button -->
                                 <button name="action_download_unsigned_file" string="Section 4" type="object" 
                                         class="btn-primary" icon="fa-download"
@@ -204,86 +183,6 @@
                                     help="Upload the signed Section 4 approval document from Collector"/>
                                 <field name="collector_signed_filename" invisible="1"/>
                             </group>
-                        </page>
-                        <page string="Surveys" icon="fa-clipboard-list" invisible="1">
-                            <div class="alert alert-info" role="alert" style="margin-bottom: 15px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px;">
-                                <strong>Survey Status:</strong> Total Surveys: <strong><field name="survey_count" readonly="1" nolabel="1"/></strong> | Approved: <strong><field name="approved_survey_count" readonly="1" nolabel="1"/></strong>
-                                <span style="color: green; font-weight: bold; margin-left: 15px;" invisible="not all_surveys_approved">✓ All surveys are approved or locked - You can generate the notification</span>
-                                <span style="color: red; font-weight: bold; margin-left: 15px;" invisible="all_surveys_approved or survey_count == 0">⚠ Some surveys are not approved yet - Please approve all surveys first</span>
-                                <span style="color: orange; font-weight: bold; margin-left: 15px;" invisible="survey_count != 0">⚠ No surveys found for selected villages</span>
-                            </div>
-                            <field name="survey_ids" readonly="1" nolabel="1">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="user_id" string="Surveyor"/>
-                                    <field name="project_id" string="Project"/>
-                                    <field name="district_name" string="District"/>
-                                    <field name="village_id" string="Village"/>
-                                    <field name="khasra_number" string="Khasra Number"/>
-                                    <field name="total_area" string="Total Area"/>
-                                    <field name="acquired_area" string="Acquired Area"/>
-                                    <field name="state" widget="badge" string="Status"
-                                           decoration-success="state == 'approved'" 
-                                           decoration-info="state == 'submitted'" 
-                                           decoration-warning="state == 'draft'"
-                                           decoration-danger="state == 'rejected'"
-                                           decoration-muted="state == 'locked'"/>
-                                    <field name="survey_date" string="Survey Date"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Project Details / परियोजना विवरण" icon="fa-info-circle" invisible="1">
-                            <!-- Section 4 Questions (Hidden) -->
-                            <group>
-                                <group string="(1) Brief Description of Public Purpose / लोक प्रयोजन का संक्षिप्त विवरण">
-                                    <field name="project_id" readonly="1" nolabel="1" 
-                                           options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
-                                </group>
-                                <group string="(2) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या (From Project Master)">
-                                    <field name="directly_affected" nolabel="1" readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="(3) Number of Indirectly Affected Families / अप्रत्यक्ष रूप से प्रभावित परिवारों की संख्या (From Project Master)">
-                                    <field name="indirectly_affected" nolabel="1" readonly="1"/>
-                                </group>
-                                <group string="(4) Estimated Number of Private Houses and Other Assets / निजी मकानों और अन्य संपत्तियों की अनुमानित संख्या (From Project Master)">
-                                    <field name="private_assets" nolabel="1" readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="(5) Estimated Number of Government Houses and Other Assets / सरकारी मकानों और अन्य संपत्तियों की अनुमानित संख्या (From Project Master)">
-                                    <field name="government_assets" nolabel="1" readonly="1"/>
-                                </group>
-                                <group string="(6) Is the Proposed Acquisition Minimal? / क्या प्रस्तावित अर्जन न्यूनतम है? (Always Yes)">
-                                    <field name="minimal_acquisition" widget="radio" nolabel="1"
-                                           options="{'horizontal': true}"
-                                           readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="(7) Have Possible Alternatives and Their Feasibility Been Considered? / क्या संभावित विकल्पों और उनकी व्यवहार्यता पर विचार किया गया है? (Always Yes)">
-                                    <field name="alternatives_considered" widget="radio" nolabel="1"
-                                           options="{'horizontal': true}"
-                                           readonly="1"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="(8) Total Cost of the Project / परियोजना की कुल लागत (From Project Master)">
-                                    <field name="total_cost" nolabel="1" readonly="1"/>
-                                </group>
-                                <group string="(9) Benefits from the Project / परियोजना से लाभ (From Project Master)">
-                                    <field name="project_benefits" widget="html" nolabel="1" readonly="1"/>
-                                </group>
-                            </group>
-                            <group string="(10) Measures for Compensation and Likely Expenditure / मुआवजे के उपाय और संभावित व्यय (From Project Master)">
-                                <field name="compensation_measures" widget="html" nolabel="1" readonly="1"/>
-                            </group>
-                            <group string="(11) Other Components Affected by the Project / परियोजना से प्रभावित अन्य घटक (From Project Master)">
-                                <field name="other_components" widget="html" nolabel="1" readonly="1"/>
-                            </group>
-                        </page>
-                    </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

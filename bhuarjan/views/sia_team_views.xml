@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- SIA Team Member Line List View -->
+    <record id="view_sia_team_member_line_list" model="ir.ui.view">
+        <field name="name">bhu.sia.team.member.line.list</field>
+        <field name="model">bhu.sia.team.member.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="member_type" column_invisible="1"/>
+                <field name="name" string="Name / नाम" required="1"/>
+                <field name="address" string="Address / पता"/>
+                <field name="post" string="Post / पद"/>
+            </list>
+        </field>
+    </record>
+
     <!-- SIA Team List View -->
     <record id="view_sia_team_list" model="ir.ui.view">
         <field name="name">bhu.sia.team.list</field>
@@ -26,11 +41,6 @@
             <form string="SIA Team / SIA टीम" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                     <div class="row w-100">
                         <div class="col w-100">
-                                <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                                icon="fa-paper-plane"
-                                                invisible="(not sdm_signed_file and is_sia_exempt != 'yes') or state != 'draft'"
-                                                confirm="Are you sure want to submit this record."
-                                                style="width: 100%; margin-top: 10px;"/>
                                 <!-- Approve Button (Collector only) -->
                             <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                     icon="fa-check"
@@ -78,65 +88,57 @@
                     <field name="can_sdm_edit" invisible="1"/>
                     <field name="can_collector_edit" invisible="1"/>
                     
-                    <group>
-                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
-                    </group>
-                    
-                    <!-- Kramank Field - First and Editable -->
+                    <!-- Kramank Field - Visible and Optional -->
                     <group>
                         <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
-                    <!-- Rest of the fields in 2 columns - All Readonly -->
-                    <group col="2">
-                        <group>
-                            <field name="project_id" required="1" readonly="1" options="{'no_open': True}"/>
-                            <field name="village_ids" widget="many2many_tags" readonly="1"
-                                   placeholder="Affected villages (auto-populated from project)..."
-                                   options="{'no_create_edit': True}"
-                                   context="{'default_project_id': project_id}" force_save="1"/>
-                            <field name="is_sia_exempt" readonly="1"
-                                   string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
-                        </group>
-                        <group>
-                            <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
-                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
-                                   placeholder="Tehsils (from selected villages)..."
-                                   options="{'no_create_edit': True}" force_save="1"/>
-                            <field name="total_area_acquired" readonly="1"/>
-                        </group>
+                    <!-- Hidden Fields (Auto-populated from context) -->
+                    <group invisible="1">
+                        <field name="pending_with" string="Pending With / लंबित" readonly="1"/>
+                        <field name="project_id" required="1" readonly="1" options="{'no_open': True}"/>
+                        <field name="village_ids" widget="many2many_tags" readonly="1"
+                               placeholder="Affected villages (auto-populated from project)..."
+                               options="{'no_create_edit': True}"
+                               context="{'default_project_id': project_id}" force_save="1"/>
+                        <field name="is_sia_exempt" readonly="1"
+                               string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
+                        <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
+                        <field name="tehsil_ids" widget="many2many_tags" readonly="1"
+                               placeholder="Tehsils (from selected villages)..."
+                               options="{'no_create_edit': True}" force_save="1"/>
+                        <field name="total_area_acquired" readonly="1"/>
                     </group>
                     
                     <notebook>
                         <page string="Team Members / टीम सदस्य">
-                            <!-- Single Column Layout with 5 Rows -->
-                            <group string="(क) Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक">
-                                <field name="non_govt_social_scientist_ids" widget="many2many_tags" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt == 'yes'"
-                                       placeholder="Select non-government social scientist..."
-                                       options="{'no_quick_create': True}"/>
+                            <!-- (क) Non-Government Social Scientist -->
+                            <group string="(क) NON-GOVERNMENT SOCIAL SCIENTIST / गैर शासकीय सामाजिक वैज्ञानिक">
+                                <field name="non_govt_social_scientist_line_ids" nolabel="1"
+                                       readonly="state == 'approved' or is_sia_exempt == 'yes'"
+                                       context="{'default_member_type': 'non_govt_social_scientist'}"/>
                             </group>
                             
-                            <group string="(ख) Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि">
-                                <field name="local_bodies_representative_ids" widget="many2many_tags" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt == 'yes'"
-                                       placeholder="Select representatives of local bodies..."
-                                       options="{'no_quick_create': True}"/>
+                            <!-- (ख) Representatives of Local Bodies -->
+                            <group string="(ख) REPRESENTATIVES OF LOCAL BODIES / स्थानीय निकायों के प्रतिनिधि">
+                                <field name="local_bodies_representative_line_ids" nolabel="1"
+                                       readonly="state == 'approved' or is_sia_exempt == 'yes'"
+                                       context="{'default_member_type': 'local_bodies_representative'}"/>
                             </group>
                             
-                            <group string="(ग) Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ">
-                                <field name="resettlement_expert_ids" widget="many2many_tags" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt == 'yes'"
-                                       placeholder="Select resettlement expert..."
-                                       options="{'no_quick_create': True}"/>
+                            <!-- (ग) Resettlement Expert -->
+                            <group string="(ग) RESETTLEMENT EXPERT / पुनर्व्यवस्थापन विशेषज्ञ">
+                                <field name="resettlement_expert_line_ids" nolabel="1"
+                                       readonly="state == 'approved' or is_sia_exempt == 'yes'"
+                                       context="{'default_member_type': 'resettlement_expert'}"/>
                             </group>
                             
-                            <group string="(घ) Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
-                                <field name="technical_expert_ids" widget="many2many_tags" nolabel="1"
-                                       readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or is_sia_exempt == 'yes'"
-                                       placeholder="Select technical expert..."
-                                       options="{'no_quick_create': True}"/>
+                            <!-- (घ) Technical Expert -->
+                            <group string="(घ) TECHNICAL EXPERT / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
+                                <field name="technical_expert_line_ids" nolabel="1"
+                                       readonly="state == 'approved' or is_sia_exempt == 'yes'"
+                                       context="{'default_member_type': 'technical_expert'}"/>
                             </group>
                             
                             <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">
@@ -168,42 +170,42 @@
                                     min-width: 300px;
                                 }
                             </style>
-                            <!-- SDM Section -->
-                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
-                                <div class="responsive-sia-group">
-                                    <group string="Download SIA Documents">
-                                        <!-- Download SIA Proposal (Collector's Order Template) -->
-                                        <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
-                                                class="btn-primary" icon="fa-download"
-                                                title="Download SIA Proposal (Collector's Order Template)"
-                                                invisible="is_sia_exempt == 'yes'"
-                                                style="width: 100%; margin-bottom: 10px;"/>
-                                        
-                                        <!-- Download SDM Signed SIA -->
-                                        <button name="action_download_sdm_signed_file" type="object" 
-                                                class="btn-primary"
-                                                title="Download SDM Signed Proposal"
-                                                invisible="not sdm_signed_file"
-                                                style="width: 100%;">
-                                            <i class="fa fa-download" style="margin-right: 5px;"/>
-                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                            SIA SDM Signed
-                                        </button>
-                                    </group>
-                                    <group string="Upload SDM Signed SIA">
-                                        <!-- Upload SDM Signed File (editable only in draft state) -->
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               string="Upload SDM Signed SIA"
-                                               widget="binary"
-                                               readonly="state != 'draft' or is_sia_exempt == 'yes'"
-                                               placeholder="Upload Signed SIA Proposal"
-                                               invisible="is_sia_exempt == 'yes'"
-                                               help="Upload the signed SIA document from SDM"/>
-                                        <field name="sdm_signed_filename" invisible="1"/>
-                                        
-                                        
-                                    </group>
-                                </div>
+                            <!-- SDM Section - Clean Layout -->
+                            <group string="SIA Documents / SIA दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_sia_exempt == 'yes'">
+                                <!-- Download SIA Proposal Button -->
+                                <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
+                                        class="btn-primary" icon="fa-download"
+                                        title="Download SIA Proposal (Collector's Order Template)"
+                                        style="margin: 5px 0;"/>
+                                
+                                <!-- Upload SDM Signed SIA -->
+                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                       string="Upload SDM Signed SIA"
+                                       widget="binary"
+                                       readonly="state != 'draft'"
+                                       placeholder="Upload Signed SIA Proposal"
+                                       help="Upload the signed SIA document from SDM"/>
+                                <field name="sdm_signed_filename" invisible="1"/>
+                                
+                                <!-- Download SDM Signed SIA Button (appears after upload) -->
+                                <button name="action_download_sdm_signed_file" type="object" 
+                                        class="btn-primary"
+                                        title="Download SDM Signed Proposal"
+                                        invisible="not sdm_signed_file"
+                                        style="margin: 5px 0;">
+                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                    SIA SDM Signed
+                                </button>
+                                
+                                <!-- Submit to Collector Button (appears after SDM Signed is uploaded) -->
+                                <button name="action_submit" string="Submit to Collector" 
+                                        type="object" 
+                                        class="btn-primary" 
+                                        icon="fa-paper-plane"
+                                        confirm="Are you sure you want to submit this to Collector?"
+                                        invisible="not sdm_signed_file or state != 'draft'"
+                                        style="margin: 5px 0;"/>
                             </group>
                             
                             <!-- Collector Section -->

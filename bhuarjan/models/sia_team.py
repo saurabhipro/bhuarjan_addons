@@ -38,33 +38,55 @@ class SiaTeam(models.Model):
       default='no', tracking=True,
       help='If Yes, this project is exempt from Social Impact Assessment. This will disable Section 4 and Expert Group for this project.')
     
-    # SIA Team Members - 5 Sections
+    # SIA Team Members - One2many fields for each section
     # (क) Non-Government Social Scientist
+    non_govt_social_scientist_line_ids = fields.One2many(
+        'bhu.sia.team.member.line', 'sia_team_id',
+        string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
+        domain=[('member_type', '=', 'non_govt_social_scientist')],
+        tracking=True)
+    
+    # (ख) Representatives of Local Bodies
+    local_bodies_representative_line_ids = fields.One2many(
+        'bhu.sia.team.member.line', 'sia_team_id',
+        string='Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि',
+        domain=[('member_type', '=', 'local_bodies_representative')],
+        tracking=True)
+    
+    # (ग) Resettlement Expert
+    resettlement_expert_line_ids = fields.One2many(
+        'bhu.sia.team.member.line', 'sia_team_id',
+        string='Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ',
+        domain=[('member_type', '=', 'resettlement_expert')],
+        tracking=True)
+    
+    # (घ) Technical Expert on Project Related Subject
+    technical_expert_line_ids = fields.One2many(
+        'bhu.sia.team.member.line', 'sia_team_id',
+        string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
+        domain=[('member_type', '=', 'technical_expert')],
+        tracking=True)
+    
+    # Keep old Many2many fields for backward compatibility (hidden in view)
     non_govt_social_scientist_ids = fields.Many2many('bhu.sia.team.member', 
                                                      'sia_team_non_govt_social_scientist_rel',
                                                      'sia_team_id', 'member_id',
-                                                     string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
+                                                     string='Non-Government Social Scientist (Old)',
                                                      tracking=True)
-    
-    # (ख) Representatives of Local Bodies
     local_bodies_representative_ids = fields.Many2many('bhu.sia.team.member',
                                                        'sia_team_local_bodies_rep_rel',
                                                        'sia_team_id', 'member_id',
-                                                       string='Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि',
+                                                       string='Representatives of Local Bodies (Old)',
                                                        tracking=True)
-    
-    # (ग) Resettlement Expert
     resettlement_expert_ids = fields.Many2many('bhu.sia.team.member',
                                                 'sia_team_resettlement_expert_rel',
                                                 'sia_team_id', 'member_id',
-                                                string='Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ',
+                                                string='Resettlement Expert (Old)',
                                                 tracking=True)
-    
-    # (घ) Technical Expert on Project Related Subject
     technical_expert_ids = fields.Many2many('bhu.sia.team.member',
                                             'sia_team_technical_expert_rel',
                                             'sia_team_id', 'member_id',
-                                            string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
+                                            string='Technical Expert (Old)',
                                             tracking=True)
     
     # (ड.) Tehsildar of Affected Area (Convener)
@@ -86,7 +108,7 @@ class SiaTeam(models.Model):
                                  help='Unique identifier for QR code download')
     
     # Kramank (Reference Number)
-    kramank = fields.Char(string='Kramank / क्रमांक', required=True, tracking=True,
+    kramank = fields.Char(string='Kramank / क्रमांक', required=False, tracking=True,
                           help='Reference number to be displayed in the report (optional)')
     
     # Legacy fields (kept for backward compatibility)
@@ -314,35 +336,12 @@ class SiaTeam(models.Model):
                         ', '.join(invalid_villages.mapped('name'))
                     )
     
-    @api.constrains('non_govt_social_scientist_ids', 'local_bodies_representative_ids', 
-                    'resettlement_expert_ids', 'technical_expert_ids', 'tehsildar_id')
-    def _check_all_team_members_filled(self):
-        """Validate that all team member sections are filled - Skip if SIA is exempt"""
-        for record in self:
-            # Skip validation if SIA is exempt
-            if record.is_sia_exempt == 'yes':
-                continue
-            
-            missing_fields = []
-            
-            if not record.non_govt_social_scientist_ids:
-                missing_fields.append(_('Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक'))
-            
-            if not record.local_bodies_representative_ids:
-                missing_fields.append(_('Representatives of Local Bodies / स्थानीय निकायों के प्रतिनिधि'))
-            
-            if not record.resettlement_expert_ids:
-                missing_fields.append(_('Resettlement Expert / पुनर्व्यवस्थापन विशेषज्ञ'))
-            
-            if not record.technical_expert_ids:
-                missing_fields.append(_('Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ'))
-            
-            if not record.tehsildar_id:
-                missing_fields.append(_('Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार'))
-            
-            if missing_fields:
-                error_message = _('Please fill in all team member sections:\n\n%s') % '\n'.join(['- ' + field for field in missing_fields])
-                raise ValidationError(error_message)
+    # Removed validation - Team members are now added via One2many after saving the record
+    # @api.constrains('non_govt_social_scientist_ids', 'local_bodies_representative_ids', 
+    #                 'resettlement_expert_ids', 'technical_expert_ids', 'tehsildar_id')
+    # def _check_all_team_members_filled(self):
+    #     """Validate that all team member sections are filled - Skip if SIA is exempt"""
+    #     pass
     
     @api.depends('project_id')
     def _compute_name(self):
@@ -489,8 +488,6 @@ class SiaTeam(models.Model):
                 }
             }
         
-        # Normal flow: Validate all team members are filled (SIA-specific)
-        self._check_all_team_members_filled()
         # Call parent mixin method
         return super().action_submit()
     

@@ -18,7 +18,7 @@ class ExpertCommitteeReport(models.Model):
     expert_committee_uuid = fields.Char(string='Expert Committee UUID', readonly=True, copy=False, index=True,
                                         help='Unique identifier for QR code download')
     # Kramank (Reference Number)
-    kramank = fields.Char(string='Kramank / क्रमांक', required=True, tracking=True,
+    kramank = fields.Char(string='Kramank / क्रमांक', required=False, tracking=True,
                           help='Reference number to be displayed in the report (optional)')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, ondelete='cascade',
                                   default=lambda self: self._default_project_id(), tracking=True,
@@ -42,34 +42,42 @@ class ExpertCommitteeReport(models.Model):
                                            store=False,
                                            help='Villages mapped to the selected project (read-only for reference)')
     
-    # Expert Committee Team Members - 4 Sections
+    # Expert Committee Team Members - 4 Sections (One2many lines)
     # (क) Non-Government Social Scientist
-    non_govt_social_scientist_ids = fields.Many2many('bhu.sia.team.member', 
-                                                     'expert_committee_non_govt_social_scientist_rel',
-                                                     'expert_committee_id', 'member_id',
-                                                     string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
-                                                     tracking=True)
+    non_govt_social_scientist_line_ids = fields.One2many(
+        'bhu.expert.committee.member.line', 
+        'expert_committee_id',
+        string='Non-Government Social Scientist / गैर शासकीय सामाजिक वैज्ञानिक',
+        domain=[('member_type', '=', 'non_govt_social_scientist')],
+        context={'default_member_type': 'non_govt_social_scientist'},
+        tracking=True)
     
     # (ख) Representatives of Local Bodies
-    local_bodies_representative_ids = fields.Many2many('bhu.sia.team.member',
-                                                       'expert_committee_local_bodies_rep_rel',
-                                                       'expert_committee_id', 'member_id',
-                                                       string='Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि',
-                                                       tracking=True)
+    local_bodies_representative_line_ids = fields.One2many(
+        'bhu.expert.committee.member.line',
+        'expert_committee_id',
+        string='Representatives of Local Bodies / ग्राम पंचायत या नगरीय निकाय के प्रतिनिधि',
+        domain=[('member_type', '=', 'local_bodies_representative')],
+        context={'default_member_type': 'local_bodies_representative'},
+        tracking=True)
     
     # (ग) Resettlement Expert
-    resettlement_expert_ids = fields.Many2many('bhu.sia.team.member',
-                                                'expert_committee_resettlement_expert_rel',
-                                                'expert_committee_id', 'member_id',
-                                                string='Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ',
-                                                tracking=True)
+    resettlement_expert_line_ids = fields.One2many(
+        'bhu.expert.committee.member.line',
+        'expert_committee_id',
+        string='Resettlement Expert / पुनर्व्यवस्थापन संबंधी विशेषज्ञ',
+        domain=[('member_type', '=', 'resettlement_expert')],
+        context={'default_member_type': 'resettlement_expert'},
+        tracking=True)
     
     # (घ) Technical Expert on Project Related Subject
-    technical_expert_ids = fields.Many2many('bhu.sia.team.member',
-                                            'expert_committee_technical_expert_rel',
-                                            'expert_committee_id', 'member_id',
-                                            string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
-                                            tracking=True)
+    technical_expert_line_ids = fields.One2many(
+        'bhu.expert.committee.member.line',
+        'expert_committee_id',
+        string='Technical Expert / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ',
+        domain=[('member_type', '=', 'technical_expert')],
+        context={'default_member_type': 'technical_expert'},
+        tracking=True)
     
     _sql_constraints = [
         ('project_unique', 'UNIQUE(project_id)', 'Only one Expert Committee Report is allowed per project.')

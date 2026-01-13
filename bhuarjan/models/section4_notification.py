@@ -62,6 +62,9 @@ class Section4Notification(models.Model):
     
     # Public Hearing Details
     public_hearing_datetime = fields.Datetime(string='Public Hearing Date & Time / जन सुनवाई दिनांक और समय', tracking=True)
+    public_hearing_date = fields.Date(string='Public Hearing Date / सार्वजनिक सुनवाई दिनांक', tracking=True)
+    public_hearing_time = fields.Float(string='Public Hearing Time / सार्वजनिक सुनवाई समय', tracking=True, 
+                                       help='Time in HH:MM format (e.g., 10:00 for 10:00 AM, 14:30 for 2:30 PM)')
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
     
     # 11 Questions from the template
@@ -182,6 +185,22 @@ class Section4Notification(models.Model):
                 record.all_surveys_approved = False
                 record.has_pending_surveys = False
                 record.has_no_surveys = False
+    
+    @api.onchange('public_hearing_date', 'public_hearing_time')
+    def _onchange_hearing_date_time(self):
+        """Sync separate date and time fields to datetime field"""
+        if self.public_hearing_date:
+            from datetime import datetime, timedelta
+            # Convert float time to hours and minutes
+            hours = int(self.public_hearing_time or 0)
+            minutes = int((self.public_hearing_time - hours) * 60)
+            # Combine date and time
+            self.public_hearing_datetime = datetime.combine(
+                self.public_hearing_date,
+                datetime.min.time()
+            ) + timedelta(hours=hours, minutes=minutes)
+        else:
+            self.public_hearing_datetime = False
     
     @api.depends('project_id', 'village_id')
     def _compute_has_section11(self):

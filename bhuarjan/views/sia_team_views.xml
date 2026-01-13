@@ -81,26 +81,29 @@
                     <group>
                         <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
                     </group>
+                    
+                    <!-- Kramank Field - First and Editable -->
+                    <group>
+                        <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
+                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                    </group>
+                    
+                    <!-- Rest of the fields in 2 columns - All Readonly -->
                     <group col="2">
                         <group>
-                            <!-- SDM can edit in draft/send_back, Collector can edit in submitted, readonly when approved -->
-                            <field name="project_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                            <field name="requiring_body_id" required="1" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)" options="{'no_open': True}"/>
-                            <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                            <field name="village_ids" widget="many2many_tags" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                            <field name="project_id" required="1" readonly="1" options="{'no_open': True}"/>
+                            <field name="village_ids" widget="many2many_tags" readonly="1"
                                    placeholder="Affected villages (auto-populated from project)..."
                                    options="{'no_create_edit': True}"
                                    context="{'default_project_id': project_id}" force_save="1"/>
-                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
-                                   placeholder="Tehsils (from selected villages)..."
-                                   options="{'no_create_edit': True}" force_save="1"/>
-                            <!-- SIA Exemption Selection (Yes/No) - Editable only in draft state by SDM -->
-                            <field name="is_sia_exempt" 
-                                   readonly="is_approved_readonly or state != 'draft' or not can_sdm_edit"
+                            <field name="is_sia_exempt" readonly="1"
                                    string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
                         </group>
                         <group>
+                            <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
+                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
+                                   placeholder="Tehsils (from selected villages)..."
+                                   options="{'no_create_edit': True}" force_save="1"/>
                             <field name="total_area_acquired" readonly="1"/>
                         </group>
                     </group>

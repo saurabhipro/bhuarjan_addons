@@ -538,7 +538,7 @@ class Section4Notification(models.Model):
             'sdm_signed_file': False,
             'sdm_signed_filename': False,
         })
-        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name)
+        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
         
         return {
             'type': 'ir.actions.client',
@@ -571,7 +571,7 @@ class Section4Notification(models.Model):
             'collector_signed_file': False,
             'collector_signed_filename': False,
         })
-        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name)
+        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
         
         return {
             'type': 'ir.actions.client',

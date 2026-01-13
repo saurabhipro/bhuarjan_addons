@@ -165,7 +165,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
                 state_labels[old_state],
                 state_labels[new_state],
                 self.env.user.name
-            )
+            ),
+            subtype_xmlid='mail.mt_note'  # Internal note - no email notification
         )
     
     # Common workflow methods
@@ -184,7 +185,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
         
         self.state = 'submitted'
         self.submitted_date = fields.Datetime.now()
-        self.message_post(body=_('Submitted for Collector approval by %s') % self.env.user.name)
+        self.message_post(body=_('Submitted for Collector approval by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
         
         # Create activity for Collector users
         self._create_submission_activity()
@@ -208,7 +209,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
         
         self.state = 'approved'
         self.approved_date = fields.Datetime.now()
-        self.message_post(body=_('Approved by %s') % self.env.user.name)
+        self.message_post(body=_('Approved by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
         
         # Create activity notification for SDM users
         self._create_approval_activity()
@@ -250,7 +251,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
             raise ValidationError(_('Only sent back records can be reset to draft for resubmission.'))
         
         self.state = 'draft'
-        self.message_post(body=_('Reset to draft by %s for resubmission') % self.env.user.name)
+        self.message_post(body=_('Reset to draft by %s for resubmission') % self.env.user.name, subtype_xmlid='mail.mt_note')
     
     # Validation methods for statusbar click handling (called from write)
     def _validate_state_to_draft(self):
@@ -307,7 +308,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
         # Allow going back to draft only from send_back state
         if self.state == 'send_back':
             self.state = 'draft'
-            self.message_post(body=_('Status changed to Draft by %s') % self.env.user.name)
+            self.message_post(body=_('Status changed to Draft by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
         else:
             raise ValidationError(_('Cannot change status to Draft from current state.'))
     
@@ -325,7 +326,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
                 raise ValidationError(_('Please upload the SDM signed document before submitting.'))
             self.state = 'submitted'
             self.submitted_date = fields.Datetime.now()
-            self.message_post(body=_('Status changed to Submitted by %s') % self.env.user.name)
+            self.message_post(body=_('Status changed to Submitted by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
             # Create activity for Collector users
             self._create_submission_activity()
         elif self.state == 'submitted':
@@ -348,7 +349,7 @@ class ProcessWorkflowMixin(models.AbstractModel):
                 raise ValidationError(_('Please upload the Collector signed document before approving.'))
             self.state = 'approved'
             self.approved_date = fields.Datetime.now()
-            self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
+            self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
             # Mark activities as done
             self._mark_activities_done()
         elif self.state == 'approved':
@@ -556,7 +557,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
             ], limit=1)
             
             if not existing_activity:
-                self.activity_schedule(
+                # Create activity without sending email notification
+                self.with_context(mail_activity_quick_update=True).activity_schedule(
                     activity_type_id=activity_type.id,
                     summary=activity_summary,
                     note=activity_note,
@@ -631,7 +633,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
             ], limit=1)
             
             if not existing_activity:
-                self.activity_schedule(
+                # Create activity without sending email notification
+                self.with_context(mail_activity_quick_update=True).activity_schedule(
                     activity_type_id=activity_type.id,
                     summary=activity_summary,
                     note=activity_note,
@@ -707,7 +710,8 @@ class ProcessWorkflowMixin(models.AbstractModel):
             ], limit=1)
             
             if not existing_activity:
-                self.activity_schedule(
+                # Create activity without sending email notification
+                self.with_context(mail_activity_quick_update=True).activity_schedule(
                     activity_type_id=activity_type.id,
                     summary=activity_summary,
                     note=activity_note,

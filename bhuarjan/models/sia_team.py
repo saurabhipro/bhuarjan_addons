@@ -409,7 +409,7 @@ class SiaTeam(models.Model):
             if record.is_sia_exempt == 'yes' and record.state == 'approved':
                 record.message_post(
                     body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
-                    message_type='notification'
+                    subtype_xmlid='mail.mt_note'
                 )
 
         return records
@@ -457,7 +457,7 @@ class SiaTeam(models.Model):
         if 'is_sia_exempt' in vals and vals.get('is_sia_exempt') == 'yes' and 'state' in vals and vals.get('state') == 'approved':
             self.message_post(
                 body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
-                message_type='notification'
+                subtype_xmlid='mail.mt_note'
             )
         
         return result
@@ -475,7 +475,7 @@ class SiaTeam(models.Model):
             self.approved_date = fields.Datetime.now()
             self.message_post(
                 body=_('SIA Team auto-approved (SIA Exempt) by %s') % self.env.user.name,
-                message_type='notification'
+                subtype_xmlid='mail.mt_note'
             )
             return {
                 'type': 'ir.actions.client',
@@ -602,7 +602,7 @@ class SiaTeam(models.Model):
             else:
                 message = _('Created %d Section 4 Notification(s) from this SIA Team.') % len(created_notifications)
             
-            self.message_post(body=message)
+            self.message_post(body=message, subtype_xmlid='mail.mt_note')
             
             # Open the first created notification in form view
             return {

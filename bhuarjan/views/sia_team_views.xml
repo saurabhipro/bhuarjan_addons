@@ -8,9 +8,12 @@
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="member_type" column_invisible="1"/>
-                <field name="name" string="Name / नाम" required="1"/>
-                <field name="address" string="Address / पता"/>
-                <field name="post" string="Post / पद"/>
+                <field name="name" string="Name / नाम" required="1" 
+                       placeholder="Enter member name / सदस्य का नाम दर्ज करें"/>
+                <field name="address" string="Address / पता" 
+                       placeholder="Enter address / पता दर्ज करें"/>
+                <field name="post" string="Post / पद" 
+                       placeholder="Enter designation / पद दर्ज करें"/>
             </list>
         </field>
     </record>
@@ -113,32 +116,64 @@
                     
                     <notebook>
                         <page string="Team Members / टीम सदस्य">
+                            <style>
+                                .o_field_one2many .o_list_table {
+                                    border: 2px dashed #8B4513 !important;
+                                    border-radius: 5px;
+                                    background-color: #f9f9f9;
+                                }
+                                .o_field_one2many .o_list_table thead {
+                                    background-color: #8B4513 !important;
+                                    color: white !important;
+                                }
+                                .o_field_one2many .o_field_x2many_list_row_add a {
+                                    color: #8B4513 !important;
+                                    font-weight: bold;
+                                }
+                            </style>
+                            
                             <!-- (क) Non-Government Social Scientist -->
                             <group string="(क) NON-GOVERNMENT SOCIAL SCIENTIST / गैर शासकीय सामाजिक वैज्ञानिक">
+                                <div class="alert alert-info" role="alert" style="margin: 5px 0; padding: 8px;">
+                                    <i class="fa fa-info-circle"/> Click "Add a line" below to add team members
+                                </div>
                                 <field name="non_govt_social_scientist_line_ids" nolabel="1"
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
-                                       context="{'default_member_type': 'non_govt_social_scientist'}"/>
+                                       context="{'default_member_type': 'non_govt_social_scientist'}"
+                                       placeholder="Click 'Add a line' to add Non-Government Social Scientists"/>
                             </group>
                             
                             <!-- (ख) Representatives of Local Bodies -->
                             <group string="(ख) REPRESENTATIVES OF LOCAL BODIES / स्थानीय निकायों के प्रतिनिधि">
+                                <div class="alert alert-info" role="alert" style="margin: 5px 0; padding: 8px;">
+                                    <i class="fa fa-info-circle"/> Click "Add a line" below to add team members
+                                </div>
                                 <field name="local_bodies_representative_line_ids" nolabel="1"
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
-                                       context="{'default_member_type': 'local_bodies_representative'}"/>
+                                       context="{'default_member_type': 'local_bodies_representative'}"
+                                       placeholder="Click 'Add a line' to add Representatives of Local Bodies"/>
                             </group>
                             
                             <!-- (ग) Resettlement Expert -->
                             <group string="(ग) RESETTLEMENT EXPERT / पुनर्व्यवस्थापन विशेषज्ञ">
+                                <div class="alert alert-info" role="alert" style="margin: 5px 0; padding: 8px;">
+                                    <i class="fa fa-info-circle"/> Click "Add a line" below to add team members
+                                </div>
                                 <field name="resettlement_expert_line_ids" nolabel="1"
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
-                                       context="{'default_member_type': 'resettlement_expert'}"/>
+                                       context="{'default_member_type': 'resettlement_expert'}"
+                                       placeholder="Click 'Add a line' to add Resettlement Experts"/>
                             </group>
                             
                             <!-- (घ) Technical Expert -->
                             <group string="(घ) TECHNICAL EXPERT / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
+                                <div class="alert alert-info" role="alert" style="margin: 5px 0; padding: 8px;">
+                                    <i class="fa fa-info-circle"/> Click "Add a line" below to add team members
+                                </div>
                                 <field name="technical_expert_line_ids" nolabel="1"
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
-                                       context="{'default_member_type': 'technical_expert'}"/>
+                                       context="{'default_member_type': 'technical_expert'}"
+                                       placeholder="Click 'Add a line' to add Technical Experts"/>
                             </group>
                             
                             <group string="(ड.) Tehsildar (Convener) / प्रभावित क्षेत्र का तहसीलदार">

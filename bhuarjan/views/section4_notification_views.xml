@@ -89,21 +89,44 @@
                     </group>
                     
                     <!-- Public Hearing Details - Editable Section -->
+                    <style>
+                        /* Darker placeholder text */
+                        .o_field_widget input::placeholder,
+                        .o_field_widget textarea::placeholder {
+                            color: #666 !important;
+                            opacity: 1 !important;
+                            font-weight: 500;
+                        }
+                        
+                        /* Time picker styling with clock icon */
+                        .o_field_float_time {
+                            position: relative;
+                        }
+                        
+                        .o_field_float_time input {
+                            padding-left: 30px !important;
+                            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>');
+                            background-repeat: no-repeat;
+                            background-position: 8px center;
+                            background-size: 16px 16px;
+                        }
+                    </style>
                     <group col="2">
                         <group>
                             <field name="public_hearing_date" string="Public Hearing Date / सार्वजनिक सुनवाई दिनांक" 
                                    required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                             <field name="public_hearing_time" string="Public Hearing Time / सार्वजनिक सुनवाई समय" 
                                    widget="float_time"
                                    required="1"
-                                   placeholder="Select time / समय चुनें (e.g., 10:00, 14:30)"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                   placeholder="⏰ Select time / समय चुनें (e.g., 10:00, 14:30)"
+                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                         </group>
                         <group>
                             <field name="public_hearing_place" string="Public Hearing Place / सार्वजनिक सुनवाई स्थान" 
                                    required="1"
-                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
+                                   placeholder="Enter hearing location / सुनवाई स्थान दर्ज करें"
+                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                         </group>
                     </group>
                     
@@ -146,14 +169,6 @@
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
-                                <!-- Download Latest PDF -->
-                                                <button name="action_download_latest_pdf" 
-                                                        string="Section 4" type="object" 
-                                        class="btn-primary" icon="fa-download"
-                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                                        invisible="not sdm_signed_file and not collector_signed_file"
-                                        style="margin: 5px 0;"/>
-                                
                                                 <!-- Download SDM Signed Section 4 -->
                                                 <button name="action_download_sdm_signed_file" 
                                                         type="object" 
@@ -165,6 +180,14 @@
                                                     <i class="fa fa-check-circle" style="margin-right: 5px;"/>
                                                     Section 4 SDM Signed
                                                 </button>
+                                
+                                <!-- Download Latest PDF -->
+                                                <button name="action_download_latest_pdf" 
+                                                        string="Section 4 Proposal" type="object" 
+                                        class="btn-primary" icon="fa-download"
+                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                        invisible="not sdm_signed_file and not collector_signed_file"
+                                        style="margin: 5px 0;"/>
                                 
                                                 <!-- Download Collector Signed Section 4 -->
                                                 <button name="action_download_collector_signed_file"

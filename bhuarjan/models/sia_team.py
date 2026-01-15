@@ -503,10 +503,19 @@ class SiaTeam(models.Model):
         return self.action_download_unsigned_file()
     
     def action_download_proposal_report(self):
-        """Generate and download SIA Proposal Report PDF (Collector's Order)"""
+        """Open wizard to select download format for SIA Proposal Report"""
         self.ensure_one()
-        # Download the SIA Proposal report (Collector's order template)
-        return self.env.ref('bhuarjan.action_report_sia_proposal').report_action(self)
+        # Open wizard to choose download format (PDF or Word)
+        return {
+            'name': _('Download SIA Proposal / SIA प्रस्ताव डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_sia_team_id': self.id,
+            }
+        }
     
     def action_download_sia_order(self):
         """Generate and download SIA Order Report PDF (SDM's Proposal) - For Collector"""

@@ -8,7 +8,7 @@ import uuid
 class Section21Notification(models.Model):
     _name = 'bhu.section21.notification'
     _description = 'Section 21 Notification / धारा 21 अधिसूचना'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.qr.code.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
     _sql_constraints = [
         (

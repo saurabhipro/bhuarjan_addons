@@ -72,7 +72,7 @@
                     </group>
                     
                     <!-- Section 19 Documents -->
-                    <group string="Section 19 Documents / धारा 19 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                    <group string="Section 19 Documents / धारा 19 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                         <!-- Download Section 19 Button -->
                         <button name="action_download_unsigned_file" string="Section 19" type="object" 
                                 class="btn-primary" icon="fa-download"

@@ -218,7 +218,7 @@
                                 }
                             </style>
                             <!-- SDM Section -->
-                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                            <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                                 <!-- Download Unsigned Expert Committee Report -->
                                 <button name="action_download_unsigned_file" string="EC" type="object" 
                                         class="btn-primary" icon="fa-download"
@@ -291,7 +291,7 @@
                             </group>
                             
                             <!-- Expert Group Report Section -->
-                            <group string="Expert Group Report / विशेषज्ञ समूह रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                            <group string="Expert Group Report / विशेषज्ञ समूह रिपोर्ट" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                                 <!-- Upload Field -->
                                 <field name="expert_group_report_file" filename="expert_group_report_filename" 
                                        string="Upload Expert Group Report"

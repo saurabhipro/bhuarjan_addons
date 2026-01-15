@@ -206,7 +206,7 @@
                                 }
                             </style>
                             <!-- SDM Section - Clean Layout -->
-                            <group string="SIA Documents / SIA दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_sia_exempt == 'yes'">
+                            <group string="SIA Documents / SIA दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_sia_exempt == 'yes' or is_collector">
                                 <!-- Download SIA Proposal Button -->
                                 <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
                                         class="btn-primary" icon="fa-download"

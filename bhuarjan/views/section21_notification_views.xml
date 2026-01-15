@@ -64,7 +64,7 @@
                     </group>
                     
                     <!-- Section 21 Documents -->
-                    <group string="Section 21 Documents / धारा 21 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                    <group string="Section 21 Documents / धारा 21 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                         <!-- Download Section 21 Button -->
                         <button name="action_generate_both_notices" type="object" 
                                 class="btn-primary" 

@@ -104,7 +104,7 @@
                     </group>
                     
                     <!-- Section 4 Documents -->
-                    <group string="Section 4 Documents / धारा 4 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                    <group string="Section 4 Documents / धारा 4 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                                 <!-- Download Section 4 Button -->
                                 <button name="action_download_unsigned_file" string="Section 4" type="object" 
                                         class="btn-primary" icon="fa-download"

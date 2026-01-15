@@ -62,8 +62,6 @@ class Section11PreliminaryReport(models.Model):
                 rec.village_domain = json.dumps([('id', 'in', rec.project_id.village_ids.ids)])
             else:
                 rec.village_domain = json.dumps([])
-
-
     
     # Section 4 Notification reference
     section4_notification_id = fields.Many2one('bhu.section4.notification', string='Section 4 Notification',

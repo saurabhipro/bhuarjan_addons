@@ -57,6 +57,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
     can_collector_edit = fields.Boolean(string='Can Collector Edit', compute='_compute_edit_permissions', store=False,
                                         help='Collector can edit when state is submitted, readonly when approved')
     
+    @api.onchange('collector_signed_file')
+    def _onchange_collector_signed_file(self):
+        """Show popup message when Collector uploads their file"""
+        if self.collector_signed_file and self.is_collector:
+            return {
+                'warning': {
+                    'title': _('File Uploaded Successfully / फ़ाइल सफलतापूर्वक अपलोड की गई'),
+                    'message': _('Please approve or reject this document using the Action buttons at the top. / कृपया शीर्ष पर एक्शन बटन का उपयोग करके इस दस्तावेज़ को स्वीकृत या अस्वीकृत करें।'),
+                }
+            }
+    
     @api.depends()
     def _compute_user_roles(self):
         """Compute if current user is SDM, Collector, or Admin"""

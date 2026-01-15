@@ -1118,6 +1118,7 @@ export class UnifiedDashboard extends Component {
     getSectionMasterName(dashboardSectionName) {
         const mapping = {
             'Surveys': 'Surveys',
+            'Create SIA Team': '(Sec 4) Create SIA Team',  // Map to backend name (with Sec 4 prefix)
             '(Sec 4) Create SIA Team': '(Sec 4) Create SIA Team',
             '(Sec 4) Section 4 Notifications': '(Sec 4) Section 4 Notifications',
             'Expert Group': 'Expert Group',

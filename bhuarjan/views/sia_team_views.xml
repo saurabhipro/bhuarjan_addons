@@ -184,7 +184,7 @@
                                        options="{'no_quick_create': True, 'no_create':True, 'no_edit':True}" domain="tehsildar_domain"/>
                             </group>
                         </page>
-                        <page string="SIA Report / SIA रिपोर्ट">
+                        <page string="SIA Upload / Download">
                             <style>
                                 @media (max-width: 768px) {
                                     .responsive-sia-group {

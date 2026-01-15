@@ -33,23 +33,21 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
-                    <group>
-                        <!-- Action Buttons: Approve, Send Back -->
-                        <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                                icon="fa-check"
-                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted' or not collector_signed_file"/>
-                        <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
-                                icon="fa-arrow-left"
-                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'submitted'"/>
-                        
-                        <!-- Resubmit button (for sent back records) -->
-                        <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                                icon="fa-refresh"
-                                groups="bhuarjan.group_bhuarjan_sdm"
-                                invisible="state != 'send_back'"/>
-                    </group>
+                    <!-- Action Buttons: Approve, Send Back -->
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                            icon="fa-check"
+                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'submitted' or not collector_signed_file"/>
+                    <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                            icon="fa-arrow-left"
+                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'submitted'"/>
+                    
+                    <!-- Resubmit button (for sent back records) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            icon="fa-refresh"
+                            groups="bhuarjan.group_bhuarjan_sdm"
+                            invisible="state != 'send_back'"/>
                     
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
@@ -65,7 +63,7 @@
                     
                     <!-- Prakaran Kramank Field - First and Editable -->
                     <group>
-                        <field name="prakaran_kramank" string="Prakaran Kramank / प्रकरण क्रमांक"
+                        <field name="prakaran_kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक"
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
@@ -86,7 +84,7 @@
                     <!-- Section 11 Documents -->
                     <group string="Section 11 Documents / धारा 11 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                         <!-- Download Section 11 Button -->
-                        <button name="action_download_unsigned_file" string="Section 11" type="object" 
+                        <button name="action_download_unsigned_file" string="Section 11 Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 title="Download Section 11 Report (Unsigned)"
                                 style="margin: 5px 0;"/>
@@ -124,7 +122,7 @@
                     <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                         <!-- Download Latest PDF -->
                         <button name="action_download_latest_pdf" 
-                                string="Section 11" type="object" 
+                                string="Section 11 Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                 invisible="not sdm_signed_file and not collector_signed_file"

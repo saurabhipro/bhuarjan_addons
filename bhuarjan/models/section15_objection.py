@@ -51,10 +51,11 @@ class Section15Objection(models.Model):
             if record.village_id:
                 # Find all surveys (khasras) for this village
                 # Multiple objections can be created for the same survey
+                # Order by khasra_number descending
                 surveys = self.env['bhu.survey'].search([
                     ('village_id', '=', record.village_id.id),
                     ('state', 'in', ['draft', 'submitted', 'approved'])  # Only show valid surveys
-                ])
+                ], order='khasra_number desc')
                 record.available_survey_ids = surveys
             else:
                 record.available_survey_ids = False
@@ -78,7 +79,7 @@ class Section15Objection(models.Model):
     objection_type = fields.Selection([
         ('area_decrease', 'Area Decrease / क्षेत्रफल कमी'),
         ('remove_landowners', 'Remove Landowners / भूमिस्वामी हटाना'),
-    ], string='Objection Type / आपत्ति प्रकार', required=True, tracking=True, default='area_decrease')
+    ], string='Objection Type / आपत्ति प्रकार', required=False, tracking=True)
     
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
     objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=False, tracking=True)

@@ -120,6 +120,7 @@
                                    widget="float_time"
                                    required="1"
                                    placeholder="⏰ Select time / समय चुनें (e.g., 10:00, 14:30)"
+                                   options="{'no_display_empty': False}"
                                    readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and id)"/>
                         </group>
                         <group>

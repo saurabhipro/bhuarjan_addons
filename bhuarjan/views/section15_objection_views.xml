@@ -30,7 +30,6 @@
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
                 <field name="survey_id" string="Survey (Khasra)"/>
-                <field name="objection_type" string="Objection Type"/>
                 <field name="objection_date" string="Objection Date"/>
                 <field name="age_days" string="Age (Days)"/>
                 <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
@@ -56,16 +55,14 @@
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
                     <!-- Action Buttons Row: Approve, Reject -->
-                    <group>
-                        <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                                icon="fa-check"
-                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'draft'"/>
-                        <button name="action_reject" string="Reject" type="object" class="btn-danger" 
-                                icon="fa-times"
-                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                invisible="state != 'draft'"/>
-                    </group>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                            icon="fa-check"
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger" 
+                            icon="fa-times"
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}"/>
                 </header>
                 <sheet>
@@ -80,9 +77,9 @@
                     <group>
                         <group>
                             <field name="name" readonly="1" invisible="1"/>
-                            <field name="project_id" required="1"
+                            <field name="project_id" required="1" invisible="1"
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
-                            <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}"
+                            <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}" invisible="1"
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="available_survey_ids" invisible="1"/>
                             <field name="survey_id" string="Survey (Khasra) / सर्वे (खसरा)" required="1"
@@ -91,12 +88,10 @@
                                    options="{'no_create': True, 'no_open': True}"
                                    context="{'show_khasra': True}"
                                    placeholder="Select a khasra from this village..."/>
-                        </group>
-                        <group>
-                            <field name="objection_type" required="1"
-                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="objection_date" required="1"
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
+                        </group>
+                        <group>
                             <field name="resolved_date" readonly="1"/>
                         </group>
                     </group>
@@ -307,18 +302,14 @@
                 <field name="project_id"/>
                 <field name="village_id"/>
                 <field name="survey_id"/>
-                <field name="objection_type"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                 <filter string="Sent Back" name="send_back" domain="[('state', '=', 'send_back')]"/>
-                <filter string="Area Decrease" name="area_decrease" domain="[('objection_type', '=', 'area_decrease')]"/>
-                <filter string="Remove Landowners" name="remove_landowners" domain="[('objection_type', '=', 'remove_landowners')]"/>
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
                     <filter string="Village" name="group_village" context="{'group_by': 'village_id'}"/>
                     <filter string="Status" name="group_status" context="{'group_by': 'state'}"/>
-                    <filter string="Objection Type" name="group_objection_type" context="{'group_by': 'objection_type'}"/>
                 </group>
             </search>
         </field>

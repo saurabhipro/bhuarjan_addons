@@ -115,14 +115,14 @@
                     </div>
 
                     <!-- Reference and Date -->
-                    <div class="date-reference-section row w-100" style="margin-bottom: 12px !important;">
-                        <div class="col w-100 normal-text letter_space" style="">
+                    <div class="date-reference-section row w-100" style="margin-bottom: 12px !important; display: flex; justify-content: space-between;">
+                        <div class="col w-100 normal-text letter_space" style="flex: 1;">
                                 <strong>क्रमांक /</strong>
                                 <span t-if="sia_team.kramank" t-esc="sia_team.kramank"/>
-                                <span t-if="not sia_team.kramank"></span>
+                                <span t-if="not sia_team.kramank">.....................</span>
                                 /&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
                         </div>
-                        <div class="col normal-text letter_space text-right w-100" style="text-align:right! important;">
+                        <div class="col normal-text letter_space text-right w-100" style="flex: 1; text-align: right !important;">
                                 <strong>दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
                         </div>
                     </div>
@@ -158,16 +158,16 @@
                             <t t-if="not sia_team.village_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
                                 ........................
                             </t>
-                            तहसील 
+                            तहसील&#160;
                             <t t-if="sia_team.tehsil_ids">
                                 <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not sia_team.tehsil_ids">
                                 ........................
                             </t>
-                            जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदन बाबत।
+                            &#160;जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदन बाबत।
                             </span>
                         </p>
                     </div>
@@ -194,23 +194,23 @@
                             <t t-if="not sia_team.village_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
                                 ........................
                             </t>
-                            <strong>तहसील</strong> 
+                            <strong>तहसील</strong>&#160;
                             <t t-if="sia_team.tehsil_ids">
                                 <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not sia_team.tehsil_ids">
                                 ........................
                             </t>
-                            <strong>जिला</strong> 
+                            &#160;<strong>जिला</strong> 
                             <t t-if="sia_team.project_id and sia_team.project_id.village_ids and len(sia_team.project_id.village_ids) > 0">
                                 <span t-esc="sia_team.project_id.village_ids[0].district_id.name if sia_team.project_id.village_ids[0].district_id else 'रायगढ़'"/>
                             </t>
                             <t t-if="not (sia_team.project_id and sia_team.project_id.village_ids and len(sia_team.project_id.village_ids) > 0)">
                                 रायगढ़
                             </t>
-                            <strong>(छ.ग.) की निजी भूमि कुल रकबा</strong> 
+                            <strong>(छ.ग.) की निजी भूमि कुल रकबा</strong>&#160;
                             <t t-if="sia_team.total_area_acquired and sia_team.total_area_acquired > 0">
                                 <span t-esc="'{:,.4f}'.format(sia_team.total_area_acquired)"/>
                             </t>

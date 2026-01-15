@@ -151,10 +151,6 @@ class ExpertCommitteeReport(models.Model):
         fallback_project = self.env['bhu.project'].search([], limit=1)
         return fallback_project.id if fallback_project else False
     
-    # Original report file (unsigned)
-    report_file = fields.Binary(string='Report File / रिपोर्ट फ़ाइल')
-    report_filename = fields.Char(string='File Name / फ़ाइल नाम')
-    
     # Expert Group Report
     expert_group_report_file = fields.Binary(string='Expert Group Report / विशेषज्ञ समूह रिपोर्ट')
     expert_group_report_filename = fields.Char(string='Expert Group Report Filename')

@@ -84,13 +84,13 @@
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
-                            <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Report / विशेषज्ञ समिति रिपोर्ट
+                            <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Creation / विशेषज्ञ समिति गठन
                         </h1>
                     </div>
                     
-                    <!-- Kramank Field - Visible and Optional -->
+                    <!-- Letter Number Field - Visible and Optional -->
                     <group>
-                        <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
+                        <field name="kramank" string="Letter Number / पत्र क्रमांक" placeholder="Enter Letter Number / पत्र क्रमांक दर्ज करें" 
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
@@ -103,7 +103,7 @@
                             <field name="total_area_acquired" readonly="1"/>
                     </group>
                     <notebook>
-                        <page string="Team Members / टीम सदस्य">
+                        <page string="Team Members / टीम सदस्य" invisible="is_collector">
                             <style>
                                 .o_field_one2many .o_list_table {
                                     border: 2px dashed #8B4513 !important;
@@ -191,10 +191,6 @@
                                     </list>
                                 </field>
                             </group>
-                            <group string="Original Report / मूल रिपोर्ट">
-                                <field name="report_file" filename="report_filename" readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
-                                <field name="report_filename" invisible="1"/>
-                            </group>
                         </page>
                         <page string="Expert Report / विशेषज्ञ रिपोर्ट">
                             <style>
@@ -219,10 +215,10 @@
                             </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
-                                        <!-- Download Unsigned Expert Committee Report -->
-                                        <button name="action_download_unsigned_file" string="Expert Committee" type="object" 
+                                        <!-- Download Unsigned Expert Committee Proposal -->
+                                        <button name="action_download_unsigned_file" string="Expert Committee Proposal" type="object" 
                                                 class="btn-primary" icon="fa-download"
-                                                title="Download Expert Committee Report (Unsigned)"
+                                                title="Download Expert Committee Proposal (Unsigned)"
                                         style="margin: 5px 0;"/>
                                 
                                 <!-- Upload SDM Signed File -->
@@ -250,7 +246,7 @@
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                                 <!-- Download Latest PDF -->
                                                 <button name="action_download_latest_pdf" 
-                                                        string="Expert Committee" type="object" 
+                                                        string="Expert Committee Proposal" type="object" 
                                         class="btn-primary" icon="fa-download"
                                                         title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                         invisible="not sdm_signed_file and not collector_signed_file"

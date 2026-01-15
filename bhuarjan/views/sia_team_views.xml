@@ -91,9 +91,9 @@
                     <field name="can_sdm_edit" invisible="1"/>
                     <field name="can_collector_edit" invisible="1"/>
                     
-                    <!-- Kramank Field - Visible and Optional -->
+                    <!-- Letter Number Field - Visible and Optional -->
                     <group>
-                        <field name="kramank" placeholder="Enter क्रमांक (Reference Number)" 
+                        <field name="kramank" string="Letter Number / पत्र क्रमांक" placeholder="Enter Letter Number / पत्र क्रमांक दर्ज करें" 
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
@@ -115,7 +115,7 @@
                     </group>
                     
                     <notebook>
-                        <page string="Team Members / टीम सदस्य">
+                        <page string="Team Members / टीम सदस्य" invisible="is_collector">
                             <style>
                                 .o_field_one2many .o_list_table {
                                     border: 2px dashed #8B4513 !important;

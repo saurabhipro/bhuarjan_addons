@@ -258,7 +258,7 @@
                         </div>
                         </t>
                         <!-- SIA Teams -->
-                        <t t-if="this.isSectionVisible('(Sec 4) Create SIA Team')">
+                        <t t-if="this.isSectionVisible('Create SIA Team')">
                         <div class="o_stat_card o_card_sia" t-on-click="() => this.openAction('action_open_sia_teams')">
                             <div class="o_stat_icon"><i class="fa fa-building"/></div>
                             <div class="o_stat_content">

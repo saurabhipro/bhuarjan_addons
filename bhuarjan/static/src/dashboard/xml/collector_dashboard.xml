@@ -68,7 +68,7 @@
                         </t>
 
                         <!-- SIA Team Card (Menu Order: 2) -->
-                        <t t-if="this.isSectionVisible('(Sec 4) Create SIA Team')">
+                        <t t-if="this.isSectionVisible('Create SIA Team')">
                         <div class="o_stat_card o_card_sia">
                             <div class="o_stat_icon">
                                 <i class="fa fa-users"/>
@@ -305,7 +305,7 @@
                         </t>
 
                         <!-- SIA Team -->
-                        <t t-if="this.isSectionVisible('(Sec 4) Create SIA Team')">
+                        <t t-if="this.isSectionVisible('Create SIA Team')">
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary">Step 2</span>
@@ -315,7 +315,7 @@
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    (Sec 4) Create SIA Team
+                                    Create SIA Team
                                     <t t-if="state.stats &amp;&amp; state.stats.sia_info &amp;&amp; state.stats.sia_info.is_completed">
                                         <span class="o_completion_tick" title="All SIA teams completed">
                                             <i class="fa fa-check-circle"/>

@@ -62,10 +62,10 @@ class Section4Notification(models.Model):
     
     # Public Hearing Details
     public_hearing_datetime = fields.Datetime(string='Public Hearing Date & Time / जन सुनवाई दिनांक और समय', tracking=True)
-    public_hearing_date = fields.Date(string='Public Hearing Date / सार्वजनिक सुनवाई दिनांक', tracking=True)
-    public_hearing_time = fields.Float(string='Public Hearing Time / सार्वजनिक सुनवाई समय', tracking=True, 
+    public_hearing_date = fields.Date(string='Public Hearing Date / सार्वजनिक सुनवाई दिनांक', tracking=True, required=True)
+    public_hearing_time = fields.Float(string='Public Hearing Time / सार्वजनिक सुनवाई समय', tracking=True, required=True,
                                        help='Time in HH:MM format (e.g., 10:00 for 10:00 AM, 14:30 for 2:30 PM)')
-    public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True)
+    public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True, required=True)
     
     # 11 Questions from the template
     # brief_description removed - using project_id.name instead

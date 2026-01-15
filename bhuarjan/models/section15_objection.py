@@ -112,6 +112,60 @@ class Section15Objection(models.Model):
             else:
                 record.age_days = 0
     
+    @api.onchange('resolution_landowner_ids')
+    def _onchange_resolution_landowner_ids(self):
+        """Auto-generate objection number when landowners are changed"""
+        if self.survey_id and self.resolution_landowner_ids and self.name == 'New':
+            # Check if landowners actually changed
+            if set(self.resolution_landowner_ids.ids) != set(self.original_landowner_ids.ids):
+                # Auto-generate objection number
+                if self.project_id:
+                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                        'section15_objection', self.project_id.id, village_id=self.village_id.id if self.village_id else None
+                    )
+                    if sequence_number:
+                        self.name = sequence_number
+                    else:
+                        sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or str(self._origin.id or 'NEW')
+                        self.name = f'OBJ-{sequence}'
+                
+                # Show warning message
+                return {
+                    'warning': {
+                        'title': _('Objection Created / आपत्ति बनाई गई'),
+                        'message': _('Landowner changes detected. Objection %s has been created automatically. Please save to confirm.') % self.name +
+                                 '\n\n' + _('भूमिस्वामी परिवर्तन का पता चला। आपत्ति %s स्वचालित रूप से बनाई गई है। पुष्टि करने के लिए कृपया सहेजें।') % self.name
+                    }
+                }
+    
+    @api.onchange('resolution_khasra_ids')
+    def _onchange_resolution_khasra_ids(self):
+        """Auto-generate objection number when area is changed"""
+        if self.survey_id and self.resolution_khasra_ids and self.name == 'New':
+            # Check if any area was actually changed
+            for khasra in self.resolution_khasra_ids:
+                if khasra.resolved_acquired_area and khasra.resolved_acquired_area != khasra.original_acquired_area:
+                    # Auto-generate objection number
+                    if self.project_id:
+                        sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                            'section15_objection', self.project_id.id, village_id=self.village_id.id if self.village_id else None
+                        )
+                        if sequence_number:
+                            self.name = sequence_number
+                        else:
+                            sequence = self.env['ir.sequence'].next_by_code('bhu.section15.objection') or str(self._origin.id or 'NEW')
+                            self.name = f'OBJ-{sequence}'
+                    
+                    # Show warning message
+                    return {
+                        'warning': {
+                            'title': _('Objection Created / आपत्ति बनाई गई'),
+                            'message': _('Area changes detected. Objection %s has been created automatically. Please save to confirm.') % self.name +
+                                     '\n\n' + _('क्षेत्रफल परिवर्तन का पता चला। आपत्ति %s स्वचालित रूप से बनाई गई है। पुष्टि करने के लिए कृपया सहेजें।') % self.name
+                        }
+                    }
+                    break
+    
     @api.model_create_multi
     def create(self, vals_list):
         """Generate objection reference if not provided"""
@@ -149,11 +203,57 @@ class Section15Objection(models.Model):
                         'original_acquired_area': record.survey_id.acquired_area,
                         'resolved_acquired_area': record.survey_id.acquired_area,
                     })]
+            
+            # Validate that changes were made
+            record._validate_objection_changes()
+        
         return records
     
+    def _validate_objection_changes(self):
+        """Validate that actual changes were made before saving objection"""
+        for record in self:
+            if not record.survey_id:
+                continue
+            
+            # Check if landowners changed
+            landowners_changed = False
+            if record.resolution_landowner_ids and record.original_landowner_ids:
+                landowners_changed = set(record.resolution_landowner_ids.ids) != set(record.original_landowner_ids.ids)
+            
+            # Check if area changed
+            area_changed = False
+            if record.resolution_khasra_ids:
+                for khasra in record.resolution_khasra_ids:
+                    if khasra.resolved_acquired_area and khasra.original_acquired_area:
+                        if khasra.resolved_acquired_area != khasra.original_acquired_area:
+                            area_changed = True
+                            break
+            
+            # If neither changed, raise error
+            if not landowners_changed and not area_changed:
+                raise ValidationError(_(
+                    'No changes detected! Cannot save objection without any changes to landowners or khasra area.\n\n'
+                    'कोई परिवर्तन नहीं मिला! भूमिस्वामी या खसरा क्षेत्रफल में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।'
+                ))
+    
     def write(self, vals):
-        """Override write to ensure resolution_khasra_ids have survey_id set"""
-        result = super().write(vals)
+        """Override write to update survey when objection is saved"""
+        # Validate changes before write (only for resolution fields)
+        if 'resolution_landowner_ids' in vals or 'resolution_khasra_ids' in vals:
+            # After write, validate changes
+            result = super().write(vals)
+            self._validate_objection_changes()
+        else:
+            result = super().write(vals)
+        
+        # Update survey's landowners when resolution_landowner_ids changes
+        if 'resolution_landowner_ids' in vals:
+            for record in self:
+                if record.survey_id and record.resolution_landowner_ids:
+                    # Update survey's landowners to match objection resolution
+                    record.survey_id.write({
+                        'landowner_ids': [(6, 0, record.resolution_landowner_ids.ids)]
+                    })
         
         # If survey_id or objection_type changed, update resolution_khasra_ids
         if 'survey_id' in vals or 'objection_type' in vals:

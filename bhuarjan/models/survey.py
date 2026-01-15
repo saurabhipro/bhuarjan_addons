@@ -378,8 +378,8 @@ class Survey(models.Model):
         
         for record in self:
             if show_khasra and record.khasra_number:
-                # Show khasra number first, then survey number
-                name = f"Khasra: {record.khasra_number} - {record.name or 'New'}"
+                # Show only khasra number
+                name = record.khasra_number
             else:
                 name = record.name or 'New'
             result.append((record.id, name))

@@ -137,7 +137,7 @@
                             <!-- Download Section 15 PDF Button -->
                             <group string="Download Section 15 Documents" 
                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                   invisible="not resolution_details or state == 'draft'"
+                                   invisible="state == 'draft'"
                                    style="margin-bottom: 20px;">
                                 <button name="%(action_report_section15_objection_resolution)d" string="Download Section 15 PDF" type="action" 
                                         class="btn-primary" icon="fa-file-pdf"
@@ -205,84 +205,6 @@
                                         <field name="resolved_acquired_area" widget="float"/>
                                     </list>
                                 </field>
-                            </div>
-                            
-                            <!-- Objection and Resolution Details -->
-                            <div style="background: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                                <h3 style="margin: 0 0 12px 0; color: #8B4513; font-size: 16px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 8px;">
-                                    <i class="fa fa-file-text" style="margin-right: 8px;"></i>
-                                    Objection &amp; Resolution Details / आपत्ति और समाधान विवरण
-                                </h3>
-                                <group col="2">
-                                    <group>
-                                        <div style="margin-bottom: 8px;">
-                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
-                                                <i class="fa fa-comment-o" style="color: #7c7bad; margin-right: 6px;"/>
-                                                Objection Details / आपत्ति विवरण
-                                            </div>
-                                        </div>
-                                        <field name="objection_details" placeholder="Enter objection details (optional)..." nolabel="1"
-                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
-                                    </group>
-                                    <group>
-                                        <div style="margin-bottom: 8px;">
-                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
-                                                <i class="fa fa-file-text-o" style="color: #5cb85c; margin-right: 6px;"/>
-                                                Resolution Details / समाधान विवरण
-                                            </div>
-                                        </div>
-                                        <field name="resolution_details" placeholder="Enter resolution details (optional)..." nolabel="1"
-                                               readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
-                                    </group>
-                                </group>
-                            </div>
-                            
-                            <!-- Documents Section -->
-                            <div style="background: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                                <h3 style="margin: 0 0 15px 0; color: #8B4513; font-size: 18px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 10px;">
-                                    <i class="fa fa-file-pdf-o" style="margin-right: 8px; color: #d9534f;"></i>
-                                    Documents / दस्तावेज़
-                                </h3>
-                                <group col="2">
-                                    <group>
-                                        <div style="margin-bottom: 8px;">
-                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
-                                                <i class="fa fa-file-pdf-o" style="color: #d9534f; margin-right: 6px;"></i>
-                                                Objection Document / आपत्ति दस्तावेज़
-                                            </div>
-                                        </div>
-                                        <field name="objection_document_filename" invisible="1"/>
-                                        <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
-                                            <field name="objection_document" filename="objection_document_filename"
-                                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
-                                                   widget="binary" 
-                                                   options="{'filename': 'objection_document_filename'}"
-                                                   placeholder="Click here to upload objection document..."
-                                                   nolabel="1"/>
-                                        </div>
-                                    </group>
-                                    <group>
-                                        <div style="margin-bottom: 8px;">
-                                            <div class="o_form_label" style="font-weight: 600; color: #555; display: block;">
-                                                <i class="fa fa-file-pdf-o" style="color: #5cb85c; margin-right: 6px;"></i>
-                                                Resolution Document / समाधान दस्तावेज़
-                                            </div>
-                                        </div>
-                                        <field name="resolution_document_filename" invisible="1"/>
-                                        <div style="padding: 15px; background-color: #f8f9fa; border: 2px dashed #8B4513; border-radius: 6px; text-align: center;">
-                                            <field name="resolution_document" filename="resolution_document_filename"
-                                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)" 
-                                                   widget="binary" 
-                                                   options="{'filename': 'resolution_document_filename'}"
-                                                   placeholder="Click here to upload resolution document..."
-                                                   nolabel="1"/>
-                                        </div>
-                                    </group>
-                                </group>
-                                <p style="margin: 15px 0 0 0; color: #666; font-size: 12px; text-align: center;">
-                                    <i class="fa fa-info-circle" style="margin-right: 4px;"></i>
-                                    Supported formats: PDF, Images (JPG, PNG, etc.)
-                                </p>
                             </div>
                         </page>
                     </notebook>

@@ -73,8 +73,19 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     _logger.error(f"Error generating PDF for Section 4 record {record.id}: {str(e)}", exc_info=True)
                     continue
             
-            # Generate Section 11 PDFs
-            for record in records['section11']:
+            # Generate Section 11 PDFs - One PDF per village (avoid duplicates)
+            # Group by (project, village) to ensure only one PDF per village per project
+            section11_by_key = {}
+            for record in records.get('section11', []):
+                if record.village_id and record.project_id:
+                    # Create unique key from project and village
+                    key = (record.project_id.id, record.village_id.id)
+                    # Only keep the first record per (project, village) combination
+                    if key not in section11_by_key:
+                        section11_by_key[key] = record
+            
+            # Generate one PDF per village
+            for key, record in section11_by_key.items():
                 try:
                     report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
                     pdf_result = report_action.sudo()._render_qweb_pdf(
@@ -95,8 +106,19 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     _logger.error(f"Error generating PDF for Section 11 record {record.id}: {str(e)}", exc_info=True)
                     continue
             
-            # Generate Section 19 PDFs
-            for record in records['section19']:
+            # Generate Section 19 PDFs - One PDF per village (avoid duplicates)
+            # Group by (project, village) to ensure only one PDF per village per project
+            section19_by_key = {}
+            for record in records.get('section19', []):
+                if record.village_id and record.project_id:
+                    # Create unique key from project and village
+                    key = (record.project_id.id, record.village_id.id)
+                    # Only keep the first record per (project, village) combination
+                    if key not in section19_by_key:
+                        section19_by_key[key] = record
+            
+            # Generate one PDF per village
+            for key, record in section19_by_key.items():
                 try:
                     report_action = self.env.ref('bhuarjan.action_report_section19_notification')
                     pdf_result = report_action.sudo()._render_qweb_pdf(

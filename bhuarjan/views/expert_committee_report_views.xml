@@ -220,14 +220,14 @@
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                                         <!-- Download Unsigned Expert Committee Report -->
-                                        <button name="action_download_unsigned_file" string="EC" type="object" 
+                                        <button name="action_download_unsigned_file" string="Expert Committee" type="object" 
                                                 class="btn-primary" icon="fa-download"
                                                 title="Download Expert Committee Report (Unsigned)"
                                         style="margin: 5px 0;"/>
                                 
                                 <!-- Upload SDM Signed File -->
                                 <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                       string="Upload SDM Signed EC"
+                                       string="Upload SDM Signed Expert Committee"
                                        widget="binary"
                                        readonly="state != 'draft'"
                                        placeholder="Upload Signed Expert Committee Report"
@@ -242,7 +242,7 @@
                                         style="margin: 5px 0;">
                                             <i class="fa fa-download" style="margin-right: 5px;"/>
                                             <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                            EC SDM Signed
+                                            Expert Committee SDM Signed
                                         </button>
                             </group>
                             
@@ -250,7 +250,7 @@
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                                 <!-- Download Latest PDF -->
                                                 <button name="action_download_latest_pdf" 
-                                                        string="EC" type="object" 
+                                                        string="Expert Committee" type="object" 
                                         class="btn-primary" icon="fa-download"
                                                         title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                         invisible="not sdm_signed_file and not collector_signed_file"
@@ -265,7 +265,7 @@
                                         style="margin: 5px 0;">
                                                     <i class="fa fa-download" style="margin-right: 5px;"/>
                                                     <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                                    EC SDM Signed
+                                                    Expert Committee SDM Signed
                                                 </button>
                                 
                                                 <!-- Download Collector Signed Expert Committee -->
@@ -277,12 +277,12 @@
                                         style="margin: 5px 0;">
                                                     <i class="fa fa-download" style="margin-right: 5px;"/>
                                                     <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                                    EC Collector Signed
+                                                    Expert Committee Collector Signed
                                                 </button>
                                     
                                 <!-- Upload Collector Signed File -->
                                                 <field name="collector_signed_file" filename="collector_signed_filename" 
-                                    string="Upload Collector Signed EC"
+                                    string="Upload Collector Signed Expert Committee"
                                                     widget="binary"
                                                     readonly="state != 'submitted'"
                                                     placeholder="Upload Expert Committee Approval Letter"

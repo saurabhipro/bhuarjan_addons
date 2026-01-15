@@ -100,7 +100,7 @@
                         <field name="project_id" required="1" readonly="1" options="{'no_open': True}"/>
                         <field name="village_ids" widget="many2many_tags" readonly="1" options="{'no_create_edit': True}"/>
                         <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
-                        <field name="total_area_acquired" readonly="1"/>
+                            <field name="total_area_acquired" readonly="1"/>
                     </group>
                     <notebook>
                         <page string="Team Members / टीम सदस्य">
@@ -219,10 +219,10 @@
                             </style>
                             <!-- SDM Section -->
                             <group string="SDM Section / SDM अनुभाग" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
-                                <!-- Download Unsigned Expert Committee Report -->
-                                <button name="action_download_unsigned_file" string="EC" type="object" 
-                                        class="btn-primary" icon="fa-download"
-                                        title="Download Expert Committee Report (Unsigned)"
+                                        <!-- Download Unsigned Expert Committee Report -->
+                                        <button name="action_download_unsigned_file" string="EC" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download Expert Committee Report (Unsigned)"
                                         style="margin: 5px 0;"/>
                                 
                                 <!-- Upload SDM Signed File -->
@@ -233,61 +233,61 @@
                                        placeholder="Upload Signed Expert Committee Report"
                                        help="Upload the signed Expert Committee document from SDM"/>
                                 <field name="sdm_signed_filename" invisible="1"/>
-                                
-                                <!-- Download SDM Signed Expert Committee Report -->
-                                <button name="action_download_sdm_signed_file" type="object" 
-                                        class="btn-primary"
-                                        title="Download SDM Signed Expert Committee Report"
-                                        invisible="not sdm_signed_file"
+                                        
+                                        <!-- Download SDM Signed Expert Committee Report -->
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
+                                                title="Download SDM Signed Expert Committee Report"
+                                                invisible="not sdm_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    EC SDM Signed
-                                </button>
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            EC SDM Signed
+                                        </button>
                             </group>
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                                 <!-- Download Latest PDF -->
-                                <button name="action_download_latest_pdf" 
-                                        string="EC" type="object" 
+                                                <button name="action_download_latest_pdf" 
+                                                        string="EC" type="object" 
                                         class="btn-primary" icon="fa-download"
-                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                        invisible="not sdm_signed_file and not collector_signed_file"
+                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                        invisible="not sdm_signed_file and not collector_signed_file"
                                         style="margin: 5px 0;"/>
                                 
-                                <!-- Download SDM Signed Expert Committee Report -->
-                                <button name="action_download_sdm_signed_file" 
-                                        type="object" 
-                                        class="btn-primary"
-                                        title="Download SDM Signed Expert Committee Report"
-                                        invisible="not sdm_signed_file"
+                                                <!-- Download SDM Signed Expert Committee Report -->
+                                                <button name="action_download_sdm_signed_file" 
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download SDM Signed Expert Committee Report"
+                                                        invisible="not sdm_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    EC SDM Signed
-                                </button>
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    EC SDM Signed
+                                                </button>
                                 
-                                <!-- Download Collector Signed Expert Committee -->
-                                <button name="action_download_collector_signed_file"
-                                        type="object" 
-                                        class="btn-primary"
-                                        title="Download Collector Signed Expert Committee"
-                                        invisible="not collector_signed_file"
+                                                <!-- Download Collector Signed Expert Committee -->
+                                                <button name="action_download_collector_signed_file"
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download Collector Signed Expert Committee"
+                                                        invisible="not collector_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    EC Collector Signed
-                                </button>
-                                
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    EC Collector Signed
+                                                </button>
+                                    
                                 <!-- Upload Collector Signed File -->
-                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
                                     string="Upload Collector Signed EC"
-                                    widget="binary"
-                                    readonly="state != 'submitted'"
-                                    placeholder="Upload Expert Committee Approval Letter"
-                                    help="Upload the signed Expert Committee approval document from Collector"/>
-                                <field name="collector_signed_filename" invisible="1"/>
+                                                    widget="binary"
+                                                    readonly="state != 'submitted'"
+                                                    placeholder="Upload Expert Committee Approval Letter"
+                                                    help="Upload the signed Expert Committee approval document from Collector"/>
+                                                <field name="collector_signed_filename" invisible="1"/>
                             </group>
                             
                             <!-- Expert Group Report Section -->

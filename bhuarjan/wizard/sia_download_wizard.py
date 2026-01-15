@@ -50,7 +50,23 @@ class SIADownloadWizard(models.TransientModel):
         styles = re.findall(style_pattern, html_str, re.DOTALL)
         combined_styles = '\n'.join(styles)
         
-        # Convert images to base64 data URIs
+        # CAREFULLY Remove ONLY the watermark section (not the header!)
+        # Pattern 1: Remove watermark HTML comments
+        watermark_pattern1 = r'<!--.*?Watermark.*?-->'
+        html_str = re.sub(watermark_pattern1, '', html_str, flags=re.DOTALL | re.IGNORECASE)
+        
+        # Pattern 2: Remove ONLY div with class="watermark" (be specific to avoid removing header)
+        # Match: <div class="watermark">...</div> but NOT the header table
+        watermark_pattern2 = r'<div\s+class=["\']watermark["\'][^>]*>(?:(?!<table).)*?</div>'
+        html_str = re.sub(watermark_pattern2, '', html_str, flags=re.DOTALL | re.IGNORECASE)
+        
+        # Pattern 3: Remove watermark images by alt text
+        html_str = re.sub(r'<img[^>]*alt=["\'][^"\']*[Ww]atermark[^"\']*["\'][^>]*/?>',  '', html_str, flags=re.IGNORECASE)
+        
+        # Remove the decorative dotted border from container but KEEP its contents
+        html_str = re.sub(r'(<div[^>]*class=["\']container[^"\']*["\'][^>]*)style="[^"]*border:\s*2px\s+dotted[^"]*"([^>]*>)', r'\1style="margin:0; padding:0; border:none;"\2', html_str, flags=re.IGNORECASE)
+        
+        # Convert images to base64 data URIs for embedding in Word
         def convert_image_to_base64(match):
             img_tag = match.group(0)
             src_match = re.search(r'src=["\']([^"\']+)["\']', img_tag)
@@ -58,6 +74,13 @@ class SIADownloadWizard(models.TransientModel):
                 return img_tag
             
             img_url = src_match.group(1)
+            
+            # Check if this is a watermark image by alt text - if so, skip it
+            if 'Watermark' in img_tag or 'watermark' in img_tag.lower():
+                return ''  # Remove watermark images
+            
+            # Don't skip any logos - the watermark div is already removed earlier
+            # All remaining images are valid (header logo, QR code, etc.)
             
             try:
                 # Handle relative URLs
@@ -72,18 +95,45 @@ class SIADownloadWizard(models.TransientModel):
                     # Determine mime type from response headers or URL
                     content_type = response.headers.get('content-type', 'image/png')
                     data_uri = f'data:{content_type};base64,{img_base64}'
-                    return img_tag.replace(src_match.group(1), data_uri)
-            except:
+                    
+                    # Build a NEW img tag with forced small size - Word needs width/height attributes, not just CSS
+                    alt_match = re.search(r'alt=["\']([^"\']*)["\']', img_tag)
+                    alt_text = alt_match.group(1) if alt_match else 'Image'
+                    
+                    class_match = re.search(r'class=["\']([^"\']*)["\']', img_tag)
+                    class_text = class_match.group(1) if class_match else ''
+                    
+                    # Create img tag with HTML width/height attributes (Word understands these better than CSS)
+                    # Use width and height attributes for Word compatibility
+                    new_tag = f'<img src="{data_uri}" alt="{alt_text}" width="80" height="80" style="width:80px; height:80px; display:block; margin:0 auto;"'
+                    if class_text:
+                        new_tag += f' class="{class_text}"'
+                    new_tag += '/>'
+                    
+                    return new_tag
+            except Exception as e:
                 pass
             
             return img_tag
         
-        # For Word format, remove ALL images (QR codes and logos) to save space
-        html_str = re.sub(r'<img[^>]*>', '', html_str)
+        # Remove <a> tags around QR codes (links not needed in Word, and they cause sizing issues)
+        html_str = re.sub(r'<a[^>]*href="[^"]*qr[^"]*"[^>]*>', '', html_str, flags=re.IGNORECASE)
+        html_str = re.sub(r'<a[^>]*href="[^"]*download[^"]*"[^>]*>', '', html_str, flags=re.IGNORECASE)
+        html_str = re.sub(r'</a>', '', html_str)
         
-        # Also remove image containers that might leave empty space
-        html_str = re.sub(r'<div[^>]*class="[^"]*qr[^"]*"[^>]*>.*?</div>', '', html_str, flags=re.DOTALL | re.IGNORECASE)
-        html_str = re.sub(r'<div[^>]*class="[^"]*logo[^"]*"[^>]*>.*?</div>', '', html_str, flags=re.DOTALL | re.IGNORECASE)
+        # Remove dots/periods used as placeholders in blank fields (e.g., "........................")
+        # Remove sequences of 3 or more dots/periods
+        html_str = re.sub(r'\.{3,}', '', html_str)
+        # Also remove sequences with spaces between dots
+        html_str = re.sub(r'(\.\s*){3,}', '', html_str)
+        
+        # Convert all images to base64 (logo and QR code will be embedded)
+        html_str = re.sub(r'<img[^>]*>', convert_image_to_base64, html_str)
+        
+        # Force table cells with rowspan="2" (logo and QR columns) to be fixed narrow width
+        # Keep styles simple for Word compatibility (no !important)
+        html_str = re.sub(r'<td([^>]*)rowspan="2"([^>]*)style="width:\s*12%;[^"]*"([^>]*)>', r'<td\1rowspan="2"\2style="width:85px; padding:2px; text-align:center; vertical-align:middle;"\3>', html_str, flags=re.IGNORECASE)
+        html_str = re.sub(r'<td([^>]*)style="width:\s*12%;[^"]*"([^>]*)rowspan="2"([^>]*)>', r'<td\1style="width:85px; padding:2px; text-align:center; vertical-align:middle;"\2rowspan="2"\3>', html_str, flags=re.IGNORECASE)
         
         # Remove inline styles that add spacing - but keep table structure
         # Don't remove border/padding from td/th elements
@@ -120,132 +170,106 @@ class SIADownloadWizard(models.TransientModel):
         {combined_styles}
         
         /* Word compatibility styles - MINIMAL margins for maximum space */
+        /* Note: Avoiding !important as Word doesn't handle it well */
         body {{
-            font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', Arial, sans-serif !important;
-            font-size: 11pt;
-            line-height: 1.2;
-            margin-top: 0.1in !important;
-            margin-bottom: 0.1in !important;
-            margin-left: 0.15in !important;
-            margin-right: 0.15in !important;
-            padding: 0 !important;
+            font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.15;
+            margin-top: 0.1in;
+            margin-bottom: 0.1in;
+            margin-left: 0.15in;
+            margin-right: 0.15in;
+            padding: 0;
         }}
         
         * {{
-            box-sizing: border-box;
-            margin: 0 !important;
-            padding: 0 !important;
+            font-size: 10pt;
         }}
         
-        /* Hide all images (QR codes and logos removed for Word format) */
+        div, p, span {{
+            margin: 0;
+            padding: 0;
+        }}
+        
+        /* Hide watermark (Word-compatible) */
+        .watermark {{
+            display: none;
+            visibility: hidden;
+        }}
+        
+        /* Images - compact with aspect ratio maintained */
         img {{
-            display: none !important;
+            max-width: 80px;
+            max-height: 80px;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 2px auto;
         }}
         
-        /* Hide empty image containers */
-        .qr_code, .o_company_logo, [class*="logo"], [class*="qr"] {{
-            display: none !important;
+        /* Image containers */
+        .qr_code, .o_company_logo {{
+            text-align: center;
+            width: 85px;
+            max-width: 85px;
         }}
         
-        /* Remove decorative borders and boxes to save space */
-        div[style*="border"], .o_border, [class*="border"], div[style*="box"] {{
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
+        /* Remove decorative borders to save space */
+        .container {{
+            border: none;
+            padding: 0;
+            margin: 0;
         }}
         
-        /* Remove dotted/dashed borders */
-        * {{
-            border-style: none !important;
-            outline: none !important;
-        }}
-        
+        /* Tables - Word-compatible styling */
         table {{
-            border-collapse: collapse !important;
-            width: 100% !important;
-            mso-table-lspace: 0pt !important;
-            mso-table-rspace: 0pt !important;
-            margin: 2px 0 !important;
-            padding: 0 !important;
-            border: 1px solid #000 !important;
+            border-collapse: collapse;
+            width: 100%;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+            margin: 2px 0;
         }}
         
-        /* All tables should have borders */
+        /* Table cells - basic borders */
         td, th {{
-            border: 1px solid #000 !important;
-            padding: 3px 5px !important;
-            margin: 0 !important;
-            mso-line-height-rule: exactly;
-            vertical-align: top;
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: middle;
             text-align: left;
+            mso-line-height-rule: exactly;
         }}
         
         /* Table headers */
         th {{
-            font-weight: bold !important;
-            background-color: #f0f0f0 !important;
+            font-weight: bold;
+            background-color: #f0f0f0;
         }}
         
-        /* Ensure proper table structure */
-        tbody, thead, tfoot {{
-            border: 1px solid #000 !important;
-        }}
-        
-        tr {{
-            border: 1px solid #000 !important;
-        }}
-        
+        /* Paragraphs and headings */
         p {{
-            margin: 0 !important;
-            padding: 0 !important;
-            line-height: 1.1 !important;
+            margin: 0;
+            padding: 0;
+            line-height: 1.15;
         }}
         
-        h1, h2, h3, h4, h5, h6 {{
-            margin: 1px 0 !important;
-            padding: 0 !important;
-            line-height: 1.1 !important;
+        h1 {{
+            font-size: 14pt;
+            margin: 2px 0;
         }}
         
-        /* ULTRA Compact layout - minimal spacing */
-        div, section, article, span {{
-            padding: 0 !important;
-            margin: 0 !important;
+        h2 {{
+            font-size: 12pt;
+            margin: 2px 0;
         }}
         
-        /* Data tables should have visible borders */
-        .o_main_table, .o_data_table, table[border] {{
-            border: 1px solid #000 !important;
+        h3 {{
+            font-size: 11pt;
+            margin: 1px 0;
         }}
         
-        .o_main_table td, .o_data_table td, table[border] td {{
-            border: 1px solid #000 !important;
-            padding: 3px 5px !important;
-        }}
-        
-        /* Clean tables without data keep minimal styling */
-        .o_clean_table {{
-            border: none !important;
-        }}
-        
-        .o_clean_table td {{
-            border: none !important;
-            padding: 1px !important;
-            margin: 0 !important;
-        }}
-        
-        /* Remove page containers and decorative elements */
-        .page, .o_page, [class*="container"] {{
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-        }}
-        
-        /* Compact text blocks */
-        .o_text_block, .text-block {{
-            margin: 0 !important;
-            padding: 0 !important;
+        h4, h5, h6 {{
+            font-size: 10pt;
+            margin: 1px 0;
         }}
     </style>
 </head>

@@ -102,16 +102,16 @@
                         <field name="pending_with" string="Pending With / लंबित" readonly="1"/>
                         <field name="project_id" required="1" readonly="1" options="{'no_open': True}"/>
                         <field name="village_ids" widget="many2many_tags" readonly="1"
-                               placeholder="Affected villages (auto-populated from project)..."
-                               options="{'no_create_edit': True}"
-                               context="{'default_project_id': project_id}" force_save="1"/>
+                                   placeholder="Affected villages (auto-populated from project)..."
+                                   options="{'no_create_edit': True}"
+                                   context="{'default_project_id': project_id}" force_save="1"/>
                         <field name="is_sia_exempt" readonly="1"
                                string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
                         <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
-                        <field name="tehsil_ids" widget="many2many_tags" readonly="1"
-                               placeholder="Tehsils (from selected villages)..."
-                               options="{'no_create_edit': True}" force_save="1"/>
-                        <field name="total_area_acquired" readonly="1"/>
+                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
+                                   placeholder="Tehsils (from selected villages)..."
+                                   options="{'no_create_edit': True}" force_save="1"/>
+                            <field name="total_area_acquired" readonly="1"/>
                     </group>
                     
                     <notebook>
@@ -141,7 +141,7 @@
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
                                        context="{'default_member_type': 'non_govt_social_scientist'}"
                                        placeholder="Click 'Add a line' to add Non-Government Social Scientists"/>
-                            </group>
+                                </group>
                             
                             <!-- (ख) Representatives of Local Bodies -->
                             <group string="(ख) REPRESENTATIVES OF LOCAL BODIES / स्थानीय निकायों के प्रतिनिधि">
@@ -152,7 +152,7 @@
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
                                        context="{'default_member_type': 'local_bodies_representative'}"
                                        placeholder="Click 'Add a line' to add Representatives of Local Bodies"/>
-                            </group>
+                                </group>
                             
                             <!-- (ग) Resettlement Expert -->
                             <group string="(ग) RESETTLEMENT EXPERT / पुनर्व्यवस्थापन विशेषज्ञ">
@@ -163,7 +163,7 @@
                                        readonly="state == 'approved' or is_sia_exempt == 'yes'"
                                        context="{'default_member_type': 'resettlement_expert'}"
                                        placeholder="Click 'Add a line' to add Resettlement Experts"/>
-                            </group>
+                                </group>
                             
                             <!-- (घ) Technical Expert -->
                             <group string="(घ) TECHNICAL EXPERT / परियोजना से संबंधित विषय का तकनीकि विशेषज्ञ">
@@ -208,9 +208,9 @@
                             <!-- SDM Section - Clean Layout -->
                             <group string="SIA Documents / SIA दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_sia_exempt == 'yes' or is_collector">
                                 <!-- Download SIA Proposal Button -->
-                                <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
-                                        class="btn-primary" icon="fa-download"
-                                        title="Download SIA Proposal (Collector's Order Template)"
+                                        <button name="action_download_proposal_report" string="SIA Proposal" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download SIA Proposal (Collector's Order Template)"
                                         style="margin: 5px 0;"/>
                                 
                                 <!-- Upload SDM Signed SIA -->
@@ -221,17 +221,17 @@
                                        placeholder="Upload Signed SIA Proposal"
                                        help="Upload the signed SIA document from SDM"/>
                                 <field name="sdm_signed_filename" invisible="1"/>
-                                
+                                        
                                 <!-- Download SDM Signed SIA Button (appears after upload) -->
-                                <button name="action_download_sdm_signed_file" type="object" 
-                                        class="btn-primary"
-                                        title="Download SDM Signed Proposal"
-                                        invisible="not sdm_signed_file"
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
+                                                title="Download SDM Signed Proposal"
+                                                invisible="not sdm_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    SIA SDM Signed
-                                </button>
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            SIA SDM Signed
+                                        </button>
                                 
                                 <!-- Submit to Collector Button (appears after SDM Signed is uploaded) -->
                                 <button name="action_submit" string="Submit to Collector" 

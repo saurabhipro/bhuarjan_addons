@@ -31,7 +31,7 @@
             <form string="Section 4 Notification" edit="not id or not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                     <div class="row w-100">
                         <div class="col w-100">
-                            <!-- Approve Button (Collector only) -->
+                                <!-- Approve Button (Collector only) -->
                             <button name="action_approve" string="Approve" type="object" class="btn-primary" 
                                     icon="fa-check"
                                     groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
@@ -106,9 +106,9 @@
                     <!-- Section 4 Documents -->
                     <group string="Section 4 Documents / धारा 4 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                                 <!-- Download Section 4 Button -->
-                                <button name="action_download_unsigned_file" string="Section 4" type="object" 
-                                        class="btn-primary" icon="fa-download"
-                                        title="Download Section 4 Notification (Unsigned)"
+                                        <button name="action_download_unsigned_file" string="Section 4" type="object" 
+                                                class="btn-primary" icon="fa-download"
+                                                title="Download Section 4 Notification (Unsigned)"
                                         style="margin: 5px 0;"/>
                                 
                                 <!-- Upload SDM Signed Section 4 -->
@@ -119,17 +119,17 @@
                                        placeholder="Upload Signed Section 4 Notification"
                                        help="Upload the signed Section 4 document from SDM"/>
                                 <field name="sdm_signed_filename" invisible="1"/>
-                                
+                                        
                                 <!-- Download SDM Signed Section 4 (appears after upload) -->
-                                <button name="action_download_sdm_signed_file" type="object" 
-                                        class="btn-primary"
-                                        title="Download SDM Signed Section 4"
-                                        invisible="not sdm_signed_file"
+                                        <button name="action_download_sdm_signed_file" type="object" 
+                                                class="btn-primary"
+                                                title="Download SDM Signed Section 4"
+                                                invisible="not sdm_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    Section 4 SDM Signed
-                                </button>
+                                            <i class="fa fa-download" style="margin-right: 5px;"/>
+                                            <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                            Section 4 SDM Signed
+                                        </button>
                                 
                                 <!-- Submit to Collector Button (appears after SDM Signed is uploaded) -->
                                 <button name="action_submit" string="Submit to Collector" type="object" 
@@ -143,45 +143,45 @@
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                                 <!-- Download Latest PDF -->
-                                <button name="action_download_latest_pdf" 
-                                        string="Section 4" type="object" 
+                                                <button name="action_download_latest_pdf" 
+                                                        string="Section 4" type="object" 
                                         class="btn-primary" icon="fa-download"
-                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
-                                        invisible="not sdm_signed_file and not collector_signed_file"
+                                                        title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
+                                                        invisible="not sdm_signed_file and not collector_signed_file"
                                         style="margin: 5px 0;"/>
                                 
-                                <!-- Download SDM Signed Section 4 -->
-                                <button name="action_download_sdm_signed_file" 
-                                        type="object" 
-                                        class="btn-primary"
-                                        title="Download SDM Signed Section 4"
-                                        invisible="not sdm_signed_file"
+                                                <!-- Download SDM Signed Section 4 -->
+                                                <button name="action_download_sdm_signed_file" 
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download SDM Signed Section 4"
+                                                        invisible="not sdm_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    Section 4 SDM Signed
-                                </button>
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 4 SDM Signed
+                                                </button>
                                 
-                                <!-- Download Collector Signed Section 4 -->
-                                <button name="action_download_collector_signed_file"
-                                        type="object" 
-                                        class="btn-primary"
-                                        title="Download Collector Signed Section 4"
-                                        invisible="not collector_signed_file"
+                                                <!-- Download Collector Signed Section 4 -->
+                                                <button name="action_download_collector_signed_file"
+                                                        type="object" 
+                                                        class="btn-primary"
+                                                        title="Download Collector Signed Section 4"
+                                                        invisible="not collector_signed_file"
                                         style="margin: 5px 0;">
-                                    <i class="fa fa-download" style="margin-right: 5px;"/>
-                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                    Section 4 Collector Signed
-                                </button>
-                                
+                                                    <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                    <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                    Section 4 Collector Signed
+                                                </button>
+                                    
                                 <!-- Upload Collector Signed File -->
-                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
                                     string="Upload Collector Signed Sec 4"
-                                    widget="binary"
-                                    readonly="state != 'submitted'"
-                                    placeholder="Upload Section 4 Approval Letter"
-                                    help="Upload the signed Section 4 approval document from Collector"/>
-                                <field name="collector_signed_filename" invisible="1"/>
+                                                    widget="binary"
+                                                    readonly="state != 'submitted'"
+                                                    placeholder="Upload Section 4 Approval Letter"
+                                                    help="Upload the signed Section 4 approval document from Collector"/>
+                                                <field name="collector_signed_filename" invisible="1"/>
                             </group>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>

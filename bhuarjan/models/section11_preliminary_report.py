@@ -99,11 +99,12 @@ class Section11PreliminaryReport(models.Model):
         """Compute total khasras count and total area acquired from Form 10 surveys"""
         for record in self:
             if record.project_id and record.village_id:
-                # Get all surveys for selected village in this project
+                # Get all surveys for selected village in this project (exclude rejected)
                 surveys = self.env['bhu.survey'].search([
                     ('project_id', '=', record.project_id.id),
                     ('village_id', '=', record.village_id.id),
                     ('khasra_number', '!=', False),
+                    ('state', '!=', 'rejected'),
                 ])
                 
                 # Count unique khasra numbers

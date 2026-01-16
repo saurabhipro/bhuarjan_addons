@@ -109,8 +109,7 @@
                         <style>
                             /* Both table headers - Brown with White Text */
                             .o_field_widget[name="resolution_landowner_ids"] .o_list_view thead th,
-                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th,
-                            .o_field_widget[name="resolution_survey_detail_ids"] .o_list_view thead th {
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th {
                                 background: linear-gradient(to bottom, #8B4513, #A0522D) !important;
                                 color: white !important;
                                 font-weight: bold !important;
@@ -118,14 +117,12 @@
                             }
                             /* Ensure text in headers is white */
                             .o_field_widget[name="resolution_landowner_ids"] .o_list_view thead th *,
-                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th *,
-                            .o_field_widget[name="resolution_survey_detail_ids"] .o_list_view thead th * {
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th * {
                                 color: white !important;
                             }
                             
                             .o_field_widget[name="resolution_landowner_ids"] .o_list_view tbody tr:hover,
-                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view tbody tr:hover,
-                            .o_field_widget[name="resolution_survey_detail_ids"] .o_list_view tbody tr:hover {
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view tbody tr:hover {
                                 background-color: #f5e0d5 !important;
                             }
                         </style>
@@ -148,12 +145,11 @@
                                    context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'list_view_ref': 'bhuarjan.view_section15_objection_khasra_tree', 'show_khasra': True}"/>
                         </group>
 
-                        <group string="Other Survey Details / अन्य सर्वे विवरण">
-                            <field name="resolution_survey_detail_ids"
+                        <group string="आपत्ति एंड निराकरण कमेंट बॉक्स">
+                            <field name="objection_resolution_comments" 
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    nolabel="1"
-                                   options="{'no_create': True}"
-                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'list_view_ref': 'bhuarjan.view_section15_objection_survey_detail_tree', 'form_view_ref': 'bhuarjan.view_section15_objection_survey_detail_form'}"/>
+                                   placeholder="यहाँ अपनी आपत्ति और निराकरण कमेंट लिखें... (Enter your objection and resolution comments here...)"/>
                         </group>
                     </div>
                     
@@ -240,64 +236,6 @@
                         <field name="khasra_number" readonly="1"/>
                         <field name="original_acquired_area" readonly="1" widget="float"/>
                         <field name="resolved_acquired_area" widget="float"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- Section 15 Objection Survey Detail Tree View -->
-    <record id="view_section15_objection_survey_detail_tree" model="ir.ui.view">
-        <field name="name">bhu.section15.objection.survey_detail.list</field>
-        <field name="model">bhu.section15.objection.survey_detail</field>
-        <field name="arch" type="xml">
-            <list string="Other Survey Details" create="0">
-                <field name="has_well" string="Well?"/>
-                <field name="well_type" string="Well Type"/>
-                <field name="well_count" string="Well Count"/>
-                <field name="has_tubewell" string="Tubewell?"/>
-                <field name="tubewell_count" string="Tubewell Count"/>
-                <field name="has_house" string="House?"/>
-                <field name="house_type" string="House Type"/>
-                <field name="house_area" string="House Area"/>
-                <field name="has_shed" string="Shed?"/>
-                <field name="shed_area" string="Shed Area"/>
-                <field name="has_pond" string="Pond?"/>
-            </list>
-        </field>
-    </record>
-
-    <!-- Section 15 Objection Survey Detail Form View -->
-    <record id="view_section15_objection_survey_detail_form" model="ir.ui.view">
-        <field name="name">bhu.section15.objection.survey_detail.form</field>
-        <field name="model">bhu.section15.objection.survey_detail</field>
-        <field name="arch" type="xml">
-            <form string="Other Survey Details / अन्य सर्वे विवरण">
-                <sheet>
-                    <field name="objection_id" invisible="1"/>
-                    <field name="survey_id" invisible="1"/>
-                    <group>
-                        <group string="Well Details / कुआं विवरण">
-                            <field name="has_well" widget="radio" options="{'horizontal': true}"/>
-                            <field name="well_type" invisible="has_well != 'yes'"/>
-                            <field name="well_count" invisible="has_well != 'yes'"/>
-                        </group>
-                        <group string="Tubewell Details / ट्यूबवेल विवरण">
-                            <field name="has_tubewell" widget="radio" options="{'horizontal': true}"/>
-                            <field name="tubewell_count" invisible="has_tubewell != 'yes'"/>
-                        </group>
-                    </group>
-                    <group>
-                        <group string="House Details / घर विवरण">
-                            <field name="has_house" widget="radio" options="{'horizontal': true}"/>
-                            <field name="house_type" invisible="has_house != 'yes'"/>
-                            <field name="house_area" invisible="has_house != 'yes'"/>
-                        </group>
-                        <group string="Shed &amp; Pond / शेड और तालाब">
-                            <field name="has_shed" widget="radio" options="{'horizontal': true}"/>
-                            <field name="shed_area" invisible="has_shed != 'yes'"/>
-                            <field name="has_pond" widget="radio" options="{'horizontal': true}"/>
-                        </group>
                     </group>
                 </sheet>
             </form>

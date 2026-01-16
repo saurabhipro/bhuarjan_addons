@@ -44,10 +44,7 @@ class Section15Objection(models.Model):
                                             tracking=True,
                                             help='Track area decreases per khasra')
     
-    # Other details changes (One2many to track changes to wells, houses, etc.)
-    resolution_survey_detail_ids = fields.One2many('bhu.section15.objection.survey_detail', 'objection_id',
-                                                  string='Other Survey Details / अन्य सर्वे विवरण',
-                                                  tracking=True)
+    objection_resolution_comments = fields.Text(string='Objection and Resolution Comments / आपत्ति एवं निराकरण कमेंट बॉक्स', tracking=True)
     
     @api.depends('village_id')
     def _compute_available_survey_ids(self):
@@ -219,33 +216,17 @@ class Section15Objection(models.Model):
                         area_changed = True
                         break
             
-            # Check if other details changed
-            details_changed = False
-            if record.resolution_survey_detail_ids:
-                for detail in record.resolution_survey_detail_ids:
-                    survey = detail.survey_id
-                    if (detail.has_well != survey.has_well or 
-                        detail.well_type != survey.well_type or 
-                        detail.well_count != survey.well_count or
-                        detail.has_tubewell != survey.has_tubewell or
-                        detail.tubewell_count != survey.tubewell_count or
-                        detail.has_house != survey.has_house or
-                        detail.house_type != survey.house_type or
-                        detail.house_area != survey.house_area or
-                        detail.has_shed != survey.has_shed or
-                        detail.shed_area != survey.shed_area or
-                        detail.has_pond != survey.has_pond):
-                        details_changed = True
-                        break
+            # Check if comments added
+            comments_added = bool(record.objection_resolution_comments)
             
             # If nothing changed, raise error
-            if not landowners_changed and not area_changed and not details_changed:
+            if not landowners_changed and not area_changed and not comments_added:
                 res_count = len(record.resolution_landowner_ids)
                 orig_count = len(record.original_landowner_ids)
                 raise ValidationError(_(
-                    "No changes detected! Cannot save objection without any changes to landowners, khasra area, or other survey details.\n"
+                    "No changes detected! Cannot save objection without any changes to landowners, khasra area, or adding comments.\n"
                     "(Current Landowners: %d, Original Landowners: %d)\n\n"
-                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या अन्य सर्वे विवरण में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।\n"
+                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या कमेंट जोड़े बिना आपत्ति सहेजी नहीं जा सकती।\n"
                     "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
                 ) % (res_count, orig_count, res_count, orig_count))
     
@@ -572,97 +553,6 @@ class Section15Objection(models.Model):
         return result
 
 
-class Section15ObjectionSurveyDetail(models.Model):
-    """Model to track resolution changes for other survey details"""
-    _name = 'bhu.section15.objection.survey_detail'
-    _description = 'Section 15 Objection Survey Detail'
-    
-    objection_id = fields.Many2one('bhu.section15.objection', string='Objection / आपत्ति', required=True, ondelete='cascade')
-    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', required=True, ondelete='restrict')
-    
-    has_well = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Well / कुआँ है')
-    well_type = fields.Selection([('kaccha', 'Kaccha / कच्चा'), ('pakka', 'Pakka / पक्का')], string='Well Type / कुएं का प्रकार')
-    well_count = fields.Integer(string='Well Count / कुओं की संख्या')
-    
-    has_tubewell = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Tubewell / ट्यूबवेल है')
-    tubewell_count = fields.Integer(string='Tubewell Count / ट्यूबवेल की संख्या')
-    
-    has_house = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has House / मकान है')
-    house_type = fields.Selection([('kaccha', 'Kaccha / कच्चा'), ('pakka', 'Pakka / पक्का')], string='House Type / मकान का प्रकार')
-    house_area = fields.Float(string='House Area / मकान का क्षेत्रफल')
-    
-    has_shed = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Shed / शेड है')
-    shed_area = fields.Float(string='Shed Area / शेड का क्षेत्रफल')
-    
-    has_pond = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Pond / तालाब है')
-
-    @api.model
-    def default_get(self, fields_list):
-        """Set default values from context"""
-        res = super().default_get(fields_list)
-        
-        # Set objection_id from context if available
-        if 'default_objection_id' in self.env.context:
-            objection_id = self.env.context.get('default_objection_id')
-            if objection_id and 'objection_id' in fields_list:
-                res['objection_id'] = objection_id
-        
-        # Try to get survey_id from context
-        survey_id = self.env.context.get('default_survey_id')
-        
-        # If not in context, try to get from objection_id
-        if not survey_id and 'default_objection_id' in self.env.context:
-            objection_id = self.env.context.get('default_objection_id')
-            if objection_id:
-                objection = self.env['bhu.section15.objection'].browse(objection_id)
-                if objection.exists() and objection.survey_id:
-                    survey_id = objection.survey_id.id
-        
-        if survey_id:
-            survey = self.env['bhu.survey'].browse(survey_id)
-            if survey.exists():
-                if 'survey_id' in fields_list:
-                    res['survey_id'] = survey_id
-                
-                # Sync other details from survey
-                res.update({
-                    'has_well': survey.has_well,
-                    'well_type': survey.well_type,
-                    'well_count': survey.well_count,
-                    'has_tubewell': survey.has_tubewell,
-                    'tubewell_count': survey.tubewell_count,
-                    'has_house': survey.has_house,
-                    'house_type': survey.house_type,
-                    'house_area': survey.house_area,
-                    'has_shed': survey.has_shed,
-                    'shed_area': survey.shed_area,
-                    'has_pond': survey.has_pond,
-                })
-        
-        return res
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Ensure survey_id is set from objection if not provided"""
-        for vals in vals_list:
-            if not vals.get('survey_id') and vals.get('objection_id'):
-                objection = self.env['bhu.section15.objection'].browse(vals['objection_id'])
-                if objection.exists() and objection.survey_id:
-                    vals['survey_id'] = objection.survey_id.id
-        
-        records = super().create(vals_list)
-        return records
-
-    def write(self, vals):
-        """Ensure survey_id is kept in sync"""
-        if 'objection_id' in vals and not vals.get('survey_id'):
-            objection = self.env['bhu.section15.objection'].browse(vals['objection_id'])
-            if objection.exists() and objection.survey_id:
-                vals['survey_id'] = objection.survey_id.id
-        
-        return super().write(vals)
-
-
 class Section15ObjectionKhasra(models.Model):
     """Model to track resolution changes per khasra (survey)"""
     _name = 'bhu.section15.objection.khasra'
@@ -689,6 +579,18 @@ class Section15ObjectionKhasra(models.Model):
     shed_area = fields.Float(string='Shed Area / शेड का क्षेत्रफल')
     has_pond = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Pond / तालाब है')
     irrigation_type = fields.Selection([('irrigated', 'Irrigated / सिंचित'), ('unirrigated', 'Unirrigated / असिंचित')], string='Irrigation Type / सिंचाई का प्रकार')
+    
+    def unlink(self):
+        """When a khasra line is deleted from the objection, mark the linked survey as rejected"""
+        for record in self:
+            if record.survey_id:
+                # Mark linked survey as rejected
+                record.survey_id.write({'state': 'rejected'})
+                # Add a message to the survey's chatter
+                record.survey_id.message_post(
+                    body=_("Survey marked as REJECTED because it was deleted from Section 15 Objection: %s") % record.objection_id.name
+                )
+        return super().unlink()
     
     @api.model
     def default_get(self, fields_list):

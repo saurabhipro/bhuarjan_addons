@@ -29,7 +29,7 @@
                 <field name="name" string="Objection Name"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
-                <field name="survey_id" string="Survey (Khasra)"/>
+                <field name="survey_id" string="Survey (Khasra)" context="{'show_khasra': True}"/>
                 <field name="objection_date" string="Objection Date"/>
                 <field name="age_days" string="Age (Days)"/>
                 <field name="pending_with" string="Pending With" invisible="state == 'approved'"/>
@@ -236,7 +236,7 @@
                 <sheet>
                     <group>
                         <field name="objection_id" invisible="1"/>
-                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
+                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" context="{'show_khasra': True}"/>
                         <field name="khasra_number" readonly="1"/>
                         <field name="original_acquired_area" readonly="1" widget="float"/>
                         <field name="resolved_acquired_area" widget="float"/>

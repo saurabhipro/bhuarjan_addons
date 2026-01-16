@@ -371,18 +371,21 @@ class Survey(models.Model):
     # Remarks
     remarks = fields.Text(string='Remarks / टिप्पणी', tracking=True)
     
-    def name_get(self):
-        """Override name_get to show khasra number prominently when called from Section 15 objections"""
-        result = []
+    @api.depends('name', 'khasra_number')
+    def _compute_display_name(self):
+        """Show khasra number prominently when called from Section 15 objections or when context requires it"""
         show_khasra = self.env.context.get('show_khasra', False)
-        
         for record in self:
             if show_khasra and record.khasra_number:
-                # Show only khasra number
-                name = record.khasra_number
+                record.display_name = record.khasra_number
             else:
-                name = record.name or 'New'
-            result.append((record.id, name))
+                record.display_name = record.name or 'New'
+
+    def name_get(self):
+        """Backward compatibility for older Odoo calls"""
+        result = []
+        for record in self:
+            result.append((record.id, record.display_name))
         return result
     
     @api.model

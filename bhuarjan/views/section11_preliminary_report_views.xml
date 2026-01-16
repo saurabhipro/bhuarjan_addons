@@ -127,7 +127,7 @@
                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                 invisible="not sdm_signed_file and not collector_signed_file"
                                 style="margin: 5px 0;"/>
-                        
+
                         <!-- Download SDM Signed Section 11 -->
                         <button name="action_download_sdm_signed_file" 
                                 type="object" 

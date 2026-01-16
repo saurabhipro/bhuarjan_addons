@@ -42,16 +42,12 @@
                     
                     <!-- Kramank Field - First and Editable -->
                     <group>
-                        <field name="kramank" placeholder="Enter क्रमांक (Reference Number)"/>
-                    </group>
-                    
-                    <!-- Notice Date - Editable -->
-                    <group>
-                        <field name="notice_date"/>
+                        <field name="kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक" placeholder="Enter क्रमांक (Reference Number)"/>
                     </group>
                     
                     <!-- Hidden Fields -->
                     <group invisible="1">
+                        <field name="notice_date"/>
                         <field name="project_id" required="1" readonly="1"
                                options="{'no_create': True, 'no_open': True}"/>
                         <field name="village_id" required="1" readonly="1"
@@ -69,7 +65,7 @@
                         <button name="action_generate_both_notices" type="object" 
                                 class="btn-primary" 
                                 icon="fa-download"
-                                string="Section 21"
+                                string="Section 21 Proposal"
                                 title="Download Both Public and Personal Section 21 Notices in one PDF"
                                 style="margin: 5px 0;"/>
                         
@@ -93,11 +89,11 @@
                             SDM Signed
                         </button>
                         
-                        <!-- Mark as Signed Button -->
-                        <button name="action_mark_signed" string="Mark as Signed" type="object" 
-                                class="btn-success" icon="fa-check"
+                        <!-- Submit to Collector Button -->
+                        <button name="action_mark_signed" string="Submit to Collector" type="object" 
+                                class="btn-success" icon="fa-paper-plane"
                                 invisible="not sdm_signed_file or state == 'signed'"
-                                title="Mark notification as signed after uploading SDM file"
+                                title="Submit notification to collector after uploading SDM file"
                                 style="margin: 5px 0;"/>
                     </group>
                     
@@ -105,7 +101,7 @@
                     <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                         <!-- Download Section 21 Button -->
                         <button name="action_generate_both_notices" 
-                                string="Section 21" type="object" 
+                                string="Section 21 Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 title="Download Both Public and Personal Section 21 Notices in one PDF"
                                 style="margin: 5px 0;"/>

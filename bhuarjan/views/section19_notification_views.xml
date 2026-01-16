@@ -30,20 +30,16 @@
                 <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
-                <div class="row w-100">
-                        <div class="col w-100">
-                            <!-- Action Buttons: Approve, Send Back -->
-                            <button name="action_approve" string="Approve" type="object" class="btn-primary" icon="fa-check" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted' or not collector_signed_file"/>
-                            <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" icon="fa-arrow-left" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted'"/>
-                            
-                            <!-- Resubmit button (for sent back records) -->
-                            <button name="action_draft" string="Resubmit" type="object" class="btn-primary" icon="fa-refresh" groups="bhuarjan.group_bhuarjan_sdm" invisible="state != 'send_back'"/>
+                <header>
+                    <!-- Action Buttons: Approve, Send Back -->
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" icon="fa-check" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted' or not collector_signed_file"/>
+                    <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" icon="fa-arrow-left" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" invisible="state != 'submitted'"/>
                     
-                        </div>
-                        <div class="col w-100"  style="text-align:right; width:100%">
-                            <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
-                        </div>
-                    </div>
+                    <!-- Resubmit button (for sent back records) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" icon="fa-refresh" groups="bhuarjan.group_bhuarjan_sdm" invisible="state != 'send_back'"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
+                </header>
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
@@ -56,7 +52,7 @@
                     
                     <!-- Prakaran Kramank Field - First and Editable -->
                     <group>
-                        <field name="prakaran_kramank" string="Prakaran Kramank / प्रकरण क्रमांक"
+                        <field name="prakaran_kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक"
                                readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
                     </group>
                     
@@ -74,7 +70,7 @@
                     <!-- Section 19 Documents -->
                     <group string="Section 19 Documents / धारा 19 दस्तावेज़" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="is_collector">
                         <!-- Download Section 19 Button -->
-                        <button name="action_download_unsigned_file" string="Section 19" type="object" 
+                        <button name="action_download_unsigned_file" string="Section 19 Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 title="Download Section 19 Notification (Unsigned)"
                                 style="margin: 5px 0;"/>
@@ -112,7 +108,7 @@
                     <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                         <!-- Download Latest PDF -->
                         <button name="action_download_latest_pdf" 
-                                string="Section 19" type="object" 
+                                string="Section 19 Proposal" type="object" 
                                 class="btn-primary" icon="fa-download"
                                 title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                 invisible="not sdm_signed_file and not collector_signed_file"

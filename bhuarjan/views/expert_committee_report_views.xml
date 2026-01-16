@@ -41,39 +41,29 @@
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
             <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
-                    <div class="row w-100">
-                        <div class="col w-100">
-                                <button name="action_submit" string="Submit to Collector" type="object" class="btn-primary" 
-                                                icon="fa-paper-plane"
-                                                groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                                invisible="not sdm_signed_file or state != 'draft'"
-                                                confirm="Are you sure want to submit this record."
-                                                style="width: 100%; margin-top: 10px;"/>
-                                <!-- Approve Button (Collector only) -->
-                            <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                                    icon="fa-check"
-                                    groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                    invisible="state != 'submitted' or not collector_signed_file"
-                                    confirm="Are you sure want to approve this record."/>
-                            
-                            <!-- Send Back Button (Collector only) -->
-                            <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
-                                    icon="fa-arrow-left"
-                                    groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                    invisible="state != 'submitted'"
-                                    confirm="Are you sure want to send back this record."/>
+                <header>
+                    <!-- Approve Button (Collector only) -->
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
+                            icon="fa-check"
+                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'submitted' or not collector_signed_file"
+                            confirm="Are you sure want to approve this record."/>
+                    
+                    <!-- Send Back Button (Collector only) -->
+                    <button name="action_send_back" string="Send Back" type="object" class="btn-secondary" 
+                            icon="fa-arrow-left"
+                            groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'submitted'"
+                            confirm="Are you sure want to send back this record."/>
 
-                            <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
-                            <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
-                                    icon="fa-refresh"
-                                    groups="bhuarjan.group_bhuarjan_sdm"
-                                    invisible="state != 'send_back'"/>
-                        </div>
-                        <div class="col text-right" style="text-align:right; width:100% ">
-                            <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}" 
-                            confirm="Are you sure want to submit this record." class="oe_right"/>
-                        </div>
-                    </div>
+                    <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
+                    <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
+                            icon="fa-refresh"
+                            groups="bhuarjan.group_bhuarjan_sdm"
+                            invisible="state != 'send_back'"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
+                </header>
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>
@@ -244,14 +234,14 @@
                             
                             <!-- Collector Section -->
                             <group string="Collector Section / कलेक्टर अनुभाग" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
-                                <!-- Download Latest PDF -->
+                                <!-- Download Latest PDF (Expert Committee Proposal) -->
                                                 <button name="action_download_latest_pdf" 
                                                         string="Expert Committee Proposal" type="object" 
                                         class="btn-primary" icon="fa-download"
                                                         title="Download Latest PDF (Collector's if available, otherwise SDM's, otherwise unsigned)"
                                                         invisible="not sdm_signed_file and not collector_signed_file"
                                         style="margin: 5px 0;"/>
-                                
+
                                                 <!-- Download SDM Signed Expert Committee Report -->
                                                 <button name="action_download_sdm_signed_file" 
                                                         type="object" 
@@ -303,6 +293,14 @@
                                         invisible="not expert_group_report_file"
                                         style="margin: 5px 0;"/>
                             </group>
+
+                            <!-- Submit to Collector Button (Moved to Bottom) -->
+                            <button name="action_submit" string="Submit to Collector" type="object" 
+                                    class="btn-primary" icon="fa-paper-plane"
+                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                    invisible="not sdm_signed_file or state != 'draft'"
+                                    confirm="Are you sure want to submit this to Collector?"
+                                    style="margin: 20px 0; width: 100%; font-weight: bold; background-color: #8B4513; border-color: #8B4513; color: white; padding: 12px; font-size: 16px;"/>
                         </page>
                     </notebook>
                 </sheet>

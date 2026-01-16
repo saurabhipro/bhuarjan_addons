@@ -256,7 +256,7 @@
                                             <t t-foreach="report.resettlement_expert_line_ids" t-as="member">
                                                 <p style="margin: 1px 0; line-height: 1.3; text-align: left;">
                                                     <span t-esc="member_index + 1"/>. 
-                                                    श्री <span t-esc="member.name or ''"/>
+                                                    <span t-esc="member.name or ''"/>
                                                     <t t-if="member.post">, <span t-esc="member.post"/></t>
                                                     <t t-if="member.address">, <span t-esc="member.address"/></t>
                                                 </p>
@@ -278,7 +278,7 @@
                                             <t t-foreach="report.technical_expert_line_ids" t-as="member">
                                                 <p style="margin: 1px 0; line-height: 1.3; text-align: left;">
                                                     <span t-esc="member_index + 1"/>. 
-                                                    श्री <span t-esc="member.name or ''"/>
+                                                    <span t-esc="member.name or ''"/>
                                                     <t t-if="member.post">, <span t-esc="member.post"/></t>
                                                     <t t-if="member.address">, <span t-esc="member.address"/></t>
                                                 </p>

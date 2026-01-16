@@ -11,11 +11,11 @@ class Section21Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
     _sql_constraints = [
-        (
-            'unique_section21_per_project_village',
-            'unique(project_id, village_id)',
-            'A Section 21 notification already exists for this project and village. Only one is allowed.'
-        ),
+        # (
+        #     'unique_section21_per_project_village',
+        #     'unique(project_id, village_id)',
+        #     'A Section 21 notification already exists for this project and village. Only one is allowed.'
+        # ),
     ]
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)

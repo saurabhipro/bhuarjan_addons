@@ -36,7 +36,7 @@ class Section15Objection(models.Model):
                                              'objection_id', 'landowner_id',
                                              string='Original Landowners / मूल भूमिस्वामी', 
                                              compute='_compute_original_landowner_ids', 
-                                             store=False, readonly=True)
+                                             store=True, readonly=True)
     
     # Resolution changes per khasra (One2many to track area decreases per survey)
     resolution_khasra_ids = fields.One2many('bhu.section15.objection.khasra', 'objection_id',
@@ -66,37 +66,14 @@ class Section15Objection(models.Model):
         for record in self:
             if record.survey_id:
                 # Get all landowners from selected survey
-                all_landowners = record.survey_id.landowner_ids
-                record.original_landowner_ids = all_landowners
-                # Initialize resolution_landowner_ids with original if not set
-                if not record.resolution_landowner_ids and all_landowners:
-                    record.resolution_landowner_ids = all_landowners
+                record.original_landowner_ids = record.survey_id.landowner_ids
             else:
                 record.original_landowner_ids = False
-                record.resolution_landowner_ids = False
-    
-    
-    objection_type = fields.Selection([
-        ('area_decrease', 'Area Decrease / क्षेत्रफल कमी'),
-        ('remove_landowners', 'Remove Landowners / भूमिस्वामी हटाना'),
-    ], string='Objection Type / आपत्ति प्रकार', required=False, tracking=True)
     
     objection_date = fields.Date(string='Objection Date / आपत्ति दिनांक', required=True, tracking=True, default=fields.Date.today)
-    objection_details = fields.Text(string='Objection Details / आपत्ति विवरण', required=False, tracking=True)
-    
-    # Single attachment file
-    objection_document = fields.Binary(string='Objection Document / आपत्ति दस्तावेज़')
-    objection_document_filename = fields.Char(string='Objection Document Filename / आपत्ति दस्तावेज़ फ़ाइल नाम')
-    
-    # Resolution document
-    resolution_document = fields.Binary(string='Resolution Document / समाधान दस्तावेज़')
-    resolution_document_filename = fields.Char(string='Resolution Document Filename / समाधान दस्तावेज़ फ़ाइल नाम')
     
     # Extend workflow state with "rejected" without overriding the base workflow selection
     state = fields.Selection(selection_add=[('rejected', 'Rejected')], tracking=True)
-    
-    resolution_details = fields.Text(string='Resolution Details / समाधान विवरण', required=False, tracking=True)
-    resolved_date = fields.Date(string='Resolved Date / समाधान दिनांक', tracking=True)
     
     # Age in days since objection date
     age_days = fields.Integer(string='Age (Days) / आयु (दिन)', compute='_compute_age_days', store=False)
@@ -190,14 +167,13 @@ class Section15Objection(models.Model):
                     vals['name'] = f'OBJ-{sequence}'
         records = super().create(vals_list)
         
-        # Initialize resolution khasra if survey_id is set and objection type is area_decrease
-        # Also link this objection to the survey
+        # Link this objection to the survey
         for record in records:
             if record.survey_id:
                 # Link objection to survey (Many2many)
                 record.survey_id.section15_objection_ids = [(4, record.id)]
                 
-                if record.objection_type == 'area_decrease' and not record.resolution_khasra_ids:
+                if not record.resolution_khasra_ids:
                     record.resolution_khasra_ids = [(0, 0, {
                         'survey_id': record.survey_id.id,
                         'original_acquired_area': record.survey_id.acquired_area,
@@ -212,29 +188,42 @@ class Section15Objection(models.Model):
     def _validate_objection_changes(self):
         """Validate that actual changes were made before saving objection"""
         for record in self:
+            # Skip validation if we don't have a survey selected yet
             if not record.survey_id:
                 continue
             
-            # Check if landowners changed
+            # Check if landowners changed - compare IDs directly
+            # Use record._origin if available to get the truly original state if needed,
+            # but for many2many, comparing resolution vs original should work.
             landowners_changed = False
-            if record.resolution_landowner_ids and record.original_landowner_ids:
-                landowners_changed = set(record.resolution_landowner_ids.ids) != set(record.original_landowner_ids.ids)
+            
+            # Get current resolution IDs and original IDs
+            # many2many fields always return a recordset, so .ids is safe
+            res_ids = set(record.resolution_landowner_ids.ids)
+            orig_ids = set(record.original_landowner_ids.ids)
+            
+            if res_ids != orig_ids:
+                landowners_changed = True
             
             # Check if area changed
             area_changed = False
             if record.resolution_khasra_ids:
                 for khasra in record.resolution_khasra_ids:
-                    if khasra.resolved_acquired_area and khasra.original_acquired_area:
-                        if khasra.resolved_acquired_area != khasra.original_acquired_area:
-                            area_changed = True
-                            break
+                    # Use a small epsilon for float comparison if necessary, but here we expect exact matches for "no change"
+                    if khasra.resolved_acquired_area != khasra.original_acquired_area:
+                        area_changed = True
+                        break
             
             # If neither changed, raise error
             if not landowners_changed and not area_changed:
+                res_count = len(record.resolution_landowner_ids)
+                orig_count = len(record.original_landowner_ids)
                 raise ValidationError(_(
-                    'No changes detected! Cannot save objection without any changes to landowners or khasra area.\n\n'
-                    'कोई परिवर्तन नहीं मिला! भूमिस्वामी या खसरा क्षेत्रफल में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।'
-                ))
+                    "No changes detected! Cannot save objection without any changes to landowners or khasra area.\n"
+                    "(Current Landowners: %d, Original Landowners: %d)\n\n"
+                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी या खसरा क्षेत्रफल में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।\n"
+                    "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
+                ) % (res_count, orig_count, res_count, orig_count))
     
     def write(self, vals):
         """Override write to update survey when objection is saved"""
@@ -255,10 +244,10 @@ class Section15Objection(models.Model):
                         'landowner_ids': [(6, 0, record.resolution_landowner_ids.ids)]
                     })
         
-        # If survey_id or objection_type changed, update resolution_khasra_ids
-        if 'survey_id' in vals or 'objection_type' in vals:
+        # If survey_id changed, update resolution_khasra_ids
+        if 'survey_id' in vals:
             for record in self:
-                if record.objection_type == 'area_decrease' and record.survey_id:
+                if record.survey_id:
                     # Ensure resolution_khasra_ids exists and has survey_id
                     if record.resolution_khasra_ids:
                         for khasra in record.resolution_khasra_ids:
@@ -276,9 +265,6 @@ class Section15Objection(models.Model):
                             'original_acquired_area': record.survey_id.acquired_area,
                             'resolved_acquired_area': record.survey_id.acquired_area,
                         })]
-                elif record.objection_type == 'remove_landowners':
-                    # Clear resolution_khasra_ids for remove_landowners type
-                    record.resolution_khasra_ids = [(5, 0, 0)]
         
         return result
 
@@ -377,8 +363,6 @@ class Section15Objection(models.Model):
         if self.state != 'draft':
             raise ValidationError(_('Only draft records can be approved.'))
         
-        # Set resolved date
-        self.resolved_date = fields.Date.today()
         self.state = 'approved'
         self.message_post(body=_('Approved by %s') % self.env.user.name)
     
@@ -408,8 +392,6 @@ class Section15Objection(models.Model):
                     self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
                 raise ValidationError(_('Only SDM can approve.'))
             # Resolution details is optional, no validation needed
-            # Set resolved date
-            self.resolved_date = fields.Date.today()
             self.state = 'approved'
             self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
         elif self.state == 'approved':
@@ -457,18 +439,6 @@ class Section15Objection(models.Model):
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
             raise ValidationError(_('Only SDM can reject.'))
-    
-    def action_download_unsigned_file(self):
-        """Download objection document if available"""
-        self.ensure_one()
-        if not self.objection_document:
-            raise ValidationError(_('No objection document available to download.'))
-        filename = self.objection_document_filename or f'objection_{self.name}.pdf'
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{self._name}/{self.id}/objection_document/{filename}?download=true',
-            'target': 'self',
-        }
     
     def get_resolution_changes_summary(self):
         """Get summary of resolution changes for report"""

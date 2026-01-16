@@ -76,7 +76,7 @@
                     </group>
                     <group>
                         <group>
-                            <field name="name" readonly="1"/>
+                            <field name="name" readonly="1" invisible="1"/>
                             <field name="project_id" required="1" invisible="1"
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"/>
                             <field name="village_id" required="1" domain="village_domain" options="{'no_create': True, 'no_open': True}" invisible="1"
@@ -108,40 +108,45 @@
                             <span style="font-size: 12px; color: #856404; margin-top: 4px; display: inline-block;">नोट: भूमिस्वामी या क्षेत्रफल बदलने से स्वचालित रूप से आपत्ति बन जाएगी।</span>
                         </div>
                         
-                        <group string="Landowner Details / भूमिस्वामी विव���ण">
+                        <style>
+                            /* Both table headers - Brown with White Text */
+                            .o_field_widget[name="resolution_landowner_ids"] .o_list_view thead th,
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th {
+                                background: linear-gradient(to bottom, #8B4513, #A0522D) !important;
+                                color: white !important;
+                                font-weight: bold !important;
+                                border: 1px solid #7a3d0f !important;
+                            }
+                            /* Ensure text in headers is white */
+                            .o_field_widget[name="resolution_landowner_ids"] .o_list_view thead th *,
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view thead th * {
+                                color: white !important;
+                            }
+                            
+                            .o_field_widget[name="resolution_landowner_ids"] .o_list_view tbody tr:hover,
+                            .o_field_widget[name="resolution_khasra_ids"] .o_list_view tbody tr:hover {
+                                background-color: #f5e0d5 !important;
+                            }
+                        </style>
+                        
+                        <group string="भूमिस्वामी विवरण">
                             <field name="resolution_landowner_ids"
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    widget="many2many"
+                                   mode="tree,form"
                                    nolabel="1"
-                                   context="{'default_village_id': village_id.id if village_id else False}"
-                                   options="{'no_create': False, 'create_edit': True}">
-                                <list string="Landowners" editable="bottom">
-                                    <field name="name" string="Name / नाम" required="1"/>
-                                    <field name="father_name" string="Father's Name / पिता का नाम"/>
-                                    <field name="spouse_name" string="Spouse's Name / पति/पत्नी का नाम"/>
-                                    <field name="village_id" string="Village / ग्राम"/>
-                                    <field name="aadhar_number" string="Aadhar / आधार"/>
-                                </list>
-                            </field>
+                                   options="{'create_text': 'Add Landowner', 'no_quick_create': False}"
+                                   context="{'default_village_id': village_id.id if village_id else False, 'form_view_ref': 'bhuarjan.view_landowner_form', 'list_view_ref': 'bhuarjan.view_section15_landowner_tree', 'show_khasra': True}"/>
                         </group>
                         
                         <group string="Khasra Area / खसरा क्षेत्रफल">
                             <field name="resolution_khasra_ids" 
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    nolabel="1"
-                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False}"
-                                   options="{'no_create': True}">
-                                <list string="Khasra Area Details" decoration-info="resolved_acquired_area &lt; original_acquired_area" editable="bottom">
-                                    <field name="objection_id" column_invisible="1"/>
-                                    <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1"/>
-                                    <field name="khasra_number" readonly="1" string="Khasra / खसरा"/>
-                                    <field name="original_acquired_area" readonly="1" widget="float" string="Original Area / मूल क्षेत्रफल"/>
-                                    <field name="resolved_acquired_area" widget="float" string="New Area / नया क्षेत्रफल"/>
-                                </list>
-                            </field>
+                                   options="{'no_create': True}"
+                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'list_view_ref': 'bhuarjan.view_section15_objection_khasra_tree', 'show_khasra': True}"/>
                         </group>
                     </div>
-                    
                     
                     <!-- Download Section 15 PDF Button -->
                     <group string="Download Section 15 Documents" 
@@ -179,6 +184,37 @@
                     <filter string="Status" name="group_status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+
+    <!-- Section 15 Objection Khasra List View -->
+    <record id="view_section15_objection_khasra_tree" model="ir.ui.view">
+        <field name="name">bhu.section15.objection.khasra.list</field>
+        <field name="model">bhu.section15.objection.khasra</field>
+        <field name="arch" type="xml">
+            <list string="Khasra Area Details" decoration-info="resolved_acquired_area &lt; original_acquired_area" editable="bottom" create="0">
+                <field name="objection_id" column_invisible="1"/>
+                <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" context="{'show_khasra': True}" string="Survey"/>
+                <field name="khasra_number" readonly="1" string="Khasra"/>
+                <field name="original_acquired_area" readonly="1" widget="float" string="Original Area"/>
+                <field name="resolved_acquired_area" widget="float" string="New Area"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Section 15 Landowner List View (English Headers, No Aadhar/PAN) -->
+    <record id="view_section15_landowner_tree" model="ir.ui.view">
+        <field name="name">bhu.section15.landowner.list</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <list string="Landowners">
+                <field name="name" string="Full Name"/>
+                <field name="company_id" string="Company"/>
+                <field name="father_name" string="Father's Name"/>
+                <field name="village_id" string="Village"/>
+                <field name="tehsil_id" string="Tehsil"/>
+                <field name="district_id" string="District"/>
+            </list>
         </field>
     </record>
 

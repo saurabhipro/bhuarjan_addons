@@ -6,7 +6,7 @@
     'description':'To digitize and streamline the end-to-end workflow for land acquisition under RFCTLARR Act, 2013, from Form-10 initiation to Section 19 declaration, ensuring transparency, traceability, and accountability at each level.',
     'category':'Bhumuarjan',
     'website': 'bhuarjan.com',
-    'depends':['website','mail','widget_owl','image_capture_upload_widget', 'hr_org_chart'],
+    'depends':['website','mail','widget_owl','image_capture_upload_widget', 'hr_org_chart', 'timepicker'],
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',

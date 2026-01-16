@@ -63,8 +63,8 @@ class Section4Notification(models.Model):
     # Public Hearing Details
     public_hearing_datetime = fields.Datetime(string='Public Hearing Date & Time / जन सुनवाई दिनांक और समय', tracking=True)
     public_hearing_date = fields.Date(string='Public Hearing Date / सार्वजनिक सुनवाई दिनांक', tracking=True, required=True)
-    public_hearing_time = fields.Float(string='Public Hearing Time / सार्वजनिक सुनवाई समय', tracking=True, required=True, default=False,
-                                       help='Time in HH:MM format (e.g., 10:00 for 10:00 AM, 14:30 for 2:30 PM)')
+    public_hearing_time = fields.Char(string='Public Hearing Time / सार्वजनिक सुनवाई समय', tracking=True, required=True,
+                                       help='Time in HH:MM:SS format')
     public_hearing_place = fields.Char(string='Public Hearing Place / जन सुनवाई स्थान', tracking=True, required=True)
     
     # 11 Questions from the template
@@ -189,16 +189,22 @@ class Section4Notification(models.Model):
     @api.onchange('public_hearing_date', 'public_hearing_time')
     def _onchange_hearing_date_time(self):
         """Sync separate date and time fields to datetime field"""
-        if self.public_hearing_date:
+        if self.public_hearing_date and self.public_hearing_time:
             from datetime import datetime, timedelta
-            # Convert float time to hours and minutes
-            hours = int(self.public_hearing_time or 0)
-            minutes = int((self.public_hearing_time - hours) * 60)
-            # Combine date and time
-            self.public_hearing_datetime = datetime.combine(
-                self.public_hearing_date,
-                datetime.min.time()
-            ) + timedelta(hours=hours, minutes=minutes)
+            try:
+                # Expecting HH:MM:SS or HH:MM
+                time_parts = self.public_hearing_time.split(':')
+                hours = int(time_parts[0]) if len(time_parts) > 0 else 0
+                minutes = int(time_parts[1]) if len(time_parts) > 1 else 0
+                seconds = int(time_parts[2]) if len(time_parts) > 2 else 0
+                
+                # Combine date and time
+                self.public_hearing_datetime = datetime.combine(
+                    self.public_hearing_date,
+                    datetime.min.time()
+                ) + timedelta(hours=hours, minutes=minutes, seconds=seconds)
+            except (ValueError, IndexError):
+                self.public_hearing_datetime = False
         else:
             self.public_hearing_datetime = False
     
@@ -269,6 +275,10 @@ class Section4Notification(models.Model):
         new_vals_list = []
         
         for vals in vals_list:
+            # Clear default zero time to show placeholder
+            if vals.get('public_hearing_time') in ('00:00', '0:00', '0:00:00', '00:00:00', '0.0', '0'):
+                vals['public_hearing_time'] = False
+                
             project_id = vals.get('project_id')
             village_id = vals.get('village_id')
             
@@ -344,6 +354,10 @@ class Section4Notification(models.Model):
     
     def write(self, vals):
         """Override write method"""
+        # Clear default zero time to show placeholder
+        if vals.get('public_hearing_time') in ('00:00', '0:00', '0:00:00', '00:00:00', '0.0', '0'):
+            vals['public_hearing_time'] = False
+            
         result = super().write(vals)
         # requiring_body_id is now automatically populated via related field from project
         return result

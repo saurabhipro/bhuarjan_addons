@@ -96,16 +96,14 @@
                     </group>
                     
                     <!-- Inline Survey Edit Section -->
-                    <div invisible="not survey_id" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #8B4513;">
-                        <h3 style="margin: 0 0 15px 0; color: #8B4513; font-size: 18px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 10px;">
-                            <i class="fa fa-edit" style="margin-right: 8px;"></i>
-                            Edit Survey Details / सर्वे विवरण संपादित करें
-                        </h3>
-                        <div style="margin-bottom: 15px; padding: 12px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-                            <i class="fa fa-exclamation-triangle" style="color: #856404; margin-right: 8px;"/>
-                            <span style="font-weight: 600; color: #856404;">Note: Changing landowners or area will create an objection automatically.</span>
+                    <div invisible="not survey_id">
+                        <separator string="Edit Survey Details / सर्वे विवरण संपादित करें"/>
+                        
+                        <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
+                            <i class="fa fa-exclamation-triangle" style="margin-right: 8px;"/>
+                            <strong>Note:</strong> Changing landowners or area will create an objection automatically.
                             <br/>
-                            <span style="font-size: 12px; color: #856404; margin-top: 4px; display: inline-block;">नोट: भूमिस्वामी या क्षेत्रफल बदलने से स्वचालित रूप से आपत्ति बन जाएगी।</span>
+                            <span style="font-size: 12px; margin-top: 4px; display: inline-block;">नोट: भूमिस्वामी या क्षेत्रफल बदलने से स्वचालित रूप से आपत्ति बन जाएगी।</span>
                         </div>
                         
                         <style>

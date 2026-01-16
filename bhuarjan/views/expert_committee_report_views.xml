@@ -192,7 +192,7 @@
                                 </field>
                             </group>
                         </page>
-                        <page string="Expert Report / विशेषज्ञ रिपोर्ट">
+                        <page string="Expert Report Download / Upload">
                             <style>
                                 @media (max-width: 768px) {
                                     .responsive-expert-group {

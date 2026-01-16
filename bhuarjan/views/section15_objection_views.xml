@@ -62,7 +62,7 @@
                     <button name="action_reject" string="Reject" type="object" class="btn-danger" 
                             icon="fa-times"
                             groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="state != 'draft'"/>
+                            invisible="1"/>
                     <button name="action_open_reject_wizard" string="Reject Survey" type="object" class="btn-danger" 
                             icon="fa-times-circle"
                             groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
@@ -136,6 +136,7 @@
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    widget="many2many"
                                    mode="tree,form"
+                                   domain="[('village_id', '=', village_id)]"
                                    nolabel="1"
                                    options="{'create_text': 'Add Landowner', 'no_quick_create': False}"
                                    context="{'default_village_id': village_id.id if village_id else False, 'form_view_ref': 'bhuarjan.view_landowner_form', 'list_view_ref': 'bhuarjan.view_section15_landowner_tree', 'show_khasra': True}"/>

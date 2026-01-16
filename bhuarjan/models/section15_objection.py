@@ -44,6 +44,11 @@ class Section15Objection(models.Model):
                                             tracking=True,
                                             help='Track area decreases per khasra')
     
+    # Other details changes (One2many to track changes to wells, houses, etc.)
+    resolution_survey_detail_ids = fields.One2many('bhu.section15.objection.survey_detail', 'objection_id',
+                                                  string='Other Survey Details / अन्य सर्वे विवरण',
+                                                  tracking=True)
+    
     @api.depends('village_id')
     def _compute_available_survey_ids(self):
         """Compute available survey IDs based on village - show all khasras from that village"""
@@ -214,14 +219,33 @@ class Section15Objection(models.Model):
                         area_changed = True
                         break
             
-            # If neither changed, raise error
-            if not landowners_changed and not area_changed:
+            # Check if other details changed
+            details_changed = False
+            if record.resolution_survey_detail_ids:
+                for detail in record.resolution_survey_detail_ids:
+                    survey = detail.survey_id
+                    if (detail.has_well != survey.has_well or 
+                        detail.well_type != survey.well_type or 
+                        detail.well_count != survey.well_count or
+                        detail.has_tubewell != survey.has_tubewell or
+                        detail.tubewell_count != survey.tubewell_count or
+                        detail.has_house != survey.has_house or
+                        detail.house_type != survey.house_type or
+                        detail.house_area != survey.house_area or
+                        detail.has_shed != survey.has_shed or
+                        detail.shed_area != survey.shed_area or
+                        detail.has_pond != survey.has_pond):
+                        details_changed = True
+                        break
+            
+            # If nothing changed, raise error
+            if not landowners_changed and not area_changed and not details_changed:
                 res_count = len(record.resolution_landowner_ids)
                 orig_count = len(record.original_landowner_ids)
                 raise ValidationError(_(
-                    "No changes detected! Cannot save objection without any changes to landowners or khasra area.\n"
+                    "No changes detected! Cannot save objection without any changes to landowners, khasra area, or other survey details.\n"
                     "(Current Landowners: %d, Original Landowners: %d)\n\n"
-                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी या खसरा क्षेत्रफल में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।\n"
+                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या अन्य सर्वे विवरण में कोई परिवर्तन किए बिना आपत्ति सहेजी नहीं जा सकती।\n"
                     "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
                 ) % (res_count, orig_count, res_count, orig_count))
     
@@ -244,11 +268,11 @@ class Section15Objection(models.Model):
                         'landowner_ids': [(6, 0, record.resolution_landowner_ids.ids)]
                     })
         
-        # If survey_id changed, update resolution_khasra_ids
+        # If survey_id changed, update resolution_khasra_ids and resolution_survey_detail_ids
         if 'survey_id' in vals:
             for record in self:
                 if record.survey_id:
-                    # Ensure resolution_khasra_ids exists and has survey_id
+                    # Update khasra resolution
                     if record.resolution_khasra_ids:
                         for khasra in record.resolution_khasra_ids:
                             if not khasra.survey_id:
@@ -259,12 +283,47 @@ class Section15Objection(models.Model):
                                 if khasra.resolved_acquired_area > record.survey_id.acquired_area:
                                     khasra.write({'resolved_acquired_area': record.survey_id.acquired_area})
                     elif record.survey_id:
-                        # Create if doesn't exist
                         record.resolution_khasra_ids = [(0, 0, {
                             'survey_id': record.survey_id.id,
                             'original_acquired_area': record.survey_id.acquired_area,
                             'resolved_acquired_area': record.survey_id.acquired_area,
                         })]
+                    
+                    # Update survey details resolution
+                    if not record.resolution_survey_detail_ids:
+                        record.resolution_survey_detail_ids = [(0, 0, {
+                            'survey_id': record.survey_id.id,
+                            'has_well': record.survey_id.has_well,
+                            'well_type': record.survey_id.well_type,
+                            'well_count': record.survey_id.well_count,
+                            'has_tubewell': record.survey_id.has_tubewell,
+                            'tubewell_count': record.survey_id.tubewell_count,
+                            'has_house': record.survey_id.has_house,
+                            'house_type': record.survey_id.house_type,
+                            'house_area': record.survey_id.house_area,
+                            'has_shed': record.survey_id.has_shed,
+                            'shed_area': record.survey_id.shed_area,
+                            'has_pond': record.survey_id.has_pond,
+                        })]
+        
+        # Update survey when survey details change
+        if 'resolution_survey_detail_ids' in vals:
+            for record in self:
+                for detail in record.resolution_survey_detail_ids:
+                    if detail.survey_id:
+                        detail.survey_id.write({
+                            'has_well': detail.has_well,
+                            'well_type': detail.well_type,
+                            'well_count': detail.well_count,
+                            'has_tubewell': detail.has_tubewell,
+                            'tubewell_count': detail.tubewell_count,
+                            'has_house': detail.has_house,
+                            'house_type': detail.house_type,
+                            'house_area': detail.house_area,
+                            'has_shed': detail.has_shed,
+                            'shed_area': detail.shed_area,
+                            'has_pond': detail.has_pond,
+                        })
         
         return result
 
@@ -296,6 +355,7 @@ class Section15Objection(models.Model):
         if not self.survey_id:
             self.resolution_landowner_ids = False
             self.resolution_khasra_ids = [(5, 0, 0)]
+            self.resolution_survey_detail_ids = [(5, 0, 0)]
             return
         
         # Compute original landowners
@@ -328,6 +388,24 @@ class Section15Objection(models.Model):
                     'survey_id': self.survey_id.id,
                     'original_acquired_area': self.survey_id.acquired_area,
                     'resolved_acquired_area': self.survey_id.acquired_area,
+                })]
+        
+        # Initialize or update other survey details record
+        if not self.resolution_survey_detail_ids:
+            if self.survey_id.id:
+                self.resolution_survey_detail_ids = [(0, 0, {
+                    'survey_id': self.survey_id.id,
+                    'has_well': self.survey_id.has_well,
+                    'well_type': self.survey_id.well_type,
+                    'well_count': self.survey_id.well_count,
+                    'has_tubewell': self.survey_id.has_tubewell,
+                    'tubewell_count': self.survey_id.tubewell_count,
+                    'has_house': self.survey_id.has_house,
+                    'house_type': self.survey_id.house_type,
+                    'house_area': self.survey_id.house_area,
+                    'has_shed': self.survey_id.has_shed,
+                    'shed_area': self.survey_id.shed_area,
+                    'has_pond': self.survey_id.has_pond,
                 })]
     
     @api.constrains('resolution_landowner_ids')
@@ -494,6 +572,97 @@ class Section15Objection(models.Model):
         return result
 
 
+class Section15ObjectionSurveyDetail(models.Model):
+    """Model to track resolution changes for other survey details"""
+    _name = 'bhu.section15.objection.survey_detail'
+    _description = 'Section 15 Objection Survey Detail'
+    
+    objection_id = fields.Many2one('bhu.section15.objection', string='Objection / आपत्ति', required=True, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey (Khasra) / सर्वे (खसरा)', required=True, ondelete='restrict')
+    
+    has_well = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Well / कुआँ है')
+    well_type = fields.Selection([('kaccha', 'Kaccha / कच्चा'), ('pakka', 'Pakka / पक्का')], string='Well Type / कुएं का प्रकार')
+    well_count = fields.Integer(string='Well Count / कुओं की संख्या')
+    
+    has_tubewell = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Tubewell / ट्यूबवेल है')
+    tubewell_count = fields.Integer(string='Tubewell Count / ट्यूबवेल की संख्या')
+    
+    has_house = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has House / मकान है')
+    house_type = fields.Selection([('kaccha', 'Kaccha / कच्चा'), ('pakka', 'Pakka / पक्का')], string='House Type / मकान का प्रकार')
+    house_area = fields.Float(string='House Area / मकान का क्षेत्रफल')
+    
+    has_shed = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Shed / शेड है')
+    shed_area = fields.Float(string='Shed Area / शेड का क्षेत्रफल')
+    
+    has_pond = fields.Selection([('yes', 'Yes / हाँ'), ('no', 'No / नहीं')], string='Has Pond / तालाब है')
+
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from context"""
+        res = super().default_get(fields_list)
+        
+        # Set objection_id from context if available
+        if 'default_objection_id' in self.env.context:
+            objection_id = self.env.context.get('default_objection_id')
+            if objection_id and 'objection_id' in fields_list:
+                res['objection_id'] = objection_id
+        
+        # Try to get survey_id from context
+        survey_id = self.env.context.get('default_survey_id')
+        
+        # If not in context, try to get from objection_id
+        if not survey_id and 'default_objection_id' in self.env.context:
+            objection_id = self.env.context.get('default_objection_id')
+            if objection_id:
+                objection = self.env['bhu.section15.objection'].browse(objection_id)
+                if objection.exists() and objection.survey_id:
+                    survey_id = objection.survey_id.id
+        
+        if survey_id:
+            survey = self.env['bhu.survey'].browse(survey_id)
+            if survey.exists():
+                if 'survey_id' in fields_list:
+                    res['survey_id'] = survey_id
+                
+                # Sync other details from survey
+                res.update({
+                    'has_well': survey.has_well,
+                    'well_type': survey.well_type,
+                    'well_count': survey.well_count,
+                    'has_tubewell': survey.has_tubewell,
+                    'tubewell_count': survey.tubewell_count,
+                    'has_house': survey.has_house,
+                    'house_type': survey.house_type,
+                    'house_area': survey.house_area,
+                    'has_shed': survey.has_shed,
+                    'shed_area': survey.shed_area,
+                    'has_pond': survey.has_pond,
+                })
+        
+        return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Ensure survey_id is set from objection if not provided"""
+        for vals in vals_list:
+            if not vals.get('survey_id') and vals.get('objection_id'):
+                objection = self.env['bhu.section15.objection'].browse(vals['objection_id'])
+                if objection.exists() and objection.survey_id:
+                    vals['survey_id'] = objection.survey_id.id
+        
+        records = super().create(vals_list)
+        return records
+
+    def write(self, vals):
+        """Ensure survey_id is kept in sync"""
+        if 'objection_id' in vals and not vals.get('survey_id'):
+            objection = self.env['bhu.section15.objection'].browse(vals['objection_id'])
+            if objection.exists() and objection.survey_id:
+                vals['survey_id'] = objection.survey_id.id
+        
+        return super().write(vals)
+
+
 class Section15ObjectionKhasra(models.Model):
     """Model to track resolution changes per khasra (survey)"""
     _name = 'bhu.section15.objection.khasra'
@@ -508,6 +677,18 @@ class Section15ObjectionKhasra(models.Model):
     resolved_acquired_area = fields.Float(string='Resolved Acquired Area (Hectares) / समाधान अर्जन क्षेत्रफल (हेक्टेयर)', 
                                          digits=(10, 4), required=True,
                                          help='Enter the resolved acquired area. Must be less than or equal to original area.')
+    
+    # Other Survey Details for Editing
+    has_well = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Well / कुआं है')
+    well_count = fields.Integer(string='Well Count / कुआं संख्या')
+    has_tubewell = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Tubewell / ट्यूबवेल है')
+    tubewell_count = fields.Integer(string='Tubewell Count / ट्यूबवेल संख्या')
+    has_house = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has House / घर है')
+    house_area = fields.Float(string='House Area / घर का क्षेत्रफल')
+    has_shed = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Shed / शेड है')
+    shed_area = fields.Float(string='Shed Area / शेड का क्षेत्रफल')
+    has_pond = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Pond / तालाब है')
+    irrigation_type = fields.Selection([('irrigated', 'Irrigated / सिंचित'), ('unirrigated', 'Unirrigated / असिंचित')], string='Irrigation Type / सिंचाई का प्रकार')
     
     @api.model
     def default_get(self, fields_list):
@@ -540,6 +721,20 @@ class Section15ObjectionKhasra(models.Model):
                     res['original_acquired_area'] = survey.acquired_area
                 if 'resolved_acquired_area' in fields_list:
                     res['resolved_acquired_area'] = survey.acquired_area
+                
+                # Sync other details from survey
+                res.update({
+                    'has_well': survey.has_well,
+                    'well_count': survey.well_count,
+                    'has_tubewell': survey.has_tubewell,
+                    'tubewell_count': survey.tubewell_count,
+                    'has_house': survey.has_house,
+                    'house_area': survey.house_area,
+                    'has_shed': survey.has_shed,
+                    'shed_area': survey.shed_area,
+                    'has_pond': survey.has_pond,
+                    'irrigation_type': survey.irrigation_type,
+                })
         
         return res
     
@@ -570,11 +765,25 @@ class Section15ObjectionKhasra(models.Model):
                 })
             
             # Update survey's acquired_area when resolved_acquired_area is set
-            if record.survey_id and record.resolved_acquired_area:
-                # Ensure resolved area is valid (not greater than original)
-                if record.original_acquired_area and record.resolved_acquired_area <= record.original_acquired_area:
-                    # Update the survey's acquired_area to match the resolved_acquired_area
-                    record.survey_id.write({'acquired_area': record.resolved_acquired_area})
+            if record.survey_id:
+                survey_vals = {}
+                if record.resolved_acquired_area and record.original_acquired_area and record.resolved_acquired_area <= record.original_acquired_area:
+                    survey_vals['acquired_area'] = record.resolved_acquired_area
+                
+                # Update other survey details
+                survey_vals.update({
+                    'has_well': record.has_well,
+                    'well_count': record.well_count,
+                    'has_tubewell': record.has_tubewell,
+                    'tubewell_count': record.tubewell_count,
+                    'has_house': record.has_house,
+                    'house_area': record.house_area,
+                    'has_shed': record.has_shed,
+                    'shed_area': record.shed_area,
+                    'has_pond': record.has_pond,
+                    'irrigation_type': record.irrigation_type,
+                })
+                record.survey_id.write(survey_vals)
         
         return records
     

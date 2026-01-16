@@ -230,6 +230,24 @@ class Section15Objection(models.Model):
             #         "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
             #     ) % (res_count, orig_count, res_count, orig_count))
     
+    def action_open_reject_wizard(self):
+        """Open the reject survey wizard from the main form"""
+        self.ensure_one()
+        if not self.survey_id:
+            raise ValidationError(_('Please select a survey (khasra) first.'))
+            
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Reject Survey / सर्वे अस्वीकार करें'),
+            'res_model': 'bhu.reject.survey.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_objection_id': self.id,
+                'default_survey_id': self.survey_id.id,
+            }
+        }
+
     def write(self, vals):
         """Override write to update survey when objection is saved"""
         # Validate changes before write (only for resolution fields)

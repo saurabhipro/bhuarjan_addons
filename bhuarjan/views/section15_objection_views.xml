@@ -63,6 +63,10 @@
                             icon="fa-times"
                             groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                             invisible="state != 'draft'"/>
+                    <button name="action_open_reject_wizard" string="Reject Survey" type="object" class="btn-danger" 
+                            icon="fa-times-circle"
+                            groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="state != 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}"/>
                 </header>
                 <sheet>

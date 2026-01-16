@@ -220,15 +220,15 @@ class Section15Objection(models.Model):
             comments_added = bool(record.objection_resolution_comments)
             
             # If nothing changed, raise error
-            if not landowners_changed and not area_changed and not comments_added:
-                res_count = len(record.resolution_landowner_ids)
-                orig_count = len(record.original_landowner_ids)
-                raise ValidationError(_(
-                    "No changes detected! Cannot save objection without any changes to landowners, khasra area, or adding comments.\n"
-                    "(Current Landowners: %d, Original Landowners: %d)\n\n"
-                    "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या कमेंट जोड़े बिना आपत्ति सहेजी नहीं जा सकती।\n"
-                    "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
-                ) % (res_count, orig_count, res_count, orig_count))
+            # if not landowners_changed and not area_changed and not comments_added:
+            #     res_count = len(record.resolution_landowner_ids)
+            #     orig_count = len(record.original_landowner_ids)
+            #     raise ValidationError(_(
+            #         "No changes detected! Cannot save objection without any changes to landowners, khasra area, or adding comments.\n"
+            #         "(Current Landowners: %d, Original Landowners: %d)\n\n"
+            #         "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या कमेंट जोड़े बिना आपत्ति सहेजी नहीं जा सकती।\n"
+            #         "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
+            #     ) % (res_count, orig_count, res_count, orig_count))
     
     def write(self, vals):
         """Override write to update survey when objection is saved"""
@@ -705,4 +705,17 @@ class Section15ObjectionKhasra(models.Model):
                 if record.resolved_acquired_area > record.original_acquired_area:
                     raise ValidationError(_('Resolved acquired area (%.4f hectares) cannot be greater than original area (%.4f hectares) for khasra %s. You can only decrease the area, not increase it.') % 
                                         (record.resolved_acquired_area, record.original_acquired_area, record.khasra_number or record.survey_id.khasra_number or ''))
-
+    def action_open_reject_wizard(self):
+        """Open the reject survey wizard"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Reject Survey / सर्वे अस्वीकार करें'),
+            'res_model': 'bhu.reject.survey.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_objection_id': self.objection_id.id,
+                'default_survey_id': self.survey_id.id,
+            }
+        }

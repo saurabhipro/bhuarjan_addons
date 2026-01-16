@@ -142,7 +142,16 @@
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    nolabel="1"
                                    options="{'no_create': True}"
-                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'list_view_ref': 'bhuarjan.view_section15_objection_khasra_tree', 'show_khasra': True}"/>
+                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'show_khasra': True}">
+                                <list string="Khasra Area Details" decoration-info="resolved_acquired_area &lt; original_acquired_area" editable="bottom" create="0">
+                                    <field name="objection_id" column_invisible="1"/>
+                                    <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" context="{'show_khasra': True}" string="Survey"/>
+                                    <field name="khasra_number" readonly="1" string="Khasra"/>
+                                    <field name="original_acquired_area" readonly="1" widget="float" string="Original Area"/>
+                                    <field name="resolved_acquired_area" widget="float" string="New Area"/>
+                                    <button name="action_open_reject_wizard" type="object" icon="fa-times-circle" class="btn-danger" title="Reject Survey / सर्वे अस्वीकार करें" confirm="This will create and save the objection. Do you want to proceed? / यह आपत्ति बनाएगा और सहेजेगा। क्या आप आगे बढ़ना चाहते हैं?"/>
+                                </list>
+                            </field>
                         </group>
 
                         <group string="आपत्ति एंड निराकरण कमेंट बॉक्स">
@@ -203,6 +212,7 @@
                 <field name="khasra_number" readonly="1" string="Khasra"/>
                 <field name="original_acquired_area" readonly="1" widget="float" string="Original Area"/>
                 <field name="resolved_acquired_area" widget="float" string="New Area"/>
+                <button name="action_open_reject_wizard" type="object" icon="fa-times-circle" class="btn-danger" title="Reject Survey / सर्वे अस्वीकार करें"/>
             </list>
         </field>
     </record>

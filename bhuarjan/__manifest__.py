@@ -71,6 +71,7 @@
         'wizard/sia_download_wizard_views.xml',
         'wizard/process_send_back_wizard.xml',
         'wizard/section8_approve_reject_wizard.xml',
+        'wizard/reject_survey_wizard_views.xml',
         'views/section15_objection_views.xml',
         'views/process_stub_views.xml',
         'views/process_views.xml',

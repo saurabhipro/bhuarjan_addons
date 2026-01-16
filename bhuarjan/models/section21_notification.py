@@ -546,8 +546,7 @@ class Section21Notification(models.Model):
 
     def action_generate_both_notices(self):
         self.ensure_one()
-        report_action = self.env.ref('bhuarjan.action_report_section21_notification')
-        return report_action.report_action(self)
+        return self.action_generate_section21_all()
         
 
     def action_generate_section21_all(self):

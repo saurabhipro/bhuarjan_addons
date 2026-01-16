@@ -270,41 +270,9 @@ class Section15Objection(models.Model):
                             'resolved_acquired_area': record.survey_id.acquired_area,
                         })]
                     
-                    # Update survey details resolution
-                    if not record.resolution_survey_detail_ids:
-                        record.resolution_survey_detail_ids = [(0, 0, {
-                            'survey_id': record.survey_id.id,
-                            'has_well': record.survey_id.has_well,
-                            'well_type': record.survey_id.well_type,
-                            'well_count': record.survey_id.well_count,
-                            'has_tubewell': record.survey_id.has_tubewell,
-                            'tubewell_count': record.survey_id.tubewell_count,
-                            'has_house': record.survey_id.has_house,
-                            'house_type': record.survey_id.house_type,
-                            'house_area': record.survey_id.house_area,
-                            'has_shed': record.survey_id.has_shed,
-                            'shed_area': record.survey_id.shed_area,
-                            'has_pond': record.survey_id.has_pond,
-                        })]
+
         
-        # Update survey when survey details change
-        if 'resolution_survey_detail_ids' in vals:
-            for record in self:
-                for detail in record.resolution_survey_detail_ids:
-                    if detail.survey_id:
-                        detail.survey_id.write({
-                            'has_well': detail.has_well,
-                            'well_type': detail.well_type,
-                            'well_count': detail.well_count,
-                            'has_tubewell': detail.has_tubewell,
-                            'tubewell_count': detail.tubewell_count,
-                            'has_house': detail.has_house,
-                            'house_type': detail.house_type,
-                            'house_area': detail.house_area,
-                            'has_shed': detail.has_shed,
-                            'shed_area': detail.shed_area,
-                            'has_pond': detail.has_pond,
-                        })
+
         
         return result
 
@@ -336,7 +304,7 @@ class Section15Objection(models.Model):
         if not self.survey_id:
             self.resolution_landowner_ids = False
             self.resolution_khasra_ids = [(5, 0, 0)]
-            self.resolution_survey_detail_ids = [(5, 0, 0)]
+
             return
         
         # Compute original landowners
@@ -371,23 +339,7 @@ class Section15Objection(models.Model):
                     'resolved_acquired_area': self.survey_id.acquired_area,
                 })]
         
-        # Initialize or update other survey details record
-        if not self.resolution_survey_detail_ids:
-            if self.survey_id.id:
-                self.resolution_survey_detail_ids = [(0, 0, {
-                    'survey_id': self.survey_id.id,
-                    'has_well': self.survey_id.has_well,
-                    'well_type': self.survey_id.well_type,
-                    'well_count': self.survey_id.well_count,
-                    'has_tubewell': self.survey_id.has_tubewell,
-                    'tubewell_count': self.survey_id.tubewell_count,
-                    'has_house': self.survey_id.has_house,
-                    'house_type': self.survey_id.house_type,
-                    'house_area': self.survey_id.house_area,
-                    'has_shed': self.survey_id.has_shed,
-                    'shed_area': self.survey_id.shed_area,
-                    'has_pond': self.survey_id.has_pond,
-                })]
+
     
     @api.constrains('resolution_landowner_ids')
     def _check_resolution_landowners(self):

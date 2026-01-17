@@ -22,8 +22,7 @@
         <field name="arch" type="xml">
             <form string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-                    <button name="action_submit_award" string="Submit / जमा करें" type="object" class="btn-primary"
-                            invisible="not is_generated or not award_document or state != 'draft'"/>
+
                     
                     <button name="action_approve_award" string="Approve / स्वीकृत करें" type="object" class="btn-success"
                             invisible="state != 'submitted'" groups="bhuarjan.group_bhu_section_officer"/>
@@ -99,17 +98,16 @@
                     </div>
 
                     <!-- Upload Section - styled card-like appearance -->
-                    <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bold" style="color: #495057; font-size: 1.1rem;"
-                         invisible="not is_generated">
+                    <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bold" style="color: #495057; font-size: 1.1rem;">
                         <i class="fa fa-upload me-2"></i>Award Document / अवार्ड दस्तावेज़
                     </div>
                     
-                    <div class="alert alert-warning" role="alert" invisible="is_generated">
+                    <div class="alert alert-warning" role="alert" invisible="award_document">
                          <i class="fa fa-info-circle me-1"></i>
-                         Please generate the award first using the button below. / कृपया पहले नीचे दिए गए बटन का उपयोग करके अवार्ड जेनरेट करें।
+                         Please generate the award using the button above or upload a document. / कृपया ऊपर दिए गए बटन का उपयोग करके अवार्ड जेनरेट करें या दस्तावेज़ अपलोड करें।
                     </div>
 
-                    <div class="p-3 mb-4 border rounded bg-light" invisible="not is_generated">
+                    <div class="p-3 mb-4 border rounded bg-light">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
                                 <field name="award_document" filename="award_document_filename" 
@@ -124,6 +122,18 @@
                                         style="background-color: #8B4513; border-color: #8B4513; color: white;" 
                                         icon="fa-download" invisible="not award_document"/>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button aligned left -->
+                    <div class="text-start mt-4 mb-4">
+                        <button name="action_submit_award" string="Submit / जमा करें" 
+                                type="object" class="btn-primary" 
+                                icon="fa-check"
+                                invisible="not award_document or state != 'draft'"/>
+                        <div class="text-muted mt-2 small" invisible="not award_document or state != 'draft'">
+                            <i class="fa fa-info-circle"></i>
+                            Submits the generated and signed award for approval. / जेनरेट और हस्ताक्षरित अवार्ड को स्वीकृति के लिए जमा करता है।
                         </div>
                     </div>
                 </sheet>

@@ -267,6 +267,14 @@
                             </div>
                         </div>
                         </t>
+                        <!-- Section 23 Award -->
+                        <div class="o_stat_card o_card_section23" t-on-click="() => this.openAction('action_open_section23')">
+                            <div class="o_stat_icon"><i class="fa fa-trophy"/></div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">SECTION 23</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section23_total : 0"/></div>
+                            </div>
+                        </div>
                         <!-- Section 20 A (Railways) -->
                         <t t-if="this.isSectionVisible('Sec 20 A (Railways)')">
                         <div class="o_stat_card o_card_section20a_railways" t-on-click="() => this.openAction('action_open_section20a_railways')">

@@ -180,6 +180,9 @@ class Section23Award(models.Model):
         
         if not self.village_id:
             raise ValidationError(_('Please select a village first.'))
+            
+        if not self.award_survey_line_ids:
+            raise ValidationError(_('No approved surveys found for this village. Cannot generate award.\n इस गाँव के लिए कोई स्वीकृत सर्वेक्षण नहीं मिला। अवार्ड उत्पन्न नहीं किया जा सकता।'))
         
         # Validate that all surveys have type configured
         # is_within_distance can be True or False (both are valid - checked or unchecked means user has made a choice)

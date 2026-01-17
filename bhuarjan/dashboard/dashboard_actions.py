@@ -647,6 +647,22 @@ class DashboardActions(models.AbstractModel):
                 'domain': [('state', '=', 'send_back')],
                 'target': 'current',
             }
+
+    @api.model
+    def action_open_section23(self):
+        try:
+            action_ref = self.env.ref('bhuarjan.action_section23_award')
+            return self._get_action_dict(action_ref)
+        except Exception as e:
+            _logger.error(f"Error getting action_section23_award: {e}", exc_info=True)
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Section 23 Award',
+                'res_model': 'bhu.section23.award',
+                'view_mode': 'list,form',
+                'views': [(False, 'list'), (False, 'form')],
+                'target': 'current',
+            }
     @api.model
     def action_open_mobile_users(self):
         """Open mobile users list (JWT tokens with mobile channel)"""

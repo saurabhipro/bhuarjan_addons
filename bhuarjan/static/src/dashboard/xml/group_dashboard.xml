@@ -3,22 +3,20 @@
     <t t-name="bhuarjan.GroupDashboard" owl="1">
         <div class="o_group_dashboard">
             <!-- Header -->
-            <div class="dashboard-header">
+            <div class="dashboard-header py-3">
                 <div class="container-fluid">
-                    <div class="row align-items-center py-3">
-                        <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
                             <h2 class="mb-0">
                                 <i class="fa fa-th-large me-2"/>
-                                Group Dashboard / समूह डैशबोर्ड
+                                Group Dashboard
                             </h2>
-                            <p class="text-muted mb-0">Bird's Eye View of All Projects</p>
+                            <small class="text-white-50">Bird's Eye View of All Projects</small>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" t-on-click="refreshDashboard">
-                                <i class="fa fa-refresh me-1"/>
-                                Refresh
-                            </button>
-                        </div>
+                        <button class="btn btn-light btn-sm" t-on-click="refreshDashboard">
+                            <i class="fa fa-refresh me-1"/>
+                            Refresh
+                        </button>
                     </div>
                 </div>
             </div>
@@ -117,14 +115,16 @@
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width: 5%">#</th>
-                                            <th style="width: 12%">Project Code</th>
-                                            <th style="width: 20%">Project Name</th>
-                                            <th style="width: 13%">Department</th>
-                                            <th style="width: 8%">Villages</th>
-                                            <th style="width: 15%">Current Stage</th>
-                                            <th style="width: 17%">Delay Status</th>
-                                            <th style="width: 10%">Actions</th>
+                                            <th style="width: 4%">#</th>
+                                            <th style="width: 10%">Project Code</th>
+                                            <th style="width: 18%">Project Name</th>
+                                            <th style="width: 12%">Department</th>
+                                            <th style="width: 6%">Villages</th>
+                                            <th style="width: 7%">Khasras</th>
+                                            <th style="width: 8%">Landowners</th>
+                                            <th style="width: 13%">Current Stage</th>
+                                            <th style="width: 14%">Delay Status</th>
+                                            <th style="width: 8%">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -150,6 +150,12 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-info" t-esc="project.village_count"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-primary" t-esc="project.total_khasras"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-success" t-esc="project.total_landowners"/>
                                                 </td>
                                                 <td>
                                                     <span class="badge stage-badge" 

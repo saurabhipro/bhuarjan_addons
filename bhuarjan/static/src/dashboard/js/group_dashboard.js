@@ -39,11 +39,27 @@ export class GroupDashboard extends Component {
                 { order: "create_date desc" }
             );
 
-            // For each project, determine its current stage and delay status
+            // For each project, determine its current stage, delay status, and counts
             for (let project of projects) {
                 project.current_stage = await this.determineProjectStage(project.id);
                 project.village_count = project.village_ids.length;
                 project.delay_info = await this.calculateDelay(project);
+
+                // Get total khasras count
+                const khasras = await this.orm.searchRead(
+                    "bhu.khasra",
+                    [["project_id", "=", project.id]],
+                    ["id"]
+                );
+                project.total_khasras = khasras.length;
+
+                // Get total landowners count
+                const landowners = await this.orm.searchRead(
+                    "bhu.landowner",
+                    [["project_id", "=", project.id]],
+                    ["id"]
+                );
+                project.total_landowners = landowners.length;
             }
 
             this.state.projects = projects;

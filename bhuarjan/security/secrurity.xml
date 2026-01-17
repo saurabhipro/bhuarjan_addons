@@ -79,6 +79,12 @@
         <field name="comment">Banker can access Payment and Users menus only.</field>
     </record>
 
+    <record id="group_bhu_section_officer" model="res.groups">
+        <field name="name">Section Officer</field>
+        <field name="category_id" ref="module_category_bhuarjan_bhuarjan"/>
+        <field name="comment">Section Officer can approve awards.</field>
+    </record>
+
     
     <!-- Survey access rule for Patwari -->
     <data noupdate="0">

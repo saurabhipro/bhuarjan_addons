@@ -54,27 +54,20 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
-                    <!-- Action Buttons Row: Approve, Reject -->
-                    <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                            icon="fa-check"
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="state != 'draft'"/>
-                    <button name="action_reject" string="Reject" type="object" class="btn-danger" 
-                            icon="fa-times"
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="1"/>
-                    <button name="action_open_reject_wizard" string="Reject Survey" type="object" class="btn-danger" 
-                            icon="fa-times-circle"
-                            groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="state != 'draft'"/>
+
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
-                            <i class="fa fa-exclamation-triangle" style="margin-right: 10px;"></i>Section 15 Objection / धारा 15 आपत्ति
+                            <i class="fa fa-exclamation-triangle" title="Warning" style="margin-right: 10px;"></i>Section 15 Objection / धारा 15 आपत्ति
                         </h1>
                     </div>
+                    <div invisible="not project_id or not village_id" class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057;">
+                         <i class="fa fa-info-circle me-1"></i>
+                         Creating Section 15 Objection for Village <field name="village_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>
+                    </div>
+
                     <group>
                         <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
                     </group>
@@ -104,7 +97,7 @@
                         <separator string="Edit Survey Details / सर्वे विवरण संपादित करें"/>
                         
                         <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
-                            <i class="fa fa-exclamation-triangle" style="margin-right: 8px;"/>
+                            <i class="fa fa-exclamation-triangle" title="Warning" style="margin-right: 8px;"/>
                             <strong>Note:</strong> Changing landowners or area will create an objection automatically.
                             <br/>
                             <span style="font-size: 12px; margin-top: 4px; display: inline-block;">नोट: भूमिस्वामी या क्षेत्रफल बदलने से स्वचालित रूप से आपत्ति बन जाएगी।</span>
@@ -165,6 +158,55 @@
                                    nolabel="1"
                                    placeholder="यहाँ अपनी आपत्ति और निराकरण कमेंट लिखें... (Enter your objection and resolution comments here...)"/>
                         </group>
+                    </div>
+
+                    <style>
+                        .custom-btn-success {
+                            background-color: #28a745 !important;
+                            border-color: #28a745 !important;
+                            color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        }
+                        .custom-btn-success:hover {
+                            background-color: #218838 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+                        }
+                        .custom-btn-danger {
+                            background-color: #dc3545 !important;
+                            border-color: #dc3545 !important;
+                            color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        }
+                        .custom-btn-danger:hover {
+                            background-color: #c82333 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+                        }
+                    </style>
+
+                    <!-- Action Buttons: Approve/Reject -->
+                    <div class="row mt-4" invisible="not survey_id or state != 'draft'">
+                         <div class="col-md-6 d-flex gap-3">
+                             <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
+                                     class="btn custom-btn-success" 
+                                     icon="fa-check"
+                                     style="min-width: 200px;"
+                                     groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                                     confirm="Are you sure want to approve this objection?"/>
+                             
+                             <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
+                                     class="btn custom-btn-danger" 
+                                     icon="fa-times-circle"
+                                     style="min-width: 200px;"
+                                     groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
+                         </div>
                     </div>
                     
                     <!-- Download Section 15 PDF Button -->

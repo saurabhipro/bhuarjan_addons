@@ -46,15 +46,6 @@
                         <div class="col w-100">
 
                             
-                            <!-- Create Section 4 Notification (SDM only) - Hidden for SIA exempt projects -->
-                            <button name="action_create_section4_notification" string="Create Section 4 Notification" 
-                                    type="object" class="btn-primary" icon="fa-file-text"
-                                    groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                    invisible="state != 'approved' or is_sia_exempt == 'yes'"
-                                    help="Create Section 4 Notifications for all villages in this SIA Team"
-                                    confirm="Are you sure want to Create Section 4 Notification ."/>
-                        
-
                             <!-- Reset to Draft button (for sent back records - allows SDM to resubmit) -->
                             <button name="action_draft" string="Resubmit" type="object" class="btn-primary" 
                                     icon="fa-refresh"

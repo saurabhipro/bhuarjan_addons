@@ -45,10 +45,7 @@
                             confirm="Are you sure want to submit this record." class="oe_right"/>
                         </div>
                     </div>
-                <div class="alert alert-danger" role="alert" invisible="not has_pending_surveys or not project_id or not village_id or state != 'draft'" 
-                     style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;">
-                    <strong style="color: #dc3545; font-weight: bold;">⚠ Error:</strong> <span style="color: #dc3545; font-weight: bold;">Cannot create Notification 4 for this village as it has some pending surveys that are in (Draft or Submitted stage).</span>
-                </div>
+
                 <div class="alert alert-danger" role="alert" invisible="not has_no_surveys or not project_id or not village_id or state != 'draft'" 
                      style="margin: 10px; padding: 12px; background-color: #f8d7da; border: 1px solid #dc3545; border-radius: 4px;"
                      groups="base.group_no_one"> <!-- Hidden from normal users but kept for logic safety if needed, effectively removing it for user -->
@@ -56,7 +53,7 @@
                 </div>
                 <div class="alert alert-success" role="alert" invisible="state != 'submitted'" 
                      style="margin: 10px; padding: 12px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;">
-                    <i class="fa fa-check-circle me-1"></i>
+                    <i class="fa fa-check-circle me-1" title="Success"></i>
                     <strong>Success:</strong> Section 4 Notification submitted successfully. Pending with Collector for approval.
                 </div>
                 <field name="is_sdm" invisible="1"/>
@@ -66,7 +63,7 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 
-                <sheet readonly="id and (has_section11 or is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit) or (has_pending_surveys and state == 'draft' and project_id and village_id) or (has_no_surveys and state == 'draft' and project_id and village_id))">
+                <sheet readonly="id and (has_section11 or is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
                             <i class="fa fa-bell" style="margin-right: 10px;"></i>Section 4 Notification / धारा 4 अधिसूचना

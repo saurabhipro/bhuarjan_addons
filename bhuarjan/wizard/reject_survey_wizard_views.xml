@@ -8,7 +8,7 @@
                 <sheet>
                     <group>
                         <div class="alert alert-danger" role="alert" style="margin-bottom: 20px;">
-                            <i class="fa fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                            <i class="fa fa-exclamation-triangle" title="Warning" style="margin-right: 10px;"></i>
                             <strong>Warning:</strong> This will reject the survey relative to this objection.
                             <br/>
                             <span style="font-size: 13px; margin-top: 5px; display: inline-block;">चेतावनी: यह इस आपत्ति से संबंधित सर्वेक्षण को अस्वीकार कर देगा।</span>

@@ -33,9 +33,9 @@ class SiaTeamMemberLine(models.Model):
         ('technical_expert', 'Technical Expert / तकनीकि विशेषज्ञ'),
     ], string='Member Type', required=True)
     
-    name = fields.Char(string='Name / नाम', required=True, tracking=True)
-    address = fields.Text(string='Address / पता', tracking=True)
-    post = fields.Char(string='Post / पद', tracking=True)
+    name = fields.Char(string='Name / नाम', required=True)
+    address = fields.Text(string='Address / पता')
+    post = fields.Char(string='Post / पद')
 
 
 class ExpertCommitteeMemberLine(models.Model):
@@ -54,7 +54,7 @@ class ExpertCommitteeMemberLine(models.Model):
         ('technical_expert', 'Technical Expert / तकनीकि विशेषज्ञ'),
     ], string='Member Type', required=True)
     
-    name = fields.Char(string='Name / नाम', required=True, tracking=True)
-    address = fields.Text(string='Address / पता', tracking=True)
-    post = fields.Char(string='Post / पद', tracking=True)
+    name = fields.Char(string='Name / नाम', required=True)
+    address = fields.Text(string='Address / पता')
+    post = fields.Char(string='Post / पद')
 

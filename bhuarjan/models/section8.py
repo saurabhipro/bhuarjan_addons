@@ -11,7 +11,7 @@ class Section8(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Section 8 Reference / धारा 8 संदर्भ', required=True, tracking=True, default='New', readonly=True)
-    department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', tracking=True)
     

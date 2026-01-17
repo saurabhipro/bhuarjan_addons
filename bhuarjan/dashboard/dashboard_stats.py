@@ -424,8 +424,8 @@ class DashboardStats(models.AbstractModel):
             'section3d_nh': self._get_simple_section_counts('bhu.section3d.nh', domain_with_village),
             # Mutual Consent Policy (has village_id)
             'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village),
-            # Section 23 Award (has village_id, no workflow - simple count only)
-            'section23_award': self._get_simple_section_counts('bhu.section23.award', domain_with_village),
+            # Section 23 Award (has village_id)
+            'section23_award': self._get_section_counts('bhu.section23.award', domain_with_village),
         }
         
         # Section 21 Notification uses 'signed' state instead of 'approved'
@@ -791,25 +791,17 @@ class DashboardStats(models.AbstractModel):
                 ),
                 'mutual_consent_policy_info': self._get_section_info('bhu.mutual.consent.policy', domains['final_domain']),
                 
-                # Section 23 Award (has village_id, no workflow - simple count only)
+                # Section 23 Award (has village_id)
                 'section23_award_total': counts['section23_award']['total'],
-                'section23_award_draft': 0,
-                'section23_award_submitted': 0,
-                'section23_award_approved': 0,
-                'section23_award_send_back': 0,
-                'section23_award_completion_percent': 0.0,
-                'section23_award_info': {
-                    'total': counts['section23_award']['total'],
-                    'draft_count': 0,
-                    'submitted_count': 0,
-                    'approved_count': 0,
-                    'rejected_count': 0,
-                    'send_back_count': 0,
-                    'all_approved': True,
-                    'is_completed': True,
-                    'first_pending_id': False,
-                    'first_document_id': False,
-                },
+                'section23_award_draft': counts['section23_award']['draft'],
+                'section23_award_submitted': counts['section23_award']['submitted'],
+                'section23_award_approved': counts['section23_award']['approved'],
+                'section23_award_send_back': counts['section23_award']['send_back'],
+                'section23_award_completion_percent': self._calculate_completion_percentage(
+                    counts['section23_award']['approved'], 0, counts['section23_award']['total'], is_survey=False
+                ),
+                'section23_award_info': self._get_section_info('bhu.section23.award', domains['final_domain']),
+
             }
             
             return result

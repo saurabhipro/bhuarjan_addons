@@ -80,6 +80,12 @@ const DASHBOARD_CONFIG = {
             'section8_draft': 'section8_draft',
             'section8_approved': 'section8_approved',
             'section8_rejected': 'section8_rejected',
+            'section23_award_total': 'section23_award_total',
+            'section23_award_draft': 'section23_award_draft',
+            'section23_award_submitted': 'section23_award_submitted',
+            'section23_award_approved': 'section23_award_approved',
+            'section23_award_send_back': 'section23_award_send_back',
+            'section23_award_completion_percent': 'section23_award_completion_percent',
         }
     },
     'collector': {
@@ -131,10 +137,16 @@ const DASHBOARD_CONFIG = {
             'section8_draft': 'section8_draft',
             'section8_approved': 'section8_approved',
             'section8_rejected': 'section8_rejected',
+            'section23_award_total': 'section23_award_total',
+            'section23_award_draft': 'section23_award_draft',
+            'section23_award_submitted': 'section23_award_submitted',
+            'section23_award_approved': 'section23_award_approved',
+            'section23_award_send_back': 'section23_award_send_back',
+            'section23_award_completion_percent': 'section23_award_completion_percent',
         }
     },
     'admin': {
-        template: 'bhuarjan.AdminDashboardTemplate',
+        template: 'bhuarjan.SDMTemplate',
         registryKey: 'bhuarjan.admin_dashboard',
         pageTitle: 'Admin Dashboard',
         localStoragePrefix: 'admin_dashboard',
@@ -142,14 +154,11 @@ const DASHBOARD_CONFIG = {
         showProjectFilter: true,
         showVillageFilter: true,
         statsMapping: {
-            // Map backend field names to admin dashboard state field names
-            'survey_total': 'total_surveys',
-            'survey_draft': 'draft_surveys',
-            'survey_submitted': 'submitted_surveys',
-            'survey_approved': 'approved_surveys',
-            'survey_rejected': 'rejected_surveys',
-            'total_surveys_done': 'total_surveys_done',
-            'pending_surveys': 'pending_surveys',
+            'survey_total': 'survey_total',
+            'survey_draft': 'survey_draft',
+            'survey_submitted': 'survey_submitted',
+            'survey_approved': 'survey_approved',
+            'survey_rejected': 'survey_rejected',
             'section4_total': 'section4_total',
             'section4_draft': 'section4_draft',
             'section4_submitted': 'section4_submitted',
@@ -160,21 +169,21 @@ const DASHBOARD_CONFIG = {
             'section11_submitted': 'section11_submitted',
             'section11_approved': 'section11_approved',
             'section11_send_back': 'section11_send_back',
-            'section19_total': 'section19_total',
-            'section19_draft': 'section19_draft',
-            'section19_submitted': 'section19_submitted',
-            'section19_approved': 'section19_approved',
-            'section19_send_back': 'section19_send_back',
             'section15_total': 'section15_total',
             'section15_draft': 'section15_draft',
             'section15_submitted': 'section15_submitted',
             'section15_approved': 'section15_approved',
             'section15_send_back': 'section15_send_back',
-            'expert_total': 'expert_committee_total',
-            'expert_draft': 'expert_committee_draft',
-            'expert_submitted': 'expert_committee_submitted',
-            'expert_approved': 'expert_committee_approved',
-            'expert_send_back': 'expert_committee_send_back',
+            'section19_total': 'section19_total',
+            'section19_draft': 'section19_draft',
+            'section19_submitted': 'section19_submitted',
+            'section19_approved': 'section19_approved',
+            'section19_send_back': 'section19_send_back',
+            'expert_total': 'expert_total',
+            'expert_draft': 'expert_draft',
+            'expert_submitted': 'expert_submitted',
+            'expert_approved': 'expert_approved',
+            'expert_send_back': 'expert_send_back',
             'sia_total': 'sia_total',
             'sia_draft': 'sia_draft',
             'sia_submitted': 'sia_submitted',
@@ -184,6 +193,12 @@ const DASHBOARD_CONFIG = {
             'section8_draft': 'section8_draft',
             'section8_approved': 'section8_approved',
             'section8_rejected': 'section8_rejected',
+            'section23_award_total': 'section23_award_total',
+            'section23_award_draft': 'section23_award_draft',
+            'section23_award_submitted': 'section23_award_submitted',
+            'section23_award_approved': 'section23_award_approved',
+            'section23_award_send_back': 'section23_award_send_back',
+            'section23_award_completion_percent': 'section23_award_completion_percent',
         }
     },
     'department': {
@@ -201,6 +216,16 @@ const DASHBOARD_CONFIG = {
             'survey_approved': 'survey_approved',
             'survey_rejected': 'survey_rejected',
             'survey_completion_percent': 'survey_completion_percent',
+            'section8_total': 'section8_total',
+            'section8_draft': 'section8_draft',
+            'section8_approved': 'section8_approved',
+            'section8_rejected': 'section8_rejected',
+            'section23_award_total': 'section23_award_total',
+            'section23_award_draft': 'section23_award_draft',
+            'section23_award_submitted': 'section23_award_submitted',
+            'section23_award_approved': 'section23_award_approved',
+            'section23_award_send_back': 'section23_award_send_back',
+            'section23_award_completion_percent': 'section23_award_completion_percent',
         }
     },
     'district': {
@@ -252,55 +277,15 @@ const DASHBOARD_CONFIG = {
             'section8_draft': 'section8_draft',
             'section8_approved': 'section8_approved',
             'section8_rejected': 'section8_rejected',
+            'section23_award_total': 'section23_award_total',
+            'section23_award_draft': 'section23_award_draft',
+            'section23_award_submitted': 'section23_award_submitted',
+            'section23_award_approved': 'section23_award_approved',
+            'section23_award_send_back': 'section23_award_send_back',
+            'section23_award_completion_percent': 'section23_award_completion_percent',
         }
     },
-    'admin': {
-        template: 'bhuarjan.AdminDashboardTemplate',
-        registryKey: 'bhuarjan.admin_dashboard',
-        pageTitle: 'Admin Dashboard',
-        localStoragePrefix: 'admin_dashboard',
-        showDepartmentFilter: true,
-        showProjectFilter: true,
-        showVillageFilter: true,
-        statsMapping: {
-            // Admin sees all stats - same as SDM
-            'survey_total': 'survey_total',
-            'survey_draft': 'survey_draft',
-            'survey_submitted': 'survey_submitted',
-            'survey_approved': 'survey_approved',
-            'survey_rejected': 'survey_rejected',
-            'section4_total': 'section4_total',
-            'section4_draft': 'section4_draft',
-            'section4_submitted': 'section4_submitted',
-            'section4_approved': 'section4_approved',
-            'section4_send_back': 'section4_send_back',
-            'section11_total': 'section11_total',
-            'section11_draft': 'section11_draft',
-            'section11_submitted': 'section11_submitted',
-            'section11_approved': 'section11_approved',
-            'section11_send_back': 'section11_send_back',
-            'section15_total': 'section15_total',
-            'section15_draft': 'section15_draft',
-            'section15_submitted': 'section15_submitted',
-            'section15_approved': 'section15_approved',
-            'section15_send_back': 'section15_send_back',
-            'section19_total': 'section19_total',
-            'section19_draft': 'section19_draft',
-            'section19_submitted': 'section19_submitted',
-            'section19_approved': 'section19_approved',
-            'section19_send_back': 'section19_send_back',
-            'expert_total': 'expert_total',
-            'expert_draft': 'expert_draft',
-            'expert_submitted': 'expert_submitted',
-            'expert_approved': 'expert_approved',
-            'expert_send_back': 'expert_send_back',
-            'sia_total': 'sia_total',
-            'sia_draft': 'sia_draft',
-            'sia_submitted': 'sia_submitted',
-            'sia_approved': 'sia_approved',
-            'sia_send_back': 'sia_send_back',
-        }
-    }
+
 };
 
 export class UnifiedDashboard extends Component {
@@ -314,24 +299,24 @@ export class UnifiedDashboard extends Component {
             this.dashboardType = this.props.dashboardType || 'sdm';
         }
         this.config = DASHBOARD_CONFIG[this.dashboardType] || DASHBOARD_CONFIG['sdm'];
-        
+
         // Set template dynamically
         this.constructor.template = this.config.template;
-        
+
         this.pageTitle = this.config.pageTitle;
         this.orm = useService("orm");
         this.action = useService("action");
         this.notification = useService("notification");
-        
+
         const localStoragePrefix = this.config.localStoragePrefix;
-        
+
         // Load persisted selections from localStorage
         const savedDepartment = localStorage.getItem(`${localStoragePrefix}_department`);
         const savedProject = localStorage.getItem(`${localStoragePrefix}_project`);
         const savedProjectName = localStorage.getItem(`${localStoragePrefix}_project_name`);
         const savedVillage = localStorage.getItem(`${localStoragePrefix}_village`);
         const savedVillageName = localStorage.getItem(`${localStoragePrefix}_village_name`);
-        
+
         // Initialize state based on configuration
         const initialState = {
             loading: true,
@@ -350,7 +335,7 @@ export class UnifiedDashboard extends Component {
             stats: this._getInitialStats(),
             lastUpdate: null,
         };
-        
+
         this.state = useState(initialState);
 
         onWillStart(async () => {
@@ -368,14 +353,14 @@ export class UnifiedDashboard extends Component {
         // Initialize stats based on dashboard type configuration
         const stats = {};
         const mapping = this.config.statsMapping || {};
-        
+
         // Initialize all mapped stats to 0
         for (const [backendKey, frontendKey] of Object.entries(mapping)) {
             stats[frontendKey] = 0;
         }
-        
+
         // Add info objects for sections that need them
-        if (this.dashboardType === 'sdm' || this.dashboardType === 'collector') {
+        if (this.dashboardType === 'sdm' || this.dashboardType === 'collector' || this.dashboardType === 'district' || this.dashboardType === 'admin') {
             stats.section4_info = null;
             stats.section11_info = null;
             stats.section15_info = null;
@@ -385,14 +370,15 @@ export class UnifiedDashboard extends Component {
             stats.section8_info = null;
             stats.survey_info = null;
             stats.draft_award_info = null;
+            stats.section23_award_info = null;
         }
-        
+
         return stats;
     }
 
     async loadInitialData() {
         const localStoragePrefix = this.config.localStoragePrefix;
-        
+
         // For department dashboard, always load department (even if filter is hidden)
         if (this.dashboardType === 'department') {
             await this.loadDepartments();
@@ -404,7 +390,7 @@ export class UnifiedDashboard extends Component {
             // Custom data loading method
             await this.loadUserDepartment();
         }
-        
+
         // Load projects (if not already loaded by loadDepartments for department dashboard)
         // For department dashboard, projects are already loaded in loadDepartments()
         // For collector dashboards, allow all projects without department selection
@@ -414,11 +400,11 @@ export class UnifiedDashboard extends Component {
         } else if (this.dashboardType !== 'department' && (this.state.selectedDepartment || !this.config.showDepartmentFilter)) {
             await this.loadProjects();
         }
-        
+
         // Load villages if project is selected
         if (this.state.selectedProject) {
             await this.loadVillages();
-            
+
             // Restore saved village name after villages are loaded
             const savedVillageName = localStorage.getItem(`${localStoragePrefix}_village_name`);
             if (this.state.selectedVillage && this.state.villages.length > 0) {
@@ -445,11 +431,11 @@ export class UnifiedDashboard extends Component {
                 this.config.initialDataMethod,
                 []
             );
-            
+
             if (userDepartment) {
                 const deptId = userDepartment.id || (Array.isArray(userDepartment) && userDepartment[0]?.id);
                 const deptName = userDepartment.name || (Array.isArray(userDepartment) && userDepartment[0]?.name);
-                
+
                 if (deptId) {
                     this.state.selectedDepartment = deptId;
                     this.state.departments = [{
@@ -486,13 +472,13 @@ export class UnifiedDashboard extends Component {
         // Get department ID from state
         // For department dashboard, use selectedDepartment even if filter is hidden
         const departmentId = this.state.selectedDepartment || null;
-        
+
         // For most dashboards, if department filter is shown and no department is selected, clear projects
         if (departmentId === null && this.config.showDepartmentFilter && !['department', 'collector'].includes(this.dashboardType)) {
             this.state.projects = [];
             return;
         }
-        
+
         try {
             // Pass departmentId to get_user_projects to filter projects by department
             const projects = await this.orm.call(
@@ -500,7 +486,7 @@ export class UnifiedDashboard extends Component {
                 "get_user_projects",
                 [departmentId]
             );
-            
+
             // Ensure we have an array
             const projectsArray = Array.isArray(projects) ? projects : [];
             this.state.projects = projectsArray;
@@ -515,7 +501,7 @@ export class UnifiedDashboard extends Component {
             this.state.villages = [];
             return;
         }
-        
+
         try {
             this.state.villages = await this.orm.call(
                 "bhuarjan.dashboard",
@@ -531,7 +517,7 @@ export class UnifiedDashboard extends Component {
     async loadDashboardData() {
         try {
             this.state.loading = true;
-            
+
             const stats = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_dashboard_stats",
@@ -541,11 +527,11 @@ export class UnifiedDashboard extends Component {
                     this.state.selectedVillage || null
                 ]
             );
-            
+
             if (stats) {
                 // Map backend stats to frontend state using configuration
                 this._mapStatsToState(stats);
-                
+
                 // Set additional flags
                 if (stats.is_collector !== undefined) {
                     this.state.isCollector = stats.is_collector;
@@ -558,7 +544,7 @@ export class UnifiedDashboard extends Component {
                     this.state.allowedSectionNames = stats.allowed_section_names || [];
                 }
             }
-            
+
             this.state.lastUpdate = new Date().toLocaleString();
         } catch (error) {
             console.error("Error loading dashboard stats:", error);
@@ -571,13 +557,13 @@ export class UnifiedDashboard extends Component {
     _mapStatsToState(backendStats) {
         // Map backend stats to frontend state using configuration mapping
         const mapping = this.config.statsMapping || {};
-        
+
         for (const [backendKey, frontendKey] of Object.entries(mapping)) {
             if (backendKey in backendStats) {
                 this.state.stats[frontendKey] = backendStats[backendKey] || 0;
             }
         }
-        
+
         // Handle info objects separately (they're not in the mapping)
         if (backendStats.survey_info) {
             this.state.stats.survey_info = backendStats.survey_info;
@@ -606,17 +592,20 @@ export class UnifiedDashboard extends Component {
         if (backendStats.draft_award_info) {
             this.state.stats.draft_award_info = backendStats.draft_award_info;
         }
+        if (backendStats.section23_award_info) {
+            this.state.stats.section23_award_info = backendStats.section23_award_info;
+        }
     }
 
     async onDepartmentChange(ev) {
         if (!this.config.showDepartmentFilter) return;
-        
+
         const value = ev.target.value;
         const departmentId = value && value !== '' ? parseInt(value, 10) : null;
-        
+
         // Update state
         this.state.selectedDepartment = departmentId;
-        
+
         // Save to localStorage
         const prefix = this.config.localStoragePrefix;
         if (departmentId) {
@@ -624,7 +613,7 @@ export class UnifiedDashboard extends Component {
         } else {
             localStorage.removeItem(`${prefix}_department`);
         }
-        
+
         // Reset project and village when department changes
         this.state.selectedProject = null;
         this.state.selectedProjectName = null;
@@ -636,7 +625,7 @@ export class UnifiedDashboard extends Component {
         localStorage.removeItem(`${prefix}_project_name`);
         localStorage.removeItem(`${prefix}_village`);
         localStorage.removeItem(`${prefix}_village_name`);
-        
+
         // Load projects for the selected department
         if (departmentId) {
             try {
@@ -645,17 +634,17 @@ export class UnifiedDashboard extends Component {
                 console.error("Error in loadProjects after department change:", error);
             }
         }
-        
+
         await this.loadDashboardData();
     }
 
     async onProjectChange(ev) {
         if (!this.config.showProjectFilter) return;
-        
+
         const value = ev.target.value;
         const projectId = value ? parseInt(value, 10) : null;
         this.state.selectedProject = projectId;
-        
+
         // Save to localStorage
         const prefix = this.config.localStoragePrefix;
         if (projectId) {
@@ -670,7 +659,7 @@ export class UnifiedDashboard extends Component {
             localStorage.removeItem(`${prefix}_project_name`);
             this.state.selectedProjectName = null;
         }
-        
+
         // Check if current village belongs to new project
         if (projectId) {
             await this.loadVillages();
@@ -692,20 +681,20 @@ export class UnifiedDashboard extends Component {
             localStorage.removeItem(`${prefix}_village`);
             localStorage.removeItem(`${prefix}_village_name`);
         }
-        
+
         // Save selection to server for bulk approval
         await this.saveDashboardSelection();
-        
+
         await this.loadDashboardData();
     }
 
     async onVillageChange(ev) {
         if (!this.config.showVillageFilter) return;
-        
+
         const value = ev.target.value;
         const villageId = value ? parseInt(value, 10) : null;
         this.state.selectedVillage = villageId;
-        
+
         // Get and save village name
         const prefix = this.config.localStoragePrefix;
         if (villageId) {
@@ -720,10 +709,10 @@ export class UnifiedDashboard extends Component {
             localStorage.removeItem(`${prefix}_village_name`);
             this.state.selectedVillageName = null;
         }
-        
+
         // Save selection to server for bulk approval
         await this.saveDashboardSelection();
-        
+
         await this.loadDashboardData();
     }
 
@@ -755,7 +744,7 @@ export class UnifiedDashboard extends Component {
             this.notification.add(_t("Please select a project first"), { type: "warning" });
             return;
         }
-        
+
         if (!this.state.selectedVillage) {
             this.notification.add(_t("Please select a village first"), { type: "warning" });
             return;
@@ -783,7 +772,7 @@ export class UnifiedDashboard extends Component {
     // Helper methods for domain building
     getDomain(model = null) {
         const domain = [];
-        
+
         // Models that have department_id field
         const modelsWithDepartment = [
             'bhu.project',
@@ -792,12 +781,12 @@ export class UnifiedDashboard extends Component {
             'bhu.section23.award',
             'bhu.draft.award',  // Legacy, keeping for compatibility
         ];
-        
+
         // Only add department_id if model has this field
         if (this.state.selectedDepartment && (!model || modelsWithDepartment.includes(model))) {
             domain.push(['department_id', '=', parseInt(this.state.selectedDepartment)]);
         }
-        
+
         if (this.state.selectedProject) {
             domain.push(['project_id', '=', parseInt(this.state.selectedProject)]);
         }
@@ -832,13 +821,13 @@ export class UnifiedDashboard extends Component {
         if (!this.checkProjectSelected()) {
             return;
         }
-        
+
         // Special handling for R and R Scheme - open form directly (one per project)
         if (model === 'bhu.section18.rr.scheme') {
             await this.openRRSchemeForm();
             return;
         }
-        
+
         const domain = this.getDomain(model);
         await this.action.doAction({
             type: 'ir.actions.act_window',
@@ -860,7 +849,7 @@ export class UnifiedDashboard extends Component {
         if (!this.checkProjectSelected()) {
             return;
         }
-        
+
         let domain = [];
         if (this.state.selectedProject) {
             domain.push(["project_id", "=", this.state.selectedProject]);
@@ -868,7 +857,7 @@ export class UnifiedDashboard extends Component {
         if (this.state.selectedVillage) {
             domain.push(["village_id", "=", this.state.selectedVillage]);
         }
-        
+
         // Try to get first pending, otherwise first document
         let recordId = false;
         if (sectionInfo) {
@@ -878,15 +867,15 @@ export class UnifiedDashboard extends Component {
                 recordId = sectionInfo.first_document_id;
             }
         }
-        
+
         const sectionName = this.getSectionName(sectionModel);
-        
+
         if (recordId) {
             // If only 1 document, open directly in form view, otherwise use list,form for pagination
             const totalCount = sectionInfo ? (sectionInfo.total || 0) : 0;
             const viewMode = totalCount === 1 ? "form" : "list,form";
             const views = totalCount === 1 ? [[false, "form"]] : [[false, "list"], [false, "form"]];
-            
+
             await this.action.doAction({
                 type: "ir.actions.act_window",
                 name: sectionName,
@@ -914,22 +903,22 @@ export class UnifiedDashboard extends Component {
         if (!this.checkProjectSelected()) {
             return;
         }
-        
+
         // District admin cannot create records - read-only mode
         if (this.config.isReadOnly) {
-            this.notification.add(_t("District Admin can only view data. Cannot create records."), { 
+            this.notification.add(_t("District Admin can only view data. Cannot create records."), {
                 type: "warning",
                 sticky: false
             });
             return;
         }
-        
+
         // Special handling for R and R Scheme - open form directly (one per project)
         if (sectionModel === 'bhu.section18.rr.scheme') {
             await this.openRRSchemeForm();
             return;
         }
-        
+
         // Village-specific sections that require village selection
         const villageSpecificSections = {
             'bhu.section4.notification': 'Section 4 Notification',
@@ -945,17 +934,17 @@ export class UnifiedDashboard extends Component {
             'bhu.section3d.nh': 'Section 3D (NH)',
             'bhu.mutual.consent.policy': 'Mutual Consent Policy',
         };
-        
+
         if (villageSpecificSections[sectionModel]) {
             if (!this.state.selectedVillage) {
-                this.notification.add(_t(`Please select a village first before creating ${villageSpecificSections[sectionModel]}.`), { 
+                this.notification.add(_t(`Please select a village first before creating ${villageSpecificSections[sectionModel]}.`), {
                     type: "warning",
                     sticky: true
                 });
                 return;
             }
         }
-        
+
         let context = {};
         if (this.state.selectedProject) {
             context.default_project_id = this.state.selectedProject;
@@ -979,13 +968,13 @@ export class UnifiedDashboard extends Component {
         if (!this.checkProjectSelected()) {
             return;
         }
-        
+
         if (!pendingId) {
             // No pending documents, just open list view
             await this.openSectionList(sectionModel);
             return;
         }
-        
+
         let domain = [];
         if (this.state.selectedProject) {
             domain.push(["project_id", "=", this.state.selectedProject]);
@@ -995,14 +984,14 @@ export class UnifiedDashboard extends Component {
         }
         // Filter to only submitted records for pagination
         domain.push(["state", "=", "submitted"]);
-        
+
         const sectionName = this.getSectionName(sectionModel);
-        
+
         // If only 1 submitted document, open directly in form view, otherwise use list,form for pagination
         const submittedCount = sectionInfo ? (sectionInfo.submitted_count || 0) : 0;
         const viewMode = submittedCount === 1 ? "form" : "list,form";
         const views = submittedCount === 1 ? [[false, "form"]] : [[false, "list"], [false, "form"]];
-        
+
         await this.action.doAction({
             type: "ir.actions.act_window",
             name: sectionName,
@@ -1060,7 +1049,7 @@ export class UnifiedDashboard extends Component {
     // Open surveys filtered by state (for department dashboard)
     async openSurveysByState(state) {
         let domain = this.getDomain('bhu.survey');  // Survey has department_id
-        
+
         // Add state filter if provided
         if (state === 'draft') {
             domain.push(['state', '=', 'draft']);
@@ -1072,7 +1061,7 @@ export class UnifiedDashboard extends Component {
             domain.push(['state', '=', 'rejected']);
         }
         // If state is null, show all surveys (no additional filter)
-        
+
         await this.action.doAction({
             type: 'ir.actions.act_window',
             name: state ? `${state.charAt(0).toUpperCase() + state.slice(1)} Surveys` : 'All Surveys',
@@ -1155,30 +1144,30 @@ export class UnifiedDashboard extends Component {
                 'Sec 3C (Objection) (NH)',  // Mapped name
                 'Sec 3D (NH)'
             ];
-            
+
             // Check if this is a Railway or NH section
-            const isRailwayNh = railwayNhSections.includes(dashboardSectionName) || 
-                                dashboardSectionName.includes('Railways') || 
-                                dashboardSectionName.includes('(NH)');
-            
+            const isRailwayNh = railwayNhSections.includes(dashboardSectionName) ||
+                dashboardSectionName.includes('Railways') ||
+                dashboardSectionName.includes('(NH)');
+
             if (isRailwayNh) {
                 // For Railway and NH sections, require department to be selected
                 if (!this.state || !this.state.selectedDepartment) {
                     return false;
                 }
             }
-            
+
             // If no project is selected, show all sections (except Railway/NH which need department)
             if (!this.state || !this.state.selectedProject || !this.state.allowedSectionNames || this.state.allowedSectionNames.length === 0) {
                 return true;
             }
-            
+
             // Get the section master name for this dashboard section
             const sectionMasterName = this.getSectionMasterName(dashboardSectionName);
-            
+
             // Check if this section is in the allowed list
             const isVisible = this.state.allowedSectionNames.includes(sectionMasterName);
-            
+
             return isVisible;
         } catch (error) {
             console.error('Error in isSectionVisible:', error);
@@ -1198,13 +1187,13 @@ for (const [dashboardType, config] of Object.entries(DASHBOARD_CONFIG)) {
     // Create a class for this dashboard type
     const DashboardClass = class extends UnifiedDashboard {
         static template = config.template;
-        
+
         setup() {
             this.dashboardType = dashboardType;
             super.setup();
         }
     };
-    
+
     // Register with Odoo
     registry.category("actions").add(config.registryKey, DashboardClass);
 }

@@ -622,8 +622,9 @@ class Survey(models.Model):
     def action_approve(self):
         """Approve the survey - Only Department Users can approve"""
         # Check if user is Department User
-        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user'):
-            raise ValidationError(_('Only Department Users can approve surveys.'))
+        # Check if user is Department User or Admin
+        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user') and not self.env.user.has_group('bhuarjan.group_bhuarjan_admin'):
+            raise ValidationError(_('Only Department Users or Admins can approve surveys.'))
         
         for record in self:
             record.state = 'approved'
@@ -636,8 +637,9 @@ class Survey(models.Model):
     def action_reject(self):
         """Reject the survey - Only Department Users can reject"""
         # Check if user is Department User
-        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user'):
-            raise ValidationError(_('Only Department Users can reject surveys.'))
+        # Check if user is Department User or Admin
+        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user') and not self.env.user.has_group('bhuarjan.group_bhuarjan_admin'):
+            raise ValidationError(_('Only Department Users or Admins can reject surveys.'))
         
         for record in self:
             record.state = 'rejected'
@@ -712,8 +714,9 @@ class Survey(models.Model):
     def action_reset_to_submitted(self):
         """Reset survey to submitted (from rejected state) - Only Department Users can reset"""
         # Check if user is Department User
-        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user'):
-            raise ValidationError(_('Only Department Users can reset surveys to submitted state.'))
+        # Check if user is Department User or Admin
+        if not self.env.user.has_group('bhuarjan.group_bhuarjan_department_user') and not self.env.user.has_group('bhuarjan.group_bhuarjan_admin'):
+            raise ValidationError(_('Only Department Users or Admins can reset surveys to submitted state.'))
         
         for record in self:
             if record.state == 'rejected':

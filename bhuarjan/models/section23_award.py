@@ -54,6 +54,17 @@ class Section23Award(models.Model):
                                            compute='_compute_all_surveys_configured',
                                            help='True when all surveys have type and distance selected')
     
+    # User Role Fields for UI Logic
+    is_sdm = fields.Boolean(compute='_compute_user_roles')
+    is_section_officer = fields.Boolean(compute='_compute_user_roles')
+    is_admin = fields.Boolean(compute='_compute_user_roles')
+
+    def _compute_user_roles(self):
+        for rec in self:
+            rec.is_sdm = self.env.user.has_group('bhuarjan.group_bhuarjan_sdm')
+            rec.is_section_officer = self.env.user.has_group('bhuarjan.group_bhu_section_officer')
+            rec.is_admin = self.env.user.has_group('bhuarjan.group_bhuarjan_admin')
+    
     @api.depends('village_id')
     def _compute_rate_permutations(self):
         """Compute rate permutations for the selected village"""

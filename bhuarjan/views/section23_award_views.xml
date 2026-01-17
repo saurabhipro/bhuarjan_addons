@@ -22,15 +22,7 @@
         <field name="arch" type="xml">
             <form string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-
-                    
-                    <button name="action_approve_award" string="Approve / स्वीकृत करें" type="object" class="btn-success"
-                            invisible="state != 'submitted'" groups="bhuarjan.group_bhu_section_officer"/>
-                            
-                    <button name="action_send_back_award" string="Send Back / वापस भेजें" type="object" class="btn-warning"
-                            invisible="state != 'submitted'" groups="bhuarjan.group_bhu_section_officer"/>
-                            
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <field name="is_generated" invisible="1"/>
@@ -39,6 +31,78 @@
                             <i class="fa fa-trophy" style="margin-right: 10px;"></i>Section 23 Award / धारा 23 अवार्ड
                         </h2>
                     </div>
+
+                    <style>
+                        .section-card {
+                            background-color: #fff;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 4px;
+                        }
+                        .section-header {
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            color: #6c757d;
+                            border-bottom: 2px solid #8B4513;
+                            padding-bottom: 10px;
+                            margin-bottom: 20px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .custom-section-header {
+                            background-color: #FFF8DC; /* Cornsilk */
+                            color: #8B4513;
+                            padding: 12px 15px;
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            border-radius: 6px;
+                            border-left: 5px solid #8B4513;
+                            margin: 20px 0 10px 0;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                            display: flex;
+                            align-items: center;
+                        }
+                        .custom-btn-primary {
+                            background-color: #8B4513 !important;
+                            border-color: #8B4513 !important;
+                            color: white !important;
+                        }
+                        .custom-btn-success {
+                            background-color: #28a745 !important;
+                            border-color: #28a745 !important;
+                            color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                            margin-right: 15px !important;
+                        }
+                        .custom-btn-success:hover {
+                            background-color: #218838 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+                        }
+                        .custom-btn-danger {
+                            background-color: #dc3545 !important;
+                            border-color: #dc3545 !important;
+                            color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        }
+                        .custom-btn-danger:hover {
+                            background-color: #c82333 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+                        }
+                        .custom-btn-teal {
+                            background-color: #008080 !important;
+                            border-color: #008080 !important;
+                            color: white !important;
+                        }
+                    </style>
                     
                     <div invisible="not project_id or not village_id" class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057; clear: both;">
                          <i class="fa fa-info-circle me-1"></i>
@@ -61,6 +125,11 @@
                     </group>
 
 
+
+                    <!-- Surveys Section -->
+                    <div class="custom-section-header">
+                        Surveys Configuration / सर्वेक्षण कॉन्फ़िगरेशन
+                    </div>
 
                     <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}" readonly="state != 'draft'">
                         <list editable="bottom" string="Surveys" default_order="survey_id" create="0">
@@ -85,55 +154,109 @@
                         <strong>Note:</strong> Please select Type (Village/Residential) for all surveys before generating award.
                     </div>
                     
-                    <!-- Generate Button aligned left -->
-                    <div class="text-start mt-4 mb-4">
-                        <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" 
-                                type="object" class="btn-primary" 
-                                icon="fa-cogs"
-                                invisible="state != 'draft'"/>
-                        <div class="text-muted mt-2 small" invisible="state != 'draft'">
-                            <i class="fa fa-info-circle"></i>
-                            Generates the award PDF based on the configured surveys. / कॉन्फ़िगर किए गए सर्वेक्षणों के आधार पर अवार्ड पीडीएफ बनाता है।
-                        </div>
-                    </div>
+                    <field name="is_sdm" invisible="1"/>
+                    <field name="is_section_officer" invisible="1"/>
+                    <field name="is_admin" invisible="1"/>
 
-                    <!-- Upload Section - styled card-like appearance -->
-                    <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bold" style="color: #495057; font-size: 1.1rem;">
-                        <i class="fa fa-upload me-2"></i>Award Document / अवार्ड दस्तावेज़
+                    <!-- Award Generation Section (SDM / Admin in Draft) -->
+                    <div class="section-card mt-4" 
+                         invisible="is_section_officer or (is_admin and state not in ('draft', 'sent_back'))">
+                        <div class="section-header">Award Generation (SDM) / अवार्ड निर्माण (SDM)</div>
+                        <div class="row">
+                            <!-- Left: Generation & Download -->
+                            <div class="col-md-6 border-right">
+                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 15px;">Step 1: Generate Award</div>
+                                
+                                <div class="mb-3">
+                                    <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" 
+                                            type="object" class="btn custom-btn-primary" 
+                                            icon="fa-cogs"
+                                            invisible="state != 'draft'"
+                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
+                                    <div class="text-muted small" invisible="state != 'draft'">
+                                        <i class="fa fa-info-circle"/> Generates the award PDF based on the configured surveys.
+                                    </div>
+                                </div>
+
+                                <div invisible="not award_document">
+                                     <button name="action_download_award" string="Download Generated Award" 
+                                            type="object" class="btn custom-btn-primary" 
+                                            icon="fa-download"
+                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
+                                </div>
+                            </div>
+
+                            <!-- Right: Upload & Submit -->
+                            <div class="col-md-6">
+                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload Signed &amp; Submit</div>
+                                <div class="bg-light p-3 rounded">
+                                    <div class="mb-3">
+                                        <field name="award_document" filename="award_document_filename" 
+                                               widget="binary" 
+                                               string="Upload Signed Award / हस्ताक्षरित अवार्ड अपलोड करें"
+                                               readonly="state != 'draft'"
+                                               placeholder="Upload Signed Award Document"/>
+                                        <field name="award_document_filename" invisible="1"/>
+                                    </div>
+
+                                    <div invisible="state != 'draft' and state != 'sent_back'">
+                                         <button name="action_submit_award" string="Submit to Collector" 
+                                                type="object" class="btn custom-btn-teal" 
+                                                icon="fa-paper-plane"
+                                                invisible="not award_document or state != 'draft'"/>
+                                         
+                                         <!-- Resubmit Button -->
+                                         <button name="action_submit_award" string="Resubmit / पुनः जमा करें"
+                                                type="object" class="btn custom-btn-primary w-100"
+                                                icon="fa-refresh"
+                                                invisible="state != 'sent_back'"
+                                                confirm="Are you sure you want to resubmit coverage?"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="alert alert-warning" role="alert" invisible="award_document">
-                         <i class="fa fa-info-circle me-1"></i>
-                         Please generate the award using the button above or upload a document. / कृपया ऊपर दिए गए बटन का उपयोग करके अवार्ड जेनरेट करें या दस्तावेज़ अपलोड करें।
-                    </div>
-
-                    <div class="p-3 mb-4 border rounded bg-light">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3">
-                                <field name="award_document" filename="award_document_filename" 
-                                       widget="binary" 
-                                       string="Upload Signed Award / हस्ताक्षरित अवार्ड अपलोड करें"
-                                       readonly="state != 'draft'"/>
-                                <field name="award_document_filename" invisible="1"/>
+                    <!-- Award Approval Section (Section Officer / Admin in Submitted) -->
+                    <div class="section-card mt-4" 
+                         invisible="not (is_section_officer or is_admin) or (is_admin and state in ('draft', 'sent_back'))">
+                        <div class="section-header">Award Approval (Section Officer) / अवार्ड स्वीकृति</div>
+                        <div class="row">
+                            <!-- Left: Review Documents -->
+                            <div class="col-md-6 border-right">
+                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 15px;">Step 1: Review Award</div>
+                                <div invisible="not award_document">
+                                     <button name="action_download_award" string="Download Signed Award" 
+                                            type="object" class="btn custom-btn-primary" 
+                                            icon="fa-download"
+                                            title="Download the signed award uploaded by SDM"
+                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fa fa-info-circle"/> Review the signed award document before approval.
+                                </div>
                             </div>
-                            <div>
-                                <button name="action_download_award" string="Download / डाउनलोड करें" 
-                                        type="object" class="btn btn-sm" 
-                                        style="background-color: #8B4513; border-color: #8B4513; color: white;" 
-                                        icon="fa-download" invisible="not award_document"/>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Submit Button aligned left -->
-                    <div class="text-start mt-4 mb-4">
-                        <button name="action_submit_award" string="Submit / जमा करें" 
-                                type="object" class="btn-primary" 
-                                icon="fa-check"
-                                invisible="not award_document or state != 'draft'"/>
-                        <div class="text-muted mt-2 small" invisible="not award_document or state != 'draft'">
-                            <i class="fa fa-info-circle"></i>
-                            Submits the generated and signed award for approval. / जेनरेट और हस्ताक्षरित अवार्ड को स्वीकृति के लिए जमा करता है।
+                            <!-- Right: Approval Actions -->
+                            <div class="col-md-6">
+                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Approve or Return</div>
+                                <div class="bg-light p-3 rounded">
+                                     <!-- Approval Buttons -->
+                                    <div class="d-flex" invisible="state != 'submitted'" style="margin-top: 5px;">
+                                        <button name="action_approve_award" string="Approve / स्वीकृत करें" type="object" 
+                                                class="btn custom-btn-success flex-fill" icon="fa-check"
+                                                groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
+                                                confirm="Are you sure you want to approve this award?"/>
+                                        <button name="action_send_back_award" string="Send Back / वापस भेजें" type="object" 
+                                                class="btn custom-btn-danger flex-fill" icon="fa-times"
+                                                groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
+                                                confirm="Are you sure you want to send back this award?"/>
+                                    </div>
+                                    <div invisible="state != 'approved'" class="text-success font-weight-bold center">
+                                        <i class="fa fa-check-circle"/> Award Approved
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </sheet>

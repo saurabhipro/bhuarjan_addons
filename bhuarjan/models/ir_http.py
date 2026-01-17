@@ -131,8 +131,8 @@ class IrHttp(models.AbstractModel):
     def get_frontend_session_info(cls):
         """Override to safely handle cases where session might be None"""
         try:
-            # Call parent method
-            result = super(IrHttp, cls).get_frontend_session_info()
+            # Call parent method - use super() without cls argument for classmethod
+            result = super().get_frontend_session_info()
             # Ensure we return a dict, not None
             if result is None:
                 return {}

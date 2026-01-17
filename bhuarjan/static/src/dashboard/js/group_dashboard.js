@@ -45,21 +45,31 @@ export class GroupDashboard extends Component {
                 project.village_count = project.village_ids.length;
                 project.delay_info = await this.calculateDelay(project);
 
-                // Get total khasras count
-                const khasras = await this.orm.searchRead(
-                    "bhu.khasra",
-                    [["project_id", "=", project.id]],
-                    ["id"]
-                );
-                project.total_khasras = khasras.length;
+                // Get total khasras count - with error handling
+                try {
+                    const khasras = await this.orm.searchRead(
+                        "bhu.survey",
+                        [["project_id", "=", project.id]],
+                        ["id"]
+                    );
+                    project.total_khasras = khasras.length;
+                } catch (error) {
+                    console.warn("Could not fetch khasras for project", project.id, error);
+                    project.total_khasras = 0;
+                }
 
-                // Get total landowners count
-                const landowners = await this.orm.searchRead(
-                    "bhu.landowner",
-                    [["project_id", "=", project.id]],
-                    ["id"]
-                );
-                project.total_landowners = landowners.length;
+                // Get total landowners count - with error handling
+                try {
+                    const landowners = await this.orm.searchRead(
+                        "bhu.landowner",
+                        [["project_id", "=", project.id]],
+                        ["id"]
+                    );
+                    project.total_landowners = landowners.length;
+                } catch (error) {
+                    console.warn("Could not fetch landowners for project", project.id, error);
+                    project.total_landowners = 0;
+                }
             }
 
             this.state.projects = projects;

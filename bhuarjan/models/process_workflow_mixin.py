@@ -45,6 +45,40 @@ class ProcessWorkflowMixin(models.AbstractModel):
                                          help='Upload the signed document from Collector')
     collector_signed_filename = fields.Char(string='Collector Signed Filename')
     
+    # Location fields - common across all process forms
+    project_id = fields.Many2one(
+        'bhu.project', 
+        string='Project / परियोजना', 
+        required=True,
+        tracking=True, 
+        ondelete='cascade',
+        help='Project for which this process form is created'
+    )
+    
+    village_id = fields.Many2one(
+        'bhu.village', 
+        string='Village / ग्राम', 
+        required=True,
+        tracking=True,
+        help='Village where the land acquisition is taking place'
+    )
+    
+    district_id = fields.Many2one(
+        'bhu.district', 
+        string='District / जिला', 
+        compute='_compute_location', 
+        store=True,
+        help='District derived from selected village'
+    )
+    
+    tehsil_id = fields.Many2one(
+        'bhu.tehsil', 
+        string='Tehsil / तहसील', 
+        compute='_compute_location', 
+        store=True,
+        help='Tehsil derived from selected village'
+    )
+    
     # Computed fields for edit permissions
     is_sdm = fields.Boolean(string='Is SDM', compute='_compute_user_roles', store=False)
     is_collector = fields.Boolean(string='Is Collector', compute='_compute_user_roles', store=False)
@@ -67,6 +101,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
                     'message': _('Please approve or reject this document using the Action buttons at the top. / कृपया शीर्ष पर एक्शन बटन का उपयोग करके इस दस्तावेज़ को स्वीकृत या अस्वीकृत करें।'),
                 }
             }
+    
+    @api.depends('village_id', 'village_id.district_id', 'village_id.tehsil_id')
+    def _compute_location(self):
+        """Compute district and tehsil from village"""
+        for record in self:
+            if record.village_id:
+                record.district_id = record.village_id.district_id
+                record.tehsil_id = record.village_id.tehsil_id
+            else:
+                record.district_id = False
+                record.tehsil_id = False
     
     @api.depends()
     def _compute_user_roles(self):
@@ -427,6 +472,66 @@ class ProcessWorkflowMixin(models.AbstractModel):
             return self.action_download_sdm_signed_file()
         else:
             return self.action_download_unsigned_file()
+    
+    def action_delete_sdm_signed_file(self):
+        """Delete SDM signed file"""
+        self.ensure_one()
+        if not self.sdm_signed_file:
+            raise ValidationError(_('No SDM signed file to delete.'))
+        
+        if self.state not in ('draft', 'send_back'):
+            raise ValidationError(_('Cannot delete SDM signed file in current state. Only allowed in Draft or Sent Back state.'))
+        
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only SDM can delete SDM signed file.'))
+        
+        self.write({
+            'sdm_signed_file': False,
+            'sdm_signed_filename': False,
+        })
+        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('SDM signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_delete_collector_signed_file(self):
+        """Delete Collector signed file"""
+        self.ensure_one()
+        if not self.collector_signed_file:
+            raise ValidationError(_('No Collector signed file to delete.'))
+        
+        if self.state != 'submitted':
+            raise ValidationError(_('Cannot delete Collector signed file in current state. Only allowed in Submitted state.'))
+        
+        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
+            raise ValidationError(_('Only Collector can delete Collector signed file.'))
+        
+        self.write({
+            'collector_signed_file': False,
+            'collector_signed_filename': False,
+        })
+        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name)
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Collector signed file has been deleted. You can now upload a new file.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     @api.depends('state', 'submitted_date')
     def _compute_days_pending(self):

@@ -24,13 +24,9 @@ class Section21Notification(models.Model):
     title = fields.Char(string='Title / शीर्षक', tracking=True,
                        help='Title for the Section 21 notification')
     
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True, ondelete='cascade',
-                                  default=lambda self: self._default_project_id())
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
-    
-    # District, Tehsil - computed from villages
-    district_id = fields.Many2one('bhu.district', string='District / जिला', compute='_compute_location', store=True)
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_location', store=True)
+    # Location fields inherited from bhu.process.workflow.mixin
+    # Override project_id to make it optional and add default
+    project_id = fields.Many2one(default=lambda self: self._default_project_id(), required=False)
     
     # Notice Date
     notice_date = fields.Date(string='Notice Date / नोटिस दिनांक', tracking=True,
@@ -94,33 +90,23 @@ class Section21Notification(models.Model):
     notification_uuid = fields.Char(string='Notification UUID', copy=False, readonly=True, index=True)
     
     # State field - simple states like Section 19
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('generated', 'Generated'),
-        ('signed', 'Signed'),
-    ], string='Status', default='draft', tracking=True)
+    # State field inherited from bhu.process.workflow.mixin
+    # Uses standard workflow: draft -> submitted -> approved (with send_back option)
     
     @api.depends('signed_document_file')
     def _compute_has_signed_document(self):
         for record in self:
             record.has_signed_document = bool(record.signed_document_file)
-            # Auto-sign when signed document is uploaded
-            if record.has_signed_document and record.state != 'signed':
-                record.state = 'signed'
+            # Auto-approve when signed document is uploaded (using standard workflow)
+            if record.has_signed_document and record.state != 'approved':
+                record.state = 'approved'
+                if not record.approved_date:
+                    record.approved_date = fields.Datetime.now()
                 if not record.signed_date:
                     record.signed_date = fields.Date.today()
     
     @api.depends('village_id')
-    def _compute_location(self):
-        """Compute district and tehsil from village"""
-        for record in self:
-            if record.village_id:
-                record.district_id = record.village_id.district_id.id if record.village_id.district_id else False
-                record.tehsil_id = record.village_id.tehsil_id.id if record.village_id.tehsil_id else False
-            else:
-                record.district_id = False
-                record.tehsil_id = False
-    
+
     @api.depends('land_parcel_ids.khasra_number')
     def _compute_khasra_info(self):
         """Compute khasra numbers and count for list view"""
@@ -560,72 +546,14 @@ class Section21Notification(models.Model):
         """Generate Section 21 Notification PDF - Legacy method (defaults to public)"""
         return self.action_generate_public_notice()
     
-    def action_delete_sdm_signed_file(self):
-        """Delete SDM signed file"""
-        self.ensure_one()
-        if not self.sdm_signed_file:
-            raise ValidationError(_('No SDM signed file to delete.'))
-        
-        if self.state == 'signed':
-            raise ValidationError(_('Cannot delete SDM signed file when notification is already marked as signed.'))
-        
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can delete SDM signed file.'))
-        
-        self.write({
-            'sdm_signed_file': False,
-            'sdm_signed_filename': False,
-        })
-        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name)
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('SDM signed file has been deleted. You can now upload a new file.'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-    
-    def action_delete_collector_signed_file(self):
-        """Delete Collector signed file"""
-        self.ensure_one()
-        if not self.collector_signed_file:
-            raise ValidationError(_('No Collector signed file to delete.'))
-        
-        if self.state == 'signed':
-            raise ValidationError(_('Cannot delete Collector signed file when notification is already marked as signed.'))
-        
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only Collector can delete Collector signed file.'))
-        
-        self.write({
-            'collector_signed_file': False,
-            'collector_signed_filename': False,
-        })
-        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name)
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('Collector signed file has been deleted. You can now upload a new file.'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
     
     def action_mark_signed(self):
-        """Mark notification as signed after SDM uploads file"""
+        """Submit notification to Collector after SDM uploads file (standard workflow)"""
         self.ensure_one()
         if not self.sdm_signed_file:
             raise ValidationError(_('Please upload SDM signed file first.'))
-        self.state = 'signed'
+        self.state = 'submitted'
+        self.submitted_date = fields.Datetime.now()
         if not self.signed_date:
             self.signed_date = fields.Date.today()
     

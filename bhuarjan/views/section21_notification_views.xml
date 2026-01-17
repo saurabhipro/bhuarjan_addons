@@ -12,7 +12,7 @@
                 <field name="khasra_numbers" string="Khasra Numbers"/>
                 <field name="khasra_count" string="Khasra Count"/>
                 <field name="notice_date" string="Notice Date"/>
-                <field name="state" widget="badge" string="Status" decoration-success="state == 'signed'" decoration-info="state == 'generated'" decoration-muted="state == 'draft'"/>
+                <field name="state" widget="badge" string="Status" decoration-success="state == 'approved'" decoration-info="state == 'submitted'" decoration-warning="state == 'send_back'" decoration-muted="state == 'draft'"/>
                 <field name="signed_date" string="Signed Date"/>
             </list>
         </field>
@@ -28,10 +28,10 @@
                     <!-- Download Signed Document Button (visible when signed) -->
                     <button name="action_download_signed_document" string="Download Notification" type="object" 
                             class="btn-secondary" icon="fa-download"
-                            invisible="not signed_document_file or state != 'signed'"
+                            invisible="not signed_document_file or state != 'approved'"
                             title="Download Signed Section 21 Notification PDF"/>
                     
-                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,signed" options="{'clickable': True}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" options="{'clickable': False}"/>
                 </header>
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
@@ -92,7 +92,7 @@
                         <!-- Submit to Collector Button -->
                         <button name="action_mark_signed" string="Submit to Collector" type="object" 
                                 class="btn-success" icon="fa-paper-plane"
-                                invisible="not sdm_signed_file or state == 'signed'"
+                                invisible="not sdm_signed_file or state == 'approved'"
                                 title="Submit notification to collector after uploading SDM file"
                                 style="margin: 5px 0;"/>
                     </group>
@@ -122,7 +122,7 @@
                         <field name="collector_signed_file" filename="collector_signed_filename" 
                             string="Upload Collector Signed Sec 21"
                             widget="binary"
-                            readonly="state != 'generated' and state != 'signed'"
+                            readonly="state != 'submitted' and state != 'approved'"
                             placeholder="Select Collector Signed Section 21 PDF to upload"
                             help="Upload the signed Section 21 approval document from Collector"/>
                         <field name="collector_signed_filename" invisible="1"/>
@@ -145,8 +145,8 @@
                 <field name="district_id"/>
                 <field name="tehsil_id"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
-                <filter string="Signed" name="signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                 <separator/>
                 <filter string="With Signed Document" name="has_signed" domain="[('has_signed_document', '=', True)]"/>
                 <group expand="0" string="Group By">

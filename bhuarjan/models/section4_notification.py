@@ -20,8 +20,9 @@ class Section4Notification(models.Model):
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     notification_seq_number = fields.Char(string='Notification Sequence Number', readonly=True, tracking=True, 
                                           help='Sequence number for this notification')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade',
-                                  default=lambda self: self._default_project_id(),
+    # Location fields inherited from bhu.process.workflow.mixin
+    # Override project_id to add default and domain
+    project_id = fields.Many2one(default=lambda self: self._default_project_id(), 
                                   domain="[('is_sia_exempt', '=', False)]")
     
     # Requiring Body - automatically populated from project's department
@@ -33,8 +34,6 @@ class Section4Notification(models.Model):
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
                                    related='project_id.department_id', store=True, readonly=True)
     
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil', store=True, readonly=True, tracking=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     village_domain = fields.Char(string='Village Domain', compute='_compute_village_domain', store=False, readonly=True)
     area_captured_from_form10 = fields.Float(string='Area Captured from Form 10 (Hectares) / फॉर्म 10 से कैप्चर किया गया क्षेत्रफल (हेक्टेयर)',
                                              compute='_compute_area_captured', store=False, digits=(16, 4), readonly=True)
@@ -122,15 +121,6 @@ class Section4Notification(models.Model):
             self.state = 'signed'
             if not self.signed_date:
                 self.signed_date = fields.Date.today()
-    
-    @api.depends('village_id')
-    def _compute_tehsil(self):
-        """Compute tehsil from village"""
-        for record in self:
-            if record.village_id and record.village_id.tehsil_id:
-                record.tehsil_id = record.village_id.tehsil_id
-            else:
-                record.tehsil_id = False
     
     @api.depends('project_id')
     def _compute_village_domain(self):
@@ -532,71 +522,6 @@ class Section4Notification(models.Model):
         """Generate and download Section 4 Notification PDF (unsigned) - Override mixin"""
         return self.action_generate_pdf()
     
-    def action_delete_sdm_signed_file(self):
-        """Delete SDM signed file"""
-        self.ensure_one()
-        if not self.sdm_signed_file:
-            raise ValidationError(_('No SDM signed file to delete.'))
-        
-        # Only allow deletion in draft or send_back state
-        if self.state not in ('draft', 'send_back'):
-            raise ValidationError(_('Cannot delete SDM signed file in current state. Only allowed in Draft or Sent Back state.'))
-        
-        # Check if user is SDM or Admin
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can delete SDM signed file.'))
-        
-        # Clear the binary fields using write to ensure proper update
-        self.write({
-            'sdm_signed_file': False,
-            'sdm_signed_filename': False,
-        })
-        self.message_post(body=_('SDM signed file deleted by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('SDM signed file has been deleted. You can now upload a new file.'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-    
-    def action_delete_collector_signed_file(self):
-        """Delete Collector signed file"""
-        self.ensure_one()
-        if not self.collector_signed_file:
-            raise ValidationError(_('No Collector signed file to delete.'))
-        
-        # Only allow deletion in submitted state
-        if self.state != 'submitted':
-            raise ValidationError(_('Cannot delete Collector signed file in current state. Only allowed in Submitted state.'))
-        
-        # Check if user is Collector or Admin
-        if not (self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or 
-                self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only Collector can delete Collector signed file.'))
-        
-        # Clear the binary fields using write to ensure proper update
-        self.write({
-            'collector_signed_file': False,
-            'collector_signed_filename': False,
-        })
-        self.message_post(body=_('Collector signed file deleted by %s') % self.env.user.name, subtype_xmlid='mail.mt_note')
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('Collector signed file has been deleted. You can now upload a new file.'),
-                'type': 'success',
-                'sticky': False,
-            }
-        }
     
     def action_download_pdf(self):
         """Download Section 4 Notification PDF (for generated/signed/notification_11 notifications)"""

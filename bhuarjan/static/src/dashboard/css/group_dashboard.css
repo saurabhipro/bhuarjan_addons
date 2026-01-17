@@ -1,128 +1,142 @@
-/* Group Dashboard Styles - Admin Theme Matching */
+/* Group Dashboard Styles - Matching Admin Dashboard Theme */
 .o_group_dashboard {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #f5f5f5;
     min-height: 100vh;
     padding: 0;
 }
 
 .o_group_dashboard .dashboard-header {
-    background: rgba(102, 126, 234, 0.9);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
 }
 
 .o_group_dashboard .dashboard-header h2 {
     color: white;
     font-weight: 700;
-    font-size: 1.75rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 1.5rem;
+    margin: 0;
 }
 
 .o_group_dashboard .dashboard-content {
-    padding: 2rem 0;
+    padding: 1.5rem 0;
 }
 
-/* Statistics Cards - Admin Dashboard Style */
+/* Statistics Cards - Admin Dashboard Style with Background Images */
 .o_group_dashboard .stat-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 1.5rem;
+    border-radius: 12px;
+    padding: 1rem 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    gap: 0.875rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: none;
     position: relative;
     overflow: hidden;
+    min-height: 65px;
 }
 
-/* Background pattern for cards */
+/* Background pattern for cards - similar to admin dashboard */
 .o_group_dashboard .stat-card::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
     pointer-events: none;
+    z-index: 0;
+}
+
+.o_group_dashboard .stat-card>* {
+    position: relative;
+    z-index: 1;
 }
 
 .o_group_dashboard .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .o_group_dashboard .stat-icon {
-    font-size: 3rem;
-    opacity: 0.9;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    font-size: 2.25rem;
+    opacity: 1;
+    color: white;
 }
 
 .o_group_dashboard .stat-details h3 {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: 1.75rem;
+    font-weight: 700;
     margin: 0;
     color: white;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .o_group_dashboard .stat-details p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* Specific card colors matching admin dashboard */
+/* Specific card colors - LIGHTER gradients for better text visibility */
 .o_group_dashboard .bg-primary {
-    background: linear-gradient(135deg, #8B6F47 0%, #6B5537 100%) !important;
+    background: linear-gradient(135deg, #A0826D 0%, #8B6F47 100%);
 }
 
 .o_group_dashboard .bg-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+    background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
 }
 
 .o_group_dashboard .bg-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%) !important;
+    background: linear-gradient(135deg, #EF5350 0%, #F44336 100%);
 }
 
 .o_group_dashboard .bg-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%) !important;
+    background: linear-gradient(135deg, #26C6DA 0%, #00BCD4 100%);
 }
 
 .o_group_dashboard .bg-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+    background: linear-gradient(135deg, #FFCA28 0%, #FFC107 100%);
+}
+
+.o_group_dashboard .stat-card.bg-warning .stat-details h3,
+.o_group_dashboard .stat-card.bg-warning .stat-details p {
+    color: #333;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 /* Projects Table - Clean White Design */
 .o_group_dashboard .card {
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     background: white;
     overflow: hidden;
+    margin-top: 1.5rem;
 }
 
 .o_group_dashboard .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
     color: white;
     border-bottom: none;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.5rem;
 }
 
 .o_group_dashboard .card-header h5 {
     color: white;
     font-weight: 700;
     margin: 0;
-    font-size: 1.1rem;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
 }
 
 .o_group_dashboard .card-header i {
@@ -136,20 +150,20 @@
 .o_group_dashboard .table thead th {
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 0.5px;
-    color: #495057;
-    border-bottom: 2px solid #dee2e6;
-    padding: 1rem 0.75rem;
-    background: #f8f9fa;
+    color: #666;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 0.875rem 0.75rem;
+    background: #fafafa;
 }
 
 .o_group_dashboard .table tbody td {
     vertical-align: middle;
-    padding: 1rem 0.75rem;
-    border-bottom: 1px solid #e9ecef;
-    color: #212529;
-    font-size: 0.9rem;
+    padding: 0.875rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    font-size: 0.875rem;
 }
 
 .o_group_dashboard .project-row {
@@ -157,16 +171,15 @@
 }
 
 .o_group_dashboard .project-row:hover {
-    background: #f8f9fa;
+    background: #f9f9f9;
 }
 
 /* Badges - Clear and Readable */
 .o_group_dashboard .badge {
-    font-size: 0.85rem;
-    padding: 0.5rem 0.9rem;
-    border-radius: 20px;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .o_group_dashboard .badge.bg-secondary {
@@ -175,63 +188,61 @@
 }
 
 .o_group_dashboard .badge.bg-info {
-    background: #17a2b8 !important;
+    background: #00BCD4 !important;
     color: white;
 }
 
 .o_group_dashboard .stage-badge {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
     font-weight: 600;
     color: white !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .o_group_dashboard .badge-success {
-    background: #28a745 !important;
+    background: #4CAF50 !important;
     color: white !important;
 }
 
 .o_group_dashboard .badge-warning {
-    background: #ffc107 !important;
-    color: #212529 !important;
+    background: #FFC107 !important;
+    color: #333 !important;
 }
 
 .o_group_dashboard .badge-danger {
-    background: #dc3545 !important;
+    background: #F44336 !important;
     color: white !important;
 }
 
 /* Button Enhancements */
 .o_group_dashboard .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
     border: none;
-    border-radius: 25px;
-    padding: 0.65rem 1.75rem;
+    border-radius: 6px;
+    padding: 0.6rem 1.5rem;
     font-weight: 600;
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
     transition: all 0.3s ease;
 }
 
 .o_group_dashboard .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 4px 10px rgba(139, 69, 19, 0.4);
 }
 
 .o_group_dashboard .btn-outline-primary {
-    border: 2px solid #667eea;
-    color: #667eea;
-    border-radius: 8px;
+    border: 2px solid #8B4513;
+    color: #8B4513;
+    border-radius: 6px;
     transition: all 0.2s ease;
     background: white;
 }
 
 .o_group_dashboard .btn-outline-primary:hover {
-    background: #667eea;
+    background: #8B4513;
     color: white;
-    transform: scale(1.05);
 }
 
 /* Loading State */
@@ -251,7 +262,7 @@
 
 /* Empty State */
 .o_group_dashboard .text-muted {
-    color: #6c757d !important;
+    color: #999 !important;
 }
 
 /* Responsive Design */
@@ -261,7 +272,7 @@
     }
 
     .o_group_dashboard .stat-details h3 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     .o_group_dashboard .table-responsive {
@@ -269,14 +280,14 @@
     }
 
     .o_group_dashboard .dashboard-header h2 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
 }
 
 /* Text clarity improvements */
 .o_group_dashboard strong {
     font-weight: 600;
-    color: #212529;
+    color: #333;
 }
 
 .o_group_dashboard .table tbody td span {
@@ -285,5 +296,10 @@
 
 /* Ensure all text is readable */
 .o_group_dashboard .card-body {
-    color: #212529;
+    color: #333;
+}
+
+/* Container spacing */
+.o_group_dashboard .container-fluid {
+    max-width: 1400px;
 }

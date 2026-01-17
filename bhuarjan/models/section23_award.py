@@ -20,7 +20,6 @@ class Section23Award(models.Model):
     
     # Award details
     award_date = fields.Date(string='Award Date / अवार्ड दिनांक', default=fields.Date.today, tracking=True)
-    award_number = fields.Char(string='Award Number / अवार्ड संख्या', tracking=True)
     
     # Award document
     award_document = fields.Binary(string='Award Document / अवार्ड दस्तावेज़', tracking=False)
@@ -28,6 +27,15 @@ class Section23Award(models.Model):
     
     # Notes
     notes = fields.Text(string='Notes / नोट्स', tracking=True)
+    
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('sent_back', 'Sent Back')
+    ], string='Status', default='draft', tracking=True)
+    
+    is_generated = fields.Boolean(string='Is Generated', default=False, tracking=True)
     
     village_domain = fields.Char()
     
@@ -205,9 +213,11 @@ class Section23Award(models.Model):
                 
                 filename = f'Section23_Award_{self.village_id.name.replace(" ", "_") if self.village_id else ""}_{datetime.now().strftime("%Y%m%d")}.pdf'
                 
+                
                 self.write({
                     'award_document': base64.b64encode(pdf_data),
-                    'award_document_filename': filename
+                    'award_document_filename': filename,
+                    'is_generated': True
                 })
                 
                 # Return download action
@@ -218,7 +228,33 @@ class Section23Award(models.Model):
                 }
         
         # Fallback to standard report action if PDF generation fails
+        self.write({'is_generated': True})
         return report_action.report_action(self)
+    
+    def action_submit_award(self):
+        """Submit the award after document upload"""
+        self.ensure_one()
+        if not self.award_document:
+            raise ValidationError(_('Please upload the signed award document before submitting.\nकृपया जमा करने से पहले हस्ताक्षरित अवार्ड दस्तावेज़ अपलोड करें।'))
+        
+        self.write({
+            'state': 'submitted'
+        })
+        
+        # Log activity
+        self.message_post(body=_("Award submitted with signed document."))
+
+    def action_approve_award(self):
+        """Approve the award"""
+        self.ensure_one()
+        self.write({'state': 'approved'})
+        self.message_post(body=_("Award approved."))
+
+    def action_send_back_award(self):
+        """Send back the award for correction"""
+        self.ensure_one()
+        self.write({'state': 'sent_back'})
+        self.message_post(body=_("Award sent back for correction."))
     
     def get_land_compensation_data(self):
         """Get land compensation data grouped by landowner and khasra"""

@@ -9,7 +9,6 @@
                 <field name="name" string="Award Reference"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
-                <field name="award_number" string="Award Number"/>
                 <field name="award_date" string="Award Date"/>
                 <field name="award_document_filename" string="Award Document"/>
             </list>
@@ -23,60 +22,110 @@
         <field name="arch" type="xml">
             <form string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-                    <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" type="object" class="btn-primary" 
-                            icon="fa-file-pdf"/>
-                    <button name="action_download_award" string="View / देखें" type="object" class="btn-secondary" 
-                            icon="fa-download" invisible="not award_document"/>
+                    <button name="action_submit_award" string="Submit / जमा करें" type="object" class="btn-primary"
+                            invisible="not is_generated or not award_document or state != 'draft'"/>
+                    
+                    <button name="action_approve_award" string="Approve / स्वीकृत करें" type="object" class="btn-success"
+                            invisible="state != 'submitted'" groups="bhuarjan.group_bhu_section_officer"/>
+                            
+                    <button name="action_send_back_award" string="Send Back / वापस भेजें" type="object" class="btn-warning"
+                            invisible="state != 'submitted'" groups="bhuarjan.group_bhu_section_officer"/>
+                            
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
                 </header>
                 <sheet>
-                    <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
-                        <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
+                    <field name="is_generated" invisible="1"/>
+                    <div class="oe_title" style="margin-bottom: 20px;">
+                        <h2 style="color: #8B4513; margin-top: 5px; font-weight: bold;">
                             <i class="fa fa-trophy" style="margin-right: 10px;"></i>Section 23 Award / धारा 23 अवार्ड
-                        </h1>
+                        </h2>
                     </div>
                     
-                    <!-- Award Date - Editable -->
-                    <group>
-                        <field name="award_date"/>
-                    </group>
+                    <div invisible="not project_id or not village_id" class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057; clear: both;">
+                         <i class="fa fa-info-circle me-1"></i>
+                         Generating award for Village <field name="village_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>, 
+                         Project <field name="project_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>
+                    </div>
                     
-                    <!-- Hidden Fields -->
                     <group invisible="1">
-                        <field name="project_id" readonly="1" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                        <field name="village_domain"/>
-                        <field name="village_id" readonly="1" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                        <!-- Hidden fields needed for logic but not displayed as inputs -->
+                        <group>
+                            <field name="project_id" readonly="state != 'draft'" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                            <field name="village_id" readonly="state != 'draft'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                            <field name="department_id"/>
+                            <field name="village_domain"/>
+                        </group>
                     </group>
                     
                     <group>
-                        <field name="award_document" filename="award_document_filename" 
-                               widget="binary" 
-                               string="Upload Award Document / अवार्ड दस्तावेज़ अपलोड करें"/>
+                         <field name="award_date" readonly="state != 'draft'"/>
                     </group>
-                    <notebook>
-                        <page string="Approved Surveys / स्वीकृत सर्वेक्षण" name="surveys">
-                            <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}">
-                                <list editable="bottom" string="Surveys" default_order="survey_id">
-                                    <field name="survey_id" string="Survey" 
-                                           domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('state', 'in', ['approved', 'locked'])]"
-                                           options="{'no_create': True}"/>
-                                    <field name="survey_name" readonly="1" string="Survey Number" optional="show"/>
-                                    <field name="khasra_number" readonly="1" string="Khasra Number"/>
-                                    <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
-                                    <field name="survey_date" readonly="1" string="Survey Date" optional="show"/>
-                                    <field name="land_type" widget="radio" options="{'horizontal': true}" 
-                                           string="Type (Village/Residential)" 
-                                           help="Select Village for 20m distance check, Residential for 5m distance check"/>
-                                    <field name="is_within_distance" 
-                                           string="Within Distance" 
-                                           help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
-                                    <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
-                                </list>
-                            </field>
-                            <div class="alert alert-info" role="alert" invisible="all_surveys_configured">
-                                <strong>Note:</strong> Please select Type (Village/Residential) and check Distance for all surveys before generating award.
+
+
+
+                    <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}" readonly="state != 'draft'">
+                        <list editable="bottom" string="Surveys" default_order="survey_id" create="0">
+                            <field name="survey_id" string="Survey" 
+                                   domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('state', 'in', ['approved', 'locked'])]"
+                                   options="{'no_create': True}"/>
+                             <field name="survey_name" column_invisible="True"/>
+                            <field name="survey_date" column_invisible="True"/>
+                            <field name="khasra_number" readonly="1" string="Khasra Number"/>
+                            <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
+                            <field name="land_type" widget="radio" options="{'horizontal': true}" 
+                                   string="Type (Village/Residential)" 
+                                   help="Select Village for 20m distance check, Residential for 5m distance check"/>
+                            <field name="is_within_distance" 
+                                   string="Within Distance" 
+                                   help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
+                            <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
+                        </list>
+                    </field>
+                    
+                    <div class="alert alert-info mt-2" role="alert" invisible="all_surveys_configured">
+                        <strong>Note:</strong> Please select Type (Village/Residential) for all surveys before generating award.
+                    </div>
+                    
+                    <!-- Generate Button aligned left -->
+                    <div class="text-start mt-4 mb-4">
+                        <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" 
+                                type="object" class="btn-primary" 
+                                icon="fa-cogs"
+                                invisible="state != 'draft'"/>
+                        <div class="text-muted mt-2 small" invisible="state != 'draft'">
+                            <i class="fa fa-info-circle"></i>
+                            Generates the award PDF based on the configured surveys. / कॉन्फ़िगर किए गए सर्वेक्षणों के आधार पर अवार्ड पीडीएफ बनाता है।
+                        </div>
+                    </div>
+
+                    <!-- Upload Section - styled card-like appearance -->
+                    <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bold" style="color: #495057; font-size: 1.1rem;"
+                         invisible="not is_generated">
+                        <i class="fa fa-upload me-2"></i>Award Document / अवार्ड दस्तावेज़
+                    </div>
+                    
+                    <div class="alert alert-warning" role="alert" invisible="is_generated">
+                         <i class="fa fa-info-circle me-1"></i>
+                         Please generate the award first using the button below. / कृपया पहले नीचे दिए गए बटन का उपयोग करके अवार्ड जेनरेट करें।
+                    </div>
+
+                    <div class="p-3 mb-4 border rounded bg-light" invisible="not is_generated">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <field name="award_document" filename="award_document_filename" 
+                                       widget="binary" 
+                                       string="Upload Signed Award / हस्ताक्षरित अवार्ड अपलोड करें"
+                                       readonly="state != 'draft'"/>
+                                <field name="award_document_filename" invisible="1"/>
                             </div>
-                        </page>
-                    </notebook>
+                            <div>
+                                <button name="action_download_award" string="Download / डाउनलोड करें" 
+                                        type="object" class="btn btn-sm" 
+                                        style="background-color: #8B4513; border-color: #8B4513; color: white;" 
+                                        icon="fa-download" invisible="not award_document"/>
+                            </div>
+                        </div>
+                    </div>
                 </sheet>
                 <chatter/>
             </form>
@@ -92,7 +141,6 @@
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="village_id"/>
-                <field name="award_number"/>
             </search>
         </field>
     </record>

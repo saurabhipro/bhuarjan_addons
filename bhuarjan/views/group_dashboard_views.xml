@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Group Dashboard Action -->
+        <record id="action_group_dashboard" model="ir.actions.client">
+            <field name="name">Group Dashboard</field>
+            <field name="tag">bhuarjan.group_dashboard</field>
+            <field name="target">current</field>
+        </record>
+
+        <!-- Menu Item under Main Menu -->
+        <menuitem
+            id="menu_group_dashboard"
+            name="Group Dashboard"
+            parent="menu_bhu_root"
+            action="action_group_dashboard"
+            sequence="0"
+            groups="bhuarjan.group_bhuarjan_admin,bhuarjan.group_bhuarjan_collector"/>
+    </data>
+</odoo>

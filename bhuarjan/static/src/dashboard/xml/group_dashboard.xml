@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.GroupDashboard" owl="1">
+        <div class="o_group_dashboard">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <div class="container-fluid">
+                    <div class="row align-items-center py-3">
+                        <div class="col-md-8">
+                            <h2 class="mb-0">
+                                <i class="fa fa-th-large me-2"/>
+                                Group Dashboard / समूह डैशबोर्ड
+                            </h2>
+                            <p class="text-muted mb-0">Bird's Eye View of All Projects</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary" t-on-click="refreshDashboard">
+                                <i class="fa fa-refresh me-1"/>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                <p class="mt-3">Loading dashboard data...</p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-else="" class="dashboard-content">
+                <!-- Statistics Cards -->
+                <div class="container-fluid mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <div class="stat-card bg-primary text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-folder-open"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_projects"/>
+                                    <p>Total Projects</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-success text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-check-circle"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.on_track_projects"/>
+                                    <p>On Track</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-danger text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-exclamation-triangle"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.delayed_projects"/>
+                                    <p>Delayed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-info text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-users"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.sia_stage"/>
+                                    <p>SIA Stage</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-warning text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-file-text"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.section11_stage"/>
+                                    <p>Section 11</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-success text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-trophy"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.award_stage"/>
+                                    <p>Award Stage</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Table -->
+                <div class="container-fluid">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fa fa-list me-2"/>
+                                All Projects Status
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%">#</th>
+                                            <th style="width: 12%">Project Code</th>
+                                            <th style="width: 20%">Project Name</th>
+                                            <th style="width: 13%">Department</th>
+                                            <th style="width: 8%">Villages</th>
+                                            <th style="width: 15%">Current Stage</th>
+                                            <th style="width: 17%">Delay Status</th>
+                                            <th style="width: 10%">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.projects.length === 0">
+                                            <tr>
+                                                <td colspan="7" class="text-center py-4 text-muted">
+                                                    <i class="fa fa-inbox fa-3x mb-3 d-block"/>
+                                                    No projects found
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-else="">
+                                            <tr t-foreach="state.projects" t-as="project" t-key="project.id" class="project-row">
+                                                <td t-esc="project_index + 1"/>
+                                                <td>
+                                                    <span class="badge bg-secondary" t-esc="project.code"/>
+                                                </td>
+                                                <td>
+                                                    <strong t-esc="project.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="project.department_id[1]"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-info" t-esc="project.village_count"/>
+                                                </td>
+                                                <td>
+                                                    <span class="badge stage-badge" 
+                                                          t-att-style="'background-color: ' + getStageColor(project.current_stage)"
+                                                          t-esc="getStageLabel(project.current_stage)"/>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          t-att-class="'badge ' + getDelayBadgeClass(project.delay_info)"
+                                                          t-esc="getDelayText(project.delay_info)"/>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" 
+                                                            t-on-click="() => this.openProject(project.id)"
+                                                            title="Open Project">
+                                                        <i class="fa fa-external-link"/>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

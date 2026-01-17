@@ -54,6 +54,7 @@
         'reports/expert_committee_order_report.xml',
         'reports/section15_objection_resolution_report.xml',
         'reports/section23_award_report.xml',
+        'reports/project_master_report.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',
@@ -116,8 +117,10 @@
         'wizard/user_report_wizard.xml',
         'views/qr_microsite_templates.xml',
         'data/mail_data.xml',
+        'views/group_dashboard_views.xml',
         'views/menu_root.xml',
         'views/menuitem.xml',
+
 
     ],
     'assets': {
@@ -142,8 +145,13 @@
             'bhuarjan/static/src/dashboard/xml/collector_dashboard.xml',
             # District Admin Dashboard XML (JS is in unified_dashboard.js)
             'bhuarjan/static/src/dashboard/xml/district_dashboard.xml',
+            # Group Dashboard (for Administrators)
+            'bhuarjan/static/src/dashboard/css/group_dashboard.css',
+            'bhuarjan/static/src/dashboard/xml/group_dashboard.xml',
+            'bhuarjan/static/src/dashboard/js/group_dashboard.js',
             # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
+
             # 'bhuarjan/static/src/css/landowner_documents.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
             # 'bhuarjan/static/src/scss/organization_chart.scss',

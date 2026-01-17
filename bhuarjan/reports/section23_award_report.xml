@@ -7,7 +7,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.section23_award_report</field>
         <field name="report_file">bhuarjan.section23_award_report</field>
-        <field name="paperformat_id" ref="bhuarjan.bhuarjan_landscape_paper_format"/>
+        <field name="paperformat_id" ref="bhuarjan.bhuarjan_section_23_award_paper_format"/>
         <field name="print_report_name">'Section23_Award_' + ((object and object.village_id and object.village_id.name.replace(' ', '_') if object.village_id.name else '') or (docs and docs[0] and docs[0].village_id and docs[0].village_id.name.replace(' ', '_') if docs[0].village_id.name else '') or '') + '_' + ((object and object.award_date and object.award_date.strftime('%Y%m%d') if object.award_date else '') or (docs and docs[0] and docs[0].award_date and docs[0].award_date.strftime('%Y%m%d') if docs[0].award_date else '') or (object and object.create_date and object.create_date.strftime('%Y%m%d') if object.create_date else '') or (docs and docs[0] and docs[0].create_date and docs[0].create_date.strftime('%Y%m%d') if docs[0].create_date else '') or '')</field>
     </record>
 

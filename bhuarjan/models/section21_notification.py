@@ -342,26 +342,7 @@ class Section21Notification(models.Model):
     
     # QR code generation is now handled by bhu.qr.code.mixin
     
-    def _get_landowners_from_parcels(self):
-        """Get all unique landowners from land parcels by finding surveys with matching khasra numbers"""
-        self.ensure_one()
-        if not self.land_parcel_ids or not self.village_id or not self.project_id:
-            return self.env['bhu.landowner']
-        
-        # Get all khasra numbers from land parcels
-        khasra_numbers = self.land_parcel_ids.mapped('khasra_number')
-        
-        # Find all surveys with these khasra numbers
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('khasra_number', 'in', khasra_numbers),
-            ('state', 'in', ['approved', 'locked'])
-        ])
-        
-        # Get all unique landowners from these surveys
-        landowner_ids = surveys.mapped('landowner_ids')
-        return landowner_ids
+
     
     def _get_khasra_landowner_mapping(self):
         """Get mapping of khasra numbers to landowners directly from surveys (no land parcel dependency)"""
@@ -400,214 +381,132 @@ class Section21Notification(models.Model):
                 # No landowner for this khasra, still return a placeholder to generate notice
                 result.append((khasra, False))
         
+                result.append((khasra, False))
+        
         return result
     
-    # Override mixin method to generate Section 21 Notification PDF
-    def action_download_unsigned_file(self):
-        """Generate and download Section 21 Notification PDF (unsigned) - Override mixin"""
+    # -------------------------------------------------------------------------
+    # NEW REPORTING LOGIC (Refactored)
+    # -------------------------------------------------------------------------
+
+    def get_section21_public_data(self):
+        """
+        Data provider for Public Notice section.
+        Returns a list containing the record itself to trigger one iteration in QWeb.
+        """
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_section21_notification').report_action(self)
-    
+        return [self]
+
+    def get_section21_personal_data(self):
+        """
+        Data provider for Personal Notice section.
+        Returns a list of dictionaries with all data needed for the personal notice.
+        No transient model dependency.
+        """
+        self.ensure_one()
+        
+        # Get khasra-landowner mapping
+        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
+        
+        # Helper to get area for a khasra
+        def get_khasra_area(khasra_num):
+            surveys = self.env['bhu.survey'].search([
+                ('village_id', '=', self.village_id.id),
+                ('project_id', '=', self.project_id.id),
+                ('khasra_number', '=', khasra_num),
+                ('state', 'in', ['approved', 'locked'])
+            ])
+            return sum(s.acquired_area or 0.0 for s in surveys)
+
+        personal_data_list = []
+        
+        # If no mapping, check if we simply have khasras without landowners
+        if not khasra_landowner_mapping:
+             surveys = self.env['bhu.survey'].search([
+                ('village_id', '=', self.village_id.id),
+                ('project_id', '=', self.project_id.id),
+                ('state', 'in', ['approved', 'locked']),
+                ('khasra_number', '!=', False)
+            ])
+             unique_khasras = list(set(surveys.mapped('khasra_number')))
+             for khasra in unique_khasras:
+                 personal_data_list.append({
+                     'khasra_number': khasra,
+                     'area': get_khasra_area(khasra),
+                     'landowner_name': '',
+                     'landowner_father': '',
+                     'landowner_address': '',
+                     # Add notification UUID for QR code generation if needed in loop
+                     'notification_uuid': self.notification_uuid
+                 })
+        else:
+            for khasra, landowner in khasra_landowner_mapping:
+                data = {
+                    'khasra_number': khasra,
+                    'area': get_khasra_area(khasra),
+                    'landowner_name': landowner.name if landowner else '',
+                    'landowner_father': (landowner.father_name or landowner.spouse_name) if landowner else '',
+                    'landowner_address': landowner.owner_address if landowner else '',
+                    'notification_uuid': self.notification_uuid
+                }
+                personal_data_list.append(data)
+        
+        # Sort by khasra number
+        try:
+             personal_data_list.sort(key=lambda x: x['khasra_number'])
+        except:
+             pass
+             
+        return personal_data_list
+
+    def action_print_section21_report(self):
+        """
+        Unified method to print Section 21 Report.
+        Uses context flags to determine what to show.
+        """
+        self.ensure_one()
+        
+        # Default flags (overridden by context if provided, otherwise assume specific button actions set them)
+        show_public = self.env.context.get('show_public_notice', False)
+        show_personal = self.env.context.get('show_personal_notice', False)
+        
+        # If no context flags, assume standard print (Public Only by default for legacy reasons, or check caller)
+        # But here we will rely on specific actions calling this with context
+        
+        return self.env.ref('bhuarjan.action_report_section21_notification').report_action(self, data=None)
+
     def action_generate_public_notice(self):
         """Generate Section 21 Public Notice PDF"""
         self.ensure_one()
-        return self.action_download_unsigned_file()
+        return self.with_context(show_public_notice=True, show_personal_notice=False).action_print_section21_report()
     
     def action_generate_personal_notices(self):
-        """Generate Section 21 Personal Notices PDF - One for each khasra (khasra-wise)"""
+        """Generate Section 21 Personal Notices PDF"""
         self.ensure_one()
-        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
-        
-        if not khasra_landowner_mapping:
-            raise ValidationError(_('No landowners found for the land parcels. Please ensure surveys are linked to the khasra numbers.'))
-        
-        # Create transient records - one per khasra with its landowner
-        personal_notices = self.env['bhu.section21.personal.notice'].create([
-            {
-                'notification_id': self.id,
-                'landowner_id': landowner.id,
-                'khasra_number': khasra,
-            }
-            for khasra, landowner in khasra_landowner_mapping
-        ])
-        
-        # Generate PDF for all personal notices
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
-        return report_action.report_action(personal_notices)
+        # Ensure validation
+        if not self.village_id or not self.project_id:
+             raise ValidationError(_('Please select Village and Project.'))
+        return self.with_context(show_public_notice=False, show_personal_notice=True).action_print_section21_report()
     
-    def action_generate_personal_notices_only(self):
-        """Generate Personal Section 21 Notices Only - One page per khasra (without public notice)"""
-        self.ensure_one()
-        if not self.village_id:
-            raise ValidationError(_('Please select a village before generating personal notices.'))
+
         
-        if not self.project_id:
-            raise ValidationError(_('Please select a project before generating personal notices.'))
-        
-        # Get khasra numbers directly from surveys (don't check land parcels)
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['approved', 'locked']),
-            ('khasra_number', '!=', False)
-        ])
-        
-        if not surveys:
-            raise ValidationError(_('No approved or locked surveys found for the selected village and project.'))
-        
-        # Get all unique khasra numbers directly from surveys
-        khasra_numbers = list(set(surveys.mapped('khasra_number')))
-        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
-        
-        if not khasra_numbers:
-            raise ValidationError(_('No khasra numbers found in surveys. Please ensure surveys have khasra numbers.'))
-        
-        # Get khasra-landowner mapping for personal notices (if available)
-        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
-        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
-        khasra_to_landowner = {}
-        for khasra, landowner in khasra_landowner_mapping:
-            if khasra not in khasra_to_landowner:
-                khasra_to_landowner[khasra] = landowner.id if landowner else False
-        
-        # Create transient records - one per khasra (even if no landowner)
-        personal_notices = self.env['bhu.section21.personal.notice'].create([
-            {
-                'notification_id': self.id,
-                'landowner_id': khasra_to_landowner.get(khasra, False),
-                'khasra_number': khasra,
-            }
-            for khasra in khasra_numbers
-        ])
-        
-        # Generate personal notices WITHOUT public notice first
-        # This will generate one page per khasra using only the personal template
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
-        # Invalidate report cache to force fresh generation
-        report_action.invalidate_recordset(['report_name', 'report_file'])
-        return report_action.with_context(
-            include_public_notice_first=False,
-            section21_notification_id=self.id,
-            active_id=self.id
-        ).report_action(personal_notices)
-    
     def action_generate_section21_public_for_all(self):
-        print("\n\n function is working work ")
-        """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
+        """Generate Both Public and Personal"""
         self.ensure_one()
-        
-        # Validate village and project are selected
-        if not self.village_id:
-            raise ValidationError(_('Please select a village before generating Section 21 notices.'))
-        
-        if not self.project_id:
-            raise ValidationError(_('Please select a project before generating Section 21 notices.'))
-        
-        # Get khasra numbers directly from surveys (don't check land parcels)
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['approved', 'locked']),
-            ('khasra_number', '!=', False)
-        ])
-        
-        if not surveys:
-            # If no surveys, just generate public notice
-            return self.action_generate_public_notice()
-        
-        # Get all unique khasra numbers directly from surveys
-        khasra_numbers = list(set(surveys.mapped('khasra_number')))
-        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
-        
-        if not khasra_numbers:
-            # If no khasras, just generate public notice
-            return self.action_generate_public_notice()
-        
-        # Get khasra-landowner mapping for personal notices (if available)
-        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
-        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
-        khasra_to_landowner = {}
-        for khasra, landowner in khasra_landowner_mapping:
-            if khasra not in khasra_to_landowner:
-                khasra_to_landowner[khasra] = landowner.id if landowner else False
-        
-        # Create transient records - one per khasra (even if no landowner)
-        personal_notices = self.env['bhu.section21.personal.notice'].create([
-            {
-                'notification_id': self.id,
-                'landowner_id': khasra_to_landowner.get(khasra, False),
-                'khasra_number': khasra,
-            }
-            for khasra in khasra_numbers
-        ])
-        print("\n\n personal_notices - ", personal_notices)
-        return personal_notices
-    
+        if not self.village_id or not self.project_id:
+             raise ValidationError(_('Please select Village and Project.'))
+        return self.with_context(show_public_notice=True, show_personal_notice=True).action_print_section21_report()
 
     def action_generate_both_notices(self):
-        self.ensure_one()
-        return self.action_generate_section21_all()
-        
+         return self.action_generate_section21_public_for_all()
 
-    def action_generate_section21_all(self):
-        """Generate Section 21 - Public notice first, then personal notices for each khasra (khasra-wise)"""
-        self.ensure_one()
-        
-        # Validate village and project are selected
-        if not self.village_id:
-            raise ValidationError(_('Please select a village before generating Section 21 notices.'))
-        
-        if not self.project_id:
-            raise ValidationError(_('Please select a project before generating Section 21 notices.'))
-        
-        # Get khasra numbers directly from surveys (don't check land parcels)
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.village_id.id),
-            ('project_id', '=', self.project_id.id),
-            ('state', 'in', ['approved', 'locked']),
-            ('khasra_number', '!=', False)
-        ])
-        
-        if not surveys:
-            # If no surveys, just generate public notice
-            return self.action_generate_public_notice()
-        
-        # Get all unique khasra numbers directly from surveys
-        khasra_numbers = list(set(surveys.mapped('khasra_number')))
-        khasra_numbers = [k for k in khasra_numbers if k]  # Remove empty/None values
-        
-        if not khasra_numbers:
-            # If no khasras, just generate public notice
-            return self.action_generate_public_notice()
-        
-        # Get khasra-landowner mapping for personal notices (if available)
-        khasra_landowner_mapping = self._get_khasra_landowner_mapping()
-        # Create a dict for quick lookup: khasra -> first landowner ID (if any)
-        khasra_to_landowner = {}
-        for khasra, landowner in khasra_landowner_mapping:
-            if khasra not in khasra_to_landowner:
-                khasra_to_landowner[khasra] = landowner.id if landowner else False
-        
-        # Create transient records - one per khasra (even if no landowner)
-        personal_notices = self.env['bhu.section21.personal.notice'].create([
-            {
-                'notification_id': self.id,
-                'landowner_id': khasra_to_landowner.get(khasra, False),
-                'khasra_number': khasra,
-            }
-            for khasra in khasra_numbers
-        ])
-        
-        # Generate personal notices with context flag to include public notice first
-        # The report template will check this context and render public notice as first page
-        report_action = self.env.ref('bhuarjan.action_report_section21_personal_notification')
-        # Invalidate report cache to force fresh generation
-        report_action.invalidate_recordset(['report_name', 'report_file'])
-        return report_action.with_context(
-            include_public_notice_first=True,
-            section21_notification_id=self.id
-        ).report_action(personal_notices)
-    
+
+
+    # -------------------------------------------------------------------------
+    # Legacy / Deprecated methods kept for compatibility or cleanup
+    # -------------------------------------------------------------------------
+
+    # Override mixin method to generate Section 21 Notification PDF
     def action_download_signed_document(self):
         """Download signed Section 21 notification document"""
         self.ensure_one()
@@ -656,9 +555,10 @@ class Section21Notification(models.Model):
             'target': 'self',
         }
     
+    
     def action_generate_pdf(self):
         """Generate Section 21 Notification PDF - Legacy method (defaults to public)"""
-        return self.action_download_unsigned_file()
+        return self.action_generate_public_notice()
     
     def action_delete_sdm_signed_file(self):
         """Delete SDM signed file"""
@@ -757,69 +657,5 @@ class Section21LandParcel(models.Model):
     remark = fields.Char(string='Remark / रिमार्क', help='Additional remarks for this land parcel')
 
 
-class Section21PersonalNotice(models.TransientModel):
-    """Transient model to link landowners with Section 21 notification for personal notice generation - one per khasra per landowner"""
-    _name = 'bhu.section21.personal.notice'
-    _description = 'Section 21 Personal Notice'
 
-    notification_id = fields.Many2one('bhu.section21.notification', string='Notification', required=True)
-    landowner_id = fields.Many2one('bhu.landowner', string='Landowner', required=False, help='Landowner (optional - notice can be generated even without landowner)')
-    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, help='Khasra number for this personal notice')
-    
-    def get_personal_notice_data(self):
-        """Get data for this specific personal notice with landowner and khasra details"""
-        self.ensure_one()
-        if not self.notification_id or not self.khasra_number:
-            return {
-                'khasra_number': self.khasra_number or '',
-                'area': 0.0,
-                'landowner_name': '',
-                'landowner_father': '',
-                'landowner_address': ''
-            }
-        
-        # Get area for this khasra from surveys
-        surveys = self.env['bhu.survey'].search([
-            ('village_id', '=', self.notification_id.village_id.id),
-            ('project_id', '=', self.notification_id.project_id.id),
-            ('khasra_number', '=', self.khasra_number),
-            ('state', 'in', ['approved', 'locked'])
-        ])
-        
-        # Sum up area for this khasra
-        total_area = sum(s.acquired_area or 0.0 for s in surveys)
-        
-        # Get landowner details if available
-        landowner_name = ''
-        landowner_father = ''
-        landowner_address = ''
-        
-        if self.landowner_id:
-            landowner_name = self.landowner_id.name or ''
-            landowner_father = self.landowner_id.father_name or self.landowner_id.spouse_name or ''
-            landowner_address = self.landowner_id.owner_address or ''
-        elif surveys:
-            # If no specific landowner but surveys exist, try to get from surveys
-            # Find survey that has this landowner (if landowner_id is set)
-            for survey in surveys:
-                if self.landowner_id and self.landowner_id in survey.landowner_ids:
-                    landowner_name = self.landowner_id.name or ''
-                    landowner_father = self.landowner_id.father_name or self.landowner_id.spouse_name or ''
-                    landowner_address = self.landowner_id.owner_address or ''
-                    break
-                elif not self.landowner_id and survey.landowner_ids:
-                    # Use first landowner from survey if no specific landowner set
-                    landowner = survey.landowner_ids[0]
-                    landowner_name = landowner.name or ''
-                    landowner_father = landowner.father_name or landowner.spouse_name or ''
-                    landowner_address = landowner.owner_address or ''
-                    break
-        
-        return {
-            'khasra_number': self.khasra_number,
-            'area': total_area,
-            'landowner_name': landowner_name,
-            'landowner_father': landowner_father,
-            'landowner_address': landowner_address
-        }
 

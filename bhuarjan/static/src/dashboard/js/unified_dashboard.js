@@ -146,7 +146,7 @@ const DASHBOARD_CONFIG = {
         }
     },
     'admin': {
-        template: 'bhuarjan.SDMTemplate',
+        template: 'bhuarjan.AdminDashboardTemplate',
         registryKey: 'bhuarjan.admin_dashboard',
         pageTitle: 'Admin Dashboard',
         localStoragePrefix: 'admin_dashboard',
@@ -1130,6 +1130,38 @@ export class UnifiedDashboard extends Component {
     }
 
     // Check if a section should be visible based on project's law
+    getStepNumber(sectionName, defaultText) {
+        if (!this.state.allowedSectionNames) {
+            return defaultText;
+        }
+
+        // Check for Railways
+        const isRailways = this.state.allowedSectionNames.includes('Sec 20 A (Railways)');
+        if (isRailways) {
+            const steps = {
+                'Surveys': 'Step 1',
+                'Sec 20 A (Railways)': 'Step 2',
+                'Sec 20 D (Objection) (Railways)': 'Step 3',
+                'Sec 20 E (Railways)': 'Step 4'
+            };
+            if (steps[sectionName]) return steps[sectionName];
+        }
+
+        // Check for NHAI
+        const isNHAI = this.state.allowedSectionNames.includes('Sec 3A (NH)');
+        if (isNHAI) {
+            const steps = {
+                'Surveys': 'Step 1',
+                'Sec 3A (NH)': 'Step 2',
+                'Sec 3C (Objection) (NH)': 'Step 3',
+                'Sec 3D (NH)': 'Step 4'
+            };
+            if (steps[sectionName]) return steps[sectionName];
+        }
+
+        return defaultText;
+    }
+
     isSectionVisible(dashboardSectionName) {
         try {
             // Railway and NH sections require department to be selected

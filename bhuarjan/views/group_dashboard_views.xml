@@ -15,6 +15,6 @@
             parent="menu_bhu_root"
             action="action_group_dashboard"
             sequence="0"
-            groups="bhuarjan.group_bhuarjan_admin,bhuarjan.group_bhuarjan_collector"/>
+            groups="bhuarjan.group_bhuarjan_admin"/>
     </data>
 </odoo>

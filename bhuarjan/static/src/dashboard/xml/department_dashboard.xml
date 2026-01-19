@@ -147,7 +147,7 @@
                         <!-- Surveys - Step 1 Only -->
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
-                                <span class="o_step_number bg-primary">Step 1</span>
+                                <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Surveys', 'Step 1')"/></span>
                             </div>
                             <div class="o_section_list_icon">
                                 <i class="fa fa-clipboard"/>

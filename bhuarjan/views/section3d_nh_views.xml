@@ -5,7 +5,7 @@
         <field name="name">bhu.section3d.nh.list</field>
         <field name="model">bhu.section3d.nh</field>
         <field name="arch" type="xml">
-            <list string="Section 3D (NH)" delete="1" create="not groups='bhuarjan.group_bhuarjan_collector'">
+            <list string="Section 3D (NH)" delete="1">
                 <field name="name" string="Reference"/>
                 <field name="department_id" string="Department"/>
                 <field name="project_id" string="Project"/>
@@ -21,8 +21,7 @@
         <field name="model">bhu.section3d.nh</field>
         <field name="arch" type="xml">
             <form string="Section 3D (NH) / धारा 3डी (राष्ट्रीय राजमार्ग)" 
-                  edit="not groups='bhuarjan.group_bhuarjan_collector'"
-                  create="not groups='bhuarjan.group_bhuarjan_collector'">
+                  edit="not groups='bhuarjan.group_bhuarjan_collector'">
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
@@ -33,11 +32,17 @@
                         <group>
                             <field name="village_domain" invisible="1"/>
                             <field name="project_domain" invisible="1"/>
-                            <field name="department_id" options="{'no_create': True, 'no_create_edit': True}"/>
-                            <field name="project_id" domain="project_domain or [('id', 'in', [])]" 
-                                   options="{'no_create': True, 'no_create_edit': True}"/>
-                            <field name="village_id" domain="village_domain" 
-                                   options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
+                            <div class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057; clear: both;">
+                                 <i class="fa fa-info-circle me-1"></i>
+                                 Creating Section 3D (NH) for Department <strong><field name="department_id" readonly="1" options="{'no_open': True}" class="d-inline"/></strong>, 
+                                 Project <strong><field name="project_id" readonly="1" options="{'no_open': True}" class="d-inline"/></strong> and 
+                                 Village <strong><field name="village_id" readonly="1" options="{'no_open': True}" class="d-inline"/></strong>
+                            </div>
+                            <group invisible="1">
+                                <field name="department_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                                <field name="project_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                                <field name="village_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                            </group>
                         </group>
                     </group>
                     <group string="Files / फ़ाइलें">

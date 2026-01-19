@@ -2,24 +2,7 @@
 <templates xml:space="preserve">
     <t t-name="bhuarjan.GroupDashboard" owl="1">
         <div class="o_group_dashboard">
-            <!-- Header -->
-            <div class="dashboard-header py-3">
-                <div class="container-fluid">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h2 class="mb-0">
-                                <i class="fa fa-th-large me-2"/>
-                                Group Dashboard
-                            </h2>
-                            <small class="text-white-50">Bird's Eye View of All Projects</small>
-                        </div>
-                        <button class="btn btn-light btn-sm" t-on-click="refreshDashboard">
-                            <i class="fa fa-refresh me-1"/>
-                            Refresh
-                        </button>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Loading State -->
             <div t-if="state.loading" class="text-center py-5">

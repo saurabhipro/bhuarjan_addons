@@ -52,7 +52,8 @@ class SurveyPhoto(models.Model):
     def _compute_google_maps_url(self):
         for record in self:
             if record.latitude and record.longitude:
-                record.google_maps_url = f"https://www.google.com/maps/search/?api=1&query={record.latitude},{record.longitude}"
+                # Street View URL format
+                record.google_maps_url = f"https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={record.latitude},{record.longitude}"
             else:
                 record.google_maps_url = False
 

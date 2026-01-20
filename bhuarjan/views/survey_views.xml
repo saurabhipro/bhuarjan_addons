@@ -205,7 +205,9 @@
                                         <field name="filename" string="Filename / फ़ाइल नाम" column_invisible="1"/>
                                         <field name="s3_filename_display" string="S3 File / S3 फ़ाइल" column_invisible="1"/>
                                         <field name="s3_url" widget="url" string="Image" text="View Image"/>
-                                        <field name="google_maps_url" widget="url" string="Map Location" text="View on Map" invisible="not google_maps_url"/>
+                                        <field name="latitude" optional="show"/>
+                                        <field name="longitude" optional="show"/>
+                                        <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
                                         <field name="sequence"/>
                                     </list>
                                 </field>
@@ -404,6 +406,8 @@ action['context'] = ctx
                 <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
                 <field name="filename" string="Filename / फ़ाइल नाम"/>
                 <field name="s3_filename_display" string="S3 File / S3 फ़ाइल"/>
+                <field name="latitude" optional="show"/>
+                <field name="longitude" optional="show"/>
                 <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
                 <field name="sequence"/>
             </list>

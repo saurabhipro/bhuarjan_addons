@@ -1407,7 +1407,9 @@ class BhuarjanAPIController(http.Controller):
                         photo_data = {
                             's3_url': photo['s3_url'],
                             'filename': photo.get('filename', ''),
-                            'file_size': photo.get('file_size', 0)
+                            'file_size': photo.get('file_size', 0),
+                            'latitude': photo.get('latitude'),
+                            'longitude': photo.get('longitude')
                         }
                         
                         # Only add photo_type_id if it was provided and is valid
@@ -1588,6 +1590,8 @@ class BhuarjanAPIController(http.Controller):
                     's3_url': photo.s3_url or '',
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
+                    'latitude': photo.latitude,
+                    'longitude': photo.longitude,
                     'sequence': photo.sequence or 10
                 } for photo in survey.photo_ids],
                 'has_house': survey.has_house,

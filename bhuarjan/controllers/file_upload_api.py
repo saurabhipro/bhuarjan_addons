@@ -371,6 +371,8 @@ class FileUploadAPIController(http.Controller):
                     's3_url': photo.s3_url,
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
+                    'latitude': photo.latitude,
+                    'longitude': photo.longitude,
                     'sequence': photo.sequence
                 })
             

@@ -42,6 +42,20 @@ class SurveyPhoto(models.Model):
     sequence = fields.Integer(string='Sequence / क्रम', default=10, tracking=True,
                              help='Display order')
     
+    # Location Details
+    latitude = fields.Float(string='Latitude / अक्षांश', digits=(10, 8), help='GPS Latitude coordinate', tracking=True)
+    longitude = fields.Float(string='Longitude / देशांतर', digits=(11, 8), help='GPS Longitude coordinate', tracking=True)
+    
+    google_maps_url = fields.Char(string='Google Maps / गूगल मैप्स', compute='_compute_google_maps_url', store=False)
+
+    @api.depends('latitude', 'longitude')
+    def _compute_google_maps_url(self):
+        for record in self:
+            if record.latitude and record.longitude:
+                record.google_maps_url = f"https://www.google.com/maps/search/?api=1&query={record.latitude},{record.longitude}"
+            else:
+                record.google_maps_url = False
+
     # Binary field for file upload
     file_upload = fields.Binary(string='Upload File / फ़ाइल अपलोड करें', 
                                 help='Select a file to upload to S3. The file will be automatically uploaded and the S3 URL will be generated.')

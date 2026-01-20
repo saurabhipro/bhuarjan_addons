@@ -198,7 +198,16 @@
                         
                         <page string="Photos / फोटो" name="survey_photos">
                             <group string="Survey Photos / सर्वे फोटो">
-                                <field name="photo_ids" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1"/>
+                                <field name="photo_ids" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1">
+                                    <list string="Survey Photos / सर्वे फोटो">
+                                        <field name="display_name" string="Name / नाम"/>
+                                        <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
+                                        <field name="filename" string="Filename / फ़ाइल नाम"/>
+                                        <field name="s3_filename_display" string="S3 File / S3 फ़ाइल"/>
+                                        <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
+                                        <field name="sequence"/>
+                                    </list>
+                                </field>
                             </group>
                         </page>
                         
@@ -394,6 +403,7 @@ action['context'] = ctx
                 <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
                 <field name="filename" string="Filename / फ़ाइल नाम"/>
                 <field name="s3_filename_display" string="S3 File / S3 फ़ाइल"/>
+                <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
                 <field name="sequence"/>
             </list>
         </field>
@@ -411,6 +421,7 @@ action['context'] = ctx
                         <field name="filename" string="Filename / फ़ाइल नाम"/>
                         <field name="s3_url" string="S3 URL / S3 यूआरएल"/>
                         <field name="s3_filename_display" string="S3 File / S3 फ़ाइल" readonly="1"/>
+                        <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
                         <field name="file_size" string="File Size (bytes) / फ़ाइल आकार"/>
                         <field name="sequence"/>
                         <field name="file_upload" string="Upload File / फ़ाइल अपलोड करें" widget="binary"/>

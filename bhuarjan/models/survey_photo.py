@@ -49,11 +49,12 @@ class SurveyPhoto(models.Model):
     google_maps_url = fields.Char(string='Google Maps / गूगल मैप्स', compute='_compute_google_maps_url', store=False)
 
     @api.depends('latitude', 'longitude')
+    @api.depends('latitude', 'longitude')
     def _compute_google_maps_url(self):
         for record in self:
             if record.latitude and record.longitude:
-                # Street View URL format
-                record.google_maps_url = f"https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={record.latitude},{record.longitude}"
+                # Simple Maps Search URL format as requested
+                record.google_maps_url = f"https://www.google.com/maps?q={record.latitude},{record.longitude}"
             else:
                 record.google_maps_url = False
 

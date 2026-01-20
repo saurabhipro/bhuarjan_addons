@@ -423,6 +423,8 @@ action['context'] = ctx
                         <field name="s3_url" string="S3 URL / S3 यूआरएल"/>
                         <field name="s3_filename_display" string="S3 File / S3 फ़ाइल" readonly="1"/>
                         <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
+                        <field name="latitude" string="Latitude / अक्षांश" readonly="0"/>
+                        <field name="longitude" string="Longitude / देशांतर" readonly="0"/>
                         <field name="file_size" string="File Size (bytes) / फ़ाइल आकार"/>
                         <field name="sequence"/>
                         <field name="file_upload" string="Upload File / फ़ाइल अपलोड करें" widget="binary"/>

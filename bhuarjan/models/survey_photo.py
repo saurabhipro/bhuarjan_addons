@@ -46,17 +46,16 @@ class SurveyPhoto(models.Model):
     latitude = fields.Float(string='Latitude / अक्षांश', digits=(10, 8), help='GPS Latitude coordinate', tracking=True)
     longitude = fields.Float(string='Longitude / देशांतर', digits=(11, 8), help='GPS Longitude coordinate', tracking=True)
     
-    google_maps_url = fields.Char(string='Google Maps / गूगल मैप्स', compute='_compute_google_maps_url', store=False)
+    google_maps_url = fields.Char(string='Google Maps / गूगल मैप्स', compute='_compute_google_maps_url', store=True)
 
-    @api.depends('latitude', 'longitude')
     @api.depends('latitude', 'longitude')
     def _compute_google_maps_url(self):
         for record in self:
-            if record.latitude and record.longitude:
-                # Simple Maps Search URL format as requested
-                record.google_maps_url = f"https://www.google.com/maps?q={record.latitude},{record.longitude}"
-            else:
-                record.google_maps_url = False
+            # Use provided lat/long or fallback to default testing coordinates
+            lat = record.latitude or 28.43372368772261
+            lon = record.longitude or 77.06891353643873
+            
+            record.google_maps_url = f"https://www.google.com/maps?q={lat},{lon}"
 
     # Binary field for file upload
     file_upload = fields.Binary(string='Upload File / फ़ाइल अपलोड करें', 

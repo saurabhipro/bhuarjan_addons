@@ -3009,7 +3009,9 @@ class BhuarjanAPIController(http.Controller):
                     photo_data = {
                         's3_url': photo['s3_url'],
                         'filename': photo.get('filename', ''),
-                        'file_size': photo.get('file_size', 0)
+                        'file_size': photo.get('file_size', 0),
+                        'latitude': photo.get('latitude', 0.0),
+                        'longitude': photo.get('longitude', 0.0)
                     }
                     
                     # Only add photo_type_id if it was provided and is valid
@@ -3060,6 +3062,8 @@ class BhuarjanAPIController(http.Controller):
                     's3_url': photo.s3_url or '',
                     'filename': photo.filename or '',
                     'file_size': photo.file_size or 0,
+                    'latitude': photo.latitude or 0.0,
+                    'longitude': photo.longitude or 0.0,
                     'sequence': photo.sequence or 10
                 } for photo in survey.photo_ids],
                 'has_house': survey.has_house or '',
@@ -3399,7 +3403,9 @@ class BhuarjanAPIController(http.Controller):
                     'survey_id': survey_id,  # Required field
                     's3_url': photo['s3_url'],
                     'filename': photo.get('filename', ''),
-                    'file_size': photo.get('file_size', 0)
+                    'file_size': photo.get('file_size', 0),
+                    'latitude': photo.get('latitude', 0.0),
+                    'longitude': photo.get('longitude', 0.0)
                 }
                 
                 # Only add photo_type_id if it was provided and is valid
@@ -3412,7 +3418,9 @@ class BhuarjanAPIController(http.Controller):
                     'photo_type_id': photo_type_id if photo_type else None,
                     'photo_type_name': photo_type.name if photo_type else None,
                     's3_url': photo['s3_url'],
-                    'filename': photo.get('filename', '')
+                    'filename': photo.get('filename', ''),
+                    'latitude': photo.get('latitude', 0.0),
+                    'longitude': photo.get('longitude', 0.0)
                 })
             
             if not photo_vals:

@@ -208,7 +208,7 @@
                                         <field name="latitude" optional="show"/>
                                         <field name="longitude" optional="show"/>
                                         <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
-                                        <field name="sequence"/>
+                                        <field name="create_date" string="Survey Date Time / सर्वे दिनांक समय"/>
                                     </list>
                                 </field>
                             </group>
@@ -409,7 +409,7 @@ action['context'] = ctx
                 <field name="latitude" optional="show"/>
                 <field name="longitude" optional="show"/>
                 <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
-                <field name="sequence"/>
+                <field name="create_date" string="Survey Date Time / सर्वे दिनांक समय" optional="show"/>
             </list>
         </field>
     </record>

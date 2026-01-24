@@ -769,6 +769,30 @@ export class UnifiedDashboard extends Component {
         }
     }
 
+    async downloadGanttChart() {
+        if (!this.state.selectedProject) {
+            this.notification.add(_t("Please select a project first"), { type: "warning" });
+            return;
+        }
+
+        try {
+            // Create wizard record
+            const wizardId = await this.orm.create("bhuarjan.gantt.report.wizard", [{
+                project_id: parseInt(this.state.selectedProject)
+            }]);
+
+            // Call method to get download action
+            const action = await this.orm.call("bhuarjan.gantt.report.wizard", "action_download_report", [wizardId]);
+
+            // Execute action
+            await this.action.doAction(action);
+
+        } catch (error) {
+            console.error("Error generating Gantt report:", error);
+            this.notification.add(_t("Error generating report"), { type: "danger" });
+        }
+    }
+
     // Helper methods for domain building
     getDomain(model = null) {
         const domain = [];

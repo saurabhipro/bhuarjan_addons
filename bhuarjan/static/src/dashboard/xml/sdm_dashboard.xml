@@ -248,6 +248,11 @@
                                 <span class="o_legend_label">Returned</span>
                             </div>
                         </div>
+                        <div class="o_dashboard_actions" style="margin-left: auto; padding-right: 20px;">
+                            <button class="btn btn-primary btn-sm" t-on-click="() => this.downloadGanttChart()" style="box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <i class="fa fa-bar-chart me-1"/> Project Status Report
+                            </button>
+                        </div>
                     </div>
                 </div>
 

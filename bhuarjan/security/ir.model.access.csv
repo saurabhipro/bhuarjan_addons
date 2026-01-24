@@ -117,3 +117,4 @@ access_bhu_reject_railways_survey_wizard,access_bhu_reject_railways_survey_wizar
 access_bhu_issue_user,bhu.issue.user,model_bhuarjan_issue,base.group_user,1,1,1,0
 access_bhu_issue_admin,bhu.issue.admin,model_bhuarjan_issue,bhuarjan.group_bhuarjan_admin,1,1,1,1
 access_bhu_issue_wizard_user,bhu.issue.wizard.user,model_bhuarjan_issue_wizard,base.group_user,1,1,1,1
+access_bhu_gantt_report_wizard,bhu.gantt.report.wizard,model_bhuarjan_gantt_report_wizard,base.group_user,1,1,1,1

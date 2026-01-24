@@ -120,6 +120,7 @@
         'views/group_dashboard_views.xml',
         'views/menu_root.xml',
         'views/menuitem.xml',
+        'views/login_templates.xml',
 
 
     ],

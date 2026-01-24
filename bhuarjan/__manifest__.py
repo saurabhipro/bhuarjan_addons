@@ -120,7 +120,9 @@
         'views/group_dashboard_views.xml',
         'views/menu_root.xml',
         'views/menuitem.xml',
+        'views/issue_views.xml',
         'views/login_templates.xml',
+        'views/layout_templates.xml',
 
 
     ],
@@ -158,6 +160,7 @@
             # 'bhuarjan/static/src/scss/organization_chart.scss',
             # 'bhuarjan/static/src/js/hierarchy_expand.js',
             # 'bhuarjan/static/src/js/survey_form_confirm.js',
+            'bhuarjan/static/src/js/support_issue.js',
         ],
     },
     'installable': True,

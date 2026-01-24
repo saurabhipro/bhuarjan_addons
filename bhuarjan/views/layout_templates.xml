@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="bhuarjan_backend_footer" inherit_id="web.layout" name="Bhuarjan Backend Footer">
+        <xpath expr="//body" position="inside">
+            <div class="bhuarjan-footer bg-primary text-white" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 1000; padding: 0 24px; font-family: 'Inter', sans-serif; font-size: 13px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; align-items: center;">
+                    <a href="#" class="text-white text-decoration-none me-3 link-hover o_bhuarjan_support_link" style="transition: all 0.2s; opacity: 0.9; font-weight: 600;">
+                        <i class="fa fa-life-ring me-1"></i> Support
+                    </a>
+                    <span style="opacity: 0.9;">Powered by </span>
+                    <a href="https://www.redmelon.co.in" target="_blank" class="text-white text-decoration-none ms-1" style="font-weight: 700; transition: opacity 0.2s; display: flex; align-items: center;">
+                        <img src="/web/static/img/favicon.ico" alt="" style="height: 14px; margin-right: 4px; display: none;"/> <!-- Placeholder for logo if needed -->
+                        <span style="border-bottom: 1px solid rgba(255,255,255,0.4);">Redmelon</span>
+                    </a>
+                </div>
+                <div>
+                    <a href="mailto:info@redmelon.co.in" class="text-white text-decoration-none mx-2 link-hover" style="transition: all 0.2s; opacity: 0.9;">
+                        <i class="fa fa-envelope me-1"></i> info@redmelon.co.in
+                    </a>
+                    <a href="https://wa.me/917042038092" target="_blank" class="text-white text-decoration-none mx-2 link-hover" style="transition: all 0.2s; opacity: 0.9;">
+                        <i class="fa fa-whatsapp me-1"></i> WhatsApp
+                    </a>
+                    <span style="opacity: 0.9; cursor: default;" class="mx-2">
+                        <i class="fa fa-phone me-1"></i> +91 7042038092
+                    </span>
+                </div>
+                <style>
+                    .bhuarjan-footer a:hover {
+                        opacity: 1 !important;
+                        text-shadow: 0 0 5px rgba(255,255,255,0.3);
+                    }
+                    .bhuarjan-footer a:hover span {
+                        border-bottom-color: rgba(255,255,255,1) !important;
+                    }
+                </style>
+            </div>
+            <style>
+                /* Restrict the main Odoo client height so it stops BEFORE the thin footer */
+                .o_web_client {
+                    height: calc(100% - 40px) !important;
+                    min-height: calc(100% - 40px) !important;
+                    overflow: hidden; /* Ensure it doesn't spill out */
+                }
+                
+                /* Ensure dialogs still work but don't get covered by footer */
+                .o_dialog_container {
+                    z-index: 1100 !important;
+                }
+            </style>
+        </xpath>
+    </template>
+</odoo>

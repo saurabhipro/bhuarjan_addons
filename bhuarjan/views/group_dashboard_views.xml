@@ -15,6 +15,7 @@
             parent="menu_bhu_root"
             action="action_group_dashboard"
             sequence="0"
-            groups="bhuarjan.group_bhuarjan_admin"/>
+            active="False"
+            groups="base.group_system"/>
     </data>
 </odoo>

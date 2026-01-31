@@ -99,6 +99,7 @@
                             <group>
                                 <field name="active" string="Active / सक्रिय"/>
                                 <field name="bhuarjan_role"/>
+                                <field name="company_id" options="{'no_create':True}"/>
                                 <field name="department_id" invisible="bhuarjan_role != 'department_user'" 
                                        options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>

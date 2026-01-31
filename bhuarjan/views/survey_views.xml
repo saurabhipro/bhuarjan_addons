@@ -410,6 +410,7 @@ action['context'] = ctx
                 <field name="longitude" optional="show"/>
                 <field name="google_maps_url" widget="url" string="Map Location" text="View on Map"/>
                 <field name="create_date" string="Survey Date Time / सर्वे दिनांक समय" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
             </list>
         </field>
     </record>
@@ -431,6 +432,7 @@ action['context'] = ctx
                         <field name="longitude" string="Longitude / देशांतर" readonly="0"/>
                         <field name="file_size" string="File Size (bytes) / फ़ाइल आकार"/>
                         <field name="sequence"/>
+                        <field name="active" widget="boolean_toggle"/>
                         <field name="file_upload" string="Upload File / फ़ाइल अपलोड करें" widget="binary"/>
                     </group>
                 </sheet>

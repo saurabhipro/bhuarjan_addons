@@ -40,12 +40,12 @@
                 <xpath expr="//field[@name='login']" position="after">
                     <field name="mobile"/>
                     <field name="parent_id"/>
-                    <field name="state_id"/>
-                    <field name="district_id"/>
-                    <field name="sub_division_ids" widget="many2many_tags"/>
-                    <field name="tehsil_ids" widget="many2many_tags"/>
+                    <field name="state_id" column_invisible="True"/>
+                    <field name="district_id" string="District"/>
+                    <field name="sub_division_ids" widget="many2many_tags" string="Sub Division"/>
+                    <field name="tehsil_ids" widget="many2many_tags" string="Tehsil"/>
                     <field name="village_ids" widget="many2many_tags"/>
-                    <field name="child_ids" widget="many2many_tags" invisible="1"/>
+                    <field name="child_ids" widget="many2many_tags" column_invisible="True"/>
                 </xpath>
                 <!-- Hide Language column -->
                 <xpath expr="//field[@name='lang']" position="attributes">

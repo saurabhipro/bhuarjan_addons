@@ -15,6 +15,13 @@ class ResUsers(models.Model):
 
     mobile = fields.Char(string="Mobile")
 
+    def copy_data(self, default=None):
+        if default is None:
+            default = {}
+        default['mobile'] = False
+        default['login'] = (self.login or '') + ' (copy)'
+        return super().copy_data(default)
+
     @api.constrains('mobile')
     def _check_mobile_unique(self):
         """Ensure mobile number is unique across all users"""
@@ -46,12 +53,17 @@ class ResUsers(models.Model):
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),
         ('sdm', 'SDM'),
+        ('tahsildar', 'Tehsildar'),  # Legacy support
         ('additional_collector', 'Additional Collector'),
         ('collector', 'Collector'),
         ('district_administrator', 'District Administrator'),
         ('administrator', 'Administrator'),
         ('department_user', 'Department User'),
     ], string="Bhuarjan Role", default=False)
+
+    def init(self):
+        """Cleanup legacy roles on module upgrade"""
+        self.env.cr.execute("UPDATE res_users SET bhuarjan_role = 'sdm' WHERE bhuarjan_role = 'tahsildar'")
 
     survey_count_in_project = fields.Integer(
         string='Survey Count / सर्वे संख्या',

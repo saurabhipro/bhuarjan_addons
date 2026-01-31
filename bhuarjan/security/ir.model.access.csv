@@ -3,6 +3,7 @@ access_bhu_district,bhu.district.model_access,model_bhu_district,base.group_user
 access_bhu_sub_division,bhu.sub.division.model_access,model_bhu_sub_division,base.group_user,1,1,1,1
 access_bhu_tehsil_user,bhu.tehsil.model_access,model_bhu_tehsil,base.group_user,1,1,1,1
 access_bhu_village,bhu.village.model_access,model_bhu_village,base.group_user,1,1,1,1
+access_bhu_village_admin,bhu.village.model_access_admin,model_bhu_village,bhuarjan.group_bhuarjan_admin,1,1,1,1
 access_bhu_village_public,bhu.village.model_access_public,model_bhu_village,base.group_public,1,0,0,0
 access_bhu_village_line,bhu.village.line.model_access,model_bhu_village_line,base.group_user,1,1,1,1
 access_bhu_project_user,bhu.project.model_access,model_bhu_project,base.group_user,1,1,1,1

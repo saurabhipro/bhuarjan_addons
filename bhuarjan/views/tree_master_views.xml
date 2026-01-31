@@ -8,6 +8,7 @@
             <list string="Tree Rate Master">
                 <field name="name"/>
                 <field name="tree_type"/>
+                <field name="district_id"/>
             </list>
         </field>
     </record>
@@ -28,6 +29,7 @@
                     <group>
                         <group string="Tree Information / वृक्ष जानकारी">
                             <field name="tree_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="district_id" options="{'no_create': True}"/>
                         </group>
                     </group>
                     
@@ -35,16 +37,16 @@
                     <group string="Rate Variants / दर वेरिएंट" col="1">
                         <field name="tree_rate_ids" nolabel="1" context="{'default_tree_master_id': id}">
                             <list string="Rate Variants by Development Stage and Girth Range" editable="bottom">
-                                <field name="development_stage" string="Development Stage / विकास स्तर" 
+                                <field name="development_stage" string="Development Stage" 
                                        required="1" width="200"/>
-                                <field name="girth_range_min" string="Min Girth (cm) / न्यूनतम छाती (से.मी.)" 
+                                <field name="girth_range_min" string="Min Girth (cm)" 
                                        required="1" width="200"/>
-                                <field name="girth_range_max" string="Max Girth (cm) / अधिकतम छाती (से.मी.)" 
+                                <field name="girth_range_max" string="Max Girth (cm)" 
                                        width="200" 
                                        placeholder="Leave empty for 'Above X cm'"/>
-                                <field name="rate" string="Rate / दर" widget="monetary" 
+                                <field name="rate" string="Rate" widget="monetary" 
                                        required="1" width="200"/>
-                                <field name="active" string="Active / सक्रिय" width="150"/>
+                                <field name="active" string="Active" width="150"/>
                             </list>
                         </field>
                     </group>

@@ -20,6 +20,8 @@ class TreeMaster(models.Model):
     ], string='Tree Type / वृक्ष प्रकार', required=True, default='non_fruit_bearing', tracking=True,
        help='Type of tree. Both types use rate variants based on development stage and girth range.')
     
+    district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
+    
     # One2many for tree rate variants (same structure for both fruit and non-fruit bearing)
     tree_rate_ids = fields.One2many('bhu.tree.rate.master', 'tree_master_id', 
                                     string='Rate Variants / दर वेरिएंट',

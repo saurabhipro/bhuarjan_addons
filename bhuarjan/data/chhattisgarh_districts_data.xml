@@ -8,7 +8,12 @@
         </record>
 
         <record id="district_raipur" model="bhu.district">
-            <field name="name">Raipur / रायपुर</field>
+            <field name="name">रायपुर</field>
+            <field name="state_id" ref="base.state_in_cg"/>
+        </record>
+
+        <record id="district_durg" model="bhu.district">
+            <field name="name">दुर्ग</field>
             <field name="state_id" ref="base.state_in_cg"/>
         </record>
         </data>

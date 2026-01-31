@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="department_id" string="Department / विभाग"/>
+                <field name="district_id" string="District / जिला"/>
                 <field name="name"/>
                 <field name="code" string="Project Code"/>
                 <field name="sdm_ids" widget="many2many_tags" string="SDM / उप-विभागीय मजिस्ट्रेट" options="{'no_create_edit': True}"/>
@@ -43,6 +44,7 @@
                             <field name="name"/>
                             <field name="code"/>
                             <field name="department_id"/>
+                            <field name="district_id"/>
                             <field name="law_master_id" options="{'no_create': False}"/>
                             <field name="project_uuid" invisible="1"/>
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>

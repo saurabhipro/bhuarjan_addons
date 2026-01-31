@@ -33,6 +33,7 @@ class BhuProject(models.Model):
     code = fields.Char(string='Project Code', tracking=True)
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True,
                                     help='Select the department for this project')
+    district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True, help='Select the district for this project')
     description = fields.Text(string='Description', tracking=True)
     state = fields.Selection([
         ('draft', 'Draft'),

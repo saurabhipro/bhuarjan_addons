@@ -72,7 +72,7 @@
                         <group string="Location Information / स्थान की जानकारी" class="survey-icon-location">
                             <field name="company_id" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="District"/>
                             <field name="village_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Village * / ग्राम का नाम *"/>
-                            <field name="tehsil_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Tehsil * / तहसील *"/>
+                            <field name="tehsil_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" string="Tehsil / तहसील"/>
                             <field name="district_name" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly"/>
                             <field name="user_id" readonly="is_collector_readonly or is_approved_readonly"/>
                             <field name="is_collector_readonly" invisible="1"/>

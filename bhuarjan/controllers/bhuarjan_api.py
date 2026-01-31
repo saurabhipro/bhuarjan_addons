@@ -945,7 +945,6 @@ class BhuarjanAPIController(http.Controller):
                 'project_id': 'Project',
                 'village_id': 'Village',
                 'department_id': 'Department',
-                'tehsil_id': 'Tehsil',
                 'khasra_number': 'Khasra Number',
                 'total_area': 'Total Area',
                 'acquired_area': 'Acquired Area'

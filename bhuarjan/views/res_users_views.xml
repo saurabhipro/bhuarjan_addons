@@ -57,6 +57,9 @@
                     <attribute name="column_invisible">1</attribute>
                     <attribute name="invisible">1</attribute>
                 </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
             </field>
         </record>
 
@@ -282,7 +285,7 @@ t-att-style="'background-color:' + (record.department_color.raw_value or '#69202
                 <xpath expr="//search" position="inside">
                     <filter string="Has Mobile" name="has_mobile" domain="[('mobile', '!=', False)]"/>
                     <group expand="0" string="Group By">
-                        <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                        <filter string="District" name="groupby_district" context="{'group_by': 'district_id'}"/>
                     </group>
                 </xpath>
             </field>
@@ -292,7 +295,7 @@ t-att-style="'background-color:' + (record.department_color.raw_value or '#69202
             <field name="name">Users</field>
             <field name="res_model">res.users</field>
             <field name="view_mode">list,form</field>
-            <field name="context">{'search_default_group_district': 1}</field>
+            <field name="context">{'search_default_groupby_district': 1}</field>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'list', 'view_id': ref('base.view_users_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('res_users_bhuarjan_view_form_inherit')})]"/>

@@ -22,7 +22,7 @@ class Survey(models.Model):
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
-    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=True, tracking=True)
+    tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=False, tracking=True)
     
     @api.onchange('project_id')
     def _onchange_project_id(self):

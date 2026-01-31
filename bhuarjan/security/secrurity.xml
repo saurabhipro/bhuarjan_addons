@@ -180,6 +180,14 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_collector')), (4, ref('bhuarjan.group_bhuarjan_additional_collector')), (4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
         </record>
 
+        <!-- Admin Rule for Village (Global Access) -->
+        <record id="record_bhu_village_rule_admin" model="ir.rule">
+            <field name="name">Admin can see all villages</field>
+            <field name="model_id" ref="model_bhu_village"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+
         <!-- Village Rule for SDM / Collector / District Administrator -->
         <record id="record_bhu_village_rule_restricted" model="ir.rule">
             <field name="name">Restricted User can see villages of their district</field>

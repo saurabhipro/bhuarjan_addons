@@ -41,6 +41,8 @@ class SurveyPhoto(models.Model):
                               help='Size of the file in bytes')
     sequence = fields.Integer(string='Sequence / क्रम', default=10, tracking=True,
                              help='Display order')
+    active = fields.Boolean(string='Active / सक्रिय', default=True, tracking=True,
+                           help='Set to false to archive the record')
     
     # Location Details
     latitude = fields.Float(string='Latitude / अक्षांश', digits=(10, 8), help='GPS Latitude coordinate', tracking=True)

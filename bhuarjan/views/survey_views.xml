@@ -125,20 +125,21 @@
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
-                                <style>
+                            <style>
                                 /* Enhanced landowner section styling */
                                 .landowner_custom_section .o_list_table {
                                     border: 2px solid #8B4513 !important;
                                     border-radius: 8px;
                                     overflow: hidden;
                                 }
-                                .landowner_custom_section .o_list_table thead {
+                                .landowner_custom_section .o_list_table thead,
+                                .landowner_custom_section .o_list_table thead tr {
                                     background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%) !important;
                                 }
-                                .landowner_custom_section .o_list_table thead th {
-                                    color: white !important;
+                                .landowner_custom_section .o_list_table thead th,
+                                .landowner_custom_section .o_list_table thead th * {
+                                    color: #FFFFFF !important;
                                     font-weight: 600 !important;
-                                    padding: 12px 8px !important;
                                     border-bottom: 2px solid #6B3410 !important;
                                 }
                                 .landowner_custom_section .o_list_table tbody tr {

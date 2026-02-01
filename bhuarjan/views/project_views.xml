@@ -47,6 +47,7 @@
                             <field name="district_id"/>
                             <field name="law_master_id" options="{'no_create': False}"/>
                             <field name="project_uuid" invisible="1"/>
+                            <field name="id" invisible="1"/>
                             <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
                         </group>
                         <group>
@@ -114,7 +115,7 @@
                         <page string="Patwaris / पटवारी">
                             <field name="patwari_ids" nolabel="1"
                                    options="{'no_create_edit': True}"
-                                   context="{'default_project_id': active_id, 'active_model': 'bhu.project', 'active_id': active_id}">
+                                   context="{'default_project_id': id, 'active_model': 'bhu.project', 'active_id': id}">
                                 <list>
                                     <field name="name"/>
                                     <field name="login"/>

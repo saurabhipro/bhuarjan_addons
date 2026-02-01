@@ -40,7 +40,6 @@ class BhuarjanAPIController(http.Controller):
             return ''
 
     @http.route('/api/bhuarjan/user/projects', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_user_projects(self, **kwargs):
         """
@@ -291,7 +290,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/users', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_all_users(self, **kwargs):
         """
@@ -384,7 +382,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/users/autocomplete', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def autocomplete_users(self, **kwargs):
         """
@@ -463,7 +460,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/departments', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     def get_all_departments(self, **kwargs):
         """
         Get all departments
@@ -516,7 +512,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/departments/<int:department_id>/projects', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     def get_department_projects(self, department_id, **kwargs):
         """
         Get all projects in a department with village objects
@@ -653,7 +648,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/channels', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_all_channels(self, **kwargs):
         """
@@ -713,7 +707,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/land-types', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     def get_all_land_types(self, **kwargs):
         """
         Get all land types
@@ -773,7 +766,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/trees', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     def get_all_trees(self, **kwargs):
         """
         Get all tree masters with optional filters by name, development stage, and girth
@@ -883,7 +875,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_app_version
     @check_permission
     def create_survey(self, **kwargs):
         """
@@ -1542,7 +1533,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_survey_details(self, survey_id, **kwargs):
         """
@@ -1665,7 +1655,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/photo/<int:photo_id>', type='http', auth='public', methods=['DELETE'], csrf=False)
-    @check_app_version
     @check_permission
     def delete_survey_photo(self, photo_id, **kwargs):
         """
@@ -1724,7 +1713,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/surveys', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def list_surveys(self, **kwargs):
         """
@@ -1815,7 +1803,6 @@ class BhuarjanAPIController(http.Controller):
     # Old Excel export methods removed - use form10_excel_api.py instead
 
     @http.route('/api/bhuarjan/landowner', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_app_version
     @check_permission
     def create_landowner(self, **kwargs):
         """
@@ -2038,7 +2025,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/form10/survey/download', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     # @check_permission
     def download_form10_by_survey(self, **kwargs):
         """
@@ -2216,8 +2202,7 @@ class BhuarjanAPIController(http.Controller):
     # The _generate_form10_excel method and download_form10_excel endpoints
     # have been moved to form10_excel_api.py controller
 
-    @http.route('/api/bhuarjan/landowner', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_app_version
+    @http.route(['/api/bhuarjan/landowner', '/api/bhuarjan/landowners'], type='http', auth='public', methods=['POST'], csrf=False)
     @check_permission
     def create_landowner(self, **kwargs):
         """
@@ -2331,7 +2316,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/landowners', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_landowners(self, **kwargs):
         """
@@ -2421,7 +2405,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/landowner/<int:landowner_id>', type='http', auth='public', methods=['PATCH'], csrf=False)
-    @check_app_version
     @check_permission
     def update_landowner(self, landowner_id, **kwargs):
         """
@@ -2697,7 +2680,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['PATCH'], csrf=False)
-    @check_app_version
     @check_permission
     def update_survey(self, survey_id, **kwargs):
         """
@@ -3235,7 +3217,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey/<int:survey_id>', type='http', auth='public', methods=['DELETE'], csrf=False)
-    @check_app_version
     @check_permission
     def delete_survey(self, survey_id, **kwargs):
         """
@@ -3312,7 +3293,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/photo-types', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_all_photo_types(self, **kwargs):
         """
@@ -3375,7 +3355,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/survey/photos', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_app_version
     @check_permission
     def add_survey_photos(self, **kwargs):
         """
@@ -3570,7 +3549,6 @@ class BhuarjanAPIController(http.Controller):
             )
 
     @http.route('/api/bhuarjan/dashboard/village', type='http', auth='public', methods=['GET'], csrf=False)
-    @check_app_version
     @check_permission
     def get_village_dashboard(self, **kwargs):
         """

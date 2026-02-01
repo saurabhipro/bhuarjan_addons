@@ -131,6 +131,7 @@
             # 'bhuarjan/static/src/xml/mail_systray_hide_button.xml',
             # 'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
+            'bhuarjan/static/src/css/search_view.css',
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders
             'bhuarjan/static/src/dashboard/css/admin_dashboard.css',

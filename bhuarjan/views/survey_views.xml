@@ -47,12 +47,11 @@
                         <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" class="btn btn-secondary" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user" style="background-color: #6c757d !important; border-color: #6c757d !important; color: white !important; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; display: inline-block;" confirm="Are you sure you want to reset this survey to submitted? / क्या आप इस सर्वे को प्रस्तुत में रीसेट करना चाहते हैं?"/>
                     </div>
                     <field name="is_approved_readonly" invisible="1"/>
-                    <!-- <div class="oe_title" style="margin-bottom: 10px;">
-                        <h1 style="margin-bottom: 5px;">
-                            <field name="name" placeholder="Survey Number / सर्वे नंबर" required="1" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
                         </h1>
                     </div>
-                     -->
                     <!-- Notification 4 Generated Warning -->
                     <div class="alert alert-info" role="alert" invisible="not is_notification_4_generated" style="margin-bottom: 15px;">
                         <strong>Notification 4 Generated / अधिसूचना 4 जेनरेट:</strong> This survey has been used to generate Notification 4. No further modifications are allowed.
@@ -60,9 +59,7 @@
                         <strong>अधिसूचना 4 जेनरेट:</strong> इस सर्वे का उपयोग अधिसूचना 4 जेनरेट करने के लिए किया गया है। कोई और संशोधन की अनुमति नहीं है।
                     </div>
                     
-                    <group>
-                        <field name="pending_with" string="Pending With / लंबित" readonly="1" invisible="1"/>
-                    </group>
+                    <field name="pending_with" invisible="1"/>
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
                             <field name="project_id" widget="selection" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>

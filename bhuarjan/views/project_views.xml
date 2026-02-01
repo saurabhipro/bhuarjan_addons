@@ -114,7 +114,7 @@
                         <page string="Patwaris / पटवारी">
                             <field name="patwari_ids" nolabel="1"
                                    options="{'no_create_edit': True}"
-                                   context="{'default_project_id': id, 'active_model': 'bhu.project', 'active_id': id}">
+                                   context="{'default_project_id': active_id, 'active_model': 'bhu.project', 'active_id': active_id}">
                                 <list>
                                     <field name="name"/>
                                     <field name="login"/>

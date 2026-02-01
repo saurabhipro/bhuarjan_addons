@@ -35,7 +35,7 @@
             <field name="arch" type="xml">
                 <!-- Add Bhuarjan Role column after name -->
                 <xpath expr="//field[@name='name']" position="after">
-                    <field name="bhuarjan_role" string="Bhuarjan Role"/>
+                    <field name="bhuarjan_role" string="Bhuarjan Role" widget="badge" decoration-info="bhuarjan_role == 'patwari' or bhuarjan_role == 'department_user'" decoration-warning="bhuarjan_role in ('sdm', 'tahsildar')" decoration-danger="bhuarjan_role in ('collector', 'additional_collector')" decoration-success="bhuarjan_role == 'administrator'" decoration-primary="bhuarjan_role == 'district_administrator'"/>
                 </xpath>
                 <xpath expr="//field[@name='login']" position="after">
                     <field name="mobile"/>

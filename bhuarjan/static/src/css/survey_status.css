@@ -87,9 +87,17 @@
 
 /* Animation for Approved Status */
 @keyframes approvedPulse {
-    0% { box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
-    50% { box-shadow: 0 4px 8px rgba(16, 185, 129, 0.5); }
-    100% { box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3); }
+    0% {
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    }
 }
 
 .o_kanban_record .badge[style*="background: linear-gradient(135deg, #10b981"] {
@@ -129,13 +137,13 @@
 }
 
 /* Ensure statusbar container takes available space and aligns right */
-.o_form_view header > div {
+.o_form_view header>div {
     display: flex !important;
     width: 100% !important;
 }
 
-.o_form_view header > div .o_statusbar_status,
-.o_form_view header > div .o_field_statusbar {
+.o_form_view header>div .o_statusbar_status,
+.o_form_view header>div .o_field_statusbar {
     margin-left: auto !important;
 }
 
@@ -145,7 +153,7 @@
         font-size: 0.75rem;
         padding: 0.25rem 0.5rem;
     }
-    
+
     .o_list_view .o_field_badge,
     .o_form_view .o_field_badge {
         font-size: 0.75rem;
@@ -153,3 +161,133 @@
     }
 }
 
+
+/* Survey Form Card Styling Request */
+
+/* Card Containers */
+.o_form_view .o_group.survey-icon-project,
+.o_form_view .o_group.survey-icon-location,
+.o_form_view .o_group.survey-icon-land,
+.o_form_view .o_group.survey-icon-crop,
+.o_form_view .o_group.survey-icon-house,
+.o_form_view .o_group.survey-icon-infrastructure,
+.o_form_view .o_group.survey-icon-remarks {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Softer shadow */
+    border: 1px solid #e0e0e0;
+    margin-bottom: 24px !important;
+    padding-bottom: 15px !important;
+    overflow: hidden;
+    /* Ensures header corners stay rounded */
+    display: block;
+    /* Ensure it behaves like a block container */
+}
+
+/* Headers Common */
+.o_form_view .o_group.survey-icon-project .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-location .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-land .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-crop .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-house .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-infrastructure .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-remarks .o_horizontal_separator {
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 1.15rem !important;
+    padding: 15px 20px !important;
+    margin: 0 0 15px 0 !important;
+    display: flex;
+    align-items: center;
+    text-transform: none !important;
+    /* Remove uppercase if applied */
+    letter-spacing: 0.5px;
+}
+
+/* Blue Gradient Headers */
+.o_form_view .o_group.survey-icon-project .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-location .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-land .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-crop .o_horizontal_separator {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%) !important;
+    /* Material Blue */
+}
+
+/* Dark Slate Headers */
+.o_form_view .o_group.survey-icon-house .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-infrastructure .o_horizontal_separator,
+.o_form_view .o_group.survey-icon-remarks .o_horizontal_separator {
+    background: linear-gradient(135deg, #37474f 0%, #263238 100%) !important;
+    /* Blue Grey */
+}
+
+/* Icons for Headers */
+.o_form_view .o_group.survey-icon-project .o_horizontal_separator::before {
+    content: "\f1ad";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Building */
+.o_form_view .o_group.survey-icon-location .o_horizontal_separator::before {
+    content: "\f041";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Map Marker */
+.o_form_view .o_group.survey-icon-land .o_horizontal_separator::before {
+    content: "\f1b2";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Cube/Land */
+.o_form_view .o_group.survey-icon-crop .o_horizontal_separator::before {
+    content: "\f06c";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Leaf */
+.o_form_view .o_group.survey-icon-house .o_horizontal_separator::before {
+    content: "\f015";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Home */
+.o_form_view .o_group.survey-icon-infrastructure .o_horizontal_separator::before {
+    content: "\f0ad";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Wrench */
+.o_form_view .o_group.survey-icon-remarks .o_horizontal_separator::before {
+    content: "\f040";
+    font-family: FontAwesome;
+    margin-right: 12px;
+    font-weight: normal;
+}
+
+/* Pencil */
+
+/* Inner Field padding fix */
+.o_form_view .o_group.survey-icon-project>table,
+.o_form_view .o_group.survey-icon-location>table,
+.o_form_view .o_group.survey-icon-land>table,
+.o_form_view .o_group.survey-icon-crop>table,
+.o_form_view .o_group.survey-icon-house>table,
+.o_form_view .o_group.survey-icon-infrastructure>table,
+.o_form_view .o_group.survey-icon-remarks>table {
+    margin: 0 15px !important;
+    width: calc(100% - 30px) !important;
+}

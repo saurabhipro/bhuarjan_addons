@@ -195,7 +195,8 @@ class BhuProject(models.Model):
                 user.has_group('bhuarjan.group_bhuarjan_department_user') or
                 user.has_group('base.group_system') or
                 user.has_group('bhuarjan.group_bhuarjan_collector') or
-                user.has_group('bhuarjan.group_bhuarjan_additional_collector')):
+                user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
+                user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
             try:
                 # Get user's assigned projects using sudo() to bypass access rights and context flag to avoid recursion
                 # Use sudo() to ensure we can search even if user doesn't have direct access

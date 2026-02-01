@@ -14,14 +14,14 @@
     <menuitem id="menu_bhu_photo_type_master" name="Photo Type Master" action="action_bhu_photo_type" parent="menu_bhu_master" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_law_master" name="Law Master" action="action_bhu_law_master" parent="menu_bhu_master" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_rate_master" name="Land Rate Master" action="action_bhu_land_rate_master" parent="menu_bhu_master" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_district" name="Districts" action="action_bhu_district" parent="menu_bhu_master" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_sub_division" name="Sub Division" action="action_bhu_sub_division" parent="menu_bhu_master" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_tehsil" name="Tehsils" action="action_bhu_tehsil" parent="menu_bhu_master" sequence="9" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_village" name="Villages" action="action_bhu_village" parent="menu_bhu_master" sequence="10" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
     <menuitem id="menu_bhu_project" name="Projects" action="action_bhu_project" parent="menu_bhu_master" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_channel_master" name="Channel Master" action="action_bhu_channel_master" parent="menu_bhu_master" sequence="12" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_bhu_department" name="Departments" action="action_bhu_department" parent="menu_bhu_master" sequence="13" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
-    <menuitem id="menu_bhu_document_template_master" name="Document Template Master" action="action_bhu_document_template_master" parent="menu_bhu_master" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
+    <menuitem id="menu_bhu_document_template_master" name="Document Template Master" action="action_bhu_document_template_master" parent="menu_bhu_master" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="menu_app_version"
                   name="App Versions"
                   parent="menu_bhu_master"

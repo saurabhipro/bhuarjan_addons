@@ -201,7 +201,7 @@
                                 <field name="photo_ids" readonly="is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly" nolabel="1">
                                     <list string="Survey Photos / सर्वे फोटो">
                                         <field name="display_name" string="Name / नाम"/>
-                                        <field name="photo_type_id" string="Photo Type / फोटो प्रकार" column_invisible="1"/>
+                                        <field name="photo_type_id" string="Photo Type / फोटो प्रकार"/>
                                         <field name="filename" string="Filename / फ़ाइल नाम" column_invisible="1"/>
                                         <field name="s3_filename_display" string="S3 File / S3 फ़ाइल" column_invisible="1"/>
                                         <field name="s3_url" widget="url" string="Image" text="View Image"/>

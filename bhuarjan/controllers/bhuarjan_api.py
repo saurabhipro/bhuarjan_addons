@@ -1387,10 +1387,12 @@ class BhuarjanAPIController(http.Controller):
             # VALIDATE PHOTOS BEFORE CREATING SURVEY
             photo_vals = []
             if 'photos' in data and isinstance(data['photos'], list):
-                for photo in data['photos']:
+                _logger.info(f"Processing {len(data['photos'])} photos for new survey")
+                for index, photo in enumerate(data['photos']):
                     if isinstance(photo, dict):
                         # s3_url is mandatory
                         if 's3_url' not in photo or not photo['s3_url']:
+                            _logger.warning(f"Photo at index {index} missing s3_url, skipping")
                             continue
                         
                         # Validate photo_type_id if provided
@@ -1399,23 +1401,35 @@ class BhuarjanAPIController(http.Controller):
                         if photo_type_id:
                             photo_type = request.env['bhu.photo.type'].sudo().browse(photo_type_id)
                             if not photo_type.exists():
-                                # Skip this photo if photo_type_id is invalid
-                                continue
+                                # Log warning but don't skip - just create without type? 
+                                # Better to skip to avoid data inconsistency if type is important
+                                _logger.warning(f"Invalid photo_type_id {photo_type_id} for photo at index {index}, using None")
+                                photo_type_id = None
+                        
+                        # Extract filename from S3 URL if not provided
+                        filename = photo.get('filename', '')
+                        if not filename and photo['s3_url']:
+                            try:
+                                filename = photo['s3_url'].split('/')[-1].split('?')[0]
+                            except Exception:
+                                filename = 'photo_upload'
                         
                         # Build photo values
                         photo_data = {
                             's3_url': photo['s3_url'],
-                            'filename': photo.get('filename', ''),
+                            'filename': filename,
                             'file_size': photo.get('file_size', 0),
                             'latitude': photo.get('latitude'),
                             'longitude': photo.get('longitude')
                         }
                         
                         # Only add photo_type_id if it was provided and is valid
-                        if photo_type_id and photo_type:
+                        if photo_type_id:
                             photo_data['photo_type_id'] = photo_type_id
                         
                         photo_vals.append((0, 0, photo_data))
+            else:
+                _logger.info("No photos provided in 'photos' list")
             
             # ALL VALIDATIONS PASSED - NOW CREATE SURVEY
             # Include all related data in survey_vals for atomic creation
@@ -1584,10 +1598,12 @@ class BhuarjanAPIController(http.Controller):
                 } for line in survey.tree_line_ids],
                 'photos': [{
                     'id': photo.id,
+                    'display_name': photo.display_name or '',
                     'photo_type_id': photo.photo_type_id.id if photo.photo_type_id else None,
                     'photo_type_name': photo.photo_type_id.name if photo.photo_type_id else '',
                     's3_url': photo.s3_url or '',
                     'filename': photo.filename or '',
+                    's3_filename_display': photo.s3_filename_display or '',
                     'file_size': photo.file_size or 0,
                     'latitude': photo.latitude,
                     'longitude': photo.longitude,
@@ -1643,6 +1659,65 @@ class BhuarjanAPIController(http.Controller):
                     'error': str(e),
                     'message': f'Error retrieving survey details: {str(e)}',
                     'survey_id': survey_id
+                }),
+                status=500,
+                content_type='application/json'
+            )
+
+    @http.route('/api/bhuarjan/photo/<int:photo_id>', type='http', auth='public', methods=['DELETE'], csrf=False)
+    @check_app_version
+    @check_permission
+    def delete_survey_photo(self, photo_id, **kwargs):
+        """
+        Delete a survey photo by ID
+        Only allowed if survey is not approved
+        """
+        try:
+            # Get photo record
+            photo = request.env['bhu.survey.photo'].sudo().browse(photo_id)
+            if not photo.exists():
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'Photo not found',
+                        'message': f'Photo with ID {photo_id} does not exist'
+                    }),
+                    status=404,
+                    content_type='application/json'
+                )
+            
+            # Check survey state
+            if photo.survey_id.state == 'approved':
+                return Response(
+                    json.dumps({
+                        'success': False,
+                        'error': 'PERMISSION_DENIED',
+                        'message': 'Cannot delete photo from an approved survey'
+                    }),
+                    status=403,
+                    content_type='application/json'
+                )
+                
+            # Delete photo
+            photo.unlink()
+            
+            return Response(
+                json.dumps({
+                    'success': True,
+                    'message': 'Photo deleted successfully',
+                    'id': photo_id
+                }),
+                status=200,
+                content_type='application/json'
+            )
+            
+        except Exception as e:
+            _logger.error(f"Error deleting photo {photo_id}: {str(e)}", exc_info=True)
+            return Response(
+                json.dumps({
+                    'success': False,
+                    'error': str(e),
+                    'message': 'Internal Server Error'
                 }),
                 status=500,
                 content_type='application/json'

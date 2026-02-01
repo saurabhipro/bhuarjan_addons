@@ -758,6 +758,46 @@
 						"description": "Delete a survey. Only surveys in 'draft' or 'submitted' state can be deleted. Once approved or rejected, surveys cannot be deleted."
 					},
 					"response": []
+				},
+				{
+					"name": "Delete Survey Photo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "JWT token from login API"
+							},
+							{
+								"key": "App-Version-Code",
+								"value": "1",
+								"description": "App version code (MANDATORY) - Required for all API calls. If missing, returns 400 error. If version check is enforced in settings, validates the app version.",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bhuarjan/photo/123",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bhuarjan",
+								"photo",
+								"123"
+							],
+							"variable": [
+								{
+									"key": "photo_id",
+									"value": "123",
+									"description": "Replace with actual photo ID"
+								}
+							]
+						},
+						"description": "Delete a survey photo by ID. Only allowed if the survey is not approved (i.e., in 'draft' or 'submitted' state)."
+					},
+					"response": []
 				}
 			]
 		},

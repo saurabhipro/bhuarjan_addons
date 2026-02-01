@@ -75,14 +75,20 @@ class SurveyPhoto(models.Model):
     @api.depends('photo_type_id', 'filename', 'survey_id')
     def _compute_display_name(self):
         for record in self:
-            parts = []
-            if record.photo_type_id:
-                parts.append(record.photo_type_id.name)
-            if record.filename:
-                parts.append(record.filename)
-            if record.survey_id:
-                parts.append(f"Survey {record.survey_id.name or record.survey_id.id}")
-            record.display_name = ' - '.join(parts) if parts else f"Photo {record.id}"
+            survey_name = record.survey_id.name or "New"
+            
+            # Count existing photos for this survey to generate sequence number
+            domain = [('survey_id', '=', record.survey_id.id)]
+            
+            if record.id and isinstance(record.id, int):
+                # If record exists, count photos created before it
+                domain.append(('id', '<', record.id))
+                count = self.env['bhu.survey.photo'].search_count(domain) + 1
+            else:
+                # If record is new, count all existing photos and add 1
+                count = self.env['bhu.survey.photo'].search_count(domain) + 1
+            
+            record.display_name = f"{survey_name}_{count}"
 
     @api.depends('s3_url')
     def _compute_s3_filename_display(self):

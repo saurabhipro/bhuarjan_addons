@@ -125,39 +125,37 @@
                         </page>
                         
                         <page string="Landowner / भूमिस्वामी" name="landowners_details">
-                            <style>
+                                <style>
                                 /* Enhanced landowner section styling */
-                                .o_field_many2many .o_list_table {
+                                .landowner_custom_section .o_list_table {
                                     border: 2px solid #8B4513 !important;
                                     border-radius: 8px;
                                     overflow: hidden;
                                 }
-                                .o_field_many2many .o_list_table thead {
+                                .landowner_custom_section .o_list_table thead {
                                     background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%) !important;
                                 }
-                                .o_field_many2many .o_list_table thead th {
+                                .landowner_custom_section .o_list_table thead th {
                                     color: white !important;
                                     font-weight: 600 !important;
                                     padding: 12px 8px !important;
                                     border-bottom: 2px solid #6B3410 !important;
                                 }
-                                .o_field_many2many .o_list_table tbody tr {
+                                .landowner_custom_section .o_list_table tbody tr {
                                     border-bottom: 1px solid #e0e0e0;
                                 }
-                                .o_field_many2many .o_list_table tbody tr:hover {
+                                .landowner_custom_section .o_list_table tbody tr:hover {
                                     background-color: #fff8f0 !important;
                                 }
                             </style>
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 10px 0; border: 2px solid #8B4513;">
+                            <div class="landowner_custom_section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 10px 0; border: 2px solid #8B4513;">
                                 <h3 style="margin: 0 0 15px 0; color: #8B4513; font-size: 18px; font-weight: bold; border-bottom: 2px solid #8B4513; padding-bottom: 10px;">
                                     <i class="fa fa-users" style="margin-right: 8px;"></i>
-                                    Manage Landowners / भूमिस्वामी प्रबंधित करें
+                                    Manage Landowners
                                 </h3>
                                 <div style="margin-bottom: 15px; padding: 12px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
                                     <i class="fa fa-info-circle" style="color: #1976d2; margin-right: 8px;"/>
                                     <span style="font-weight: 600; color: #1565c0;">Click "Add" to add new landowners or select existing ones. You can edit details inline.</span>
-                                    <br/>
-                                    <span style="font-size: 12px; color: #1565c0; margin-top: 4px; display: inline-block;">नए भूमिस्वामी जोड़ने के लिए "Add" पर क्लिक करें या मौजूदा का चयन करें। आप विवरण इनलाइन संपादित कर सकते हैं।</span>
                                 </div>
                                 <field name="landowner_ids" 
                                        widget="many2many"
@@ -166,15 +164,15 @@
                                        readonly="is_collector_readonly or is_approved_readonly"
                                        nolabel="1">
                                     <list string="Landowners" editable="bottom" create="true" delete="true">
-                                        <field name="name" string="Name / नाम" required="1"/>
-                                        <field name="father_name" string="Father's Name / पिता का नाम"/>
-                                        <field name="spouse_name" string="Spouse's Name / पति/पत्नी का नाम"/>
-                                        <field name="village_id" string="Village / ग्राम"/>
-                                        <field name="tehsil_id" string="Tehsil / तहसील"/>
-                                        <field name="aadhar_number" string="Aadhar / आधार"/>
-                                        <field name="pan_number" string="PAN / पैन"/>
-                                        <field name="bank_name" string="Bank / बैंक"/>
-                                        <field name="account_number" string="Account / खाता"/>
+                                        <field name="name" string="Name" required="1"/>
+                                        <field name="father_name" string="Father's Name"/>
+                                        <field name="spouse_name" string="Spouse's Name"/>
+                                        <field name="village_id" string="Village"/>
+                                        <field name="tehsil_id" string="Tehsil"/>
+                                        <field name="aadhar_number" string="Aadhar"/>
+                                        <field name="pan_number" string="PAN"/>
+                                        <field name="bank_name" string="Bank"/>
+                                        <field name="account_number" string="Account"/>
                                     </list>
                                 </field>
                             </div>

@@ -4,14 +4,11 @@
         <xpath expr="//body" position="inside">
             <div class="bhuarjan-footer bg-primary text-white" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 1000; padding: 0 24px; font-family: 'Inter', sans-serif; font-size: 13px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); border-top: 1px solid rgba(255,255,255,0.1);">
                 <div style="display: flex; align-items: center;">
-                    <a href="#" class="text-white text-decoration-none me-3 link-hover o_bhuarjan_support_link" style="transition: all 0.2s; opacity: 0.9; font-weight: 600;">
-                        <i class="fa fa-life-ring me-1"></i> Support
+                    <span style="opacity: 0.9;">Developed and maintained by </span>
+                    <a href="https://www.redmelon.co.in" target="_blank" class="text-white text-decoration-none mx-1" style="font-weight: 700;">
+                        Redmelon
                     </a>
-                    <span style="opacity: 0.9;">Powered by </span>
-                    <a href="https://www.redmelon.co.in" target="_blank" class="text-white text-decoration-none ms-1" style="font-weight: 700; transition: opacity 0.2s; display: flex; align-items: center;">
-                        <img src="/web/static/img/favicon.ico" alt="" style="height: 14px; margin-right: 4px; display: none;"/> <!-- Placeholder for logo if needed -->
-                        <span style="border-bottom: 1px solid rgba(255,255,255,0.4);">Redmelon</span>
-                    </a>
+                    <span style="opacity: 0.9;"> as a technical service provider.</span>
                 </div>
                 <div>
                     <a href="mailto:info@redmelon.co.in" class="text-white text-decoration-none mx-2 link-hover" style="transition: all 0.2s; opacity: 0.9;">

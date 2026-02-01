@@ -9,8 +9,7 @@
         <field name="arch" type="xml">
             <list string="Departments">
                 <field name="name"/>
-                <field name="code"/>
-                <field name="head_of_department"/>
+                <field name="project_ids" widget="many2many_tags" string="Projects"/>
                 <field name="contact_number"/>
                 <field name="email"/>
             </list>
@@ -26,17 +25,11 @@
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="code"/>
-                            <field name="head_of_department"/>
                         </group>
                         <group>
                             <field name="contact_number"/>
                             <field name="email"/>
                         </group>
-                    </group>
-                    <group>
-                        <field name="description"/>
-                        <field name="address"/>
                     </group>
                     <group>
                         <field name="project_ids" widget="many2many" 

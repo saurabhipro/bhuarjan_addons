@@ -56,12 +56,8 @@ class BhuDepartment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     name = fields.Char(string='Department Name', required=True, tracking=True)
-    code = fields.Char(string='Department Code', tracking=True)
-    description = fields.Text(string='Description', tracking=True)
-    head_of_department = fields.Char(string='Head of Department', tracking=True)
     contact_number = fields.Char(string='Contact Number', tracking=True)
     email = fields.Char(string='Email', tracking=True)
-    address = fields.Text(string='Address', tracking=True)
     project_ids = fields.Many2many('bhu.project', string='Projects / परियोजनाएं', tracking=True,
                                    help='Select multiple projects associated with this department')
 

@@ -74,15 +74,25 @@ class BhuLandowner(models.Model):
 
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):
-        """Override search to apply role-based filtering for Patwari users"""
-        # Apply role-based domain filtering
-        if self.env.user.bhuarjan_role == 'patwari':
+        """Override search to apply role-based filtering"""
+        user = self.env.user
+        
+        # Admin sees everything - no filter
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            return super(BhuLandowner, self)._search(args, offset=offset, limit=limit, order=order)
+            
+        # For all other users, restrict to their assigned district if they have one
+        if user.district_id:
+            args = [('district_id', '=', user.district_id.id)] + args
+            
+        # Apply additional Patwari-specific filtering
+        if user.bhuarjan_role == 'patwari':
             # Patwari can only see landowners from their assigned villages
             # and landowners who are in surveys they created
             patwari_domain = [
                 '|',  # OR condition
-                ('village_id', 'in', self.env.user.village_ids.ids),  # Landowners from their assigned villages
-                ('survey_ids.user_id', '=', self.env.user.id)  # Landowners in surveys they created
+                ('village_id', 'in', user.village_ids.ids),  # Landowners from their assigned villages
+                ('survey_ids.user_id', '=', user.id)  # Landowners in surveys they created
             ]
             args = patwari_domain + args
         

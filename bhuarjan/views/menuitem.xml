@@ -2,7 +2,7 @@
 <odoo>
     <data>
     <!-- Surveys menu - NOT visible to Collector (bhuarjan.group_bhuarjan_collector or bhuarjan.group_bhuarjan_additional_collector) -->
-    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_patwari,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
+    <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
     <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2"/>
 
@@ -75,7 +75,7 @@
     <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu_dept" name="Dashboard" action="action_department_dashboard_owl" groups="bhuarjan.group_bhuarjan_department_user" sequence="1"/>
 
     <!-- For All Other Roles (Uses role-based routing) -->
-    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu" name="Dashboard" action="action_role_based_dashboard" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_district_administrator,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_patwari"/>
+    <menuitem parent="menu_bhu_root" id="bhuarjan_dashboard_menu" name="Dashboard" action="action_role_based_dashboard" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_district_administrator,bhuarjan.group_bhuarjan_sdm"/>
 
     <!-- Move Settings Master and Sequence Settings to General Settings section -->
     <menuitem id="menu_bhu_settings_master" name="Settings Master" action="action_bhuarjan_settings_master_tree" parent="base.menu_administration" sequence="100" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

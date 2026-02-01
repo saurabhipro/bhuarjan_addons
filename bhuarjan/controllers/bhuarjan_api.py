@@ -1777,6 +1777,9 @@ class BhuarjanAPIController(http.Controller):
                     'is_notification_4_generated': survey.is_notification_4_generated,
                     'surveyor_id': survey.user_id.id if survey.user_id else None,
                     'surveyor_name': survey.user_id.name if survey.user_id else '',
+                    'landowners_count': len(survey.landowner_ids),
+                    'images_count': len(survey.photo_ids),
+                    'tree_count': sum(survey.tree_line_ids.mapped('quantity')),
                 })
 
             # Get total count

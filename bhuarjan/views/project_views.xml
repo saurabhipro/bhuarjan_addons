@@ -39,50 +39,42 @@
                             invisible="state == 'draft'"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Project Name..."/></h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="code"/>
                             <field name="department_id"/>
                             <field name="district_id"/>
                             <field name="law_master_id" options="{'no_create': False}"/>
                             <field name="project_uuid" invisible="1"/>
                             <field name="id" invisible="1"/>
-                            <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
+                            <button name="action_regenerate_uuid" type="object" string="Regenerate UUID" class="oe_link" invisible="1"/>
                         </group>
                         <group>
-                            <field name="is_sia_exempt"/>
-                            <field name="is_displacement"/>
-                        </group>
-                    </group>
-                    
-                    <!-- Affected Families and Persons (shown when is_displacement is True) -->
-                    <group invisible="not is_displacement">
-                        <group>
+                            <field name="is_sia_exempt" widget="boolean_toggle"/>
+                            <field name="is_displacement" widget="boolean_toggle"/>
+                            
+                            <!-- Counts shown directly here if displacement is involved -->
                             <field name="affected_families_count" 
-                                   string="Number of Families / परिवारों की संख्या"/>
+                                   invisible="not is_displacement"/>
                             <field name="affected_persons_count" 
-                                   string="Number of Persons / प्रभावित व्यक्तियों की संख्या"/>
+                                   invisible="not is_displacement"/>
                         </group>
                     </group>
                     
-                    <!-- Rehabilitation Allocation Fields (shown when is_displacement is True) -->
-                    <group invisible="not is_displacement">
-                        <group col="2">
-                            <group>
-                                <field name="allocated_village" 
-                                       placeholder="Enter allocated village name..."/>
-                                <field name="allocated_tehsil" 
-                                       placeholder="Enter allocated tehsil name..."/>
-                                <field name="allocated_district" 
-                                       placeholder="Enter allocated district name..."/>
-                            </group>
-                            <group>
-                                <field name="allocated_khasra_number"
-                                       placeholder="Enter allocated khasra number..."/>
-                                <field name="allocated_area_hectares"
-                                       placeholder="0.0000"/>
-                            </group>
+                    <!-- Rehabilitation Allocation Section -->
+                    <group string="Rehabilitation Allocation Details" invisible="not is_displacement">
+                        <group>
+                            <field name="allocated_village" placeholder="Allocated Village"/>
+                            <field name="allocated_tehsil" placeholder="Allocated Tehsil"/>
+                            <field name="allocated_district" placeholder="Allocated District"/>
+                        </group>
+                        <group>
+                            <field name="allocated_khasra_number" placeholder="Allocated Khasra"/>
+                            <field name="allocated_area_hectares" placeholder="0.0000"/>
                         </group>
                     </group>
                     <notebook>
@@ -178,9 +170,9 @@
                                 <group string="(11) Rehabilitation Administrator / पुनर्वास प्रशासक">
                                     <field name="rehab_admin_name" nolabel="1"/>
                                 </group>
-                            </group>
-                            <group string="(13) Section 5 Text / धारा 5 पाठ">
-                                <field name="section5_text_type" nolabel="1"/>
+                                <group string="(13) Section 5 Text / धारा 5 पाठ">
+                                    <field name="section5_text_type" nolabel="1"/>
+                                </group>
                             </group>
                         </page>
                     </notebook>

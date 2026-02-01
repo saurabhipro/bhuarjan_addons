@@ -105,6 +105,13 @@ class ResUsers(models.Model):
     
     def read(self, fields=None, load='_classic_read'):
         """Override read to recompute survey_count_in_project when context has project"""
+        # Log context for debugging
+        # import logging
+        # _logger = logging.getLogger(__name__)
+        # project_id_ctx = self.env.context.get('default_project_id') or self.env.context.get('active_id')
+        # if 'survey_count_in_project' in (fields or []):
+        #     _logger.info(f"ResUsers read: fields={fields}, project_id_ctx={project_id_ctx}")
+            
         result = super().read(fields=fields, load=load)
         # Force recomputation if survey_count_in_project is being read and context has project
         if fields is None or 'survey_count_in_project' in fields:

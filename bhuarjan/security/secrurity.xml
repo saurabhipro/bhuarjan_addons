@@ -418,7 +418,7 @@
         <record id="record_res_users_rule_district_administrator" model="ir.rule">
             <field name="name">District Administrator can see users from their district</field>
             <field name="model_id" ref="base.model_res_users"/>
-            <field name="domain_force">[('district_id', '=', user.district_id.id)]</field>
+            <field name="domain_force">[('district_id', '=', user.district_id.id), ('bhuarjan_role', '!=', 'administrator')]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
         </record>
         

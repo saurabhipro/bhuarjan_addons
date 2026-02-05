@@ -80,6 +80,18 @@ class BhuProject(models.Model):
                                    domain="[('bhuarjan_role', '=', 'patwari')]",
                                    help="Patwaris assigned to this project")
     
+    is_patwari_editable = fields.Boolean(compute='_compute_is_patwari_editable')
+    
+    def _compute_is_patwari_editable(self):
+        for rec in self:
+            rec.is_patwari_editable = (
+                self.env.user.has_group('bhuarjan.group_bhuarjan_admin') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_district_administrator') or
+                self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
+                self.env.user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
+                self.env.user.has_group('base.group_system')
+            )
+    
     def action_view_patwari_surveys(self, patwari_id):
         """Open surveys for a specific patwari in this project"""
         self.ensure_one()

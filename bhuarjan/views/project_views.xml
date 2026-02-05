@@ -107,6 +107,7 @@
                         <page string="Patwaris / पटवारी">
                             <field name="patwari_ids" nolabel="1"
                                    options="{'no_create_edit': True}"
+                                   domain="[('district_id', '=', district_id)]"
                                    context="{'default_project_id': id, 'active_model': 'bhu.project', 'active_id': id}">
                                 <list>
                                     <field name="name"/>

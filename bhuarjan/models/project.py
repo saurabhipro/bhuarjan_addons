@@ -68,8 +68,8 @@ class BhuProject(models.Model):
                                help="Select Sub-Divisional Magistrates for this project")
     tehsildar_ids = fields.Many2many('res.users', 'bhu_project_tehsildar_rel', 'project_id', 'user_id',
                                      string="Tehsildar / तहसीलदार", 
-                                     domain="[('bhuarjan_role', '=', 'sdm')]", tracking=True,
-                                     help="Select Tehsildars for this project (using SDM role)")
+                                     domain="[('bhuarjan_role', '=', 'tahsildar')]", tracking=True,
+                                     help="Select Tehsildars for this project")
     department_user_ids = fields.Many2many('res.users', 'bhu_project_department_user_rel', 'project_id', 'user_id',
                                            string="Department User / विभाग उपयोगकर्ता", 
                                            domain="[('bhuarjan_role', '=', 'department_user')]", tracking=True,
@@ -77,22 +77,8 @@ class BhuProject(models.Model):
     
     patwari_ids = fields.Many2many('res.users', 'bhu_project_patwari_rel', 'project_id', 'user_id',
                                    string="Patwaris / पटवारी", 
-                                   compute='_compute_patwari_ids', store=False, readonly=True,
-                                   help="Patwaris assigned to villages in this project")
-    
-    @api.depends('village_ids')
-    def _compute_patwari_ids(self):
-        """Compute patwaris assigned to villages in this project"""
-        for project in self:
-            if project.village_ids:
-                # Find all patwaris who have at least one village in common with project villages
-                patwaris = self.env['res.users'].search([
-                    ('bhuarjan_role', '=', 'patwari'),
-                    ('village_ids', 'in', project.village_ids.ids)
-                ])
-                project.patwari_ids = patwaris
-            else:
-                project.patwari_ids = False
+                                   domain="[('bhuarjan_role', '=', 'patwari')]",
+                                   help="Patwaris assigned to this project")
     
     def action_view_patwari_surveys(self, patwari_id):
         """Open surveys for a specific patwari in this project"""

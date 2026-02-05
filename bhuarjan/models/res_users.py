@@ -269,5 +269,8 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     # Extend permission for signup_type to District Administrator
-    signup_type = fields.Selection(groups="base.group_erp_manager,bhuarjan.group_bhuarjan_district_administrator")
+    signup_type = fields.Selection(
+        [('signup', 'Signup Token'), ('reset', 'Reset Password Token')],
+        groups="base.group_erp_manager,bhuarjan.group_bhuarjan_district_administrator"
+    )
 

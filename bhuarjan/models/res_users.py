@@ -263,3 +263,11 @@ class ResUsers(models.Model):
             pass  # Use default if reference not found
         return action
 
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    # Extend permission for signup_type to District Administrator
+    signup_type = fields.Selection(groups="base.group_erp_manager,bhuarjan.group_bhuarjan_district_administrator")
+

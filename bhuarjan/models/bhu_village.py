@@ -111,6 +111,8 @@ class BhuVillage(models.Model):
     village_code = fields.Char(string='Village Code / ग्राम कोड', required=True, tracking=True, copy=False, help='Unique code for the village')
     pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
     
+    project_ids = fields.Many2many('bhu.project', 'bhu_project_bhu_village_rel', 'bhu_village_id', 'bhu_project_id', string='Projects / परियोजनाएं', readonly=True)
+    
     # Related records counts
     section4_notification_count = fields.Integer(string='Section 4 Notifications', compute='_compute_notification_counts', store=False)
     

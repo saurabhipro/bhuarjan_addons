@@ -19,13 +19,13 @@
                         </t>
                         <t t-esc="title"/>
                         <t t-if="state.selectedProjectName">
-                            <span class="o_selected_project_inline" t-att-title="state.selectedProjectName" style="max-width: 280px; display: inline-flex; align-items: center;">
+                            <span class="o_selected_project_inline" t-att-title="state.selectedProjectName" style="max-width: 400px; display: inline-flex; align-items: center;">
                                 <i class="fa fa-briefcase" style="margin-right: 8px; flex-shrink: 0;"/>
                                 <span class="o_project_name_bold" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><t t-esc="state.selectedProjectName"/></span>
                             </span>
                         </t>
                         <t t-if="state.selectedVillageName">
-                            <span class="o_selected_project_inline" t-att-title="state.selectedVillageName" style="margin-left: 10px; max-width: 200px; display: inline-flex; align-items: center;">
+                            <span class="o_selected_project_inline" t-att-title="state.selectedVillageName" style="margin-left: 10px; max-width: 280px; display: inline-flex; align-items: center;">
                                 <i class="fa fa-home" style="margin-right: 8px; flex-shrink: 0;"/>
                                 <span class="o_project_name_bold" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><t t-esc="state.selectedVillageName"/></span>
                             </span>

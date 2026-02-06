@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- Kharsiyan Block Land Rate Master Data (2019-2020) -->
         <!-- Based on Market Value Guide for Land in Kharsiyan Block -->
         <!-- Using existing Raigarh district and tehsil structure -->

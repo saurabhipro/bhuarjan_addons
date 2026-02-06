@@ -230,8 +230,25 @@ class DashboardStats(models.AbstractModel):
         # Domain for models without village_id (only project filter, no village)
         # Ensure we use empty list if project_domain is empty or falsy
         domain_without_village = project_domain if project_domain else []
-        _logger.info(f"Domain Building - domain_without_village for Section 8/Expert/SIA: {domain_without_village}")
+        _logger.info(f"Domain Building - domain_without_village for Section 8: {domain_without_village}")
         
+        # Domain for models with village_ids M2M (Expert, SIA)
+        # These models handle multiple villages, so we need to check if the filtered village is IN the record's villages
+        m2m_village_domain = list(domain_without_village)  # Start with project filter
+        if village_domain:
+            # Extract village_id from domain [('village_id', '=', ID)]
+            v_id = None
+            for item in village_domain:
+                if isinstance(item, (list, tuple)) and item[0] == 'village_id' and item[1] == '=':
+                    v_id = item[2]
+                    break
+            
+            if v_id:
+                # Add M2M check for village
+                m2m_village_domain.append(('village_ids', 'in', [v_id]))
+        
+        _logger.info(f"Domain Building - m2m_village_domain for Expert/SIA: {m2m_village_domain}")
+
         # Extract project IDs for completion calculations
         project_ids_from_domain = self._extract_project_ids(project_id, project_domain, department_id, user_access)
         
@@ -240,6 +257,7 @@ class DashboardStats(models.AbstractModel):
             'village_domain': village_domain,
             'final_domain': final_domain,
             'domain_without_village': domain_without_village,
+            'm2m_village_domain': m2m_village_domain,
             'project_ids_from_domain': project_ids_from_domain,
         }
 
@@ -401,6 +419,7 @@ class DashboardStats(models.AbstractModel):
         """
         domain_with_village = domains['final_domain']
         domain_without_village = domains['domain_without_village']
+        m2m_village_domain = domains.get('m2m_village_domain', domain_without_village)  # Fallback just in case
         
         # Get counts using generic methods
         # Get counts using generic methods
@@ -413,8 +432,8 @@ class DashboardStats(models.AbstractModel):
             'section11': self._get_section_counts('bhu.section11.preliminary.report', domain_with_village, states=workflow_states),
             'section15': self._get_section_counts('bhu.section15.objection', domain_with_village, states=workflow_states),
             'section19': self._get_section_counts('bhu.section19.notification', domain_with_village, states=workflow_states),
-            'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village, states=workflow_states),
-            'sia': self._get_section_counts('bhu.sia.team', domain_without_village, states=workflow_states),
+            'expert': self._get_section_counts('bhu.expert.committee.report', m2m_village_domain, states=workflow_states),
+            'sia': self._get_section_counts('bhu.sia.team', m2m_village_domain, states=workflow_states),
             'section8': self._get_section_counts('bhu.section8', domain_without_village, state_field='state', states=['draft', 'approved', 'rejected']),  # Section 8 is per project, not per village
             # Railway Act Sections (all have village_id)
             # Sections 20A and 20E have no workflow - simple count only
@@ -654,7 +673,7 @@ class DashboardStats(models.AbstractModel):
                 ) if domains['project_ids_from_domain'] else 0.0,
                 'section19_info': self._get_section_info('bhu.section19.notification', domains['final_domain']),
                 
-                # Expert Committee (NO village_id - use domain_without_village)
+                # Expert Committee (uses m2m_village_domain)
                 'expert_total': counts['expert']['total'],
                 'expert_draft': counts['expert']['draft'],
                 'expert_submitted': counts['expert']['submitted'],
@@ -663,9 +682,9 @@ class DashboardStats(models.AbstractModel):
                 'expert_completion_percent': self._calculate_completion_percentage(
                     counts['expert']['approved'], 0, counts['expert']['total'], is_survey=False
                 ),
-                'expert_info': self._get_section_info('bhu.expert.committee.report', domains['domain_without_village']),
+                'expert_info': self._get_section_info('bhu.expert.committee.report', domains.get('m2m_village_domain', domains['domain_without_village'])),
                 
-                # SIA Teams (NO village_id - use domain_without_village)
+                # SIA Teams (uses m2m_village_domain)
                 'sia_total': counts['sia']['total'],
                 'sia_draft': counts['sia']['draft'],
                 'sia_submitted': counts['sia']['submitted'],
@@ -674,7 +693,7 @@ class DashboardStats(models.AbstractModel):
                 'sia_completion_percent': self._calculate_completion_percentage(
                     counts['sia']['approved'], 0, counts['sia']['total'], is_survey=False
                 ),
-                'sia_info': self._get_section_info('bhu.sia.team', domains['domain_without_village']),
+                'sia_info': self._get_section_info('bhu.sia.team', domains.get('m2m_village_domain', domains['domain_without_village'])),
                 
                 # Section 8 (NO village_id - use domain_without_village, per project)
                 'section8_total': counts['section8']['total'],

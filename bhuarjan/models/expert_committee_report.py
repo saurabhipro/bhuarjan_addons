@@ -85,9 +85,32 @@ class ExpertCommitteeReport(models.Model):
         context={'default_member_type': 'technical_expert'},
         tracking=True)
     
-    _sql_constraints = [
-        ('project_unique', 'UNIQUE(project_id)', 'Only one Expert Committee Report is allowed per project.')
-    ]
+    @api.constrains('project_id', 'village_ids')
+    def _check_project_village_uniqueness(self):
+        """Ensure no overlapping villages for the same project"""
+        for record in self:
+            if not record.project_id or not record.village_ids:
+                continue
+            
+            # This report covers specific villages. Check if any of these villages are already covered.
+            domain = [
+                ('project_id', '=', record.project_id.id),
+                ('id', '!=', record.id)
+            ]
+            existing_reports = self.search(domain)
+            
+            for existing in existing_reports:
+                # If existing report has no villages, skip it (allow overlap with "full project" reports as per user request)
+                if not existing.village_ids:
+                    continue
+                
+                # Check for overlap
+                # intersection of IDs
+                overlap = set(record.village_ids.ids) & set(existing.village_ids.ids)
+                if overlap:
+                    overlapping_villages = self.env['bhu.village'].browse(list(overlap))
+                    names = ', '.join(overlapping_villages.mapped('name'))
+                    raise ValidationError(_('Expert Committee Report already exists for the following village(s): %s') % names)
     
     @api.depends('project_id', 'project_id.village_ids', 'village_ids')
     def _compute_project_villages(self):

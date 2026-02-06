@@ -111,7 +111,7 @@
                                 <strong>क्रमांक /</strong>
                                 <span t-if="sia_team.kramank" t-esc="sia_team.kramank"/>
                                 <span t-if="not sia_team.kramank">.....................</span>
-                                /&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
+                                /
                         </div>
                         <div class="col normal-text letter_space text-right w-100" style="flex: 1; text-align: right !important;">
                                 <strong>रायगढ़, दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
@@ -320,7 +320,7 @@
                                 <strong>पृ. क्रमांक /</strong>
                                 <span t-if="sia_team.kramank" t-esc="sia_team.kramank"/>
                                 <span t-if="not sia_team.kramank">.....................</span>
-                                /भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>&#160;
+                                /
                             </span>
                             <span class="normal-text letter_space" style="text-align: right !important; font-weight: bold !important; font-size: 21px !important; flex: 1;">
                                 <strong>रायगढ़, दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>

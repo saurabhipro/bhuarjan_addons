@@ -209,22 +209,6 @@
                                 </field>
                             </group>
                         </page>
-                        
-                        <page string="Rate Permutations / दर क्रमचय" name="rate_permutations" invisible="not village_id">
-                            <group string="Rate Permutations for Village / ग्राम के लिए दर क्रमचय">
-                                <div class="alert alert-info" role="alert" invisible="village_id">
-                                    <strong>Note:</strong> Please select a village to view rate permutations.
-                                </div>
-                                <field name="rate_permutation_ids" nolabel="1" readonly="1">
-                                    <list string="Rate Permutations" default_order="road_proximity,irrigation_status,is_diverted">
-                                        <field name="road_proximity" string="Road Proximity / सड़क निकटता"/>
-                                        <field name="irrigation_status" string="Irrigation Status / सिंचाई स्थिति"/>
-                                        <field name="is_diverted" string="Diverted / विचलित" widget="boolean_toggle"/>
-                                        <field name="calculated_rate" string="Rate per Hectare / हेक्टेयर दर" widget="monetary"/>
-                                    </list>
-                                </field>
-                            </group>
-                        </page>
                     </notebook>
                     
                     <!-- Chatter removed -->

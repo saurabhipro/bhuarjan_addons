@@ -54,7 +54,7 @@
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
-                            <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Creation / विशेषज्ञ समिति गठन
+                            <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>Expert Committee Creation for <field name="project_id" readonly="1" options="{'no_open': True}" class="oe_inline" nolabel="1"/> / विशेषज्ञ समिति गठन
                         </h1>
                     </div>
                     

@@ -269,28 +269,28 @@ class Section4Notification(models.Model):
             if vals.get('public_hearing_time') in ('00:00', '0:00', '0:00:00', '00:00:00', '0.0', '0'):
                 vals['public_hearing_time'] = False
                 
-            project_id = vals.get('project_id')
-            village_id = vals.get('village_id')
+            # Resolve project_id and village_id
+            # Fields might be missing in vals if they are readonly in the view
+            check_project_id = vals.get('project_id') or self.env.context.get('default_project_id')
+            if not check_project_id:
+                 check_project_id = self._default_project_id()
+            
+            check_village_id = vals.get('village_id') or self.env.context.get('default_village_id')
             
             # Check if project is SIA exempt
-            if project_id:
-                project = self.env['bhu.project'].browse(project_id)
+            if check_project_id:
+                project = self.env['bhu.project'].browse(check_project_id)
                 if project.is_sia_exempt:
                     raise ValidationError(_('Section 4 Notifications cannot be created for projects that are exempt from Social Impact Assessment.'))
+
+            # Ensure vals has project_id (if we resolved it from context/default)
+            # This ensures the SQL constraint checks the correct project
+            if not vals.get('project_id') and check_project_id:
+                vals['project_id'] = check_project_id
             
-            # Check for existing records to prevent UniqueViolation
-            # Skip this check during data loading - let Odoo's mechanism handle it
-            is_data_loading = self.env.context.get('install_mode') or self.env.context.get('load') or \
-                             self.env.context.get('module') or '_force_unlink' in self.env.context
-            if project_id and village_id and not is_data_loading:
-                existing = self.env['bhu.section4.notification'].sudo().search([
-                    ('project_id', '=', project_id),
-                    ('village_id', '=', village_id)
-                ], limit=1)
-                if existing:
-                    # In normal create, return existing to prevent duplicate
-                    existing_records.append(existing)
-                    continue
+            # Assign resolved values to local variables for use in rest of method
+            project_id = check_project_id
+            village_id = check_village_id
             
             # Generate sequence number for notification_seq_number
             sequence_number = None

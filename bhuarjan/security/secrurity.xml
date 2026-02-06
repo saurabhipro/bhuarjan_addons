@@ -422,6 +422,23 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
         </record>
         
+        <!-- Department Rules -->
+        <!-- Admin can see all departments -->
+        <record id="record_bhu_department_rule_admin" model="ir.rule">
+            <field name="name">Admin can see all departments</field>
+            <field name="model_id" ref="model_bhu_department"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_admin'))]"/>
+        </record>
+        
+        <!-- District Administrator can only see departments in their district -->
+        <record id="record_bhu_department_rule_district_admin" model="ir.rule">
+            <field name="name">District Administrator can see departments in their district</field>
+            <field name="model_id" ref="model_bhu_department"/>
+            <field name="domain_force">[('district_id', '=', user.district_id.id)]</field>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
+        </record>
+        
         
     </data>
 </odoo>

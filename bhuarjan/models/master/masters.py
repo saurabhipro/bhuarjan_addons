@@ -56,12 +56,45 @@ class BhuDepartment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     name = fields.Char(string='Department Name', required=True, tracking=True)
+    district_id = fields.Many2one('bhu.district', string='District', tracking=True,
+                                  default=lambda self: self._get_default_district(),
+                                  help='District for this department')
+    is_district_readonly = fields.Boolean(compute='_compute_is_district_readonly', store=False)
     code = fields.Char(string='Department Code', tracking=True)
     description = fields.Text(string='Description', tracking=True)
     head_of_department = fields.Char(string='Head of Department', tracking=True)
     contact_number = fields.Char(string='Contact Number', tracking=True)
     email = fields.Char(string='Email', tracking=True)
     address = fields.Text(string='Address', tracking=True)
-    project_ids = fields.Many2many('bhu.project', string='Projects / परियोजनाएं', tracking=True,
+    project_ids = fields.Many2many('bhu.project', string='Projects', tracking=True,
                                    help='Select multiple projects associated with this department')
+
+    @api.depends_context('uid')
+    def _compute_is_district_readonly(self):
+        """Compute if district field should be readonly (for non-admin users)"""
+        user = self.env.user
+        is_admin = user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')
+        for record in self:
+            record.is_district_readonly = not is_admin
+
+    @api.model
+    def _get_default_district(self):
+        """Get default district based on logged-in user (for non-administrators)"""
+        user = self.env.user
+        # Administrators can select any district, so no default
+        if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
+            return False
+        # For other users, default to their district
+        return user.district_id.id if user.district_id else False
+
+    @api.model
+    def default_get(self, fields_list):
+        """Override to set district automatically for non-admin users"""
+        res = super(BhuDepartment, self).default_get(fields_list)
+        user = self.env.user
+        # For non-admin users, force district to their district
+        if not (user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system')):
+            if user.district_id:
+                res['district_id'] = user.district_id.id
+        return res
 

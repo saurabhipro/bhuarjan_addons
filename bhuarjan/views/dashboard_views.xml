@@ -33,10 +33,10 @@
                         </button>
                     </div>
                     
-                    <div class="dashboard-section-title">
+                    <div class="dashboard-section-title" invisible="1">
                         <i class="fa fa-database" title="Master Data Statistics"/> MASTER DATA STATISTICS
                     </div>
-                    <div class="dashboard-grid">
+                    <div class="dashboard-grid" invisible="1">
                         <button name="action_open_districts" type="object" class="dashboard-kpi-card kpi-card-green">
                             <div class="kpi-header">
                                 <div class="kpi-label">Districts</div>
@@ -44,7 +44,7 @@
                             </div>
                             <div class="kpi-value"><field name="total_districts" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-blue">
+                        <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-blue" invisible="1">
                             <div class="kpi-header">
                                 <div class="kpi-label">Sub Divisions</div>
                                 <div class="kpi-icon"><i class="fa fa-sitemap" title="Sub Divisions"/></div>

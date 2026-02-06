@@ -61,7 +61,7 @@
                     <!-- Letter Number Field - Visible and Optional -->
                     <group>
                         <field name="project_id" string="Project / परियोजना" 
-                               readonly="state == 'approved'" 
+                               readonly="not is_admin or state == 'approved'" 
                                required="1"
                                options="{'no_create': True, 'no_open': True}"/>
                         <field name="kramank" string="Letter Number / पत्र क्रमांक" placeholder="Enter Letter Number / पत्र क्रमांक दर्ज करें" 

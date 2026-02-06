@@ -328,9 +328,9 @@ class Section15Objection(models.Model):
         # Compute original landowners
         all_landowners = self.survey_id.landowner_ids
         self.original_landowner_ids = all_landowners
-        # Initialize resolution_landowner_ids with original if not set
-        if not self.resolution_landowner_ids and all_landowners:
-            self.resolution_landowner_ids = all_landowners
+        # Initialize resolution_landowner_ids with original
+        # Always update when survey changes
+        self.resolution_landowner_ids = all_landowners
         
         # Initialize or update resolution khasra record
         if self.resolution_khasra_ids and len(self.resolution_khasra_ids) > 0:

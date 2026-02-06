@@ -329,8 +329,16 @@ class Section15Objection(models.Model):
         all_landowners = self.survey_id.landowner_ids
         self.original_landowner_ids = all_landowners
         # Initialize resolution_landowner_ids with original
-        # Always update when survey changes
-        self.resolution_landowner_ids = all_landowners
+        if all_landowners:
+            self.resolution_landowner_ids = [(6, 0, all_landowners.ids)]
+        else:
+            self.resolution_landowner_ids = False
+            return {
+                'warning': {
+                    'title': _('No Landowners Found'),
+                    'message': _('The selected survey (Khasra %s) has no linked landowners. Please check the survey data.') % self.survey_id.khasra_number
+                }
+            }
         
         # Initialize or update resolution khasra record
         if self.resolution_khasra_ids and len(self.resolution_khasra_ids) > 0:

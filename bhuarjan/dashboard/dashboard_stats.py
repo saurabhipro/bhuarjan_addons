@@ -403,29 +403,33 @@ class DashboardStats(models.AbstractModel):
         domain_without_village = domains['domain_without_village']
         
         # Get counts using generic methods
+        # Get counts using generic methods
+        # Include 'generated' and 'signed' states for all workflow sections
+        workflow_states = ['draft', 'submitted', 'approved', 'send_back', 'generated', 'signed']
+        
         counts = {
             'survey': self._get_survey_counts(domain_with_village),
-            'section4': self._get_section_counts('bhu.section4.notification', domain_with_village),
-            'section11': self._get_section_counts('bhu.section11.preliminary.report', domain_with_village),
-            'section15': self._get_section_counts('bhu.section15.objection', domain_with_village),
-            'section19': self._get_section_counts('bhu.section19.notification', domain_with_village),
-            'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village),
-            'sia': self._get_section_counts('bhu.sia.team', domain_without_village),
+            'section4': self._get_section_counts('bhu.section4.notification', domain_with_village, states=workflow_states),
+            'section11': self._get_section_counts('bhu.section11.preliminary.report', domain_with_village, states=workflow_states),
+            'section15': self._get_section_counts('bhu.section15.objection', domain_with_village, states=workflow_states),
+            'section19': self._get_section_counts('bhu.section19.notification', domain_with_village, states=workflow_states),
+            'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village, states=workflow_states),
+            'sia': self._get_section_counts('bhu.sia.team', domain_without_village, states=workflow_states),
             'section8': self._get_section_counts('bhu.section8', domain_without_village, state_field='state', states=['draft', 'approved', 'rejected']),  # Section 8 is per project, not per village
             # Railway Act Sections (all have village_id)
             # Sections 20A and 20E have no workflow - simple count only
             'section20a_railways': self._get_simple_section_counts('bhu.section20a.railways', domain_with_village),
-            'section20d_railways': self._get_section_counts('bhu.section20d.railways', domain_with_village),
+            'section20d_railways': self._get_section_counts('bhu.section20d.railways', domain_with_village, states=workflow_states),
             'section20e_railways': self._get_simple_section_counts('bhu.section20e.railways', domain_with_village),
             # National Highway Act Sections (all have village_id)
             # Sections 3A and 3D have no workflow - simple count only
             'section3a_nh': self._get_simple_section_counts('bhu.section3a.nh', domain_with_village),
-            'section3c_nh': self._get_section_counts('bhu.section3c.nh', domain_with_village),
+            'section3c_nh': self._get_section_counts('bhu.section3c.nh', domain_with_village, states=workflow_states),
             'section3d_nh': self._get_simple_section_counts('bhu.section3d.nh', domain_with_village),
             # Mutual Consent Policy (has village_id)
-            'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village),
+            'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village, states=workflow_states),
             # Section 23 Award (has village_id)
-            'section23_award': self._get_section_counts('bhu.section23.award', domain_with_village),
+            'section23_award': self._get_section_counts('bhu.section23.award', domain_with_village, states=workflow_states),
         }
         
         # Section 21 Notification uses 'signed' state instead of 'approved'
@@ -542,7 +546,25 @@ class DashboardStats(models.AbstractModel):
             counts = self._get_all_section_counts(domains)
             
             # Log survey counts for debugging
+            # Log survey counts for debugging
             _logger.info(f"Dashboard Stats - Survey counts: total={counts['survey']['total']}, approved={counts['survey']['approved']}, domain={domains['final_domain']}")
+            
+            # Log Section 4 counts significantly
+            try:
+                _logger.info(f"Dashboard Stats - Section 4 counts: "
+                             f"total={counts['section4']['total']},"
+                             f"draft={counts['section4']['draft']},"
+                             f"generated={counts['section4'].get('generated', 0)},"
+                             f"submitted={counts['section4']['submitted']},"
+                             f"Domain={domains['final_domain']}")
+                if domains['final_domain']:
+                    sec4_recs = self.env['bhu.section4.notification'].search(domains['final_domain'])
+                    if sec4_recs:
+                        _logger.info(f"Dashboard Stats - FOUND Section 4 IDs: {sec4_recs.ids}, States: {sec4_recs.mapped('state')}")
+                    else:
+                        _logger.info("Dashboard Stats - NO Section 4 records found with this domain.")
+            except Exception as e:
+                 _logger.error(f"Error logging section 4 stats: {e}")
             
             # Debug Section 8 specifically
             _logger.info(f"Dashboard Stats - Section 8 domain_without_village: {domains['domain_without_village']}")
@@ -588,6 +610,8 @@ class DashboardStats(models.AbstractModel):
                 'section4_submitted': counts['section4']['submitted'],
                 'section4_approved': counts['section4']['approved'],
                 'section4_send_back': counts['section4']['send_back'],
+                'section4_generated': counts['section4'].get('generated', 0),
+                'section4_signed': counts['section4'].get('signed', 0),
                 'section4_completion_percent': self._calculate_village_based_completion(
                     'bhu.section4.notification', domains['project_ids_from_domain'], total_villages
                 ) if domains['project_ids_from_domain'] else 0.0,
@@ -599,6 +623,8 @@ class DashboardStats(models.AbstractModel):
                 'section11_submitted': counts['section11']['submitted'],
                 'section11_approved': counts['section11']['approved'],
                 'section11_send_back': counts['section11']['send_back'],
+                'section11_generated': counts['section11'].get('generated', 0),
+                'section11_signed': counts['section11'].get('signed', 0),
                 'section11_completion_percent': self._calculate_village_based_completion(
                     'bhu.section11.preliminary.report', domains['project_ids_from_domain'], total_villages
                 ) if domains['project_ids_from_domain'] else 0.0,
@@ -621,6 +647,8 @@ class DashboardStats(models.AbstractModel):
                 'section19_submitted': counts['section19']['submitted'],
                 'section19_approved': counts['section19']['approved'],
                 'section19_send_back': counts['section19']['send_back'],
+                'section19_generated': counts['section19'].get('generated', 0),
+                'section19_signed': counts['section19'].get('signed', 0),
                 'section19_completion_percent': self._calculate_village_based_completion(
                     'bhu.section19.notification', domains['project_ids_from_domain'], total_villages
                 ) if domains['project_ids_from_domain'] else 0.0,

@@ -50,6 +50,7 @@ class BhuVillage(models.Model):
     is_forest_area = fields.Boolean(string='Forest Area / वन क्षेत्र', tracking=True)
 
 
+
 class BhuDepartment(models.Model):
     _name = 'bhu.department'
     _description = 'Department'

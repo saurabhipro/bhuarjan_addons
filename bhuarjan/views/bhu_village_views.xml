@@ -12,8 +12,10 @@
                 <field name="district_id" string="District"/>
                 <field name="sub_division_id" string="Sub Division"/>
                 <field name="tehsil_id" string="Tehsil"/>
+                <field name="project_ids" widget="many2many_tags" string="Projects / परियोजनाएं"/>
                 <field name="pincode" string="Pincode"/>
             </list>
+            
         </field>
     </record>
 
@@ -47,6 +49,11 @@
                         <field name="village_uuid" readonly="1" invisible="1"/>
                         <button name="action_regenerate_uuid" type="object" string="Regenerate UUID / UUID पुनर्जीवित करें" class="oe_link" invisible="1"/>
                     </group>
+                    <notebook>
+                        <page string="Projects / परियोजनाएं">
+                            <field name="project_ids" readonly="1"/>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_ri,bhuarjan.group_bhuarjan_nayab_tahsildar,bhuarjan.group_bhuarjan_tahsildar,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"/>
 

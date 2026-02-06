@@ -283,7 +283,7 @@ class Section4Notification(models.Model):
             is_data_loading = self.env.context.get('install_mode') or self.env.context.get('load') or \
                              self.env.context.get('module') or '_force_unlink' in self.env.context
             if project_id and village_id and not is_data_loading:
-                existing = self.env['bhu.section4.notification'].search([
+                existing = self.env['bhu.section4.notification'].sudo().search([
                     ('project_id', '=', project_id),
                     ('village_id', '=', village_id)
                 ], limit=1)

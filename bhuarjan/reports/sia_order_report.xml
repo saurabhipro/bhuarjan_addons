@@ -118,48 +118,22 @@
                         </div>
                     </div>
 
-                    <!-- Subject -->
-                    <div class="subject-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
-                            <strong>विषय:-</strong>
-                            <span style="padding-left: 20px !important; display: inline;">
-                                विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or '........................'"/> हेतु प्रभावित ग्राम 
-                            <t t-if="sia_team.village_ids">
-                                <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
-                                </t>
-                            </t>
-                            <t t-if="not sia_team.village_ids and sia_team.project_id and sia_team.project_id.village_ids">
-                                <t t-foreach="sia_team.project_id.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
-                                </t>
-                            </t>
-                            <t t-if="not sia_team.village_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
-                                ........................
-                            </t>
-                            तहसील&#160;
-                            <t t-if="sia_team.tehsil_ids">
-                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
-                                </t>
-                            </t>
-                            <t t-if="not sia_team.tehsil_ids">
-                                ........................
-                            </t>
-                            &#160;जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदन बाबत।
-                            </span>
-                        </p>
-                    </div>
+                    <!-- SDM Logic (Moved up for use in first paragraph) -->
+                    <t t-set="subdivision_name" t-value="''"/>
+                    <t t-if="sia_team.sub_division_id">
+                        <t t-set="subdivision_name" t-value="sia_team.sub_division_id.name"/>
+                    </t>
+                    <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
+                        <t t-set="first_sdm" t-value="sia_team.project_id.sdm_ids[0]"/>
+                        <t t-if="first_sdm.sub_division_ids and len(first_sdm.sub_division_ids) > 0">
+                            <t t-set="subdivision_name" t-value="first_sdm.sub_division_ids[0].name"/>
+                        </t>
+                    </t>
 
-                    
-                    <div style="text-align: center; margin: 10px 0;">
-                        <strong class="normal-text">--00--</strong>
-                    </div>
-
-                    <!-- New Paragraph -->
-                    <div class="body-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
+                    <!-- Main Body Paragraph (Replaces Subject and Old Body) -->
+                    <div class="body-section" style="margin-bottom: 5px !important; margin-top: 15px !important;">
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
-                            <strong>उपरोक्त विषयांतर्गत विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> <strong>रायगढ़ (छ.ग.) अंतर्गत</strong> <strong>परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/> <strong>हेतु प्रभावित ग्राम</strong> 
+                            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,</strong> <span t-esc="subdivision_name if subdivision_name else '........................'"/> <strong>द्वारा विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> <strong>(छ.ग.) अंतर्गत परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/> <strong>निर्माण हेतु प्रभावित ग्राम</strong> 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>
@@ -196,7 +170,7 @@
                             <t t-if="not sia_team.total_area_acquired or sia_team.total_area_acquired == 0">
                                 ........................
                             </t>
-                            <strong>हेक्टेयर </strong>भूमि के भू-अर्जन प्रस्ताव पर, सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदित किया जाता है। अनुमोदित दल का विवरण निम्नानुसार है :-
+                            <strong>हेक्टेयर भूमि के भू-अर्जन प्रस्ताव पर, सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव प्रस्तुत किया गया है, जो निम्नानुसार है :-</strong>
                         </p>
                     </div>
 
@@ -327,18 +301,7 @@
                     <!-- Team Roles and Responsibilities -->
                     <div class="body-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
-                            उपरोक्त दल के सदस्यों में से क्रमांक (क) के सदस्य को अध्यक्ष तथा क्रमांक (ख) से (घ) तक के सदस्यों को सदस्य के रूप में निर्धारित किया जाता है। यह दल अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, 
-                            <t t-set="subdivision_name" t-value="''"/>
-                            <t t-if="sia_team.sub_division_id">
-                                <t t-set="subdivision_name" t-value="sia_team.sub_division_id.name"/>
-                            </t>
-                            <t t-if="not sia_team.sub_division_id and sia_team.project_id and sia_team.project_id.sdm_ids and len(sia_team.project_id.sdm_ids) > 0">
-                                <t t-set="first_sdm" t-value="sia_team.project_id.sdm_ids[0]"/>
-                                <t t-if="first_sdm.sub_division_ids and len(first_sdm.sub_division_ids) > 0">
-                                    <t t-set="subdivision_name" t-value="first_sdm.sub_division_ids[0].name"/>
-                                </t>
-                            </t>
-                            <span t-esc="subdivision_name if subdivision_name else '........................'"/> जिला रायगढ़ (छ.ग.) जो पुनर्वास प्रशासक भी है, के मार्गदर्शन में कार्य करेगा। दल नियमानुसार सामाजिक समाघात निर्धारण की कार्यवाही पूर्ण कर अपनी रिपोर्ट निर्धारित समय सीमा के अंदर पुनर्वास प्रशासक को प्रस्तुत करेगा।
+                            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;उपरोक्त प्रस्ताव अनुसार दल का गठन किया जाता है। सारणी में क्रमांक “क” अध्यक्ष तथा क्रमांक “ख” से “घ” समिति के सदस्य होंगे। उक्त समिति अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, <span t-esc="subdivision_name if subdivision_name else '........................'"/> जो पुनर्वास प्रशासक है, के मार्गदर्शन में सामाजिक समाघात निर्धारण संबंधी कार्यवाही नियमानुसार पूर्ण करेंगे एवं प्रतिवेदन पुनर्वास प्रशासक को समय-सीमा के भीतर प्रस्तुत करेंगे।
                         </p>
                     </div>
 

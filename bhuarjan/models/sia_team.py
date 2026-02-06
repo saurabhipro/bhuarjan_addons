@@ -12,10 +12,10 @@ class SiaTeam(models.Model):
     _order = 'create_date desc'
     _rec_name = 'name'
     
-    _sql_constraints = [
-        ('unique_project', 'UNIQUE(project_id)', 
-         'Only one SIA Team can be created per project! / प्रति परियोजना केवल एक SIA टीम बनाई जा सकती है!')
-    ]
+    # _sql_constraints = [
+    #     ('unique_project', 'UNIQUE(project_id)', 
+    #      'Only one SIA Team can be created per project! / प्रति परियोजना केवल एक SIA टीम बनाई जा सकती है!')
+    # ]
 
     name = fields.Char(string='Team Name / टीम का नाम', compute='_compute_name', store=True, readonly=True)
     
@@ -289,20 +289,37 @@ class SiaTeam(models.Model):
         # For other users, return empty domain (they shouldn't be creating SIA teams)
         return []
     
-    @api.constrains('project_id')
-    def _check_unique_project(self):
-        """Ensure only one SIA Team per project"""
+    # SQL constraint removed to allow multiple teams per project
+    # _sql_constraints = [
+    #     ('unique_project', 'UNIQUE(project_id)', 
+    #      'Only one SIA Team can be created per project! / प्रति परियोजना केवल एक SIA टीम बनाई जा सकती है!')
+    # ]
+    
+    @api.constrains('project_id', 'village_ids')
+    def _check_project_village_uniqueness(self):
+        """Ensure no overlapping villages for the same project"""
         for record in self:
-            if record.project_id:
-                existing = self.search([
-                    ('id', '!=', record.id),
-                    ('project_id', '=', record.project_id.id)
-                ], limit=1)
-                if existing:
-                    raise ValidationError(
-                        _('A SIA Team already exists for project "%s". Only one SIA Team can be created per project.') %
-                        record.project_id.name
-                    )
+            if not record.project_id or not record.village_ids:
+                continue
+            
+            # This team covers specific villages. Check if any of these villages are already covered.
+            domain = [
+                ('project_id', '=', record.project_id.id),
+                ('id', '!=', record.id)
+            ]
+            existing_teams = self.search(domain)
+            
+            for existing in existing_teams:
+                # If existing team has no villages, skip it (allow overlap with "full project" teams)
+                if not existing.village_ids:
+                    continue
+                
+                # Check for overlap
+                overlap = set(record.village_ids.ids) & set(existing.village_ids.ids)
+                if overlap:
+                    overlapping_villages = self.env['bhu.village'].browse(list(overlap))
+                    names = ', '.join(overlapping_villages.mapped('name'))
+                    raise ValidationError(_('A SIA Team already exists for the following village(s): %s') % names)
     
     @api.constrains('project_id')
     def _check_sdm_project_assignment(self):

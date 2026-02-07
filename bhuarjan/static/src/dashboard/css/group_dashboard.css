@@ -275,6 +275,30 @@
     font-size: 0.9rem;
 }
 
+/* Header Integrated Search Bar */
+.o_group_dashboard .header-search-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    max-width: 400px;
+    height: 32px;
+}
+
+.o_group_dashboard .header-search-input {
+    width: 100%;
+    outline: none;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.o_group_dashboard .header-search-input::placeholder {
+    color: #adb5bd;
+}
+
+.o_group_dashboard .input-group-text {
+    height: 32px;
+}
+
 /* Table Header Sorting Styling */
 .o_group_dashboard .table thead th {
     font-weight: 700;

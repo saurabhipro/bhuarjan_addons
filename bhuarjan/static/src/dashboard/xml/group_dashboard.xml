@@ -97,32 +97,28 @@
                 <!-- Projects Table -->
                 <div class="container-fluid pb-5">
                     <div class="card shadow-sm border-0">
-                        <div class="card-header custom-card-header">
-                            <h5 class="mb-0">
-                                <i class="fa fa-list-alt me-2"/>
-                                All Projects Status
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <!-- Search and Filter Bar -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="input-group search-bar-container shadow-sm rounded overflow-hidden">
-                                        <span class="input-group-text bg-white border-end-0 border-primary-subtle">
-                                            <i class="fa fa-search text-muted"/>
-                                        </span>
-                                        <input type="text" 
-                                               class="form-control border-start-0 border-primary-subtle" 
-                                               placeholder="Search projects by name, code, district..." 
-                                               t-on-input="onSearchInput"/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 text-end">
-                                    <div class="text-muted small d-inline-block pt-2">
-                                        Found <strong t-esc="filteredProjects.length"/> projects
-                                    </div>
+                        <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-list-alt me-2"/>
+                                    All Projects Status
+                                </h5>
+                                <!-- Search Bar in Header -->
+                                <div class="header-search-container shadow-sm rounded overflow-hidden">
+                                    <span class="input-group-text bg-white border-0 py-1">
+                                        <i class="fa fa-search text-muted small"/>
+                                    </span>
+                                    <input type="text" 
+                                           class="header-search-input border-0 py-1 px-2" 
+                                           placeholder="Search projects by name, code, district..." 
+                                           t-on-input="onSearchInput"/>
                                 </div>
                             </div>
+                            <div class="text-white-50 small">
+                                Found <strong class="text-white" t-esc="filteredProjects.length"/> projects
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
 
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped mb-0">

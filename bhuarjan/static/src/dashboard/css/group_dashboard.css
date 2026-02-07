@@ -275,6 +275,44 @@
     font-size: 0.9rem;
 }
 
+/* Header Integrated Search Bar */
+.o_group_dashboard .header-search-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    /* Increased length */
+    height: 36px;
+    /* Slightly taller for professional feel */
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.o_group_dashboard .header-search-container:focus-within {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15) !important;
+    border-color: #8B4513;
+}
+
+.o_group_dashboard .header-search-input {
+    width: 100%;
+    outline: none;
+    font-size: 0.9rem;
+    color: #333;
+    padding-left: 0.5rem;
+}
+
+.o_group_dashboard .header-search-input::placeholder {
+    color: #adb5bd;
+    font-size: 0.85rem;
+}
+
+.o_group_dashboard .header-search-container .input-group-text {
+    height: 100%;
+    background: transparent;
+    padding-right: 0;
+}
+
 /* Table Header Sorting Styling */
 .o_group_dashboard .table thead th {
     font-weight: 700;

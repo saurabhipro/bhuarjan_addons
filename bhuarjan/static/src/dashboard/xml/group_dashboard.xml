@@ -123,17 +123,17 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 4%">#</th>
-                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('code')">
-                                                Code <i t-att-class="'fa ms-1 ' + getSortIcon('code')"/>
+                                            <th style="width: 12%; cursor: pointer;" t-on-click="() => this.sortBy('district_id')">
+                                                District <i t-att-class="'fa ms-1 ' + getSortIcon('district_id')"/>
                                             </th>
-                                            <th style="width: 18%; cursor: pointer;" t-on-click="() => this.sortBy('name')">
-                                                Project Name <i t-att-class="'fa ms-1 ' + getSortIcon('name')"/>
-                                            </th>
-                                            <th style="width: 12%; cursor: pointer;" t-on-click="() => this.sortBy('department_id')">
+                                            <th style="width: 15%; cursor: pointer;" t-on-click="() => this.sortBy('department_id')">
                                                 Department <i t-att-class="'fa ms-1 ' + getSortIcon('department_id')"/>
                                             </th>
-                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('district_id')">
-                                                District <i t-att-class="'fa ms-1 ' + getSortIcon('district_id')"/>
+                                            <th style="width: 20%; cursor: pointer;" t-on-click="() => this.sortBy('name')">
+                                                Project Name <i t-att-class="'fa ms-1 ' + getSortIcon('name')"/>
+                                            </th>
+                                            <th style="width: 8%; cursor: pointer;" t-on-click="() => this.sortBy('code')">
+                                                Code <i t-att-class="'fa ms-1 ' + getSortIcon('code')"/>
                                             </th>
                                             <th style="width: 6%; cursor: pointer;" t-on-click="() => this.sortBy('village_count')">
                                                 Vil <i t-att-class="'fa ms-1 ' + getSortIcon('village_count')"/>
@@ -144,8 +144,8 @@
                                             <th style="width: 8%; cursor: pointer;" t-on-click="() => this.sortBy('total_landowners')">
                                                 Land <i t-att-class="'fa ms-1 ' + getSortIcon('total_landowners')"/>
                                             </th>
-                                            <th style="width: 13%">Stage</th>
-                                            <th style="width: 12%; cursor: pointer;" t-on-click="() => this.sortBy('last_survey_date')">
+                                            <th style="width: 10%">Stage</th>
+                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('last_survey_date')">
                                                 Survey <i t-att-class="'fa ms-1 ' + getSortIcon('last_survey_date')"/>
                                             </th>
                                         </tr>
@@ -165,18 +165,18 @@
                                         <t t-else="">
                                             <tr t-foreach="filteredProjects" t-as="project" t-key="project.id" class="project-row">
                                                 <td t-esc="project_index + 1"/>
-                                                <td>
-                                                    <span class="badge bg-secondary" t-esc="project.code"/>
-                                                </td>
-                                                <td class="clickable-cell" t-on-click="() => this.openProject(project.id)">
-                                                    <strong class="dashboard-link" t-esc="project.name"/>
+                                                <td class="clickable-cell" t-on-click="() => project.district_id &amp;&amp; this.openDistrict(project.district_id[0])">
+                                                    <span t-att-class="project.district_id ? 'dashboard-link-secondary' : ''" 
+                                                          t-esc="project.district_id ? project.district_id[1] : 'N/A'"/>
                                                 </td>
                                                 <td class="clickable-cell" t-on-click="() => this.openDepartment(project.department_id[0])">
                                                     <span class="dashboard-link-secondary" t-esc="project.department_id[1]"/>
                                                 </td>
-                                                <td class="clickable-cell" t-on-click="() => project.district_id &amp;&amp; this.openDistrict(project.district_id[0])">
-                                                    <span t-att-class="project.district_id ? 'dashboard-link-secondary' : ''" 
-                                                          t-esc="project.district_id ? project.district_id[1] : 'N/A'"/>
+                                                <td class="clickable-cell" t-on-click="() => this.openProject(project.id)">
+                                                    <strong class="dashboard-link" t-esc="project.name"/>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary" t-esc="project.code"/>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-info" t-esc="project.village_count"/>

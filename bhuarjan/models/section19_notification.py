@@ -17,6 +17,18 @@ class Section19Notification(models.Model):
         ('unique_project_village', 'unique(project_id, village_id)', 'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
     ]
 
+    @api.constrains('project_id', 'village_id')
+    def _check_unique_project_village(self):
+        for record in self:
+            if record.project_id and record.village_id:
+                existing = self.search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id),
+                    ('id', '!=', record.id)
+                ])
+                if existing:
+                    raise ValidationError(_('A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!'))
+
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     
     # Location fields inherited from bhu.process.workflow.mixin
@@ -303,6 +315,14 @@ class Section19NotificationWizard(models.TransientModel):
     def action_generate_notification(self):
         """Create Section 19 Notification record and generate PDF"""
         self.ensure_one()
+        
+        # Check if notification already exists
+        existing = self.env['bhu.section19.notification'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id)
+        ])
+        if existing:
+            raise ValidationError(_('A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!'))
         
         # Create notification record
         notification = self.env['bhu.section19.notification'].create({

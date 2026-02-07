@@ -13,6 +13,10 @@ class Section19Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
 
+    _sql_constraints = [
+        ('unique_project_village', 'unique(project_id, village_id)', 'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
+    ]
+
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     
     # Location fields inherited from bhu.process.workflow.mixin

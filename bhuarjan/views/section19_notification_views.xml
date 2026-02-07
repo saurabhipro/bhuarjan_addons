@@ -250,14 +250,14 @@
                                         <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
                                                 class="btn custom-btn-success flex-fill" 
                                                 icon="fa-check"
-                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"
                                                 invisible="not collector_signed_file"
                                                 confirm="Are you sure want to approve this record."/>
                                         
                                         <button name="action_send_back" string="Send Back / वापस भेजें" type="object" 
                                                 class="btn custom-btn-danger flex-fill" 
                                                 icon="fa-times"
-                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"
                                                 confirm="Are you sure want to send back this record."/>
                                     </div>
                                 </div>

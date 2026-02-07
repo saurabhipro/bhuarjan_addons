@@ -190,13 +190,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section20d_railways_info &amp;&amp; state.stats.section20d_railways_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section20d.railways', state.stats &amp;&amp; state.stats.section20d_railways_info ? state.stats.section20d_railways_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section20d_railways_info ? state.stats.section20d_railways_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section20d_railways_info ? this.isAllApproved(state.stats.section20d_railways_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section20d.railways', state.stats &amp;&amp; state.stats.section20d_railways_info ? state.stats.section20d_railways_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section20d_railways_info ? state.stats.section20d_railways_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section20d_railways_info ? this.isAllApproved(state.stats.section20d_railways_info) : true"
                                         title="Return First Pending">
@@ -249,13 +249,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section3c_nh_info &amp;&amp; state.stats.section3c_nh_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section3c.nh', state.stats &amp;&amp; state.stats.section3c_nh_info ? state.stats.section3c_nh_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section3c_nh_info ? state.stats.section3c_nh_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section3c_nh_info ? this.isAllApproved(state.stats.section3c_nh_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section3c.nh', state.stats &amp;&amp; state.stats.section3c_nh_info ? state.stats.section3c_nh_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section3c_nh_info ? state.stats.section3c_nh_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section3c_nh_info ? this.isAllApproved(state.stats.section3c_nh_info) : true"
                                         title="Return First Pending">
@@ -299,20 +299,20 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.sia.team')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" 
                                         t-on-click.stop="() => this.openFirstDocument('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.sia_info ? this.isAllApproved(state.stats.sia_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.sia.team', state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info.first_pending_id : false, state.stats &amp;&amp; state.stats.sia_info ? state.stats.sia_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.sia_info ? this.isAllApproved(state.stats.sia_info) : true"
                                         title="Return First Pending">
@@ -362,20 +362,20 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector &amp;&amp; !state.isProjectExempt" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section4.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" 
+                                <button class="btn btn-sm btn-info" 
                                         t-on-click.stop="() => this.openFirstDocument('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section4_info ? this.isAllApproved(state.stats.section4_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section4.notification', state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section4_info ? state.stats.section4_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section4_info ? this.isAllApproved(state.stats.section4_info) : true"
                                         title="Return First Pending">
@@ -419,20 +419,20 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector &amp;&amp; !state.isProjectExempt" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.expert.committee.report')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
-                                <button t-if="!state.isProjectExempt" class="btn btn-sm btn-info" 
+                                <button class="btn btn-sm btn-info" 
                                         t-on-click.stop="() => this.openFirstDocument('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.expert_info ? this.isAllApproved(state.stats.expert_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.expert.committee.report', state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info.first_pending_id : false, state.stats &amp;&amp; state.stats.expert_info ? state.stats.expert_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.expert_info ? this.isAllApproved(state.stats.expert_info) : true"
                                         title="Return First Pending">
@@ -444,7 +444,7 @@
 
                         <!-- Section 8 (Only for Collector, after Expert Group) -->
                         <t t-if="this.isSectionVisible('Section 8')">
-                        <div t-if="state.isCollector" class="o_section_list_item o_card_no_click">
+                        <div t-if="state.isCollector or state.isAdmin" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary">Step 5</span>
                             </div>
@@ -476,6 +476,9 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
+                                <button t-if="state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section8')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section8')">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
@@ -485,7 +488,7 @@
 
                         <!-- Section 11 (Step 5 for non-collector - stays in Column 1) -->
                         <t t-if="this.isSectionVisible('Section 11 Notifications')">
-                        <div t-if="!state.isCollector" class="o_section_list_item o_card_no_click">
+                        <div t-if="!state.isCollector or state.isAdmin" class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary">Step 5</span>
                             </div>
@@ -530,6 +533,18 @@
                                         t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
+                                        t-att-disabled="state.stats &amp;&amp; state.stats.section11_info ? this.isAllApproved(state.stats.section11_info) : true"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -640,7 +655,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section15.objection')">
                                     <i class="fa fa-bolt"/> Action
                                 </button>
                                 <button class="btn btn-sm btn-info" 
@@ -648,13 +663,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section15_info &amp;&amp; state.stats.section15_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
                                         title="Return First Pending">
@@ -690,11 +705,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section18.rr.scheme')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section18.rr.scheme')">
                                     <i class="fa fa-upload"/> Upload
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section18.rr.scheme')">
                                     <i class="fa fa-eye"/> View
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section18.rr.scheme', state.stats &amp;&amp; state.stats.section18_rr_scheme_first_pending_id ? state.stats.section18_rr_scheme_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section18.rr.scheme', state.stats &amp;&amp; state.stats.section18_rr_scheme_first_pending_id ? state.stats.section18_rr_scheme_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -740,7 +765,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section19.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" 
@@ -748,13 +773,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section19_info &amp;&amp; state.stats.section19_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section19.notification', state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section19_info ? state.stats.section19_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.section19_info ? this.isAllApproved(state.stats.section19_info) : true"
                                         title="Return First Pending">
@@ -804,7 +829,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section21.notification')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section21.notification')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" 
@@ -812,13 +837,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.draft_award_info &amp;&amp; state.stats.draft_award_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section21.notification', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info.first_pending_id : false, state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.section21.notification', state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info.first_pending_id : false, state.stats &amp;&amp; state.stats.draft_award_info ? state.stats.draft_award_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.draft_award_info ? this.isAllApproved(state.stats.draft_award_info) : true"
                                         title="Return First Pending">
@@ -860,11 +885,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section23.award')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section23.award')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section23.award', state.stats &amp;&amp; state.stats.section23_award_first_pending_id ? state.stats.section23_award_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section23.award', state.stats &amp;&amp; state.stats.section23_award_first_pending_id ? state.stats.section23_award_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -902,11 +937,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section20a.railways')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section20a.railways')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section20a.railways')">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section20a.railways', state.stats &amp;&amp; state.stats.section20a_railways_first_pending_id ? state.stats.section20a_railways_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section20a.railways', state.stats &amp;&amp; state.stats.section20a_railways_first_pending_id ? state.stats.section20a_railways_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -945,11 +990,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section20e.railways')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section20e.railways')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section20e.railways')">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section20e.railways', state.stats &amp;&amp; state.stats.section20e_railways_first_pending_id ? state.stats.section20e_railways_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section20e.railways', state.stats &amp;&amp; state.stats.section20e_railways_first_pending_id ? state.stats.section20e_railways_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -987,11 +1042,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section3a.nh')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section3a.nh')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section3a.nh')">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section3a.nh', state.stats &amp;&amp; state.stats.section3a_nh_first_pending_id ? state.stats.section3a_nh_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section3a.nh', state.stats &amp;&amp; state.stats.section3a_nh_first_pending_id ? state.stats.section3a_nh_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -1030,11 +1095,21 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section3d.nh')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section3d.nh')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section3d.nh')">
                                     <i class="fa fa-eye"/> View/Edit
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section3d.nh', state.stats &amp;&amp; state.stats.section3d_nh_first_pending_id ? state.stats.section3d_nh_first_pending_id : false)"
+                                        title="Approve First Pending">
+                                    <i class="fa fa-check"/> Approve
+                                </button>
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
+                                        t-on-click.stop="() => this.openFirstPending('bhu.section3d.nh', state.stats &amp;&amp; state.stats.section3d_nh_first_pending_id ? state.stats.section3d_nh_first_pending_id : false)"
+                                        title="Return First Pending">
+                                    <i class="fa fa-times"/> Return
                                 </button>
                             </div>
                         </div>
@@ -1075,7 +1150,7 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.mutual.consent.policy')">
+                                <button t-if="!state.isCollector or state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.mutual.consent.policy')">
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" 
@@ -1083,13 +1158,13 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.mutual_consent_policy_info &amp;&amp; state.stats.mutual_consent_policy_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.mutual.consent.policy', state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info.first_pending_id : false, state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? this.isAllApproved(state.stats.mutual_consent_policy_info) : true"
                                         title="Approve First Pending">
                                     <i class="fa fa-check"/> Approve
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
+                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
                                         t-on-click.stop="() => this.openFirstPending('bhu.mutual.consent.policy', state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info.first_pending_id : false, state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info : null)"
                                         t-att-disabled="state.stats &amp;&amp; state.stats.mutual_consent_policy_info ? this.isAllApproved(state.stats.mutual_consent_policy_info) : true"
                                         title="Return First Pending">

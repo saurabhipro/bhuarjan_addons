@@ -57,6 +57,7 @@ class BhuDepartment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     name = fields.Char(string='Department Name', required=True, tracking=True)
+    active = fields.Boolean(default=True, tracking=True)
     icon = fields.Char(string='Icon Class', help='Bootstrap icon class (e.g. fa-building)', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District', tracking=True,
                                   default=lambda self: self._get_default_district(),

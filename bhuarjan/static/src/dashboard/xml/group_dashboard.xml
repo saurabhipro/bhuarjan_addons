@@ -164,14 +164,15 @@
                                                 <td>
                                                     <span class="badge bg-secondary" t-esc="project.code"/>
                                                 </td>
-                                                <td>
-                                                    <strong t-esc="project.name"/>
+                                                <td class="clickable-cell" t-on-click="() => this.openProject(project.id)">
+                                                    <strong class="dashboard-link" t-esc="project.name"/>
                                                 </td>
-                                                <td>
-                                                    <span t-esc="project.department_id[1]"/>
+                                                <td class="clickable-cell" t-on-click="() => this.openDepartment(project.department_id[0])">
+                                                    <span class="dashboard-link-secondary" t-esc="project.department_id[1]"/>
                                                 </td>
-                                                <td>
-                                                    <span t-esc="project.district_id ? project.district_id[1] : 'N/A'"/>
+                                                <td class="clickable-cell" t-on-click="() => project.district_id &amp;&amp; this.openDistrict(project.district_id[0])">
+                                                    <span t-att-class="project.district_id ? 'dashboard-link-secondary' : ''" 
+                                                          t-esc="project.district_id ? project.district_id[1] : 'N/A'"/>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-info" t-esc="project.village_count"/>

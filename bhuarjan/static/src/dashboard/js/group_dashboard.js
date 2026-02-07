@@ -160,6 +160,36 @@ export class GroupDashboard extends Component {
         return this.state.sortConfig.direction === "asc" ? "fa-sort-up" : "fa-sort-down";
     }
 
+    async openProject(projectId) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "bhu.project",
+            res_id: projectId,
+            views: [[false, "form"]],
+            target: "current",
+        });
+    }
+
+    async openDepartment(departmentId) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "bhu.department",
+            res_id: departmentId,
+            views: [[false, "form"]],
+            target: "current",
+        });
+    }
+
+    async openDistrict(districtId) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "bhu.district",
+            res_id: districtId,
+            views: [[false, "form"]],
+            target: "current",
+        });
+    }
+
     async determineProjectStage(projectId) {
         // Check stages in reverse order (latest first)
 

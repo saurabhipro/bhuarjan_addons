@@ -62,7 +62,7 @@ export class GroupDashboard extends Component {
                 try {
                     const landowners = await this.orm.searchRead(
                         "bhu.landowner",
-                        [["project_id", "=", project.id]],
+                        [["survey_ids.project_id", "=", project.id]],
                         ["id"]
                     );
                     project.total_landowners = landowners.length;

@@ -23,6 +23,10 @@
         <field name="arch" type="xml">
             <form string="Department">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <field name="icon" widget="char" class="oe_avatar" placeholder="Icon Class (e.g. fa-building)"/>
                     <div class="oe_title">
                         <label for="name" string="Department Name"/>
                         <h1>

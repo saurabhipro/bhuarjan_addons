@@ -93,25 +93,61 @@
                                 All Projects Status
                             </h5>
                         </div>
-                        <div class="card-body p-0">
+                        <div class="card-body p-4">
+                            <!-- Search and Filter Bar -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group search-bar-container shadow-sm rounded overflow-hidden">
+                                        <span class="input-group-text bg-white border-end-0 border-primary-subtle">
+                                            <i class="fa fa-search text-muted"/>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control border-start-0 border-primary-subtle" 
+                                               placeholder="Search projects by name, code, district..." 
+                                               t-on-input="onSearchInput"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <div class="text-muted small d-inline-block pt-2">
+                                        Found <strong t-esc="filteredProjects.length"/> projects
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped mb-0">
-                                    <thead class="table-light">
+                                    <thead>
                                         <tr>
                                             <th style="width: 4%">#</th>
-                                            <th style="width: 10%">Project Code</th>
-                                            <th style="width: 18%">Project Name</th>
-                                            <th style="width: 12%">Department</th>
-                                            <th style="width: 10%">District</th>
-                                            <th style="width: 6%">Villages</th>
-                                            <th style="width: 7%">Khasras</th>
-                                            <th style="width: 8%">Landowners</th>
-                                            <th style="width: 13%">Current Stage</th>
-                                            <th style="width: 12%">Last Survey</th>
+                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('code')">
+                                                Code <i t-att-class="'fa ms-1 ' + getSortIcon('code')"/>
+                                            </th>
+                                            <th style="width: 18%; cursor: pointer;" t-on-click="() => this.sortBy('name')">
+                                                Project Name <i t-att-class="'fa ms-1 ' + getSortIcon('name')"/>
+                                            </th>
+                                            <th style="width: 12%; cursor: pointer;" t-on-click="() => this.sortBy('department_id')">
+                                                Department <i t-att-class="'fa ms-1 ' + getSortIcon('department_id')"/>
+                                            </th>
+                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('district_id')">
+                                                District <i t-att-class="'fa ms-1 ' + getSortIcon('district_id')"/>
+                                            </th>
+                                            <th style="width: 6%; cursor: pointer;" t-on-click="() => this.sortBy('village_count')">
+                                                Vil <i t-att-class="'fa ms-1 ' + getSortIcon('village_count')"/>
+                                            </th>
+                                            <th style="width: 7%; cursor: pointer;" t-on-click="() => this.sortBy('total_khasras')">
+                                                Khas <i t-att-class="'fa ms-1 ' + getSortIcon('total_khasras')"/>
+                                            </th>
+                                            <th style="width: 8%; cursor: pointer;" t-on-click="() => this.sortBy('total_landowners')">
+                                                Land <i t-att-class="'fa ms-1 ' + getSortIcon('total_landowners')"/>
+                                            </th>
+                                            <th style="width: 13%">Stage</th>
+                                            <th style="width: 12%; cursor: pointer;" t-on-click="() => this.sortBy('last_survey_date')">
+                                                Survey <i t-att-class="'fa ms-1 ' + getSortIcon('last_survey_date')"/>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <t t-if="state.projects.length === 0">
+                                        <t t-if="filteredProjects.length === 0">
                                             <tr>
                                                 <td colspan="10" class="text-center py-5 no-projects-state">
                                                     <div class="empty-state-wrapper">
@@ -123,7 +159,7 @@
                                             </tr>
                                         </t>
                                         <t t-else="">
-                                            <tr t-foreach="state.projects" t-as="project" t-key="project.id" class="project-row">
+                                            <tr t-foreach="filteredProjects" t-as="project" t-key="project.id" class="project-row">
                                                 <td t-esc="project_index + 1"/>
                                                 <td>
                                                     <span class="badge bg-secondary" t-esc="project.code"/>

@@ -11,6 +11,11 @@ export class GroupDashboard extends Component {
         this.state = useState({
             projects: [],
             loading: true,
+            searchTerm: "",
+            sortConfig: {
+                field: "create_date",
+                direction: "desc"
+            },
             stats: {
                 total_projects: 0,
                 sia_stage: 0,
@@ -19,8 +24,6 @@ export class GroupDashboard extends Component {
                 section19_stage: 0,
                 section21_stage: 0,
                 award_stage: 0,
-                delayed_projects: 0,
-                on_track_projects: 0
             }
         });
 
@@ -91,16 +94,70 @@ export class GroupDashboard extends Component {
             // Calculate stage statistics
             this.calculateStageStats(projects);
 
-            // Calculate delay statistics
-            const delayedProjects = projects.filter(p => p.delay_info.is_delayed);
-            this.state.stats.delayed_projects = delayedProjects.length;
-            this.state.stats.on_track_projects = projects.length - delayedProjects.length;
-
             this.state.loading = false;
         } catch (error) {
             console.error("Error loading dashboard data:", error);
             this.state.loading = false;
         }
+    }
+
+    get filteredProjects() {
+        let projects = [...this.state.projects];
+
+        // 1. Apply Filtering
+        if (this.state.searchTerm) {
+            const term = this.state.searchTerm.toLowerCase();
+            projects = projects.filter(p =>
+                (p.name && p.name.toLowerCase().includes(term)) ||
+                (p.code && p.code.toLowerCase().includes(term)) ||
+                (p.district_id && p.district_id[1].toLowerCase().includes(term)) ||
+                (p.department_id && p.department_id[1].toLowerCase().includes(term))
+            );
+        }
+
+        // 2. Apply Sorting
+        const { field, direction } = this.state.sortConfig;
+        projects.sort((a, b) => {
+            let valA = this.getFieldValue(a, field);
+            let valB = this.getFieldValue(b, field);
+
+            if (valA === null || valA === undefined) valA = "";
+            if (valB === null || valB === undefined) valB = "";
+
+            if (valA < valB) return direction === "asc" ? -1 : 1;
+            if (valA > valB) return direction === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        return projects;
+    }
+
+    getFieldValue(obj, field) {
+        if (field === "department_id" || field === "district_id") {
+            return obj[field] ? obj[field][1] : "";
+        }
+        if (field === "total_khasras" || field === "total_landowners" || field === "village_count") {
+            return obj[field] || 0;
+        }
+        return obj[field];
+    }
+
+    onSearchInput(ev) {
+        this.state.searchTerm = ev.target.value;
+    }
+
+    sortBy(field) {
+        if (this.state.sortConfig.field === field) {
+            this.state.sortConfig.direction = this.state.sortConfig.direction === "asc" ? "desc" : "asc";
+        } else {
+            this.state.sortConfig.field = field;
+            this.state.sortConfig.direction = "asc";
+        }
+    }
+
+    getSortIcon(field) {
+        if (this.state.sortConfig.field !== field) return "fa-sort text-muted opacity-50";
+        return this.state.sortConfig.direction === "asc" ? "fa-sort-up" : "fa-sort-down";
     }
 
     async determineProjectStage(projectId) {

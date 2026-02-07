@@ -176,6 +176,24 @@
     opacity: 0.2;
 }
 
+/* Search Bar Styling */
+.o_group_dashboard .search-bar-container {
+    background-color: white;
+    max-width: 500px;
+    transition: all 0.3s ease;
+}
+
+.o_group_dashboard .search-bar-container:focus-within {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-2px);
+}
+
+.o_group_dashboard .search-bar-container input::placeholder {
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
+
+/* Table Header Sorting Styling */
 .o_group_dashboard .table thead th {
     font-weight: 700;
     text-transform: uppercase;
@@ -185,6 +203,28 @@
     border-bottom: 3px solid #dee2e6;
     background-color: #f8f9fa;
     padding: 1rem 0.75rem;
+    transition: background-color 0.2s, color 0.2s;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.o_group_dashboard .table thead th[t-on-click]:hover {
+    background-color: #f1f3f5;
+    color: #8B4513;
+    cursor: pointer;
+}
+
+.o_group_dashboard .table thead th i {
+    transition: transform 0.2s;
+}
+
+.o_group_dashboard .table thead th:active i {
+    transform: scale(0.8);
+}
+
+.o_group_dashboard .table thead th .fa-sort-up,
+.o_group_dashboard .table thead th .fa-sort-down {
+    color: #8B4513;
 }
 
 .o_group_dashboard .table tbody td {

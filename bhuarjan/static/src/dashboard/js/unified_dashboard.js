@@ -539,6 +539,9 @@ export class UnifiedDashboard extends Component {
                 if (stats.is_project_exempt !== undefined) {
                     this.state.isProjectExempt = stats.is_project_exempt;
                 }
+                if (stats.user_type !== undefined) {
+                    this.state.isAdmin = (stats.user_type === 'admin');
+                }
                 // Store allowed section names from project's law
                 if (stats.allowed_section_names !== undefined) {
                     this.state.allowedSectionNames = stats.allowed_section_names || [];

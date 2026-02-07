@@ -119,8 +119,8 @@
                     </style>
 
                     <!-- SDM Section / SDM अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" 
-                         invisible="is_collector or (is_admin and state not in ('draft', 'send_back'))">
+                    <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
+                         invisible="(is_collector and not is_admin) or (is_admin and state not in ('draft', 'send_back'))">
                         <div class="section-header">SDM Section / SDM अनुभाग</div>
                         <div class="row">
                             <!-- Left: Download Options -->
@@ -177,7 +177,7 @@
                     </div>
 
                     <!-- Collector Section / कलेक्टर अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin" 
+                    <div class="section-card" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
                          invisible="not (is_collector or is_admin) or (is_admin and state in ('draft', 'send_back'))">
                         <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
                         <div class="row">

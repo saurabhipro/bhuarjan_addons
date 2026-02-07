@@ -40,6 +40,11 @@
                             <i class="fa fa-file-text-o" style="margin-right: 10px;"></i>Section 8 / धारा 8
                         </h1>
                     </div>
+                    
+                    <div invisible="not project_id" class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057; clear: both;">
+                         <i class="fa fa-info-circle me-1"></i>
+                         Creating Section 8 for Project <field name="project_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>
+                    </div>
                     <group>
                         <group>
                             <field name="name" invisible="1"/>

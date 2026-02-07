@@ -160,7 +160,7 @@
 
                     <!-- Award Generation Section (SDM / Admin in Draft) -->
                     <div class="section-card mt-4" 
-                         invisible="is_section_officer or (is_admin and state not in ('draft', 'sent_back'))">
+                         invisible="(is_section_officer and not is_admin) or (is_admin and state not in ('draft', 'sent_back'))">
                         <div class="section-header">Award Generation (SDM) / अवार्ड निर्माण (SDM)</div>
                         <div class="row">
                             <!-- Left: Generation & Download -->

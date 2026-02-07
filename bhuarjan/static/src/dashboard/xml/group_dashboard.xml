@@ -114,9 +114,7 @@
                                        t-on-input="onSearchInput"/>
                             </div>
 
-                            <div class="text-white-50 small text-nowrap">
-                                Found <strong class="text-white" t-esc="filteredProjects.length"/> projects
-                            </div>
+
                         </div>
                         <div class="card-body p-4">
 

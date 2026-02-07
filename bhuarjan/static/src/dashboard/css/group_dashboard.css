@@ -152,7 +152,7 @@
     background: linear-gradient(135deg, #8B4513 0%, #5D2E0C 100%);
     color: white !important;
     border-bottom: none;
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem 1rem;
 }
 
 .o_group_dashboard .card-header.custom-card-header h5 {

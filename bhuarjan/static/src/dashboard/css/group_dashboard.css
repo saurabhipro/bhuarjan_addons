@@ -150,9 +150,30 @@
 
 .o_group_dashboard .card-header.custom-card-header {
     background: linear-gradient(135deg, #8B4513 0%, #5D2E0C 100%);
-    color: white;
+    color: white !important;
     border-bottom: none;
     padding: 1.25rem 1.5rem;
+}
+
+.o_group_dashboard .card-header.custom-card-header h5 {
+    color: white !important;
+    font-weight: 700;
+}
+
+/* Empty State Styling */
+.o_group_dashboard .no-projects-state {
+    background-color: #fafafa;
+}
+
+.o_group_dashboard .empty-state-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.o_group_dashboard .empty-state-wrapper i {
+    color: #8B4513 !important;
+    opacity: 0.2;
 }
 
 .o_group_dashboard .table thead th {

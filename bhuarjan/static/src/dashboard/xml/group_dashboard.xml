@@ -102,20 +102,23 @@
                                             <th style="width: 10%">Project Code</th>
                                             <th style="width: 18%">Project Name</th>
                                             <th style="width: 12%">Department</th>
+                                            <th style="width: 10%">District</th>
                                             <th style="width: 6%">Villages</th>
                                             <th style="width: 7%">Khasras</th>
                                             <th style="width: 8%">Landowners</th>
                                             <th style="width: 13%">Current Stage</th>
-                                            <th style="width: 14%">Delay Status</th>
-                                            <th style="width: 8%">Actions</th>
+                                            <th style="width: 12%">Last Survey</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <t t-if="state.projects.length === 0">
                                             <tr>
-                                                <td colspan="7" class="text-center py-4 text-muted">
-                                                    <i class="fa fa-inbox fa-3x mb-3 d-block"/>
-                                                    No projects found
+                                                <td colspan="10" class="text-center py-5 no-projects-state">
+                                                    <div class="empty-state-wrapper">
+                                                        <i class="fa fa-folder-open-o fa-4x mb-3 text-muted opacity-50"/>
+                                                        <h4 class="text-muted fw-bold">No Projects Found</h4>
+                                                        <p class="text-muted px-4">There are currently no projects matching your selected company or filters.</p>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </t>
@@ -130,6 +133,9 @@
                                                 </td>
                                                 <td>
                                                     <span t-esc="project.department_id[1]"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="project.district_id ? project.district_id[1] : 'N/A'"/>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-info" t-esc="project.village_count"/>
@@ -146,16 +152,8 @@
                                                           t-esc="getStageLabel(project.current_stage)"/>
                                                 </td>
                                                 <td>
-                                                    <span class="badge" 
-                                                          t-att-class="'badge ' + getDelayBadgeClass(project.delay_info)"
-                                                          t-esc="getDelayText(project.delay_info)"/>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary" 
-                                                            t-on-click="() => this.openProject(project.id)"
-                                                            title="Open Project">
-                                                        <i class="fa fa-external-link"/>
-                                                    </button>
+                                                    <span t-att-class="project.last_survey_date === 'No Survey' ? 'text-muted italic' : 'fw-bold text-dark'" 
+                                                          t-esc="project.last_survey_date"/>
                                                 </td>
                                             </tr>
                                         </t>

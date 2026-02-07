@@ -8,14 +8,23 @@
             <field name="target">current</field>
         </record>
 
-        <!-- Menu Item under Main Menu -->
+        <!-- Hidden Group Dashboard Menu -->
         <menuitem
             id="menu_group_dashboard"
-            name="Group Dashboard"
+            name="Group Dashboard (Hidden)"
             parent="menu_bhu_root"
             action="action_group_dashboard"
             sequence="0"
             active="False"
+            groups="base.group_system"/>
+
+        <!-- Visible Group Dashboard Menu for Administrator -->
+        <menuitem
+            id="menu_group_dashboard_admin"
+            name="Group Dashboard"
+            parent="menu_bhu_root"
+            action="action_group_dashboard"
+            sequence="99"
             groups="base.group_system"/>
     </data>
 </odoo>

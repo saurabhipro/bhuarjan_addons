@@ -268,6 +268,34 @@
     color: white;
 }
 
+/* Navigation Links Styling */
+.o_group_dashboard .clickable-cell {
+    cursor: pointer;
+}
+
+.o_group_dashboard .dashboard-link {
+    color: #8B4513;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.o_group_dashboard .dashboard-link:hover {
+    color: #5D2E0C;
+    border-bottom-color: #5D2E0C;
+}
+
+.o_group_dashboard .dashboard-link-secondary {
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.o_group_dashboard .dashboard-link-secondary:hover {
+    color: #8B4513;
+    text-decoration: underline;
+}
+
 .o_group_dashboard .stage-badge {
     font-size: 0.8rem;
     padding: 0.4rem 0.9rem;

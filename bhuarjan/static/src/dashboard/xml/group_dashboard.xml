@@ -5,9 +5,19 @@
 
 
             <!-- Loading State -->
-            <div t-if="state.loading" class="text-center py-5">
-                <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
-                <p class="mt-3">Loading dashboard data...</p>
+            <div t-if="state.loading" class="loading-state-wrapper">
+                <div class="loading-content">
+                    <div class="coffee-loader mb-4">
+                        <i class="fa fa-coffee fa-4x text-primary-gradient"/>
+                        <div class="steam">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <h3 class="loading-title">Loading your projects...</h3>
+                    <p class="loading-subtitle text-muted italic">Sit back and sip some coffee while we prepare your data.</p>
+                </div>
             </div>
 
             <!-- Dashboard Content -->

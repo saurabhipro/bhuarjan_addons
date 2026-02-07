@@ -263,7 +263,7 @@
     <record id="action_bhu_survey" model="ir.actions.act_window">
         <field name="name">Surveys</field>
         <field name="res_model">bhu.survey</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">list,kanban,form</field>
         <field name="search_view_id" ref="view_bhu_survey_search"/>
         <field name="context">{'create_name': 'नया सर्वे'}</field>
         <field name="help" type="html">

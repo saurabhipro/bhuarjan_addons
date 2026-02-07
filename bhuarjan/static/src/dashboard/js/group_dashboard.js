@@ -35,15 +35,28 @@ export class GroupDashboard extends Component {
             const projects = await this.orm.searchRead(
                 "bhu.project",
                 [["company_id", "in", this.env.services.company.activeCompanyIds]],
-                ["name", "code", "department_id", "state", "village_ids", "create_date"],
+                ["name", "code", "department_id", "district_id", "state", "village_ids", "create_date"],
                 { order: "create_date desc" }
             );
 
-            // For each project, determine its current stage, delay status, and counts
+            // For each project, determine its current stage, counts and last survey date
             for (let project of projects) {
                 project.current_stage = await this.determineProjectStage(project.id);
                 project.village_count = project.village_ids.length;
-                project.delay_info = await this.calculateDelay(project);
+
+                // Fetch last survey date for the project
+                try {
+                    const lastSurvey = await this.orm.searchRead(
+                        "bhu.survey",
+                        [["project_id", "=", project.id]],
+                        ["survey_date"],
+                        { limit: 1, order: "survey_date desc" }
+                    );
+                    project.last_survey_date = lastSurvey.length > 0 ? lastSurvey[0].survey_date : "No Survey";
+                } catch (error) {
+                    console.warn("Could not fetch last survey date for project", project.id, error);
+                    project.last_survey_date = "N/A";
+                }
 
                 // Get total khasras count - with error handling
                 try {

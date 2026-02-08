@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models
+from odoo import models, api
 from odoo.http import request
 import logging
 import os

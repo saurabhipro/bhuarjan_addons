@@ -125,6 +125,8 @@
         'views/layout_templates.xml',
         # Debranding views (merged from debrand_odoo module)
         'views/debrand_views.xml',
+        # Password eyes icon views (merged from password_eyes_icon module)
+        'views/password_eyes_templates.xml',
 
 
     ],
@@ -167,6 +169,19 @@
             # Debranding assets (merged from debrand_odoo module)
             'bhuarjan/static/src/js/debrand_user_menu.js',
             'bhuarjan/static/src/xml/debrand_web.xml',
+            # Password eyes icon assets (merged from password_eyes_icon module)
+            'bhuarjan/static/src/scss/password_eyes_icon.scss',
+            'bhuarjan/static/src/js/password_eyes_icon.js',
+            'bhuarjan/static/src/js/password_eyes_icon_field.js',
+            'bhuarjan/static/src/xml/password_eyes_icon.xml',
+        ],
+        'web.assets_frontend': [
+            'bhuarjan/static/src/scss/password_eyes_icon.scss',
+            'bhuarjan/static/src/js/password_toggle_public.js',
+        ],
+        'web.assets_public': [
+            'bhuarjan/static/src/scss/password_eyes_icon.scss',
+            'bhuarjan/static/src/js/password_toggle_public.js',
         ],
     },
     'installable': True,

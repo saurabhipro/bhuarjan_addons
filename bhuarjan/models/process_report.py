@@ -39,6 +39,8 @@ class ProcessReport(models.TransientModel):
         ('sec21', 'Section 21'),
         ('sec23', 'Section 23'),
         ('form10', 'Form 10'),
+        ('sia_order', 'SIA Order'),
+        ('sia_proposal', 'SIA Proposal'),
     ], string='Section Type', readonly=True)
 
 
@@ -65,6 +67,8 @@ class ProcessReportWizard(models.TransientModel):
         ('sec21', 'Sec-21'),
         ('sec23', 'Sec-23'),
         ('form10', 'Form-10'),
+        ('sia_order', 'SIA Order'),
+        ('sia_proposal', 'SIA Proposal'),
         ('all', 'All'),
     ], string='Status Wise / स्टेटस वाइज', default='all')
     
@@ -206,6 +210,50 @@ class ProcessReportWizard(models.TransientModel):
                     'section_type': 'sec19',
                 })
                 serial += 1
+
+        # SIA Teams (Order and Proposal)
+        if self.status_type in ('sia_order', 'sia_proposal', 'all'):
+            sia_domain = []
+            if project_ids:
+                sia_domain.append(('project_id', 'in', project_ids))
+            elif self.project_id:
+                sia_domain.append(('project_id', '=', self.project_id.id))
+            
+            sia_teams = self.env['bhu.sia.team'].search(sia_domain)
+            
+            for team in sia_teams:
+                # Add SIA Order if selected
+                if self.status_type in ('sia_order', 'all'):
+                    report_records.append({
+                        'serial_number': serial,
+                        'department_id': team.project_id.department_id.id if team.project_id.department_id else False,
+                        'project_id': team.project_id.id,
+                        'tehsil_id': team.tehsil_ids[0].id if team.tehsil_ids else False,
+                        # Use first village or empty if multiple/none, as SIA team is project level
+                        'village_id': team.village_ids[0].id if team.village_ids else False,
+                        'total_khasras': team.total_khasras_count,
+                        'total_area': team.total_area_acquired,
+                        'status': dict(team._fields['state'].selection).get(team.state, team.state),
+                        'status_mark': 'Green' if team.state == 'approved' else 'Red',
+                        'section_type': 'sia_order',
+                    })
+                    serial += 1
+                
+                # Add SIA Proposal if selected
+                if self.status_type in ('sia_proposal', 'all'):
+                    report_records.append({
+                        'serial_number': serial,
+                        'department_id': team.project_id.department_id.id if team.project_id.department_id else False,
+                        'project_id': team.project_id.id,
+                        'tehsil_id': team.tehsil_ids[0].id if team.tehsil_ids else False,
+                        'village_id': team.village_ids[0].id if team.village_ids else False,
+                        'total_khasras': team.total_khasras_count,
+                        'total_area': team.total_area_acquired,
+                        'status': dict(team._fields['state'].selection).get(team.state, team.state),
+                        'status_mark': 'Green' if team.state == 'approved' else 'Red',
+                        'section_type': 'sia_proposal',
+                    })
+                    serial += 1
         
         # Create report records
         if report_records:
@@ -375,13 +423,15 @@ class ProcessReportWizard(models.TransientModel):
             records['section21'] = self.env['bhu.section21.notification'].search(section21_domain)
         
         # SIA Teams (project level - filter by project only)
-        # Always include SIA teams when project is selected (they're project-level documents)
-        sia_domain = []
-        if project_ids:
-            sia_domain.append(('project_id', 'in', project_ids))
-        elif self.project_id:
-            sia_domain.append(('project_id', '=', self.project_id.id))
-        records['sia_teams'] = self.env['bhu.sia.team'].search(sia_domain) if sia_domain else []
+        # Include SIA teams if status is All, SIA Order, or SIA Proposal
+        records['sia_teams'] = []
+        if self.status_type in ('all', 'sia_order', 'sia_proposal'):
+            sia_domain = []
+            if project_ids:
+                sia_domain.append(('project_id', 'in', project_ids))
+            elif self.project_id:
+                sia_domain.append(('project_id', '=', self.project_id.id))
+            records['sia_teams'] = self.env['bhu.sia.team'].search(sia_domain) if sia_domain else []
         
         # Expert Committee Reports (project level - filter by project only)
         # Always include Expert Committee reports when project is selected (they're project-level documents)

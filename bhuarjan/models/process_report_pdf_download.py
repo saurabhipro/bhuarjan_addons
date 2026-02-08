@@ -174,50 +174,52 @@ class ProcessReportPdfDownload(models.AbstractModel):
                     continue
             
             # Generate SIA Proposal PDFs (project level)
-            for sia_team in records.get('sia_teams', []):
-                try:
-                    # Generate SIA Proposal (Collector's Order template)
-                    report_action = self.env.ref('bhuarjan.action_report_sia_proposal')
-                    pdf_result = report_action.sudo()._render_qweb_pdf(
-                        report_action.report_name,
-                        [sia_team.id],
-                        data={}
-                    )
-                    
-                    if pdf_result:
-                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
-                        if isinstance(pdf_data, bytes):
-                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
-                            # SIA is project-level, use "All" for village
-                            filename = f'{project_name}_SIA_Proposal_All_{current_date}.pdf'
-                            zip_file.writestr(filename, pdf_data)
-                            pdf_count += 1
-                except Exception as e:
-                    _logger.error(f"Error generating SIA Proposal PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
-                    continue
+            if self.status_type in ('all', 'sia_proposal'):
+                for sia_team in records.get('sia_teams', []):
+                    try:
+                        # Generate SIA Proposal (Collector's Order template)
+                        report_action = self.env.ref('bhuarjan.action_report_sia_proposal')
+                        pdf_result = report_action.sudo()._render_qweb_pdf(
+                            report_action.report_name,
+                            [sia_team.id],
+                            data={}
+                        )
+                        
+                        if pdf_result:
+                            pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                            if isinstance(pdf_data, bytes):
+                                project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
+                                # SIA is project-level, use "All" for village
+                                filename = f'{project_name}_SIA_Proposal_All_{current_date}.pdf'
+                                zip_file.writestr(filename, pdf_data)
+                                pdf_count += 1
+                    except Exception as e:
+                        _logger.error(f"Error generating SIA Proposal PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
+                        continue
             
             # Generate SIA Order PDFs (project level)
-            for sia_team in records.get('sia_teams', []):
-                try:
-                    # Generate SIA Order (SDM's Proposal template)
-                    report_action = self.env.ref('bhuarjan.action_report_sia_order')
-                    pdf_result = report_action.sudo()._render_qweb_pdf(
-                        report_action.report_name,
-                        [sia_team.id],
-                        data={}
-                    )
-                    
-                    if pdf_result:
-                        pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
-                        if isinstance(pdf_data, bytes):
-                            project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
-                            # SIA is project-level, use "All" for village
-                            filename = f'{project_name}_SIA_Order_All_{current_date}.pdf'
-                            zip_file.writestr(filename, pdf_data)
-                            pdf_count += 1
-                except Exception as e:
-                    _logger.error(f"Error generating SIA Order PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
-                    continue
+            if self.status_type in ('all', 'sia_order'):
+                for sia_team in records.get('sia_teams', []):
+                    try:
+                        # Generate SIA Order (SDM's Proposal template)
+                        report_action = self.env.ref('bhuarjan.action_report_sia_order')
+                        pdf_result = report_action.sudo()._render_qweb_pdf(
+                            report_action.report_name,
+                            [sia_team.id],
+                            data={}
+                        )
+                        
+                        if pdf_result:
+                            pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+                            if isinstance(pdf_data, bytes):
+                                project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
+                                # SIA is project-level, use "All" for village
+                                filename = f'{project_name}_SIA_Order_All_{current_date}.pdf'
+                                zip_file.writestr(filename, pdf_data)
+                                pdf_count += 1
+                    except Exception as e:
+                        _logger.error(f"Error generating SIA Order PDF for SIA team {sia_team.id}: {str(e)}", exc_info=True)
+                        continue
             
             # Generate Expert Committee Proposal PDFs (project level)
             for expert_committee in records.get('expert_committees', []):

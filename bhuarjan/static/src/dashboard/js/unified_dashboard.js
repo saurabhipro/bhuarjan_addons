@@ -1217,8 +1217,15 @@ export class UnifiedDashboard extends Component {
             }
 
             // If no project is selected, show all sections (except Railway/NH which need department)
-            if (!this.state || !this.state.selectedProject || !this.state.allowedSectionNames || this.state.allowedSectionNames.length === 0) {
+            if (!this.state || !this.state.selectedProject) {
                 return true;
+            }
+
+            // If project is selected but no allowed sections configured, hide all sections
+            // This prevents showing all sections when law master is not configured
+            if (!this.state.allowedSectionNames || this.state.allowedSectionNames.length === 0) {
+                console.warn(`Project ${this.state.selectedProject} has no law master sections configured. Hiding all sections.`);
+                return false;
             }
 
             // Get the section master name for this dashboard section

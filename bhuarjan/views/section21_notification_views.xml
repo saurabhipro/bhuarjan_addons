@@ -45,14 +45,27 @@
                         <field name="kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक" placeholder="Enter क्रमांक (Reference Number)"/>
                     </group>
                     
-                    <!-- Hidden Fields -->
-                    <group invisible="1">
-                        <field name="notice_date"/>
+                    <!-- Project and Village Fields - Read-only for non-admins -->
+                    <group groups="!bhuarjan.group_bhuarjan_admin,!base.group_system">
                         <field name="project_id" required="1" readonly="1"
                                options="{'no_create': True, 'no_open': True}"/>
                         <field name="village_id" required="1" readonly="1"
                                options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
                                placeholder="Village"/>
+                    </group>
+                    
+                    <!-- Project and Village Fields - Editable for admins -->
+                    <group groups="bhuarjan.group_bhuarjan_admin,base.group_system">
+                        <field name="project_id" required="1"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="village_id" required="1"
+                               options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
+                               placeholder="Village"/>
+                    </group>
+                    
+                    <!-- Hidden Fields -->
+                    <group invisible="1">
+                        <field name="notice_date"/>
                         <field name="requisitioning_body" readonly="1"/>
                         <field name="district_id" readonly="1"/>
                         <field name="tehsil_id" readonly="1"/>

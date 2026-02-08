@@ -52,6 +52,7 @@ class IrHttp(models.AbstractModel):
                 try:
                     with registry.cursor() as cr:
                         # Use INSERT ... ON CONFLICT for PostgreSQL (atomic, no race conditions)
+                        # We use a raw query to avoid ORM overhead and transaction coupling
                         cr.execute("""
                             INSERT INTO ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date)
                             VALUES ('bhuarjan.server_pid', %s, 1, NOW(), 1, NOW())
@@ -59,8 +60,9 @@ class IrHttp(models.AbstractModel):
                             SET value = EXCLUDED.value, write_uid = 1, write_date = NOW()
                         """, (current_pid,))
                         cr.commit()
-                except Exception as pid_err:
-                    # Silently ignore concurrency errors (harmless - another worker already updated)
+                except Exception:
+                    # If this fails (e.g. concurrent update serialization error), it means
+                    # another worker is doing it or has done it. We can safely ignore it.
                     pass
                 
             # Mark this process as checked so we don't hit the DB on every request

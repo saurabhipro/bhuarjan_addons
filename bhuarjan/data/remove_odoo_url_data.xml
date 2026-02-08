@@ -1,3 +1,0 @@
-<odoo noupdate="1">
-    <function model="ir.config_parameter" name="set_param" eval="('web.base.sorturl', 'web')"/>
-</odoo>

@@ -77,6 +77,14 @@ def post_init_hook(env):
                 _logger.warning("POST_INIT_HOOK: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
             else:
                 _logger.info("POST_INIT_HOOK: Server PID set/updated: %s", current_pid)
+        
+        # FIX: Ensure web.base.url does not have trailing slash to prevent double slashes (e.g. //action-...)
+        base_url = env['ir.config_parameter'].sudo().get_param('web.base.url')
+        if base_url and base_url.endswith('/'):
+            clean_url = base_url.rstrip('/')
+            env['ir.config_parameter'].sudo().set_param('web.base.url', clean_url)
+            _logger.info("POST_INIT_HOOK: Removed trailing slash from web.base.url: %s -> %s", base_url, clean_url)
+
     except Exception as e:
         _logger.error("POST_INIT_HOOK: Error in post_init_hook: %s", e, exc_info=True)
 

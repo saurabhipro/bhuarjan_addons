@@ -17,26 +17,10 @@
         'data/tree_master_data.xml',
         'data/tree_rate_master_data.xml',
         'data/photo_type_master_data.xml',
-        # District and Sub-Division data - commented out to prevent import
-        # 'data/chhattisgarh_districts_data.xml',
-        # 'data/raigarh_sub_division_data.xml',
-        # 'data/raipur_sub_division_data.xml',
-        # 'data/tehsil_data.xml',
-        # Village data - commented out to prevent import
-        # 'data/raigarh_village_data.xml',
         'data/department_data.xml',
         'data/settings_master_data.xml',
-        # Process-related sample data - commented out to prevent default import
         'data/sample_project_data.xml',
         'data/sample_sequence_settings.xml',
-        # 'data/sample_expert_committee_report.xml',
-        # 'data/sample_landowners.xml',  # Disabled - not importing sample landowners
-        # 'data/sample_surveys.xml',  # Disabled - not importing sample surveys
-        # 'data/sample_section4_config.xml',
-        # 'data/sample_section4_notifications.xml',
-        # 'data/sample_section15_objections.xml',  # Disabled - not importing objection data
-        # 'data/sample_section11_reports.xml',
-        # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
         'data/kharsiyan_rate_master_data.xml',
         'data/section_master_data.xml',
         'data/qweb_report_paper_format.xml',
@@ -113,7 +97,6 @@
         'views/document_template_master_views.xml',
         'views/jwt_token_views.xml',
         'views/mobile_otp_views.xml',
-
         'wizard/report_wizard.xml',
         'wizard/user_report_wizard.xml',
         'views/qr_microsite_templates.xml',
@@ -126,11 +109,7 @@
         'views/layout_templates.xml',
         'views/debrand_website.xml',
         'views/password_eyes_icon_templates.xml',
-        'views/remove_odoo_url_views.xml',
-        'data/remove_odoo_url_data.xml',
         'views/widget_owl_res_partner_views.xml',
-
-
     ],
     'assets': {
         'web.assets_backend': [
@@ -170,7 +149,6 @@
             # Debrand Odoo
             'bhuarjan/static/src/extensions/debrand_odoo/js/user_menu.js',
             'bhuarjan/static/src/extensions/debrand_odoo/xml/web.xml',
-
             # Image Capture Upload Widget
             'bhuarjan/static/src/extensions/image_capture_upload_widget/scss/image_capture.scss',
             'bhuarjan/static/src/extensions/image_capture_upload_widget/js/image_capture.js',

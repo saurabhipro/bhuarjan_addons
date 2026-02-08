@@ -22,28 +22,28 @@
                 <!-- Report-specific overrides for SIA Order (Collector's Order) -->
                 <style>
                     .normal-text {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .normal-text p, .normal-text span, .normal-text strong {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .table-header {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .fsc {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .date-reference-section span {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     table td, table th {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .subject-section, .body-section {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                     .subject-section p, .body-section p {
-                        font-size: 21px !important;
+                        font-size: 19px !important;
                     }
                 </style>
 
@@ -66,7 +66,7 @@
                                 </td>
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 23px; line-height: 0.95;">
                                         कार्यालय कलेक्टर (भू-अर्जन शाखा) रायगढ़ (छत्तीसगढ़)
                                     </h3>
                                 </td>
@@ -97,7 +97,7 @@
                             <tr>
                                 <!-- Header Text - Line 2 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 23px; line-height: 0.95;">
                                         //आदेश//
                                     </h3>
                                 </td>
@@ -132,7 +132,7 @@
 
                     <!-- Main Body Paragraph (Replaces Subject and Old Body) -->
                     <div class="body-section" style="margin-bottom: 5px !important; margin-top: 15px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
+                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 19px !important;">
                             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,</strong> <span t-esc="subdivision_name if subdivision_name else '........................'"/> <strong>द्वारा विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> <strong>(छ.ग.) अंतर्गत परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/> <strong>निर्माण हेतु प्रभावित ग्राम</strong> 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
@@ -153,7 +153,14 @@
                                     <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
-                            <t t-if="not sia_team.tehsil_ids">
+                            <!-- Fallback to project tehsils if no specific tehsils selected on SIA team -->
+                            <t t-if="not sia_team.tehsil_ids and sia_team.project_id and sia_team.project_id.village_ids">
+                                <t t-set="project_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
+                                <t t-foreach="project_tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-if="not sia_team.tehsil_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
                                 ........................
                             </t>
                             &#160;<strong>जिला</strong> 
@@ -300,15 +307,15 @@
 
                     <!-- Team Roles and Responsibilities -->
                     <div class="body-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 21px !important;">
+                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 19px !important;">
                             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;उपरोक्त प्रस्ताव अनुसार दल का गठन किया जाता है। सारणी में क्रमांक “क” अध्यक्ष तथा क्रमांक “ख” से “घ” समिति के सदस्य होंगे। उक्त समिति अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, <span t-esc="subdivision_name if subdivision_name else '........................'"/> जो पुनर्वास प्रशासक है, के मार्गदर्शन में सामाजिक समाघात निर्धारण संबंधी कार्यवाही नियमानुसार पूर्ण करेंगे एवं प्रतिवेदन पुनर्वास प्रशासक को समय-सीमा के भीतर प्रस्तुत करेंगे।
                         </p>
                     </div>
 
                     <!-- Issuing Authority -->
                     <div class="footer-section" style="margin-top: 80px !important; margin-bottom: 15px !important;">
-                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 21px !important;">
-                            <strong style="font-size: 21px !important;">कलेक्टर रायगढ़ (छ.ग.)</strong>
+                        <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 19px !important;">
+                            <strong style="font-size: 19px !important;">कलेक्टर रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
 
@@ -316,33 +323,33 @@
                     <div style="margin-top: 20px; padding-top: 10px;">
                         <!-- क्रमांक and दिनांक Section -->
                         <div class="date-reference-section" style="margin-bottom: 10px !important; display: flex; justify-content: space-between;">
-                            <span class="normal-text letter_space" style="font-weight: bold !important; font-size: 21px !important; flex: 1;">
+                            <span class="normal-text letter_space" style="font-weight: bold !important; font-size: 19px !important; flex: 1;">
                                 <strong>पृ. क्रमांक /</strong>
                                 <span t-if="sia_team.kramank" t-esc="sia_team.kramank"/>
                                 <span t-if="not sia_team.kramank">.....................</span>
                                 /
                             </span>
-                            <span class="normal-text letter_space" style="text-align: right !important; font-weight: bold !important; font-size: 21px !important; flex: 1;">
+                            <span class="normal-text letter_space" style="text-align: right !important; font-weight: bold !important; font-size: 19px !important; flex: 1;">
                                 <strong>रायगढ़, दिनांक /</strong>........................./<span t-if="sia_team.create_date" t-esc="sia_team.create_date.strftime('%Y')"/><span t-if="not sia_team.create_date">2025</span>
                             </span>
                         </div>
                         
                         <!-- प्रतिलिपि Section -->
                         <div style="margin-bottom: 10px !important;">
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                <strong style="font-size: 21px !important;">प्रतिलिपिः-</strong>
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
+                                <strong style="font-size: 19px !important;">प्रतिलिपिः-</strong>
                             </p>
                         </div>
                         
                         <!-- Copy Distribution List -->
                         <div style="margin-bottom: 10px !important;">
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
                                 1. सचिव, छ.ग. शासन, राजस्व एवं आपदा प्रबंधन विभाग, मंत्रालय महानदी भवन, रायपुर की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
                             </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
                                 2. आयुक्त, बिलासपुर संभाग बिलासपुर की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
                             </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
                                 3. अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी, 
                             <t t-set="subdivision_name_copy" t-value="''"/>
                             <t t-if="sia_team.sub_division_id">
@@ -356,17 +363,17 @@
                             </t>
                             <span t-esc="subdivision_name_copy if subdivision_name_copy else '........................'"/> जिला रायगढ़ (छ.ग.) की ओर रिपोर्ट प्रस्तुत करने पर आवश्यक कार्यवाही सुनिश्चित करने हेतु।
                             </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
-                                4. विभाग. <span style="font-size: 21px !important;" t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> रायगढ़ (छ.ग.) की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
+                                4. विभाग. <span style="font-size: 19px !important;" t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> रायगढ़ (छ.ग.) की ओर सूचनार्थ एवं आवश्यक कार्यवाही हेतु।
                             </p>
-                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 21px !important;">
+                            <p class="normal-text letter_space" style="margin: 5px 0 !important; line-height: 1.5 !important; font-size: 19px !important;">
                                 5. दल के सभी संबंधित अधिकारियों की ओर।
                             </p>
                         </div>
                         
                         <!-- Signature Block -->
-                        <p class="normal-text letter_space footer-section" style="margin: 10px 0 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 21px !important;">
-                            <strong style="font-size: 21px !important;">अपर कलेक्टर रायगढ़ (छ.ग.)</strong>
+                        <p class="normal-text letter_space footer-section" style="margin: 10px 0 5px 0 !important; text-align: right !important; line-height: 1.5 !important; font-size: 19px !important;">
+                            <strong style="font-size: 19px !important;">अपर कलेक्टर रायगढ़ (छ.ग.)</strong>
                         </p>
                     </div>
                 </div>

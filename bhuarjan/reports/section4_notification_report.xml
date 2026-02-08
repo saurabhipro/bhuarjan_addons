@@ -33,13 +33,13 @@
                     <div style="text-align: center; margin-bottom: 12px;">
                         <!-- Form Title - Line 1 -->
                         <div style="margin-bottom: 8px;">
-                            <h2 style="margin: 0; padding: 0; font-size: 28px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                            <h2 style="margin: 0; padding: 0; font-size: 25px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                 <strong>प्ररूप-एक</strong>
                             </h2>
                         </div>
                         <!-- Form Title - Line 2 (Rule reference) -->
                         <div style="margin-bottom: 12px;">
-                            <p style="margin: 0; padding: 0; font-size: 20px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                            <p style="margin: 0; padding: 0; font-size: 18px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                 (नियम 11 देखिये)
                             </p>
                         </div>
@@ -57,7 +57,7 @@
                                 </td>
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 24px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 21px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                         कार्यालय कलेक्टर एवं पदेन उप सचिव,
                                     </h3>
                                 </td>
@@ -92,7 +92,7 @@
                             <tr>
                                 <!-- Header Text - Line 2 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 24px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                    <h3 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 21px; line-height: 1.2; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                                         राजस्व एवं आपदा प्रबंधन विभाग
                                     </h3>
                                 </td>
@@ -102,15 +102,15 @@
 
                     <!-- Notification Title -->
                     <div style="text-align: center; margin-bottom: 12px;">
-                        <h2 style="text-decoration: underline; margin: 0; padding: 0; font-size: 24px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                        <h2 style="text-decoration: underline; margin: 0; padding: 0; font-size: 21px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
                             <strong>अधिसूचना</strong>
                         </h2>
                     </div>
 
                     <!-- Content -->
-                    <div class="content" style="font-size: 18px !important; line-height: 1.6 !important;">
+                    <div class="content" style="font-size: 16px !important; line-height: 1.6 !important;">
                         <div class="intro-section" style="margin: 20px 0 !important; padding: 0 !important;">
-                            <p style="text-align: justify; margin-bottom: 12px; font-size: 18px !important; line-height: 1.6 !important;">
+                            <p style="text-align: justify; margin-bottom: 12px; font-size: 16px !important; line-height: 1.6 !important;">
                                 भूमि अर्जन, पुनर्वासन एवं पुनर्व्यवस्थापन में उचित प्रतिकर तथा पारदर्शिता का अधिकार अधिनियम, 2013 की धारा 4 सहपठित नियम 7 के अंतर्गत
                                 नीचे अनुसूची में उल्लिखित भूमि का अर्जन लोक प्रयोजन हेतु राज्य सरकार द्वारा आशयित है, अर्थात् :-
                             </p>
@@ -133,17 +133,17 @@
                                 <t t-if="consolidated_data and len(consolidated_data) > 0">
                                     <t t-foreach="consolidated_data" t-as="v_data">
                                         <tr>
-                                            <td style="font-size: 18px !important;"><t t-esc="v_data.get('district', 'Raigarh (Chhattisgarh)')"/></td>
-                                            <td style="font-size: 18px !important;"><t t-esc="v_data.get('tehsil', '')"/></td>
-                                            <td style="font-size: 18px !important;"><t t-esc="v_data.get('village_name', '')"/></td>
-                                            <td style="font-size: 18px !important;"><t t-esc="'{:.4f}'.format(v_data.get('total_area', 0.0))"/></td>
-                                            <td style="font-size: 18px !important; text-align: left !important;"><t t-esc="project_name"/></td>
+                                            <td style="font-size: 16px !important;"><t t-esc="v_data.get('district', 'Raigarh (Chhattisgarh)')"/></td>
+                                            <td style="font-size: 16px !important;"><t t-esc="v_data.get('tehsil', '')"/></td>
+                                            <td style="font-size: 16px !important;"><t t-esc="v_data.get('village_name', '')"/></td>
+                                            <td style="font-size: 16px !important;"><t t-esc="'{:.4f}'.format(v_data.get('total_area', 0.0))"/></td>
+                                            <td style="font-size: 16px !important; text-align: left !important;"><t t-esc="project_name"/></td>
                                         </tr>
                                     </t>
                                 </t>
                                 <t t-if="not consolidated_data or len(consolidated_data) == 0">
                                     <tr>
-                                        <td colspan="5" style="text-align: center; padding: 20px; color: #999; font-size: 18px !important;">
+                                        <td colspan="5" style="text-align: center; padding: 20px; color: #999; font-size: 16px !important;">
                                             No survey data available for the selected villages.
                                         </td>
                                     </tr>
@@ -151,8 +151,8 @@
                             </tbody>
                         </table>
                         
-                        <div class="hearing-info" style="margin: 20px 0 !important; padding: 0 !important; font-size: 18px !important; line-height: 1.6 !important;">
-                            <p style="text-align: justify; margin-bottom: 0; font-size: 18px !important; line-height: 1.6 !important; word-wrap: break-word; overflow-wrap: break-word;">
+                        <div class="hearing-info" style="margin: 20px 0 !important; padding: 0 !important; font-size: 16px !important; line-height: 1.6 !important;">
+                            <p style="text-align: justify; margin-bottom: 0; font-size: 16px !important; line-height: 1.6 !important; word-wrap: break-word; overflow-wrap: break-word;">
                                 उपरोक्त उल्लिखित भूमि के अर्जन हेतु सामाजिक समाघात निर्धारण के अध्ययन हेतु जन सुनवाई (दिनांक) 
                                 <strong><t t-esc="wizard.get_formatted_hearing_date_only()"/></strong> को 
                                 (समय) <strong><t t-esc="wizard.get_formatted_hearing_time_only() or '........................'"/></strong> बजे 
@@ -240,7 +240,7 @@
                         </div>
                         
                         <div class="intro-section" style="margin-top: 10px !important; margin-bottom: 20px !important;">
-                            <p style="text-align: justify; margin-bottom: 0; font-size: 18px !important; line-height: 1.6 !important;">
+                            <p style="text-align: justify; margin-bottom: 0; font-size: 16px !important; line-height: 1.6 !important;">
                                 उपरोक्त भूमि अर्जन के संबंध में किसी व्यक्ति/संस्था या अन्य किसी व्यक्ति को कोई जानकारी / सुझाव देना हो, तो विहित तिथि/समय एवं स्थान पर दी जा सकेगी।
                             </p>
                         </div>
@@ -248,10 +248,10 @@
                         <div class="signature-block">
                             <div style="text-align: right; margin-top: 30px; margin-right: 0;">
                                 <div style="margin-bottom: 10px;">
-                                    <p style="text-align: right; margin-bottom: 0; font-size: 20px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">कलेक्टर</p>
+                                    <p style="text-align: right; margin-bottom: 0; font-size: 18px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">कलेक्टर</p>
                                 </div>
                                 <div>
-                                    <p style="text-align: right; margin-bottom: 0; font-size: 20px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">जिला-रायगढ़</p>
+                                    <p style="text-align: right; margin-bottom: 0; font-size: 18px; font-weight: bold; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">जिला-रायगढ़</p>
                                 </div>
                             </div>
                         </div>

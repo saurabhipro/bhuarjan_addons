@@ -7,7 +7,7 @@
                GLOBAL FONT SETTINGS
                ============================================ */
             body, html, .container, .page {
-                font-size: 18px !important;
+                font-size: 16px !important;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
             }
             
@@ -20,7 +20,7 @@
                 height: 100%;
                 margin: 0;
                 padding: 0;
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             /* Force font sizes on all text elements */
@@ -30,7 +30,7 @@
             
             /* Table cells */
             table td, table th {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             /* ============================================
@@ -44,12 +44,12 @@
                HEADER TEXT STYLES
                ============================================ */
             .header-text {
-                font-size: 30px !important;
+                font-size: 27px !important;
                 font-weight: bold !important;
             }
             
             .header-text h3 {
-                font-size: 26px !important;
+                font-size: 23px !important;
                 font-weight: bold !important;
             }
             
@@ -57,24 +57,24 @@
                NORMAL TEXT STYLES
                ============================================ */
             .normal-text {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             .normal-text p, .normal-text span, .normal-text strong {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             /* ============================================
                TABLE HEADER
                ============================================ */
             .table-header {
-                font-size: 18px !important;
+                font-size: 16px !important;
                 font-weight: bold !important;
             }
             
             /* Legacy class for backward compatibility */
             .fsc {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             /* ============================================
@@ -83,7 +83,7 @@
             .header-info-table { 
                 width: 100% !important; 
                 border-collapse: collapse !important; 
-                font-size: 20px !important; 
+                font-size: 18px !important; 
                 border: 2px solid #000 !important; 
                 margin-bottom: 0 !important; 
             }
@@ -92,7 +92,7 @@
                 border: 1px solid #000 !important; 
                 padding: 6px !important; 
                 vertical-align: middle !important;
-                font-size: 20px !important;
+                font-size: 18px !important;
             }
             
             /* ============================================
@@ -107,7 +107,7 @@
             }
             
             .date-reference-section span {
-                font-size: 18px !important;
+                font-size: 16px !important;
                 font-weight: 500 !important;    
             }
             
@@ -231,11 +231,11 @@
                SUBJECT AND BODY SECTIONS
                ============================================ */
             .subject-section, .body-section {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             .subject-section p, .body-section p {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             /* ============================================
@@ -253,14 +253,14 @@
                 border: 1px solid #000 !important;
                 padding: 6px 8px !important;
                 text-align: center !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 vertical-align: middle !important;
             }
             
             .notification-table th {
                 background-color: #f5f5f5 !important;
                 font-weight: bold !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 padding: 7px 8px !important;
             }
             
@@ -277,21 +277,21 @@
                 border-collapse: collapse !important;
                 margin: 8px 0 !important;
                 border: 2px solid #000 !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             .schedule-table th, .schedule-table td {
                 border: 1px solid #000 !important;
                 padding: 6px !important;
                 text-align: center !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 vertical-align: middle !important;
             }
             
             .schedule-table th {
                 background-color: #f5f5f5 !important;
                 font-weight: bold !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 padding: 7px 8px !important;
             }
             
@@ -303,12 +303,12 @@
                 padding: 0 !important;
                 page-break-inside: avoid !important;
                 line-height: 1.8 !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             .question-label {
                 font-weight: bold !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 display: inline !important;
                 text-align: left !important;
                 margin-right: 8px !important;
@@ -319,7 +319,7 @@
                 display: inline !important;
                 margin-left: 0 !important;
                 text-align: left !important;
-                font-size: 18px !important;
+                font-size: 16px !important;
                 line-height: 1.8 !important;
                 padding: 0 !important;
                 vertical-align: top !important;
@@ -351,7 +351,7 @@
             
             .signature-label {
                 font-weight: bold !important;
-                font-size: 20px !important;
+                font-size: 18px !important;
                 text-align: center !important;
                 margin-top: 10px !important;
                 letter-spacing: 0.5px !important;
@@ -362,7 +362,7 @@
                ============================================ */
             .paragraph-section {
                 margin: 15px 0 !important;
-                font-size: 21px !important;
+                font-size: 19px !important;
                 line-height: 1.6 !important;
             }
             

@@ -155,18 +155,20 @@
                             </page>
                         </notebook>
 
-                        <group string="आपत्ति (Objection)">
-                            <field name="objection_comments" 
-                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
-                                   nolabel="1"
-                                   placeholder="यहाँ अपनी आपत्ति लिखें... (Enter your objection here...)"/>
-                        </group>
-                        
-                        <group string="निराकरण (Resolution)">
-                            <field name="resolution_comments" 
-                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
-                                   nolabel="1"
-                                   placeholder="यहाँ निराकरण लिखें... (Enter resolution here...)"/>
+                        <group>
+                            <group string="आपत्ति (Objection)">
+                                <field name="objection_comments" 
+                                       readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
+                                       nolabel="1"
+                                       placeholder="यहाँ अपनी आपत्ति लिखें... (Enter your objection here...)"/>
+                            </group>
+                            
+                            <group string="निराकरण (Resolution)">
+                                <field name="resolution_comments" 
+                                       readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
+                                       nolabel="1"
+                                       placeholder="यहाँ निराकरण लिखें... (Enter resolution here...)"/>
+                            </group>
                         </group>
                     </div>
 

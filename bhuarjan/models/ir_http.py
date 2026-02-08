@@ -38,23 +38,50 @@ class IrHttp(models.AbstractModel):
             from odoo.modules.registry import Registry
             registry = Registry(request.db)
             
+            stored_pid = ''
             with registry.cursor() as cr:
-                # 1. Read stored PID
                 cr.execute("SELECT value FROM ir_config_parameter WHERE key = %s", ('bhuarjan.server_pid',))
                 row = cr.fetchone()
                 stored_pid = row[0] if row else ''
 
-                if stored_pid != current_pid:
-                    _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
-
-                    # 3. Update the PID
-                    # We utilize ON CONFLICT to handle concurrent updates gracefully
-                    # This query works for PostgreSQL 9.5+
-                    cr.execute("""
-                        INSERT INTO ir_config_parameter (key, value) 
-                        VALUES ('bhuarjan.server_pid', %s)
-                        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
-                    """, (current_pid,))
+            if stored_pid != current_pid:
+                # Always update PID in a separate transaction
+                try:
+                    with registry.cursor() as cr:
+                        env = api.Environment(cr, 1, {})
+                        # Try ORM first (more reliable)
+                        try:
+                            Param = env.get('ir.config_parameter')
+                            if Param:
+                                Param.set_param('bhuarjan.server_pid', current_pid)
+                                cr.commit()
+                                _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
+                            else:
+                                # Fallback to SQL
+                                cr.execute("SELECT id FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
+                                existing = cr.fetchone()
+                                if existing:
+                                    cr.execute("UPDATE ir_config_parameter SET value = %s WHERE key = 'bhuarjan.server_pid'", (current_pid,))
+                                else:
+                                    cr.execute("""
+                                        INSERT INTO ir_config_parameter (key, value) 
+                                        VALUES ('bhuarjan.server_pid', %s)
+                                    """, (current_pid,))
+                                cr.commit()
+                                _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
+                        except Exception as pid_err:
+                            # Suppress harmless concurrency errors (multiple workers updating at same time)
+                            error_msg = str(pid_err).lower()
+                            if 'could not serialize' in error_msg or 'concurrent update' in error_msg:
+                                _logger.debug("BHUARJAN: Concurrent PID update (harmless): %s", pid_err)
+                            else:
+                                _logger.warning("BHUARJAN: Could not store PID: %s", pid_err)
+                            cr.rollback()
+                except Exception as pid_trans_err:
+                    # Suppress harmless concurrency errors
+                    error_msg = str(pid_trans_err).lower()
+                    if 'could not serialize' not in error_msg and 'concurrent update' not in error_msg:
+                        _logger.warning("BHUARJAN: Could not create transaction for PID storage: %s", pid_trans_err)
                 
             # Mark this process as checked so we don't hit the DB on every request
             cls._worker_pid_checked = True

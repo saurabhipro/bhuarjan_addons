@@ -174,10 +174,10 @@
             'bhuarjan/static/src/js/password_eyes_icon.js',
             'bhuarjan/static/src/js/password_eyes_icon_field.js',
             'bhuarjan/static/src/xml/password_eyes_icon.xml',
-            # Timepicker assets (merged from timepicker module)
-            'bhuarjan/static/src/xml/timepicker.xml',
-            'bhuarjan/static/src/css/timepicker.css',
-            'bhuarjan/static/src/js/timepicker.js',
+            # Timepicker assets (merged from timepicker module) - Disabled
+            # 'bhuarjan/static/src/xml/timepicker.xml',
+            # 'bhuarjan/static/src/css/timepicker.css',
+            # 'bhuarjan/static/src/js/timepicker.js',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

@@ -15,7 +15,7 @@ class IrHttp(models.AbstractModel):
     def _authenticate(cls, endpoint):
         """Override authenticate to check for server restart and force logout"""
         # Check server restart BEFORE authentication
-        cls._check_server_restart()
+        # cls._check_server_restart()  # Disabled to prevent logout on restart
         return super(IrHttp, cls)._authenticate(endpoint)
     
     @classmethod
@@ -127,11 +127,10 @@ class IrHttp(models.AbstractModel):
         except Exception as e:
             _logger.error("Error in _check_server_restart: %s", e, exc_info=True)
     
-    @classmethod
-    def get_frontend_session_info(cls):
+    def get_frontend_session_info(self):
         """Override to safely handle cases where session might be None"""
         try:
-            # Call parent method - use super() without cls argument for classmethod
+            # Call parent method
             result = super().get_frontend_session_info()
             # Ensure we return a dict, not None
             if result is None:

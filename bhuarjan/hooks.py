@@ -37,53 +37,34 @@ def post_init_hook(env):
         except Exception as e:
             _logger.error("POST_INIT_HOOK: Error updating sample data project_id: %s", e, exc_info=True)
         
-        # Delete all active sessions using ORM
-        try:
-            Session = env.get('ir.session')
-            if Session:
-                # Use env directly since it's already superuser context in hook
-                sessions = Session.search([])
-                session_count = len(sessions)
-                if session_count > 0:
-                    sessions.unlink()
-                    _logger.warning("POST_INIT_HOOK: All %d sessions invalidated via ORM on module update", session_count)
-                else:
-                    _logger.info("POST_INIT_HOOK: No active sessions found")
-            else:
-                _logger.warning("POST_INIT_HOOK: ir.session model not found, trying SQL")
-                env.cr.execute("DELETE FROM ir_session")
-                env.cr.commit()
-                _logger.warning("POST_INIT_HOOK: Sessions deleted via SQL")
-        except Exception as e:
-            _logger.error("POST_INIT_HOOK: Could not invalidate sessions via ORM: %s", e)
-            # Try fallback SQL
-            try:
-                env.cr.execute("DELETE FROM ir_session")
-                env.cr.commit()
-                _logger.warning("POST_INIT_HOOK: Sessions deleted via SQL fallback")
-            except Exception as sql_err:
-                _logger.error("POST_INIT_HOOK: SQL fallback also failed: %s", sql_err)
+        # Session invalidation and PID tracking removed as per user request.
+
         
-        # Also set server PID for future restart detection
-        import os
-        current_pid = str(os.getpid())
-        
-        # Check if parameter exists
-        Param = env.get('ir.config_parameter')
-        if Param:
-            stored_pid = Param.get_param('bhuarjan.server_pid', default='')
-            Param.set_param('bhuarjan.server_pid', current_pid)
-            if stored_pid and stored_pid != current_pid:
-                _logger.warning("POST_INIT_HOOK: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
-            else:
-                _logger.info("POST_INIT_HOOK: Server PID set/updated: %s", current_pid)
-        
-        # FIX: Ensure web.base.url does not have trailing slash to prevent double slashes (e.g. //action-...)
-        base_url = env['ir.config_parameter'].sudo().get_param('web.base.url')
+        # FIX: Ensure web.base.url is clean and valid.
+        param_obj = env['ir.config_parameter'].sudo()
+        base_url = param_obj.get_param('web.base.url')
+
+        # 1. Remove trailing slash
         if base_url and base_url.endswith('/'):
             clean_url = base_url.rstrip('/')
-            env['ir.config_parameter'].sudo().set_param('web.base.url', clean_url)
+            param_obj.set_param('web.base.url', clean_url)
             _logger.info("POST_INIT_HOOK: Removed trailing slash from web.base.url: %s -> %s", base_url, clean_url)
+
+        # 2. Reset if it looks completely broken (e.g. 'odoo', 'apps', or no protocol)
+        if base_url and ('://' not in base_url or base_url in ['odoo', 'apps']):
+             _logger.warning("POST_INIT_HOOK: web.base.url detected as invalid (%s). Resetting to empty to force regeneration.", base_url)
+             param_obj.set_param('web.base.url', '') 
+
+        # 3. Remove web.base.sorturl (from deleted module)
+        sort_url_param = param_obj.search([('key', '=', 'web.base.sorturl')])
+        if sort_url_param:
+            _logger.info("POST_INIT_HOOK: Removing deprecated web.base.sorturl parameter.")
+            sort_url_param.unlink()
+            
+        # 4. Regenerate assets to ensure no old JS code is cached
+        _logger.info("POST_INIT_HOOK: Regenerating assets bundles...")
+        env['ir.attachment'].regenerate_assets_bundles()
+        env.registry.clear_cache()
 
     except Exception as e:
         _logger.error("POST_INIT_HOOK: Error in post_init_hook: %s", e, exc_info=True)

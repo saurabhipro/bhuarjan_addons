@@ -10,8 +10,9 @@
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
-        'security/secrurity.xml',  # MUST load before ir.model.access.csv
+        'security/bhuarjan_groups.xml',
         'security/ir.model.access.csv',
+        'security/bhuarjan_rules.xml',
         'data/land_type_data.xml',
         'data/tree_master_data.xml',
         'data/tree_rate_master_data.xml',

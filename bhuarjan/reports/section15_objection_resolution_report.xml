@@ -195,26 +195,26 @@
                             </div>
                         </t>
 
-                        <!-- Resolution Details -->
+                        <!-- Resolution Comments -->
                         <div style="margin-bottom: 15px;">
                             <h3 style="margin: 0 0 10px 0; font-size: 20px; font-weight: bold;">
-                                समाधान विवरण / Resolution Details
+                                निराकरण कमेंट / Resolution Comments
                             </h3>
                             <div style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; min-height: 100px;">
                                 <p style="margin: 0; text-align: justify; line-height: 1.6;">
-                                    <t t-raw="o.resolution_details or ''"/>
+                                    <t t-raw="o.resolution_comments or ''"/>
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Objection Details (for reference) -->
+                        <!-- Objection Comments (for reference) -->
                         <div style="margin-bottom: 15px;">
                             <h3 style="margin: 0 0 10px 0; font-size: 20px; font-weight: bold;">
-                                आपत्ति विवरण / Objection Details
+                                आपत्ति कमेंट / Objection Comments
                             </h3>
                             <div style="padding: 10px; border: 1px solid #ddd; background-color: #fff; min-height: 80px;">
                                 <p style="margin: 0; text-align: justify; line-height: 1.6;">
-                                    <t t-raw="o.objection_details or ''"/>
+                                    <t t-raw="o.objection_comments or ''"/>
                                 </p>
                             </div>
                         </div>

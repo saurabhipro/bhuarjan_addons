@@ -6,7 +6,7 @@
     'description':'To digitize and streamline the end-to-end workflow for land acquisition under RFCTLARR Act, 2013, from Form-10 initiation to Section 19 declaration, ensuring transparency, traceability, and accountability at each level.',
     'category':'Bhumuarjan',
     'website': 'bhuarjan.com',
-    'depends':['website','mail','widget_owl','image_capture_upload_widget', 'hr_org_chart', 'auth_oauth'],
+    'depends':['website','mail',  'hr_org_chart', 'auth_oauth'],
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
@@ -127,6 +127,8 @@
         'views/debrand_views.xml',
         # Password eyes icon views (merged from password_eyes_icon module)
         'views/password_eyes_templates.xml',
+        # Widget Owl (merged from widget_owl module)
+        'views/widget_owl_res_partner.xml',
 
 
     ],
@@ -178,6 +180,14 @@
             'bhuarjan/static/src/xml/timepicker.xml',
             'bhuarjan/static/src/css/timepicker.css',
             'bhuarjan/static/src/js/timepicker.js',
+            # Widget Owl (merged from widget_owl module)
+            'bhuarjan/static/src/js/components/list_renderer.js',
+            'bhuarjan/static/src/js/components/one2many_field_dialoge.js',
+            'bhuarjan/static/src/js/components/popup.js',
+            # Image Capture Widget (merged from image_capture_upload_widget module)
+            'bhuarjan/static/src/scss/image_capture.scss',
+            'bhuarjan/static/src/js/components/image_capture.js',
+            'bhuarjan/static/src/xml/image_capture_templates.xml',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

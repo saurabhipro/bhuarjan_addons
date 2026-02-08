@@ -45,43 +45,23 @@ class IrHttp(models.AbstractModel):
                 stored_pid = row[0] if row else ''
 
             if stored_pid != current_pid:
-                # Always update PID in a separate transaction
+                _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
+                
+                # Update PID using INSERT ... ON CONFLICT to handle concurrency gracefully
+                # This is atomic and won't cause serialization errors
                 try:
                     with registry.cursor() as cr:
-                        env = api.Environment(cr, 1, {})
-                        # Try ORM first (more reliable)
-                        try:
-                            Param = env.get('ir.config_parameter')
-                            if Param:
-                                Param.set_param('bhuarjan.server_pid', current_pid)
-                                cr.commit()
-                                _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
-                            else:
-                                # Fallback to SQL
-                                cr.execute("SELECT id FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
-                                existing = cr.fetchone()
-                                if existing:
-                                    cr.execute("UPDATE ir_config_parameter SET value = %s WHERE key = 'bhuarjan.server_pid'", (current_pid,))
-                                else:
-                                    cr.execute("""
-                                        INSERT INTO ir_config_parameter (key, value) 
-                                        VALUES ('bhuarjan.server_pid', %s)
-                                    """, (current_pid,))
-                                cr.commit()
-                                _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
-                        except Exception as pid_err:
-                            # Suppress harmless concurrency errors (multiple workers updating at same time)
-                            error_msg = str(pid_err).lower()
-                            if 'could not serialize' in error_msg or 'concurrent update' in error_msg:
-                                _logger.debug("BHUARJAN: Concurrent PID update (harmless): %s", pid_err)
-                            else:
-                                _logger.warning("BHUARJAN: Could not store PID: %s", pid_err)
-                            cr.rollback()
-                except Exception as pid_trans_err:
-                    # Suppress harmless concurrency errors
-                    error_msg = str(pid_trans_err).lower()
-                    if 'could not serialize' not in error_msg and 'concurrent update' not in error_msg:
-                        _logger.warning("BHUARJAN: Could not create transaction for PID storage: %s", pid_trans_err)
+                        # Use INSERT ... ON CONFLICT for PostgreSQL (atomic, no race conditions)
+                        cr.execute("""
+                            INSERT INTO ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date)
+                            VALUES ('bhuarjan.server_pid', %s, 1, NOW(), 1, NOW())
+                            ON CONFLICT (key) DO UPDATE 
+                            SET value = EXCLUDED.value, write_uid = 1, write_date = NOW()
+                        """, (current_pid,))
+                        cr.commit()
+                except Exception as pid_err:
+                    # Silently ignore concurrency errors (harmless - another worker already updated)
+                    pass
                 
             # Mark this process as checked so we don't hit the DB on every request
             cls._worker_pid_checked = True

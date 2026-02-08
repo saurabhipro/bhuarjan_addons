@@ -124,39 +124,49 @@
                             }
                         </style>
                         
-                        <group string="भूमिस्वामी विवरण">
-                            <field name="resolution_landowner_ids"
+                        
+                        <notebook>
+                            <page string="भूमिस्वामी विवरण (Landowner Details)" name="landowner_details">
+                                <field name="resolution_landowner_ids"
+                                       readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
+                                       widget="many2many"
+                                       mode="tree,form"
+                                       domain="[('village_id', '=', village_id)]"
+                                       nolabel="1"
+                                       options="{'create_text': 'Add Landowner', 'no_quick_create': False}"
+                                       context="{'default_village_id': village_id.id if village_id else False, 'form_view_ref': 'bhuarjan.view_landowner_form', 'list_view_ref': 'bhuarjan.view_section15_landowner_tree', 'show_khasra': True}"/>
+                            </page>
+                            
+                            <page string="खसरा क्षेत्रफल (Khasra Area)" name="khasra_area">
+                                <field name="resolution_khasra_ids" 
+                                       readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
+                                       nolabel="1"
+                                       options="{'no_create': True}"
+                                       context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'show_khasra': True}">
+                                    <list string="Khasra Area Details" decoration-info="resolved_acquired_area &lt; original_acquired_area" editable="bottom" create="0">
+                                        <field name="objection_id" column_invisible="1"/>
+                                        <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" context="{'show_khasra': True}" string="Survey"/>
+                                        <field name="khasra_number" readonly="1" string="Khasra"/>
+                                        <field name="original_acquired_area" readonly="1" widget="float" string="Original Area"/>
+                                        <field name="resolved_acquired_area" widget="float" string="New Area"/>
+                                        <button name="action_open_reject_wizard" type="object" icon="fa-times-circle" class="btn-danger" title="Reject Survey / सर्वे अस्वीकार करें" confirm="This will create and save the objection. Do you want to proceed? / यह आपत्ति बनाएगा और सहेजेगा। क्या आप आगे बढ़ना चाहते हैं?"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+
+                        <group string="आपत्ति (Objection)">
+                            <field name="objection_comments" 
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
-                                   widget="many2many"
-                                   mode="tree,form"
-                                   domain="[('village_id', '=', village_id)]"
                                    nolabel="1"
-                                   options="{'create_text': 'Add Landowner', 'no_quick_create': False}"
-                                   context="{'default_village_id': village_id.id if village_id else False, 'form_view_ref': 'bhuarjan.view_landowner_form', 'list_view_ref': 'bhuarjan.view_section15_landowner_tree', 'show_khasra': True}"/>
+                                   placeholder="यहाँ अपनी आपत्ति लिखें... (Enter your objection here...)"/>
                         </group>
                         
-                        <group string="Khasra Area / खसरा क्षेत्रफल">
-                            <field name="resolution_khasra_ids" 
+                        <group string="निराकरण (Resolution)">
+                            <field name="resolution_comments" 
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    nolabel="1"
-                                   options="{'no_create': True}"
-                                   context="{'default_objection_id': id, 'default_survey_id': survey_id.id if survey_id else False, 'show_khasra': True}">
-                                <list string="Khasra Area Details" decoration-info="resolved_acquired_area &lt; original_acquired_area" editable="bottom" create="0">
-                                    <field name="objection_id" column_invisible="1"/>
-                                    <field name="survey_id" readonly="1" options="{'no_create': True, 'no_open': True}" required="1" context="{'show_khasra': True}" string="Survey"/>
-                                    <field name="khasra_number" readonly="1" string="Khasra"/>
-                                    <field name="original_acquired_area" readonly="1" widget="float" string="Original Area"/>
-                                    <field name="resolved_acquired_area" widget="float" string="New Area"/>
-                                    <button name="action_open_reject_wizard" type="object" icon="fa-times-circle" class="btn-danger" title="Reject Survey / सर्वे अस्वीकार करें" confirm="This will create and save the objection. Do you want to proceed? / यह आपत्ति बनाएगा और सहेजेगा। क्या आप आगे बढ़ना चाहते हैं?"/>
-                                </list>
-                            </field>
-                        </group>
-
-                        <group string="आपत्ति एंड निराकरण कमेंट बॉक्स">
-                            <field name="objection_resolution_comments" 
-                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
-                                   nolabel="1"
-                                   placeholder="यहाँ अपनी आपत्ति और निराकरण कमेंट लिखें... (Enter your objection and resolution comments here...)"/>
+                                   placeholder="यहाँ निराकरण लिखें... (Enter resolution here...)"/>
                         </group>
                     </div>
 
@@ -193,32 +203,23 @@
 
                     <!-- Action Buttons: Approve/Reject -->
                     <div class="row mt-4" invisible="not survey_id or state != 'draft'">
-                         <div class="col-md-6 d-flex gap-3">
+                         <div class="col-md-12 d-flex gap-3 justify-content-start">
                              <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
                                      class="btn custom-btn-success" 
                                      icon="fa-check"
-                                     style="min-width: 200px;"
+                                     style="min-width: 250px; padding: 15px 30px; font-size: 18px;"
                                      groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                                      confirm="Are you sure want to approve this objection?"/>
                              
                              <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
                                      class="btn custom-btn-danger" 
                                      icon="fa-times-circle"
-                                     style="min-width: 200px;"
+                                     style="min-width: 250px; padding: 15px 30px; font-size: 18px;"
                                      groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
                          </div>
                     </div>
                     
-                    <!-- Download Section 15 PDF Button -->
-                    <group string="Download Section 15 Documents" 
-                           groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                           invisible="state == 'draft'"
-                           style="margin-top: 20px;">
-                        <button name="%(action_report_section15_objection_resolution)d" string="Download Section 15 PDF" type="action" 
-                                class="btn-primary" icon="fa-file-pdf"
-                                title="Download Section 15 Objection Resolution Report"
-                                style="background-color: #8B4513; border-color: #8B4513; color: white; font-weight: bold; padding: 12px 24px; font-size: 16px; width: 100%;"/>
-                    </group>
+
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

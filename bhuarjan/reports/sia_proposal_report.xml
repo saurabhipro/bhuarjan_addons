@@ -159,19 +159,19 @@
                                 ........................
                             </t>
                             तहसील&#160;
-                            <t t-if="sia_team.tehsil_ids">
-                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
+                            <t t-set="display_tehsils" t-value="False"/>
+                            <t t-if="sia_team.village_ids">
+                                <t t-set="display_tehsils" t-value="sia_team.village_ids.mapped('tehsil_id')"/>
+                            </t>
+                            <t t-elif="sia_team.project_id and sia_team.project_id.village_ids">
+                                <t t-set="display_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
+                            </t>
+                            <t t-if="display_tehsils">
+                                <t t-foreach="display_tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">,&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
-                            <!-- Fallback to project tehsils if not present on sia_team -->
-                            <t t-if="not sia_team.tehsil_ids and sia_team.project_id and sia_team.project_id.village_ids">
-                                <t t-set="project_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="project_tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
-                                </t>
-                            </t>
-                            <t t-if="not sia_team.tehsil_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
+                            <t t-if="not display_tehsils">
                                 ........................
                             </t>
                             &#160;जिला रायगढ़ (छ.ग.) में सामाजिक समाघात निर्धारण हेतु दल गठन का प्रस्ताव अनुमोदन बाबत।
@@ -202,19 +202,19 @@
                                 ........................
                             </t>
                             <strong>तहसील</strong>&#160;
-                            <t t-if="sia_team.tehsil_ids">
-                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
+                            <t t-set="body_tehsils" t-value="False"/>
+                            <t t-if="sia_team.village_ids">
+                                <t t-set="body_tehsils" t-value="sia_team.village_ids.mapped('tehsil_id')"/>
+                            </t>
+                            <t t-elif="sia_team.project_id and sia_team.project_id.village_ids">
+                                <t t-set="body_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
+                            </t>
+                            <t t-if="body_tehsils">
+                                <t t-foreach="body_tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">,&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
-                            <!-- Fallback to project tehsils if not present on sia_team -->
-                            <t t-if="not sia_team.tehsil_ids and sia_team.project_id and sia_team.project_id.village_ids">
-                                <t t-set="project_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="project_tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
-                                </t>
-                            </t>
-                            <t t-if="not sia_team.tehsil_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
+                            <t t-if="not body_tehsils">
                                 ........................
                             </t>
                             &#160;<strong>जिला</strong> 

@@ -451,14 +451,15 @@ class DashboardStats(models.AbstractModel):
             'section23_award': self._get_section_counts('bhu.section23.award', domain_with_village, states=workflow_states),
         }
         
-        # Section 21 Notification uses 'signed' state instead of 'approved'
+        # Section 21 Notification uses standard workflow states (draft, submitted, approved, send_back)
         section21_total = self._get_model_count_by_status('bhu.section21.notification', domain_with_village, None)
         _logger.info(f"Section 21 counts - domain: {domain_with_village}, total: {section21_total}")
         counts['draft_award'] = {
             'total': section21_total,
-            'approved': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'signed'),
+            'approved': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'approved'),
             'draft': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'draft'),
-            'generated': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'generated'),
+            'submitted': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'submitted'),
+            'send_back': self._get_model_count_by_status('bhu.section21.notification', domain_with_village, 'send_back'),
         }
         
         # Log Section 23 Award counts
@@ -708,22 +709,13 @@ class DashboardStats(models.AbstractModel):
                 # Draft Award
                 'draft_award_total': counts['draft_award']['total'],
                 'draft_award_draft': counts['draft_award']['draft'],
-                'draft_award_generated': counts['draft_award']['generated'],
+                'draft_award_submitted': counts['draft_award']['submitted'],
                 'draft_award_approved': counts['draft_award']['approved'],
+                'draft_award_send_back': counts['draft_award']['send_back'],
                 'draft_award_completion_percent': self._calculate_completion_percentage(
                     counts['draft_award']['approved'], 0, counts['draft_award']['total'], is_survey=False
                 ),
-                'draft_award_info': {
-                    'total': counts['draft_award']['total'],
-                    'submitted_count': counts['draft_award']['generated'],
-                    'approved_count': counts['draft_award']['approved'],
-                    'rejected_count': 0,
-                    'send_back_count': 0,
-                    'all_approved': counts['draft_award']['total'] > 0 and counts['draft_award']['approved'] == counts['draft_award']['total'],
-                    'is_completed': counts['draft_award']['total'] > 0 and counts['draft_award']['approved'] == counts['draft_award']['total'],
-                    'first_pending_id': False,
-                    'first_document_id': False,
-                },
+                'draft_award_info': self._get_section_info('bhu.section21.notification', domains['final_domain']),
                 
                 # Railway Act Sections (all have village_id)
                 # Section 20A - No workflow, just total count
@@ -889,7 +881,7 @@ class DashboardStats(models.AbstractModel):
             'sia_completion_percent': 0, 'sia_info': empty_info.copy(),
             'section8_total': 0, 'section8_draft': 0, 'section8_approved': 0, 'section8_rejected': 0,
             'section8_completion_percent': 0, 'section8_info': empty_info.copy(),
-            'draft_award_total': 0, 'draft_award_draft': 0, 'draft_award_generated': 0, 'draft_award_approved': 0,
+            'draft_award_total': 0, 'draft_award_draft': 0, 'draft_award_submitted': 0, 'draft_award_approved': 0, 'draft_award_send_back': 0,
             'draft_award_completion_percent': 0, 'draft_award_info': empty_info.copy(),
             # Railway Act Sections
             'section20a_railways_total': 0, 'section20a_railways_draft': 0, 'section20a_railways_submitted': 0,

@@ -13,9 +13,12 @@ class Section19Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
 
-    _sql_constraints = [
-        ('unique_project_village', 'unique(project_id, village_id)', 'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
-    ]
+    # SQL constraint commented out - enforced by Python @api.constrains instead
+    # This avoids warnings when duplicate records exist in database
+    # _sql_constraints = [
+    #     ('unique_project_village', 'unique(project_id, village_id)', 
+    #      'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
+    # ]
 
     @api.constrains('project_id', 'village_id')
     def _check_unique_project_village(self):

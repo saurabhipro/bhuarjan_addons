@@ -13,20 +13,17 @@ class BhuDistrict(models.Model):
                               domain="[('country_id.name','=','India')]", tracking=True)
     
     # Related Records
-    sub_division_ids = fields.One2many('bhu.sub.division', 'district_id', string='Sub Divisions / उपभाग')
     tehsil_ids = fields.One2many('bhu.tehsil', 'district_id', string='Tehsils / तहसील')
     village_ids = fields.One2many('bhu.village', 'district_id', string='Villages / ग्राम')
     
     # Computed Fields
-    sub_division_count = fields.Integer(string='Sub Divisions Count', compute='_compute_counts')
     tehsil_count = fields.Integer(string='Tehsils Count', compute='_compute_counts')
     village_count = fields.Integer(string='Villages Count', compute='_compute_counts')
     
-    @api.depends('sub_division_ids', 'tehsil_ids', 'village_ids')
+    @api.depends('tehsil_ids', 'village_ids')
     def _compute_counts(self):
         """Compute counts of related records"""
         for record in self:
-            record.sub_division_count = len(record.sub_division_ids)
             record.tehsil_count = len(record.tehsil_ids)
             record.village_count = len(record.village_ids)
     
@@ -44,16 +41,7 @@ class BhuDistrict(models.Model):
                     raise ValidationError(_('District "%s" already exists in state "%s".') % 
                                         (district.name, district.state_id.name))
     
-    def action_view_sub_divisions(self):
-        """View sub divisions of this district"""
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Sub Divisions of %s') % self.name,
-            'res_model': 'bhu.sub.division',
-            'view_mode': 'list,form',
-            'domain': [('district_id', '=', self.id)],
-            'context': {'default_district_id': self.id}
-        }
+
     
     def action_view_tehsils(self):
         """View tehsils of this district"""

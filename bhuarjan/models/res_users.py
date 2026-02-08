@@ -39,7 +39,7 @@ class ResUsers(models.Model):
                     )
     state_id = fields.Many2one('res.country.state', string='State', domain=lambda self: self._get_state_domain(), default=lambda self: self.env.user.state_id.id)
     district_id = fields.Many2one('bhu.district', string='District / जिला', default=lambda self: self.env.user.district_id.id)
-    sub_division_ids = fields.Many2many('bhu.sub.division', string='Sub Division / उपभाग')
+
     tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील')
     bhu_department_id = fields.Many2one(
         'bhu.department',  # Maps to bhu.department model (Bhuarjan Department), NOT hr.department
@@ -194,10 +194,8 @@ class ResUsers(models.Model):
             if group:
                 self.groups_id = [(4, group.id)]
 
-        for rec in self:
-            if rec.bhuarjan_role == 'collector' and rec.district_id:
-                sub_divisions = self.env['bhu.sub.division'].search([('district_id', '=', rec.district_id.id)])
-                rec.sub_division_ids = [(6, 0, sub_divisions.ids)]
+
+
 
     @api.depends('project_id')
     def _compute_village_domain(self):

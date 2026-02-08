@@ -56,7 +56,7 @@
         'reports/section23_award_report.xml',
         'reports/project_master_report.xml',
         'views/district_views.xml',
-        'views/bhu_sub_division_views.xml',
+
         'views/bhu_tehsil_views.xml',
         'views/bhu_village_views.xml',
         'views/res_users_views.xml',
@@ -65,7 +65,7 @@
         'views/landowner_views.xml',
         'views/survey_views.xml',
         'views/survey_bulk_approval_wizard_views.xml',
-        'views/document_vault_views.xml',
+
         'views/sia_team_views.xml',
         'views/sia_team_member_views.xml',
         'wizard/sia_send_back_wizard.xml',
@@ -112,7 +112,7 @@
         'views/document_template_master_views.xml',
         'views/jwt_token_views.xml',
         'views/mobile_otp_views.xml',
-        'views/app_version_views.xml',
+
         'wizard/report_wizard.xml',
         'wizard/user_report_wizard.xml',
         'views/qr_microsite_templates.xml',

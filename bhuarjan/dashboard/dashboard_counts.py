@@ -104,8 +104,7 @@ class DashboardCounts(models.AbstractModel):
             'processed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'processed')]),
             'completed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'completed')]),
             
-            # Document Vault
-            'total_documents': self.env['bhu.document.vault'].search_count([]),
+
             
             # Active Mobile Users (unique users with JWT tokens from mobile channel)
             'active_mobile_users': len(set(self.env['jwt.token'].search([('channel_type', '=', 'mobile')]).mapped('user_id').ids)),

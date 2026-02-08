@@ -47,7 +47,7 @@ class BhuarjanDashboard(models.TransientModel):
 
     # Master Data Counts
     total_districts = fields.Integer(string='Total Districts', readonly=True, default=0)
-    total_sub_divisions = fields.Integer(string='Total Sub Divisions', readonly=True, default=0)
+
     total_tehsils = fields.Integer(string='Total Tehsils', readonly=True, default=0)
     total_villages = fields.Integer(string='Total Villages', readonly=True, default=0)
     total_projects = fields.Integer(string='Total Projects', readonly=True, default=0)
@@ -103,7 +103,7 @@ class BhuarjanDashboard(models.TransientModel):
     completed_reconciliations = fields.Integer(string='Completed Reconciliations', readonly=True, default=0)
     
     # Document Vault Counts
-    total_documents = fields.Integer(string='Total Documents', readonly=True, default=0)
+
     
     # Active Mobile Users (based on JWT tokens)
     active_mobile_users = fields.Integer(string='Active Mobile Users', readonly=True, default=0,
@@ -114,7 +114,7 @@ class BhuarjanDashboard(models.TransientModel):
         for record in self:
             # Master Data Counts
             record.total_districts = self.env['bhu.district'].search_count([])
-            record.total_sub_divisions = self.env['bhu.sub.division'].search_count([])
+
             record.total_tehsils = self.env['bhu.tehsil'].search_count([])
             record.total_villages = self.env['bhu.village'].search_count([])
             record.total_projects = self.env['bhu.project'].search_count([])
@@ -176,7 +176,7 @@ class BhuarjanDashboard(models.TransientModel):
             record.completed_reconciliations = self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'completed')])
             
             # Document Vault
-            record.total_documents = self.env['bhu.document.vault'].search_count([])
+
             
             # Active Mobile Users (unique users with JWT tokens from mobile channel)
             mobile_tokens = self.env['jwt.token'].search([('channel_type', '=', 'mobile')])

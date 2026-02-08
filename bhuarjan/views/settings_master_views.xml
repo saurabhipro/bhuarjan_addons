@@ -100,27 +100,7 @@
                                     </group>
                                 </group>
                             </page>
-                            
-                            <!-- Version Check Settings Tab -->
-                            <page string="Version Check" name="version_check_settings">
-                                <div class="alert alert-info" role="alert">
-                                    <strong>App Version Check Configuration</strong><br/>
-                                    Configure app version checking to control which versions of the mobile app can be used. When enabled, only active app versions will be allowed to login.
-                                </div>
-                                
-                                <group col="2">
-                                    <group>
-                                        <field name="enforce_app_version_check"/>
-                                    </group>
-                                    <group>
-                                        <field name="latest_app_version" readonly="1"/>
-                                    </group>
-                                </group>
-                                
-                                <div class="alert alert-warning" role="alert" style="margin-top: 16px;">
-                                    <strong>Note:</strong> When "Enforce App Version Check" is enabled, the system will check the app version during login. If disabled, version checking will be bypassed and all app versions will be allowed.
-                                </div>
-                            </page>
+
                         </notebook>
                     </sheet>
                 </form>

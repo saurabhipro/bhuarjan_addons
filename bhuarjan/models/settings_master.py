@@ -266,24 +266,7 @@ class BhuarjanSettingsMaster(models.Model):
                                       help='If enabled, use static OTP instead of sending SMS. Useful when SMS API is disabled.')
     static_otp_value = fields.Char(string='Static OTP Value', help='Static OTP value to use when static OTP is enabled (e.g., 1234)')
     
-    # App Version Check Configuration
-    enforce_app_version_check = fields.Boolean(string='Enforce App Version Check', default=False,
-                                               help='If enabled, app version check will be enforced. If disabled, version check will be bypassed.')
-    latest_app_version = fields.Char(string='Latest App Version', compute='_compute_latest_app_version', 
-                                    readonly=True, store=False,
-                                    help='Latest active app version from App Version model')
-    
     active = fields.Boolean(string='Active', default=True)
-    
-    @api.depends('enforce_app_version_check')
-    def _compute_latest_app_version(self):
-        """Compute latest app version from app version model"""
-        for record in self:
-            latest_version = self.env['bhu.app.version'].sudo().get_latest_version()
-            if latest_version:
-                record.latest_app_version = f"{latest_version.name} (Code: {latest_version.version_code})"
-            else:
-                record.latest_app_version = "No active version found"
     
     @api.model_create_multi
     def create(self, vals_list):

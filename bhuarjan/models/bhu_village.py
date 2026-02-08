@@ -105,7 +105,7 @@ class BhuVillage(models.Model):
     
     state_id = fields.Many2one('res.country.state', string='State', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
-    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', tracking=True)
+
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', tracking=True)
     name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
     village_code = fields.Char(string='Village Code / ग्राम कोड', required=True, tracking=True, copy=False, help='Unique code for the village')

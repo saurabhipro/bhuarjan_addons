@@ -20,7 +20,7 @@ class SiaTeam(models.Model):
     name = fields.Char(string='Team Name / टीम का नाम', compute='_compute_name', store=True, readonly=True)
     
     # New fields
-    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', required=False, tracking=True)
+
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     requiring_body_id = fields.Many2one('bhu.department', string='Requiring Body / अपेक्षक निकाय', required=True, tracking=True,
                                        help='Select the requiring body/department', related="project_id.department_id")

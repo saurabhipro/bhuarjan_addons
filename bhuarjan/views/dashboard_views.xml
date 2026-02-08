@@ -44,13 +44,7 @@
                             </div>
                             <div class="kpi-value"><field name="total_districts" nolabel="1" readonly="1"/></div>
                         </button>
-                        <button name="action_open_sub_divisions" type="object" class="dashboard-kpi-card kpi-card-blue" invisible="1">
-                            <div class="kpi-header">
-                                <div class="kpi-label">Sub Divisions</div>
-                                <div class="kpi-icon"><i class="fa fa-sitemap" title="Sub Divisions"/></div>
-                            </div>
-                            <div class="kpi-value"><field name="total_sub_divisions" nolabel="1" readonly="1"/></div>
-                        </button>
+
                         <button name="action_open_tehsils" type="object" class="dashboard-kpi-card kpi-card-purple">
                             <div class="kpi-header">
                                 <div class="kpi-label">Tehsils</div>
@@ -263,13 +257,7 @@
                                 </div>
                             </div>
                         </button>
-                        <button name="action_open_documents" type="object" class="dashboard-kpi-card kpi-card-green">
-                            <div class="kpi-header">
-                                <div class="kpi-label">Total Documents</div>
-                                <div class="kpi-icon"><i class="fa fa-folder" title="Total Documents"/></div>
-                            </div>
-                            <div class="kpi-value"><field name="total_documents" nolabel="1" readonly="1"/></div>
-                        </button>
+
                     </div>
                     
                     <div class="dashboard-section-title">

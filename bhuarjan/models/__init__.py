@@ -7,7 +7,7 @@ from . import qr_code_mixin
 from . import survey
 from . import landowner
 from . import bhu_district
-from . import bhu_sub_division
+
 from . import bhu_tehsil
 from . import bhu_village
 from . import post_award_payment
@@ -18,7 +18,7 @@ from . import land_rate_master
 from . import settings_master
 from . import message_wizard
 from . import survey_bulk_approval_wizard
-from . import document_vault
+
 from . import utils
 from . import sia_team
 from . import sia_team_member
@@ -54,7 +54,7 @@ from . import section3d_nh
 from . import mutual_consent_policy
 from . import survey_photo
 from . import form10_export_utils
-from . import app_version
+
 from . import document_template_master
 from . import issue
 from . import debrand_res_company

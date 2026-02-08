@@ -66,20 +66,7 @@ class DashboardActions(models.AbstractModel):
                 'view_mode': 'list,form',
                 'target': 'current',
             }
-    @api.model
-    def action_open_sub_divisions(self):
-        try:
-            action_ref = self.env.ref('bhuarjan.action_bhu_sub_division')
-            return self._get_action_dict(action_ref)
-        except Exception as e:
-            _logger.error(f"Error getting action_bhu_sub_division: {e}", exc_info=True)
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Sub Divisions',
-                'res_model': 'bhu.sub.division',
-                'view_mode': 'list,form',
-                'target': 'current',
-            }
+
     @api.model
     def action_open_tehsils(self):
         try:
@@ -356,21 +343,7 @@ class DashboardActions(models.AbstractModel):
                 'views': [(False, 'list'), (False, 'form')],
                 'target': 'current',
             }
-    @api.model
-    def action_open_documents(self):
-        try:
-            action_ref = self.env.ref('bhuarjan.action_document_vault')
-            return self._get_action_dict(action_ref)
-        except Exception as e:
-            _logger.error(f"Error getting action_document_vault: {e}", exc_info=True)
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Document Vault',
-                'res_model': 'bhu.document.vault',
-                'view_mode': 'list,form',
-                'views': [(False, 'list'), (False, 'form')],
-                'target': 'current',
-            }
+
     @api.model
     def action_open_section19(self):
         try:

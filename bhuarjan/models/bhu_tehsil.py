@@ -13,7 +13,7 @@ class BhuTehsil(models.Model):
             
     state_id = fields.Many2one('res.country.state', string='State', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District / जिला', tracking=True)
-    sub_division_id = fields.Many2one('bhu.sub.division', string='Sub Division / उपभाग', tracking=True)
+
     code = fields.Char(string='Tehsil Code / तहसील कोड', tracking=True)
     headquarters = fields.Char(string='Headquarters / मुख्यालय', tracking=True)
     population = fields.Integer(string='Population / जनसंख्या', tracking=True)

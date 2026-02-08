@@ -15,8 +15,7 @@
                             <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="district_id" domain="[('state_id', '=', state_id)]" 
                                    options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                            <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                            <field name="tehsil_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="village_ids" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                         </group>
                     </group>
@@ -42,7 +41,6 @@
                     <field name="parent_id"/>
                     <field name="state_id" column_invisible="True"/>
                     <field name="district_id" string="District"/>
-                    <field name="sub_division_ids" widget="many2many_tags" string="Sub Division"/>
                     <field name="tehsil_ids" widget="many2many_tags" string="Tehsil"/>
                     <field name="village_ids" widget="many2many_tags"/>
                     <field name="child_ids" widget="many2many_tags" column_invisible="True"/>
@@ -110,8 +108,7 @@
                                 <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             </group>
                             <group>
-                                <field name="sub_division_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
-                                <field name="tehsil_ids" domain="[('sub_division_id', 'in', sub_division_ids)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
+                                <field name="tehsil_ids" domain="[('district_id', '=', district_id)]" widget="many2many_tags" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="project_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="bhu_department_id"/>
                                 <field name="village_domain" invisible="1"/>
@@ -145,7 +142,7 @@
             <field name="parent_id"/>
             <field name="state_id"/>
             <field name="district_id"/>
-            <field name="sub_division_ids"/>
+
             <field name="tehsil_ids"/>
             <field name="village_ids"/>
             <field name="child_ids"/>
@@ -189,10 +186,7 @@
                                 <b>District:</b> <field name="district_id"/>
                             </div>
 
-                            <div t-if="record.sub_division_ids.raw_value">
-                                <b>Sub Division:</b>
-                                <field name="sub_division_ids" widget="many2many_tags"/>
-                            </div>
+
 
                             <div t-if="record.tehsil_ids.raw_value">
                                 <b>Tehsil:</b>

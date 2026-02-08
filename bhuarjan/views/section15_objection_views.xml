@@ -152,11 +152,22 @@
                             </field>
                         </group>
 
-                        <group string="आपत्ति एंड निराकरण कमेंट बॉक्स">
-                            <field name="objection_resolution_comments" 
+                        <group string="आपत्ति कमेंट / Objection Comments">
+                            <field name="objection_comments" 
                                    readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
                                    nolabel="1"
-                                   placeholder="यहाँ अपनी आपत्ति और निराकरण कमेंट लिखें... (Enter your objection and resolution comments here...)"/>
+                                   options="{'resizable': false}"
+                                   style="max-height: 150px; overflow-y: auto;"
+                                   placeholder="यहाँ अपनी आपत्ति कमेंट लिखें... (Enter your objection comments here...)"/>
+                        </group>
+                        
+                        <group string="निराकरण कमेंट / Resolution Comments">
+                            <field name="resolution_comments" 
+                                   readonly="state in ('approved', 'rejected') or (state == 'draft' and not can_sdm_edit)"
+                                   nolabel="1"
+                                   options="{'resizable': false}"
+                                   style="max-height: 150px; overflow-y: auto;"
+                                   placeholder="यहाँ अपनी निराकरण कमेंट लिखें... (Enter your resolution comments here...)"/>
                         </group>
                     </div>
 

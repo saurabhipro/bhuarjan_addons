@@ -44,7 +44,11 @@ class Section15Objection(models.Model):
                                             tracking=True,
                                             help='Track area decreases per khasra')
     
-    objection_resolution_comments = fields.Text(string='Objection and Resolution Comments / आपत्ति एवं निराकरण कमेंट बॉक्स', tracking=True)
+    
+    objection_comments = fields.Text(string='Objection Comments / आपत्ति कमेंट', tracking=True,
+                                     help='Enter objection details and reasons / आपत्ति विवरण और कारण दर्ज करें')
+    resolution_comments = fields.Text(string='Resolution Comments / निराकरण कमेंट', tracking=True,
+                                      help='Enter resolution details and decisions / निराकरण विवरण और निर्णय दर्ज करें')
     
     @api.depends('village_id')
     def _compute_available_survey_ids(self):
@@ -217,7 +221,7 @@ class Section15Objection(models.Model):
                         break
             
             # Check if comments added
-            comments_added = bool(record.objection_resolution_comments)
+            comments_added = bool(record.objection_comments) or bool(record.resolution_comments)
             
             # If nothing changed, raise error
             # if not landowners_changed and not area_changed and not comments_added:

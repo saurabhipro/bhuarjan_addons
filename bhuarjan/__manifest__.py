@@ -188,6 +188,9 @@
             # 'bhuarjan/static/src/scss/image_capture.scss',
             # 'bhuarjan/static/src/js/components/image_capture.js',
             # 'bhuarjan/static/src/xml/image_capture_templates.xml',
+            'bhuarjan/static/src/scss/image_capture.scss',
+            'bhuarjan/static/src/js/components/image_capture.js',
+            'bhuarjan/static/src/xml/image_capture_templates.xml',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

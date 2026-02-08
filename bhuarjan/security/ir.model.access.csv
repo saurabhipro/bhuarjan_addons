@@ -122,4 +122,4 @@ access_bhu_issue_wizard_user,bhu.issue.wizard.user,model_bhuarjan_issue_wizard,b
 access_bhu_gantt_report_wizard,bhu.gantt.report.wizard,model_bhuarjan_gantt_report_wizard,base.group_user,1,1,1,1
 access_change_password_wizard_district_admin,change.password.wizard.district.admin,base.model_change_password_wizard,bhuarjan.group_bhuarjan_district_administrator,1,1,1,1
 access_change_password_user_district_admin,change.password.user.district.admin,base.model_change_password_user,bhuarjan.group_bhuarjan_district_administrator,1,1,1,1
-
+access_image_capture_user,access.image.capture.user,model_image_capture,base.group_user,1,1,1,1

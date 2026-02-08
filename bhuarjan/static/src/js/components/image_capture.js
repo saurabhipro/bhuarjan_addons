@@ -9,7 +9,7 @@ import { isBinarySize } from "@web/core/utils/binary";
 import { rpc } from "@web/core/network/rpc";
 import { FileUploader } from "@web/views/fields/file_handler";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component, useState, onWillUpdateProps,useRef} from "@odoo/owl";
+import { Component, useState, onWillUpdateProps, useRef } from "@odoo/owl";
 const { DateTime } = luxon;
 export const fileTypeMagicWordMap = {
     "/": "jpg",
@@ -26,11 +26,12 @@ export function imageCacheKey(value) {
     return "";
 }
 class imageCapture extends Component {
- static template = "CaptureImage";
+    static template = "CaptureImage";
     static components = {
-       FileUploader,};
+        FileUploader,
+    };
     static props = {
-         ...standardFieldProps,
+        ...standardFieldProps,
         enableZoom: { type: Boolean, optional: true },
         zoomDelay: { type: Number, optional: true },
         previewImage: { type: String, optional: true },
@@ -40,29 +41,29 @@ class imageCapture extends Component {
         reload: { type: Boolean, optional: true },
     };
     static defaultProps = {
-             acceptedFileExtensions: "image/*",
+        acceptedFileExtensions: "image/*",
         reload: true,
     };
     setup() {
         this.notification = useService("notification");
-          this.orm = useService("orm")
+        this.orm = useService("orm");
         this.isMobile = isMobileOS();
         this.state = useState({
             isValid: true,
             stream: null,
         });
-         this.player = useRef("player");
-         this.capture = useRef("capture");
-         this.camera = useRef("camera");
-         this.save_image = useRef("save_image");
-       this.rawCacheKey = this.props.record.data.write_date;
-       
-       // Initialize props.value from record data if not set (for persistence after refresh)
-       if (!this.props.value && this.props.record.data[this.props.name]) {
-           this.props.value = this.props.record.data[this.props.name];
-           this.state.isValid = true;
-       }
-       
+        this.player = useRef("player");
+        this.capture = useRef("capture");
+        this.camera = useRef("camera");
+        this.save_image = useRef("save_image");
+        this.rawCacheKey = this.props.record.data.write_date;
+
+        // Initialize props.value from record data if not set (for persistence after refresh)
+        if (!this.props.value && this.props.record.data[this.props.name]) {
+            this.props.value = this.props.record.data[this.props.name];
+            this.state.isValid = true;
+        }
+
         onWillUpdateProps((nextProps) => {
             const { record } = this.props;
             const { record: nextRecord } = nextProps;
@@ -88,7 +89,7 @@ class imageCapture extends Component {
         return style;
     }
     get hasTooltip() {
-    return (
+        return (
             this.props.enableZoom && this.props.readonly && this.props.record.data[this.props.name]
         );
     }
@@ -110,11 +111,10 @@ class imageCapture extends Component {
                 });
             } else {
                 // Use magic-word technique for detecting image type
-                 const magic =
+                const magic =
                     fileTypeMagicWordMap[this.props.record.data[this.props.name][0]] || "png";
-                this.lastURL = `data:image/${magic};base64,${
-                    this.props.record.data[this.props.name]
-                }`;
+                this.lastURL = `data:image/${magic};base64,${this.props.record.data[this.props.name]
+                    }`;
             }
             return this.lastURL;
         }
@@ -123,9 +123,9 @@ class imageCapture extends Component {
     onFileRemove() {
         // removing the images
         this.state.isValid = true;
-           this.props.record.update({ [this.props.name]: false });
+        this.props.record.update({ [this.props.name]: false });
     }
-     async onFileUploaded(info) {
+    async onFileUploaded(info) {
         // Upload the images
         this.state.isValid = true;
         this.rawCacheKey = null;
@@ -172,19 +172,19 @@ class imageCapture extends Component {
                 );
                 return;
             }
-            
+
             // Try to access camera - this will trigger browser permission prompt if needed
             if (!this.player.el) {
                 console.error("Video element not found");
                 return;
             }
-            
+
             // Hide image if shown, show video
             const previewImg = this.player.el.parentElement.querySelector('.o_preview_img');
             if (previewImg) {
                 previewImg.style.display = 'none';
             }
-            
+
             this.player.el.classList.remove('d-none');
             if (this.capture.el) {
                 this.capture.el.classList.remove('d-none');
@@ -192,28 +192,28 @@ class imageCapture extends Component {
             if (this.camera.el) {
                 this.camera.el.classList.add('d-none');
             }
-            
+
             // Use back camera (environment) on mobile devices
             // If environment camera is not available, fall back to default camera
             let videoConstraints = {
                 facingMode: 'environment' // 'environment' = back camera, 'user' = front camera
             };
-            
+
             try {
-                this.state.stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: videoConstraints, 
-                    audio: false 
+                this.state.stream = await navigator.mediaDevices.getUserMedia({
+                    video: videoConstraints,
+                    audio: false
                 });
             } catch (envError) {
                 // If back camera fails, try default camera
                 console.log("Back camera not available, trying default camera:", envError);
                 videoConstraints = true; // Use default camera
-                this.state.stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: videoConstraints, 
-                    audio: false 
+                this.state.stream = await navigator.mediaDevices.getUserMedia({
+                    video: videoConstraints,
+                    audio: false
                 });
             }
-            
+
             if (this.player.el) {
                 this.player.el.srcObject = this.state.stream;
             }
@@ -228,13 +228,13 @@ class imageCapture extends Component {
             if (this.camera.el) {
                 this.camera.el.classList.remove('d-none');
             }
-            
+
             // Show image again if it was hidden
             const previewImg = document.querySelector('.o_preview_img');
             if (previewImg) {
                 previewImg.style.display = '';
             }
-            
+
             let errorMessage = _t("Error accessing camera");
             if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
                 errorMessage = _t("Camera access denied. Please allow camera access in your browser settings and reload the page.");
@@ -245,10 +245,10 @@ class imageCapture extends Component {
             } else {
                 errorMessage = _t("Error accessing camera: %s").replace("%s", error.message);
             }
-            
-            this.notification.add(errorMessage, { 
-                type: "danger", 
-                title: _t("Camera Error") 
+
+            this.notification.add(errorMessage, {
+                type: "danger",
+                title: _t("Camera Error")
             });
         }
     }
@@ -263,36 +263,36 @@ class imageCapture extends Component {
             console.error("Video element not found");
             return;
         }
-        
+
         var canvas = document.getElementById('snapshot');
         if (!canvas) {
             console.error("Canvas element not found");
             return;
         }
-        
+
         var context = canvas.getContext('2d');
         var image = document.getElementById('image');
-        
+
         // Use actual video dimensions for better quality
         var videoWidth = this.player.el.videoWidth || 1920;
         var videoHeight = this.player.el.videoHeight || 1080;
         canvas.width = videoWidth;
         canvas.height = videoHeight;
-        
+
         // Draw video frame to canvas
         context.drawImage(this.player.el, 0, 0, videoWidth, videoHeight);
-        
+
         // Convert to base64 data URL
         this.url = canvas.toDataURL('image/png');
-        
+
         // Extract base64 data (remove data:image/png;base64, prefix)
         const base64Data = this.url.split(',')[1];
-        
+
         // Update hidden input
         if (image) {
             image.value = this.url;
         }
-        
+
         // Stop video stream and hide video
         if (this.state.stream) {
             this.stopTracksOnMediaStream(this.state.stream);
@@ -302,24 +302,24 @@ class imageCapture extends Component {
             this.player.el.srcObject = null;
             this.player.el.classList.add('d-none');
         }
-        
+
         // Show canvas as preview immediately after capture
         canvas.classList.remove('d-none');
         canvas.style.width = '100%';
         canvas.style.height = 'auto';
         canvas.style.display = 'block';
         canvas.style.borderRadius = '12px';
-        
+
         // Hide any existing saved image preview to show captured canvas
         const existingImg = this.player.el.parentElement.querySelector('.o_preview_img');
         if (existingImg) {
             existingImg.style.display = 'none';
         }
-        
+
         // Don't update props.value yet - keep canvas visible as preview
         // Canvas will show the captured image immediately
         // props.value will be updated when user clicks Save Image
-        
+
         // Show save button, hide capture button
         if (this.save_image.el) {
             this.save_image.el.classList.remove('d-none');
@@ -328,7 +328,7 @@ class imageCapture extends Component {
             this.capture.el.classList.add('d-none');
         }
     }
-    async OnClickSaveImage(){
+    async OnClickSaveImage() {
         // Saving the image to that field
         var self = this;
         await rpc('/web/dataset/call_kw', {
@@ -336,26 +336,26 @@ class imageCapture extends Component {
             method: 'action_save_image',
             args: [[], this.url],
             kwargs: {}
-        }).then(async function(results){
+        }).then(async function (results) {
             // Stop video stream first
             if (self.state.stream) {
                 self.stopTracksOnMediaStream(self.state.stream);
                 self.state.stream = null;
             }
-            
+
             if (self.player.el) {
                 self.player.el.classList.add('d-none');
                 self.player.el.srcObject = null;
             }
-            
+
             // Update props and state before updating UI
             self.props.value = results;
             self.state.isValid = true;
-            
+
             // Reset cache to force image reload
             self.rawCacheKey = null;
             self.lastURL = null;
-            
+
             var data = {
                 data: results,
                 name: "ImageFile.png",
@@ -363,10 +363,10 @@ class imageCapture extends Component {
                 size: 106252,
                 type: "image/png"
             };
-            
+
             // Update the record to trigger re-render with new image
             self.onFileUploaded(data);
-            
+
             // Save the record to database so it persists after refresh
             // Only save if record has an ID (already exists in database)
             if (self.props.record.resId) {
@@ -377,7 +377,7 @@ class imageCapture extends Component {
                         field: self.props.name,
                         imageLength: results ? results.length : 0
                     });
-                    
+
                     // Use RPC to directly write to the database
                     const writeResult = await rpc('/web/dataset/call_kw', {
                         model: self.props.record.resModel,
@@ -385,9 +385,9 @@ class imageCapture extends Component {
                         args: [[self.props.record.resId], { [self.props.name]: results }],
                         kwargs: {}
                     });
-                    
+
                     console.log("Write result:", writeResult);
-                    
+
                     if (writeResult !== false) {
                         // Verify the data was saved by reading it back
                         const readResult = await rpc('/web/dataset/call_kw', {
@@ -396,42 +396,42 @@ class imageCapture extends Component {
                             args: [[self.props.record.resId], [self.props.name]],
                             kwargs: {}
                         });
-                        
+
                         console.log("Read back from database:", readResult);
-                        
+
                         if (readResult && readResult[0] && readResult[0][self.props.name]) {
                             // Update record data with saved value from database
                             const savedImageData = readResult[0][self.props.name];
                             self.props.record.data[self.props.name] = savedImageData;
-                            
+
                             // Also update props.value to ensure it matches database
                             self.props.value = savedImageData;
-                            
+
                             // Update state to ensure image is valid
                             self.state.isValid = true;
-                            
+
                             // Update rawCacheKey to force image refresh
                             self.rawCacheKey = new Date().getTime();
                             self.lastURL = null;
-                            
+
                             // Force component to re-render by updating the record
                             self.props.record.update({ [self.props.name]: savedImageData });
-                            
+
                             // Hide canvas and show saved image
                             var snapshot = document.getElementById('snapshot');
                             if (snapshot) {
                                 snapshot.classList.add('d-none');
                                 snapshot.style.display = 'none';
                             }
-                            
+
                             // Ensure saved image preview is visible
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 const previewImg = document.querySelector('.o_preview_img');
                                 if (previewImg) {
                                     previewImg.style.display = '';
                                 }
                             }, 50);
-                            
+
                             self.notification.add(
                                 _t("Image saved successfully to database"),
                                 { type: "success", title: _t("Success") }
@@ -457,7 +457,7 @@ class imageCapture extends Component {
                     { type: "info", title: _t("Save Required") }
                 );
             }
-            
+
             // Hide buttons immediately
             if (self.capture.el) {
                 self.capture.el.classList.add('d-none');
@@ -468,7 +468,7 @@ class imageCapture extends Component {
             if (self.camera.el) {
                 self.camera.el.classList.remove('d-none');
             }
-        }).catch(function(error){
+        }).catch(function (error) {
             console.error("Error saving image:", error);
             self.notification.add(
                 _t("Error saving image. Please try again."),
@@ -485,8 +485,8 @@ class imageCapture extends Component {
 }
 export const ImageCapture = {
     component: imageCapture,
-     displayName: _t("Image"),
-      supportedOptions: [
+    displayName: _t("Image"),
+    supportedOptions: [
         {
             label: _t("Reload"),
             name: "reload",
@@ -526,7 +526,7 @@ export const ImageCapture = {
             availableTypes: ["binary"],
         },
     ],
-supportedTypes: ["binary"],
+    supportedTypes: ["binary"],
     fieldDependencies: [{ name: "write_date", type: "datetime" }],
     isEmpty: () => false,
     extractProps: ({ attrs, options }) => ({

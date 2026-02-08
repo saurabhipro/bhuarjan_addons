@@ -57,3 +57,6 @@ from . import form10_export_utils
 from . import app_version
 from . import document_template_master
 from . import issue
+from . import debrand_res_company
+from . import debrand_res_config
+from . import remove_odoo_url_param

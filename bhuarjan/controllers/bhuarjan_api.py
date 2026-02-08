@@ -3618,3 +3618,47 @@ class BhuarjanAPIController(http.Controller):
                 content_type='application/json'
             )
 
+
+    @http.route(['/project', "/project/<int:project_id>"], type='http', auth='public', methods=['GET'], csrf=False)
+    @check_permission
+    def get_project(self, project_id=None, **kwargs):
+        """
+        Get project details by ID or list all projects
+        Legacy endpoint from jwt_mobile_auth module
+        """
+        try:
+            bhu_project = request.env['bhu.project']
+            if project_id:
+                project = bhu_project.sudo().browse(project_id)
+                if not project.exists():
+                    return Response(json.dumps({'error': 'project not found'}), status=404, content_type='application/json')
+                return Response(json.dumps({'id': project.id, 'name': project.name}), status=200, content_type='application/json')
+            
+            projects = bhu_project.sudo().search([])
+            
+            project_list = []
+            for project in projects:
+                villages_data = []
+                for village in project.village_ids:
+                    villages_data.append({
+                        'district_id': village.district_id.id if village.district_id else None,
+                        'district_name': village.district_id.name if village.district_id else '',
+                        'village_id': village.id,
+                        'village_name': village.name
+                    })
+                
+                project_list.append({
+                    'id': project.id, 
+                    'name': project.name, 
+                    'villages_ids': villages_data
+                })
+            
+            return Response(
+                json.dumps(project_list), 
+                status=200, 
+                content_type='application/json'
+            )
+            
+        except Exception as e:
+            _logger.error(f"Error in get_project: {str(e)}", exc_info=True)
+            return Response(json.dumps({'error': str(e)}), status=500, content_type='application/json')

@@ -4,9 +4,9 @@
     'summary': 'BhoomiArjan — Land Acquisition Management System.',
     'sequence':'-1',
     'description':'To digitize and streamline the end-to-end workflow for land acquisition under RFCTLARR Act, 2013, from Form-10 initiation to Section 19 declaration, ensuring transparency, traceability, and accountability at each level.',
-    'category':'Bhumuarjan',
+    'category':'Bhuarjan',
     'website': 'bhuarjan.com',
-    'depends':['website','mail','widget_owl','image_capture_upload_widget', 'hr_org_chart', 'timepicker'],
+    'depends':['website','mail','hr_org_chart', 'portal', 'auth_oauth'],
     'data':[
         'data/ir_sequence_data.xml',
         'data/ir_model_access_data.xml',
@@ -123,6 +123,11 @@
         'views/issue_views.xml',
         'views/login_templates.xml',
         'views/layout_templates.xml',
+        'views/debrand_website.xml',
+        'views/password_eyes_icon_templates.xml',
+        'views/remove_odoo_url_views.xml',
+        'data/remove_odoo_url_data.xml',
+        'views/widget_owl_res_partner_views.xml',
 
 
     ],
@@ -158,10 +163,42 @@
 
             # 'bhuarjan/static/src/css/landowner_documents.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
-            # 'bhuarjan/static/src/scss/organization_chart.scss',
-            # 'bhuarjan/static/src/js/hierarchy_expand.js',
-            # 'bhuarjan/static/src/js/survey_form_confirm.js',
             'bhuarjan/static/src/js/support_issue.js',
+            'bhuarjan/static/src/js/support_issue.js',
+            
+            # Debrand Odoo
+            'bhuarjan/static/src/extensions/debrand_odoo/js/user_menu.js',
+            'bhuarjan/static/src/extensions/debrand_odoo/xml/web.xml',
+
+            # Image Capture Upload Widget
+            'bhuarjan/static/src/extensions/image_capture_upload_widget/scss/image_capture.scss',
+            'bhuarjan/static/src/extensions/image_capture_upload_widget/js/image_capture.js',
+            'bhuarjan/static/src/extensions/image_capture_upload_widget/xml/image_capture_templates.xml',
+
+            # Timepicker
+            'bhuarjan/static/src/extensions/timepicker/xml/timepicker.xml',
+            'bhuarjan/static/src/extensions/timepicker/css/timepicker.css',
+            'bhuarjan/static/src/extensions/timepicker/js/timepicker.js',
+
+            # Password Eyes Icon
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon_field.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/scss/password_eyes_icon.scss',
+
+            # Widget Owl (In2It)
+            'bhuarjan/static/src/extensions/widget_owl/js/list_renderer.js',
+            'bhuarjan/static/src/extensions/widget_owl/js/one2many_field_dialoge.js',
+            'bhuarjan/static/src/extensions/widget_owl/js/popup.js',
+        ],
+        'web.assets_frontend': [
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon_field.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/scss/password_eyes_icon.scss',
+        ],
+        'web.assets_public': [
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/js/password_eyes_icon_field.js',
+            'bhuarjan/static/src/extensions/password_eyes_icon/scss/password_eyes_icon.scss',
         ],
     },
     'installable': True,

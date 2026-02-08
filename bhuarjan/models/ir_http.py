@@ -22,117 +22,52 @@ class IrHttp(models.AbstractModel):
     def _check_server_restart(cls):
         """Check if server has restarted and invalidate sessions"""
         try:
+            # We need a request with a db to proceed
             if not hasattr(request, 'db') or not request.db:
-                # Don't spam logs for non-db requests (e.g. service worker, /web assets).
-                _logger.debug("BHURAJAN: No request.db on request; skipping PID check.")
                 return
             
-            # Get current process ID
+            # fast check: if we already checked this worker process, skip
+            # This is a class attribute, so it persists for the life of the worker
+            if getattr(cls, '_worker_pid_checked', False):
+                return
+
             current_pid = str(os.getpid())
             
-            # Get registry and cursor directly
-            try:
-                from odoo.modules.registry import Registry
-                from odoo import api
-                registry = Registry(request.db)
+            # Use a new cursor to checking/updating the global state
+            # This avoids messing with the current transaction
+            from odoo.modules.registry import Registry
+            registry = Registry(request.db)
+            
+            with registry.cursor() as cr:
+                # 1. Read stored PID
+                cr.execute("SELECT value FROM ir_config_parameter WHERE key = %s", ('bhuarjan.server_pid',))
+                row = cr.fetchone()
+                stored_pid = row[0] if row else ''
+
+                if stored_pid != current_pid:
+                    _logger.info("BHUARJAN: Server PID changed from %s to %s (server restarted)", stored_pid, current_pid)
+
+                    # 3. Update the PID
+                    # We utilize ON CONFLICT to handle concurrent updates gracefully
+                    # This query works for PostgreSQL 9.5+
+                    cr.execute("""
+                        INSERT INTO ir_config_parameter (key, value) 
+                        VALUES ('bhuarjan.server_pid', %s)
+                        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+                    """, (current_pid,))
                 
-                # First, get stored PID and check if restart occurred
-                stored_pid = ''
-                try:
-                    with registry.cursor() as cr:
-                        env = api.Environment(cr, 1, {})
-                        # Try SQL first
-                        try:
-                            cr.execute("SELECT value FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
-                            result = cr.fetchone()
-                            if result:
-                                stored_pid = result[0] or ''
-                        except Exception:
-                            # Fallback to ORM
-                            try:
-                                Param = env.get('ir.config_parameter')
-                                if Param:
-                                    stored_pid = Param.get_param('bhuarjan.server_pid', default='')
-                            except:
-                                pass
-                except Exception as read_err:
-                    _logger.warning("Could not read PID: %s", read_err)
-                
-                # Log PID check at DEBUG level to avoid noisy logs on every request.
-                _logger.debug("BHURAJAN PID CHECK: current=%s stored=%s", current_pid, stored_pid)
-                
-                # If PIDs don't match, server was restarted - handle session deletion in separate transaction
-                if stored_pid and stored_pid != current_pid:
-                    _logger.warning("=== SERVER RESTART DETECTED! PID changed from %s to %s ===", stored_pid, current_pid)
-                    
-                    # Invalidate ALL sessions using ORM in a separate transaction
-                    try:
-                        with registry.cursor() as cr:
-                            env = api.Environment(cr, 1, {})
-                            Session = env.get('ir.session')
-                            if Session:
-                                sessions = Session.search([])
-                                session_count = len(sessions)
-                                if session_count > 0:
-                                    sessions.unlink()
-                                    cr.commit()
-                                    _logger.warning("=== DELETED %d SESSIONS VIA ORM DUE TO SERVER RESTART ===", session_count)
-                                else:
-                                    _logger.info("=== NO ACTIVE SESSIONS FOUND ===")
-                            cr.commit()
-                    except Exception as session_err:
-                        _logger.error("Failed to delete sessions: %s", session_err, exc_info=True)
-                    
-                    # Force invalidate current session
-                    if hasattr(request, 'session'):
-                        try:
-                            request.session.clear()
-                            _logger.warning("=== CLEARED CURRENT SESSION ===")
-                        except Exception as e:
-                            _logger.error("Failed to clear session: %s", e)
-                
-                # Always update PID in a separate transaction
-                try:
-                    with registry.cursor() as cr:
-                        env = api.Environment(cr, 1, {})
-                        # Try ORM first (more reliable)
-                        try:
-                            Param = env.get('ir.config_parameter')
-                            if Param:
-                                Param.set_param('bhuarjan.server_pid', current_pid)
-                                cr.commit()
-                                _logger.info("PID stored via ORM: %s", current_pid)
-                            else:
-                                # Fallback to SQL
-                                cr.execute("SELECT id FROM ir_config_parameter WHERE key = 'bhuarjan.server_pid'")
-                                existing = cr.fetchone()
-                                if existing:
-                                    cr.execute("UPDATE ir_config_parameter SET value = %s WHERE key = 'bhuarjan.server_pid'", (current_pid,))
-                                else:
-                                    cr.execute("""
-                                        INSERT INTO ir_config_parameter (key, value) 
-                                        VALUES ('bhuarjan.server_pid', %s)
-                                    """, (current_pid,))
-                                cr.commit()
-                                _logger.info("PID stored via SQL: %s", current_pid)
-                        except Exception as pid_err:
-                            _logger.error("Could not store PID: %s", pid_err)
-                            cr.rollback()
-                except Exception as pid_trans_err:
-                    _logger.error("Could not create transaction for PID storage: %s", pid_trans_err)
-                        
-            except Exception as env_err:
-                _logger.error("Could not access database: %s", env_err, exc_info=True)
+            # Mark this process as checked so we don't hit the DB on every request
+            cls._worker_pid_checked = True
                 
         except Exception as e:
-            _logger.error("Error in _check_server_restart: %s", e, exc_info=True)
+            # Don't block the request if this maintenance task fails
+            _logger.error("BHUARJAN: Error in _check_server_restart: %s", e)
     
-    @classmethod
     def get_frontend_session_info(cls):
         """Override to safely handle cases where session might be None"""
         try:
             # Call parent method - use super() without cls argument for classmethod
-            result = super().get_frontend_session_info()
+            result = super(IrHttp, cls).get_frontend_session_info()
             # Ensure we return a dict, not None
             if result is None:
                 return {}

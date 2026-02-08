@@ -940,6 +940,18 @@ export class UnifiedDashboard extends Component {
             return;
         }
 
+        // Check if Expert Committee Report already exists (max 1 per project)
+        if (sectionModel === 'bhu.expert.committee.report') {
+            const expertInfo = this.state.stats.expert_info;
+            if (expertInfo && expertInfo.total && expertInfo.total > 0) {
+                this.notification.add(_t("Expert Committee Report already exists for this project. Please use the View/Edit button."), {
+                    type: "warning",
+                    sticky: false
+                });
+                return;
+            }
+        }
+
         // Special handling for R and R Scheme - open form directly (one per project)
         if (sectionModel === 'bhu.section18.rr.scheme') {
             await this.openRRSchemeForm();

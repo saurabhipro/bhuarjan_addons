@@ -21,13 +21,13 @@ class Section19Notification(models.Model):
     def _check_unique_project_village(self):
         for record in self:
             if record.project_id and record.village_id:
-                existing = self.search([
+                existing = self.sudo().search([
                     ('project_id', '=', record.project_id.id),
                     ('village_id', '=', record.village_id.id),
-                    ('id', '!=', record.id)
-                ])
+                    ('id', '!=', (record.id.origin if hasattr(record.id, 'origin') else record.id) or 0)
+                ], limit=1)
                 if existing:
-                    raise ValidationError(_('A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!'))
+                    raise ValidationError(_('A Section 19 notification already exists for this Project: %s and Village: %s (ID: %s, Name: %s, State: %s)! Please check and edit the existing record. / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना (ID: %s) पहले से मौजूद है! (स्थिति: %s)') % (record.project_id.name, record.village_id.name, existing.id, existing.name, existing.state, existing.id, existing.state))
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     

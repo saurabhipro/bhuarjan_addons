@@ -817,7 +817,26 @@ export class UnifiedDashboard extends Component {
         if (this.state.selectedProject) {
             domain.push(['project_id', '=', parseInt(this.state.selectedProject)]);
         }
-        if (this.state.selectedVillage) {
+
+        // Models that have village_id field and should be filtered by village selection
+        const modelsWithVillage = [
+            'bhu.survey',
+            'bhu.section4.notification',
+            'bhu.section11.preliminary.report',
+            'bhu.section15.objection',
+            'bhu.section19.notification',
+            'bhu.section21.notification',
+            'bhu.section23.award',
+            'bhu.section20a.railways',
+            'bhu.section20d.railways',
+            'bhu.section20e.railways',
+            'bhu.section3a.nh',
+            'bhu.section3c.nh',
+            'bhu.section3d.nh',
+            'bhu.mutual.consent.policy',
+        ];
+
+        if (this.state.selectedVillage && (!model || modelsWithVillage.includes(model))) {
             domain.push(['village_id', '=', parseInt(this.state.selectedVillage)]);
         }
         return domain;
@@ -877,13 +896,7 @@ export class UnifiedDashboard extends Component {
             return;
         }
 
-        let domain = [];
-        if (this.state.selectedProject) {
-            domain.push(["project_id", "=", this.state.selectedProject]);
-        }
-        if (this.state.selectedVillage) {
-            domain.push(["village_id", "=", this.state.selectedVillage]);
-        }
+        const domain = this.getDomain(sectionModel);
 
         // Try to get first pending, otherwise first document
         let recordId = false;
@@ -1002,13 +1015,7 @@ export class UnifiedDashboard extends Component {
             return;
         }
 
-        let domain = [];
-        if (this.state.selectedProject) {
-            domain.push(["project_id", "=", this.state.selectedProject]);
-        }
-        if (this.state.selectedVillage) {
-            domain.push(["village_id", "=", this.state.selectedVillage]);
-        }
+        const domain = this.getDomain(sectionModel);
         // Filter to only submitted records for pagination
         domain.push(["state", "=", "submitted"]);
 

@@ -247,11 +247,6 @@ class Section19Notification(models.Model):
             # Generate UUID if not provided
             if not vals.get('notification_uuid'):
                 vals['notification_uuid'] = str(uuid.uuid4())
-            # Set default project_id if not provided
-            if not vals.get('project_id'):
-                project_id = self._default_project_id()
-                if project_id:
-                    vals['project_id'] = project_id
         return super().create(vals_list)
 
     def write(self, vals):

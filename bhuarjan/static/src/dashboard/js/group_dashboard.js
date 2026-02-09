@@ -3,11 +3,15 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { ProjectTimelineDialog } from "../../js/components/project_timeline";
+import { _t } from "@web/core/l10n/translation";
 
 export class GroupDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
+        this.dialog = useService("dialog");
+        this.notification = useService("notification");
         this.state = useState({
             projects: [],
             loading: true,
@@ -375,6 +379,39 @@ export class GroupDashboard extends Component {
     async refreshDashboard() {
         this.state.loading = true;
         await this.loadDashboardData();
+    }
+
+    async showTimeline(projectId) {
+        console.log("showTimeline triggered for project:", projectId);
+        try {
+            this.notification.add(_t("Fetching progress data..."), { type: "info", sticky: false });
+
+            const stages = await this.orm.call(
+                "bhu.project",
+                "get_project_progress",
+                [projectId]
+            );
+
+            console.log("Stages data received:", stages);
+
+            if (!ProjectTimelineDialog) {
+                console.error("ProjectTimelineDialog is undefined in showTimeline!");
+                this.notification.add(_t("Technical Error: Dialog component not found."), { type: "danger" });
+                return;
+            }
+
+            this.dialog.add(ProjectTimelineDialog, {
+                projectId: projectId,
+                stages: stages,
+                title: _t("Project Progress Timeline"),
+            }, {
+                size: "lg",
+            });
+            console.log("Dialog.add called successfully");
+        } catch (error) {
+            console.error("FATAL: Failed to show timeline:", error);
+            this.notification.add(_t("Server Error: Could not load project progress."), { type: "danger" });
+        }
     }
 }
 

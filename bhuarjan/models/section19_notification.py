@@ -13,22 +13,10 @@ class Section19Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
 
-    # _sql_constraints = [
-    #     ('unique_project_village', 'unique(project_id, village_id)', 'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
-    # ]
+    _sql_constraints = [
+        ('unique_project_village', 'unique(project_id, village_id)', 'A Section 19 notification already exists for this Project and Village! / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना पहले से मौजूद है!')
+    ]
 
-    @api.constrains('project_id', 'village_id')
-    def _check_unique_project_village(self):
-        return  # Validation disabled as per user request to unblock
-        # for record in self:
-        #     if record.project_id and record.village_id:
-        #         existing = self.sudo().search([
-        #             ('project_id', '=', record.project_id.id),
-        #             ('village_id', '=', record.village_id.id),
-        #             ('id', '!=', (record.id.origin if hasattr(record.id, 'origin') else record.id) or 0)
-        #         ], limit=1)
-        #         if existing:
-        #             raise ValidationError(_('A Section 19 notification already exists for this Project: %s and Village: %s (ID: %s, Name: %s, State: %s)! Please check and edit the existing record. / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना (ID: %s) पहले से मौजूद है! (स्थिति: %s)') % (record.project_id.name, record.village_id.name, existing.id, existing.name, existing.state, existing.id, existing.state))
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     

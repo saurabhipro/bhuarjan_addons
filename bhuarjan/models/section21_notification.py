@@ -11,11 +11,11 @@ class Section21Notification(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
     _sql_constraints = [
-        # (
-        #     'unique_section21_per_project_village',
-        #     'unique(project_id, village_id)',
-        #     'A Section 21 notification already exists for this project and village. Only one is allowed.'
-        # ),
+        (
+            'unique_section21_per_project_village',
+            'unique(project_id, village_id)',
+            'A Section 21 notification already exists for this project and village. Only one is allowed.'
+        ),
     ]
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
@@ -267,11 +267,26 @@ class Section21Notification(models.Model):
     def create(self, vals_list):
         """Create records with batch support"""
         for vals in vals_list:
+            # Check for duplicate project + village combination before creating
+            project_id = vals.get('project_id')
+            village_id = vals.get('village_id')
+            if project_id and village_id:
+                existing = self.search([
+                    ('project_id', '=', project_id),
+                    ('village_id', '=', village_id)
+                ], limit=1)
+                if existing:
+                    project = self.env['bhu.project'].browse(project_id)
+                    village = self.env['bhu.village'].browse(village_id)
+                    raise ValidationError(
+                        _('A Section 21 notification already exists for project "%s" and village "%s".\n'
+                          'Only one Section 21 notification is allowed per project-village combination.\n'
+                          'Existing notification: %s') % (project.name, village.name, existing.name)
+                    )
+            
             # village_id is already required at field level, no need for extra validation
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
-                project_id = vals.get('project_id')
-                village_id = vals.get('village_id')
                 if project_id:
                     try:
                         sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
@@ -305,6 +320,26 @@ class Section21Notification(models.Model):
     
     def write(self, vals):
         """Override write to repopulate land parcels when village or project changes"""
+        # Check for duplicate project + village combination when updating
+        if 'project_id' in vals or 'village_id' in vals:
+            for record in self:
+                new_project_id = vals.get('project_id', record.project_id.id)
+                new_village_id = vals.get('village_id', record.village_id.id)
+                if new_project_id and new_village_id:
+                    existing = self.search([
+                        ('project_id', '=', new_project_id),
+                        ('village_id', '=', new_village_id),
+                        ('id', '!=', record.id)
+                    ], limit=1)
+                    if existing:
+                        project = self.env['bhu.project'].browse(new_project_id)
+                        village = self.env['bhu.village'].browse(new_village_id)
+                        raise ValidationError(
+                            _('A Section 21 notification already exists for project "%s" and village "%s".\n'
+                              'Only one Section 21 notification is allowed per project-village combination.\n'
+                              'Existing notification: %s') % (project.name, village.name, existing.name)
+                        )
+        
         result = super().write(vals)
         # If village_id or project_id changed, repopulate land parcels
         if 'village_id' in vals or 'project_id' in vals:

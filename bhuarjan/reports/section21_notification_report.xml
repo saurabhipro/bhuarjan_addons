@@ -165,10 +165,9 @@
                                 <table class="schedule-table">
                                     <thead>
                                         <tr>
-                                            <th style="width: 25%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
-                                            <th style="width: 35%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">भूमिस्वामी का नाम</th>
-                                            <th style="width: 25%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">अर्जित रकबा</th>
-                                            <th style="width: 15%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">रिमार्क</th>
+                                            <th style="width: 40%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">खसरा क्रमांक</th>
+                                            <th style="width: 40%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">अर्जित रकबा</th>
+                                            <th style="width: 20%; border: 1px solid #000; padding: 8px; text-align: center; background-color: #f0f0f0; font-weight: bold;">रिमार्क</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -180,14 +179,10 @@
                                                         <t t-esc="item['khasra_number']"/>
                                                     </td>
                                                     <td style="text-align: center;">
-                                                        <t t-if="item.get('landowner_name')" t-esc="item['landowner_name']"/>
-                                                        <t t-if="not item.get('landowner_name')">........................</t>
-                                                    </td>
-                                                    <td style="text-align: center;">
                                                         <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                         <t t-if="item['area'] == 0">........................</t>
                                                     </td>
-                                                    <td style="text-align: center;">--</td>
+                                                    <td style="text-align: center;">NA</td>
                                                 </tr>
                                             </t>
                                         </t>
@@ -195,8 +190,7 @@
                                             <tr>
                                                 <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">........................</td>
                                                 <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">........................</td>
-                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">........................</td>
-                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">--</td>
+                                                <td style="border: 1px solid #000; text-align: center; padding: 8px; font-size: 16px !important;">NA</td>
                                             </tr>
                                         </t>
                                     </tbody>
@@ -409,7 +403,7 @@
                                                         <t t-if="item['area'] > 0" t-esc="'{:.4f}'.format(item['area'])"/>
                                                         <t t-if="item['area'] == 0">........................</t>
                                                     </td>
-                                                    <td style="text-align: center;">--</td>
+                                                    <td style="text-align: center;">NA</td>
                                                 </tr>
                                             </tbody>
                                         </table>

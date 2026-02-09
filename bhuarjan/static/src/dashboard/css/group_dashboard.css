@@ -422,6 +422,13 @@
     border-radius: 4px;
     font-weight: 600;
     color: white !important;
+    transition: all 0.2s ease;
+}
+
+.o_group_dashboard .stage-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
 }
 
 .o_group_dashboard .badge-success {

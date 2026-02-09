@@ -187,9 +187,9 @@
                                                 <td class="text-center">
                                                     <span class="badge bg-success" t-esc="project.total_landowners"/>
                                                 </td>
-                                                <td>
-                                                    <span class="badge stage-badge" 
-                                                          t-att-style="'background-color: ' + getStageColor(project.current_stage)"
+                                                <td class="text-center clickable-cell" t-on-click="() => this.showTimeline(project.id)" style="cursor: pointer;">
+                                                    <span class="badge stage-badge shadow-sm" 
+                                                          t-att-style="'background-color: ' + getStageColor(project.current_stage) + '; pointer-events: none;'"
                                                           t-esc="getStageLabel(project.current_stage)"/>
                                                 </td>
                                                 <td>

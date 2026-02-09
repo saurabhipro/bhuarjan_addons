@@ -223,3 +223,162 @@ class BhuProject(models.Model):
         
         # Call parent search with modified domain
         return super()._search(args, offset=offset, limit=limit, order=order)
+
+    def get_project_progress(self):
+        """Returns progress of each stage for the project with icons and counts"""
+        self.ensure_one()
+        villages = self.village_ids
+        village_count = len(villages)
+        
+        def get_village_info(model_name, domain_extra=[]):
+            if not village_count:
+                return {'status': 'not_started', 'count': 0, 'total': 0, 'details': 'No Villages'}
+            
+            domain = [('project_id', '=', self.id)] + domain_extra
+            records = self.env[model_name].sudo().search(domain)
+            
+            approved_records = records.filtered(lambda r: r.state == 'approved')
+            approved_villages = approved_records.mapped('village_id')
+            count = len(approved_villages)
+            
+            status = 'not_started'
+            if count >= village_count and village_count > 0:
+                status = 'completed'
+            elif records:
+                status = 'in_progress'
+            
+            return {
+                'status': status,
+                'count': count,
+                'total': village_count,
+                'details': f"{count}/{village_count} Villages"
+            }
+
+        def get_project_level_info(model_name):
+            records = self.env[model_name].sudo().search([('project_id', '=', self.id)])
+            approved = records.filtered(lambda r: r.state == 'approved')
+            
+            status = 'not_started'
+            details = 'Pending'
+            if approved:
+                status = 'completed'
+                details = 'Approved'
+            elif records:
+                status = 'in_progress'
+                details = 'Draft/Submitted'
+                
+            return {
+                'status': status,
+                'details': details
+            }
+
+        # Survey Status
+        surveys = self.env['bhu.survey'].sudo().search([('project_id', '=', self.id)])
+        survey_count = len(surveys)
+        approved_surveys = surveys.filtered(lambda s: s.state in ('approved', 'locked'))
+        survey_status = 'completed' if survey_count > 0 and len(approved_surveys) == survey_count else ('in_progress' if survey_count > 0 else 'not_started')
+        
+        stages = [
+            {
+                'id': 'survey',
+                'name': 'Surveying / सर्वेक्षण',
+                'status': survey_status,
+                'icon': 'fa-clipboard',
+                'count': len(approved_surveys),
+                'total': survey_count,
+                'details': f"{len(approved_surveys)}/{survey_count} Approved"
+            }
+        ]
+
+        # Section 4
+        s4_info = get_village_info('bhu.section4.notification')
+        stages.append({
+            'id': 'section4',
+            'name': 'Section 4 / धारा 4',
+            'status': s4_info['status'],
+            'icon': 'fa-bullhorn',
+            'count': s4_info['count'],
+            'total': s4_info['total'],
+            'details': s4_info['details']
+        })
+        
+        if not self.is_sia_exempt:
+            sia_info = get_project_level_info('bhu.sia.team')
+            stages.append({
+                'id': 'sia_team',
+                'name': 'SIA Team / SIA टीम',
+                'status': sia_info['status'],
+                'icon': 'fa-users',
+                'details': sia_info['details']
+            })
+            
+            expert_info = get_project_level_info('bhu.expert.committee.report')
+            stages.append({
+                'id': 'expert_committee',
+                'name': 'Expert Committee / विशेषज्ञ समिति',
+                'status': expert_info['status'],
+                'icon': 'fa-balance-scale',
+                'details': expert_info['details']
+            })
+
+        # Section 11
+        s11_info = get_village_info('bhu.section11.preliminary.report')
+        stages.append({
+            'id': 'section11',
+            'name': 'Section 11 / धारा 11',
+            'status': s11_info['status'],
+            'icon': 'fa-file-text-o',
+            'count': s11_info['count'],
+            'total': s11_info['total'],
+            'details': s11_info['details']
+        })
+
+        # Section 15
+        s15_info = get_village_info('bhu.section15.objection')
+        stages.append({
+            'id': 'section15',
+            'name': 'Section 15 / धारा 15',
+            'status': s15_info['status'],
+            'icon': 'fa-comments-o',
+            'count': s15_info['count'],
+            'total': s15_info['total'],
+            'details': s15_info['details']
+        })
+
+        # Section 19
+        s19_info = get_village_info('bhu.section19.notification')
+        stages.append({
+            'id': 'section19',
+            'name': 'Section 19 / धारा 19',
+            'status': s19_info['status'],
+            'icon': 'fa-newspaper-o',
+            'count': s19_info['count'],
+            'total': s19_info['total'],
+            'details': s19_info['details']
+        })
+
+        # Section 21
+        s21_info = get_village_info('bhu.section21.notification')
+        stages.append({
+            'id': 'section21',
+            'name': 'Section 21 / धारा 21',
+            'status': s21_info['status'],
+            'icon': 'fa-map-marker',
+            'count': s21_info['count'],
+            'total': s21_info['total'],
+            'details': s21_info['details']
+        })
+
+        # Section 23
+        s23_info = get_village_info('bhu.section23.award')
+        stages.append({
+            'id': 'section23',
+            'name': 'Section 23 / धारा 23',
+            'status': s23_info['status'],
+            'icon': 'fa-trophy',
+            'count': s23_info['count'],
+            'total': s23_info['total'],
+            'details': s23_info['details']
+        })
+
+        return stages

@@ -283,7 +283,7 @@
                         </div>
                     
                         <!-- PERSONAL NOTICES (one per khasra/landowner) -->
-                        <t t-set="surveys_data" t-value="o._get_approved_surveys_data() if o else []"/>
+                        <t t-set="surveys_data" t-value="o.get_section21_personal_data() if o else []"/>
                         <t t-if="surveys_data and len(surveys_data) > 0">
                             <t t-foreach="surveys_data" t-as="item">
                                 <div style="page-break-before: always;"/>

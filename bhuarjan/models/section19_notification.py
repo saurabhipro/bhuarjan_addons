@@ -211,8 +211,19 @@ class Section19Notification(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Create records with batch support"""
+        """Create records with batch support and validation"""
         for vals in vals_list:
+            # Check validation before flush
+            project_id_val = vals.get('project_id')
+            village_id_val = vals.get('village_id')
+            if project_id_val and village_id_val:
+                existing = self.sudo().search([
+                    ('project_id', '=', project_id_val),
+                    ('village_id', '=', village_id_val)
+                ], limit=1)
+                if existing:
+                    raise ValidationError(_('A Section 19 notification already exists for this Project and Village (ID: %s, Name: %s, State: %s)! Please check and edit the existing record. / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना (ID: %s) पहले से मौजूद है! (स्थिति: %s)') % (existing.id, existing.name, existing.state, existing.id, existing.state))
+
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 # Try to use sequence settings from settings master
                 project_id = vals.get('project_id')
@@ -242,6 +253,33 @@ class Section19Notification(models.Model):
                 if project_id:
                     vals['project_id'] = project_id
         return super().create(vals_list)
+
+    def write(self, vals):
+        """Override write to validate uniqueness and repopulate land parcels"""
+        # Check uniqueness if project or village is changing
+        if 'project_id' in vals or 'village_id' in vals:
+            for record in self:
+                project_id = vals.get('project_id', record.project_id.id)
+                village_id = vals.get('village_id', record.village_id.id)
+                
+                if project_id and village_id:
+                    existing = self.sudo().search([
+                        ('project_id', '=', project_id),
+                        ('village_id', '=', village_id),
+                        ('id', '!=', record.id)
+                    ], limit=1)
+                    if existing:
+                        raise ValidationError(_('A Section 19 notification already exists for this Project and Village (ID: %s, Name: %s, State: %s)! Please check and edit the existing record. / इस परियोजना और ग्राम के लिए धारा 19 अधिसूचना (ID: %s) पहले से मौजूद है! (स्थिति: %s)') % (existing.id, existing.name, existing.state, existing.id, existing.state))
+
+        result = super().write(vals)
+        # If village_id or project_id changed, repopulate land parcels
+        if 'village_id' in vals or 'project_id' in vals:
+            for record in self:
+                if record.village_id and record.project_id:
+                     # Reset village if not in new project - logic already handled by onchange but good for write too
+                     # But here we assume valid data. Re-populate land parcels.
+                     record._populate_land_parcels_from_section19()
+        return result
     
     # QR code generation is now handled by bhu.qr.code.mixin
     

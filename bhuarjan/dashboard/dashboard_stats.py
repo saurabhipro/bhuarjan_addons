@@ -44,8 +44,7 @@ class DashboardStats(models.AbstractModel):
             'bhuarjan.group_bhuarjan_sdm',             # SDM users
         ],
         'tehsildar_groups': [
-            # Add tehsildar-specific groups here if they exist
-            # Example: 'bhuarjan.group_bhuarjan_tehsildar',
+            'bhuarjan.group_bhuarjan_tahsildar',
         ],
         'department_groups': [
             'bhuarjan.group_bhuarjan_department_user',  # Department users
@@ -432,8 +431,8 @@ class DashboardStats(models.AbstractModel):
             'section11': self._get_section_counts('bhu.section11.preliminary.report', domain_with_village, states=workflow_states),
             'section15': self._get_section_counts('bhu.section15.objection', domain_with_village, states=workflow_states),
             'section19': self._get_section_counts('bhu.section19.notification', domain_with_village, states=workflow_states),
-            'expert': self._get_section_counts('bhu.expert.committee.report', m2m_village_domain, states=workflow_states),
-            'sia': self._get_section_counts('bhu.sia.team', m2m_village_domain, states=workflow_states),
+            'expert': self._get_section_counts('bhu.expert.committee.report', domain_without_village, states=workflow_states),
+            'sia': self._get_section_counts('bhu.sia.team', domain_without_village, states=workflow_states),
             'section8': self._get_section_counts('bhu.section8', domain_without_village, state_field='state', states=['draft', 'approved', 'rejected']),  # Section 8 is per project, not per village
             # Railway Act Sections (all have village_id)
             # Sections 20A and 20E have no workflow - simple count only
@@ -683,7 +682,7 @@ class DashboardStats(models.AbstractModel):
                 'expert_completion_percent': self._calculate_completion_percentage(
                     counts['expert']['approved'], 0, counts['expert']['total'], is_survey=False
                 ),
-                'expert_info': self._get_section_info('bhu.expert.committee.report', domains.get('m2m_village_domain', domains['domain_without_village'])),
+                'expert_info': self._get_section_info('bhu.expert.committee.report', domains['domain_without_village']),
                 
                 # SIA Teams (uses m2m_village_domain)
                 'sia_total': counts['sia']['total'],
@@ -694,7 +693,7 @@ class DashboardStats(models.AbstractModel):
                 'sia_completion_percent': self._calculate_completion_percentage(
                     counts['sia']['approved'], 0, counts['sia']['total'], is_survey=False
                 ),
-                'sia_info': self._get_section_info('bhu.sia.team', domains.get('m2m_village_domain', domains['domain_without_village'])),
+                'sia_info': self._get_section_info('bhu.sia.team', domains['domain_without_village']),
                 
                 # Section 8 (NO village_id - use domain_without_village, per project)
                 'section8_total': counts['section8']['total'],

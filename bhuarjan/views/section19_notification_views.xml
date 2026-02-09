@@ -53,11 +53,11 @@
                         <group>
                             <field name="project_id" required="1"
                                    options="{'no_create': True, 'no_open': True}"
-                                   readonly="1"/>
+                                   readonly="1" force_save="1"/>
                             <field name="village_id" required="1"
                                    options="{'no_create_edit': True, 'no_open':True, 'no_create':True}"
                                    placeholder="Village"
-                                   readonly="1"/>
+                                   readonly="1" force_save="1"/>
                         </group>
                         <group>
                              <field name="prakaran_kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक"

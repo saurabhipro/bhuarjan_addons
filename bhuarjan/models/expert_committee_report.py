@@ -22,7 +22,7 @@ class ExpertCommitteeReport(models.Model):
                           help='Reference number to be displayed in the report (optional)')
     # Location fields inherited from bhu.process.workflow.mixin
     # Override project_id to add default and domain
-    project_id = fields.Many2one(default=lambda self: self._default_project_id())
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True)
     
     # Override village_id to make it Many2many for Expert Committee (multiple villages)
     # Expert Committee can cover multiple villages, unlike other sections
@@ -169,16 +169,6 @@ class ExpertCommitteeReport(models.Model):
         else:
             return {'domain': {'village_ids': [('id', '=', False)]}}
     
-    @api.model
-    def _default_project_id(self):
-        """Default project_id to PROJ01 if it exists, otherwise use first available project"""
-        project = self.env['bhu.project'].search([('code', '=', 'PROJ01')], limit=1)
-        if project:
-            return project.id
-        # Fallback to first available project if PROJ01 doesn't exist
-        fallback_project = self.env['bhu.project'].search([], limit=1)
-        return fallback_project.id if fallback_project else False
-    
     # Expert Group Report
     expert_group_report_file = fields.Binary(string='Expert Group Report / विशेषज्ञ समूह रिपोर्ट')
     expert_group_report_filename = fields.Char(string='Expert Group Report Filename')
@@ -207,19 +197,10 @@ class ExpertCommitteeReport(models.Model):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New' or not vals.get('name'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('bhu.expert.committee.report') or 'New'
-            # Set default project_id if not provided
-            if not vals.get('project_id'):
-                project_id = self._default_project_id()
-                if project_id:
-                    vals['project_id'] = project_id
-                else:
-                    # If no project exists at all, we can't create the record
-                    # This should not happen if sample_project_data.xml is loaded first
-                    # But if it does, the post-init hook will fix it
-                    # For now, we'll try to use any project as a last resort
-                    any_project = self.env['bhu.project'].search([], limit=1)
-                    if any_project:
-                        vals['project_id'] = any_project.id
+            
+            # Removed automatic project assignment logic - rely on context or user input
+            # This fixes the issue where project defaults to PROJ01 incorrectly
+
             
             # Check if project is SIA exempt
             # Check if project is SIA exempt - Removed as per user request

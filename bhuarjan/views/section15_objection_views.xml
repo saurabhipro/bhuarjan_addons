@@ -55,8 +55,9 @@
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
                     <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
-                            class="oe_highlight btn-success" 
+                            class="btn-success" 
                             icon="fa-check"
+                            style="background-color: #28a745 !important; border-color: #28a745 !important; color: white !important;"
                             groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                             invisible="not survey_id or state != 'draft'"
                             confirm="Are you sure want to approve this objection?"/>
@@ -64,6 +65,7 @@
                     <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
                             class="btn-danger" 
                             icon="fa-times-circle"
+                            style="background-color: #dc3545 !important; border-color: #dc3545 !important; color: white !important;"
                             groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
                             invisible="not survey_id or state != 'draft'"/>
 

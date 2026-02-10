@@ -283,6 +283,13 @@
                                     color: white !important;
                                     font-weight: bold !important;
                                 }
+                                /* Highlight rows with approved objections with a light background */
+                                .o_list_table tr.text-danger {
+                                    background-color: #FFF5F5 !important;
+                                }
+                                .o_list_table tr.text-danger:hover {
+                                    background-color: #FFEBEB !important;
+                                }
                             </style>
                             <field name="survey_ids" readonly="1" nolabel="1">
                                 <list string="Surveys" decoration-danger="has_approved_objection">

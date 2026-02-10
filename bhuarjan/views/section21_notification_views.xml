@@ -269,12 +269,12 @@
                         <!-- Surveys Tab -->
                         <page string="Surveys / सर्वे" name="surveys_tab">
                             <style>
-                                .o_list_table thead {
-                                    background-color: #875A7B !important;
+                                /* Highlight rows with approved objections with a light background */
+                                .o_list_table tr.text-danger {
+                                    background-color: #FFF5F5 !important;
                                 }
-                                .o_list_table thead th {
-                                    color: white !important;
-                                    font-weight: bold !important;
+                                .o_list_table tr.text-danger:hover {
+                                    background-color: #FFEBEB !important;
                                 }
                             </style>
                             <field name="survey_ids" readonly="1" nolabel="1">

@@ -5,6 +5,9 @@
     <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
     <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <record id="menu_report_wizard" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
+    </record>
 
     <!-- Master Data menu - visible to Admin, System, and District Administrator (NOT Collector, NOT Settings Master/Sequence Settings/Users for District Admin) -->
     <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
@@ -54,8 +57,19 @@
     <!-- Mutual Consent Policy -->
     <menuitem id="menu_mutual_consent_policy" name="Mutual Consent Policy" action="action_mutual_consent_policy" parent="menu_bhu_process" sequence="20" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <menuitem id="menu_process_report" name="Reports" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <record id="menu_process_report" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
+    </record>
+    
     <menuitem id="menu_process_report_wizard" name="Process Report" action="action_process_report_wizard" parent="menu_process_report" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <record id="menu_process_report_wizard" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
+    </record>
+
     <menuitem id="menu_all_sections_report" name="All Sections List" action="action_all_sections_report" parent="menu_process_report" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <record id="menu_all_sections_report" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
+    </record>
     
     <!-- Payment Menu - visible to Admin and System -->
     <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
@@ -71,6 +85,9 @@
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" />
     <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <record id="menu_bhu_reporting" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
+    </record>
 
     <!-- Dashboard menus - Split by role to ensure correct dashboard opens -->
     <!-- For Department Users -->

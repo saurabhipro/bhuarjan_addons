@@ -138,7 +138,6 @@ class Survey(models.Model):
     landowner_ids = fields.Many2many('bhu.landowner', 'bhu_survey_landowner_rel', 
                                    'survey_id', 'landowner_id', string='Landowners / भूमिस्वामी', tracking=True)
     
-    # Section 15 Objections - multiple objections can be created for one survey
     section15_objection_ids = fields.Many2many('bhu.section15.objection',
                                                'bhu_survey_section15_objection_rel',
                                                'survey_id', 'objection_id',
@@ -146,6 +145,25 @@ class Survey(models.Model):
                                                readonly=True,
                                                help='Objections raised for this survey. Multiple objections can track different changes (landowner added/removed, area decreased).')
     section15_objection_count = fields.Integer(string='Objection Count', compute='_compute_section15_objection_count', store=False)
+    
+    approved_objection_id = fields.Many2one('bhu.section15.objection', string='Approved Objection / स्वीकृत आपत्ति', 
+                                            compute='_compute_approved_objection', store=True)
+    has_approved_objection = fields.Boolean(string='Has Approved Objection / स्वीकृत आपत्ति है', 
+                                            compute='_compute_approved_objection', store=True)
+
+    @api.depends('section15_objection_ids', 'section15_objection_ids.state')
+    def _compute_approved_objection(self):
+        """Compute approved objection and flag for UI highlighting"""
+        for record in self:
+            approved_obj = record.section15_objection_ids.filtered(lambda x: x.state == 'approved')
+            if approved_obj:
+                # Get the latest approved objection
+                record.approved_objection_id = approved_obj[0]
+                record.has_approved_objection = True
+            else:
+                record.approved_objection_id = False
+                record.has_approved_objection = False
+
     
     @api.depends('section15_objection_ids')
     def _compute_section15_objection_count(self):

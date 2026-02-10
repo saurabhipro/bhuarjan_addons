@@ -278,11 +278,13 @@
                                 }
                             </style>
                             <field name="survey_ids" readonly="1" nolabel="1">
-                                <list string="Surveys">
+                                <list string="Surveys" decoration-danger="has_approved_objection">
+                                    <field name="has_approved_objection" invisible="1"/>
                                     <field name="khasra_number" string="Khasra / खसरा"/>
                                     <field name="acquired_area" string="Area (Ha) / क्षेत्रफल (हे)"/>
                                     <field name="state" widget="badge" string="Status / स्थिति"/>
                                     <field name="landowner_ids" widget="many2many_tags" string="Landowners / भूमिस्वामी"/>
+                                    <field name="approved_objection_id" string="Objection / आपत्ति" widget="many2one" optional="show"/>
                                 </list>
                             </field>
                         </page>

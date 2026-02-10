@@ -626,6 +626,9 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
+                                <button t-if="state.isAdmin" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section11.preliminary.report')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
                                 <button class="btn btn-sm btn-info" 
                                         t-on-click.stop="() => this.openFirstDocument('bhu.section11.preliminary.report', state.stats &amp;&amp; state.stats.section11_info ? state.stats.section11_info : null)"
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section11_info &amp;&amp; state.stats.section11_info.total > 0)">

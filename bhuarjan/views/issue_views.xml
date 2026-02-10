@@ -68,7 +68,7 @@
 
     <!-- My Issues Action -->
     <record id="action_bhuarjan_my_issues" model="ir.actions.act_window">
-        <field name="name">My Support Tickets</field>
+        <field name="name">Tickets</field>
         <field name="res_model">bhuarjan.issue</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('user_id', '=', uid)]</field>
@@ -81,7 +81,7 @@
 
     <!-- My Issues Menu -->
     <menuitem id="menu_bhuarjan_my_issues"
-              name="My Support Tickets"
+              name="Tickets"
               parent="menu_bhu_root"
               action="action_bhuarjan_my_issues"
               sequence="90"

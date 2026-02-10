@@ -4,7 +4,7 @@
     <!-- Surveys menu - NOT visible to Collector (bhuarjan.group_bhuarjan_collector or bhuarjan.group_bhuarjan_additional_collector) -->
     <menuitem id="menu_bhu_surveys" name="Surveys" parent="menu_bhu_root" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_department_user"/>
     <menuitem id="menu_bhu_survey" name="Survey" action="action_bhu_survey" parent="menu_bhu_surveys" sequence="1" />
-    <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2"/>
+    <menuitem id="menu_report_wizard" name="Form 10 Download" parent="menu_bhu_surveys" action="action_report_wizard" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
     <!-- Master Data menu - visible to Admin, System, and District Administrator (NOT Collector, NOT Settings Master/Sequence Settings/Users for District Admin) -->
     <menuitem id="menu_bhu_master" name="Master Data" parent="menu_bhu_root" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_district_administrator"/>
@@ -70,7 +70,7 @@
     <menuitem id="menu_sia_team_members" name="SIA Team Members" action="action_sia_team_member" parent="menu_bhu_users_maai_menu" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <menuitem id="jwt_token_menu_item" name="JWT Token List" parent="menu_bhu_users_maai_menu" action="jwt_token_action" />
     <menuitem id="mobile_otp_menu_item" name="Mobile OTP List" parent="menu_bhu_users_maai_menu" action="mobile_otp_action" />
-    <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8"/>
+    <menuitem id="menu_bhu_reporting" name="Reporting Section" parent="menu_bhu_root" sequence="8" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
 
     <!-- Dashboard menus - Split by role to ensure correct dashboard opens -->
     <!-- For Department Users -->

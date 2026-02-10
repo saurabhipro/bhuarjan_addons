@@ -117,3 +117,43 @@ class AllSectionReport(models.Model):
                 FROM bhu_expert_committee_report
             )
         """ % (self._table,))
+
+    def action_open_record(self):
+        """Redirect to the actual record form view"""
+        self.ensure_one()
+        
+        model_map = {
+            'sec4': 'bhu.section4.notification',
+            'sec11': 'bhu.section11.preliminary.report',
+            'sec19': 'bhu.section19.notification',
+            'sec21': 'bhu.section21.notification',
+            'sec23': 'bhu.section23.award',
+            'sia': 'bhu.sia.team',
+            'expert': 'bhu.expert.committee.report',
+        }
+        
+        res_model = model_map.get(self.section_type)
+        if not res_model:
+            return False
+            
+        # Extract the real ID by removing the prefix added in init()
+        prefix_map = {
+            'sec4': 100000000,
+            'sec11': 200000000,
+            'sec19': 300000000,
+            'sec21': 400000000,
+            'sec23': 500000000,
+            'sia': 600000000,
+            'expert': 700000000,
+        }
+        
+        real_id = self.id - prefix_map.get(self.section_type)
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.name,
+            'res_model': res_model,
+            'res_id': real_id,
+            'view_mode': 'form',
+            'target': 'current',
+        }

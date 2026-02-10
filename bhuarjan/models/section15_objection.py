@@ -173,11 +173,17 @@ class Section15Objection(models.Model):
                     vals['name'] = f'OBJ-{sequence}'
         records = super().create(vals_list)
         
-        # Link this objection to the survey
+        # Link this objection to the survey and sync landowners
         for record in records:
             if record.survey_id:
                 # Link objection to survey (Many2many)
                 record.survey_id.section15_objection_ids = [(4, record.id)]
+                
+                # Sync landowners to survey immediately on creation if provided
+                if record.resolution_landowner_ids:
+                    record.survey_id.write({
+                        'landowner_ids': [(6, 0, record.resolution_landowner_ids.ids)]
+                    })
                 
                 if not record.resolution_khasra_ids:
                     record.resolution_khasra_ids = [(0, 0, {
@@ -262,14 +268,10 @@ class Section15Objection(models.Model):
         else:
             result = super().write(vals)
         
-        # Update survey's landowners when resolution_landowner_ids changes
-        if 'resolution_landowner_ids' in vals:
+        # Centralized sync to survey
+        if 'resolution_landowner_ids' in vals or 'resolution_khasra_ids' in vals:
             for record in self:
-                if record.survey_id and record.resolution_landowner_ids:
-                    # Update survey's landowners to match objection resolution
-                    record.survey_id.write({
-                        'landowner_ids': [(6, 0, record.resolution_landowner_ids.ids)]
-                    })
+                record._sync_to_survey()
         
         # If survey_id changed, update resolution_khasra_ids and resolution_survey_detail_ids
         if 'survey_id' in vals:
@@ -297,6 +299,37 @@ class Section15Objection(models.Model):
 
         
         return result
+
+    def _sync_to_survey(self):
+        """Centralized method to sync objection changes to the survey"""
+        self.ensure_one()
+        if not self.survey_id:
+            return
+            
+        # 1. Sync landowners
+        if self.resolution_landowner_ids:
+            self.survey_id.write({
+                'landowner_ids': [(6, 0, self.resolution_landowner_ids.ids)]
+            })
+            
+        # 2. Sync khasra details (area, wells, etc.) from resolution lines
+        for khasra in self.resolution_khasra_ids:
+            if khasra.survey_id:
+                # Map all resolution fields to survey fields
+                sync_vals = {
+                    'acquired_area': khasra.resolved_acquired_area,
+                    'has_well': khasra.has_well,
+                    'well_count': khasra.well_count,
+                    'has_tubewell': khasra.has_tubewell,
+                    'tubewell_count': khasra.tubewell_count,
+                    'has_house': khasra.has_house,
+                    'house_area': khasra.house_area,
+                    'has_shed': khasra.has_shed,
+                    'shed_area': khasra.shed_area,
+                    'has_pond': khasra.has_pond,
+                    'irrigation_type': khasra.irrigation_type,
+                }
+                khasra.survey_id.write(sync_vals)
 
     
 
@@ -405,7 +438,11 @@ class Section15Objection(models.Model):
             raise ValidationError(_('Only draft records can be approved.'))
         
         self.state = 'approved'
-        self.message_post(body=_('Approved by %s') % self.env.user.name)
+        
+        # Ensure all changes are synced to survey upon approval
+        self._sync_to_survey()
+        
+        self.message_post(body=_('Approved by %s and changes synced to survey.') % self.env.user.name)
     
     def action_reject(self):
         """Reject objection (SDM action)"""
@@ -434,7 +471,8 @@ class Section15Objection(models.Model):
                 raise ValidationError(_('Only SDM can approve.'))
             # Resolution details is optional, no validation needed
             self.state = 'approved'
-            self.message_post(body=_('Status changed to Approved by %s') % self.env.user.name)
+            self._sync_to_survey()
+            self.message_post(body=_('Status changed to Approved by %s and changes synced to survey.') % self.env.user.name)
         elif self.state == 'approved':
             # Already in approved state
             pass
@@ -673,14 +711,17 @@ class Section15ObjectionKhasra(models.Model):
     
     def write(self, vals):
         """Ensure survey_id is set from objection if not provided, and update survey's acquired_area when resolved_acquired_area changes"""
-        # Track which records need survey update
-        records_to_update_survey = []
-        resolved_area_value = None
+        # Fields that trigger a survey update
+        sync_fields = [
+            'resolved_acquired_area', 'has_well', 'well_count', 'has_tubewell', 
+            'tubewell_count', 'has_house', 'house_area', 'has_shed', 'shed_area', 
+            'has_pond', 'irrigation_type'
+        ]
         
-        # Check if resolved_acquired_area is being updated
-        if 'resolved_acquired_area' in vals:
-            resolved_area_value = vals['resolved_acquired_area']
-            records_to_update_survey = self
+        # Track which records need survey update
+        records_to_update = self.env[self._name]
+        if any(f in vals for f in sync_fields):
+            records_to_update = self
         
         result = super().write(vals)
         
@@ -694,13 +735,22 @@ class Section15ObjectionKhasra(models.Model):
                 if not record.resolved_acquired_area or record.resolved_acquired_area > record.objection_id.survey_id.acquired_area:
                     record.write({'resolved_acquired_area': record.objection_id.survey_id.acquired_area})
         
-        # Update survey's acquired_area when resolved_acquired_area is changed
-        for record in records_to_update_survey:
-            if record.survey_id and record.resolved_acquired_area:
-                # Ensure resolved area is valid (not greater than original)
-                if record.original_acquired_area and record.resolved_acquired_area <= record.original_acquired_area:
-                    # Update the survey's acquired_area to match the resolved_acquired_area
-                    record.survey_id.write({'acquired_area': record.resolved_acquired_area})
+        # Update linked surveys
+        for record in records_to_update:
+            if record.survey_id:
+                record.survey_id.write({
+                    'acquired_area': record.resolved_acquired_area,
+                    'has_well': record.has_well,
+                    'well_count': record.well_count,
+                    'has_tubewell': record.has_tubewell,
+                    'tubewell_count': record.tubewell_count,
+                    'has_house': record.has_house,
+                    'house_area': record.house_area,
+                    'has_shed': record.has_shed,
+                    'shed_area': record.shed_area,
+                    'has_pond': record.has_pond,
+                    'irrigation_type': record.irrigation_type,
+                })
         
         return result
     

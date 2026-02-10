@@ -53,9 +53,9 @@
     <menuitem id="menu_sec3d_nh" name="(Sec 3D) National Highway" action="action_section3d_nh" parent="menu_bhu_process" sequence="19" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
     <!-- Mutual Consent Policy -->
     <menuitem id="menu_mutual_consent_policy" name="Mutual Consent Policy" action="action_mutual_consent_policy" parent="menu_bhu_process" sequence="20" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
-    <menuitem id="menu_process_report" name="Reports" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
-    <menuitem id="menu_process_report_wizard" name="Process Report / प्रक्रिया रिपोर्ट" action="action_process_report_wizard" parent="menu_process_report" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
-    <menuitem id="menu_all_sections_report" name="All Sections List / सभी अनुभाग सूची" action="action_all_sections_report" parent="menu_process_report" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_additional_collector,bhuarjan.group_bhuarjan_sdm"/>
+    <menuitem id="menu_process_report" name="Reports" parent="menu_bhu_root" sequence="11" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_process_report_wizard" name="Process Report" action="action_process_report_wizard" parent="menu_process_report" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_all_sections_report" name="All Sections List" action="action_all_sections_report" parent="menu_process_report" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
     <!-- Payment Menu - visible to Admin and System -->
     <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

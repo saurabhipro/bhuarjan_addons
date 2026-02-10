@@ -43,7 +43,7 @@
         <field name="name">bhu.process.report.list</field>
         <field name="model">bhu.process.report</field>
         <field name="arch" type="xml">
-            <list string="Process Report / प्रक्रिया रिपोर्ट" 
+            <list string="Process Report" 
                   default_order="serial_number"
                   decoration-success="status_mark == 'Green'"
                   decoration-danger="status_mark == 'Red'"
@@ -89,7 +89,7 @@
 
     <!-- Process Report Wizard Action -->
     <record id="action_process_report_wizard" model="ir.actions.act_window">
-        <field name="name">Process Report / प्रक्रिया रिपोर्ट</field>
+        <field name="name">Process Report</field>
         <field name="res_model">bhu.process.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
@@ -97,7 +97,7 @@
 
     <!-- Process Report Action -->
     <record id="action_process_report" model="ir.actions.act_window">
-        <field name="name">Process Report / प्रक्रिया रिपोर्ट</field>
+        <field name="name">Process Report</field>
         <field name="res_model">bhu.process.report</field>
         <field name="view_mode">list</field>
         <field name="search_view_id" ref="view_process_report_search"/>

@@ -135,7 +135,7 @@
                         <page string="SDM Section / SDM अनुभाग" name="sdm_tab">
                             <!-- SDM Section / SDM अनुभाग -->
                             <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                                 invisible="(is_collector and not is_admin) or (is_admin and state not in ('draft', 'send_back'))">
+                                 invisible="(is_collector and not is_admin)">
                                 <div class="section-header">SDM Section / SDM अनुभाग</div>
                         <div class="row">
                             <!-- Left: Download Options -->
@@ -170,11 +170,11 @@
                                                options="{'accepted_file_extensions': '.pdf'}"
                                                widget="binary" class="w-100"
                                                string="Upload SDM Signed Section 19 / हस्ताक्षरित अधिसूचना अपलोड करें"
-                                               readonly="state != 'draft'"/>
+                                               readonly="state != 'draft' and not is_admin"/>
                                         <field name="sdm_signed_filename" invisible="1"/>
                                     </div>
 
-                                    <div invisible="not sdm_signed_file or (state != 'draft' and state != 'send_back')">
+                                    <div invisible="not sdm_signed_file or (state not in ('draft', 'send_back') and not is_admin)">
                                          <button name="action_submit" string="Submit to Collector" type="object" 
                                                  class="btn custom-btn-teal" icon="fa-paper-plane"
                                                  invisible="state != 'draft'"/>

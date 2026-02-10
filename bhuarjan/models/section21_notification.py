@@ -25,8 +25,9 @@ class Section21Notification(models.Model):
                        help='Title for the Section 21 notification')
     
     # Location fields inherited from bhu.process.workflow.mixin
-    # Override project_id to make it optional and add default
-    project_id = fields.Many2one(default=lambda self: self._default_project_id(), required=False)
+    # Override project_id to make it optional
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=False, tracking=True)
+
     
     # Notice Date
     notice_date = fields.Date(string='Notice Date / नोटिस दिनांक', tracking=True,
@@ -254,14 +255,7 @@ class Section21Notification(models.Model):
         
         return res
     
-    @api.model
-    def _default_project_id(self):
-        """Default project_id to PROJ01 if it exists, otherwise use first available project"""
-        project = self.env['bhu.project'].search([('code', '=', 'PROJ01')], limit=1)
-        if project:
-            return project.id
-        fallback_project = self.env['bhu.project'].search([], limit=1)
-        return fallback_project.id if fallback_project else False
+
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -306,11 +300,7 @@ class Section21Notification(models.Model):
             # Generate UUID if not provided
             if not vals.get('notification_uuid'):
                 vals['notification_uuid'] = str(uuid.uuid4())
-            # Set default project_id if not provided
-            if not vals.get('project_id'):
-                project_id = self._default_project_id()
-                if project_id:
-                    vals['project_id'] = project_id
+
         records = super().create(vals_list)
         # Auto-populate land parcels after creation
         for record in records:

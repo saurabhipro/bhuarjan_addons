@@ -54,6 +54,18 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 <header>
+                    <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
+                            class="oe_highlight btn-success" 
+                            icon="fa-check"
+                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="not survey_id or state != 'draft'"
+                            confirm="Are you sure want to approve this objection?"/>
+                    
+                    <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
+                            class="btn-danger" 
+                            icon="fa-times-circle"
+                            groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                            invisible="not survey_id or state != 'draft'"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
                 </header>
@@ -198,23 +210,6 @@
                         }
                     </style>
 
-                    <!-- Action Buttons: Approve/Reject -->
-                    <div class="row mt-4" invisible="not survey_id or state != 'draft'">
-                         <div class="col-md-12 d-flex gap-3 justify-content-start">
-                             <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
-                                     class="btn custom-btn-success" 
-                                     icon="fa-check"
-                                     style="min-width: 250px; padding: 15px 30px; font-size: 18px;"
-                                     groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                                     confirm="Are you sure want to approve this objection?"/>
-                             
-                             <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
-                                     class="btn custom-btn-danger" 
-                                     icon="fa-times-circle"
-                                     style="min-width: 250px; padding: 15px 30px; font-size: 18px;"
-                                     groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
-                         </div>
-                    </div>
                     
 
                 </sheet>

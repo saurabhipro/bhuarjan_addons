@@ -135,7 +135,7 @@
                     <notebook>
                         <!-- SDM Tab -->
                         <page string="SDM Section / SDM अनुभाग" name="sdm_tab" 
-                              groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                              groups="bhuarjan.group_bhuarjan_sdm">
                             <div class="section-card">
                                 <div class="section-header">SDM Section / SDM अनुभाग</div>
                                 <div class="row">
@@ -193,7 +193,7 @@
 
                         <!-- Collector Tab -->
                         <page string="Collector Section / कलेक्टर अनुभाग" name="collector_tab" 
-                              groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                              groups="bhuarjan.group_bhuarjan_collector">
                             <div class="section-card">
                                 <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
                                 <div class="row">

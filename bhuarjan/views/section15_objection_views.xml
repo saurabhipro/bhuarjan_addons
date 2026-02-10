@@ -96,12 +96,7 @@
                     <div invisible="not survey_id">
                         <separator string="Edit Survey Details / सर्वे विवरण संपादित करें"/>
                         
-                        <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
-                            <i class="fa fa-exclamation-triangle" title="Warning" style="margin-right: 8px;"/>
-                            <strong>Note:</strong> Changing landowners or area will create an objection automatically.
-                            <br/>
-                            <span style="font-size: 12px; margin-top: 4px; display: inline-block;">नोट: भूमिस्वामी या क्षेत्रफल बदलने से स्वचालित रूप से आपत्ति बन जाएगी।</span>
-                        </div>
+
                         
                         <style>
                             /* Both table headers - Brown with White Text */

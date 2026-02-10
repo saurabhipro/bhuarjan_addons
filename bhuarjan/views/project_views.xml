@@ -6,13 +6,19 @@
         <field name="model">bhu.project</field>
         <field name="arch" type="xml">
             <list>
-                <field name="department_id" string="Department / विभाग"/>
-                <field name="district_id" string="District / जिला"/>
-                <field name="name"/>
+                <field name="department_id" string="Department"/>
+                <field name="district_id" string="District"/>
+                <field name="name" string="Project Name"/>
                 <field name="code" string="Project Code"/>
-                <field name="sdm_ids" widget="many2many_tags" string="SDM / उप-विभागीय मजिस्ट्रेट" options="{'no_create_edit': True}"/>
-                <field name="tehsildar_ids" widget="many2many_tags" string="Tehsildar / तहसीलदार" options="{'no_create_edit': True}"/>
-                <field name="state" string="Status / स्थिति" widget="badge" 
+                <field name="sia_exempt_display" string="SIA Exempt" widget="badge" 
+                       decoration-success="sia_exempt_display == 'Yes'" 
+                       decoration-muted="sia_exempt_display == 'No'"/>
+                <field name="displacement_display" string="Displacement" widget="badge" 
+                       decoration-danger="displacement_display == 'Yes'" 
+                       decoration-muted="displacement_display == 'No'"/>
+                <field name="sdm_ids" widget="many2many_tags" string="SDM" options="{'no_create_edit': True}"/>
+                <field name="tehsildar_ids" widget="many2many_tags" string="Tehsildar" options="{'no_create_edit': True}"/>
+                <field name="state" string="Status" widget="badge" 
                        decoration-success="state == 'active'"
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'completed'"

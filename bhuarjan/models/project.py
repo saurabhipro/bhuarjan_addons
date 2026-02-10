@@ -171,6 +171,16 @@ class BhuProject(models.Model):
                                           digits=(16, 4), tracking=True,
                                           help='Area in hectares allocated for rehabilitation and resettlement')
     
+    # Computed fields for List View display
+    sia_exempt_display = fields.Char(string='SIA Exempt Status', compute='_compute_yes_no_flags')
+    displacement_display = fields.Char(string='Displacement Status', compute='_compute_yes_no_flags')
+
+    @api.depends('is_sia_exempt', 'is_displacement')
+    def _compute_yes_no_flags(self):
+        for rec in self:
+            rec.sia_exempt_display = 'Yes' if rec.is_sia_exempt else 'No'
+            rec.displacement_display = 'Yes' if rec.is_displacement else 'No'
+    
     @api.model
     def _search(self, args, offset=0, limit=None, order=None):
         """Override search to filter projects by user's assigned projects"""

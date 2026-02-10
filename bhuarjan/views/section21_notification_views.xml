@@ -132,10 +132,12 @@
                     </style>
 
                     <!-- Notebook with SDM, Collector, and Surveys Tabs -->
+                    <field name="is_collector_role" invisible="1"/>
                     <notebook>
                         <!-- SDM Tab -->
                         <page string="SDM Section / SDM अनुभाग" name="sdm_tab" 
-                              groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
+                              groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
+                              invisible="is_collector_role">
                             <div class="section-card">
                                 <div class="section-header">SDM Section / SDM अनुभाग</div>
                                 <div class="row">

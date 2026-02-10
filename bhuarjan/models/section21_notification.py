@@ -98,6 +98,13 @@ class Section21Notification(models.Model):
     def _compute_has_signed_document(self):
         for record in self:
             record.has_signed_document = bool(record.signed_document_file)
+
+    is_collector_role = fields.Boolean(compute='_compute_is_collector_role', compute_sudo=True)
+
+    def _compute_is_collector_role(self):
+        is_collector = self.env.user.bhuarjan_role == 'collector'
+        for record in self:
+            record.is_collector_role = is_collector
             # Auto-approve when signed document is uploaded (using standard workflow)
             if record.has_signed_document and record.state != 'approved':
                 record.state = 'approved'
@@ -582,6 +589,15 @@ class Section21Notification(models.Model):
         if not self.signed_date:
             self.signed_date = fields.Date.today()
     
+    def action_approve(self):
+        """Allow Collector to approve even from draft state if they have the file"""
+        self.ensure_one()
+        if self.state == 'draft':
+            self.state = 'submitted'
+            if not self.submitted_date:
+                self.submitted_date = fields.Datetime.now()
+        return super(Section21Notification, self).action_approve()
+
     def action_upload_personal_file(self):
         """Handle upload of Personal Section 21 signed file"""
         self.ensure_one()

@@ -130,10 +130,22 @@
                                 ........................
                             </t>
                             तहसील 
-                            <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
+                            <t t-if="report.village_ids and len(report.village_ids) == 1 and report.village_ids[0].tehsil_id">
                                 <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
                             </t>
-                            <t t-if="not report.village_ids or not report.village_ids[0] or not report.village_ids[0].tehsil_id">
+                            <t t-elif="report.village_ids and len(report.village_ids) > 1">
+                                <t t-set="tehsils" t-value="report.village_ids.mapped('tehsil_id')"/>
+                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-elif="report.project_id and report.project_id.village_ids and len(report.project_id.village_ids) > 0">
+                                <t t-set="tehsils" t-value="report.project_id.village_ids.mapped('tehsil_id')"/>
+                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-else="">
                                 ........................
                             </t>
                             जिला रायगढ़ (छ.ग.) में विशेषज्ञ समूह गठन का प्रस्ताव अनुमोदन बाबत।
@@ -164,10 +176,22 @@
                                 ........................
                             </t>
                             <strong>तहसील</strong> 
-                            <t t-if="report.village_ids and report.village_ids[0] and report.village_ids[0].tehsil_id">
+                            <t t-if="report.village_ids and len(report.village_ids) == 1 and report.village_ids[0].tehsil_id">
                                 <span t-esc="report.village_ids[0].tehsil_id.name or ''"/>
                             </t>
-                            <t t-if="not report.village_ids or not report.village_ids[0] or not report.village_ids[0].tehsil_id">
+                            <t t-elif="report.village_ids and len(report.village_ids) > 1">
+                                <t t-set="tehsils" t-value="report.village_ids.mapped('tehsil_id')"/>
+                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-elif="report.project_id and report.project_id.village_ids and len(report.project_id.village_ids) > 0">
+                                <t t-set="tehsils" t-value="report.project_id.village_ids.mapped('tehsil_id')"/>
+                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
+                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                </t>
+                            </t>
+                            <t t-else="">
                                 ........................
                             </t>
                             <strong>जिला</strong> 

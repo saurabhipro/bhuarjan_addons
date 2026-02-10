@@ -548,11 +548,13 @@ class DashboardStats(models.AbstractModel):
             
             # Get project exemption status and allowed sections
             is_project_exempt = False
+            is_displacement = False
             allowed_section_names = []  # List of section names allowed for this project
             if project_id:
                 project = self.env['bhu.project'].browse(project_id)
                 if project.exists():
                     is_project_exempt = project.is_sia_exempt or False
+                    is_displacement = project.is_displacement or False
                     # Get sections from project's law
                     if project.law_master_id and project.law_master_id.section_ids:
                         allowed_section_names = project.law_master_id.section_ids.mapped('name')
@@ -611,6 +613,7 @@ class DashboardStats(models.AbstractModel):
             result = {
                 'is_collector': is_collector,
                 'is_project_exempt': is_project_exempt,
+                'is_displacement': is_displacement,
                 'user_type': user_access['user_type'],
                 'allowed_section_names': allowed_section_names,  # Sections mapped to project's law
                 

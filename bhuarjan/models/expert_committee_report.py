@@ -22,8 +22,7 @@ class ExpertCommitteeReport(models.Model):
                           help='Reference number to be displayed in the report (optional)')
     # Location fields inherited from bhu.process.workflow.mixin
     # Override project_id to add default and domain
-    project_id = fields.Many2one(default=lambda self: self._default_project_id(), 
-                                  domain="[('is_sia_exempt', '=', False)]")
+    project_id = fields.Many2one(default=lambda self: self._default_project_id())
     
     # Override village_id to make it Many2many for Expert Committee (multiple villages)
     # Expert Committee can cover multiple villages, unlike other sections
@@ -223,11 +222,12 @@ class ExpertCommitteeReport(models.Model):
                         vals['project_id'] = any_project.id
             
             # Check if project is SIA exempt
-            project_id = vals.get('project_id')
-            if project_id:
-                project = self.env['bhu.project'].browse(project_id)
-                if project.is_sia_exempt:
-                    raise ValidationError(_('Expert Group Reports cannot be created for projects that are exempt from Social Impact Assessment.'))
+            # Check if project is SIA exempt - Removed as per user request
+            # project_id = vals.get('project_id')
+            # if project_id:
+            #     project = self.env['bhu.project'].browse(project_id)
+            #     if project.is_sia_exempt:
+            #         raise ValidationError(_('Expert Group Reports cannot be created for projects that are exempt from Social Impact Assessment.'))
             
             # Generate UUID if not provided
             if not vals.get('expert_committee_uuid'):

@@ -130,10 +130,13 @@
                         }
                     </style>
 
-                    <!-- SDM Section / SDM अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                         invisible="(is_collector and not is_admin) or (is_admin and state not in ('draft', 'send_back'))">
-                        <div class="section-header">SDM Section / SDM अनुभाग</div>
+                    <notebook>
+                        <!-- SDM Tab -->
+                        <page string="SDM Section / SDM अनुभाग" name="sdm_tab">
+                            <!-- SDM Section / SDM अनुभाग -->
+                            <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
+                                 invisible="(is_collector and not is_admin) or (is_admin and state not in ('draft', 'send_back'))">
+                                <div class="section-header">SDM Section / SDM अनुभाग</div>
                         <div class="row">
                             <!-- Left: Download Options -->
                             <div class="col-md-6 border-right">
@@ -195,10 +198,14 @@
                         </div>
                     </div>
 
-                    <!-- Collector Section / कलेक्टर अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                         invisible="not (is_collector or is_admin) or (is_admin and state in ('draft', 'send_back'))">
-                        <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
+                        </page>
+
+                        <!-- Collector Tab -->
+                        <page string="Collector Section / कलेक्टर अनुभाग" name="collector_tab" 
+                              groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
+                            <!-- Collector Section / कलेक्टर अनुभाग -->
+                            <div class="section-card" invisible="not (is_collector or is_admin) or (is_admin and state in ('draft', 'send_back'))">
+                                <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
                         <div class="row">
                             <!-- Left: Download Options -->
                             <div class="col-md-6 border-right">
@@ -263,7 +270,30 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                            </div>
+                        </page>
+
+                        <!-- Surveys Tab -->
+                        <page string="Surveys / सर्वे" name="surveys_tab">
+                            <style>
+                                .o_list_table thead {
+                                    background-color: #8B4513 !important;
+                                }
+                                .o_list_table thead th {
+                                    color: white !important;
+                                    font-weight: bold !important;
+                                }
+                            </style>
+                            <field name="survey_ids" readonly="1" nolabel="1">
+                                <list string="Surveys">
+                                    <field name="khasra_number" string="Khasra / खसरा"/>
+                                    <field name="acquired_area" string="Area (Ha) / क्षेत्रफल (हे)"/>
+                                    <field name="state" widget="badge" string="Status / स्थिति"/>
+                                    <field name="landowner_ids" widget="many2many_tags" string="Landowners / भूमिस्वामी"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

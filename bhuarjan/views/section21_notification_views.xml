@@ -269,6 +269,13 @@
                         <!-- Surveys Tab -->
                         <page string="Surveys / सर्वे" name="surveys_tab">
                             <style>
+                                .o_list_table thead {
+                                    background-color: #714B67 !important;
+                                }
+                                .o_list_table thead th {
+                                    color: white !important;
+                                    font-weight: bold !important;
+                                }
                                 /* Highlight rows with approved objections with a light background */
                                 .o_list_table tr.text-danger {
                                     background-color: #FFF5F5 !important;
@@ -280,11 +287,11 @@
                             <field name="survey_ids" readonly="1" nolabel="1">
                                 <list string="Surveys" decoration-danger="has_approved_objection">
                                     <field name="has_approved_objection" invisible="1"/>
-                                    <field name="khasra_number" string="Khasra / खसरा"/>
-                                    <field name="acquired_area" string="Area (Ha) / क्षेत्रफल (हे)"/>
-                                    <field name="state" widget="badge" string="Status / स्थिति"/>
-                                    <field name="landowner_ids" widget="many2many_tags" string="Landowners / भूमिस्वामी"/>
-                                    <field name="approved_objection_id" string="Objection / आपत्ति" widget="many2one" optional="show"/>
+                                    <field name="khasra_number" string="Khasra"/>
+                                    <field name="acquired_area" string="Area (Ha)"/>
+                                    <field name="state" widget="badge" string="Status"/>
+                                    <field name="landowner_ids" widget="many2many_tags" string="Landowners"/>
+                                    <field name="approved_objection_id" string="Objection Ref" widget="many2one" optional="show"/>
                                 </list>
                             </field>
                         </page>

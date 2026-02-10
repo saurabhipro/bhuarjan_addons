@@ -64,23 +64,30 @@
                 <div class="o_status_legend_section">
                     <div class="o_status_legend_container" style="display: flex; align-items: center; justify-content: space-between !important;">
                         <div style="display: flex; align-items: center;">
-                            <div class="o_status_legend_title">
+                            <div class="o_status_legend_title" style="margin-right: 5px;">
                                 <i class="fa fa-info-circle"/>
                                 <span>Status Legend</span>
                             </div>
-                            <div class="o_status_legend_items">
+                            
+                            <!-- Separator -->
+                            <span style="color: #ccc; margin: 0 15px; font-size: 18px;">|</span>
+                            
+                            <div class="o_status_legend_items" style="display: flex; align-items: center;">
                                 <div class="o_legend_item">
                                     <i class="fa fa-file-o o_legend_icon_draft"/>
                                     <span class="o_legend_label">Draft</span>
                                 </div>
+                                <span style="color: #ccc; margin: 0 10px;">|</span>
                                 <div class="o_legend_item">
                                     <i class="fa fa-paper-plane o_legend_icon_submitted"/>
                                     <span class="o_legend_label">Submitted</span>
                                 </div>
+                                <span style="color: #ccc; margin: 0 10px;">|</span>
                                 <div class="o_legend_item">
                                     <i class="fa fa-check-circle o_legend_icon_approved"/>
                                     <span class="o_legend_label">Approved</span>
                                 </div>
+                                <span style="color: #ccc; margin: 0 10px;">|</span>
                                 <div class="o_legend_item">
                                     <i class="fa fa-times-circle o_legend_icon_rejected"/>
                                     <span class="o_legend_label">Returned</span>

@@ -62,27 +62,52 @@
             <!-- Dashboard Content -->
             <div t-if="state and !state.loading and state.selectedDepartment and state.selectedProject" class="o_dashboard_content">
                 <div class="o_status_legend_section">
-                    <div class="o_status_legend_container">
-                        <div class="o_status_legend_title">
-                            <i class="fa fa-info-circle"/>
-                            <span>Status Legend</span>
+                    <div class="o_status_legend_container" style="display: flex; align-items: center; justify-content: space-between !important;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="o_status_legend_title">
+                                <i class="fa fa-info-circle"/>
+                                <span>Status Legend</span>
+                            </div>
+                            <div class="o_status_legend_items">
+                                <div class="o_legend_item">
+                                    <i class="fa fa-file-o o_legend_icon_draft"/>
+                                    <span class="o_legend_label">Draft</span>
+                                </div>
+                                <div class="o_legend_item">
+                                    <i class="fa fa-paper-plane o_legend_icon_submitted"/>
+                                    <span class="o_legend_label">Submitted</span>
+                                </div>
+                                <div class="o_legend_item">
+                                    <i class="fa fa-check-circle o_legend_icon_approved"/>
+                                    <span class="o_legend_label">Approved</span>
+                                </div>
+                                <div class="o_legend_item">
+                                    <i class="fa fa-times-circle o_legend_icon_rejected"/>
+                                    <span class="o_legend_label">Returned</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="o_status_legend_items">
-                            <div class="o_legend_item">
-                                <i class="fa fa-file-o o_legend_icon_draft"/>
-                                <span class="o_legend_label">Draft</span>
+
+                         <!-- Project Status Flags -->
+                        <div class="d-flex align-items-center">
+                            <!-- Separator before flags (optional, makes it clear) -->
+                            <span style="color: #ccc; margin: 0 15px; font-size: 18px;">|</span>
+
+                            <!-- SIA Exempt -->
+                            <div class="d-flex align-items-center me-3" 
+                                 t-att-style="state.isProjectExempt ? 'color: #28a745;' : 'color: #dc3545;'">
+                                <i t-att-class="state.isProjectExempt ? 'fa fa-check-circle me-1' : 'fa fa-times-circle me-1'" style="font-size: 16px;"></i>
+                                <span style="font-weight: 600; font-size: 14px;">SIA Exempt: <t t-esc="state.isProjectExempt ? 'Yes' : 'No'"/></span>
                             </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-paper-plane o_legend_icon_submitted"/>
-                                <span class="o_legend_label">Submitted</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-check-circle o_legend_icon_approved"/>
-                                <span class="o_legend_label">Approved</span>
-                            </div>
-                            <div class="o_legend_item">
-                                <i class="fa fa-times-circle o_legend_icon_rejected"/>
-                                <span class="o_legend_label">Returned</span>
+                            
+                            <!-- Separator between flags -->
+                            <span style="color: #ccc; margin-right: 15px; font-size: 18px;">|</span>
+
+                            <!-- Displacement -->
+                            <div class="d-flex align-items-center" 
+                                 t-att-style="state.isDisplacement ? 'color: #28a745;' : 'color: #dc3545;'">
+                                <i t-att-class="state.isDisplacement ? 'fa fa-check-circle me-1' : 'fa fa-times-circle me-1'" style="font-size: 16px;"></i>
+                                <span style="font-weight: 600; font-size: 14px;">Displacement: <t t-esc="state.isDisplacement ? 'Yes' : 'No'"/></span>
                             </div>
                         </div>
                     </div>

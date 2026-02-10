@@ -12,10 +12,10 @@
                 <field name="code" string="Project Code"/>
                 <field name="sia_exempt_display" string="SIA Exempt" widget="badge" 
                        decoration-success="sia_exempt_display == 'Yes'" 
-                       decoration-muted="sia_exempt_display == 'No'"/>
+                       decoration-danger="sia_exempt_display == 'No'"/>
                 <field name="displacement_display" string="Displacement" widget="badge" 
-                       decoration-danger="displacement_display == 'Yes'" 
-                       decoration-muted="displacement_display == 'No'"/>
+                       decoration-success="displacement_display == 'Yes'" 
+                       decoration-danger="displacement_display == 'No'"/>
                 <field name="sdm_ids" widget="many2many_tags" string="SDM" options="{'no_create_edit': True}"/>
                 <field name="tehsildar_ids" widget="many2many_tags" string="Tehsildar" options="{'no_create_edit': True}"/>
                 <field name="state" string="Status" widget="badge" 

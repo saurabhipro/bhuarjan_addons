@@ -330,8 +330,9 @@ export class UnifiedDashboard extends Component {
             villages: [],
             isCollector: false,
             isProjectExempt: false,
+            isDisplacement: false,
             isReadOnly: this.config.isReadOnly || false, // District admin is read-only
-            allowedSectionNames: [], // Sections mapped to project's law
+            allowedSectionNames: [], // Sections mapped to project'
             stats: this._getInitialStats(),
             lastUpdate: null,
         };
@@ -538,6 +539,9 @@ export class UnifiedDashboard extends Component {
                 }
                 if (stats.is_project_exempt !== undefined) {
                     this.state.isProjectExempt = stats.is_project_exempt;
+                }
+                if (stats.is_displacement !== undefined) {
+                    this.state.isDisplacement = stats.is_displacement;
                 }
                 if (stats.user_type !== undefined) {
                     this.state.isAdmin = (stats.user_type === 'admin');

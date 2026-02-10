@@ -347,10 +347,10 @@ class Section21Notification(models.Model):
     
     def get_deadline_date(self):
         """Calculate deadline date based on state:
-        Proposal (not approved): blank
-        Order (approved): current date + 45 days
+        Proposal (Draft): blank
+        Order (Submitted/Approved): current date + 45 days
         """
-        if self.state != 'approved':
+        if self.state not in ['submitted', 'approved']:
             return None
         
         # User explicitly asked for "current date + 45 days" for the order

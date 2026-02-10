@@ -131,134 +131,154 @@
                         }
                     </style>
 
-                    <!-- SDM Section / SDM अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                         invisible="(is_collector and not is_admin) or (is_admin and state not in ('draft', 'send_back'))">
-                        <div class="section-header">SDM Section / SDM अनुभाग</div>
-                        <div class="row">
-                            <!-- Left: Download Options -->
-                            <div class="col-md-6 border-right">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 1: Download Proposal</div>
-                                <div class="mb-3">
-                                    <button name="action_generate_both_notices" string="Section 21 Proposal" type="object" 
-                                            class="btn custom-btn-primary" icon="fa-download"
-                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
-                                </div>
-                                
-                                <div invisible="not sdm_signed_file">
-                                    <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Signed Document</div>
-                                    <button name="action_download_sdm_signed_file" 
-                                            type="object" 
-                                            class="btn custom-btn-primary"
-                                            title="Download SDM Signed Section 21"
-                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <i class="fa fa-download" style="margin-right: 10px;"/>
-                                        <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                        SDM Signed
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Right: Upload & Submit -->
-                            <div class="col-md-6">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload Signed Proposal</div>
-                                <div class="bg-light p-3 rounded">
-                                    <div class="mb-3">
-                                        <field name="sdm_signed_file" filename="sdm_signed_filename" 
-                                               options="{'accepted_file_extensions': '.pdf'}"
-                                               widget="binary" class="w-100"
-                                               string="Upload SDM Signed Section 21 / हस्ताक्षरित अधिसूचना अपलोड करें"
-                                               readonly="state != 'draft'"/>
-                                        <field name="sdm_signed_filename" invisible="1"/>
-                                    </div>
-
-                                    <div invisible="not sdm_signed_file or (state != 'draft' and state != 'send_back')">
-                                         <button name="action_mark_signed" string="Submit to Collector" type="object" 
-                                                 class="btn custom-btn-teal" icon="fa-paper-plane"
-                                                 invisible="state != 'draft'"/>
-                                         <!-- If send_back action exists for SDM resubmit, use it, otherwise rely on manual fix or action_mark_signed if it handles it. 
-                                              For now, we know action_mark_signed is 'Submit'. -->
-                                    </div>
-                                    
-                                    <div class="alert alert-warning mt-2" role="alert" invisible="sdm_signed_file">
-                                        <i class="fa fa-exclamation-triangle me-2"></i>
-                                        Please upload the signed document to proceed.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Collector Section / कलेक्टर अनुभाग -->
-                    <div class="section-card" groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system" 
-                         invisible="not (is_collector or is_admin) or (is_admin and state in ('draft', 'send_back'))">
-                        <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
-                        <div class="row">
-                            <!-- Left: Download Options -->
-                            <div class="col-md-6 border-right">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 1: Download Documents</div>
-                                <div class="d-flex flex-wrap mb-3">
-                                    <button name="action_download_sdm_signed_file" 
-                                            type="object" 
-                                            class="btn custom-btn-primary mr-2 mb-2"
-                                            title="Download SDM Signed Section 21"
-                                            invisible="not sdm_signed_file">
-                                        <i class="fa fa-download" style="margin-right: 5px;"/> SDM Signed
-                                    </button>
-                                    
-                                    <button name="action_generate_both_notices" 
-                                            string="Section 21 Proposal" type="object" 
-                                            class="btn custom-btn-primary mb-2" icon="fa-download"
-                                            title="Download Latest PDF"
-                                            invisible="not sdm_signed_file and not collector_signed_file"/>
-                                </div>
-                                
-                                <div invisible="not collector_signed_file" class="mt-3">
-                                    <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Signed Document</div>
-                                    <button name="action_download_signed_document"
-                                            type="object" 
-                                            class="btn custom-btn-primary"
-                                            string="Collector Signed"
-                                            title="Download Collector Signed Section 21">
-                                        <i class="fa fa-download" style="margin-right: 5px;"/>
-                                        <i class="fa fa-check-circle" style="margin-right: 5px;"/>
-                                        Collector Signed
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Right: Upload & Workflow -->
-                            <div class="col-md-6">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload &amp; Approve</div>
-                                <div class="bg-light p-3 rounded">
-                                    <div class="mb-3">
-                                        <field name="collector_signed_file" filename="collector_signed_filename" 
-                                               string="Upload Collector Signed Section 21 / हस्ताक्षरित आदेश अपलोड करें"
-                                               widget="binary"
-                                               readonly="state != 'submitted'"
-                                               placeholder="Upload Section 21 Approval Letter"/>
-                                        <field name="collector_signed_filename" invisible="1"/>
-                                    </div>
-                                    
-                                    <!-- Action Buttons -->
-                                    <div class="d-flex" invisible="state != 'submitted'" style="margin-top: 15px;">
-                                        <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
-                                                class="btn custom-btn-success flex-fill" 
-                                                icon="fa-check"
-                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                                invisible="not collector_signed_file"
-                                                confirm="Are you sure want to approve this record."/>
+                    <!-- Notebook with SDM, Collector, and Surveys Tabs -->
+                    <notebook>
+                        <!-- SDM Tab -->
+                        <page string="SDM Section / SDM अनुभाग" name="sdm_tab">
+                            <div class="section-card">
+                                <div class="section-header">SDM Section / SDM अनुभाग</div>
+                                <div class="row">
+                                    <!-- Left: Download Options -->
+                                    <div class="col-md-6 border-right">
+                                        <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 1: Download Proposal</div>
+                                        <div class="mb-3">
+                                            <button name="action_generate_both_notices" string="Section 21 Proposal" type="object" 
+                                                    class="btn custom-btn-primary" icon="fa-download"
+                                                    style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
+                                        </div>
                                         
-                                        <button name="action_send_back" string="Send Back / वापस भेजें" type="object" 
-                                                class="btn custom-btn-danger flex-fill" 
-                                                icon="fa-times"
-                                                groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
-                                                confirm="Are you sure want to send back this record."/>
+                                        <div invisible="not sdm_signed_file">
+                                            <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Signed Document</div>
+                                            <button name="action_download_sdm_signed_file" 
+                                                    type="object" 
+                                                    class="btn custom-btn-primary"
+                                                    title="Download SDM Signed Section 21"
+                                                    style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <i class="fa fa-download" style="margin-right: 10px;"/>
+                                                <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                SDM Signed
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right: Upload & Submit -->
+                                    <div class="col-md-6">
+                                        <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload Signed Proposal</div>
+                                        <div class="bg-light p-3 rounded">
+                                            <div class="mb-3">
+                                                <field name="sdm_signed_file" filename="sdm_signed_filename" 
+                                                       options="{'accepted_file_extensions': '.pdf'}"
+                                                       widget="binary" class="w-100"
+                                                       string="Upload SDM Signed Section 21 / हस्ताक्षरित अधिसूचना अपलोड करें"
+                                                       readonly="state != 'draft'"/>
+                                                <field name="sdm_signed_filename" invisible="1"/>
+                                            </div>
+
+                                            <div invisible="not sdm_signed_file or (state != 'draft' and state != 'send_back')">
+                                                 <button name="action_mark_signed" string="Submit to Collector" type="object" 
+                                                         class="btn custom-btn-teal" icon="fa-paper-plane"
+                                                         invisible="state != 'draft'"/>
+                                            </div>
+                                            
+                                            <div class="alert alert-warning mt-2" role="alert" invisible="sdm_signed_file">
+                                                <i class="fa fa-exclamation-triangle me-2"></i>
+                                                Please upload the signed document to proceed.
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </page>
+
+                        <!-- Collector Tab -->
+                        <page string="Collector Section / कलेक्टर अनुभाग" name="collector_tab">
+                            <div class="section-card">
+                                <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
+                                <div class="row">
+                                    <!-- Left: Download Options -->
+                                    <div class="col-md-6 border-right">
+                                        <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 1: Download Documents</div>
+                                        <div class="d-flex flex-wrap mb-3">
+                                            <button name="action_download_sdm_signed_file" 
+                                                    type="object" 
+                                                    class="btn custom-btn-primary mr-2 mb-2"
+                                                    title="Download SDM Signed Section 21">
+                                                <i class="fa fa-download" style="margin-right: 5px;"/> SDM Signed
+                                            </button>
+                                            
+                                            <button name="action_generate_both_notices" 
+                                                    string="Section 21 Proposal" type="object" 
+                                                    class="btn custom-btn-primary mb-2" icon="fa-download"
+                                                    title="Download Latest PDF"/>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Signed Document</div>
+                                            <button name="action_download_signed_document"
+                                                    type="object" 
+                                                    class="btn custom-btn-primary"
+                                                    string="Collector Signed"
+                                                    title="Download Collector Signed Section 21">
+                                                <i class="fa fa-download" style="margin-right: 5px;"/>
+                                                <i class="fa fa-check-circle" style="margin-right: 5px;"/>
+                                                Collector Signed
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right: Upload & Workflow -->
+                                    <div class="col-md-6">
+                                        <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload &amp; Approve</div>
+                                        <div class="bg-light p-3 rounded">
+                                            <div class="mb-3">
+                                                <field name="collector_signed_file" filename="collector_signed_filename" 
+                                                       string="Upload Collector Signed Section 21 / हस्ताक्षरित आदेश अपलोड करें"
+                                                       widget="binary"
+                                                       placeholder="Upload Section 21 Approval Letter"/>
+                                                <field name="collector_signed_filename" invisible="1"/>
+                                            </div>
+                                            
+                                            <!-- Action Buttons -->
+                                            <div class="d-flex" style="margin-top: 15px;">
+                                                <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
+                                                        class="btn custom-btn-success flex-fill" 
+                                                        icon="fa-check"
+                                                        groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                                        confirm="Are you sure want to approve this record."/>
+                                                
+                                                <button name="action_send_back" string="Send Back / वापस भेजें" type="object" 
+                                                        class="btn custom-btn-danger flex-fill" 
+                                                        icon="fa-times"
+                                                        groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
+                                                        confirm="Are you sure want to send back this record."/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+
+                        <!-- Surveys Tab -->
+                        <page string="Surveys / सर्वे" name="surveys_tab">
+                            <style>
+                                .o_list_table thead {
+                                    background-color: #875A7B !important;
+                                }
+                                .o_list_table thead th {
+                                    color: white !important;
+                                    font-weight: bold !important;
+                                }
+                            </style>
+                            <field name="survey_ids" readonly="1" nolabel="1">
+                                <list string="Surveys">
+                                    <field name="khasra_number" string="Khasra / खसरा"/>
+                                    <field name="acquired_area" string="Area (Ha) / क्षेत्रफल (हे)"/>
+                                    <field name="state" widget="badge" string="Status / स्थिति"/>
+                                    <field name="landowner_ids" widget="many2many_tags" string="Landowners / भूमिस्वामी"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin,base.group_system"/>
             </form>

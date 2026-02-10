@@ -52,7 +52,7 @@
                             <field name="project_domain" invisible="1"/>
                             <field name="is_sdm_user" invisible="1"/>
                             <field name="department_id" options="{'no_create': True, 'no_create_edit': True}" 
-                                   readonly="is_sdm_user"/>
+                                   readonly="1"/>
                             <field name="project_id" domain="project_domain or [('id', 'in', [])]" 
                                    options="{'no_create': True, 'no_create_edit': True}"
                                    readonly="is_sdm_user"/>

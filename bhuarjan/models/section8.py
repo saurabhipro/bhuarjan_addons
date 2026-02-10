@@ -11,7 +11,10 @@ class Section8(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Section 8 Reference / धारा 8 संदर्भ', required=True, tracking=True, default='New', readonly=True)
-    department_id = fields.Many2one('bhu.department', string='Department / विभाग', tracking=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
+                                    related='project_id.department_id', 
+                                    store=True, readonly=True, tracking=True,
+                                    help='Department automatically derived from selected project')
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', tracking=True)
     
@@ -55,29 +58,6 @@ class Section8(models.Model):
         for rec in self:
             rec.is_sdm_user = is_sdm
     
-    @api.onchange('department_id')
-    def _onchange_department_id(self):
-        """Filter projects based on selected department"""
-        for rec in self:
-            if rec.department_id:
-                # Get projects that belong to this department
-                # Projects can be linked via department_id (Many2one) or via project_ids (Many2many on department)
-                # Collect project IDs from both sources
-                project_ids_from_department_id = self.env['bhu.project'].search([
-                    ('department_id', '=', rec.department_id.id)
-                ]).ids
-                project_ids_from_m2m = rec.department_id.project_ids.ids
-                # Combine and deduplicate
-                all_project_ids = list(set(project_ids_from_department_id + project_ids_from_m2m))
-                if all_project_ids:
-                    rec.project_domain = json.dumps([('id', 'in', all_project_ids)])
-                else:
-                    rec.project_domain = json.dumps([('id', 'in', [])])
-                # Reset project when department changes
-                rec.project_id = False
-            else:
-                rec.project_domain = json.dumps([('id', 'in', [])])
-                rec.project_id = False
     
     @api.onchange('project_id')
     def _onchange_project_id(self):

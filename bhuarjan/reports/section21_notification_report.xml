@@ -50,9 +50,10 @@
                                         </td>
                                         <!-- Header Text -->
                                         <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
-                                            <h1 class="hindi letter_space header-text" style="margin: 0; padding: 0; font-size: 26px; line-height: 0.95;">
-                                                <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
-                                            </h1>
+                                            <h1 style="font-size: 0px; color: transparent; margin: 0; padding: 0;">लोक सूचना (Public Notice)</h1>
+                                            <div class="hindi letter_space header-text" style="font-size: 26px; line-height: 0.95; font-weight: bold;">
+                                                न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)
+                                            </div>
                                         </td>
                                         <!-- QR Code on Right -->
                                         <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
@@ -297,9 +298,13 @@
                                     
                                     <!-- Header: Collector's Court -->
                                     <div style="text-align: center; margin-bottom: 8px;">
-                                        <h1 style="margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
-                                            <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
+                                        <!-- Heading for PDF Outline (Visible text size 1px to ensure detection) -->
+                                        <h1 style="font-size: 1px; color: transparent; margin: 0; padding: 0; height: 1px; overflow: hidden;">
+                                            <t t-esc="item_index + 1"/>. <t t-esc="item.get('landowner_name') or 'श्री/श्रीमती'"/> (खसरा: <t t-esc="item.get('khasra_number')"/>)
                                         </h1>
+                                        <div style="margin: 0; padding: 0; font-size: 24px; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;">
+                                            <strong>न्यायालय कलेक्टर, जिला-<span t-if="o.district_id" t-esc="o.district_id.name"/><span t-if="not o or not o.district_id">रायगढ़</span> (छ.ग.)</strong>
+                                        </div>
                                     </div>
 
                                     
@@ -494,4 +499,3 @@
     </t>
 </template>
 </odoo>
-

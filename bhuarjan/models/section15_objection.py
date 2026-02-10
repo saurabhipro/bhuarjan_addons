@@ -56,7 +56,7 @@ class Section15Objection(models.Model):
         for record in self:
             if record.village_id:
                 # Find all surveys (khasras) for this village
-                # Multiple objections can be created for the same survey
+                # Only one active objection can be created for the same survey (Khasra)
                 # Order by khasra_number descending
                 surveys = self.env['bhu.survey'].search([
                     ('village_id', '=', record.village_id.id),
@@ -239,6 +239,25 @@ class Section15Objection(models.Model):
             #         "कोई परिवर्तन नहीं मिला! भूमिस्वामी, खसरा क्षेत्रफल या कमेंट जोड़े बिना आपत्ति सहेजी नहीं जा सकती।\n"
             #         "(वर्तमान भूमिस्वामी: %d, मूल भूमिस्वामी: %d)"
             #     ) % (res_count, orig_count, res_count, orig_count))
+    
+    @api.constrains('survey_id')
+    def _check_unique_survey_objection(self):
+        """Ensure only one objection per Khasra (Survey) is possible in a village"""
+        for record in self:
+            if record.survey_id:
+                # Search for other objections for the same survey_id that are NOT rejected
+                duplicate = self.search([
+                    ('survey_id', '=', record.survey_id.id),
+                    ('id', '!=', record.id),
+                    ('state', '!=', 'rejected'),
+                ], limit=1)
+                
+                if duplicate:
+                    raise ValidationError(_(
+                        "An objection already exists for Khasra No. %s (Objection Ref: %s). "
+                        "Only one objection per Khasra is allowed in this village."
+                    ) % (record.survey_id.khasra_number, duplicate.name))
+
     
     def action_open_reject_wizard(self):
         """Open the reject survey wizard from the main form"""

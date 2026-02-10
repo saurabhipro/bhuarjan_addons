@@ -134,7 +134,8 @@
                     <!-- Notebook with SDM, Collector, and Surveys Tabs -->
                     <notebook>
                         <!-- SDM Tab -->
-                        <page string="SDM Section / SDM अनुभाग" name="sdm_tab">
+                        <page string="SDM Section / SDM अनुभाग" name="sdm_tab" 
+                              groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin">
                             <div class="section-card">
                                 <div class="section-header">SDM Section / SDM अनुभाग</div>
                                 <div class="row">
@@ -191,7 +192,8 @@
                         </page>
 
                         <!-- Collector Tab -->
-                        <page string="Collector Section / कलेक्टर अनुभाग" name="collector_tab">
+                        <page string="Collector Section / कलेक्टर अनुभाग" name="collector_tab" 
+                              groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin">
                             <div class="section-card">
                                 <div class="section-header">Collector Section / कलेक्टर अनुभाग</div>
                                 <div class="row">
@@ -208,7 +210,7 @@
                                             </button>
                                             
                                             <button name="action_generate_both_notices" 
-                                                    string="Section 21 Proposal" type="object" 
+                                                    string="Sec 21 Order" type="object" 
                                                     class="btn custom-btn-primary mb-2" icon="fa-download"
                                                     title="Download Latest PDF"/>
                                         </div>

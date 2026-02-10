@@ -735,18 +735,7 @@
                                         t-att-disabled="!(state.stats &amp;&amp; state.stats.section15_info &amp;&amp; state.stats.section15_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-success" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
-                                        t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
-                                        title="Approve First Pending">
-                                    <i class="fa fa-check"/> Approve
-                                </button>
-                                <button t-if="state.isCollector" class="btn btn-sm btn-danger" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.section15.objection', state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info.first_pending_id : false, state.stats &amp;&amp; state.stats.section15_info ? state.stats.section15_info : null)"
-                                        t-att-disabled="state.stats &amp;&amp; state.stats.section15_info ? this.isAllApproved(state.stats.section15_info) : true"
-                                        title="Return First Pending">
-                                    <i class="fa fa-times"/> Return
-                                </button>
+
                             </div>
                         </div>
                         </t>

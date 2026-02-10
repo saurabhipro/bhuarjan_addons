@@ -346,10 +346,15 @@ class Section21Notification(models.Model):
         return result
     
     def get_deadline_date(self):
-        """Calculate deadline date (30 days from notice_date)"""
-        if not self.notice_date:
+        """Calculate deadline date based on state:
+        Proposal (not approved): blank
+        Order (approved): current date + 45 days
+        """
+        if self.state != 'approved':
             return None
-        return self.notice_date + relativedelta(days=30)
+        
+        # User explicitly asked for "current date + 45 days" for the order
+        return fields.Date.today() + relativedelta(days=45)
     
     def get_deadline_date_formatted(self):
         """Get deadline date formatted as dd/mm/yyyy"""

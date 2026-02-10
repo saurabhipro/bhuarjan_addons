@@ -128,7 +128,7 @@
                                         <span t-esc="o.get_deadline_date_formatted()"/>
                                     </t>
                                     <t t-if="not o or not o.get_deadline_date_formatted()">
-                                        <span style="text-decoration: underline;">----------------</span>
+                                        <span style="text-decoration: underline;">...........................</span>
                                     </t>
                                     दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                 </p>
@@ -350,9 +350,9 @@
                                 <t t-if="o and o.get_deadline_date_formatted()">
                                     <span t-esc="o.get_deadline_date_formatted()"/>
                                 </t>
-                                <t t-if="not o or not o.get_deadline_date_formatted()">
-                                    <span style="text-decoration: underline;">____</span>
-                                </t>
+                                 <t t-if="not o or not o.get_deadline_date_formatted()">
+                                     <span style="text-decoration: underline;">...........................</span>
+                                 </t>
                                 दिनांक तक कार्यालयीन दिवस एवं समय में प्रस्तुत कर सकते हैं।
                                         </p>
                                     </div>

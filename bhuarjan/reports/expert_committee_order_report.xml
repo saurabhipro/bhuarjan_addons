@@ -82,14 +82,14 @@
                                         <strong>क्रमांक/</strong>
                                         <span t-if="report.kramank" t-esc="report.kramank"/>
                                         <span t-if="not report.kramank"></span>
-                                        /भू-अर्जन/<span t-if="report.create_date" t-esc="report.create_date.strftime('%Y')"/><span t-if="not report.create_date">2025</span>
+                                        /भू-अर्जन/<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>
                                     </p>
                                 </td>
                                 <td style="width: 50%; text-align: right;">
                                     <p style="margin: 5px 0;">
                                         रायगढ़, <strong>दिनांक /</strong> 
                                         <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
-                                        <t t-if="not report.create_date">/ /2025</t>
+                                        <t t-if="not report.create_date">/ /<span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/></t>
                                     </p>
                                 </td>
                             </tr>
@@ -236,14 +236,14 @@
                             <tr>
                                 <td style="width: 50%;">
                                     <p style="margin: 5px 0;">
-                                        <strong>पृ.क्रमांक/</strong> -/भू-अर्जन/2025
+                                        <strong>पृ.क्रमांक/</strong> -/भू-अर्जन/<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>
                                     </p>
                                 </td>
                                 <td style="width: 50%; text-align: right;">
                                     <p style="margin: 5px 0;">
                                         रायगढ़, <strong>दिनांक /</strong> 
                                         <t t-if="report.create_date" t-esc="report.create_date.strftime('%d/%m/%Y')"/>
-                                        <t t-if="not report.create_date">/ /2025</t>
+                                        <t t-if="not report.create_date">/ /<span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/></t>
                                     </p>
                                 </td>
                             </tr>

@@ -91,10 +91,10 @@
                             <strong>क्रमांक /</strong>
                             <span t-if="report.kramank" t-esc="report.kramank"/>
                             <span t-if="not report.kramank"></span>
-                            /&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="report.create_date" t-esc="report.create_date.strftime('%Y')"/><span t-if="not report.create_date">2025</span>&#160;
+                            /&#160;भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>&#160;
                         </span>
                         <span class="normal-text letter_space" style="text-align: right !important; font-weight: 500 !important; font-size: 18px !important; margin-left: auto !important;">
-                            <strong>दिनांक /</strong>........................./<span t-if="report.create_date" t-esc="report.create_date.strftime('%Y')"/><span t-if="not report.create_date">2025</span>
+                            <strong>दिनांक /</strong>........../<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>
                         </span>
                     </div>
 
@@ -339,10 +339,10 @@
                         <!-- क्रमांक and दिनांक Section -->
                         <div class="date-reference-section" style="margin-bottom: 10px !important;">
                             <span class="normal-text letter_space" style="font-weight: bold !important; font-size: 18px !important; text-align: left !important;">
-                                <strong>क्रमांक /</strong><span t-if="report.kramank" t-esc="report.kramank"/><span t-if="not report.kramank"></span>/भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-if="report.create_date" t-esc="report.create_date.strftime('%Y')"/><span t-if="not report.create_date">2025</span>&#160;
+                                <strong>क्रमांक /</strong><span t-if="report.kramank" t-esc="report.kramank"/><span t-if="not report.kramank"></span>/भू-अर्जन&#160;/&#160;वाचक&#160;/&#160;<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>&#160;
                             </span>
                             <span class="normal-text letter_space" style="text-align: right !important; font-weight: bold !important; font-size: 18px !important; margin-left: auto !important;">
-                                <strong>दिनांक /</strong>........................./<span t-if="report.create_date" t-esc="report.create_date.strftime('%Y')"/><span t-if="not report.create_date">2025</span>
+                                <strong>दिनांक /</strong>........................./<span t-esc="context_timestamp(report.create_date or datetime.datetime.now()).strftime('%Y')"/>
                             </span>
                         </div>
                         

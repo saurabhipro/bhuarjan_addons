@@ -445,10 +445,11 @@ class Section15Objection(models.Model):
         """Approve objection (SDM action)"""
         self.ensure_one()
         
-        # Check if user is SDM
+        # Check if user is SDM or Collector
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can approve.'))
+            raise ValidationError(_('Only SDM or Collector can approve.'))
         
         # Resolution details is optional, no validation needed
         
@@ -467,10 +468,11 @@ class Section15Objection(models.Model):
         """Reject objection (SDM action)"""
         self.ensure_one()
         
-        # Check if user is SDM
+        # Check if user is SDM or Collector
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can reject.'))
+            raise ValidationError(_('Only SDM or Collector can reject.'))
         
         # Validate state is draft
         if self.state != 'draft':
@@ -484,10 +486,11 @@ class Section15Objection(models.Model):
         self.ensure_one()
         # Allow going to approved from draft state
         if self.state == 'draft':
-            # Check if user is SDM
+            # Check if user is SDM or Collector
             if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                    self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                     self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-                raise ValidationError(_('Only SDM can approve.'))
+                raise ValidationError(_('Only SDM or Collector can approve.'))
             # Resolution details is optional, no validation needed
             self.state = 'approved'
             self._sync_to_survey()
@@ -503,10 +506,11 @@ class Section15Objection(models.Model):
         self.ensure_one()
         # Allow going to rejected from draft state
         if self.state == 'draft':
-            # Check if user is SDM
+            # Check if user is SDM or Collector
             if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                    self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                     self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-                raise ValidationError(_('Only SDM can reject.'))
+                raise ValidationError(_('Only SDM or Collector can reject.'))
             self.state = 'rejected'
             self.message_post(body=_('Status changed to Rejected by %s') % self.env.user.name)
         elif self.state == 'rejected':
@@ -521,10 +525,11 @@ class Section15Objection(models.Model):
         # Allow going to approved from draft state
         if self.state != 'draft':
             raise ValidationError(_('Cannot change status to Approved from current state. Only draft records can be approved.'))
-        # Check if user is SDM
+        # Check if user is SDM or Collector
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can approve.'))
+            raise ValidationError(_('Only SDM or Collector can approve.'))
         # Resolution details is optional, no validation needed
     
     def _validate_state_to_rejected(self):
@@ -533,10 +538,11 @@ class Section15Objection(models.Model):
         # Allow going to rejected from draft state
         if self.state != 'draft':
             raise ValidationError(_('Cannot change status to Rejected from current state. Only draft records can be rejected.'))
-        # Check if user is SDM
+        # Check if user is SDM or Collector
         if not (self.env.user.has_group('bhuarjan.group_bhuarjan_sdm') or 
+                self.env.user.has_group('bhuarjan.group_bhuarjan_collector') or
                 self.env.user.has_group('bhuarjan.group_bhuarjan_admin')):
-            raise ValidationError(_('Only SDM can reject.'))
+            raise ValidationError(_('Only SDM or Collector can reject.'))
     
     def get_resolution_changes_summary(self):
         """Get summary of resolution changes for report"""

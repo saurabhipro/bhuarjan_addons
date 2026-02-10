@@ -692,7 +692,7 @@
 
                         <!-- Section 15 (Disabled for Collector) -->
                         <t t-if="this.isSectionVisible('(Sec 15) Objections')">
-                        <div class="o_section_list_item o_card_no_click" style="opacity: 0.5; pointer-events: none;">
+                        <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary">Step 7</span>
                             </div>

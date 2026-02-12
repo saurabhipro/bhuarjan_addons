@@ -92,13 +92,13 @@
                         <field name="is_sia_exempt" readonly="1"
                                string="कि क्या इस परियोजना को सामाजिक समाघत अध्ययन से छूट प्राप्त है ?"/>
                         <field name="requiring_body_id" required="1" readonly="1" options="{'no_open': True}"/>
-                            <field name="tehsil_ids" widget="many2many_tags" readonly="1"
-                                   placeholder="Tehsils (from selected villages)..."
-                                   options="{'no_create_edit': True}" force_save="1"/>
-                            <field name="total_area_acquired" readonly="1"/>
+                        <field name="tehsil_ids" widget="many2many_tags" readonly="1"
+                               placeholder="Tehsils (from selected villages)..."
+                               options="{'no_create_edit': True}" force_save="1"/>
+                        <field name="total_area_acquired" readonly="1"/>
                     </group>
                     
-                    <!-- New Layout: SDM and Collector Sections above Notebook -->
+                    <!-- Consolidated Styles -->
                     <style>
                         .section-card {
                             background-color: #fff;
@@ -126,69 +126,90 @@
                             background-color: #28a745 !important;
                             border-color: #28a745 !important;
                             color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                            margin-right: 15px !important;
+                        }
+                        .custom-btn-success:hover {
+                            background-color: #218838 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
                         }
                         .custom-btn-danger {
                             background-color: #dc3545 !important;
                             border-color: #dc3545 !important;
                             color: white !important;
+                            border-radius: 5px !important;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            font-weight: 600;
+                            transition: all 0.2s;
+                        }
+                        .custom-btn-danger:hover {
+                            background-color: #c82333 !important;
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
                         }
                         .custom-btn-teal {
                             background-color: #008080 !important;
                             border-color: #008080 !important;
                             color: white !important;
                         }
+                        /* Custom Section Headers */
+                        .custom-section-header {
+                            background-color: #FFF8DC; /* Cornsilk */
+                            color: #8B4513;
+                            padding: 12px 15px;
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            border-radius: 6px;
+                            border-left: 5px solid #8B4513;
+                            margin: 20px 0 10px 0;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                            display: flex;
+                            align-items: center;
+                        }
+                        .custom-section-header i {
+                            margin-right: 10px;
+                            opacity: 0.8;
+                        }
+
+                        /* Table Styling */
+                        .o_field_one2many .o_list_table {
+                            border: 1px solid #e0e0e0 !important;
+                            border-radius: 6px;
+                            overflow: hidden;
+                        }
+                        .o_field_one2many .o_list_table thead {
+                            background-color: #FFF8DC !important; /* Match Header */
+                            color: #8B4513 !important;
+                            font-weight: bold;
+                            border-bottom: 2px solid #8B4513 !important;
+                        }
+                        .o_field_one2many .o_list_table thead th {
+                            border-right: 1px solid rgba(139, 69, 19, 0.1);
+                            vertical-align: middle;
+                        }
+                        .o_field_one2many .o_field_x2many_list_row_add a {
+                            color: #8B4513 !important;
+                            font-weight: bold;
+                            padding: 8px 0;
+                            display: inline-block;
+                        }
+                        .o_field_one2many .o_field_x2many_list_row_add a:hover {
+                            text-decoration: underline;
+                        }
                     </style>
+                    
+                    <!-- New Layout: SDM and Collector Sections above Notebook -->
+
 
 
 
                     <notebook>
                         <page string="Team Members / टीम सदस्य" invisible="is_collector and not is_admin">
-                            <style>
-                                /* Custom Section Headers */
-                                .custom-section-header {
-                                    background-color: #FFF8DC; /* Cornsilk */
-                                    color: #8B4513;
-                                    padding: 12px 15px;
-                                    font-size: 1.1rem;
-                                    font-weight: 600;
-                                    border-radius: 6px;
-                                    border-left: 5px solid #8B4513;
-                                    margin: 20px 0 10px 0;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                                    display: flex;
-                                    align-items: center;
-                                }
-                                .custom-section-header i {
-                                    margin-right: 10px;
-                                    opacity: 0.8;
-                                }
 
-                                /* Table Styling */
-                                .o_field_one2many .o_list_table {
-                                    border: 1px solid #e0e0e0 !important;
-                                    border-radius: 6px;
-                                    overflow: hidden;
-                                }
-                                .o_field_one2many .o_list_table thead {
-                                    background-color: #FFF8DC !important; /* Match Header */
-                                    color: #8B4513 !important;
-                                    font-weight: bold;
-                                    border-bottom: 2px solid #8B4513 !important;
-                                }
-                                .o_field_one2many .o_list_table thead th {
-                                    border-right: 1px solid rgba(139, 69, 19, 0.1);
-                                    vertical-align: middle;
-                                }
-                                .o_field_one2many .o_field_x2many_list_row_add a {
-                                    color: #8B4513 !important;
-                                    font-weight: bold;
-                                    padding: 8px 0;
-                                    display: inline-block;
-                                }
-                                .o_field_one2many .o_field_x2many_list_row_add a:hover {
-                                    text-decoration: underline;
-                                }
-                            </style>
                             
                             <!-- (क) Non-Government Social Scientist -->
                             <div class="custom-section-header">
@@ -261,64 +282,7 @@
 
                         <page string="SIA Upload / Download">
                             <!-- New Layout: SDM and Collector Sections inside "SIA Upload / Download" tab -->
-                            <style>
-                                .section-card {
-                                    background-color: #fff;
-                                    padding: 20px;
-                                    margin-bottom: 20px;
-                                    border: 1px solid #e0e0e0;
-                                    border-radius: 4px;
-                                }
-                                .section-header {
-                                    font-size: 1.1rem;
-                                    font-weight: 600;
-                                    color: #6c757d;
-                                    border-bottom: 2px solid #8B4513;
-                                    padding-bottom: 10px;
-                                    margin-bottom: 20px;
-                                    text-transform: uppercase;
-                                    letter-spacing: 0.5px;
-                                }
-                                .custom-btn-primary {
-                                    background-color: #8B4513 !important;
-                                    border-color: #8B4513 !important;
-                                    color: white !important;
-                                }
-                                .custom-btn-success {
-                                    background-color: #28a745 !important;
-                                    border-color: #28a745 !important;
-                                    color: white !important;
-                                    border-radius: 5px !important;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                                    font-weight: 600;
-                                    transition: all 0.2s;
-                                    margin-right: 15px !important;
-                                }
-                                .custom-btn-success:hover {
-                                    background-color: #218838 !important;
-                                    transform: translateY(-1px);
-                                    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-                                }
-                                .custom-btn-danger {
-                                    background-color: #dc3545 !important;
-                                    border-color: #dc3545 !important;
-                                    color: white !important;
-                                    border-radius: 5px !important;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                                    font-weight: 600;
-                                    transition: all 0.2s;
-                                }
-                                .custom-btn-danger:hover {
-                                    background-color: #c82333 !important;
-                                    transform: translateY(-1px);
-                                    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-                                }
-                                .custom-btn-teal {
-                                    background-color: #008080 !important;
-                                    border-color: #008080 !important;
-                                    color: white !important;
-                                }
-                            </style>
+
 
                             <!-- SDM Section / SDM अनुभाग -->
                             <div class="section-card" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin,base.group_system"
@@ -436,6 +400,26 @@
                                                         confirm="Are you sure want to send back this record."/>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        <page string="SIA team report" invisible="not is_sdm">
+                            <div class="section-card">
+                                <div class="section-header">SIA Team Report / SIA टीम रिपोर्ट</div>
+                                <div class="bg-light p-3 rounded mb-3">
+                                    <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">
+                                        Upload SIA Team Report (Optional)
+                                    </div>
+                                    <div class="mb-2">
+                                        <field name="sia_team_report_file" filename="sia_team_report_filename" 
+                                               widget="binary"
+                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                               placeholder="Upload SIA Team Report"/>
+                                        <field name="sia_team_report_filename" invisible="1"/>
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="fa fa-info-circle"/> Optional
                                     </div>
                                 </div>
                             </div>

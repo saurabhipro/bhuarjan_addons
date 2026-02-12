@@ -27,6 +27,8 @@ class PaymentFile(models.Model):
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
     award_id = fields.Many2one('bhu.section23.award', string='Section 23 Award / धारा 23 अवार्ड', required=True, tracking=True)
     
+    award_ref = fields.Char(string='Award Number / अवार्ड क्र.', related='award_id.name', store=True, readonly=True)
+    
     # Case Details - removed as fields no longer exist in award model
     
     # District, Tehsil
@@ -62,14 +64,28 @@ class PaymentFile(models.Model):
     
     def amount_to_text(self, amount):
         """Convert amount to text (Indian system)"""
-        # For Hindi, we might need a custom tool, but for now let's use standard amount_to_text from currency
         try:
-            if self.currency_id:
-                return self.currency_id.amount_to_text(amount)
-            return str(amount)
-        except:
-            return str(amount)
-    
+            # Try to use num2words for Indian format if available
+            from num2words import num2words
+            params = {'lang': 'en_IN'} 
+            text = num2words(amount, **params).title()
+            # Clean up currency format
+            if 'Point' in text:
+                text = text.replace('Point', 'Rupees And') + ' Paisa Only'
+            else:
+                 text += " Rupees Only"
+            return text
+        except ImportError:
+            # Fallback to currency provider or standard method
+            try:
+                if self.currency_id:
+                     # Odoo's default amount_to_text often uses standard international scale (Billions), 
+                     # we might want to override or implement custom if num2words is missing
+                    return self.currency_id.amount_to_text(amount)
+                return str(amount)
+            except:
+                return str(amount)
+
     @api.model
     def default_get(self, fields_list):
         defaults = super(PaymentFile, self).default_get(fields_list)
@@ -86,8 +102,8 @@ class PaymentFile(models.Model):
             
             if awards:
                 defaults['award_id'] = awards.id
-                if not defaults.get('project_id'):
-                    defaults['project_id'] = awards.project_id.id
+                # Explicitly set project_id so it's not missing
+                defaults['project_id'] = awards.project_id.id
                     
         return defaults
 
@@ -178,7 +194,7 @@ class PaymentFile(models.Model):
                 
             line_vals.append((0, 0, {
                 'serial_number': serial,
-                'award_serial_number': str(serial), # Placeholder as serial isn't in data
+                'award_serial_number': data.get('serial_no', str(serial)), # Use actual serial from data
                 'khasra_number': data.get('khasra', ''),
                 'landowner_id': landowner_id,
                 'bank_name': landowner.bank_name or '',

@@ -56,9 +56,10 @@
                                    context="{'default_village_id': village_id, 'default_project_id': project_id}"
                                    domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
                                    required="1" readonly="1" force_save="1"/>
+                            <field name="award_ref" readonly="1"/>
                             <!-- Hidden fields to ensure they are available for the header -->
-                            <field name="project_id" invisible="1"/>
-                            <field name="village_id" invisible="1"/>
+                            <field name="project_id" readonly="1" options="{'no_open': True}" force_save="1"/>
+                            <field name="village_id" readonly="1" options="{'no_open': True}" force_save="1"/>
                             <field name="department_id" invisible="1"/>
                             <field name="district_id" invisible="1"/>
                             <field name="tehsil_id" invisible="1"/>

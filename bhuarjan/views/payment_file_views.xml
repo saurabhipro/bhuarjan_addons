@@ -39,34 +39,40 @@
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="project_id" required="1" readonly="state == 'generated'"/>
-                            <field name="village_id" required="1" readonly="state == 'generated'"/>
+                            <field name="project_id" required="1" readonly="1" force_save="1"/>
+                            <field name="village_id" required="1" readonly="1" force_save="1"/>
                             <field name="district_id" invisible="1"/>
                             <field name="tehsil_id" invisible="1"/>
-                            <field name="award_id" invisible="not village_id and not award_id" required="1" readonly="state == 'generated'"/>
+                            <field name="award_id" invisible="not village_id and not award_id" required="1" readonly="1" force_save="1"/>
                         </group>
-                    </group>
-                    
-                    <group string="Totals" class="o_group_totals text-primary">
-                        <field name="total_net_payable" readonly="1" options="{'currency_field': 'currency_id'}"/>
-                        <field name="total_net_payable_text" readonly="1"/>
-                        <field name="currency_id" invisible="1"/>
+                        <group>
+                            <div class="o_td_label">
+                                <label for="total_net_payable" string="Total Net Payable" style="font-weight: bold; font-size: 1.1em;"/>
+                            </div>
+                            <field name="total_net_payable" nolabel="1" readonly="1" options="{'currency_field': 'currency_id'}" style="font-weight: bold; font-size: 1.1em; color: #017e84;"/>
+                            
+                            <div class="o_td_label">
+                                <label for="total_net_payable_text" string="Total in Words" style="font-weight: bold;"/>
+                            </div>
+                            <field name="total_net_payable_text" nolabel="1" readonly="1" style="font-style: italic;"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
                     </group>
                     
                     <group string="Payment Lines (Auto-populated from Award)">
                         <field name="payment_line_ids" nolabel="1">
                             <list string="Payment Lines" editable="bottom">
-                                <field name="serial_number"/>
-                                <field name="award_serial_number"/>
-                                <field name="khasra_number"/>
-                                <field name="landowner_id"/>
-                                <field name="bank_name"/>
-                                <field name="bank_branch"/>
-                                <field name="account_number"/>
-                                <field name="ifsc_code"/>
-                                <field name="compensation_amount" sum="Total"/>
-                                <field name="net_payable_amount" sum="Total"/>
-                                <field name="remark"/>
+                                <field name="serial_number" string="Serial Number"/>
+                                <field name="award_serial_number" string="Award Serial No."/>
+                                <field name="khasra_number" string="Khasra Number"/>
+                                <field name="landowner_id" string="Landowner"/>
+                                <field name="bank_name" string="Bank Name"/>
+                                <field name="bank_branch" string="Branch"/>
+                                <field name="account_number" string="Account Number"/>
+                                <field name="ifsc_code" string="IFSC Code"/>
+                                <field name="compensation_amount" sum="Total" string="Compensation"/>
+                                <field name="net_payable_amount" sum="Total" string="Net Payable"/>
+                                <field name="remark" string="Remark"/>
                             </list>
                         </field>
                     </group>

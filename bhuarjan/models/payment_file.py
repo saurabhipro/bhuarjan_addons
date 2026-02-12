@@ -70,6 +70,27 @@ class PaymentFile(models.Model):
         except:
             return str(amount)
     
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super(PaymentFile, self).default_get(fields_list)
+        
+        # Auto-populate from context if available
+        if 'village_id' in defaults and not defaults.get('award_id'):
+            village_id = defaults['village_id']
+            # Look for active draft awards for this village
+            # Prioritize submitted/approved awards
+            awards = self.env['bhu.draft.award'].search([
+                ('village_id', '=', village_id),
+                ('state', 'in', ['submitted', 'approved', 'draft'])
+            ], order='state desc, create_date desc', limit=1)
+            
+            if awards:
+                defaults['award_id'] = awards.id
+                if not defaults.get('project_id'):
+                    defaults['project_id'] = awards.project_id.id
+                    
+        return defaults
+
     @api.depends('payment_line_ids.compensation_amount', 'payment_line_ids.net_payable_amount')
     def _compute_totals(self):
         """Compute totals from payment lines"""

@@ -31,31 +31,42 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
                 </header>
                 <sheet>
-                    <div class="alert alert-info py-2 mb-2" role="alert" invisible="not project_id or not village_id">
-                        <i class="fa fa-info-circle mr-2"/>
-                        Generating Payment File for Project: <strong><field name="project_id" readonly="1" options="{'no_open': True}"/></strong> 
-                        and Village: <strong><field name="village_id" readonly="1" options="{'no_open': True}"/></strong>
+                    <!-- Attractive Header / Banner Section -->
+                    <div class="row mb16 mt8" invisible="not project_id or not village_id" style="background-color: #f8f9fa; border-left: 5px solid #017e84; padding: 15px; margin: 0 0 20px 0; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div class="col-8">
+                            <h3 style="color: #017e84; margin: 0; font-weight: 600;">
+                                <i class="fa fa-file-text-o mr-2"/> Payment File Generation
+                            </h3>
+                            <div class="mt8" style="font-size: 1.1em; color: #495057;">
+                                Generating payment file for Project: <strong><field name="project_id" readonly="1" options="{'no_open': True}" class="text-primary"/></strong>
+                                in Village: <strong><field name="village_id" readonly="1" options="{'no_open': True}" class="text-primary"/></strong>
+                            </div>
+                            <div class="text-muted mt4" style="font-size: 0.9em;">
+                                <i class="fa fa-info-circle mr-1"/> This file is auto-populated based on the approved Award for this village.
+                            </div>
+                        </div>
+                        <div class="col-4 text-right align-self-center">
+                            <field name="currency_id" invisible="1"/>
+                            <div style="font-size: 2em; font-weight: bold; color: #28a745;">
+                                <field name="total_net_payable" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </div>
+                            <div class="text-muted">Total Net Payable</div>
+                        </div>
                     </div>
+
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="project_id" required="1" readonly="1" force_save="1"/>
-                            <field name="village_id" required="1" readonly="1" force_save="1"/>
+                        <group string="File Details">
+                            <field name="name" placeholder="e.g. Payment File 001"/>
+                            <field name="award_id" options="{'no_create': True, 'no_open': True}"
+                                   context="{'default_village_id': village_id, 'default_project_id': project_id}"
+                                   domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
+                                   required="1" readonly="1" force_save="1"/>
                             <field name="district_id" invisible="1"/>
                             <field name="tehsil_id" invisible="1"/>
-                            <field name="award_id" invisible="not village_id and not award_id" required="1" readonly="1" force_save="1"/>
                         </group>
-                        <group>
-                            <div class="o_td_label">
-                                <label for="total_net_payable" string="Total Net Payable" style="font-weight: bold; font-size: 1.1em;"/>
-                            </div>
-                            <field name="total_net_payable" nolabel="1" readonly="1" options="{'currency_field': 'currency_id'}" style="font-weight: bold; font-size: 1.1em; color: #017e84;"/>
-                            
-                            <div class="o_td_label">
-                                <label for="total_net_payable_text" string="Total in Words" style="font-weight: bold;"/>
-                            </div>
-                            <field name="total_net_payable_text" nolabel="1" readonly="1" style="font-style: italic;"/>
-                            <field name="currency_id" invisible="1"/>
+                        <group string="Amount Summary">
+                            <field name="total_net_payable_text" nolabel="1" readonly="1" 
+                                   style="font-style: italic; background-color: #fefefe; padding: 10px; border: 1px solid #eee; border-radius: 4px; display: block;"/>
                         </group>
                     </group>
                     

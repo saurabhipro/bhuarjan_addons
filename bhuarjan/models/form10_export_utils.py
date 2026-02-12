@@ -207,6 +207,16 @@ class Form10ExportUtils(models.AbstractModel):
             'font_size': 12
         })
         
+        cell_format_bold = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'text_wrap': True,
+            'font_size': 11,
+            'bg_color': '#f8f9fa'
+        })
+        
         first = surveys[0]
         current_row = 0
         
@@ -271,6 +281,9 @@ class Form10ExportUtils(models.AbstractModel):
         current_row += 1
         
         # Data rows
+        total_area_sum = 0.0
+        total_acquired_area_sum = 0.0
+        
         for idx, survey in enumerate(surveys):
             serial_num = idx + 1
             
@@ -380,7 +393,20 @@ class Form10ExportUtils(models.AbstractModel):
                     format_to_use = cell_format
                 
                 worksheet.write(current_row, col, value, format_to_use)
+            
+            # Accumulate totals
+            total_area_sum += survey.total_area or 0.0
+            total_acquired_area_sum += survey.acquired_area or 0.0
+            
             current_row += 1
+        
+        # Total Row
+        worksheet.merge_range(current_row, 0, current_row, 1, 'कुल योग', cell_format_bold)
+        worksheet.write(current_row, 2, round(total_area_sum, 4), cell_format_bold)
+        worksheet.write(current_row, 3, round(total_acquired_area_sum, 4), cell_format_bold)
+        for col in range(4, 18):
+             worksheet.write(current_row, col, '', cell_format_bold)
+        current_row += 1
         
         # Signature section at the end
         current_row += 1  # Spacing

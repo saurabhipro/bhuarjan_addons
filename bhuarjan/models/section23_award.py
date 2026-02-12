@@ -578,11 +578,11 @@ class Section23AwardSurveyLine(models.Model):
         for line in self:
             rate = 0.0
             if line.award_id and line.award_id.village_id and line.land_type:
-                # Get active rate master for this village
+                # Get rate master for this village (prioritize active, but allow draft)
                 rate_master = self.env['bhu.rate.master'].search([
                     ('village_id', '=', line.award_id.village_id.id),
-                    ('state', '=', 'active'),
-                ], limit=1, order='effective_from desc')
+                    ('state', 'in', ['active', 'draft']),
+                ], limit=1, order='state ASC, effective_from DESC')
                 
                 if rate_master:
                     # Determine which rate to use based on type and distance

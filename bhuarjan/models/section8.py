@@ -110,6 +110,7 @@ class Section8(models.Model):
             'res_model': 'bhu.section8.approve.reject.wizard',
             'res_id': wizard.id,
             'view_mode': 'form',
+            'views': [[False, 'form']],
             'target': 'new',
         }
     
@@ -130,6 +131,7 @@ class Section8(models.Model):
             'res_model': 'bhu.section8.approve.reject.wizard',
             'res_id': wizard.id,
             'view_mode': 'form',
+            'views': [[False, 'form']],
             'target': 'new',
         }
     

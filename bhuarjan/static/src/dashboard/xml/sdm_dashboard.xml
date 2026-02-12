@@ -220,6 +220,32 @@
                             </div>
                         </div>
                         </t>
+
+                        <!-- Payment File Card -->
+                        <t t-if="this.isSectionVisible('Payment File')">
+                        <div class="o_stat_card o_card_payment_file">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-file-excel-o"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Payment File</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.payment_file_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
+
+                        <!-- Payment Reconciliation Card -->
+                        <t t-if="this.isSectionVisible('Payment Reconciliation')">
+                        <div class="o_stat_card o_card_reconciliation">
+                            <div class="o_stat_icon">
+                                <i class="fa fa-exchange"/>
+                            </div>
+                            <div class="o_stat_content">
+                                <div class="o_stat_label">Reconciliation</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.reconciliation_total : 0"/></div>
+                            </div>
+                        </div>
+                        </t>
                     </div>
                 </div>
 
@@ -1030,6 +1056,105 @@
                                     <i class="fa fa-plus"/> Create
                                 </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                            </div>
+                        </div>
+                        </t>
+
+                        <!-- Payment File -->
+                        <t t-if="this.isSectionVisible('Payment File')">
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 12' : 'Step 11'"/></span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-file-excel-o"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Payment File
+                                    <t t-if="state.stats &amp;&amp; state.stats.payment_file_info &amp;&amp; state.stats.payment_file_info.is_completed">
+                                        <span class="o_completion_tick" title="All Payment Files completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.payment_file_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft" title="Total"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.payment_file_total || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted" title="Draft"><i class="fa fa-edit"/> <t t-esc="state.stats ? (state.stats.payment_file_draft || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved" title="Generated"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.payment_file_generated || 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.payment.file')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.payment.file')">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                            </div>
+                        </div>
+                        </t>
+
+                        <!-- Payment Reconciliation -->
+                        <t t-if="this.isSectionVisible('Payment Reconciliation')">
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number bg-primary"><t t-esc="state.isCollector ? 'Step 13' : 'Step 12'"/></span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-exchange"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Payment Reconciliation
+                                    <t t-if="state.stats &amp;&amp; state.stats.reconciliation_info &amp;&amp; state.stats.reconciliation_info.is_completed">
+                                        <span class="o_completion_tick" title="All Reconciliations completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.reconciliation_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft" title="Total"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.reconciliation_total || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted" title="Draft"><i class="fa fa-edit"/> <t t-esc="state.stats ? (state.stats.reconciliation_draft || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved" title="Processed"><i class="fa fa-spinner fa-spin"/> <t t-esc="state.stats ? (state.stats.reconciliation_processed || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected" title="Completed"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.reconciliation_completed || 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button t-if="!state.isCollector" class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.payment.reconciliation.bank')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.payment.reconciliation.bank')">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>

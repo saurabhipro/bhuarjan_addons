@@ -866,6 +866,8 @@ export class UnifiedDashboard extends Component {
             'bhu.survey',
             'bhu.section23.award',
             'bhu.draft.award',  // Legacy, keeping for compatibility
+            'bhu.payment.file',
+            'bhu.payment.reconciliation.bank',
         ];
 
         // Only add department_id if model has this field
@@ -1034,6 +1036,8 @@ export class UnifiedDashboard extends Component {
             'bhu.section3c.nh': 'Section 3C (NH)',
             'bhu.section3d.nh': 'Section 3D (NH)',
             'bhu.mutual.consent.policy': 'Mutual Consent Policy',
+            'bhu.payment.file': 'Payment File',
+            'bhu.payment.reconciliation.bank': 'Payment Reconciliation',
         };
 
         if (villageSpecificSections[sectionModel]) {
@@ -1194,6 +1198,8 @@ export class UnifiedDashboard extends Component {
             'bhu.section3c.nh': 'Section 3C (NH)',
             'bhu.section3d.nh': 'Section 3D (NH)',
             'bhu.mutual.consent.policy': 'Mutual Consent Policy',
+            'bhu.payment.file': 'Payment File',
+            'bhu.payment.reconciliation.bank': 'Payment Reconciliation',
         };
         return names[model] || model;
     }

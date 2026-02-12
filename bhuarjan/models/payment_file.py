@@ -32,6 +32,7 @@ class PaymentFile(models.Model):
     # District, Tehsil
     district_id = fields.Many2one('bhu.district', string='District / जिला', related='village_id.district_id', store=True, readonly=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', related='village_id.tehsil_id', store=True, readonly=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', related='project_id.department_id', store=True, readonly=True)
     
     debit_account_number = fields.Char(string='Debit Account Number / डेबिट खाता संख्या', tracking=True)
     

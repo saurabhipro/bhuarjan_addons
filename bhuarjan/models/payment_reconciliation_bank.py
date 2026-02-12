@@ -18,6 +18,7 @@ class PaymentReconciliationBank(models.Model):
     payment_file_id = fields.Many2one('bhu.payment.file', string='Payment File / भुगतान फ़ाइल', required=True, tracking=True)
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', related='payment_file_id.village_id', store=True, readonly=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', related='payment_file_id.project_id', store=True, readonly=True)
+    department_id = fields.Many2one('bhu.department', string='Department / विभाग', related='project_id.department_id', store=True, readonly=True)
     
     # Bank File Upload
     bank_file = fields.Binary(string='Bank File / बैंक फ़ाइल', required=True, tracking=True)

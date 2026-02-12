@@ -25,7 +25,7 @@ class PaymentFile(models.Model):
     name = fields.Char(string='Payment File Number / भुगतान फ़ाइल संख्या', required=True, default='New', tracking=True)
     project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
-    award_id = fields.Many2one('bhu.draft.award', string='Draft Award / अवार्ड', required=True, tracking=True)
+    award_id = fields.Many2one('bhu.section23.award', string='Section 23 Award / धारा 23 अवार्ड', required=True, tracking=True)
     
     # Case Details - removed as fields no longer exist in award model
     
@@ -77,11 +77,11 @@ class PaymentFile(models.Model):
         # Auto-populate from context if available
         if 'village_id' in defaults and not defaults.get('award_id'):
             village_id = defaults['village_id']
-            # Look for active draft awards for this village
+            # Look for active section 23 awards for this village
             # Prioritize submitted/approved awards
-            awards = self.env['bhu.draft.award'].search([
+            awards = self.env['bhu.section23.award'].search([
                 ('village_id', '=', village_id),
-                ('state', 'in', ['submitted', 'approved', 'draft'])
+                ('state', 'in', ['submitted', 'approved'])
             ], order='state desc, create_date desc', limit=1)
             
             if awards:
@@ -132,11 +132,11 @@ class PaymentFile(models.Model):
     def _onchange_village_id(self):
         """Auto-populate award_id if village is selected"""
         if self.village_id:
-            # Look for active draft awards for this village
+            # Look for active section 23 awards for this village
             # We prioritize awards in 'submitted' or 'approved' state if possible
-            awards = self.env['bhu.draft.award'].search([
+            awards = self.env['bhu.section23.award'].search([
                 ('village_id', '=', self.village_id.id),
-                ('state', 'in', ['submitted', 'approved', 'draft'])
+                ('state', 'in', ['submitted', 'approved'])
             ], order='state desc, create_date desc')
             if awards:
                 self.award_id = awards[0].id
@@ -154,15 +154,14 @@ class PaymentFile(models.Model):
             self._populate_payment_lines()
     
     def _populate_payment_lines(self):
-        """Populate payment lines from award compensation lines"""
+        """Populate payment lines from award compensation data"""
         self.ensure_one()
         if not self.award_id or not self.village_id:
             return
         
-        # Get compensation lines for this village
-        compensation_lines = self.award_id.compensation_line_ids.filtered(
-            lambda l: l.landowner_id.village_id.id == self.village_id.id
-        )
+        # Get compensation data from Section 23 Award
+        # This returns a list of dictionaries grouped by landowner/khasra
+        compensation_data = self.award_id.get_land_compensation_data()
         
         # Clear existing lines
         self.payment_line_ids = [(5, 0, 0)]
@@ -170,21 +169,24 @@ class PaymentFile(models.Model):
         # Create payment lines
         line_vals = []
         serial = 1
-        for comp_line in compensation_lines:
-            landowner_id = comp_line.landowner_id.id  # Use ID directly
-            landowner = comp_line.landowner_id # Keep object for field access
-            
+        
+        for data in compensation_data:
+            landowner_id = data.get('landowner').id if data.get('landowner') else False
+            landowner = data.get('landowner')
+            if not landowner:
+                continue
+                
             line_vals.append((0, 0, {
                 'serial_number': serial,
-                'award_serial_number': comp_line.serial_number,
-                'khasra_number': comp_line.khasra_number or '',
+                'award_serial_number': str(serial), # Placeholder as serial isn't in data
+                'khasra_number': data.get('khasra', ''),
                 'landowner_id': landowner_id,
                 'bank_name': landowner.bank_name or '',
                 'bank_branch': landowner.bank_branch or '',
                 'account_number': landowner.account_number or '',
                 'ifsc_code': landowner.ifsc_code or '',
-                'compensation_amount': comp_line.payable_compensation_amount,
-                'net_payable_amount': comp_line.payable_compensation_amount,
+                'compensation_amount': data.get('total_compensation', 0.0),
+                'net_payable_amount': data.get('total_compensation', 0.0), # Assume 0 deductions for now
                 'remark': '', 
             }))
             serial += 1

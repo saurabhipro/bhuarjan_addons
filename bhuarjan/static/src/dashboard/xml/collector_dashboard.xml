@@ -933,6 +933,11 @@
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
                                     Section 23 Award
+                                    <t t-if="state.stats &amp;&amp; state.stats.section23_award_info &amp;&amp; state.stats.section23_award_info.is_completed">
+                                        <span class="o_completion_tick" title="All Section 23 Awards completed">
+                                            <i class="fa fa-check-circle"/>
+                                        </span>
+                                    </t>
                                     <t t-if="state.selectedProjectName or state.selectedVillageName">
                                         <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
                                             <t t-if="state.selectedProjectName">
@@ -946,9 +951,12 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list">-</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section23_award_completion_percent || 0) : 0"/>% Complete</div>
                                     <div class="o_section_list_count">
-                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_total || 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.submitted_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.approved_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.send_back_count : 0) : 0"/></span>
                                     </div>
                                 </div>
                             </div>

@@ -650,12 +650,7 @@
                             </div>
                         </div>
                         </t>
-                        </div>
-                        <!-- End Column 1 -->
-
-                        <!-- Column 2: Steps 6-11 -->
-                        <div class="o_sections_column">
-                        <!-- Section 11 -->
+                        <!-- Section 11 (Step 6) - moved to Column 1 -->
                         <t t-if="this.isSectionVisible('Section 11 Notifications')">
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
@@ -715,6 +710,11 @@
                             </div>
                         </div>
                         </t>
+                        </div>
+                        <!-- End Column 1 -->
+
+                        <!-- Column 2: Steps 7-11 -->
+                        <div class="o_sections_column">
 
                         <!-- Section 15 (Disabled for Collector) -->
                         <t t-if="this.isSectionVisible('(Sec 15) Objections')">

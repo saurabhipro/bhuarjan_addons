@@ -62,11 +62,11 @@ class PaymentFile(models.Model):
     
     def amount_to_text(self, amount):
         """Convert amount to text (Indian system)"""
-        from odoo.tools import amount_to_text_en
-        # Odoo's default is English, but we can use it as a base
-        # For Hindi, we might need a custom tool, but for now let's use standard or just keep it char
+        # For Hindi, we might need a custom tool, but for now let's use standard amount_to_text from currency
         try:
-            return self.currency_id.amount_to_text(amount)
+            if self.currency_id:
+                return self.currency_id.amount_to_text(amount)
+            return str(amount)
         except:
             return str(amount)
     

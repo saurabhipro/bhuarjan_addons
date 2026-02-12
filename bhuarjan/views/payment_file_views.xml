@@ -46,27 +46,34 @@
                         <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary"/></span>
                     </div>
 
-                    <group col="4">
-                        <field name="name" readonly="1" force_save="1"/>
-                        <field name="generation_date"/>
+                    <group>
+                        <group string="File Information">
+                            <field name="name" readonly="1" force_save="1"/>
+                            <field name="generation_date"/>
+                            <field name="project_id" options="{'no_open': True, 'no_create': True}" required="1"/>
+                            <field name="village_id" options="{'no_open': True, 'no_create': True}" required="1"
+                                   domain="[('project_id', '=', project_id)]"
+                                   context="{'default_project_id': project_id}"/>
+                        </group>
                         
-                        <field name="project_id" readonly="1" options="{'no_open': True}" force_save="1"/>
-                        <field name="village_id" readonly="1" options="{'no_open': True}" force_save="1"/>
-                        
-                        <field name="award_id" options="{'no_create': True, 'no_open': True}"
-                               context="{'default_village_id': village_id, 'default_project_id': project_id}"
-                               domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
-                               required="1" readonly="1" force_save="1"/>
-                        <field name="award_ref" readonly="1" string="Award No." style="font-weight: bold; font-size: 1.1em;"/>
-                        
-                        <field name="total_net_payable" widget="monetary" options="{'currency_field': 'currency_id'}" 
-                               style="font-size: 1.2em; font-weight: bold; color: #28a745;"/>
-                        <field name="currency_id" invisible="1"/>
-                        
-                        <!-- Hidden fields -->
-                        <field name="department_id" invisible="1"/>
-                        <field name="district_id" invisible="1"/>
-                        <field name="tehsil_id" invisible="1"/>
+                        <group string="Award &amp; Financials">
+                            <field name="award_id" options="{'no_create': True, 'no_open': True}"
+                                   context="{'default_village_id': village_id, 'default_project_id': project_id}"
+                                   domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
+                                   required="1" readonly="1" force_save="1"/>
+                            <field name="award_ref" readonly="1" string="Award No." style="font-weight: bold; font-size: 1.1em; color: #333;"/>
+                            
+                            <separator string="Total Amount"/>
+                            <field name="total_net_payable" widget="monetary" options="{'currency_field': 'currency_id'}" 
+                                   nolabel="0" class="oe_subtotal_footer_separator"
+                                   style="font-size: 1.5em; font-weight: bold; color: #28a745;"/>
+                            <field name="currency_id" invisible="1"/>
+                            
+                            <!-- Hidden fields -->
+                            <field name="department_id" invisible="1"/>
+                            <field name="district_id" invisible="1"/>
+                            <field name="tehsil_id" invisible="1"/>
+                        </group>
                     </group>
                     
                     <div class="row mt-2 mb-4">

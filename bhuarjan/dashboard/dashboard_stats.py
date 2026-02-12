@@ -59,6 +59,8 @@ class DashboardStats(models.AbstractModel):
         'bhu.section15.objection',
         'bhu.section19.notification',
         'bhu.section21.notification',
+        'bhu.payment.file',
+        'bhu.payment.reconciliation.bank',
     ]
 
     # Models that don't have village_id field (only project filtering)

@@ -10,7 +10,6 @@
                 <field name="award_id"/>
                 <field name="village_id"/>
                 <field name="project_id"/>
-                <field name="total_compensation" sum="Total Compensation"/>
                 <field name="total_net_payable" sum="Total Net Payable"/>
                 <field name="state" widget="badge" 
                        decoration-success="state == 'generated'"
@@ -37,19 +36,16 @@
                             <field name="name"/>
                             <field name="project_id" required="1"/>
                             <field name="village_id" required="1"/>
-                            <field name="award_id" required="1"/>
-                        </group>
-                        <group>
-                            <field name="district_id" readonly="1"/>
-                            <field name="tehsil_id" readonly="1"/>
+                            <field name="district_id" invisible="1"/>
+                            <field name="tehsil_id" invisible="1"/>
+                            <field name="award_id" invisible="1"/>
                         </group>
                     </group>
                     
                     <group string="Totals / योग">
-                        <field name="total_compensation" readonly="1"/>
-                        <field name="total_tds" readonly="1"/>
-                        <field name="total_net_payable" readonly="1"/>
-                        <field name="total_net_payable_text" placeholder="Enter amount in words..."/>
+                        <field name="total_net_payable" readonly="1" options="{'currency_field': 'currency_id'}"/>
+                        <field name="total_net_payable_text" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
                     </group>
                     
                     <group string="Payment Lines / भुगतान पंक्तियां (Auto-populated from Award)">
@@ -57,13 +53,13 @@
                             <list string="Payment Lines" editable="bottom">
                                 <field name="serial_number"/>
                                 <field name="award_serial_number"/>
+                                <field name="khasra_number"/>
                                 <field name="landowner_id"/>
                                 <field name="bank_name"/>
                                 <field name="bank_branch"/>
                                 <field name="account_number"/>
                                 <field name="ifsc_code"/>
                                 <field name="compensation_amount" sum="Total"/>
-                                <field name="tds_deduction" sum="Total"/>
                                 <field name="net_payable_amount" sum="Total"/>
                                 <field name="remark"/>
                             </list>

@@ -33,6 +33,7 @@ class PaymentFile(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला', related='village_id.district_id', store=True, readonly=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', related='village_id.tehsil_id', store=True, readonly=True)
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', related='project_id.department_id', store=True, readonly=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.INR'))
     
     debit_account_number = fields.Char(string='Debit Account Number / डेबिट खाता संख्या', tracking=True)
     
@@ -46,9 +47,8 @@ class PaymentFile(models.Model):
     
     # Totals
     total_compensation = fields.Float(string='Total Compensation / कुल मुआवजा', compute='_compute_totals', store=True, digits=(16, 2))
-    total_tds = fields.Float(string='Total TDS / कुल टीडीएस', compute='_compute_totals', store=True, digits=(16, 2))
     total_net_payable = fields.Float(string='Total Net Payable / कुल शुद्ध देय', compute='_compute_totals', store=True, digits=(16, 2))
-    total_net_payable_text = fields.Char(string='Total Net Payable (Text) / कुल शुद्ध देय (पाठ)')
+    total_net_payable_text = fields.Char(string='Total Net Payable (Text) / कुल शुद्ध देय (पाठ)', compute='_compute_totals', store=True)
     
     # File Generation
     generated_file = fields.Binary(string='Generated File / जेनरेट की गई फ़ाइल')
@@ -60,13 +60,23 @@ class PaymentFile(models.Model):
         ('generated', 'Generated / जेनरेट किया गया'),
     ], string='Status / स्थिति', default='draft', tracking=True)
     
-    @api.depends('payment_line_ids.compensation_amount', 'payment_line_ids.tds_deduction', 'payment_line_ids.net_payable_amount')
+    def amount_to_text(self, amount):
+        """Convert amount to text (Indian system)"""
+        from odoo.tools import amount_to_text_en
+        # Odoo's default is English, but we can use it as a base
+        # For Hindi, we might need a custom tool, but for now let's use standard or just keep it char
+        try:
+            return self.currency_id.amount_to_text(amount)
+        except:
+            return str(amount)
+    
+    @api.depends('payment_line_ids.compensation_amount', 'payment_line_ids.net_payable_amount')
     def _compute_totals(self):
         """Compute totals from payment lines"""
         for record in self:
             record.total_compensation = sum(record.payment_line_ids.mapped('compensation_amount'))
-            record.total_tds = sum(record.payment_line_ids.mapped('tds_deduction'))
             record.total_net_payable = sum(record.payment_line_ids.mapped('net_payable_amount'))
+            record.total_net_payable_text = record.amount_to_text(record.total_net_payable)
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -118,6 +128,8 @@ class PaymentFile(models.Model):
                 ('project_id', '=', self.project_id.id),
                 ('village_id', '=', self.village_id.id)
             ])
+            if len(awards) == 1:
+                self.award_id = awards[0].id
             return {'domain': {'award_id': [('id', 'in', awards.ids)]}}
         return {'domain': {'award_id': []}}
     
@@ -149,13 +161,13 @@ class PaymentFile(models.Model):
             line_vals.append((0, 0, {
                 'serial_number': serial,
                 'award_serial_number': comp_line.serial_number,
+                'khasra_number': comp_line.khasra_number or '',
                 'landowner_id': landowner.id,
                 'bank_name': landowner.bank_name or '',
                 'bank_branch': landowner.bank_branch or '',
                 'account_number': landowner.account_number or '',
                 'ifsc_code': landowner.ifsc_code or '',
                 'compensation_amount': comp_line.payable_compensation_amount,
-                'tds_deduction': 0.0,  # Default, can be updated
                 'net_payable_amount': comp_line.payable_compensation_amount,
             }))
             serial += 1
@@ -167,7 +179,10 @@ class PaymentFile(models.Model):
         """Generate payment file (Excel/Annexure)"""
         self.ensure_one()
         if not self.payment_line_ids:
-            raise ValidationError(_('Please populate payment lines first. Select Award and Village, then save the record.'))
+            self._populate_payment_lines()
+            
+        if not self.payment_line_ids:
+            raise ValidationError(_('No compensation data found for this village and project in the selected Award.'))
         
         if not HAS_XLSXWRITER:
             raise ValidationError(_('xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter'))
@@ -232,7 +247,10 @@ class PaymentFile(models.Model):
             'IFSC',
             'Purpose 1',
             'Purpose 2',
-            'Cheque Number'
+            'Cheque Number',
+            'Project',
+            'Village',
+            'Khasra'
         ]
         
         # Write headers
@@ -253,6 +271,9 @@ class PaymentFile(models.Model):
             worksheet.write(row, 8, self.village_id.name or '', cell_format)  # Purpose 1
             worksheet.write(row, 9, self.project_id.name or '', cell_format)  # Purpose 2
             worksheet.write(row, 10, '', cell_format)  # Cheque Number
+            worksheet.write(row, 11, self.project_id.name or '', cell_format)  # Project
+            worksheet.write(row, 12, self.village_id.name or '', cell_format)  # Village
+            worksheet.write(row, 13, line.khasra_number or '', cell_format)  # Khasra
             row += 1
         
         # Set column widths
@@ -267,6 +288,7 @@ class PaymentFile(models.Model):
         worksheet.set_column('I:I', 20)
         worksheet.set_column('J:J', 20)
         worksheet.set_column('K:K', 15)
+        worksheet.set_column('L:N', 25)
         
         workbook.close()
         output.seek(0)
@@ -283,6 +305,7 @@ class PaymentFileLine(models.Model):
     # Serial Numbers
     serial_number = fields.Integer(string='Serial Number / स.क.', required=True, default=1)
     award_serial_number = fields.Integer(string='Award Serial Number / अवॉर्ड स.क.', required=True)
+    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर')
     
     # Landowner Details
     landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूमिस्वामी', required=False, ondelete='set null')
@@ -298,16 +321,17 @@ class PaymentFileLine(models.Model):
     
     # Payment Amounts
     compensation_amount = fields.Float(string='Compensation Amount / मुआवजा राशि', required=True, digits=(16, 2))
-    tds_deduction = fields.Float(string='TDS Deduction / टीडीएस कटौती', digits=(16, 2), default=0.0)
     net_payable_amount = fields.Float(string='Net Payable Amount / शुद्ध भुगतान की राशि', 
                                       compute='_compute_net_payable', store=True, digits=(16, 2))
+    
+    currency_id = fields.Many2one('res.currency', string='Currency', related='payment_file_id.currency_id')
     
     # Remarks
     remark = fields.Text(string='Remark / रिमार्क')
     
-    @api.depends('compensation_amount', 'tds_deduction')
+    @api.depends('compensation_amount')
     def _compute_net_payable(self):
         """Compute net payable amount"""
         for record in self:
-            record.net_payable_amount = record.compensation_amount - record.tds_deduction
+            record.net_payable_amount = record.compensation_amount
 

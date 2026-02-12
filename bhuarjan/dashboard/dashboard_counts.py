@@ -51,6 +51,8 @@ class DashboardCounts(models.AbstractModel):
         expert_base = project_domain if (project_id or department_id) else []
         sia_base = project_domain if (project_id or department_id) else []
         section23_base = project_domain + village_domain if has_filters else []
+        payment_base = project_domain + village_domain if has_filters else []
+        reconciliation_base = project_domain + village_domain if has_filters else []
         
         # Survey domain - combine project and village filters properly
         survey_base = []
@@ -94,15 +96,15 @@ class DashboardCounts(models.AbstractModel):
             'section23_send_back': section23_counts['send_back'],
             
             # Payment Files
-            'total_payment_files': self.env['bhu.payment.file'].search_count([]),
-            'draft_payment_files': self.env['bhu.payment.file'].search_count([('state', '=', 'draft')]),
-            'generated_payment_files': self.env['bhu.payment.file'].search_count([('state', '=', 'generated')]),
+            'payment_file_total': self.env['bhu.payment.file'].search_count(payment_base),
+            'payment_file_draft': self.env['bhu.payment.file'].search_count(payment_base + [('state', '=', 'draft')]),
+            'payment_file_generated': self.env['bhu.payment.file'].search_count(payment_base + [('state', '=', 'generated')]),
             
             # Payment Reconciliations
-            'total_payment_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([]),
-            'draft_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'draft')]),
-            'processed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'processed')]),
-            'completed_reconciliations': self.env['bhu.payment.reconciliation.bank'].search_count([('state', '=', 'completed')]),
+            'reconciliation_total': self.env['bhu.payment.reconciliation.bank'].search_count(reconciliation_base),
+            'reconciliation_draft': self.env['bhu.payment.reconciliation.bank'].search_count(reconciliation_base + [('state', '=', 'draft')]),
+            'reconciliation_processed': self.env['bhu.payment.reconciliation.bank'].search_count(reconciliation_base + [('state', '=', 'processed')]),
+            'reconciliation_completed': self.env['bhu.payment.reconciliation.bank'].search_count(reconciliation_base + [('state', '=', 'completed')]),
             
             # Document Vault
             'total_documents': self.env['bhu.document.vault'].search_count([]),

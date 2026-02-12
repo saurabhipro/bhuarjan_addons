@@ -52,7 +52,7 @@
                             <field name="generation_date"/>
                             <field name="project_id" options="{'no_open': True, 'no_create': True}" required="1"/>
                             <field name="village_id" options="{'no_open': True, 'no_create': True}" required="1"
-                                   domain="[('project_id', '=', project_id)]"
+                                   domain="[('project_ids', 'in', project_id)]"
                                    context="{'default_project_id': project_id}"/>
                         </group>
                         

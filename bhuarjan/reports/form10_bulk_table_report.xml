@@ -165,6 +165,9 @@
         <!-- Set surveys from docs - handle both list and recordset -->
         <t t-set="surveys" t-value="docs if docs else (object and [object] or [])"/>
         <t t-set="first" t-value="surveys and len(surveys) > 0 and surveys[0] or (object or False)"/>
+        <!-- Calculate Totals -->
+        <t t-set="total_area_sum" t-value="sum(s.total_area or 0.0 for s in surveys)"/>
+        <t t-set="total_acquired_area_sum" t-value="sum(s.acquired_area or 0.0 for s in surveys)"/>
         <t t-call="web.html_container">
             <!-- Include centralized CSS styles -->
             <t t-call="bhuarjan.report_common_styles"/>
@@ -429,6 +432,17 @@
                                                 </td>
                                             </tr>
                                 </t>
+                                <!-- Total Row -->
+                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                    <td colspan="2" style="text-align:right; border: 1px solid #000; padding: 5px;">कुल योग</td>
+                                    <td style="text-align:center; border: 1px solid #000; padding: 5px;">
+                                        <t t-esc="round(total_area_sum, 4)"/>
+                                    </td>
+                                    <td style="text-align:center; border: 1px solid #000; padding: 5px;">
+                                        <t t-esc="round(total_acquired_area_sum, 4)"/>
+                                    </td>
+                                    <td colspan="14" style="border: 1px solid #000;"></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -454,6 +468,9 @@
         <!-- Set surveys from docs - handle both list and recordset -->
         <t t-set="surveys" t-value="docs if docs else (object and [object] or [])"/>
         <t t-set="first" t-value="surveys and len(surveys) > 0 and surveys[0] or (object or False)"/>
+        <!-- Calculate Totals -->
+        <t t-set="total_area_sum" t-value="sum(s.total_area or 0.0 for s in surveys)"/>
+        <t t-set="total_acquired_area_sum" t-value="sum(s.acquired_area or 0.0 for s in surveys)"/>
         <t t-call="web.html_container">
             <!-- Include centralized CSS styles -->
             <t t-call="bhuarjan.report_common_styles"/>
@@ -665,6 +682,17 @@
                                                 </td>
                                             </tr>
                                 </t>
+                                <!-- Total Row -->
+                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                    <td colspan="2" style="text-align:right; border: 1px solid #000; padding: 5px;">कुल योग</td>
+                                    <td style="text-align:center; border: 1px solid #000; padding: 5px;">
+                                        <t t-esc="round(total_area_sum, 4)"/>
+                                    </td>
+                                    <td style="text-align:center; border: 1px solid #000; padding: 5px;">
+                                        <t t-esc="round(total_acquired_area_sum, 4)"/>
+                                    </td>
+                                    <td colspan="14" style="border: 1px solid #000;"></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

@@ -340,7 +340,7 @@
         <record id="record_bhu_survey_rule_department_user" model="ir.rule">
             <field name="name">Department User can see surveys from projects in their department</field>
             <field name="model_id" ref="model_bhu_survey"/>
-            <field name="domain_force">['|', ('project_id.department_id', '=', user.bhu_department_id.id), ('department_id', '=', user.bhu_department_id.id)]</field>
+            <field name="domain_force">['|', '|', ('project_id.department_id', '=', user.bhu_department_id.id), ('department_id', '=', user.bhu_department_id.id), ('project_id.department_user_ids', 'in', user.id)]</field>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_department_user'))]"/>
         </record>
 

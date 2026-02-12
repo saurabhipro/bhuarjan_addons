@@ -38,7 +38,6 @@ class DashboardStats(models.AbstractModel):
             'bhuarjan.group_bhuarjan_collector',       # Collector users
             'bhuarjan.group_bhuarjan_additional_collector',  # Additional Collector users
             'bhuarjan.group_bhuarjan_district_administrator',  # District Administrator users
-            'bhuarjan.group_bhuarjan_department_user',  # Department users - can see all projects
         ],
         'sdm_groups': [
             'bhuarjan.group_bhuarjan_sdm',             # SDM users
@@ -132,9 +131,16 @@ class DashboardStats(models.AbstractModel):
         
         # Department user
         if any(user.has_group(group) for group in config['department_groups']):
+            # For Department Users, find projects in their department OR where they are explicitly assigned
+            # Correct domain: ('department_id', '=', user.bhu_department_id.id) OR ('department_user_ids', 'in', user.id)
+            domain = [('department_user_ids', 'in', [user.id])]
+            if user.bhu_department_id:
+                domain = ['|', ('department_id', '=', user.bhu_department_id.id)] + domain
+            
+            assigned_projects = self.env['bhu.project'].search(domain)
             return {
                 'can_see_all': False,
-                'project_ids': [],  # Department users see projects based on their department
+                'project_ids': assigned_projects.ids,
                 'user_type': 'department',
             }
         

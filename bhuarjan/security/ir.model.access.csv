@@ -124,3 +124,4 @@ access_change_password_wizard_district_admin,change.password.wizard.district.adm
 access_change_password_user_district_admin,change.password.user.district.admin,base.model_change_password_user,bhuarjan.group_bhuarjan_district_administrator,1,1,1,1
 access_image_capture_user,access.image.capture.user,model_image_capture,base.group_user,1,1,1,1
 access_bhu_all_section_report,access_bhu_all_section_report,model_bhu_all_section_report,base.group_user,1,0,0,0
+access_bhu_landowner_payment_status,bhu.landowner.payment.status.model_access,model_bhu_landowner_payment_status,base.group_user,1,1,1,1

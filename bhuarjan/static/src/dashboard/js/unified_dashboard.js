@@ -1297,6 +1297,11 @@ export class UnifiedDashboard extends Component {
                 return true;
             }
 
+            // Always show Payment File and Payment Reconciliation if they are present
+            if (dashboardSectionName === 'Payment File' || dashboardSectionName === 'Payment Reconciliation') {
+                return true;
+            }
+
             // If project is selected but no allowed sections configured, hide all sections
             // This prevents showing all sections when law master is not configured
             if (!this.state.allowedSectionNames || this.state.allowedSectionNames.length === 0) {

@@ -46,33 +46,43 @@
                         <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary"/></span>
                     </div>
 
-                    <group>
-                        <group string="File Details">
-                            <field name="name" readonly="1" force_save="1"/>
-                            <div class="text-muted" colspan="2" style="font-size: 0.85em; margin-top: -10px; margin-bottom: 10px;">
-                                <i class="fa fa-info-circle"/> File Number will be generated automatically upon file generation.
-                            </div>
-                            <field name="award_id" options="{'no_create': True, 'no_open': True}"
-                                   context="{'default_village_id': village_id, 'default_project_id': project_id}"
-                                   domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
-                                   required="1" readonly="1" force_save="1"/>
-                            <field name="award_ref" readonly="1"/>
-                            <!-- Hidden fields to ensure they are available for the header -->
-                            <field name="project_id" readonly="1" options="{'no_open': True}" force_save="1"/>
-                            <field name="village_id" readonly="1" options="{'no_open': True}" force_save="1"/>
-                            <field name="department_id" invisible="1"/>
-                            <field name="district_id" invisible="1"/>
-                            <field name="tehsil_id" invisible="1"/>
-                        </group>
-                        <group string="Amount Summary">
-                            <field name="total_net_payable_text" nolabel="1" readonly="1" 
-                                   style="font-style: italic; background-color: #fefefe; padding: 10px; border: 1px solid #eee; border-radius: 4px; display: block;"/>
-                        </group>
+                    <group col="4">
+                        <field name="name" readonly="1" force_save="1"/>
+                        <field name="generation_date"/>
+                        
+                        <field name="project_id" readonly="1" options="{'no_open': True}" force_save="1"/>
+                        <field name="village_id" readonly="1" options="{'no_open': True}" force_save="1"/>
+                        
+                        <field name="award_id" options="{'no_create': True, 'no_open': True}"
+                               context="{'default_village_id': village_id, 'default_project_id': project_id}"
+                               domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"
+                               required="1" readonly="1" force_save="1"/>
+                        <field name="award_ref" readonly="1" string="Award No." style="font-weight: bold; font-size: 1.1em;"/>
+                        
+                        <field name="total_net_payable" widget="monetary" options="{'currency_field': 'currency_id'}" 
+                               style="font-size: 1.2em; font-weight: bold; color: #28a745;"/>
+                        <field name="currency_id" invisible="1"/>
+                        
+                        <!-- Hidden fields -->
+                        <field name="department_id" invisible="1"/>
+                        <field name="district_id" invisible="1"/>
+                        <field name="tehsil_id" invisible="1"/>
                     </group>
                     
+                    <div class="row mt-2 mb-4">
+                        <div class="col-12">
+                            <field name="total_net_payable_text" nolabel="1" readonly="1" 
+                                   style="font-style: italic; background-color: #fefefe; padding: 10px; border: 1px solid #eee; border-radius: 4px; display: block; width: 100%;"/>
+                        </div>
+                    </div>
+                    
+                    <div class="text-muted mb-2" style="font-size: 0.85em;">
+                        <i class="fa fa-info-circle"/> File Number will be generated automatically upon file generation.
+                    </div>
+                    
                     <group string="Payment Lines (Auto-populated from Award)">
-                        <field name="payment_line_ids" nolabel="1">
-                            <list string="Payment Lines" editable="bottom">
+                        <field name="payment_line_ids" nolabel="1" readonly="1">
+                            <list string="Payment Lines" create="0" delete="0" edit="0">
                                 <field name="serial_number" string="Serial Number"/>
                                 <field name="award_serial_number" string="Award Serial No."/>
                                 <field name="khasra_number" string="Khasra Number"/>
@@ -82,7 +92,7 @@
                                 <field name="account_number" string="Account Number"/>
                                 <field name="ifsc_code" string="IFSC Code"/>
                                 <field name="compensation_amount" sum="Total" string="Compensation"/>
-                                <field name="net_payable_amount" sum="Total" string="Net Payable"/>
+                                <field name="net_payable_amount" sum="Total" string="Net Payable" decoration-bf="1" decoration-success="1"/>
                                 <field name="remark" string="Remark"/>
                             </list>
                         </field>

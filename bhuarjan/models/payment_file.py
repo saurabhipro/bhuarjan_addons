@@ -121,15 +121,20 @@ class PaymentFile(models.Model):
     
     @api.onchange('village_id')
     def _onchange_village_id(self):
-        """Reset award when village changes and filter awards"""
-        self.award_id = False
-        if self.village_id and self.project_id:
+        """Auto-populate award_id if village is selected"""
+        if self.village_id:
+            # Look for active draft awards for this village
+            # We prioritize awards in 'submitted' or 'approved' state if possible
             awards = self.env['bhu.draft.award'].search([
-                ('project_id', '=', self.project_id.id),
-                ('village_id', '=', self.village_id.id)
-            ])
-            if len(awards) == 1:
+                ('village_id', '=', self.village_id.id),
+                ('state', 'in', ['submitted', 'approved', 'draft'])
+            ], order='state desc, create_date desc')
+            if awards:
                 self.award_id = awards[0].id
+            
+            # Also set project_id if not set and found in award
+            if not self.project_id and self.award_id:
+                self.project_id = self.award_id.project_id.id
             return {'domain': {'award_id': [('id', 'in', awards.ids)]}}
         return {'domain': {'award_id': []}}
     

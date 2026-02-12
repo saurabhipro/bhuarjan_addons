@@ -31,7 +31,7 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
                 </header>
                 <sheet>
-                    <div class="alert alert-info py-2 mb-2" role="alert" t-if="project_id and village_id">
+                    <div class="alert alert-info py-2 mb-2" role="alert" invisible="not project_id or not village_id">
                         <i class="fa fa-info-circle mr-2"/>
                         Generating Payment File for Project: <strong><field name="project_id" readonly="1" options="{'no_open': True}"/></strong> 
                         and Village: <strong><field name="village_id" readonly="1" options="{'no_open': True}"/></strong>

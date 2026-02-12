@@ -101,24 +101,12 @@ class PaymentFile(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Generate payment file number if not provided"""
+        """Create payment file"""
+        # Just ensure name defaults to New if not set
         for vals in vals_list:
-            if vals.get('name', 'New') == 'New' or not vals.get('name'):
-                # Try to use sequence settings from settings master
-                project_id = vals.get('project_id')
-                village_id = vals.get('village_id')
-                if project_id:
-                    sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
-                        'payment_file', project_id, village_id=village_id
-                    )
-                    if sequence_number:
-                        vals['name'] = sequence_number
-                    else:
-                        # Fallback to ir.sequence
-                        vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
-                else:
-                    # No project_id, use fallback
-                    vals['name'] = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
+            if not vals.get('name'):
+                vals['name'] = 'New'
+                
         records = super().create(vals_list)
         # Auto-populate payment lines from award compensation lines
         for record in records:
@@ -183,18 +171,21 @@ class PaymentFile(models.Model):
         line_vals = []
         serial = 1
         for comp_line in compensation_lines:
-            landowner = comp_line.landowner_id
+            landowner_id = comp_line.landowner_id.id  # Use ID directly
+            landowner = comp_line.landowner_id # Keep object for field access
+            
             line_vals.append((0, 0, {
                 'serial_number': serial,
                 'award_serial_number': comp_line.serial_number,
                 'khasra_number': comp_line.khasra_number or '',
-                'landowner_id': landowner.id,
+                'landowner_id': landowner_id,
                 'bank_name': landowner.bank_name or '',
                 'bank_branch': landowner.bank_branch or '',
                 'account_number': landowner.account_number or '',
                 'ifsc_code': landowner.ifsc_code or '',
                 'compensation_amount': comp_line.payable_compensation_amount,
                 'net_payable_amount': comp_line.payable_compensation_amount,
+                'remark': '', 
             }))
             serial += 1
         
@@ -204,12 +195,27 @@ class PaymentFile(models.Model):
     def action_generate_file(self):
         """Generate payment file (Excel/Annexure)"""
         self.ensure_one()
+        
+        # Generate Sequence Number if not already generated
+        if self.name == 'New' or not self.name or self.name == 'Draft':
+            sequence_number = False
+            if self.project_id:
+                sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
+                    'payment_file', self.project_id.id, village_id=self.village_id.id
+                )
+            
+            if sequence_number:
+                self.name = sequence_number
+            else:
+                self.name = self.env['ir.sequence'].next_by_code('bhu.payment.file') or 'New'
+
         if not self.payment_line_ids:
             self._populate_payment_lines()
             
         if not self.payment_line_ids:
             raise ValidationError(_('No compensation data found for this village and project in the selected Award.'))
         
+        # Check library after sequence generation, so we don't fail before assigning name if library is missing (though library check is important)
         if not HAS_XLSXWRITER:
             raise ValidationError(_('xlsxwriter library is required for Excel export. Please install it: pip install xlsxwriter'))
         

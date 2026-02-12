@@ -56,7 +56,10 @@
 
                     <group>
                         <group string="File Details">
-                            <field name="name" placeholder="e.g. Payment File 001"/>
+                            <field name="name" readonly="1" force_save="1"/>
+                            <div class="text-muted" colspan="2" style="font-size: 0.85em; margin-top: -10px; margin-bottom: 10px;">
+                                <i class="fa fa-info-circle"/> File Number will be generated automatically upon file generation.
+                            </div>
                             <field name="award_id" options="{'no_create': True, 'no_open': True}"
                                    context="{'default_village_id': village_id, 'default_project_id': project_id}"
                                    domain="[('village_id', '=', village_id), ('state', 'in', ['approved', 'submitted'])]"

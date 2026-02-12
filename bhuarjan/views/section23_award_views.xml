@@ -26,10 +26,11 @@
                 </header>
                 <sheet>
                     <field name="is_generated" invisible="1"/>
-                    <div class="oe_title" style="margin-bottom: 20px;">
-                        <h2 style="color: #8B4513; margin-top: 5px; font-weight: bold;">
-                            <i class="fa fa-trophy" style="margin-right: 10px;"></i>Section 23 Award / धारा 23 अवार्ड
-                        </h2>
+                    <div class="oe_title">
+                        <h1>
+                            <i class="fa fa-trophy text-primary" style="margin-right: 10px;"/>
+                            Section 23 Award / धारा 23 अवार्ड
+                        </h1>
                     </div>
 
                     <style>
@@ -104,10 +105,12 @@
                         }
                     </style>
                     
-                    <div invisible="not project_id or not village_id" class="mt-2 mb-3 p-2 rounded w-100" style="background-color: #e9ecef; border-left: 4px solid #8B4513; color: #495057; clear: both;">
-                         <i class="fa fa-info-circle me-1"></i>
-                         Generating award for Village <field name="village_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>, 
-                         Project <field name="project_id" readonly="1" options="{'no_open': True}" class="fw-bold" style="color: #8B4513;"/>
+                    <div class="alert alert-warning mb-4 mt-2" role="alert" style="border-left: 5px solid #8B4513; background-color: #fcf8f2; color: #555; padding: 15px;">
+                        <i class="fa fa-info-circle mr-2"/>
+                        Generating award for 
+                        <strong>Village:</strong> <field name="village_id" readonly="1" options="{'no_open': True}" class="text-primary"/>, 
+                        <strong>Project:</strong> <field name="project_id" readonly="1" options="{'no_open': True}" class="text-primary"/>
+                        <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary"/></span>
                     </div>
                     
                     <group invisible="1">

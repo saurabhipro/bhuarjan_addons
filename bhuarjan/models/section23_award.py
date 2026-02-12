@@ -530,7 +530,7 @@ class Section23AwardSurveyLine(models.Model):
     land_type = fields.Selection([
         ('village', 'Village / ग्राम'),
         ('residential', 'Residential / आवासीय')
-    ], string='Type / प्रकार', required=False,
+    ], string='Type / प्रकार', required=True, default='village',
        help='Select whether this is village land or residential land')
     
     # Distance checkbox
@@ -542,13 +542,15 @@ class Section23AwardSurveyLine(models.Model):
     
     @api.onchange('land_type', 'is_within_distance')
     def _onchange_type_distance(self):
-        """Sync type and distance to survey model"""
+        """Sync type and distance to survey model and trigger rate recompute"""
         for line in self:
             if line.survey_id:
                 line.survey_id.write({
                     'land_type_for_award': line.land_type,
                     'is_within_distance_for_award': line.is_within_distance,
                 })
+            # Force recompute for immediate UI feedback
+            line._compute_rate_per_hectare()
     
     def write(self, vals):
         """Sync type and distance to survey when updating"""
@@ -575,7 +577,7 @@ class Section23AwardSurveyLine(models.Model):
         """Compute rate per hectare from rate master based on type and distance"""
         for line in self:
             rate = 0.0
-            if line.award_id and line.award_id.village_id and line.land_type and line.is_within_distance is not False:
+            if line.award_id and line.award_id.village_id and line.land_type:
                 # Get active rate master for this village
                 rate_master = self.env['bhu.rate.master'].search([
                     ('village_id', '=', line.award_id.village_id.id),
@@ -584,31 +586,31 @@ class Section23AwardSurveyLine(models.Model):
                 
                 if rate_master:
                     # Determine which rate to use based on type and distance
-                    if line.land_type == 'village':
+                    # Default to village rules if not set
+                    land_type = line.land_type or 'village'
+                    
+                    if land_type == 'village':
                         # Village: 20 meters
                         if line.is_within_distance:
-                            # Within 20m - use main_road_rate_hectare
                             base_rate = rate_master.main_road_rate_hectare
                         else:
-                            # Beyond 20m - use other_road_rate_hectare
                             base_rate = rate_master.other_road_rate_hectare
                     else:
                         # Residential: 5 meters
                         if line.is_within_distance:
-                            # Within 5m - use main_road_rate_hectare
                             base_rate = rate_master.main_road_rate_hectare
                         else:
-                            # Beyond 5m - use other_road_rate_hectare
                             base_rate = rate_master.other_road_rate_hectare
                     
-                    # Apply irrigation adjustment if survey has irrigation type
-                    if line.survey_id and line.survey_id.irrigation_type:
-                        if line.survey_id.irrigation_type == 'irrigated':
-                            rate = base_rate * 1.2  # 20% increase for irrigated
-                        elif line.survey_id.irrigation_type == 'unirrigated':
-                            rate = base_rate * 0.8  # 20% decrease for unirrigated
-                        else:
-                            rate = base_rate
+                    # Apply irrigation adjustment from survey
+                    # Rules from Land Rate Master get_rate_for_land:
+                    # Irrigated: +20% (1.2), Non-Irrigated: -20% (0.8)
+                    irrigation_type = line.survey_id.irrigation_type if line.survey_id else False
+                    
+                    if irrigation_type == 'irrigated':
+                        rate = base_rate * 1.2
+                    elif irrigation_type in ['unirrigated', 'non_irrigated']:
+                        rate = base_rate * 0.8
                     else:
                         rate = base_rate
             

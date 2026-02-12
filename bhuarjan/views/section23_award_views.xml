@@ -133,9 +133,7 @@
 
                     <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}" readonly="state != 'draft'">
                         <list editable="bottom" string="Surveys" default_order="survey_id" create="0">
-                            <field name="survey_id" string="Survey" 
-                                   domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('state', 'in', ['approved', 'locked'])]"
-                                   options="{'no_create': True}"/>
+                            <field name="survey_id" column_invisible="True"/>
                              <field name="survey_name" column_invisible="True"/>
                             <field name="survey_date" column_invisible="True"/>
                             <field name="khasra_number" readonly="1" string="Khasra Number"/>
@@ -146,7 +144,7 @@
                             <field name="is_within_distance" 
                                    string="Within Distance" 
                                    help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
-                            <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
+                            <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show" force_save="1"/>
                         </list>
                     </field>
                     

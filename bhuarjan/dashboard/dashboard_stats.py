@@ -624,6 +624,7 @@ class DashboardStats(models.AbstractModel):
             # Build response with all statistics
             result = {
                 'is_collector': is_collector,
+                'is_admin': user_access['user_type'] == 'admin',
                 'is_project_exempt': is_project_exempt,
                 'is_displacement': is_displacement,
                 'user_type': user_access['user_type'],

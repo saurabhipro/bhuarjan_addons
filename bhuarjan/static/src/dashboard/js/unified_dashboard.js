@@ -363,6 +363,13 @@ export class UnifiedDashboard extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
 
+        // Bind methods to this instance for use in templates
+        this.openSection8ForRecommend = this.openSection8ForRecommend.bind(this);
+        this.openFirstPending = this.openFirstPending.bind(this);
+        this.openSectionList = this.openSectionList.bind(this);
+        this.openFirstDocument = this.openFirstDocument.bind(this);
+        this.createSectionRecord = this.createSectionRecord.bind(this);
+
         const localStoragePrefix = this.config.localStoragePrefix;
 
         // Load persisted selections from localStorage
@@ -384,6 +391,7 @@ export class UnifiedDashboard extends Component {
             projects: [],
             villages: [],
             isCollector: false,
+            isAdmin: false,
             isProjectExempt: false,
             isDisplacement: false,
             isReadOnly: this.config.isReadOnly || false, // District admin is read-only
@@ -591,6 +599,9 @@ export class UnifiedDashboard extends Component {
                 // Set additional flags
                 if (stats.is_collector !== undefined) {
                     this.state.isCollector = stats.is_collector;
+                }
+                if (stats.is_admin !== undefined) {
+                    this.state.isAdmin = stats.is_admin;
                 }
                 if (stats.is_project_exempt !== undefined) {
                     this.state.isProjectExempt = stats.is_project_exempt;
@@ -868,6 +879,7 @@ export class UnifiedDashboard extends Component {
             'bhu.draft.award',  // Legacy, keeping for compatibility
             'bhu.payment.file',
             'bhu.payment.reconciliation.bank',
+            'bhu.section8',
         ];
 
         // Only add department_id if model has this field
@@ -897,6 +909,7 @@ export class UnifiedDashboard extends Component {
             'bhu.mutual.consent.policy',
             'bhu.payment.file',
             'bhu.payment.reconciliation.bank',
+            'bhu.section8',
         ];
 
         if (this.state.selectedVillage && (!model || modelsWithVillage.includes(model))) {
@@ -1107,7 +1120,7 @@ export class UnifiedDashboard extends Component {
         });
     }
 
-    // Handle Section 8 Recommend/Not Recommend actions
+    // Handle Section 8 Recommend/Not Recommend actions (for Collector)
     async openSection8ForRecommend(actionType) {
         if (!this.checkProjectSelected()) {
             return;

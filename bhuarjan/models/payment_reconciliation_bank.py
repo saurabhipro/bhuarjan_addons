@@ -92,34 +92,39 @@ class PaymentReconciliationBank(models.Model):
         import base64
         import csv
         import io
+        import xlrd
+        from odoo.tools import pycompat
         
         try:
             file_content = base64.b64decode(self.bank_file)
-            # Try to decode as text
-            if isinstance(file_content, bytes):
-                file_content = file_content.decode('utf-8')
-            
-            # Parse CSV/TXT file
-            reader = csv.DictReader(io.StringIO(file_content))
             
             # Clear existing lines
             self.reconciliation_line_ids = [(5, 0, 0)]
-            
-            # Create reconciliation lines from bank file
             line_vals = []
-            for row in reader:
-                # Map bank file columns to reconciliation line fields
-                line_vals.append((0, 0, {
-                    'utr_number': row.get('UTR Number', '') or row.get('UTR', ''),
-                    'transaction_reference': row.get('Transaction Reference', '') or row.get('Transaction Ref', ''),
-                    'beneficiary_account': row.get('Beneficiary Account', '') or row.get('Account Number', ''),
-                    'beneficiary_name': row.get('Beneficiary Name', ''),
-                    'beneficiary_bank_code': row.get('Beneficiary Bank Code', '') or row.get('IFSC Code', ''),
-                    'credit_amount': float(row.get('Credit Amount', 0) or 0),
-                    'status': row.get('Status', '').lower() if row.get('Status') else 'pending',
-                    'error': row.get('Error', ''),
-                    'payment_id': row.get('Payment Id', ''),
-                }))
+
+            # Try to determine if it's Excel or CSV
+            is_excel = self.bank_file_filename and (self.bank_file_filename.endswith('.xls') or self.bank_file_filename.endswith('.xlsx'))
+            
+            if is_excel:
+                # Process Excel
+                workbook = xlrd.open_workbook(file_contents=file_content)
+                sheet = workbook.sheet_by_index(0)
+                headers = [sheet.cell_value(0, col) for col in range(sheet.ncols)]
+                
+                for row_idx in range(1, sheet.nrows):
+                    row_data = {}
+                    for col_idx, header in enumerate(headers):
+                        row_data[header] = sheet.cell_value(row_idx, col_idx)
+                    
+                    line_vals.append((0, 0, self._prepare_line_vals(row_data)))
+            else:
+                # Process CSV
+                if isinstance(file_content, bytes):
+                    file_content = file_content.decode('utf-8-sig') # Handle BOM
+                
+                reader = csv.DictReader(io.StringIO(file_content))
+                for row in reader:
+                    line_vals.append((0, 0, self._prepare_line_vals(row)))
             
             if line_vals:
                 self.reconciliation_line_ids = line_vals
@@ -129,6 +134,23 @@ class PaymentReconciliationBank(models.Model):
                 self._match_payments()
         except Exception as e:
             raise ValidationError(_('Error processing bank file: %s') % str(e))
+
+    def _prepare_line_vals(self, row):
+        """Helper to map row data to line vals"""
+        # Mapping Template 2 columns
+        return {
+            'utr_number': row.get('UTR Number', '') or row.get('UTR', ''),
+            'transaction_reference': row.get('Transaction Reference', '') or row.get('Transaction Ref', ''),
+            'beneficiary_account': str(row.get('Beneficiary Account', '') or row.get('Account Number', '')).split('.')[0],
+            'beneficiary_name': row.get('Beneficiary Name', ''),
+            'beneficiary_bank_code': row.get('Beneficiary Bank Code', '') or row.get('IFSC Code', ''),
+            'credit_amount': float(row.get('Credit Amount', 0) or row.get('Amount', 0) or 0),
+            'status': row.get('Status', '').lower() if row.get('Status') else 'pending',
+            'event_status': row.get('Event Status', ''),
+            'error': row.get('Error', ''),
+            'payment_id': row.get('Payment Id', ''),
+            'transaction_date': row.get('Date', ''),
+        }
     
     def _match_payments(self):
         """Match bank file transactions with payment file lines"""
@@ -160,6 +182,59 @@ class PaymentReconciliationBank(models.Model):
             else:
                 recon_line.status = 'pending'
 
+    def action_complete_reconciliation(self):
+        """Complete reconciliation and update landowner status"""
+        self.ensure_one()
+        if self.state != 'processed':
+            raise ValidationError(_('Please process the file first.'))
+        
+        for recon_line in self.reconciliation_line_ids:
+            if recon_line.payment_line_id and recon_line.payment_line_id.landowner_id:
+                landowner = recon_line.payment_line_id.landowner_id
+                
+                # Find all surveys for this landowner in this village/project
+                # We need to update status for each survey since the user wants khasra-wise status
+                surveys = self.env['bhu.survey'].search([
+                    ('landowner_ids', 'in', landowner.id),
+                    ('village_id', '=', self.village_id.id),
+                    ('project_id', '=', self.project_id.id)
+                ])
+                
+                for survey in surveys:
+                    # Update or create landowner payment status
+                    status_val = 'pending'
+                    if recon_line.status == 'settled':
+                        status_val = 'paid'
+                    elif recon_line.status == 'failed':
+                        status_val = 'failed'
+                    
+                    status_record = self.env['bhu.landowner.payment.status'].search([
+                        ('landowner_id', '=', landowner.id),
+                        ('survey_id', '=', survey.id),
+                        ('project_id', '=', self.project_id.id)
+                    ], limit=1)
+                    
+                    vals = {
+                        'landowner_id': landowner.id,
+                        'survey_id': survey.id,
+                        'project_id': self.project_id.id,
+                        'village_id': self.village_id.id,
+                        'payment_file_id': self.payment_file_id.id,
+                        'utr_number': recon_line.utr_number,
+                        'transaction_date': fields.Date.today(), # Or extract from file
+                        'amount': recon_line.credit_amount,
+                        'status': status_val,
+                        'remarks': recon_line.error or recon_line.event_status or ''
+                    }
+                    
+                    if status_record:
+                        status_record.write(vals)
+                    else:
+                        self.env['bhu.landowner.payment.status'].create(vals)
+        
+        self.state = 'completed'
+        return True
+
 
 class PaymentReconciliationBankLine(models.Model):
     _name = 'bhu.payment.reconciliation.bank.line'
@@ -181,8 +256,10 @@ class PaymentReconciliationBankLine(models.Model):
         ('settled', 'Settled / निपटाया गया'),
         ('failed', 'Failed / असफल'),
     ], string='Status / स्थिति', default='pending')
+    event_status = fields.Char(string='Event Status / इवेंट स्थिति')
     error = fields.Text(string='Error / त्रुटि')
     payment_id = fields.Char(string='Payment ID / भुगतान आईडी')
+    transaction_date = fields.Char(string='Transaction Date / लेनदेन दिनांक')
     
     # Matched Payment Line
     payment_line_id = fields.Many2one('bhu.payment.file.line', string='Matched Payment Line / मिलान भुगतान पंक्ति')

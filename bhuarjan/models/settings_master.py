@@ -255,6 +255,9 @@ class BhuarjanSettingsMaster(models.Model):
     aws_access_key = fields.Char(string='AWS Access Key', help='AWS access key ID')
     aws_secret_key = fields.Char(string='AWS Secret Key', help='AWS secret access key')
     
+    # Payment Configuration
+    debit_account_number = fields.Char(string='Debit Account Number', help='Default debit account number for payment file generation')
+    
     # OTP API Configuration
     otp_api_url = fields.Char(string='OTP API URL', help='Base URL for OTP API service')
     otp_api_key = fields.Char(string='OTP API Key', help='API key for OTP service')

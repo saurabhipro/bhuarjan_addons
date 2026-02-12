@@ -33,6 +33,13 @@ class PaymentFile(models.Model):
     district_id = fields.Many2one('bhu.district', string='District / जिला', related='village_id.district_id', store=True, readonly=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', related='village_id.tehsil_id', store=True, readonly=True)
     
+    debit_account_number = fields.Char(string='Debit Account Number / डेबिट खाता संख्या', tracking=True)
+    
+    _sql_constraints = [
+        ('unique_project_village_payment', 'unique(project_id, village_id)', 
+         'A payment file already exists for this village and project!')
+    ]
+    
     # Payment Lines
     payment_line_ids = fields.One2many('bhu.payment.file.line', 'payment_file_id', string='Payment Lines / भुगतान पंक्तियां')
     
@@ -83,6 +90,11 @@ class PaymentFile(models.Model):
         records = super().create(vals_list)
         # Auto-populate payment lines from award compensation lines
         for record in records:
+            # Set default debit account from settings
+            if not record.debit_account_number:
+                settings = self.env['bhuarjan.settings.master'].get_settings_master()
+                record.debit_account_number = settings.debit_account_number
+            
             if record.award_id and record.village_id:
                 record._populate_payment_lines()
         return records
@@ -189,160 +201,71 @@ class PaymentFile(models.Model):
         }
     
     def _generate_excel_file(self):
-        """Generate Excel file based on template"""
+        """Generate Excel file based on Template 1 (Bank Export)"""
         self.ensure_one()
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        worksheet = workbook.add_worksheet('Annexure')
+        worksheet = workbook.add_worksheet('PaymentData')
         
         # Define formats
-        title_format = workbook.add_format({
-            'bold': True,
-            'align': 'center',
-            'valign': 'vcenter',
-            'font_size': 14
-        })
-        
         header_format = workbook.add_format({
             'bold': True,
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 11
+            'bg_color': '#D3D3D3',
+            'border': 1
         })
         
         cell_format = workbook.add_format({
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 11
+            'border': 1
         })
         
-        border_format = workbook.add_format({
-            'border': 1,
-            'align': 'left',
-            'valign': 'vcenter',
-            'font_size': 11
-        })
-        
-        number_format = workbook.add_format({
-            'num_format': '#,##0.00',
-            'border': 1,
-            'align': 'right',
-            'valign': 'vcenter',
-            'font_size': 11
-        })
-        
-        # Row 1: Title "Annexure" in column K
-        worksheet.write(0, 10, 'Annexure', title_format)
-        
-        # Row 2: Case Number
-        case_num_text = f"राजस्व प्रकरण क्रमांक ........................ / अ-82 वर्ष {fields.Date.today().strftime('%Y-%m')}"
-        worksheet.write(1, 6, case_num_text, cell_format)
-        
-        # Row 3: Village, Tehsil, District
-        village_text = f"ग्राम {self.village_id.name or '........................'}"
-        tehsil_dist_text = f"तहसील {self.tehsil_id.name or '........................'} व जिला {self.district_id.name or '........................'} (छ.ग.)"
-        worksheet.write(2, 6, village_text, cell_format)
-        worksheet.write(2, 8, tehsil_dist_text, cell_format)
-        
-        # Row 4: Instruction
-        instruction1 = "प्रकरण सक्षम प्रस्तुत ।"
-        worksheet.write(3, 0, instruction1, cell_format)
-        
-        # Row 5: Detailed instruction
-        award_date_str = fields.Date.today().strftime('%d.%m.%Y')
-        instruction2 = f"प्रकरण में पारित आवार्ड दिनांक {award_date_str} के अनुसार निम्नलिखित पक्षकारों / प्रभावित भूस्वामियों को मुआवजा का भुगतान हेतु निम्नानुसार सूची तैयार कर संबंधित भू-स्वामी के बैंक खाते में उनकी मुआवजा राशि RTGS के माध्यम से जमा करावे ।"
-        worksheet.merge_range(4, 0, 4, 10, instruction2, cell_format)
-        
-        # Row 6: Sub-headers
-        worksheet.write(5, 0, 'ग्राम', header_format)
-        worksheet.write(5, 4, f"तहसील {self.tehsil_id.name or '........................'} व जिला {self.district_id.name or '........................'} (छ.ग.)", header_format)
-        
-        # Row 7: Column headers
+        # Template 1 Headers
         headers = [
-            'स.क.',  # Serial No
-            'अवॉर्ड स. क.',  # Award Serial No
-            'पक्षकार का नाम एवं पिता/पति का नाम',  # Name
-            'बैंक का नाम',  # Bank Name
-            'शाखा',  # Branch
-            'खाता क्रमांक',  # Account Number
-            'आईएफएस कोड',  # IFSC Code
-            'मुआवजा राशि',  # Compensation Amount
-            'टीडीएस कटौती यदि हो तो',  # TDS Deduction
-            'शुद्ध भुगतान की राशि',  # Net Payable Amount
-            'रिमार्क'  # Remark
+            'Bulk Transaction Type',
+            'External Ref No',
+            'Debit Account number',
+            'Amount',
+            'Beneficiary Name',
+            'Beneficiary Bank Name',
+            'Beneficiary Account Number',
+            'IFSC',
+            'Purpose 1',
+            'Purpose 2',
+            'Cheque Number'
         ]
         
+        # Write headers
         for col, header in enumerate(headers):
-            worksheet.write(6, col, header, border_format)
+            worksheet.write(0, col, header, header_format)
         
-        # Data rows (starting from row 8, index 7)
-        row = 7
+        # Write data rows
+        row = 1
         for line in self.payment_line_ids:
-            # Serial Number
-            worksheet.write(row, 0, line.serial_number, border_format)
-            # Award Serial Number
-            worksheet.write(row, 1, line.award_serial_number, border_format)
-            # Name with Father/Husband name
-            name_text = f"{line.landowner_name or ''}"
-            if line.father_husband_name:
-                name_text += f" व. {line.father_husband_name}"
-            worksheet.write(row, 2, name_text, border_format)
-            # Bank Name
-            worksheet.write(row, 3, line.bank_name or '', border_format)
-            # Branch
-            worksheet.write(row, 4, line.bank_branch or '', border_format)
-            # Account Number
-            worksheet.write(row, 5, line.account_number or '', border_format)
-            # IFSC Code
-            worksheet.write(row, 6, line.ifsc_code or '', border_format)
-            # Compensation Amount
-            worksheet.write(row, 7, line.compensation_amount, number_format)
-            # TDS Deduction
-            worksheet.write(row, 8, line.tds_deduction, number_format)
-            # Net Payable Amount
-            worksheet.write(row, 9, line.net_payable_amount, number_format)
-            # Remark
-            worksheet.write(row, 10, line.remark or '', border_format)
+            worksheet.write(row, 0, 'N', cell_format)  # Bulk Transaction Type
+            worksheet.write(row, 1, self.name, cell_format)  # External Ref No
+            worksheet.write(row, 2, self.debit_account_number or '', cell_format)  # Debit Account number
+            worksheet.write(row, 3, line.net_payable_amount, cell_format)  # Amount
+            worksheet.write(row, 4, line.landowner_name or '', cell_format)  # Beneficiary Name
+            worksheet.write(row, 5, line.bank_name or '', cell_format)  # Beneficiary Bank Name
+            worksheet.write(row, 6, line.account_number or '', cell_format)  # Beneficiary Account Number
+            worksheet.write(row, 7, line.ifsc_code or '', cell_format)  # IFSC
+            worksheet.write(row, 8, self.village_id.name or '', cell_format)  # Purpose 1
+            worksheet.write(row, 9, self.project_id.name or '', cell_format)  # Purpose 2
+            worksheet.write(row, 10, '', cell_format)  # Cheque Number
             row += 1
         
-        # Total row (data starts at row 8, which is index 7)
-        total_row = row
-        first_data_row = 8  # Excel row number (1-indexed)
-        last_data_row = row  # Excel row number (1-indexed)
-        worksheet.write(total_row, 2, 'योग -', header_format)
-        worksheet.write_formula(total_row, 7, f'=SUM(H{first_data_row}:H{last_data_row})', number_format)  # Total Compensation
-        worksheet.write_formula(total_row, 8, f'=SUM(I{first_data_row}:I{last_data_row})', number_format)  # Total TDS
-        worksheet.write_formula(total_row, 9, f'=SUM(J{first_data_row}:J{last_data_row})', number_format)  # Total Net Payable
-        
-        # Footer: Amount in words
-        footer_row = total_row + 1
-        worksheet.write(footer_row, 0, 'अक्षरी:-', cell_format)
-        worksheet.write(footer_row, 1, self.total_net_payable_text or '', cell_format)
-        
-        # Footer: Instructions
-        footer_row += 1
-        instruction_text = f"उक्त सारणी के कालम 10 में अंकित धनराशि की कुल {self.total_net_payable:.2f} रू. का चेक संख्या .................................... दिनांक .................................... हस्ताक्षर कर प्रेषित । संबंधित भू-स्वामी के बैंक खाते में उनकी मुआवजा राशि को RTGS के माध्यम से जमा करावे एवं जमा की राशि की जानकारी इस कार्यालय को भी भेजे ।"
-        worksheet.merge_range(footer_row, 0, footer_row, 10, instruction_text, cell_format)
-        
-        # Signatory section
-        signatory_row = footer_row + 2
-        worksheet.write(signatory_row, 6, 'सक्षम प्राधिकारी भू-अर्जन एवं', cell_format)
-        worksheet.write(signatory_row + 1, 6, f'अनुविभागीय अधिकारी (रा.) {self.tehsil_id.name or "कोरबा"},', cell_format)
-        worksheet.write(signatory_row + 2, 6, f'जिला {self.district_id.name or "कोरबा"} (छ.ग.)', cell_format)
-        
         # Set column widths
-        worksheet.set_column('A:A', 8)   # Serial No
-        worksheet.set_column('B:B', 12)  # Award Serial No
-        worksheet.set_column('C:C', 35)  # Name
-        worksheet.set_column('D:D', 20)  # Bank Name
-        worksheet.set_column('E:E', 15)  # Branch
-        worksheet.set_column('F:F', 18)  # Account Number
-        worksheet.set_column('G:G', 15)  # IFSC Code
-        worksheet.set_column('H:H', 18)  # Compensation Amount
-        worksheet.set_column('I:I', 18)  # TDS Deduction
-        worksheet.set_column('J:J', 20)  # Net Payable Amount
-        worksheet.set_column('K:K', 20)  # Remark
+        worksheet.set_column('A:A', 20)
+        worksheet.set_column('B:B', 20)
+        worksheet.set_column('C:C', 25)
+        worksheet.set_column('D:D', 15)
+        worksheet.set_column('E:E', 30)
+        worksheet.set_column('F:F', 25)
+        worksheet.set_column('G:G', 25)
+        worksheet.set_column('H:H', 15)
+        worksheet.set_column('I:I', 20)
+        worksheet.set_column('J:J', 20)
+        worksheet.set_column('K:K', 15)
         
         workbook.close()
         output.seek(0)

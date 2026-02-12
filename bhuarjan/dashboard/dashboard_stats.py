@@ -448,6 +448,10 @@ class DashboardStats(models.AbstractModel):
             'mutual_consent_policy': self._get_section_counts('bhu.mutual.consent.policy', domain_with_village, states=workflow_states),
             # Section 23 Award (has village_id)
             'section23_award': self._get_section_counts('bhu.section23.award', domain_with_village, states=workflow_states),
+            # Payment File (has village_id)
+            'payment_file': self._get_section_counts('bhu.payment.file', domain_with_village, states=['draft', 'generated']),
+            # Payment Reconciliation (has village_id)
+            'reconciliation': self._get_section_counts('bhu.payment.reconciliation.bank', domain_with_village, states=['draft', 'processed', 'completed']),
         }
         
         # Section 21 Notification uses standard workflow states (draft, submitted, approved, send_back)
@@ -843,6 +847,25 @@ class DashboardStats(models.AbstractModel):
                 ),
                 'section23_award_info': self._get_section_info('bhu.section23.award', domains['final_domain']),
 
+                # Payment File (has village_id)
+                'payment_file_total': counts['payment_file']['total'],
+                'payment_file_draft': counts['payment_file']['draft'],
+                'payment_file_generated': counts['payment_file']['generated'],
+                'payment_file_completion_percent': self._calculate_completion_percentage(
+                    counts['payment_file']['generated'], 0, counts['payment_file']['total'], is_survey=False
+                ),
+                'payment_file_info': self._get_section_info('bhu.payment.file', domains['final_domain'], state_field='state'),
+
+                # Reconciliation (has village_id)
+                'reconciliation_total': counts['reconciliation']['total'],
+                'reconciliation_draft': counts['reconciliation']['draft'],
+                'reconciliation_processed': counts['reconciliation']['processed'],
+                'reconciliation_completed': counts['reconciliation']['completed'],
+                'reconciliation_completion_percent': self._calculate_completion_percentage(
+                    counts['reconciliation']['completed'], 0, counts['reconciliation']['total'], is_survey=False
+                ),
+                'reconciliation_info': self._get_section_info('bhu.payment.reconciliation.bank', domains['final_domain'], state_field='state'),
+
             }
             
             return result
@@ -913,6 +936,12 @@ class DashboardStats(models.AbstractModel):
             'section23_award_total': 0, 'section23_award_draft': 0, 'section23_award_submitted': 0,
             'section23_award_approved': 0, 'section23_award_send_back': 0, 'section23_award_completion_percent': 0,
             'section23_award_info': empty_info.copy(),
+            # Payment File
+            'payment_file_total': 0, 'payment_file_draft': 0, 'payment_file_generated': 0,
+            'payment_file_completion_percent': 0, 'payment_file_info': empty_info.copy(),
+            # Reconciliation
+            'reconciliation_total': 0, 'reconciliation_draft': 0, 'reconciliation_processed': 0, 'reconciliation_completed': 0,
+            'reconciliation_completion_percent': 0, 'reconciliation_info': empty_info.copy(),
         }
 
     # ========== Generic Data Methods ==========

@@ -96,6 +96,20 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Payment Status / भुगतान की स्थिति" name="payment_status">
+                            <field name="payment_status_ids" readonly="1">
+                                <list>
+                                    <field name="survey_id"/>
+                                    <field name="village_id"/>
+                                    <field name="project_id"/>
+                                    <field name="transaction_date"/>
+                                    <field name="utr_number"/>
+                                    <field name="amount"/>
+                                    <field name="status" widget="badge" decoration-success="status == 'paid'" decoration-danger="status == 'failed'" decoration-info="status == 'pending'"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <footer>

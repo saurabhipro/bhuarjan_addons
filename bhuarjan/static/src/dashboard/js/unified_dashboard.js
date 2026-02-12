@@ -86,6 +86,17 @@ const DASHBOARD_CONFIG = {
             'section23_award_approved': 'section23_award_approved',
             'section23_award_send_back': 'section23_award_send_back',
             'section23_award_completion_percent': 'section23_award_completion_percent',
+            'payment_file_total': 'payment_file_total',
+            'payment_file_draft': 'payment_file_draft',
+            'payment_file_generated': 'payment_file_generated',
+            'payment_file_completion_percent': 'payment_file_completion_percent',
+            'payment_file_info': 'payment_file_info',
+            'reconciliation_total': 'reconciliation_total',
+            'reconciliation_draft': 'reconciliation_draft',
+            'reconciliation_processed': 'reconciliation_processed',
+            'reconciliation_completed': 'reconciliation_completed',
+            'reconciliation_completion_percent': 'reconciliation_completion_percent',
+            'reconciliation_info': 'reconciliation_info',
         }
     },
     'collector': {
@@ -143,6 +154,17 @@ const DASHBOARD_CONFIG = {
             'section23_award_approved': 'section23_award_approved',
             'section23_award_send_back': 'section23_award_send_back',
             'section23_award_completion_percent': 'section23_award_completion_percent',
+            'payment_file_total': 'payment_file_total',
+            'payment_file_draft': 'payment_file_draft',
+            'payment_file_generated': 'payment_file_generated',
+            'payment_file_completion_percent': 'payment_file_completion_percent',
+            'payment_file_info': 'payment_file_info',
+            'reconciliation_total': 'reconciliation_total',
+            'reconciliation_draft': 'reconciliation_draft',
+            'reconciliation_processed': 'reconciliation_processed',
+            'reconciliation_completed': 'reconciliation_completed',
+            'reconciliation_completion_percent': 'reconciliation_completion_percent',
+            'reconciliation_info': 'reconciliation_info',
         }
     },
     'admin': {
@@ -199,6 +221,17 @@ const DASHBOARD_CONFIG = {
             'section23_award_approved': 'section23_award_approved',
             'section23_award_send_back': 'section23_award_send_back',
             'section23_award_completion_percent': 'section23_award_completion_percent',
+            'payment_file_total': 'payment_file_total',
+            'payment_file_draft': 'payment_file_draft',
+            'payment_file_generated': 'payment_file_generated',
+            'payment_file_completion_percent': 'payment_file_completion_percent',
+            'payment_file_info': 'payment_file_info',
+            'reconciliation_total': 'reconciliation_total',
+            'reconciliation_draft': 'reconciliation_draft',
+            'reconciliation_processed': 'reconciliation_processed',
+            'reconciliation_completed': 'reconciliation_completed',
+            'reconciliation_completion_percent': 'reconciliation_completion_percent',
+            'reconciliation_info': 'reconciliation_info',
         }
     },
     'department': {
@@ -226,6 +259,17 @@ const DASHBOARD_CONFIG = {
             'section23_award_approved': 'section23_award_approved',
             'section23_award_send_back': 'section23_award_send_back',
             'section23_award_completion_percent': 'section23_award_completion_percent',
+            'payment_file_total': 'payment_file_total',
+            'payment_file_draft': 'payment_file_draft',
+            'payment_file_generated': 'payment_file_generated',
+            'payment_file_completion_percent': 'payment_file_completion_percent',
+            'payment_file_info': 'payment_file_info',
+            'reconciliation_total': 'reconciliation_total',
+            'reconciliation_draft': 'reconciliation_draft',
+            'reconciliation_processed': 'reconciliation_processed',
+            'reconciliation_completed': 'reconciliation_completed',
+            'reconciliation_completion_percent': 'reconciliation_completion_percent',
+            'reconciliation_info': 'reconciliation_info',
         }
     },
     'district': {
@@ -283,6 +327,17 @@ const DASHBOARD_CONFIG = {
             'section23_award_approved': 'section23_award_approved',
             'section23_award_send_back': 'section23_award_send_back',
             'section23_award_completion_percent': 'section23_award_completion_percent',
+            'payment_file_total': 'payment_file_total',
+            'payment_file_draft': 'payment_file_draft',
+            'payment_file_generated': 'payment_file_generated',
+            'payment_file_completion_percent': 'payment_file_completion_percent',
+            'payment_file_info': 'payment_file_info',
+            'reconciliation_total': 'reconciliation_total',
+            'reconciliation_draft': 'reconciliation_draft',
+            'reconciliation_processed': 'reconciliation_processed',
+            'reconciliation_completed': 'reconciliation_completed',
+            'reconciliation_completion_percent': 'reconciliation_completion_percent',
+            'reconciliation_info': 'reconciliation_info',
         }
     },
 
@@ -838,6 +893,8 @@ export class UnifiedDashboard extends Component {
             'bhu.section3c.nh',
             'bhu.section3d.nh',
             'bhu.mutual.consent.policy',
+            'bhu.payment.file',
+            'bhu.payment.reconciliation.bank',
         ];
 
         if (this.state.selectedVillage && (!model || modelsWithVillage.includes(model))) {
@@ -1163,6 +1220,8 @@ export class UnifiedDashboard extends Component {
             'Sec 3C (NH)': 'Sec 3C (Objection) (NH)',
             'Sec 3D (NH)': 'Sec 3D (NH)',
             'Mutual Consent': 'आपसी सहमति की क्रय नीति (Only in रायगढ़ and पसौर)',
+            'Payment File': 'Payment File',
+            'Payment Reconciliation': 'Payment Reconciliation',
         };
         return mapping[dashboardSectionName] || dashboardSectionName;
     }

@@ -47,9 +47,12 @@ class BhuLandowner(models.Model):
     aadhar_card = fields.Binary(string='Aadhar Card / आधार कार्ड')
     pan_card = fields.Binary(string='PAN Card / पैन कार्ड')
     
-    # Survey Relations
     survey_ids = fields.Many2many('bhu.survey', 'bhu_survey_landowner_rel', 
                                  'landowner_id', 'survey_id', string='Related Surveys / संबंधित सर्वे')
+    
+    # Payment Status Tracking
+    payment_status_ids = fields.One2many('bhu.landowner.payment.status', 'landowner_id', 
+                                        string='Payment Status / भुगतान की स्थिति')
     
     # Validation Methods removed - no validations for aadhar, pan, account_number
     
@@ -128,7 +131,35 @@ class BhuLandowner(models.Model):
                 
                 _logger.warning(warning_msg)
                 
-        # Call parent unlink - Odoo automatically removes Many2many relationship records
-        # from bhu_survey_landowner_rel table, but surveys remain intact
         return super(BhuLandowner, self).unlink()
+
+
+class BhuLandownerPaymentStatus(models.Model):
+    _name = 'bhu.landowner.payment.status'
+    _description = 'Landowner Payment Status / भूस्वामी भुगतान स्थिति'
+    _order = 'transaction_date desc'
+
+    landowner_id = fields.Many2one('bhu.landowner', string='Landowner / भूस्वामी', required=True, ondelete='cascade')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True)
+    survey_id = fields.Many2one('bhu.survey', string='Khasra (Survey) / खसरा (सर्वे)', required=True)
+    
+    # Transaction Details
+    payment_file_id = fields.Many2one('bhu.payment.file', string='Payment File / भुगतान फ़ाइल')
+    utr_number = fields.Char(string='UTR Number / यूटीआर संख्या')
+    transaction_date = fields.Date(string='Transaction Date / लेनदेन दिनांक')
+    amount = fields.Float(string='Amount / राशि', digits=(16, 2))
+    
+    status = fields.Selection([
+        ('pending', 'Pending / लंबित'),
+        ('paid', 'Paid / भुगतान किया गया'),
+        ('failed', 'Failed / असफल'),
+    ], string='Status / स्थिति', default='pending', tracking=True)
+    
+    remarks = fields.Text(string='Remarks / रिमार्क')
+    
+    _sql_constraints = [
+        ('unique_landowner_survey_project', 'unique(landowner_id, survey_id, project_id)', 
+         'Payment status record already exists for this landowner, survey and project!')
+    ]
     

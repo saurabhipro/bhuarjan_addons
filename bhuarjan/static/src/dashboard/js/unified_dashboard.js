@@ -883,12 +883,14 @@ export class UnifiedDashboard extends Component {
         ];
 
         // Only add department_id if model has this field
-        if (this.state.selectedDepartment && (!model || modelsWithDepartment.includes(model))) {
-            domain.push(['department_id', '=', parseInt(this.state.selectedDepartment)]);
+        const deptId = parseInt(this.state.selectedDepartment);
+        if (!isNaN(deptId) && this.state.selectedDepartment && (!model || modelsWithDepartment.includes(model))) {
+            domain.push(['department_id', '=', deptId]);
         }
 
-        if (this.state.selectedProject) {
-            domain.push(['project_id', '=', parseInt(this.state.selectedProject)]);
+        const projectId = parseInt(this.state.selectedProject);
+        if (!isNaN(projectId) && this.state.selectedProject) {
+            domain.push(['project_id', '=', projectId]);
         }
 
         // Models that have village_id field and should be filtered by village selection
@@ -912,8 +914,9 @@ export class UnifiedDashboard extends Component {
             'bhu.section8',
         ];
 
-        if (this.state.selectedVillage && (!model || modelsWithVillage.includes(model))) {
-            domain.push(['village_id', '=', parseInt(this.state.selectedVillage)]);
+        const villageId = parseInt(this.state.selectedVillage);
+        if (!isNaN(villageId) && this.state.selectedVillage && (!model || modelsWithVillage.includes(model))) {
+            domain.push(['village_id', '=', villageId]);
         }
         return domain;
     }
@@ -1142,20 +1145,31 @@ export class UnifiedDashboard extends Component {
 
             if (records && records.length > 0) {
                 const recordId = records[0].id;
+                console.log(`Processing Section 8 record ${recordId} with action ${actionType}`);
+
                 const method = actionType === 'recommend' ? 'action_approve' : 'action_reject';
 
-                // Call the model method which returns an action (wizard)
-                const action = await this.orm.call('bhu.section8', method, [recordId]);
+                try {
+                    // Call the model method which returns an action (wizard)
+                    const action = await this.orm.call('bhu.section8', method, [recordId]);
 
-                if (action && action.type) {
-                    await this.action.doAction(action);
+                    if (action && action.type) {
+                        await this.action.doAction(action);
+                    } else {
+                        console.error("Method did not return a valid action:", action);
+                        this.notification.add(_t("The action could not be started. Please try again."), { type: "danger" });
+                    }
+                } catch (callError) {
+                    console.error(`Odoo call error for ${method}:`, callError);
+                    const msg = callError.message || (callError.data && callError.data.message) || _t("Server error while processing action");
+                    this.notification.add(msg, { type: "danger" });
                 }
             } else {
-                this.notification.add(_t("No draft Section 8 records found to process."), { type: "warning" });
+                this.notification.add(_t("No draft Section 8 records found to process for the selected filters."), { type: "warning" });
             }
         } catch (error) {
-            console.error(`Error executing ${actionType} for Section 8:`, error);
-            this.notification.add(_t("Error processing Section 8 action"), { type: "danger" });
+            console.error(`General error in openSection8ForRecommend:`, error);
+            this.notification.add(_t("Error accessing Section 8 data"), { type: "danger" });
         }
     }
 

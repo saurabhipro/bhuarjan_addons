@@ -59,6 +59,24 @@ class Section23Award(models.Model):
     is_section_officer = fields.Boolean(compute='_compute_user_roles')
     is_admin = fields.Boolean(compute='_compute_user_roles')
 
+    _sql_constraints = [
+        ('project_village_unique', 'unique(project_id, village_id)', 
+         'Only one award per project and village is allowed! / प्रत्येक परियोजना और गाँव के लिए केवल एक अवार्ड की अनुमति है!')
+    ]
+
+    @api.constrains('project_id', 'village_id')
+    def _check_unique_award(self):
+        """Python constraint to prevent duplicates during creation/write"""
+        for record in self:
+            if record.project_id and record.village_id:
+                existing = self.search([
+                    ('project_id', '=', record.project_id.id),
+                    ('village_id', '=', record.village_id.id),
+                    ('id', '!=', record.id)
+                ])
+                if existing:
+                    raise ValidationError(_('An award already exists for this Project and Village. / इस परियोजना और गाँव के लिए एक अवार्ड पहले से ही मौजूद है।'))
+
     def _compute_user_roles(self):
         for rec in self:
             rec.is_sdm = self.env.user.has_group('bhuarjan.group_bhuarjan_sdm')
@@ -609,7 +627,7 @@ class Section23AwardSurveyLine(models.Model):
                     
                     if irrigation_type == 'irrigated':
                         rate = base_rate * 1.2
-                    elif irrigation_type in ['unirrigated', 'non_irrigated']:
+                    elif irrigation_type in ['non_irrigated', 'unirrigated']:
                         rate = base_rate * 0.8
                     else:
                         rate = base_rate

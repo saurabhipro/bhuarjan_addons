@@ -1107,6 +1107,45 @@ export class UnifiedDashboard extends Component {
         });
     }
 
+    // Handle Section 8 Recommend/Not Recommend actions
+    async openSection8ForRecommend(actionType) {
+        if (!this.checkProjectSelected()) {
+            return;
+        }
+
+        // Section 8 uses 'draft' as pending state
+        // Find first draft record
+        const domain = this.getDomain('bhu.section8');
+        domain.push(['state', '=', 'draft']);
+
+        try {
+            // Find the first draft record
+            const records = await this.orm.searchRead(
+                'bhu.section8',
+                domain,
+                ['id'],
+                { limit: 1, order: 'create_date asc' }
+            );
+
+            if (records && records.length > 0) {
+                const recordId = records[0].id;
+                const method = actionType === 'recommend' ? 'action_approve' : 'action_reject';
+
+                // Call the model method which returns an action (wizard)
+                const action = await this.orm.call('bhu.section8', method, [recordId]);
+
+                if (action && action.type) {
+                    await this.action.doAction(action);
+                }
+            } else {
+                this.notification.add(_t("No draft Section 8 records found to process."), { type: "warning" });
+            }
+        } catch (error) {
+            console.error(`Error executing ${actionType} for Section 8:`, error);
+            this.notification.add(_t("Error processing Section 8 action"), { type: "danger" });
+        }
+    }
+
     // Open R and R Scheme form directly (one per project)
     async openRRSchemeForm() {
         if (!this.checkProjectSelected()) {

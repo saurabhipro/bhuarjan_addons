@@ -948,6 +948,9 @@
                         </div>
                         </t>
 
+
+
+
                         <!-- Payment File -->
                         <t t-if="this.isSectionVisible('Payment File')">
                         <div class="o_section_list_item o_card_no_click">

@@ -54,6 +54,7 @@
                             <field name="code"/>
                             <field name="department_id"/>
                             <field name="district_id"/>
+                            <field name="sub_division_id" domain="[('district_id', '=', district_id)]"/>
                             <field name="law_master_id" options="{'no_create': False}"/>
                             <field name="project_uuid" invisible="1"/>
                             <field name="id" invisible="1"/>

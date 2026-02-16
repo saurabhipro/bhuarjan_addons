@@ -41,7 +41,7 @@
         <field name="name">bhu.sia.team.form</field>
         <field name="model">bhu.sia.team</field>
         <field name="arch" type="xml">
-            <form string="SIA Team / SIA टीम" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
+            <form string="SIA Team / SIA टीम" edit="not ((state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit))">
                     <div class="row w-100">
                         <div class="col w-100">
 
@@ -414,7 +414,7 @@
                                     <div class="mb-2">
                                         <field name="sia_team_report_file" filename="sia_team_report_filename" 
                                                widget="binary"
-                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                               readonly="(state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
                                                placeholder="Upload SIA Team Report"/>
                                         <field name="sia_team_report_filename" invisible="1"/>
                                     </div>

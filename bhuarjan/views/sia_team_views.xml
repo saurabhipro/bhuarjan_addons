@@ -404,7 +404,7 @@
                                 </div>
                             </div>
                         </page>
-                        <page string="SIA team report" invisible="not is_sdm and not is_admin">
+                        <page string="SIA team report">
                             <div class="section-card">
                                 <div class="section-header">SIA Team Report / SIA टीम रिपोर्ट</div>
                                 <div class="bg-light p-3 rounded mb-3">

@@ -33,17 +33,18 @@
         <field name="model">bhu.project</field>
         <field name="arch" type="xml">
             <form>
-                <header>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,active,completed,cancelled"/>
-                    <button name="action_set_active" string="Set to Active" type="object" 
-                            class="oe_highlight" invisible="state == 'active'"/>
-                    <button name="action_set_completed" string="Set to Completed" type="object" 
-                            class="oe_highlight" invisible="state == 'completed'"/>
-                    <button name="action_set_cancelled" string="Set to Cancelled" type="object" 
-                            invisible="state == 'cancelled'"/>
-                    <button name="action_set_draft" string="Set to Draft" type="object" 
-                            invisible="state == 'draft'"/>
-                </header>
+                
+                <div class="row">
+                        <div class="col">
+                            <button name="action_set_active" string="Set to Active" type="object" class="oe_highlight" invisible="state == 'active'"/>
+                            <button name="action_set_completed" string="Set to Completed" type="object" class="oe_highlight" invisible="state == 'completed'"/>
+                            <button name="action_set_cancelled" string="Set to Cancelled" type="object" invisible="state == 'cancelled'"/>
+                            <button name="action_set_draft" string="Set to Draft" type="object" invisible="state == 'draft'"/>
+                        </div>
+                        <div class="col" style="text-align: right;">
+                            <field name="state" widget="statusbar" statusbar_visible="draft,active,completed,cancelled"/>
+                        </div>
+                    </div>
                 <sheet>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>

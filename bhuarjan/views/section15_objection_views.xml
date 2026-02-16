@@ -53,24 +53,15 @@
                 <field name="is_approved_readonly" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
-                <header>
-                    <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
-                            class="btn-success" 
-                            icon="fa-check"
-                            style="background-color: #28a745 !important; border-color: #28a745 !important; color: white !important;"
-                            groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="not survey_id or state != 'draft'"
-                            confirm="Are you sure want to approve this objection?"/>
-                    
-                    <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" 
-                            class="btn-danger" 
-                            icon="fa-times-circle"
-                            style="background-color: #dc3545 !important; border-color: #dc3545 !important; color: white !important;"
-                            groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"
-                            invisible="not survey_id or state != 'draft'"/>
-
-                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
-                </header>
+                <div class="row">
+                    <div class="col">
+                        <button name="action_approve" string="Approve / स्वीकृत करें" type="object" class="btn-success" icon="fa-check" style="background-color: #28a745 !important; border-color: #28a745 !important; color: white !important;" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="not survey_id or state != 'draft'" confirm="Are you sure want to approve this objection?"/>
+                        <button name="action_open_reject_wizard" string="Reject Survey / अस्वीकार करें" type="object" class="btn-danger" icon="fa-times-circle" style="background-color: #dc3545 !important; border-color: #dc3545 !important; color: white !important;" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin" invisible="not survey_id or state != 'draft'"/>
+                    </div>
+                    <div class="col"  style="text-align:right;">
+                        <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected" options="{'clickable': True}" groups="bhuarjan.group_bhuarjan_sdm,bhuarjan.group_bhuarjan_admin"/>
+                    </div>
+                </div>
                 <sheet>
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">

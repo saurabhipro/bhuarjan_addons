@@ -245,6 +245,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
         
         # Create activity for Collector users
         self._create_submission_activity()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success / सफलता'),
+                'message': _('Document Submitted Successfully to Collector / दस्तावेज कलेक्टर को सफलतापूर्वक प्रस्तुत किया गया'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def action_approve(self):
         """Approve (Collector action)"""

@@ -149,8 +149,20 @@ class Section8(models.Model):
         if not sia_team:
             raise ValidationError(_('No SIA Team found for this project.'))
         
-        # Download SIA Order (SDM's proposal)
-        return self.env.ref('bhuarjan.action_report_sia_order').report_action(sia_team)
+        # Download SIA Order (SDM's proposal) via generic wizard
+        return {
+            'name': _('Download SIA Team Report / SIA रिपोर्ट डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': 'bhu.sia.team',
+                'default_res_id': sia_team.id,
+                'default_report_xml_id': 'bhuarjan.action_report_sia_order',
+                'default_filename': f'SIA_Team_Report_{self.project_id.name}.doc'
+            }
+        }
     
     def action_download_expert_report(self):
         """Download Expert Committee Report for the project"""
@@ -166,6 +178,18 @@ class Section8(models.Model):
         if not expert_report:
             raise ValidationError(_('No Expert Committee Report found for this project.'))
         
-        # Download Expert Committee Order
-        return self.env.ref('bhuarjan.action_report_expert_committee_order').report_action(expert_report)
+        # Download Expert Committee Order via generic wizard
+        return {
+            'name': _('Download Expert Group Report / विशेषज्ञ समिति रिपोर्ट डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': 'bhu.expert.committee.report',
+                'default_res_id': expert_report.id,
+                'default_report_xml_id': 'bhuarjan.action_report_expert_committee_order',
+                'default_filename': f'Expert_Group_Report_{self.project_id.name}.doc'
+            }
+        }
 

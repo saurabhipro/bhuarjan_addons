@@ -78,11 +78,9 @@
                     </group>
                     
                     <group string="Satisfaction / संतुष्टि">
-                        <field name="is_satisfied" widget="radio" 
-                               readonly="is_sdm_user"/>
+                        <field name="is_satisfied" widget="radio"/>
                         <field name="dissatisfaction_reason" 
                                invisible="is_satisfied != 'no'"
-                               readonly="is_sdm_user"
                                placeholder="Enter reason for dissatisfaction..."/>
                     </group>
                     <group string="Attachment / अनुलग्नक">

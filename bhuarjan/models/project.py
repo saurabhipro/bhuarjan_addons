@@ -158,6 +158,16 @@ class BhuProject(models.Model):
     rehab_admin_name = fields.Char(string='Rehabilitation Administrator / पुनर्वास प्रशासक', tracking=True,
                                                help='Name/Designation of Rehabilitation and Resettlement Administrator')
     
+    @api.onchange('department_id')
+    def _onchange_department_id(self):
+        if self.department_id:
+            self.authorized_officer = self.department_id.name
+
+    @api.onchange('sdm_ids')
+    def _onchange_sdm_ids(self):
+        if self.sdm_ids:
+            self.rehab_admin_name = ", ".join(self.sdm_ids.mapped('name'))
+    
     # Rehabilitation Allocation Fields (shown when is_displacement is True)
     allocated_village = fields.Char(string='Allocated Village / आवंटित ग्राम', tracking=True,
                                      help='Village allocated for rehabilitation and resettlement')

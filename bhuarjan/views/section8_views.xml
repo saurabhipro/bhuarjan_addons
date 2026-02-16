@@ -63,13 +63,13 @@
                     <group string="SIA / Expert Team Report / SIA / विशेषज्ञ समिति रिपोर्ट">
                         <group col="2">
                             <button name="action_download_sia_report" 
-                                    string="SIA Report" type="object" 
+                                    string="Download SIA Team Report" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download SIA Report"
                                     invisible="not project_id"
                                     style="width: 100%;"/>
                             <button name="action_download_expert_report" 
-                                    string="Expert Report" type="object" 
+                                    string="Download Expert Group Report" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download Expert Committee Report"
                                     invisible="not project_id"

@@ -189,15 +189,20 @@ class Section23Award(models.Model):
         return super().create(vals_list)
     
     def action_download_award(self):
-        """Download award document"""
+        """Download award document - Open wizard for PDF/Word"""
         self.ensure_one()
-        if not self.award_document:
-            raise ValidationError(_('No award document available to download.'))
-        filename = self.award_document_filename or f'award_{self.name}.pdf'
         return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{self._name}/{self.id}/award_document/{filename}?download=true',
-            'target': 'self',
+            'name': _('Download Section 23 Award / धारा 23 अवार्ड डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_section23_award',
+                'default_filename': f'Section23_Award_{self.name}.doc'
+            }
         }
     
     def action_generate_award(self):

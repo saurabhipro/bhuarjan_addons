@@ -530,14 +530,29 @@ class SiaTeam(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {
-                'default_sia_team_id': self.id,
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_sia_proposal',
+                'default_filename': f'SIA_Proposal_{self.approval_nathi_ref or self.name}.doc'
             }
         }
     
     def action_download_sia_order(self):
         """Generate and download SIA Order Report PDF (SDM's Proposal) - For Collector"""
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_sia_order').report_action(self)
+        return {
+            'name': _('Download SIA Order / SIA आदेश डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_sia_order',
+                'default_filename': f'SIA_Order_{self.approval_nathi_ref or self.name}.doc'
+            }
+        }
     
     def action_download_latest_pdf(self):
         """Download the latest available PDF - Override mixin to use proposal report for Collector"""

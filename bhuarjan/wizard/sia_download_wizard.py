@@ -5,34 +5,65 @@ from odoo.exceptions import UserError
 import base64
 
 
-class SIADownloadWizard(models.TransientModel):
-    _name = 'sia.download.wizard'
-    _description = 'SIA Download Format Wizard'
+class BhuDownloadWizard(models.TransientModel):
+    _name = 'sia.download.wizard'  # Keep name for backward compatibility or rename if views updated
+    _description = 'Download Format Wizard'
 
-    sia_team_id = fields.Many2one('bhu.sia.team', string='SIA Team', required=True)
+    # Generic fields
+    res_model = fields.Char(string='Model Name', required=True)
+    res_id = fields.Integer(string='Record ID', required=True)
+    report_xml_id = fields.Char(string='Report XML ID', required=True)
+    filename = fields.Char(string='Filename', help='Filename for the downloaded file')
+    
+    # Legacy field (optional/deprecated)
+    sia_team_id = fields.Many2one('bhu.sia.team', string='SIA Team')
+    
     format = fields.Selection([
         ('pdf', 'PDF Format'),
         ('word', 'Word Format (.doc)')
     ], string='Download Format', default='pdf', required=True)
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        # Handle context for legacy calls or quick setup
+        if self.env.context.get('active_model') and self.env.context.get('active_id'):
+            if 'res_model' not in res:
+                res['res_model'] = self.env.context.get('active_model')
+            if 'res_id' not in res:
+                res['res_id'] = self.env.context.get('active_id')
+        
+        # If legacy sia_team_id is provided in context
+        if self.env.context.get('default_sia_team_id'):
+            res['res_model'] = 'bhu.sia.team'
+            res['res_id'] = self.env.context.get('default_sia_team_id')
+            # Default report for SIA Team if not specified
+            if 'report_xml_id' not in res:
+                res['report_xml_id'] = 'bhuarjan.action_report_sia_proposal'
+                
+        return res
+
     def action_download(self):
-        """Download the SIA Proposal in selected format"""
+        """Download the report in selected format"""
         self.ensure_one()
+        
+        record = self.env[self.res_model].browse(self.res_id)
         
         if self.format == 'pdf':
             # Download as PDF using standard report
-            return self.env.ref('bhuarjan.action_report_sia_proposal').report_action(self.sia_team_id)
+            report = self.env.ref(self.report_xml_id)
+            return report.report_action(record)
         else:
             # Download as Word (.doc) - HTML format that Word can open
-            return self._generate_word_doc()
+            return self._generate_word_doc(record)
     
-    def _generate_word_doc(self):
+    def _generate_word_doc(self, record):
         """Generate Word document from report HTML with embedded images and inline styles"""
         self.ensure_one()
         
         # Get the HTML content from the report
-        report = self.env.ref('bhuarjan.action_report_sia_proposal')
-        html_content, report_format = report._render_qweb_html(report.report_name, [self.sia_team_id.id])
+        report = self.env.ref(self.report_xml_id)
+        html_content, report_format = report._render_qweb_html(report.report_name, [self.res_id])
         
         # Convert bytes to string if needed
         html_str = html_content.decode('utf-8') if isinstance(html_content, bytes) else html_content
@@ -279,21 +310,29 @@ class SIADownloadWizard(models.TransientModel):
 </html>"""
         
         # Generate filename
-        project_name = self.sia_team_id.project_id.name or 'Project'
-        project_name = project_name.replace('/', '_').replace('\\', '_').replace(' ', '_')
-        date_str = self.sia_team_id.create_date.strftime('%Y%m%d') if self.sia_team_id.create_date else 'Date'
-        filename = f'SIA_Proposal_{project_name}_{date_str}.doc'
-        
+        if self.filename:
+            fn = self.filename
+        else:
+            name_part = getattr(record, 'name', 'Record')
+            # Sanitize name_part for filename
+            name_part = re.sub(r'[^\w\s-]', '', name_part).strip().replace(' ', '_')
+            
+            date_str = getattr(record, 'create_date', fields.Datetime.now()).strftime('%Y%m%d')
+            fn = f'{self.res_model.replace(".","_")}_{name_part}_{date_str}'
+            
+        if not fn.endswith('.doc'):
+            fn += '.doc'
+            
         # Encode to base64
         word_data = base64.b64encode(word_html.encode('utf-8'))
         
         # Create attachment and download
         attachment = self.env['ir.attachment'].create({
-            'name': filename,
+            'name': fn,
             'type': 'binary',
             'datas': word_data,
-            'res_model': 'bhu.sia.team',
-            'res_id': self.sia_team_id.id,
+            'res_model': self.res_model,
+            'res_id': self.res_id,
             'mimetype': 'application/msword'
         })
         

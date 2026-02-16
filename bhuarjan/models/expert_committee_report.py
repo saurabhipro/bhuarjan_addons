@@ -228,30 +228,21 @@ class ExpertCommitteeReport(models.Model):
     # Workflow methods are inherited from mixin
     # Override action_download_unsigned_file to generate PDF report
     def action_download_unsigned_file(self):
-        """Generate and download Expert Committee Proposal PDF (unsigned) - Override mixin"""
+        """Generate and download Expert Committee Proposal PDF/Word (unsigned) - Override mixin"""
         self.ensure_one()
-        # Get the report action
-        report_action = self.env['ir.actions.report'].sudo().search([
-            ('report_name', '=', 'bhuarjan.expert_committee_proposal_report')
-        ], limit=1)
-        
-        if not report_action:
-            # Fallback: try using ir.model.data
-            try:
-                report_data = self.env['ir.model.data'].sudo().search([
-                    ('module', '=', 'bhuarjan'),
-                    ('name', '=', 'action_report_expert_committee_proposal')
-                ], limit=1)
-                if report_data and report_data.res_id:
-                    report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
-            except Exception as e:
-                _logger.error(f"Error in fallback for expert committee report: {str(e)}", exc_info=True)
-        
-        if not report_action or not report_action.exists():
-            raise ValidationError(_('Expert Committee Proposal report template not found. Please contact administrator.'))
-        
-        # Generate PDF
-        return report_action.report_action(self)
+        return {
+            'name': _('Download Expert Committee Proposal / विशेषज्ञ समिति प्रस्ताव डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_expert_committee_proposal',
+                'default_filename': f'Expert_Committee_Proposal_{self.name}.doc'
+            }
+        }
     
     def action_download_expert_group_report(self):
         """Download Expert Group Report file"""
@@ -266,30 +257,21 @@ class ExpertCommitteeReport(models.Model):
         }
     
     def action_download_expert_committee_order(self):
-        """Generate and download Expert Committee Approval Order PDF - For Collector"""
+        """Generate and download Expert Committee Approval Order PDF/Word - For Collector"""
         self.ensure_one()
-        # Get the report action
-        report_action = self.env['ir.actions.report'].sudo().search([
-            ('report_name', '=', 'bhuarjan.expert_committee_order_report')
-        ], limit=1)
-        
-        if not report_action:
-            # Fallback: try using ir.model.data
-            try:
-                report_data = self.env['ir.model.data'].sudo().search([
-                    ('module', '=', 'bhuarjan'),
-                    ('name', '=', 'action_report_expert_committee_order')
-                ], limit=1)
-                if report_data and report_data.res_id:
-                    report_action = self.env['ir.actions.report'].sudo().browse(report_data.res_id)
-            except Exception as e:
-                _logger.error(f"Error in fallback for expert committee order report: {str(e)}", exc_info=True)
-        
-        if not report_action or not report_action.exists():
-            raise ValidationError(_('Expert Committee Order report template not found. Please contact administrator.'))
-        
-        # Generate PDF
-        return report_action.report_action(self)
+        return {
+            'name': _('Download Expert Committee Order / विशेषज्ञ समिति आदेश डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_expert_committee_order',
+                'default_filename': f'Expert_Committee_Order_{self.name}.doc'
+            }
+        }
     
     def action_download_latest_pdf(self):
         """Override mixin method to always download Expert Committee Proposal PDF"""

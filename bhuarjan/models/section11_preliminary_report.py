@@ -528,12 +528,22 @@ class Section11PreliminaryReport(models.Model):
             }
         }
     
-    # Override mixin method to generate Section 11 PDF
     def action_download_unsigned_file(self):
-        """Generate and download Section 11 Preliminary Report PDF (unsigned) - Override mixin"""
+        """Generate and download Section 11 Preliminary Report PDF/Word (unsigned) - Override mixin"""
         self.ensure_one()
-        report_action = self.env.ref('bhuarjan.action_report_section11_preliminary')
-        return report_action.report_action(self.ids)
+        return {
+            'name': _('Download Section 11 Preliminary Report / धारा 11 प्रारंभिक रिपोर्ट डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_section11_preliminary',
+                'default_filename': f'Section11_Report_{self.name}.doc'
+            }
+        }
     
     def action_download_pdf(self):
         """Download Section 11 Preliminary Report PDF - Legacy method"""

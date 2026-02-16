@@ -517,10 +517,23 @@ class Section4Notification(models.Model):
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
         return report_action.report_action(wizard)
     
-    # Override mixin method to generate Section 4 PDF
+    # Override mixin method to generate Section 4 PDF/Word
     def action_download_unsigned_file(self):
-        """Generate and download Section 4 Notification PDF (unsigned) - Override mixin"""
-        return self.action_generate_pdf()
+        """Generate and download Section 4 Notification PDF/Word (unsigned) - Override mixin"""
+        self.ensure_one()
+        return {
+            'name': _('Download Section 4 Notification / धारा 4 अधिसूचना डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_section4_notification',
+                'default_filename': f'Section4_Notification_{self.name}.doc'
+            }
+        }
     
     
     def action_download_pdf(self):
@@ -538,27 +551,20 @@ class Section4Notification(models.Model):
                 'target': 'self',
             }
         
-        # Otherwise, generate PDF using wizard (same as action_generate_pdf but for download)
-        wizard = self.env['bhu.section4.notification.wizard'].create({
-            'project_id': self.project_id.id,
-            'village_id': self.village_id.id,
-            'public_purpose': self.public_purpose,
-            'public_hearing_datetime': self.public_hearing_datetime,
-            'public_hearing_place': self.public_hearing_place,
-            'directly_affected': self.directly_affected,
-            'indirectly_affected': self.indirectly_affected,
-            'private_assets': self.private_assets,
-            'government_assets': self.government_assets,
-            'minimal_acquisition': 'yes',  # Always yes
-            'alternatives_considered': 'yes',  # Always yes
-            'total_cost': self.total_cost,
-            'project_benefits': self.project_benefits,
-            'compensation_measures': self.compensation_measures,
-            'other_components': self.other_components,
-        })
-        
-        report_action = self.env.ref('bhuarjan.action_report_section4_notification')
-        return report_action.report_action(wizard)
+        # Otherwise, generate PDF/Word using wizard
+        return {
+            'name': _('Download Section 4 Notification / धारा 4 अधिसूचना डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_section4_notification',
+                'default_filename': f'Section4_Notification_{self.name}.doc'
+            }
+        }
 
 
 class Section4NotificationWizard(models.TransientModel):

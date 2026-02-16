@@ -280,9 +280,21 @@ class Section19Notification(models.Model):
     
     
     def action_download_unsigned_file(self):
-        """Generate and download Section 19 Notification PDF (unsigned) - Override mixin"""
+        """Generate and download Section 19 Notification PDF/Word (unsigned) - Override mixin"""
         self.ensure_one()
-        return self.env.ref('bhuarjan.action_report_section19_notification').report_action(self)
+        return {
+            'name': _('Download Section 19 Notification / धारा 19 अधिसूचना डाउनलोड करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sia.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': 'bhuarjan.action_report_section19_notification',
+                'default_filename': f'Section19_Notification_{self.name}.doc'
+            }
+        }
     
     def action_generate_pdf(self):
         """Generate Section 19 Notification PDF - Legacy method"""

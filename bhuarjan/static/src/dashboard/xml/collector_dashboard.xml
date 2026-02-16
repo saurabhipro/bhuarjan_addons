@@ -614,6 +614,9 @@
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-primary" t-on-click.stop="() => this.createSectionRecord('bhu.section8')">
+                                    <i class="fa fa-plus"/> Create
+                                </button>
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section8')">
                                     <i class="fa fa-eye"/> View
                                 </button>

@@ -144,7 +144,7 @@
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 17px !important;">
                             <strong>विषय:-</strong>
                             <span style="padding-left: 20px !important; display: inline;">
-                                विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or '........................'"/> हेतु प्रभावित ग्राम 
+                                विभाग <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/>&#160;अंतर्गत परियोजना <span t-esc="sia_team.project_id.name or '........................'"/>&#160;हेतु प्रभावित ग्राम 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>
@@ -187,7 +187,7 @@
                     <!-- New Paragraph -->
                     <div class="body-section" style="margin-bottom: 15px !important; margin-top: 10px !important;">
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 17px !important;">
-                            <strong>उपरोक्त विषयांतर्गत विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/>&#160;<strong>रायगढ़ (छ.ग.) अंतर्गत</strong> <strong>परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/> <strong>हेतु प्रभावित ग्राम</strong> 
+                            <strong>उपरोक्त विषयांतर्गत विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/>&#160;<strong>रायगढ़ (छ.ग.) अंतर्गत</strong> <strong>परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/>&#160;<strong>हेतु प्रभावित ग्राम</strong> 
                             <t t-if="sia_team.village_ids">
                                 <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
                                     <t t-if="not first">, </t><span t-esc="village.name or ''"/>

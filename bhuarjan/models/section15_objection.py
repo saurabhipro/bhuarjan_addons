@@ -572,6 +572,10 @@ class Section15Objection(models.Model):
     
     def unlink(self):
         """Remove objection from survey when deleted"""
+        for record in self:
+            if record.state == 'approved':
+                raise ValidationError(_('You cannot delete an approved objection. / आप स्वीकृत आपत्ति को हटा नहीं सकते।'))
+        
         # Store survey_ids and objection_ids before deletion
         survey_objection_map = {}
         for record in self:

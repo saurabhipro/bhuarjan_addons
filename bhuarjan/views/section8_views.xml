@@ -55,7 +55,7 @@
                                    readonly="1"/>
                             <field name="project_id" domain="project_domain or [('id', 'in', [])]" 
                                    options="{'no_create': True, 'no_create_edit': True}"
-                                   readonly="is_sdm_user"/>
+                                   readonly="1" force_save="1"/>
                         </group>
                     </group>
                     
@@ -63,13 +63,13 @@
                     <group string="SIA / Expert Team Report / SIA / विशेषज्ञ समिति रिपोर्ट">
                         <group col="2">
                             <button name="action_download_sia_report" 
-                                    string="SIA Report" type="object" 
+                                    string="Download SIA Team Report" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download SIA Report"
                                     invisible="not project_id"
                                     style="width: 100%;"/>
                             <button name="action_download_expert_report" 
-                                    string="Expert Report" type="object" 
+                                    string="Download Expert Group Report" type="object" 
                                     class="btn-primary" icon="fa-download"
                                     title="Download Expert Committee Report"
                                     invisible="not project_id"
@@ -78,11 +78,9 @@
                     </group>
                     
                     <group string="Satisfaction / संतुष्टि">
-                        <field name="is_satisfied" widget="radio" 
-                               readonly="is_sdm_user"/>
+                        <field name="is_satisfied" widget="radio"/>
                         <field name="dissatisfaction_reason" 
                                invisible="is_satisfied != 'no'"
-                               readonly="is_sdm_user"
                                placeholder="Enter reason for dissatisfaction..."/>
                     </group>
                     <group string="Attachment / अनुलग्नक">

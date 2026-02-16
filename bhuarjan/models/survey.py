@@ -255,6 +255,15 @@ class Survey(models.Model):
         is_collector = self.env.user.has_group('bhuarjan.group_bhuarjan_collector')
         for record in self:
             record.is_collector_readonly = is_collector
+
+    is_admin = fields.Boolean(string='Is Admin', compute='_compute_is_admin', store=False)
+
+    @api.depends()
+    def _compute_is_admin(self):
+        """Compute if current user has admin access"""
+        is_admin_user = self.env.user.has_group('bhuarjan.group_bhuarjan_admin') or self.env.user.has_group('base.group_system')
+        for record in self:
+            record.is_admin = is_admin_user
     
     @api.depends('state', 'submitted_date')
     def _compute_days_pending_survey(self):

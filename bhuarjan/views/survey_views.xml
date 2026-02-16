@@ -35,7 +35,10 @@
         <field name="arch" type="xml">
             <form string="Survey / सर्वे" duplicate="0" js_class="confirm_save_form" create="groups='bhuarjan.group_bhuarjan_admin' or groups='base.group_system'" edit="not groups='bhuarjan.group_bhuarjan_collector' and not groups='bhuarjan.group_bhuarjan_sdm' and state != 'approved' or groups='bhuarjan.group_bhuarjan_admin' or groups='base.group_system'">
                 <header>
-                    <!-- Submit button removed - Surveys are submitted via mobile app only -->
+                    <!-- Submit button for Admin -->
+                    <button name="action_submit" string="Submit / प्रस्तुत करें" type="object" class="btn btn-primary" 
+                            invisible="state != 'draft'" 
+                            groups="bhuarjan.group_bhuarjan_admin"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
                     <field name="is_notification_4_generated" widget="boolean_toggle" readonly="1" string="Is Noti 4 Generated / अधिसूचना 4 जेनरेट"/>
                 </header>
@@ -44,7 +47,7 @@
                     <div style="text-align: left !important; margin: 15px 0; padding: 0; width: 100%; display: block; clear: both;">
                         <button name="action_approve" string="Approve / अनुमोदित करें" type="object" class="btn btn-primary" invisible="state in ('approved', 'rejected')" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin" style="margin-right: 8px; background-color: #28a745 !important; border-color: #28a745 !important; color: white !important; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; display: inline-block;" confirm="Are you sure you want to approve this survey? / क्या आप इस सर्वे को अनुमोदित करना चाहते हैं?"/>
                         <button name="action_reject" string="Reject / अस्वीकृत करें" type="object" class="btn btn-primary" invisible="state in ('approved', 'rejected')" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin" style="margin-right: 8px; background-color: #dc3545 !important; border-color: #dc3545 !important; color: white !important; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; display: inline-block;" confirm="Are you sure you want to reject this survey? / क्या आप इस सर्वे को अस्वीकृत करना चाहते हैं?"/>
-                        <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" class="btn btn-secondary" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user" style="background-color: #6c757d !important; border-color: #6c757d !important; color: white !important; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; display: inline-block;" confirm="Are you sure you want to reset this survey to submitted? / क्या आप इस सर्वे को प्रस्तुत में रीसेट करना चाहते हैं?"/>
+                        <button name="action_reset_to_submitted" string="Reset to Submitted / प्रस्तुत में रीसेट" type="object" class="btn btn-secondary" invisible="state != 'rejected'" groups="bhuarjan.group_bhuarjan_department_user,bhuarjan.group_bhuarjan_admin" style="background-color: #6c757d !important; border-color: #6c757d !important; color: white !important; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; display: inline-block;" confirm="Are you sure you want to reset this survey to submitted? / क्या आप इस सर्वे को प्रस्तुत में रीसेट करना चाहते हैं?"/>
                     </div>
                     <field name="is_approved_readonly" invisible="1"/>
                     <div class="oe_title">

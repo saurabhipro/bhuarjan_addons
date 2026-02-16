@@ -269,6 +269,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
         
         # Create activity notification for SDM users
         self._create_approval_activity()
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success / सफलता'),
+                'message': _('Document Approved Successfully'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def action_send_back(self):
         """Open wizard to send back (Collector action)"""

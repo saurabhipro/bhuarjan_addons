@@ -55,7 +55,7 @@
                                    readonly="1"/>
                             <field name="project_id" domain="project_domain or [('id', 'in', [])]" 
                                    options="{'no_create': True, 'no_create_edit': True}"
-                                   readonly="is_sdm_user"/>
+                                   readonly="1" force_save="1"/>
                         </group>
                     </group>
                     

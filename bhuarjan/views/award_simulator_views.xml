@@ -69,16 +69,29 @@
                             </group>
                         </group>
 
+                        <!-- Dates Section -->
+                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा">
+                            <group>
+                                <field name="section11_date"/>
+                                <field name="award_date"/>
+                            </group>
+                            <group>
+                                <field name="interest_rate_percent"/>
+                            </group>
+                        </group>
+
                         <!-- Land Calculation Summary -->
                         <group string="Land Award Calculation / भूमि अवार्ड गणना"
                                invisible="acquired_area == 0">
                             <group>
                                 <field name="effective_land_rate" readonly="1"/>
                                 <field name="land_award_amount" readonly="1"/>
+                                <field name="solatium_amount" readonly="1"/>
                             </group>
                             <group>
-                                <field name="solatium_amount" readonly="1"/>
-                                <field name="land_total" readonly="1"/>
+                                <field name="interest_days" readonly="1" invisible="interest_days == 0"/>
+                                <field name="interest_amount" readonly="1" invisible="interest_amount == 0"/>
+                                <field name="land_total" readonly="1" class="fw-bold"/>
                             </group>
                         </group>
 

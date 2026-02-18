@@ -58,6 +58,11 @@ class AwardSimulator(models.Model):
         digits=(10, 4), default=1.0
     )
 
+    # ─── Dates & Interest Section ──────────────────────────────────────────────
+    section11_date = fields.Date(string='Section 11 Publication Date / धारा 11 प्रकाशन तिथि')
+    award_date = fields.Date(string='Award Date / अवार्ड तिथि', default=fields.Date.context_today)
+    interest_rate_percent = fields.Float(string='Interest Rate (%)', default=12.0)
+
     # ─── Computed Land Rate ────────────────────────────────────────────────────
     effective_land_rate = fields.Float(
         string='Effective Land Rate (₹/Ha) / प्रभावी भूमि दर',
@@ -76,7 +81,15 @@ class AwardSimulator(models.Model):
         digits=(16, 2), compute='_compute_land_award', store=True
     )
 
-    @api.depends('base_rate', 'road_type', 'is_diverted', 'irrigation_type', 'acquired_area', 'village_id')
+    # ─── Computed Interest ─────────────────────────────────────────────────────
+    interest_days = fields.Integer(string='Interest Days', compute='_compute_land_award', store=True)
+    interest_amount = fields.Float(
+        string='Interest 12% (₹/Sec 30(2)) / ब्याज 12%',
+        digits=(16, 2), compute='_compute_land_award', store=True
+    )
+
+    @api.depends('base_rate', 'road_type', 'is_diverted', 'irrigation_type', 'acquired_area', 'village_id', 
+                 'section11_date', 'award_date', 'interest_rate_percent')
     def _compute_land_award(self):
         for rec in self:
             base = rec.base_rate or 0.0
@@ -105,11 +118,22 @@ class AwardSimulator(models.Model):
 
             land_award = rate * (rec.acquired_area or 0.0)
             solatium = land_award * 1.0  # 100% solatium
+            
+            # Interest Calculation (12% per annum on Market Value)
+            interest = 0.0
+            days = 0
+            if rec.section11_date and rec.award_date and rec.section11_date < rec.award_date:
+                delta = rec.award_date - rec.section11_date
+                days = delta.days
+                # Interest = Market Value * (12/100) * (Days / 365)
+                interest = land_award * (rec.interest_rate_percent / 100.0) * (days / 365.25)
 
             rec.effective_land_rate = rate
             rec.land_award_amount = land_award
             rec.solatium_amount = solatium
-            rec.land_total = land_award + solatium
+            rec.interest_days = days
+            rec.interest_amount = interest
+            rec.land_total = land_award + solatium + interest
 
     # ─── Reference Rates (For testing) ─────────────────────────────────────────
     reference_land_rate_ids = fields.Many2many(

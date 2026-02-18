@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import re
+import requests
 
 
 class BhuarjanSequenceSettings(models.Model):
@@ -269,6 +270,10 @@ class BhuarjanSettingsMaster(models.Model):
                                       default='OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.',
                                       help='Message template. Use {otp} as placeholder for the OTP code')
     
+    # Test SMS Configuration
+    test_mobile_number = fields.Char(string='Test Mobile Number', help='Mobile number to send test OTP to')
+    test_otp = fields.Char(string='Test OTP', help='OTP to send for testing', default='1234')
+
     # Static OTP Configuration (for testing/development when SMS API is disabled)
     enable_static_otp = fields.Boolean(string='Enable Static OTP', default=False,
                                       help='If enabled, use static OTP instead of sending SMS. Useful when SMS API is disabled.')
@@ -574,3 +579,55 @@ class BhuarjanSettingsMaster(models.Model):
             'notify_checker': first_setting.notify_checker,
             'notify_approver': first_setting.notify_approver,
         }
+
+    def action_test_sms(self):
+        """Action to test SMS sending configuration"""
+        self.ensure_one()
+        
+        if not self.test_mobile_number:
+            raise ValidationError("Please enter a Test Mobile Number.")
+            
+        if not self.otp_api_url:
+             raise ValidationError("OTP API URL is not configured.")
+
+        # Logic similar to request_otp in auth.py
+        otp_code = self.test_otp or '1234'
+        mobile = self.test_mobile_number
+        
+        # Prepare message
+        message_template = self.otp_message_template or 'OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.'
+        message = message_template.replace('{otp}', otp_code)
+        
+        # Prepare parameters
+        params = {
+            'ApiKey': self.otp_api_key or '',
+            'ClientId': self.otp_client_id or '',
+            'senderid': self.otp_sender_id or '',
+            'message': message,
+            'MobileNumbers': mobile,
+            'msgtype': 'TXT',
+            'response': 'Y',
+            'dlttempid': self.otp_dlt_template_id or ''
+        }
+        
+        try:
+            # We use verify=False because some SMS gateways have SSL issues or self-signed certs
+            # But in production you ideally want ssl valid
+            response = requests.get(self.otp_api_url, params=params)
+            
+            if response.status_code == 200:
+                # Show success notification
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Success',
+                        'message': f'Test SMS sent successfully to {mobile}. Response: {response.text}',
+                        'type': 'success',
+                        'sticky': False,
+                    }
+                }
+            else:
+                raise ValidationError(f"Failed to send SMS. Status Code: {response.status_code}. Response: {response.text}")
+        except Exception as e:
+            raise ValidationError(f"Error sending SMS: {str(e)}")

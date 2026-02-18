@@ -91,6 +91,16 @@
                                     <field name="otp_message_template" placeholder="Enter OTP Message Template"/>
                                 </group>
                                 
+                                <div class="alert alert-success" role="alert" style="margin-top: 16px;">
+                                    <strong>Test SMS Configuration</strong><br/>
+                                    Enter a mobile number and click the button to test if the OTP SMS is sent successfully.
+                                </div>
+                                <group col="4">
+                                    <field name="test_mobile_number" placeholder="Enter Mobile Number"/>
+                                    <field name="test_otp" placeholder="Enter 4-digit OTP"/>
+                                    <button name="action_test_sms" string="Send Test SMS" type="object" class="btn-primary" icon="fa-paper-plane"/>
+                                </group>
+                                
                                 <div class="alert alert-warning" role="alert" style="margin-top: 16px;">
                                     <strong>Static OTP Configuration</strong><br/>
                                     Enable static OTP to use a fixed OTP value instead of sending SMS. This is useful when SMS API is disabled or for testing purposes.

@@ -1112,6 +1112,7 @@ class BhuarjanAPIController(http.Controller):
                 'village_id': data.get('village_id'),
                 'department_id': data.get('department_id'),
                 'tehsil_id': data.get('tehsil_id'),
+                'survey_type': data.get('survey_type', 'rural'),
                 'khasra_number': data.get('khasra_number'),
                 'total_area': total_area,
                 'acquired_area': acquired_area,
@@ -1288,32 +1289,31 @@ class BhuarjanAPIController(http.Controller):
                         tree_line_data['development_stage'] = development_stage
                         
                         # For non-fruit-bearing trees, handle girth_cm
-                        if tree_type == 'non_fruit_bearing':
-                            # Handle girth_cm for non-fruit-bearing trees
-                            girth_cm = tree_line.get('girth_cm')
-                            # girth_cm is optional - if provided, it must be > 0
-                            # Check if girth_cm is explicitly provided (not None and not empty string)
-                            if girth_cm is not None and girth_cm != '':
-                                try:
-                                    girth_cm_float = float(girth_cm)
-                                    if girth_cm_float <= 0:
-                                        return Response(
-                                            json.dumps({
-                                                'error': 'girth_cm must be greater than 0 if provided'
-                                            }),
-                                            status=400,
-                                            content_type='application/json'
-                                        )
-                                    tree_line_data['girth_cm'] = girth_cm_float
-                                except (ValueError, TypeError):
+                        # Handle girth_cm for all tree types
+                        girth_cm = tree_line.get('girth_cm')
+                        # girth_cm is optional - if provided, it must be > 0
+                        # Check if girth_cm is explicitly provided (not None and not empty string)
+                        if girth_cm is not None and girth_cm != '':
+                            try:
+                                girth_cm_float = float(girth_cm)
+                                if girth_cm_float <= 0:
                                     return Response(
                                         json.dumps({
-                                            'error': 'girth_cm must be a valid number if provided'
+                                            'error': 'girth_cm must be greater than 0 if provided'
                                         }),
                                         status=400,
                                         content_type='application/json'
                                     )
-                            # Don't set girth_cm if not provided - Odoo will use default/False
+                                tree_line_data['girth_cm'] = girth_cm_float
+                            except (ValueError, TypeError):
+                                return Response(
+                                    json.dumps({
+                                        'error': 'girth_cm must be a valid number if provided'
+                                    }),
+                                    status=400,
+                                    content_type='application/json'
+                                )
+                        # Don't set girth_cm if not provided - Odoo will use default/False
                         
                         tree_line_vals.append((0, 0, tree_line_data))
             
@@ -1567,6 +1567,7 @@ class BhuarjanAPIController(http.Controller):
                 'tehsil_id': survey.tehsil_id.id if survey.tehsil_id else None,
                 'tehsil_name': survey.tehsil_id.name if survey.tehsil_id else '',
                 'district_name': survey.district_name or '',
+                'survey_type': survey.survey_type or 'rural',
                 'khasra_number': survey.khasra_number or '',
                 'total_area': survey.total_area,
                 'acquired_area': survey.acquired_area,
@@ -1583,7 +1584,7 @@ class BhuarjanAPIController(http.Controller):
                     'tree_master_id': line.tree_master_id.id,
                     'tree_name': line.tree_master_id.name,
                     'development_stage': line.development_stage,
-                    'girth_cm': line.girth_cm if line.tree_type == 'non_fruit_bearing' else None,
+                    'girth_cm': line.girth_cm,
                     'quantity': line.quantity
                 } for line in survey.tree_line_ids],
                 'photos': [{
@@ -1760,6 +1761,7 @@ class BhuarjanAPIController(http.Controller):
                     'tehsil_name': survey.tehsil_id.name if survey.tehsil_id else '',
                     'district_id': survey.company_id.id if survey.company_id else None,
                     'district_name': survey.company_id.name if survey.company_id else '',
+                    'survey_type': survey.survey_type or 'rural',
                     'survey_date': survey.survey_date.strftime('%Y-%m-%d') if survey.survey_date else None,
                     'total_area': survey.total_area,
                     'acquired_area': survey.acquired_area,

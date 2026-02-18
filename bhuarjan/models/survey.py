@@ -24,6 +24,11 @@ class Survey(models.Model):
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=False, tracking=True)
     
+    survey_type = fields.Selection([
+        ('rural', 'Rural / ग्रामीण'),
+        ('urban', 'Urban / शहरी')
+    ], string='Survey Type / सर्वे प्रकार', default='rural', tracking=True)
+    
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and filter villages to only those mapped to the project.

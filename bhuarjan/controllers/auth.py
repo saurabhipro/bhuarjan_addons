@@ -27,17 +27,34 @@ class JWTAuthController(http.Controller):
                 existing_otp.unlink()
 
             # Check if static OTP is enabled in any active settings master
-            # Get active settings master
             settings_master = request.env['bhuarjan.settings.master'].sudo().search([
                 ('active', '=', True)
             ], limit=1)
 
-            # Use static OTP if enabled, otherwise generate random OTP
+            # Determine if we should use static OTP behavior (skip SMS)
+            use_static_otp_behavior = False
+            otp_to_return = None
+
+            # 1. Check Global Static OTP Setting
             if settings_master and settings_master.enable_static_otp and settings_master.static_otp_value:
                 otp_code = str(settings_master.static_otp_value)
-                _logger.info(f"Using static OTP: {otp_code} for mobile: {mobile}")
+                use_static_otp_behavior = True
+                otp_to_return = otp_code
+                _logger.info(f"Using Global Static OTP: {otp_code} for mobile: {mobile}")
+            
+            # 2. Check for Patwari Role (Auto-Detect Logic)
+            # If user is a Patwari, we generate an OTP but return it in the response (skipping SMS)
+            # so the app can auto-detect/auto-fill it for easy login.
+            elif user.bhuarjan_role == 'patwari':
+                otp_code = str(random.randint(1000, 9999))
+                use_static_otp_behavior = True # We treat it like static in terms of "return in response, skip SMS"
+                otp_to_return = otp_code
+                _logger.info(f"Generated Auto-Login OTP for Patwari: {otp_code}")
+
+            # 3. Default: Generate Random OTP for SMS
             else:
                 otp_code = str(random.randint(1000, 9999))
+                # Do NOT set use_static_otp_behavior or otp_to_return
 
             expire_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(minutes=5)
             # Convert to naive datetime (Odoo Datetime fields expect naive datetimes)
@@ -50,20 +67,20 @@ class JWTAuthController(http.Controller):
                 'expire_date': expire_time_naive,
             })
 
-            # If static OTP is enabled, skip SMS sending
-            if settings_master and settings_master.enable_static_otp and settings_master.static_otp_value:
+            # If we decided to skip SMS (Global Static OR Patwari Auto-Login)
+            if use_static_otp_behavior:
                 return Response(
                     json.dumps({
-                        'message': 'Static OTP generated successfully',
-                        'details': otp_code,
-                        'static_otp': True
+                        'message': 'OTP generated successfully',
+                        'details': otp_to_return, # Return OTP for auto-fill
+                        'auto_fill': True,       # Flag for app to know it can auto-fill
+                        'role': user.bhuarjan_role or 'user'
                     }),
                     status=200,
                     content_type='application/json'
                 )
 
-            # Send SMS if static OTP is not enabled
-            # Send SMS if static OTP is not enabled
+            # Send SMS for normal users (Non-Patwari, and Global Static is OFF)
             try:
                 # Check if OTP API URL is configured in settings
                 if settings_master and settings_master.otp_api_url:
@@ -86,17 +103,31 @@ class JWTAuthController(http.Controller):
                     }
                     
                     _logger.info(f"Sending OTP to {mobile} via configured API")
+                    
+                    # Verify we have a sender ID before sending
+                    if not settings_master.otp_sender_id:
+                        _logger.error("OTP Sender ID is missing in configuration")
+                        return Response(json.dumps({'error': 'SMS Configuration Error: Sender ID is missing'}), status=500, content_type='application/json')
+
                     response = requests.get(api_url, params=params)
                 else:
-                    # Fallback to legacy API if settings not configured
-                    _logger.warning("OTP Settings not configured. Using legacy hardcoded API as fallback.")
-                    msg = f"Your SELECTIAL OPT {otp_code}"
-                    api_url = f"https://webmsg.smsbharti.com/app/smsapi/index.php?key=5640415B1D6730&campaign=0&routeid=9&type=text&contacts={mobile}&senderid=SPTSMS&msg=Your%20otp%20is%20{otp_code}%20SELECTIAL&template_id=1707166619134631839"
-                    response = requests.get(api_url)
+                    # Settings not configured
+                    _logger.error("OTP Settings (API URL) not configured in Bhuarjan Settings.")
+                    return Response(json.dumps({'error': 'OTP Service Not Configured', 'details': 'Please contact administrator to configure OTP settings'}), status=500, content_type='application/json')
                 
                 print("\n\n response.status_code - ", response.status_code)
+                
                 if response.status_code == 200:
-                    return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), status=200, content_type='application/json')
+                    # Check for API-level errors in JSON if possible
+                    try:
+                        resp_json = response.json()
+                        if resp_json.get('ErrorCode') and resp_json.get('ErrorCode') != 0:
+                             _logger.error(f"SMS API Error: {resp_json}")
+                             return Response(json.dumps({'error': 'SMS Gateway Error', 'details': resp_json.get('ErrorDescription')}), status=400, content_type='application/json')
+                    except:
+                        pass # Not JSON or parse error, assume success if 200 OK
+
+                    return Response(json.dumps({'message': 'OTP sent successfully'}), status=200, content_type='application/json')
                 else:
                     return Response(json.dumps({'error': 'Failed to send OTP via SMS API', 'details': response.text}), status=400, content_type='application/json')
 
@@ -187,54 +218,14 @@ class JWTAuthController(http.Controller):
                 content_type='application/json'
             )
 
-    @http.route('/api/auth/login', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/api/auth/otp_validate', type='http', auth='none', methods=['POST'], csrf=False)
     @check_app_version
-    def login(self, **kwargs):
+    def otp_validate(self, **kwargs):
         try:
             data = json.loads(request.httprequest.data or "{}")
             mobile = data.get('mobile')
-            otp_input = data.get('otp_input')
-            channel_id = data.get('channel_id')
-
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
-
-            # Channel ID is required
-            if not channel_id:
-                return Response(
-                    json.dumps({'error': 'channel_id is required'}),
-                    status=400,
-                    content_type='application/json'
-                )
-
-            # Convert channel_id to integer if it's a string
-            try:
-                channel_id = int(channel_id) if channel_id else None
-            except (ValueError, TypeError):
-                return Response(
-                    json.dumps({'error': 'channel_id must be a valid integer'}),
-                    status=400,
-                    content_type='application/json'
-                )
-
-            # Validate channel
-            channel = request.env['bhu.channel.master'].sudo().browse(channel_id)
-            if not channel.exists():
-                return Response(
-                    json.dumps({'error': f'Channel with ID {channel_id} not found'}),
-                    status=404,
-                    content_type='application/json'
-                )
-            if not channel.active:
-                return Response(
-                    json.dumps({
-                        'error': 'Channel is inactive. Please contact Administrator.',
-                        'channel_name': channel.name or '',
-                        'channel_type': channel.channel_type or ''
-                    }),
-                    status=403,
-                    content_type='application/json'
-                )
 
             otp_record = request.env['mobile.otp'].sudo().search([
                 ('mobile', '=', mobile),
@@ -284,7 +275,6 @@ class JWTAuthController(http.Controller):
             request.env['jwt.token'].sudo().create({
                 'user_id': user_id,
                 'token': token,
-                'channel_id': channel_id
             })
 
             # Get user's groups/roles

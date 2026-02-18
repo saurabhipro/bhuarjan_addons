@@ -6,8 +6,6 @@
         <field name="arch" type="xml">
             <list string="JWT Tokens">
                 <field name="user_id"/>
-                <field name="channel_id"/>
-                <field name="channel_type"/>
                 <field name="create_date"/>
                 <field name="token" optional="hide"/>
             </list>
@@ -34,8 +32,6 @@
                     <group>
                         <group>
                             <field name="user_id"/>
-                            <field name="channel_id"/>
-                            <field name="channel_type"/>
                         </group>
                         <group>
                             <field name="create_date"/>

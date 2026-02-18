@@ -12,7 +12,7 @@ import logging
 import base64
 import re
 from .main import *
-from .main import check_app_version
+
 import datetime
 
 _logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 from .main import *
-from .main import check_app_version
+
 from datetime import timezone
 import logging
 
@@ -10,7 +10,7 @@ SECRET_KEY = 'secret'
 class JWTAuthController(http.Controller):
 
     @http.route('/api/auth/request_otp', type='http', auth='none', methods=['POST'], csrf=False)
-    @check_app_version
+
     def request_otp(self, **kwargs):
         try:
             data = json.loads(request.httprequest.data or "{}")
@@ -147,7 +147,7 @@ class JWTAuthController(http.Controller):
             return Response(json.dumps({'error': 'Internal server error', 'details': str(e)}), status=500, content_type='application/json')
                
     @http.route('/api/auth/register', type='http', auth='public', methods=['POST'], csrf=False)
-    @check_app_version
+
     def create_user(self, **kwargs):
         try:
             # Parse incoming JSON data
@@ -223,7 +223,7 @@ class JWTAuthController(http.Controller):
             )
 
     @http.route('/api/auth/login', type='http', auth='none', methods=['POST'], csrf=False)
-    @check_app_version
+
     def login(self, **kwargs):
         try:
             data = json.loads(request.httprequest.data or "{}")

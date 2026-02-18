@@ -60,7 +60,7 @@
 					"response": []
 				},
 				{
-					"name": "login",
+					"name": "otp_validate",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -73,7 +73,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\",\n  \"channel_id\": 1\n}",
+							"raw": "{\n  \"mobile\":\"9990649990\",\n  \"otp_input\":\"525314\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -81,17 +81,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/login",
+							"raw": "{{base_url}}/api/auth/otp_validate",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"auth",
-								"login"
+								"otp_validate"
 							]
 						},
-						"description": "Login with mobile and OTP. channel_id is REQUIRED. app_version_code is MANDATORY - If missing, returns 400 error. If provided and version check is enforced in settings, validates the app version. If version is disabled, returns 403 error with latest version information. If version check is not enforced in settings, the version is still validated but all versions are allowed."
+						"description": "Login with mobile and OTP. app_version_code is MANDATORY - If missing, returns 400 error. If provided and version check is enforced in settings, validates the app version. If version is disabled, returns 403 error with latest version information. If version check is not enforced in settings, the version is still validated but all versions are allowed."
 					},
 					"response": []
 				},

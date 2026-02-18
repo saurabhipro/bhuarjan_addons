@@ -5,19 +5,47 @@
         <!-- ═══════════════════════════════════════════════════════════════════
              Award Simulator Wizard Form View
         ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ═══════════════════════════════════════════════════════════════════
+             Award Simulator – Tree Line list view
+        ═══════════════════════════════════════════════════════════════════ -->
+        <record id="view_bhu_award_simulator_list" model="ir.ui.view">
+            <field name="name">bhu.award.simulator.list</field>
+            <field name="model">bhu.award.simulator</field>
+            <field name="arch" type="xml">
+                <list string="Simulation History">
+                    <field name="name"/>
+                    <field name="village_id"/>
+                    <field name="user_id"/>
+                    <field name="create_date"/>
+                    <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             Award Simulator Wizard Form View
+        ═══════════════════════════════════════════════════════════════════ -->
         <record id="view_bhu_award_simulator_form" model="ir.ui.view">
             <field name="name">bhu.award.simulator.form</field>
             <field name="model">bhu.award.simulator</field>
             <field name="arch" type="xml">
                 <form string="Award Simulator / अवार्ड सिमुलेटर">
+                    <header>
+                        <button string="Recalculate / पुनः गणना करें"
+                                name="action_calculate"
+                                type="object"
+                                class="btn-primary"/>
+                    </header>
                     <sheet>
 
                         <!-- Header -->
                         <div class="oe_title">
-                            <h1>
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" required="1"/></h1>
+                            <h2>
                                 <span class="text-primary">Award Simulator</span>
                                 <small class="text-muted ms-2" style="font-size:0.6em;">अवार्ड सिमुलेटर</small>
-                            </h1>
+                            </h2>
                         </div>
 
                         <!-- Survey Type -->
@@ -30,8 +58,9 @@
                             <group>
                                 <field name="village_id" options="{'no_create': true, 'no_open': true}"/>
                                 <field name="district_id" options="{'no_create': true, 'no_open': true}"/>
-                                <field name="base_rate" readonly="village_id != False"/>
+                                <field name="distance_from_road"/>
                                 <field name="road_type" widget="radio" options="{'horizontal': true}"/>
+                                <field name="base_rate" readonly="village_id != False"/>
                             </group>
                             <group>
                                 <field name="is_diverted"/>
@@ -88,6 +117,30 @@
                                     <field name="structure_total" readonly="1" string="Structure Total (Rs.)"/>
                                 </group>
                             </page>
+
+                            <page string="Reference Rates / संदर्भ दरें" groups="base.group_system">
+                                <group string="Village Land Rates / ग्राम भूमि दरें">
+                                    <field name="reference_land_rate_ids" nolabel="1" readonly="1">
+                                        <list>
+                                            <field name="village_id"/>
+                                            <field name="main_road_rate_hectare"/>
+                                            <field name="other_road_rate_hectare"/>
+                                            <field name="state" widget="badge" decoration-success="state == 'active'"/>
+                                        </list>
+                                    </field>
+                                </group>
+                                <group string="Selected Tree Rates / चयनित वृक्ष दरें">
+                                    <field name="reference_tree_rate_ids" nolabel="1" readonly="1">
+                                        <list>
+                                            <field name="tree_master_id"/>
+                                            <field name="development_stage"/>
+                                            <field name="girth_range_min" string="Min Girth"/>
+                                            <field name="girth_range_max" string="Max Girth"/>
+                                            <field name="rate"/>
+                                        </list>
+                                    </field>
+                                </group>
+                            </page>
                         </notebook>
 
                         <!-- Grand Total -->
@@ -96,23 +149,14 @@
                                 <field name="land_total" readonly="1" string="Land Total (Rs.)"/>
                                 <field name="tree_total" readonly="1" string="Tree Total (Rs.)"/>
                                 <field name="structure_total" readonly="1" string="Structure Total (Rs.)"/>
+                                <field name="user_id" readonly="1" groups="base.group_no_one"/>
                             </group>
                             <group>
-                                <field name="grand_total" readonly="1" string="Grand Total Award (Rs.)"/>
+                                <field name="grand_total" readonly="1" string="Grand Total Award (Rs.)" class="oe_subtotal_footer_separator"/>
                             </group>
                         </group>
 
                     </sheet>
-
-                    <footer>
-                        <button string="Recalculate / पुनः गणना करें"
-                                name="action_calculate"
-                                type="object"
-                                class="btn-primary"/>
-                        <button string="Close / बंद करें"
-                                class="btn-secondary"
-                                special="cancel"/>
-                    </footer>
                 </form>
             </field>
         </record>
@@ -121,8 +165,8 @@
         <record id="action_bhu_award_simulator" model="ir.actions.act_window">
             <field name="name">Award Simulator / अवार्ड सिमुलेटर</field>
             <field name="res_model">bhu.award.simulator</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
+            <field name="view_mode">list,form</field>
+            <field name="target">current</field>
             <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
         </record>
 

@@ -3,9 +3,13 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
-class AwardSimulator(models.TransientModel):
+class AwardSimulator(models.Model):
     _name = 'bhu.award.simulator'
     _description = 'Award Simulator / अवार्ड सिमुलेटर'
+    _order = 'id desc'
+
+    name = fields.Char(string='Reference Name', default='New Simulation')
+    user_id = fields.Many2one('res.users', string='Created By', default=lambda self: self.env.user)
 
     # ─── Survey Type ───────────────────────────────────────────────────────────
     survey_type = fields.Selection([
@@ -23,10 +27,25 @@ class AwardSimulator(models.TransientModel):
         help='Enter the base land rate per hectare manually, or it will be auto-filled from the Land Rate Master if a village is selected.'
     )
 
+    distance_from_road = fields.Float(
+        string='Distance from Main Road (M) / मुख्य मार्ग से दूरी (मीटर)',
+        digits=(10, 2), default=0.0,
+        help='Rural: <= 20m is MR, Urban: <= 50m is MR'
+    )
+
     road_type = fields.Selection([
         ('mr', 'MR – Main Road / मुख्यमार्ग'),
         ('mbr', 'MBR – Beyond Main Road / मुख्यमार्ग से परे'),
-    ], string='Road Type / सड़क प्रकार', required=True, default='mr')
+    ], string='Road Type / सड़क प्रकार', compute='_compute_road_type', store=True, readonly=False)
+
+    @api.depends('distance_from_road', 'survey_type')
+    def _compute_road_type(self):
+        for rec in self:
+            dist = rec.distance_from_road
+            if rec.survey_type == 'rural':
+                rec.road_type = 'mr' if dist <= 20 else 'mbr'
+            else: # urban
+                rec.road_type = 'mr' if dist <= 50 else 'mbr'
 
     is_diverted = fields.Boolean(string='Diverted Land / विचलित भूमि', default=False)
     irrigation_type = fields.Selection([
@@ -42,19 +61,19 @@ class AwardSimulator(models.TransientModel):
     # ─── Computed Land Rate ────────────────────────────────────────────────────
     effective_land_rate = fields.Float(
         string='Effective Land Rate (₹/Ha) / प्रभावी भूमि दर',
-        digits=(16, 2), compute='_compute_land_award', store=False
+        digits=(16, 2), compute='_compute_land_award', store=True
     )
     land_award_amount = fields.Float(
         string='Land Award Amount (₹) / भूमि अवार्ड राशि',
-        digits=(16, 2), compute='_compute_land_award', store=False
+        digits=(16, 2), compute='_compute_land_award', store=True
     )
     solatium_amount = fields.Float(
         string='Solatium 100% (₹) / सॉलेशियम 100%',
-        digits=(16, 2), compute='_compute_land_award', store=False
+        digits=(16, 2), compute='_compute_land_award', store=True
     )
     land_total = fields.Float(
         string='Land Total (₹) / भूमि कुल',
-        digits=(16, 2), compute='_compute_land_award', store=False
+        digits=(16, 2), compute='_compute_land_award', store=True
     )
 
     @api.depends('base_rate', 'road_type', 'is_diverted', 'irrigation_type', 'acquired_area', 'village_id')
@@ -71,8 +90,7 @@ class AwardSimulator(models.TransientModel):
                 if rate_master:
                     base = rate_master.main_road_rate_hectare if rec.road_type == 'mr' else rate_master.other_road_rate_hectare
 
-            # Road type adjustment: MBR uses other_road rate (already selected via base)
-            # If base was manually entered, MBR = base (no further road adjustment needed)
+            # Road type adjustment
             rate = base
 
             # Diverted: -20%
@@ -93,6 +111,36 @@ class AwardSimulator(models.TransientModel):
             rec.solatium_amount = solatium
             rec.land_total = land_award + solatium
 
+    # ─── Reference Rates (For testing) ─────────────────────────────────────────
+    reference_land_rate_ids = fields.Many2many(
+        'bhu.rate.master', string='Land Rates for Testing',
+        compute='_compute_reference_rates'
+    )
+    reference_tree_rate_ids = fields.Many2many(
+        'bhu.tree.rate.master', string='Tree Rates for Testing',
+        compute='_compute_reference_rates'
+    )
+
+    @api.depends('village_id', 'tree_line_ids.tree_master_id')
+    def _compute_reference_rates(self):
+        for rec in self:
+            # Land rates for current village
+            if rec.village_id:
+                rec.reference_land_rate_ids = self.env['bhu.rate.master'].search([
+                    ('village_id', '=', rec.village_id.id)
+                ])
+            else:
+                rec.reference_land_rate_ids = False
+
+            # Tree rates for trees in current lines
+            if rec.tree_line_ids:
+                tree_master_ids = rec.tree_line_ids.mapped('tree_master_id').ids
+                rec.reference_tree_rate_ids = self.env['bhu.tree.rate.master'].search([
+                    ('tree_master_id', 'in', tree_master_ids)
+                ])
+            else:
+                rec.reference_tree_rate_ids = False
+
     # ─── Tree Section ──────────────────────────────────────────────────────────
     tree_line_ids = fields.One2many(
         'bhu.award.simulator.tree.line', 'simulator_id',
@@ -100,7 +148,7 @@ class AwardSimulator(models.TransientModel):
     )
     tree_total = fields.Float(
         string='Tree Total (₹) / वृक्ष कुल',
-        digits=(16, 2), compute='_compute_tree_total', store=False
+        digits=(16, 2), compute='_compute_tree_total', store=True
     )
 
     @api.depends('tree_line_ids', 'tree_line_ids.line_total')
@@ -115,7 +163,7 @@ class AwardSimulator(models.TransientModel):
     )
     structure_total = fields.Float(
         string='Structure Total (₹) / संरचना कुल',
-        digits=(16, 2), compute='_compute_structure_total', store=False
+        digits=(16, 2), compute='_compute_structure_total', store=True
     )
 
     @api.depends('structure_line_ids', 'structure_line_ids.line_total')
@@ -126,7 +174,7 @@ class AwardSimulator(models.TransientModel):
     # ─── Grand Total ───────────────────────────────────────────────────────────
     grand_total = fields.Float(
         string='Grand Total Award (₹) / कुल अवार्ड',
-        digits=(16, 2), compute='_compute_grand_total', store=False
+        digits=(16, 2), compute='_compute_grand_total', store=True
     )
 
     @api.depends('land_total', 'tree_total', 'structure_total')
@@ -135,7 +183,7 @@ class AwardSimulator(models.TransientModel):
             rec.grand_total = rec.land_total + rec.tree_total + rec.structure_total
 
     # ─── Auto-fill base rate from village ─────────────────────────────────────
-    @api.onchange('village_id', 'road_type')
+    @api.onchange('village_id', 'road_type', 'distance_from_road')
     def _onchange_village_id(self):
         if self.village_id:
             if self.village_id.district_id:
@@ -151,18 +199,15 @@ class AwardSimulator(models.TransientModel):
                     self.base_rate = rate_master.other_road_rate_hectare
 
     def action_calculate(self):
-        """Trigger recompute (no-op, computed fields auto-update)"""
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'bhu.award.simulator',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': self.env.context,
-        }
+        """Trigger recompute (now that store=True, this might be needed for forced refresh)"""
+        self._compute_land_award()
+        self._compute_tree_total()
+        self._compute_structure_total()
+        self._compute_grand_total()
+        return True
 
 
-class AwardSimulatorTreeLine(models.TransientModel):
+class AwardSimulatorTreeLine(models.Model):
     _name = 'bhu.award.simulator.tree.line'
     _description = 'Award Simulator – Tree Line'
 
@@ -188,11 +233,11 @@ class AwardSimulatorTreeLine(models.TransientModel):
 
     unit_rate = fields.Float(
         string='Unit Rate (₹) / इकाई दर',
-        digits=(16, 2), compute='_compute_unit_rate', store=False
+        digits=(16, 2), compute='_compute_unit_rate', store=True
     )
     line_total = fields.Float(
         string='Line Total (₹) / पंक्ति कुल',
-        digits=(16, 2), compute='_compute_unit_rate', store=False
+        digits=(16, 2), compute='_compute_unit_rate', store=True
     )
 
     @api.depends('tree_master_id', 'development_stage', 'girth_cm', 'condition', 'quantity')
@@ -238,7 +283,7 @@ class AwardSimulatorTreeLine(models.TransientModel):
         self.girth_cm = 0.0
 
 
-class AwardSimulatorStructureLine(models.TransientModel):
+class AwardSimulatorStructureLine(models.Model):
     _name = 'bhu.award.simulator.structure.line'
     _description = 'Award Simulator – Structure Line'
 
@@ -263,7 +308,7 @@ class AwardSimulatorStructureLine(models.TransientModel):
 
     line_total = fields.Float(
         string='Line Total (₹) / पंक्ति कुल',
-        digits=(16, 2), compute='_compute_line_total', store=False
+        digits=(16, 2), compute='_compute_line_total', store=True
     )
 
     @api.depends('quantity', 'area_sqft', 'unit_rate')

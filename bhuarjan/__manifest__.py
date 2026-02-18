@@ -114,6 +114,7 @@
         'views/jwt_token_views.xml',
         'views/mobile_otp_views.xml',
         'views/app_version_views.xml',
+        'views/api_docs_views.xml',
         'wizard/report_wizard.xml',
         'wizard/user_report_wizard.xml',
         'views/qr_microsite_templates.xml',

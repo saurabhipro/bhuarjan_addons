@@ -2,6 +2,43 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import json
 
+
+class BhuUserMobile(models.Model):
+    """Additional mobile numbers for a user (for multi-mobile OTP login)"""
+    _name = 'bhu.user.mobile'
+    _description = 'User Additional Mobile Number'
+    _order = 'sequence, id'
+
+    user_id = fields.Many2one('res.users', string='User', required=True, ondelete='cascade')
+    mobile = fields.Char(string='Mobile Number', required=True)
+    label = fields.Char(string='Label', help='e.g. Personal, Office, WhatsApp')
+    sequence = fields.Integer(string='Sequence', default=10)
+    active = fields.Boolean(string='Active', default=True)
+
+    @api.constrains('mobile')
+    def _check_mobile_unique(self):
+        """Ensure this additional mobile is not already used by any user (primary or additional)"""
+        for rec in self:
+            # Check against primary mobile of all users
+            dup_primary = self.env['res.users'].search([
+                ('mobile', '=', rec.mobile),
+                ('id', '!=', rec.user_id.id),
+            ], limit=1)
+            if dup_primary:
+                raise ValidationError(
+                    f'Mobile {rec.mobile} is already the primary number of user "{dup_primary.name}".'
+                )
+            # Check against other additional mobiles
+            dup_additional = self.env['bhu.user.mobile'].search([
+                ('mobile', '=', rec.mobile),
+                ('id', '!=', rec.id),
+            ], limit=1)
+            if dup_additional:
+                raise ValidationError(
+                    f'Mobile {rec.mobile} is already registered as an additional number for user "{dup_additional.user_id.name}".'
+                )
+
+
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
@@ -14,6 +51,13 @@ class ResUsers(models.Model):
         return [('id', 'in', state_ids)]
 
     mobile = fields.Char(string="Mobile")
+
+    # Additional mobile numbers for multi-mobile OTP login
+    mobile_number_ids = fields.One2many(
+        'bhu.user.mobile', 'user_id',
+        string='Additional Mobile Numbers / अतिरिक्त मोबाइल नंबर',
+        help='Add extra mobile numbers so this user can login with any of them.'
+    )
 
     def copy_data(self, default=None):
         if default is None:

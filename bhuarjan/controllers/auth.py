@@ -9,6 +9,22 @@ SECRET_KEY = 'secret'
 
 class JWTAuthController(http.Controller):
 
+    def _find_user_by_mobile(self, mobile):
+        """Find a user by primary mobile OR any of their additional mobile numbers."""
+        env = request.env
+        # 1. Check primary mobile
+        user = env['res.users'].sudo().search([('mobile', '=', mobile)], limit=1)
+        if user:
+            return user
+        # 2. Check additional mobile numbers
+        extra = env['bhu.user.mobile'].sudo().search([
+            ('mobile', '=', mobile),
+            ('active', '=', True),
+        ], limit=1)
+        if extra:
+            return extra.user_id
+        return env['res.users'].sudo().browse()  # empty recordset
+
     @http.route('/api/auth/request_otp', type='http', auth='none', methods=['POST'], csrf=False)
 
     def request_otp(self, **kwargs):
@@ -18,7 +34,7 @@ class JWTAuthController(http.Controller):
             if not mobile:
                 return Response(json.dumps({'error': 'Mobile number is missing'}), status=400, content_type='application/json')
 
-            user = request.env['res.users'].sudo().search([('mobile', '=', mobile)], limit=1)
+            user = self._find_user_by_mobile(mobile)
             if not user:            
                 return Response(json.dumps({'error': "User Not Register"}), status=400, content_type='application/json')
 
@@ -242,8 +258,8 @@ class JWTAuthController(http.Controller):
             if settings_master and settings_master.enable_static_otp:
                 static_val = str(settings_master.static_otp_value or '1234')
                 if otp_input == static_val:
-                     # Static OTP Matched! Find user by mobile directly.
-                     user_obj = request.env['res.users'].sudo().search([('mobile', '=', mobile)], limit=1)
+                     # Static OTP Matched! Find user by mobile directly (primary OR additional).
+                     user_obj = self._find_user_by_mobile(mobile)
                      if not user_obj:
                          return Response(json.dumps({'error': 'User not found for this mobile'}), status=400, content_type='application/json')
                      bypass_otp_check = True

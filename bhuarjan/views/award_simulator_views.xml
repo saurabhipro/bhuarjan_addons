@@ -42,7 +42,7 @@
 
                         <!-- Land Calculation Summary -->
                         <group string="Land Award Calculation / भूमि अवार्ड गणना"
-                               attrs="{'invisible': [('acquired_area', '=', 0)]}">
+                               invisible="acquired_area == 0">
                             <group>
                                 <field name="effective_land_rate" readonly="1"/>
                                 <field name="land_award_amount" readonly="1"/>

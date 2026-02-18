@@ -1726,6 +1726,7 @@ class BhuarjanAPIController(http.Controller):
             project_id = request.httprequest.args.get('project_id', type=int)
             village_id = request.httprequest.args.get('village_id', type=int)
             state = request.httprequest.args.get('state')
+            survey_type = request.httprequest.args.get('survey_type')
             limit = request.httprequest.args.get('limit', type=int) or 100
             offset = request.httprequest.args.get('offset', type=int) or 0
 
@@ -1735,6 +1736,8 @@ class BhuarjanAPIController(http.Controller):
                 domain.append(('project_id', '=', project_id))
             if village_id:
                 domain.append(('village_id', '=', village_id))
+            if survey_type:
+                domain.append(('survey_type', '=', survey_type))
             if state:
                 # Handle special case: 'pending' means all surveys that are NOT approved
                 if state.lower() == 'pending':

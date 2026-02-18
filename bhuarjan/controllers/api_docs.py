@@ -300,7 +300,8 @@ class ApiDocsController(http.Controller):
                         "parameters": [
                              {"name": "project_id", "in": "query", "schema": {"type": "integer"}},
                              {"name": "village_id", "in": "query", "schema": {"type": "integer"}},
-                             {"name": "state", "in": "query", "schema": {"type": "string"}}
+                             {"name": "state", "in": "query", "schema": {"type": "string"}},
+                             {"name": "survey_type", "in": "query", "schema": {"type": "string", "enum": ["rural", "urban"]}}
                         ],
                         "responses": {
                             "200": {"description": "List of surveys"}

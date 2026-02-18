@@ -274,6 +274,9 @@ class BhuarjanSettingsMaster(models.Model):
     test_mobile_number = fields.Char(string='Test Mobile Number', help='Mobile number to send test OTP to')
     test_otp = fields.Char(string='Test OTP', help='OTP to send for testing', default='1234')
     api_documentation = fields.Text(string='API Documentation', readonly=True, help='Generated API documentation JSON')
+    
+    # App Hash for Android Auto-Read
+    android_app_hash = fields.Char(string='Android App Hash', help='11-character hash string required for Android SMS Retriever API (e.g., FA+9qCX9VSu)')
 
     # Static OTP Configuration (for testing/development when SMS API is disabled)
     enable_static_otp = fields.Boolean(string='Enable Static OTP', default=False,
@@ -601,6 +604,10 @@ class BhuarjanSettingsMaster(models.Model):
         # Prepare message
         message_template = self.otp_message_template or 'OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.'
         message = message_template.replace('{otp}', otp_code)
+        
+        # Append Android App Hash if configured
+        if self.android_app_hash:
+            message = f"{message} {self.android_app_hash}"
         
         # Prepare parameters
         params = {

@@ -88,6 +88,7 @@
                                 </group>
                                 <group>
                                     <field name="otp_message_template" placeholder="Enter OTP Message Template"/>
+                                    <field name="android_app_hash" placeholder="e.g. FA+9qCX9VSu"/>
                                 </group>
                                 
                                 <div class="alert alert-success" role="alert" style="margin-top: 16px;">
@@ -100,7 +101,7 @@
                                     <button name="action_test_sms" string="Send Test SMS" type="object" class="btn btn-primary" icon="fa-paper-plane"/>
                                 </group>
                                 
-                                <separator string="Integration Details (JSON Req/Res)" style="margin-top: 20px;"/>
+                                <separator string="Test SMS Configuration" style="margin-top: 20px; font-weight: bold; border-bottom: 2px solid #dee2e6; padding-bottom: 5px;"/>
                                 <field name="api_documentation" widget="text" style="min-height: 300px; font-family: monospace; background-color: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; border-radius: 4px;" readonly="1"/>
 
                                 <div class="alert alert-warning" role="alert" style="margin-top: 16px;">

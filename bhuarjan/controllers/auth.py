@@ -36,8 +36,8 @@ class JWTAuthController(http.Controller):
             otp_to_return = None
 
             # 1. Check Global Static OTP Setting
-            if settings_master and settings_master.enable_static_otp and settings_master.static_otp_value:
-                otp_code = str(settings_master.static_otp_value)
+            if settings_master and settings_master.enable_static_otp:
+                otp_code = str(settings_master.static_otp_value or '1234')
                 use_static_otp_behavior = True
                 otp_to_return = otp_code
                 _logger.info(f"Using Global Static OTP: {otp_code} for mobile: {mobile}")
@@ -89,6 +89,10 @@ class JWTAuthController(http.Controller):
                     # Prepare message
                     message_template = settings_master.otp_message_template or 'OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.'
                     message = message_template.replace('{otp}', otp_code)
+                    
+                    # Append Android App Hash if configured
+                    if settings_master.android_app_hash:
+                        message = f"{message} {settings_master.android_app_hash}"
                     
                     # Prepare parameters
                     params = {
@@ -227,28 +231,47 @@ class JWTAuthController(http.Controller):
             otp_input = data.get('otp_input')
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
+            
+            user_obj = None
+            otp_record = None
 
-            otp_record = request.env['mobile.otp'].sudo().search([
-                ('mobile', '=', mobile),
-                ('otp', '=', otp_input)
-            ], limit=1)
-            if not otp_record:
-                return Response(json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json')
+            # Check Global Static OTP Setting for Bypass
+            settings_master = request.env['bhuarjan.settings.master'].sudo().search([('active', '=', True)], limit=1)
+            
+            bypass_otp_check = False
+            if settings_master and settings_master.enable_static_otp:
+                static_val = str(settings_master.static_otp_value or '1234')
+                if otp_input == static_val:
+                     # Static OTP Matched! Find user by mobile directly.
+                     user_obj = request.env['res.users'].sudo().search([('mobile', '=', mobile)], limit=1)
+                     if not user_obj:
+                         return Response(json.dumps({'error': 'User not found for this mobile'}), status=400, content_type='application/json')
+                     bypass_otp_check = True
+            
+            if not bypass_otp_check:
+                otp_record = request.env['mobile.otp'].sudo().search([
+                    ('mobile', '=', mobile),
+                    ('otp', '=', otp_input)
+                ], limit=1)
+                if not otp_record:
+                    return Response(json.dumps({'error': 'Invalid OTP'}), status=400, content_type='application/json')
 
-            expire_date = otp_record.expire_date
-            # Odoo returns naive datetime, convert current time to naive UTC for comparison
-            if expire_date:
-                current_time_naive = datetime.datetime.now(timezone.utc).replace(tzinfo=None)
-                if current_time_naive > expire_date:
-                    otp_record.unlink()
-                    return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
+                expire_date = otp_record.expire_date
+                # Odoo returns naive datetime, convert current time to naive UTC for comparison
+                if expire_date:
+                    current_time_naive = datetime.datetime.now(timezone.utc).replace(tzinfo=None)
+                    if current_time_naive > expire_date:
+                        otp_record.unlink()
+                        return Response(json.dumps({'error': 'OTP expired'}), status=400, content_type='application/json')
+                
+                user_obj = otp_record.user_id
 
-            user_obj = otp_record.user_id
             user_id = user_obj.id
             
             # Check if user is active
             if not user_obj.active:
-                otp_record.unlink()
+                if otp_record:
+                    otp_record.unlink()
                 return Response(
                     json.dumps({
                         'error': 'User account is inactive. Please contact Administrator.',
@@ -259,7 +282,8 @@ class JWTAuthController(http.Controller):
                     content_type='application/json'
                 )
             
-            otp_record.unlink()
+            if otp_record:
+                otp_record.unlink()
 
             # Delete old JWT tokens for the same user before creating a new one
             old_tokens = request.env['jwt.token'].sudo().search([('user_id', '=', user_id)])

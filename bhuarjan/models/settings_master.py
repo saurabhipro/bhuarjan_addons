@@ -262,7 +262,7 @@ class BhuarjanSettingsMaster(models.Model):
     # OTP API Configuration
     otp_api_url = fields.Char(string='OTP API URL', help='Base URL for OTP API service')
     otp_api_key = fields.Char(string='OTP API Key', help='API key for OTP service')
-    otp_api_secret = fields.Char(string='OTP API Secret', help='API secret for OTP service')
+
     otp_sender_id = fields.Char(string='OTP Sender ID', help='Sender ID for OTP messages')
     otp_client_id = fields.Char(string='OTP Client ID', help='Client ID for OTP service')
     otp_dlt_template_id = fields.Char(string='DLT Template ID', help='DLT Template ID for OTP messages')
@@ -273,6 +273,7 @@ class BhuarjanSettingsMaster(models.Model):
     # Test SMS Configuration
     test_mobile_number = fields.Char(string='Test Mobile Number', help='Mobile number to send test OTP to')
     test_otp = fields.Char(string='Test OTP', help='OTP to send for testing', default='1234')
+    api_documentation = fields.Text(string='API Documentation', readonly=True, help='Generated API documentation JSON')
 
     # Static OTP Configuration (for testing/development when SMS API is disabled)
     enable_static_otp = fields.Boolean(string='Enable Static OTP', default=False,
@@ -616,6 +617,20 @@ class BhuarjanSettingsMaster(models.Model):
             response = requests.get(self.otp_api_url, params=params)
             
             if response.status_code == 200:
+                # Generate API documentation after successful test
+                self.action_generate_api_docs(response_text=response.text, status_code=response.status_code)
+                
+                # Check for API-level errors in the JSON response
+                try:
+                    response_json = response.json()
+                    if response_json.get('ErrorCode') and response_json.get('ErrorCode') != 0:
+                         # API returned 200 OK but with an application error
+                         error_msg = response_json.get('ErrorDescription', 'Unknown API Error')
+                         raise ValidationError(f"SMS API Error: {error_msg} (Code: {response_json.get('ErrorCode')})")
+                except ValueError:
+                    # Response is not JSON, proceed with caution or log it
+                    pass
+
                 # Show success notification
                 return {
                     'type': 'ir.actions.client',
@@ -631,3 +646,50 @@ class BhuarjanSettingsMaster(models.Model):
                 raise ValidationError(f"Failed to send SMS. Status Code: {response.status_code}. Response: {response.text}")
         except Exception as e:
             raise ValidationError(f"Error sending SMS: {str(e)}")
+
+    def action_generate_api_docs(self, response_text=None, status_code=200):
+        """Generate API documentation JSON"""
+        self.ensure_one()
+        
+        # Determine values to use (defaults if not set)
+        api_url = self.otp_api_url or 'https://api.example.com/otp'
+        api_key = self.otp_api_key or 'YOUR_API_KEY'
+        client_id = self.otp_client_id or 'YOUR_CLIENT_ID'
+        sender_id = self.otp_sender_id or 'SENDER_ID'
+        dlt_template_id = self.otp_dlt_template_id or 'YOUR_DLT_ID'
+        
+        test_mobile = self.test_mobile_number or '9999999999'
+        test_otp = self.test_otp or '1234'
+        
+        message_template = self.otp_message_template or 'OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.'
+        message = message_template.replace('{otp}', test_otp)
+        
+        # Clean URL to get base path and params separate for clarity
+        base_url = api_url.split('?')[0]
+        
+        documentation = {
+            "name": "Send OTP SMS",
+            "request": {
+                "method": "GET",
+                "url": base_url,
+                "params": [
+                    {"key": "ApiKey", "value": api_key, "description": "API Key provided by service"},
+                    {"key": "ClientId", "value": client_id, "description": "Client ID provided by service"},
+                    {"key": "senderid", "value": sender_id, "description": "Sender ID (approved via DLT)"},
+                    {"key": "message", "value": message, "description": "Message content (must match template)"},
+                    {"key": "MobileNumbers", "value": test_mobile, "description": "Comma separated mobile numbers"},
+                    {"key": "msgtype", "value": "TXT", "description": "Message type"},
+                    {"key": "response", "value": "Y", "description": "Return response"},
+                    {"key": "dlttempid", "value": dlt_template_id, "description": "DLT Template ID (mandatory)"}
+                ]
+            },
+            "response": {
+                "status_code": status_code,
+                "body": response_text or '{"status": "success", "message": "SMS sent successfully"}'
+            },
+            "curl_example": f"""curl --location --request GET '{base_url}?ApiKey={api_key}&ClientId={client_id}&senderid={sender_id}&message={requests.utils.quote(message)}&MobileNumbers={test_mobile}&msgtype=TXT&response=Y&dlttempid={dlt_template_id}'"""
+        }
+        
+        import json
+        self.api_documentation = json.dumps(documentation, indent=4)
+        return True

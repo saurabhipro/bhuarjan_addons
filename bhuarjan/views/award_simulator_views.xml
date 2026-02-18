@@ -13,7 +13,6 @@
             <field name="model">bhu.award.simulator</field>
             <field name="arch" type="xml">
                 <list string="Simulation History">
-                    <field name="name"/>
                     <field name="village_id"/>
                     <field name="user_id"/>
                     <field name="create_date"/>
@@ -40,12 +39,10 @@
 
                         <!-- Header -->
                         <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
-                            <h1><field name="name" required="1"/></h1>
-                            <h2>
+                            <h1>
                                 <span class="text-primary">Award Simulator</span>
                                 <small class="text-muted ms-2" style="font-size:0.6em;">अवार्ड सिमुलेटर</small>
-                            </h2>
+                            </h1>
                         </div>
 
                         <!-- Survey Type -->
@@ -70,10 +67,14 @@
                         </group>
 
                         <!-- Dates Section -->
-                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा" col="3">
-                            <field name="section4_date"/>
-                            <field name="award_date"/>
-                            <field name="interest_rate_percent"/>
+                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा">
+                            <group>
+                                <field name="section4_date"/>
+                                <field name="award_date"/>
+                            </group>
+                            <group>
+                                <field name="interest_rate_percent"/>
+                            </group>
                         </group>
 
                         <!-- Land Calculation Summary -->

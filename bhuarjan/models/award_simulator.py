@@ -8,7 +8,6 @@ class AwardSimulator(models.Model):
     _description = 'Award Simulator / अवार्ड सिमुलेटर'
     _order = 'id desc'
 
-    name = fields.Char(string='Reference Name', default='New Simulation')
     user_id = fields.Many2one('res.users', string='Created By', default=lambda self: self.env.user)
 
     # ─── Survey Type ───────────────────────────────────────────────────────────

@@ -218,9 +218,9 @@ class JWTAuthController(http.Controller):
                 content_type='application/json'
             )
 
-    @http.route('/api/auth/otp_validate', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/api/auth/login', type='http', auth='none', methods=['POST'], csrf=False)
     @check_app_version
-    def otp_validate(self, **kwargs):
+    def login(self, **kwargs):
         try:
             data = json.loads(request.httprequest.data or "{}")
             mobile = data.get('mobile')

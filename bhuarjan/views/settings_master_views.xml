@@ -79,11 +79,16 @@
                                     <group>
                                         <field name="otp_api_url" placeholder="e.g., https://api.example.com/otp"/>
                                         <field name="otp_api_key" placeholder="Enter OTP API Key"/>
+                                        <field name="otp_client_id" placeholder="Enter OTP Client ID"/>
                                     </group>
                                     <group>
                                         <field name="otp_api_secret" widget="password" placeholder="Enter OTP API Secret"/>
                                         <field name="otp_sender_id" placeholder="e.g., BHUAJN"/>
+                                        <field name="otp_dlt_template_id" placeholder="Enter DLT Template ID"/>
                                     </group>
+                                </group>
+                                <group>
+                                    <field name="otp_message_template" placeholder="Enter OTP Message Template"/>
                                 </group>
                                 
                                 <div class="alert alert-warning" role="alert" style="margin-top: 16px;">

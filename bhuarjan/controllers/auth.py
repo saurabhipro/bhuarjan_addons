@@ -27,14 +27,13 @@ class JWTAuthController(http.Controller):
                 existing_otp.unlink()
 
             # Check if static OTP is enabled in any active settings master
+            # Get active settings master
             settings_master = request.env['bhuarjan.settings.master'].sudo().search([
-                ('active', '=', True),
-                ('enable_static_otp', '=', True),
-                ('static_otp_value', '!=', False)
+                ('active', '=', True)
             ], limit=1)
 
             # Use static OTP if enabled, otherwise generate random OTP
-            if settings_master and settings_master.static_otp_value:
+            if settings_master and settings_master.enable_static_otp and settings_master.static_otp_value:
                 otp_code = str(settings_master.static_otp_value)
                 _logger.info(f"Using static OTP: {otp_code} for mobile: {mobile}")
             else:
@@ -52,7 +51,7 @@ class JWTAuthController(http.Controller):
             })
 
             # If static OTP is enabled, skip SMS sending
-            if settings_master and settings_master.static_otp_value:
+            if settings_master and settings_master.enable_static_otp and settings_master.static_otp_value:
                 return Response(
                     json.dumps({
                         'message': 'Static OTP generated successfully',
@@ -64,10 +63,37 @@ class JWTAuthController(http.Controller):
                 )
 
             # Send SMS if static OTP is not enabled
+            # Send SMS if static OTP is not enabled
             try:
-                msg = f"Your SELECTIAL OPT {otp_code}"
-                api_url = f"https://webmsg.smsbharti.com/app/smsapi/index.php?key=5640415B1D6730&campaign=0&routeid=9&type=text&contacts={mobile}&senderid=SPTSMS&msg=Your%20otp%20is%20{otp_code}%20SELECTIAL&template_id=1707166619134631839"
-                response = requests.get(api_url)
+                # Check if OTP API URL is configured in settings
+                if settings_master and settings_master.otp_api_url:
+                    api_url = settings_master.otp_api_url
+                    
+                    # Prepare message
+                    message_template = settings_master.otp_message_template or 'OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.'
+                    message = message_template.replace('{otp}', otp_code)
+                    
+                    # Prepare parameters
+                    params = {
+                        'ApiKey': settings_master.otp_api_key or '',
+                        'ClientId': settings_master.otp_client_id or '',
+                        'senderid': settings_master.otp_sender_id or '',
+                        'message': message,
+                        'MobileNumbers': mobile,
+                        'msgtype': 'TXT',
+                        'response': 'Y',
+                        'dlttempid': settings_master.otp_dlt_template_id or ''
+                    }
+                    
+                    _logger.info(f"Sending OTP to {mobile} via configured API")
+                    response = requests.get(api_url, params=params)
+                else:
+                    # Fallback to legacy API if settings not configured
+                    _logger.warning("OTP Settings not configured. Using legacy hardcoded API as fallback.")
+                    msg = f"Your SELECTIAL OPT {otp_code}"
+                    api_url = f"https://webmsg.smsbharti.com/app/smsapi/index.php?key=5640415B1D6730&campaign=0&routeid=9&type=text&contacts={mobile}&senderid=SPTSMS&msg=Your%20otp%20is%20{otp_code}%20SELECTIAL&template_id=1707166619134631839"
+                    response = requests.get(api_url)
+                
                 print("\n\n response.status_code - ", response.status_code)
                 if response.status_code == 200:
                     return Response(json.dumps({'message': 'OTP sent successfully','details': otp_code}), status=200, content_type='application/json')

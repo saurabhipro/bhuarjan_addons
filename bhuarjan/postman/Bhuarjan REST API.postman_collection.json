@@ -1863,6 +1863,76 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "External Services",
+			"item": [
+				{
+					"name": "Send SMS (Zapim)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://qlogin.zapim.com/api/v2/SendSMS?ApiKey=yd1A8jcCSftiW1tkLfx/tAWu1pOVJB+vp60gxiMvO0w=&ClientId=e33522d2-a4cf-4776-838e-1765ad3b5319&senderid=REDM&message=OTP to Login in Survey APP 1234 Redmelon Pvt Ltd.&MobileNumbers=9990649990&msgtype=TXT&response=Y&dlttempid=1707174989930855861",
+							"protocol": "https",
+							"host": [
+								"qlogin",
+								"zapim",
+								"com"
+							],
+							"path": [
+								"api",
+								"v2",
+								"SendSMS"
+							],
+							"query": [
+								{
+									"key": "ApiKey",
+									"value": "yd1A8jcCSftiW1tkLfx/tAWu1pOVJB+vp60gxiMvO0w=",
+									"description": "API Key provided by service"
+								},
+								{
+									"key": "ClientId",
+									"value": "e33522d2-a4cf-4776-838e-1765ad3b5319",
+									"description": "Client ID provided by service"
+								},
+								{
+									"key": "senderid",
+									"value": "REDM",
+									"description": "Sender ID (approved via DLT)"
+								},
+								{
+									"key": "message",
+									"value": "OTP to Login in Survey APP 1234 Redmelon Pvt Ltd.",
+									"description": "Message content (must match template)"
+								},
+								{
+									"key": "MobileNumbers",
+									"value": "9990649990",
+									"description": "Comma separated mobile numbers"
+								},
+								{
+									"key": "msgtype",
+									"value": "TXT",
+									"description": "Message type"
+								},
+								{
+									"key": "response",
+									"value": "Y",
+									"description": "Return response"
+								},
+								{
+									"key": "dlttempid",
+									"value": "1707174989930855861",
+									"description": "DLT Template ID (mandatory)"
+								}
+							]
+						},
+						"description": "Direct test request to Zapim SMS Gateway to verify credentials and template."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

@@ -263,6 +263,11 @@ class BhuarjanSettingsMaster(models.Model):
     otp_api_key = fields.Char(string='OTP API Key', help='API key for OTP service')
     otp_api_secret = fields.Char(string='OTP API Secret', help='API secret for OTP service')
     otp_sender_id = fields.Char(string='OTP Sender ID', help='Sender ID for OTP messages')
+    otp_client_id = fields.Char(string='OTP Client ID', help='Client ID for OTP service')
+    otp_dlt_template_id = fields.Char(string='DLT Template ID', help='DLT Template ID for OTP messages')
+    otp_message_template = fields.Char(string='OTP Message Template', 
+                                      default='OTP to Login in Survey APP {otp} Redmelon Pvt Ltd.',
+                                      help='Message template. Use {otp} as placeholder for the OTP code')
     
     # Static OTP Configuration (for testing/development when SMS API is disabled)
     enable_static_otp = fields.Boolean(string='Enable Static OTP', default=False,

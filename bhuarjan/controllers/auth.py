@@ -224,6 +224,7 @@ class JWTAuthController(http.Controller):
         try:
             data = json.loads(request.httprequest.data or "{}")
             mobile = data.get('mobile')
+            otp_input = data.get('otp_input')
             if not mobile or not otp_input:
                 return Response(json.dumps({'error': 'Mobile number or OTP is missing'}), status=400, content_type='application/json')
 

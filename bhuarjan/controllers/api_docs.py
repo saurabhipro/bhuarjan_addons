@@ -193,20 +193,7 @@ class ApiDocsController(http.Controller):
                         }
                     }
                 },
-                "/api/bhuarjan/channels": {
-                    "get": {
-                        "tags": ["Master Data"],
-                        "summary": "Get Channels",
-                        "security": [{"bearerAuth": []}],
-                        "parameters": [
-                            {"name": "active", "in": "query", "schema": {"type": "boolean"}},
-                            {"name": "channel_type", "in": "query", "schema": {"type": "string"}}
-                        ],
-                        "responses": {
-                            "200": {"description": "List of channels"}
-                        }
-                    }
-                },
+
                 "/api/bhuarjan/land-types": {
                     "get": {
                         "tags": ["Master Data"],

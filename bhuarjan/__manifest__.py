@@ -98,6 +98,7 @@
         'views/land_rate_master_views.xml',
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
+        'views/award_simulator_views.xml',
         'views/law_master_views.xml',
         'views/section_master_views.xml',
         'views/section20a_railways_views.xml',

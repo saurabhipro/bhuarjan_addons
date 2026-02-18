@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             Award Simulator Wizard View
+        ═══════════════════════════════════════════════════════════════════ -->
+        <record id="view_bhu_award_simulator_form" model="ir.ui.view">
+            <field name="name">bhu.award.simulator.form</field>
+            <field name="model">bhu.award.simulator</field>
+            <field name="arch" type="xml">
+                <form string="Award Simulator / अवार्ड सिमुलेटर">
+                    <sheet>
+
+                        <!-- Header Banner -->
+                        <div class="oe_title">
+                            <h1>
+                                <span class="text-primary">🏛️ Award Simulator</span>
+                                <small class="text-muted ms-2" style="font-size:0.6em;">अवार्ड सिमुलेटर</small>
+                            </h1>
+                        </div>
+
+                        <!-- ── Survey Type ─────────────────────────────────── -->
+                        <group string="Survey Type / सर्वे प्रकार" col="2">
+                            <field name="survey_type" widget="radio" options="{'horizontal': true}"/>
+                        </group>
+
+                        <!-- ── Land Section ───────────────────────────────── -->
+                        <group string="🌾 Land Section / भूमि अनुभाग">
+                            <group>
+                                <field name="village_id"
+                                       options="{'no_create': true, 'no_open': true}"/>
+                                <field name="district_id"
+                                       options="{'no_create': true, 'no_open': true}"/>
+                                <field name="base_rate"
+                                       attrs="{'readonly': [('village_id', '!=', False)]}"/>
+                                <field name="road_type" widget="radio" options="{'horizontal': true}"/>
+                            </group>
+                            <group>
+                                <field name="is_diverted"/>
+                                <field name="irrigation_type" widget="radio" options="{'horizontal': true}"/>
+                                <field name="acquired_area"/>
+                            </group>
+                        </group>
+
+                        <!-- Land Calculation Summary -->
+                        <group string="Land Award Calculation / भूमि अवार्ड गणना"
+                               col="4"
+                               attrs="{'invisible': [('acquired_area', '=', 0)]}">
+                            <group>
+                                <field name="effective_land_rate" readonly="1"/>
+                                <field name="land_award_amount" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="solatium_amount" readonly="1"/>
+                                <field name="land_total" readonly="1"
+                                       class="fw-bold text-success"/>
+                            </group>
+                        </group>
+
+                        <!-- ── Tree Section ───────────────────────────────── -->
+                        <notebook>
+                            <page string="🌳 Trees / वृक्ष">
+                                <field name="tree_line_ids" nolabel="1">
+                                    <tree editable="bottom" decoration-warning="condition == 'unsound'">
+                                        <field name="tree_master_id"
+                                               options="{'no_create': true}"/>
+                                        <field name="tree_type" optional="show"/>
+                                        <field name="development_stage"/>
+                                        <field name="girth_cm"/>
+                                        <field name="condition"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_rate" readonly="1"/>
+                                        <field name="line_total" readonly="1" sum="Tree Total"/>
+                                    </tree>
+                                </field>
+                                <group col="2">
+                                    <field name="tree_total" readonly="1"
+                                           class="fw-bold text-success"/>
+                                </group>
+                            </page>
+
+                            <!-- ── Structure Section ──────────────────────── -->
+                            <page string="🏗️ Structures / संरचनाएं">
+                                <field name="structure_line_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="structure_type"/>
+                                        <field name="description"/>
+                                        <field name="quantity"/>
+                                        <field name="area_sqft"/>
+                                        <field name="unit_rate"/>
+                                        <field name="line_total" readonly="1" sum="Structure Total"/>
+                                    </tree>
+                                </field>
+                                <group col="2">
+                                    <field name="structure_total" readonly="1"
+                                           class="fw-bold text-success"/>
+                                </group>
+                            </page>
+                        </notebook>
+
+                        <!-- ── Grand Total ────────────────────────────────── -->
+                        <div class="o_field_widget o_wrap_field mt-3">
+                            <div class="alert alert-success d-flex align-items-center justify-content-between p-3"
+                                 style="border-radius:8px; font-size:1.1em;">
+                                <div>
+                                    <strong>🏆 Grand Total Award / कुल अवार्ड राशि</strong>
+                                    <div class="text-muted small">
+                                        Land (<field name="land_total" readonly="1" nolabel="1" class="d-inline"/>) +
+                                        Trees (<field name="tree_total" readonly="1" nolabel="1" class="d-inline"/>) +
+                                        Structures (<field name="structure_total" readonly="1" nolabel="1" class="d-inline"/>)
+                                    </div>
+                                </div>
+                                <div style="font-size:1.5em; font-weight:700;">
+                                    <field name="grand_total" readonly="1" nolabel="1"
+                                           class="text-success"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </sheet>
+
+                    <footer>
+                        <button string="Recalculate / पुनः गणना करें"
+                                name="action_calculate"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Close / बंद करें"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action to open the simulator -->
+        <record id="action_bhu_award_simulator" model="ir.actions.act_window">
+            <field name="name">Award Simulator / अवार्ड सिमुलेटर</field>
+            <field name="res_model">bhu.award.simulator</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <!-- Menu item – under Master Data, admin only -->
+        <menuitem
+            id="menu_bhu_award_simulator"
+            name="Award Simulator / अवार्ड सिमुलेटर"
+            action="action_bhu_award_simulator"
+            parent="menu_bhu_master"
+            sequence="99"
+            groups="base.group_system"/>
+
+    </data>
+</odoo>

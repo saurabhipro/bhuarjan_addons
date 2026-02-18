@@ -15,6 +15,7 @@ from . import payment_reconciliation
 from . import payment_file
 from . import payment_reconciliation_bank
 from . import land_rate_master
+from . import award_simulator
 from . import settings_master
 from . import message_wizard
 from . import survey_bulk_approval_wizard

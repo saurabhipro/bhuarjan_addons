@@ -126,3 +126,6 @@ access_change_password_user_district_admin,change.password.user.district.admin,b
 access_image_capture_user,access.image.capture.user,model_image_capture,base.group_user,1,1,1,1
 access_bhu_all_section_report,access_bhu_all_section_report,model_bhu_all_section_report,base.group_user,1,0,0,0
 access_bhu_landowner_payment_status,bhu.landowner.payment.status.model_access,model_bhu_landowner_payment_status,base.group_user,1,1,1,1
+access_bhu_award_simulator,access_bhu_award_simulator,model_bhu_award_simulator,base.group_system,1,1,1,1
+access_bhu_award_simulator_tree_line,access_bhu_award_simulator_tree_line,model_bhu_award_simulator_tree_line,base.group_system,1,1,1,1
+access_bhu_award_simulator_structure_line,access_bhu_award_simulator_structure_line,model_bhu_award_simulator_structure_line,base.group_system,1,1,1,1

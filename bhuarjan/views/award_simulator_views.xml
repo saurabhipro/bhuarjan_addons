@@ -30,7 +30,7 @@
                             <group>
                                 <field name="village_id" options="{'no_create': true, 'no_open': true}"/>
                                 <field name="district_id" options="{'no_create': true, 'no_open': true}"/>
-                                <field name="base_rate" attrs="{'readonly': [('village_id', '!=', False)]}"/>
+                                <field name="base_rate" readonly="village_id != False"/>
                                 <field name="road_type" widget="radio" options="{'horizontal': true}"/>
                             </group>
                             <group>

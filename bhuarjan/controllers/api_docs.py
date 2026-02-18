@@ -49,8 +49,7 @@ class ApiDocsController(http.Controller):
              return request.not_found()
 
         # Construct basic spec
-        base_url = request.httprequest.host_url.rstrip('/')
-        
+        # Use relative URL to allow flexibility (works with HTTP/HTTPS automatically)
         spec = {
             "openapi": "3.0.0",
             "info": {
@@ -59,7 +58,7 @@ class ApiDocsController(http.Controller):
                 "version": "1.0.0"
             },
             "servers": [
-                {"url": base_url} 
+                {"url": "/"} 
             ],
             "components": {
                 "securitySchemes": {

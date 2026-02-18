@@ -591,6 +591,9 @@ class BhuarjanSettingsMaster(models.Model):
         if not self.otp_api_url:
              raise ValidationError("OTP API URL is not configured.")
 
+        if not self.otp_sender_id:
+             raise ValidationError("OTP Sender ID is not configured. Please enter the Sender ID (e.g., REDM) in the field.")
+
         # Logic similar to request_otp in auth.py
         otp_code = self.test_otp or '1234'
         mobile = self.test_mobile_number

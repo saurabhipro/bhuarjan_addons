@@ -94,17 +94,14 @@
                                     <strong>Test SMS Configuration</strong><br/>
                                     Enter a mobile number and click the button to test if the OTP SMS is sent successfully.
                                 </div>
-                                <group col="4">
+                                <group col="6">
                                     <field name="test_mobile_number" placeholder="Enter Mobile Number"/>
                                     <field name="test_otp" placeholder="Enter 4-digit OTP"/>
-                                    <button name="action_test_sms" string="Send Test SMS" type="object" class="btn-primary" icon="fa-paper-plane"/>
+                                    <button name="action_test_sms" string="Send Test SMS" type="object" class="btn btn-primary" icon="fa-paper-plane"/>
                                 </group>
                                 
-                                <notebook>
-                                    <page string="Integration Details">
-                                        <field name="api_documentation" widget="ace" options="{'mode': 'json'}" style="min-height: 400px;"/>
-                                    </page>
-                                </notebook>
+                                <separator string="Integration Details (JSON Req/Res)" style="margin-top: 20px;"/>
+                                <field name="api_documentation" widget="text" style="min-height: 300px; font-family: monospace; background-color: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; border-radius: 4px;" readonly="1"/>
 
                                 <div class="alert alert-warning" role="alert" style="margin-top: 16px;">
                                     <strong>Static OTP Configuration</strong><br/>

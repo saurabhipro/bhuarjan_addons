@@ -70,14 +70,10 @@
                         </group>
 
                         <!-- Dates Section -->
-                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा">
-                            <group>
-                                <field name="section4_date"/>
-                                <field name="award_date"/>
-                            </group>
-                            <group>
-                                <field name="interest_rate_percent"/>
-                            </group>
+                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा" col="3">
+                            <field name="section4_date"/>
+                            <field name="award_date"/>
+                            <field name="interest_rate_percent"/>
                         </group>
 
                         <!-- Land Calculation Summary -->

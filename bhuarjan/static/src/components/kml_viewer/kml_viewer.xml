@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="bhuarjan.KmlViewer" owl="1">
+        <div class="kml-viewer">
+            <div t-ref="mapContainer" class="map-container" style="height: 400px; width: 100%;">Map Loading...</div>
+        </div>
+    </t>
+</templates>

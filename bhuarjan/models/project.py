@@ -159,6 +159,11 @@ class BhuProject(models.Model):
     rehab_admin_name = fields.Char(string='Rehabilitation Administrator / पुनर्वास प्रशासक', tracking=True,
                                                help='Name/Designation of Rehabilitation and Resettlement Administrator')
     
+    # KML File for Map Visualization
+    kml_file = fields.Binary(string='KML File / KML फाइल', attachment=True, 
+                             help='Upload a KML file to view on map')
+    kml_filename = fields.Char(string='KML Filename')
+
     @api.onchange('department_id')
     def _onchange_department_id(self):
         if self.department_id:

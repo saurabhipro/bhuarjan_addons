@@ -136,6 +136,17 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Map View / मानचित्र दृश्य">
+                            <group>
+                                <field name="kml_filename" invisible="1"/>
+                                <field name="kml_file" filename="kml_filename" widget="binary" 
+                                       options="{'accepted_file_extensions': '.kml'}"
+                                       string="Upload KML File / KML अपलोड करें"/>
+                            </group>
+                            <div invisible="not kml_file" style="margin-top: 10px;">
+                                <field name="kml_file" widget="kml_viewer" nolabel="1"/>
+                            </div>
+                        </page>
                         <page string="Project Details / परियोजना विवरण">
                             <group>
                                 <group string="(1) Number of Directly Affected Families / प्रत्यक्ष रूप से प्रभावित परिवारों की संख्या">

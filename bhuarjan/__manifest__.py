@@ -197,7 +197,11 @@
             # Project Timeline Widget
             'bhuarjan/static/src/scss/project_timeline.scss',
             'bhuarjan/static/src/js/components/project_timeline.js',
+            'bhuarjan/static/src/js/components/project_timeline.js',
             'bhuarjan/static/src/xml/project_timeline.xml',
+            # KML Viewer Component
+            'bhuarjan/static/src/components/kml_viewer/kml_viewer.js',
+            'bhuarjan/static/src/components/kml_viewer/kml_viewer.xml',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

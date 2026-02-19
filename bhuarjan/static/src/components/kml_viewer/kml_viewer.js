@@ -21,11 +21,18 @@ export class KmlViewer extends Component {
         });
 
         onMounted(async () => {
+            console.log("KML Viewer: Mounting...");
             try {
+                this.state.isLoading = true;
                 await this.loadDependencies();
-                this.initializeMap();
-                await this.renderKml();
-                this.state.isLoading = false;
+                console.log("KML Viewer: Dependencies loaded.");
+
+                // Slight delay to ensure DOM is ready
+                setTimeout(() => {
+                    this.initializeMap();
+                    this.renderKml();
+                    this.state.isLoading = false;
+                }, 100);
             } catch (e) {
                 console.error("Setup error:", e);
                 this.state.error = "Error initializing map: " + e.message;
@@ -45,8 +52,8 @@ export class KmlViewer extends Component {
                 this.renderKml();
                 // Ensure map invalidates size when data changes or component updates
                 setTimeout(() => {
-                    this.map.invalidateSize();
-                }, 100);
+                    if (this.map) this.map.invalidateSize();
+                }, 200);
             }
         }, () => [this.props.record.data[this.props.name]]);
     }
@@ -61,13 +68,18 @@ export class KmlViewer extends Component {
             await loadJS("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
         } catch (e) {
             console.error("Failed to load map dependencies", e);
-            throw e;
+            throw new Error("Failed to load map libraries (Leaflet/JSZip). Check internet connection.");
         }
     }
 
     initializeMap() {
-        if (!this.mapContainer.el || this.map) return;
+        if (!this.mapContainer.el) {
+            console.error("Map container element not found!");
+            return;
+        }
+        if (this.map) return;
 
+        console.log("KML Viewer: Initializing map...");
         // Default view (India)
         this.map = L.map(this.mapContainer.el).setView([20.5937, 78.9629], 5);
 
@@ -75,7 +87,7 @@ export class KmlViewer extends Component {
             attribution: '© OpenStreetMap contributors'
         }).addTo(this.map);
 
-        // Fix for map not rendering correctly initially
+        // Force resize
         setTimeout(() => {
             if (this.map) this.map.invalidateSize();
         }, 500);
@@ -92,12 +104,8 @@ export class KmlViewer extends Component {
         }
 
         if (kmlData) {
+            console.log("KML Viewer: Rendering data...");
             try {
-                // Determine file type from filename or try to detect
-                // Since we only hold data, let's try KML first, then KMZ if zip signature or if filename ends in .kmz
-                // We don't have filename in props reliably unless we fetch it from another field
-                // But generally users upload .kmz or .kml
-
                 // Decode Base64 to binary string
                 const binaryString = atob(kmlData);
 
@@ -120,12 +128,9 @@ export class KmlViewer extends Component {
                     const loadedZip = await zip.loadAsync(binaryString);
 
                     // Find the .kml file inside
-                    // KMZ usually contains a doc.kml at root, but can be any .kml
-                    let kmlFile = null;
-
-                    // Search for .kml files
                     const kmlFiles = Object.keys(loadedZip.files).filter(filename => filename.toLowerCase().endsWith('.kml'));
 
+                    let kmlFile = null;
                     if (kmlFiles.length > 0) {
                         // Prioritize doc.kml if exists, else take first
                         kmlFile = kmlFiles.find(name => name.toLowerCase() === 'doc.kml') || kmlFiles[0];
@@ -137,9 +142,7 @@ export class KmlViewer extends Component {
                         throw new Error("No KML file found inside KMZ archive.");
                     }
                 } else {
-                    // Assume KML text
-                    // Decode properly for utf-8 characters if needed
-                    // atob handles base64 to binary string (latin1), we need to decode to utf-8 text
+                    // KML Text Handling with standard decoding
                     try {
                         const uint8Array = new Uint8Array(binaryString.length);
                         for (let i = 0; i < binaryString.length; i++) {
@@ -162,16 +165,15 @@ export class KmlViewer extends Component {
                 this.layer = layer;
 
                 // Wait for layer to be ready to get bounds
-                layer.on('ready', () => {
+                const adjustBounds = () => {
                     if (layer.getBounds().isValid()) {
                         this.map.fitBounds(layer.getBounds());
                     }
-                });
+                };
 
-                // Also handle immediate bounds if already parsed synchronously (sometimes omnivore is sync for strings)
-                if (layer.getBounds().isValid()) {
-                    this.map.fitBounds(layer.getBounds());
-                }
+                layer.on('ready', adjustBounds);
+                // Also try immediately
+                adjustBounds();
 
             } catch (e) {
                 console.error("Error parsing KML/KMZ data", e);

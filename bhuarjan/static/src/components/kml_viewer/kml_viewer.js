@@ -94,16 +94,13 @@ export class KmlViewer extends Component {
     }
 
     async renderKml() {
-        if (!this.map || !window.omnivore || !window.JSZip) return;
-
-        const kmlData = this.props.record.data[this.props.name];
-        const filename = this.props.record.data.kml_filename;
-
-        if (filename && !filename.toLowerCase().endsWith('.kml') && !filename.toLowerCase().endsWith('.kmz')) {
-            this.state.error = "Unsupported file type. Please upload a .kml or .kmz file.";
-            console.warn("KML Viewer: Unsupported file extension:", filename);
+        if (!this.map || !window.omnivore || !window.JSZip) {
+            this.state.status = "Missing dependencies for render.";
             return;
         }
+
+        const kmlData = this.props.record.data[this.props.name];
+        // Filename check removed to rely on content parsing
 
         if (this.layer) {
             this.map.removeLayer(this.layer);
@@ -111,6 +108,7 @@ export class KmlViewer extends Component {
         }
 
         if (kmlData) {
+            this.state.status = "Decoding data...";
             console.log("KML Viewer: Rendering data...");
             try {
                 // Clean base64 string (remove newlines/spaces)
@@ -122,8 +120,6 @@ export class KmlViewer extends Component {
                     binaryString = atob(cleanKmlData);
                 } catch (e) {
                     console.error("Base64 decode error:", e);
-                    // If standard atob fails, it might not be base64 or might be corrupted. 
-                    // Odoo binary fields are always base64. 
                     throw new Error("Invalid Base64 data.");
                 }
 
@@ -136,6 +132,7 @@ export class KmlViewer extends Component {
                 }
 
                 if (isKmz) {
+                    this.state.status = "Processing KMZ Archive...";
                     // Check if JSZip is loaded
                     if (typeof JSZip === 'undefined') {
                         throw new Error("JSZip library not loaded.");
@@ -160,6 +157,7 @@ export class KmlViewer extends Component {
                         throw new Error("No KML file found inside KMZ archive.");
                     }
                 } else {
+                    this.state.status = "Processing KML Content...";
                     // KML Text Handling with standard decoding
                     try {
                         const uint8Array = new Uint8Array(binaryString.length);
@@ -174,18 +172,24 @@ export class KmlViewer extends Component {
                     }
                 }
 
-                if (!kmlString) return;
+                if (!kmlString) {
+                    this.state.status = "Empty content.";
+                    return;
+                }
 
+                this.state.status = "Parsing geometry...";
                 // Parse using omnivore
                 const layer = omnivore.kml.parse(kmlString);
 
                 layer.addTo(this.map);
                 this.layer = layer;
 
-                // Wait for layer to be ready to get bounds
                 const adjustBounds = () => {
                     if (layer.getBounds().isValid()) {
                         this.map.fitBounds(layer.getBounds());
+                        this.state.status = "Rendered successfully.";
+                    } else {
+                        this.state.status = "Map loaded (No bounds found).";
                     }
                 };
 
@@ -196,7 +200,10 @@ export class KmlViewer extends Component {
             } catch (e) {
                 console.error("Error parsing KML/KMZ data", e);
                 this.state.error = "Error parsing file: " + e.message;
+                this.state.status = "Failed to parse.";
             }
+        } else {
+            this.state.status = "No data uploaded.";
         }
     }
 }

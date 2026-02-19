@@ -533,7 +533,7 @@ class SiaTeam(models.Model):
                 'default_res_model': self._name,
                 'default_res_id': self.id,
                 'default_report_xml_id': 'bhuarjan.action_report_sia_proposal',
-                'default_filename': f'SIA_Proposal_{self.approval_nathi_ref or self.name}.doc'
+                'default_filename': f'SIA_Proposal_{self.kramank or self.name}.doc'
             }
         }
     
@@ -550,7 +550,7 @@ class SiaTeam(models.Model):
                 'default_res_model': self._name,
                 'default_res_id': self.id,
                 'default_report_xml_id': 'bhuarjan.action_report_sia_order',
-                'default_filename': f'SIA_Order_{self.approval_nathi_ref or self.name}.doc'
+                'default_filename': f'SIA_Order_{self.kramank or self.name}.doc'
             }
         }
     

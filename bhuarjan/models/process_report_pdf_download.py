@@ -34,30 +34,11 @@ class ProcessReportPdfDownload(models.AbstractModel):
             # Generate Section 4 PDFs
             for record in records['section4']:
                 try:
-                    # Create wizard for Section 4
-                    wizard = self.env['bhu.section4.notification.wizard'].create({
-                        'project_id': record.project_id.id,
-                        'village_id': record.village_id.id,
-                        'public_purpose': record.public_purpose,
-                        'public_hearing_datetime': record.public_hearing_datetime,
-                        'public_hearing_place': record.public_hearing_place,
-                        'directly_affected': record.directly_affected,
-                        'indirectly_affected': record.indirectly_affected,
-                        'private_assets': record.private_assets,
-                        'government_assets': record.government_assets,
-                        'minimal_acquisition': record.minimal_acquisition,
-                        'alternatives_considered': record.alternatives_considered,
-                        'total_cost': record.total_cost,
-                        'project_benefits': record.project_benefits,
-                        'compensation_measures': record.compensation_measures,
-                        'other_components': record.other_components,
-                    })
-                    
-                    # Generate PDF
+                    # Generate PDF using persistent record
                     report_action = self.env.ref('bhuarjan.action_report_section4_notification')
                     pdf_result = report_action.sudo()._render_qweb_pdf(
                         report_action.report_name, 
-                        [wizard.id], 
+                        [record.id], 
                         data={}
                     )
                     

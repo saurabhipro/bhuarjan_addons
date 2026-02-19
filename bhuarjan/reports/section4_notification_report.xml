@@ -3,7 +3,7 @@
     <!-- Section 4 Notification Report -->
     <record id="action_report_section4_notification" model="ir.actions.report">
         <field name="name">Section 4 Notification / धारा 4 अधिसूचना</field>
-        <field name="model">bhu.section4.notification.wizard</field>
+        <field name="model">bhu.section4.notification</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bhuarjan.section4_notification_report</field>
         <field name="report_file">bhuarjan.section4_notification_report</field>

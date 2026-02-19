@@ -494,28 +494,9 @@ class Section4Notification(models.Model):
         # Don't change state - keep it in draft until submitted
         # State will be changed when SDM submits to Collector
         
-        # Use wizard to generate PDF (reuse existing logic)
-        # Always create a fresh wizard with current data to ensure report has all data
-        wizard = self.env['bhu.section4.notification.wizard'].create({
-            'project_id': self.project_id.id,
-            'village_id': self.village_id.id,
-            'public_purpose': self.public_purpose,
-            'public_hearing_datetime': self.public_hearing_datetime,
-            'public_hearing_place': self.public_hearing_place,
-            'directly_affected': self.directly_affected,
-            'indirectly_affected': self.indirectly_affected,
-            'private_assets': self.private_assets,
-            'government_assets': self.government_assets,
-            'minimal_acquisition': self.minimal_acquisition,
-            'alternatives_considered': self.alternatives_considered,
-            'total_cost': self.total_cost,
-            'project_benefits': self.project_benefits,
-            'compensation_measures': self.compensation_measures,
-            'other_components': self.other_components,
-        })
-        
+        # Use self to generate PDF directly (avoid transient wizard issues)
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
-        return report_action.report_action(wizard)
+        return report_action.report_action(self)
     
     # Override mixin method to generate Section 4 PDF/Word
     def action_download_unsigned_file(self):
@@ -705,7 +686,7 @@ class Section4NotificationWizard(models.TransientModel):
             'state': 'generated',
         })
         
-        # Generate PDF report - pass the wizard recordset
+        # Generate PDF report - pass the persistent notification record
         report_action = self.env.ref('bhuarjan.action_report_section4_notification')
-        return report_action.report_action(self)
+        return report_action.report_action(notification)
 

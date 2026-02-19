@@ -105,6 +105,17 @@ class ResUsers(models.Model):
         ('department_user', 'Department User'),
     ], string="Bhuarjan Role", default=False)
 
+    bhuarjan_category_id = fields.Many2one(
+        'ir.module.category',
+        string="Bhuarjan Category",
+        compute='_compute_bhuarjan_category'
+    )
+
+    def _compute_bhuarjan_category(self):
+        category = self.env.ref('bhuarjan.module_category_bhuarjan_bhuarjan', raise_if_not_found=False)
+        for record in self:
+            record.bhuarjan_category_id = category
+
     def init(self):
         """Cleanup legacy roles on module upgrade"""
         self.env.cr.execute("UPDATE res_users SET bhuarjan_role = 'sdm' WHERE bhuarjan_role = 'tahsildar'")

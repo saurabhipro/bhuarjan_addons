@@ -97,6 +97,13 @@ export class KmlViewer extends Component {
         if (!this.map || !window.omnivore || !window.JSZip) return;
 
         const kmlData = this.props.record.data[this.props.name];
+        const filename = this.props.record.data.kml_filename;
+
+        if (filename && !filename.toLowerCase().endsWith('.kml') && !filename.toLowerCase().endsWith('.kmz')) {
+            this.state.error = "Unsupported file type. Please upload a .kml or .kmz file.";
+            console.warn("KML Viewer: Unsupported file extension:", filename);
+            return;
+        }
 
         if (this.layer) {
             this.map.removeLayer(this.layer);

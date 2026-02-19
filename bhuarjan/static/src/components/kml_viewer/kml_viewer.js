@@ -92,8 +92,17 @@ export class KmlViewer extends Component {
     }
 
     // Helper: convert a base64 string to Uint8Array correctly
+    // Handles standard base64, URL-safe base64, and missing padding (all variants Odoo can return)
     base64ToUint8Array(base64) {
-        const cleaned = base64.replace(/\s/g, "");
+        // Step 1: Remove all whitespace (newlines, spaces, tabs)
+        let cleaned = base64.replace(/[\s\r\n]+/g, "");
+        // Step 2: Convert URL-safe base64 to standard base64
+        cleaned = cleaned.replace(/-/g, "+").replace(/_/g, "/");
+        // Step 3: Fix padding (add = signs to make length a multiple of 4)
+        const pad = cleaned.length % 4;
+        if (pad === 2) cleaned += "==";
+        else if (pad === 3) cleaned += "=";
+        // Step 4: Decode
         const binaryStr = atob(cleaned);
         const len = binaryStr.length;
         const bytes = new Uint8Array(len);

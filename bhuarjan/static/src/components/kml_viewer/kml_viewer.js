@@ -106,8 +106,19 @@ export class KmlViewer extends Component {
         if (kmlData) {
             console.log("KML Viewer: Rendering data...");
             try {
+                // Clean base64 string (remove newlines/spaces)
+                const cleanKmlData = kmlData.replace(/\s/g, '');
+
                 // Decode Base64 to binary string
-                const binaryString = atob(kmlData);
+                let binaryString;
+                try {
+                    binaryString = atob(cleanKmlData);
+                } catch (e) {
+                    console.error("Base64 decode error:", e);
+                    // If standard atob fails, it might not be base64 or might be corrupted. 
+                    // Odoo binary fields are always base64. 
+                    throw new Error("Invalid Base64 data.");
+                }
 
                 let kmlString = "";
                 let isKmz = false;

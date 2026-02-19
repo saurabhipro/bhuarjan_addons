@@ -219,7 +219,11 @@ class ResUsers(models.Model):
             self.env.ref('bhuarjan.group_bhuarjan_department_user').id,
         ]
         if self.groups_id:
-            self.groups_id = [(3, gid) for gid in all_custom_group_ids if gid in self.groups_id.ids]
+            # properly handle removing ids from One2many
+            current_ids = self.groups_id.ids
+            new_ids = [gid for gid in current_ids if gid not in all_custom_group_ids]
+            # Use command to replace
+            self.groups_id = [(6, 0, new_ids)]
 
         # Assign selected group
         group_map = {

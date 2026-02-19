@@ -8,7 +8,7 @@
                 <i class="fa fa-spinner fa-spin me-2"/> Loading Map Resources...
             </div>
             
-            <div t-ref="mapContainer" class="map-container" style="flex: 1; min-height: 500px; width: 100%; border: 1px solid #ccc; background-color: #f8f9fa; position: relative;">
+            <div t-ref="mapContainer" class="map-container" style="height: 600px; width: 100%; border: 1px solid #ccc; background-color: #f8f9fa; position: relative;">
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.7); padding: 5px; font-size: 0.8em; color: #666; z-index: 1000; pointer-events: none;">
                     Status: <t t-esc="state.status"/>
                 </div>

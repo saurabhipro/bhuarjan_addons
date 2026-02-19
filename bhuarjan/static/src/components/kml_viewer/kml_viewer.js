@@ -60,15 +60,15 @@ export class KmlViewer extends Component {
 
     async loadDependencies() {
         try {
-            await loadCSS("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
-            await loadJS("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js");
-            // Omnivore for KML parsing
-            await loadJS("https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js");
+            await loadCSS("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css");
+            await loadJS("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js");
+            // Omnivore for KML parsing - using cdnjs
+            await loadJS("https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js");
             // JSZip for KMZ extraction
             await loadJS("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
         } catch (e) {
             console.error("Failed to load map dependencies", e);
-            throw new Error("Failed to load map libraries (Leaflet/JSZip). Check internet connection.");
+            throw new Error("Failed to load map libraries. Check internet connection or CSP.");
         }
     }
 

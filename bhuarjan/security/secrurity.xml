@@ -441,6 +441,19 @@
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
         </record>
         
+        <!-- District Administrator Group Write Access Rule -->
+        <!-- Allow modifying ONLY Bhuarjan specific groups -->
+        <record id="record_res_groups_district_administrator" model="ir.rule">
+            <field name="name">District Administrator can manage Bhuarjan groups</field>
+            <field name="model_id" ref="base.model_res_groups"/>
+            <field name="domain_force">[('category_id', '=', ref('bhuarjan.module_category_bhuarjan_bhuarjan'))]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
+        </record>
+        
         
     </data>
 </odoo>

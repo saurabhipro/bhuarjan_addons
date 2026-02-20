@@ -1,47 +1,57 @@
 /** @odoo-module **/
-/* version: v7-google-maps */
+/* version: v8-google-maps-fetch */
 
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useRef, useState, useEffect } from "@odoo/owl";
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyCQ1XvoKRmX1qqo2XwlLj2C2gCIiCjtgFE";
+const GOOGLE_MAPS_API_KEY = "abcd";
 const JSZIP_CDN = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
 
+// Load a <script> tag once
 function loadScript(url) {
     return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${url}"]`)) {
+        if (document.querySelector(`script[src^="${url.split("?")[0]}"]`)) {
             resolve();
             return;
         }
-        const script = document.createElement("script");
-        script.src = url;
-        script.async = true;
-        script.defer = true;
-        script.onload = resolve;
-        script.onerror = () => reject(new Error(`Failed to load: ${url}`));
-        document.head.appendChild(script);
+        const s = document.createElement("script");
+        s.src = url;
+        s.async = true;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error("Failed to load: " + url));
+        document.head.appendChild(s);
     });
 }
 
+// Load Google Maps API exactly once, via callback
 function loadGoogleMaps() {
     return new Promise((resolve, reject) => {
-        if (window.google && window.google.maps) {
+        if (window.google && window.google.maps && window.google.maps.Map) {
             resolve();
             return;
         }
-        // Unique callback name to avoid collisions
-        const cb = "__gm_cb_" + Date.now();
-        window[cb] = () => {
-            delete window[cb];
-            resolve();
-        };
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=${cb}&v=weekly`;
-        script.async = true;
-        script.defer = true;
-        script.onerror = () => reject(new Error("Google Maps API failed to load. Check your API key."));
-        document.head.appendChild(script);
+        if (window.__gmLoading) {
+            // Already loading – wait for existing promise
+            window.__gmLoading.then(resolve).catch(reject);
+            return;
+        }
+        const cb = "__gmReady_" + Date.now();
+        window.__gmLoading = new Promise((res, rej) => {
+            window[cb] = () => { delete window[cb]; delete window.__gmLoading; res(); resolve(); };
+            const s = document.createElement("script");
+            s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=${cb}&v=weekly&libraries=`;
+            s.async = true;
+            s.defer = true;
+            s.onerror = () => {
+                delete window[cb];
+                delete window.__gmLoading;
+                const err = new Error("Google Maps API failed to load. Check your API key and network.");
+                rej(err);
+                reject(err);
+            };
+            document.head.appendChild(s);
+        });
     });
 }
 
@@ -52,7 +62,6 @@ export class KmlViewer extends Component {
     setup() {
         this.mapContainer = useRef("mapContainer");
         this.map = null;
-        this.dataLayers = [];
         this.markers = [];
         this.polylines = [];
         this.polygons = [];
@@ -60,36 +69,40 @@ export class KmlViewer extends Component {
         this.state = useState({
             isLoading: true,
             error: null,
-            status: "Initializing Google Maps...",
-            layerCount: 0,
+            status: "Initializing...",
+            featureCount: 0,
         });
 
         onMounted(async () => {
-            console.log("KML Viewer V7 (Google Maps): Mounted");
             try {
-                this.state.status = "Loading JSZip...";
+                this.state.status = "Loading libraries...";
                 await loadScript(JSZIP_CDN);
-
-                this.state.status = "Loading Google Maps API...";
                 await loadGoogleMaps();
 
-                this.state.status = "Initializing map...";
-                await new Promise(r => setTimeout(r, 100));
+                this.state.status = "Initializing Google Maps...";
+                await new Promise(r => setTimeout(r, 80));
 
                 this.initMap();
                 await this.renderKml();
                 this.state.isLoading = false;
             } catch (e) {
-                console.error("KML Viewer V7 error:", e);
+                console.error("KML Viewer V8:", e);
                 this.state.error = e.message;
                 this.state.isLoading = false;
             }
         });
 
         onWillUnmount(() => {
-            this.clearLayers();
+            this.clearOverlays();
             this.map = null;
         });
+
+        // Re-render when field value changes (e.g. user uploads a new file)
+        useEffect(() => {
+            if (!this.state.isLoading && this.map) {
+                this.renderKml();
+            }
+        }, () => [this.props.record.data[this.props.name]]);
     }
 
     initMap() {
@@ -99,7 +112,7 @@ export class KmlViewer extends Component {
         this.map = new google.maps.Map(el, {
             center: { lat: 22.5937, lng: 80.9629 },
             zoom: 5,
-            mapTypeId: google.maps.MapTypeId.HYBRID,  // Satellite + labels (Google Earth look)
+            mapTypeId: google.maps.MapTypeId.HYBRID,   // Satellite + labels = Google Earth feel
             mapTypeControl: true,
             mapTypeControlOptions: {
                 style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
@@ -114,32 +127,58 @@ export class KmlViewer extends Component {
             fullscreenControl: true,
             streetViewControl: false,
             zoomControl: true,
+            gestureHandling: "greedy",
         });
 
-        console.log("KML Viewer V7: Google Map initialized (HYBRID/satellite mode)");
+        // Ensure map fills container after layout is complete
+        setTimeout(() => {
+            if (this.map) google.maps.event.trigger(this.map, "resize");
+        }, 300);
     }
 
-    clearLayers() {
-        if (this.dataLayers) {
-            this.dataLayers.forEach(dl => dl.setMap(null));
-        }
-        if (this.markers) {
-            this.markers.forEach(m => m.setMap(null));
-        }
-        if (this.polylines) {
-            this.polylines.forEach(p => p.setMap(null));
-        }
-        if (this.polygons) {
-            this.polygons.forEach(p => p.setMap(null));
-        }
-        this.dataLayers = [];
+    clearOverlays() {
+        (this.markers || []).forEach(m => m.setMap(null));
+        (this.polylines || []).forEach(p => p.setMap(null));
+        (this.polygons || []).forEach(p => p.setMap(null));
         this.markers = [];
         this.polylines = [];
         this.polygons = [];
     }
 
-    // Robust base64 decode
-    decodeBase64ToBytes(b64) {
+    // ─── Binary data fetching ────────────────────────────────────────────────
+    // In Odoo 18, saved binary fields return `true` (not the base64 string)
+    // to avoid sending large payloads on every form load.
+    // We must fetch the actual bytes via /web/content instead.
+    async fetchBinaryBytes() {
+        const value = this.props.record.data[this.props.name];
+
+        // No file
+        if (!value) return null;
+
+        // If it's a plain base64 string (e.g. newly uploaded, not yet saved)
+        if (typeof value === "string" && value.length > 10) {
+            return this.base64ToBytes(value);
+        }
+
+        // Otherwise fetch from server (saved record returns true/false for binary)
+        const model = this.props.record.resModel;
+        const id = this.props.record.resId;
+        const field = this.props.name;
+
+        if (!id) {
+            throw new Error("Please save the record first before viewing the map.");
+        }
+
+        const url = `/web/content?model=${encodeURIComponent(model)}&id=${id}&field=${encodeURIComponent(field)}&download=1`;
+        this.state.status = "Downloading KML/KMZ file...";
+        const resp = await fetch(url, { credentials: "same-origin" });
+        if (!resp.ok) throw new Error(`File download failed: HTTP ${resp.status}`);
+        const buf = await resp.arrayBuffer();
+        return new Uint8Array(buf);
+    }
+
+    // Robust base64 → Uint8Array
+    base64ToBytes(b64) {
         let s = b64.replace(/[\s\r\n]+/g, "")
             .replace(/-/g, "+")
             .replace(/_/g, "/");
@@ -147,232 +186,162 @@ export class KmlViewer extends Component {
         if (mod === 2) s += "==";
         else if (mod === 3) s += "=";
         const bin = atob(s);
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        return bytes;
+        const out = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
     }
 
-    // Parse KML coordinates string → array of google.maps.LatLng
-    parseCoords(coordStr) {
-        return coordStr.trim().split(/\s+/).map(triplet => {
-            const parts = triplet.split(",");
-            const lng = parseFloat(parts[0]);
-            const lat = parseFloat(parts[1]);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                return new google.maps.LatLng(lat, lng);
-            }
-            return null;
+    // ─── KML parsing helpers ─────────────────────────────────────────────────
+    parseCoords(str) {
+        return str.trim().split(/\s+/).map(t => {
+            const p = t.split(",");
+            const lng = parseFloat(p[0]), lat = parseFloat(p[1]);
+            return (!isNaN(lat) && !isNaN(lng)) ? new google.maps.LatLng(lat, lng) : null;
         }).filter(Boolean);
     }
 
-    getStyleFromPlacemark(placemark) {
-        const styleEl = placemark.querySelector("Style");
-        let strokeColor = "#3388ff";
-        let fillColor = "#3388ff";
-        let strokeOpacity = 1;
-        let fillOpacity = 0.35;
-        let strokeWeight = 2;
-
-        if (styleEl) {
-            const lineColor = styleEl.querySelector("LineStyle > color")?.textContent;
-            const polyColor = styleEl.querySelector("PolyStyle > color")?.textContent;
-            if (lineColor) strokeColor = this.kmlColorToHex(lineColor);
-            if (polyColor) fillColor = this.kmlColorToHex(polyColor);
-        }
-        return { strokeColor, fillColor, strokeOpacity, fillOpacity, strokeWeight };
+    kmlColorToHex(kml) {
+        if (!kml || kml.length < 6) return "#2979ff";
+        const c = kml.replace(/[^0-9a-fA-F]/g, "").padStart(8, "0");
+        return `#${c.slice(6, 8)}${c.slice(4, 6)}${c.slice(2, 4)}`;
     }
 
-    // KML AABBGGRR → CSS #RRGGBB
-    kmlColorToHex(kmlColor) {
-        if (!kmlColor || kmlColor.length < 6) return "#3388ff";
-        const c = kmlColor.replace(/[^0-9a-fA-F]/g, "").padStart(8, "0");
-        const r = c.substring(6, 8);
-        const g = c.substring(4, 6);
-        const b = c.substring(2, 4);
-        return `#${r}${g}${b}`;
+    placemarkStyle(pm) {
+        const st = pm.querySelector("Style");
+        return {
+            strokeColor: st ? this.kmlColorToHex(st.querySelector("LineStyle > color")?.textContent) : "#2979ff",
+            fillColor: st ? this.kmlColorToHex(st.querySelector("PolyStyle > color")?.textContent) : "#2979ff",
+            strokeOpacity: 1,
+            fillOpacity: 0.35,
+            strokeWeight: 2,
+        };
     }
 
     parsePlacemarks(dom, bounds) {
         let count = 0;
+        dom.querySelectorAll("Placemark").forEach(pm => {
+            const name = pm.querySelector("name")?.textContent?.trim() || "";
+            const desc = pm.querySelector("description")?.textContent?.trim() || "";
+            const infoHtml = `<div style="max-width:280px;font-family:sans-serif"><b>${name}</b>${desc ? "<br><small>" + desc + "</small>" : ""}</div>`;
 
-        // Points
-        dom.querySelectorAll("Placemark").forEach(placemark => {
-            const name = placemark.querySelector("name")?.textContent || "";
-            const desc = placemark.querySelector("description")?.textContent || "";
-            const infoContent = `<div style="max-width:260px"><b>${name}</b>${desc ? "<br>" + desc : ""}</div>`;
-
-            // --- Point ---
-            placemark.querySelectorAll("Point > coordinates").forEach(c => {
-                const coords = this.parseCoords(c.textContent);
-                if (coords.length > 0) {
-                    const marker = new google.maps.Marker({
-                        position: coords[0],
-                        map: this.map,
-                        title: name,
-                    });
-                    if (name || desc) {
-                        const iw = new google.maps.InfoWindow({ content: infoContent });
-                        marker.addListener("click", () => iw.open(this.map, marker));
-                    }
-                    this.markers.push(marker);
-                    bounds.extend(coords[0]);
-                    count++;
-                }
-            });
-
-            // --- LineString ---
-            placemark.querySelectorAll("LineString > coordinates").forEach(c => {
-                const coords = this.parseCoords(c.textContent);
-                if (coords.length > 1) {
-                    const style = this.getStyleFromPlacemark(placemark);
-                    const polyline = new google.maps.Polyline({
-                        path: coords,
-                        map: this.map,
-                        strokeColor: style.strokeColor,
-                        strokeOpacity: style.strokeOpacity,
-                        strokeWeight: style.strokeWeight + 1,
-                    });
-                    if (name || desc) {
-                        const iw = new google.maps.InfoWindow({ content: infoContent });
-                        polyline.addListener("click", e => {
-                            iw.setPosition(e.latLng);
-                            iw.open(this.map);
-                        });
-                    }
-                    this.polylines.push(polyline);
-                    coords.forEach(pt => bounds.extend(pt));
-                    count++;
-                }
-            });
-
-            // --- Polygon ---
-            placemark.querySelectorAll("Polygon").forEach(poly => {
-                const outerEl = poly.querySelector("outerBoundaryIs > LinearRing > coordinates");
-                if (!outerEl) return;
-                const outerCoords = this.parseCoords(outerEl.textContent);
-                if (outerCoords.length < 3) return;
-
-                const style = this.getStyleFromPlacemark(placemark);
-                const polygon = new google.maps.Polygon({
-                    paths: outerCoords,
-                    map: this.map,
-                    strokeColor: style.strokeColor,
-                    strokeOpacity: style.strokeOpacity,
-                    strokeWeight: style.strokeWeight,
-                    fillColor: style.fillColor,
-                    fillOpacity: style.fillOpacity,
-                });
+            // Points
+            pm.querySelectorAll("Point > coordinates").forEach(c => {
+                const pts = this.parseCoords(c.textContent);
+                if (!pts.length) return;
+                const mk = new google.maps.Marker({ position: pts[0], map: this.map, title: name });
                 if (name || desc) {
-                    const iw = new google.maps.InfoWindow({ content: infoContent });
-                    polygon.addListener("click", e => {
-                        iw.setPosition(e.latLng);
-                        iw.open(this.map);
-                    });
+                    const iw = new google.maps.InfoWindow({ content: infoHtml });
+                    mk.addListener("click", () => iw.open(this.map, mk));
                 }
-                this.polygons.push(polygon);
-                outerCoords.forEach(pt => bounds.extend(pt));
+                this.markers.push(mk);
+                bounds.extend(pts[0]);
                 count++;
             });
 
-            // --- MultiGeometry (recursively handles nested geometries) ---
-            placemark.querySelectorAll("MultiGeometry").forEach(mg => {
-                mg.querySelectorAll("LineString > coordinates").forEach(c => {
-                    const coords = this.parseCoords(c.textContent);
-                    if (coords.length > 1) {
-                        const style = this.getStyleFromPlacemark(placemark);
-                        const polyline = new google.maps.Polyline({
-                            path: coords,
-                            map: this.map,
-                            strokeColor: style.strokeColor,
-                            strokeOpacity: style.strokeOpacity,
-                            strokeWeight: style.strokeWeight + 1,
-                        });
-                        this.polylines.push(polyline);
-                        coords.forEach(pt => bounds.extend(pt));
-                        count++;
-                    }
+            // LineStrings (direct + inside MultiGeometry)
+            pm.querySelectorAll("LineString > coordinates").forEach(c => {
+                const pts = this.parseCoords(c.textContent);
+                if (pts.length < 2) return;
+                const sty = this.placemarkStyle(pm);
+                const pl = new google.maps.Polyline({
+                    path: pts, map: this.map,
+                    strokeColor: sty.strokeColor, strokeOpacity: 1, strokeWeight: 3,
                 });
+                if (name || desc) {
+                    const iw = new google.maps.InfoWindow({ content: infoHtml });
+                    pl.addListener("click", e => { iw.setPosition(e.latLng); iw.open(this.map); });
+                }
+                this.polylines.push(pl);
+                pts.forEach(p => bounds.extend(p));
+                count++;
+            });
+
+            // Polygons
+            pm.querySelectorAll("Polygon").forEach(poly => {
+                const oc = poly.querySelector("outerBoundaryIs > LinearRing > coordinates");
+                if (!oc) return;
+                const pts = this.parseCoords(oc.textContent);
+                if (pts.length < 3) return;
+                const sty = this.placemarkStyle(pm);
+                const pg = new google.maps.Polygon({
+                    paths: pts, map: this.map,
+                    strokeColor: sty.strokeColor, strokeOpacity: 1, strokeWeight: 2,
+                    fillColor: sty.fillColor, fillOpacity: sty.fillOpacity,
+                });
+                if (name || desc) {
+                    const iw = new google.maps.InfoWindow({ content: infoHtml });
+                    pg.addListener("click", e => { iw.setPosition(e.latLng); iw.open(this.map); });
+                }
+                this.polygons.push(pg);
+                pts.forEach(p => bounds.extend(p));
+                count++;
             });
         });
-
         return count;
     }
 
+    // ─── Main render ─────────────────────────────────────────────────────────
     async renderKml() {
         if (!this.map) return;
-
-        this.clearLayers();
-
-        const kmlData = this.props.record.data[this.props.name];
-        if (!kmlData) {
-            this.state.status = "No KML/KMZ file uploaded.";
-            return;
-        }
-
-        this.state.error = null;
-        this.state.status = "Decoding file...";
+        this.clearOverlays();
 
         try {
-            let bytes;
-            try {
-                bytes = this.decodeBase64ToBytes(kmlData);
-            } catch (e) {
-                throw new Error("Base64 decode failed: " + e.message);
+            const bytes = await this.fetchBinaryBytes();
+            if (!bytes) {
+                this.state.status = "No KML/KMZ file uploaded.";
+                return;
             }
 
+            this.state.error = null;
             let kmlString = "";
 
-            // Detect ZIP (KMZ) magic bytes: PK = 0x50 0x4B
+            // KMZ = ZIP (magic: PK 0x50 0x4B)
             if (bytes[0] === 0x50 && bytes[1] === 0x4B) {
-                this.state.status = "Extracting KMZ archive...";
+                this.state.status = "Extracting KMZ...";
                 if (!window.JSZip) throw new Error("JSZip not loaded.");
-                const zip = new JSZip();
-                const loaded = await zip.loadAsync(bytes);
-                const kmlEntries = Object.keys(loaded.files).filter(n => n.toLowerCase().endsWith(".kml"));
-                const entry = kmlEntries.find(n => n.toLowerCase() === "doc.kml") || kmlEntries[0];
+                const zip = await new JSZip().loadAsync(bytes);
+                const files = Object.keys(zip.files).filter(n => n.toLowerCase().endsWith(".kml"));
+                const entry = files.find(n => n.toLowerCase() === "doc.kml") || files[0];
                 if (!entry) throw new Error("No .kml file found inside KMZ.");
-                kmlString = await loaded.file(entry).async("string");
-                console.log("KML Viewer V7: Extracted KML from KMZ:", entry);
+                kmlString = await zip.file(entry).async("string");
             } else {
-                this.state.status = "Reading KML file...";
                 kmlString = new TextDecoder("utf-8").decode(bytes);
             }
 
-            if (!kmlString.trim()) throw new Error("File content is empty.");
+            if (!kmlString.trim()) throw new Error("KML file is empty.");
 
             this.state.status = "Parsing KML...";
-            const parser = new DOMParser();
-            const dom = parser.parseFromString(kmlString, "text/xml");
+            const dom = new DOMParser().parseFromString(kmlString, "text/xml");
+            const err = dom.querySelector("parsererror");
+            if (err) throw new Error("XML error: " + err.textContent.slice(0, 120));
 
-            const parseErr = dom.querySelector("parsererror");
-            if (parseErr) throw new Error("XML parse error: " + parseErr.textContent.substring(0, 150));
-
-            this.state.status = "Rendering on Google Maps...";
-
+            this.state.status = "Rendering features...";
             const bounds = new google.maps.LatLngBounds();
             const count = this.parsePlacemarks(dom, bounds);
 
             if (count === 0) {
-                this.state.status = "⚠ No geometry found in KML file.";
+                this.state.status = "⚠ No geometry found in KML.";
                 return;
             }
 
             if (!bounds.isEmpty()) {
-                this.map.fitBounds(bounds);
-                // Ensure we don't zoom in too close for single points
+                this.map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
                 google.maps.event.addListenerOnce(this.map, "idle", () => {
                     if (this.map.getZoom() > 18) this.map.setZoom(16);
                 });
             }
 
-            this.state.layerCount = count;
-            this.state.status = `✓ Rendered ${count} feature(s) on Google Maps.`;
-            console.log("KML Viewer V7: Rendered", count, "features.");
+            // Final resize to ensure full-width render
+            setTimeout(() => {
+                if (this.map) google.maps.event.trigger(this.map, "resize");
+            }, 200);
 
+            this.state.featureCount = count;
+            this.state.status = `✓ ${count} feature(s) loaded`;
         } catch (e) {
-            console.error("KML Viewer V7 render error:", e);
+            console.error("KML Viewer V8:", e);
             this.state.error = "❌ " + e.message;
-            this.state.status = "Render failed.";
+            this.state.status = "Failed.";
         }
     }
 }

@@ -1,17 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
     <t t-name="bhuarjan.KmlViewer" owl="1">
-        <div class="kml-viewer" style="width: 100%; height: 100%; min-height: 500px; display: flex; flex-direction: column; position: relative;">
-            <div t-if="state.error" class="alert alert-danger" role="alert">
+        <div class="kml-viewer" style="width: 100%; height: 100%; min-height: 520px; display: flex; flex-direction: column; position: relative; background: #1a1a2e;">
+
+            <!-- Error Banner -->
+            <div t-if="state.error" class="alert alert-danger mb-0" role="alert" style="border-radius: 0; font-size: 0.875rem; border: none; border-bottom: 2px solid #dc3545;">
+                <i class="fa fa-exclamation-triangle me-2"/>
                 <t t-esc="state.error"/>
             </div>
-            
-            <div t-if="state.isLoading" class="d-flex justify-content-center align-items-center" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000;">
-                <i class="fa fa-spinner fa-spin me-2"/> Loading Map Resources...
-            </div>
-            
-            <div t-ref="mapContainer" class="map-container" style="height: 600px; width: 100%; border: 1px solid #ccc; background-color: #f8f9fa; position: relative;">
-                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.7); padding: 5px; font-size: 0.8em; color: #666; z-index: 1000; pointer-events: none;">
-                    Status: <t t-esc="state.status"/>
+
+            <!-- Loading Overlay -->
+            <div t-if="state.isLoading"
+                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,15,30,0.88); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px;">
+                <div style="width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.15); border-top-color: #4285f4; border-radius: 50%; animation: kml-spin 0.9s linear infinite;"/>
+                <div style="color: #fff; font-size: 0.9rem; letter-spacing: 0.04em;">
+                    <t t-esc="state.status"/>
                 </div>
             </div>
+
+            <!-- Google Map Container -->
+            <div t-ref="mapContainer"
+                 class="kml-map-container"
+                 style="flex: 1; height: 600px; width: 100%; position: relative; overflow: hidden;">
+            </div>
+
+            <!-- Status Bar -->
+            <div t-if="!state.isLoading and !state.error"
+                 style="background: rgba(0,0,0,0.75); color: #cde; padding: 6px 14px; font-size: 0.78rem; letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px;">
+                <i class="fa fa-map-marker" style="color: #4285f4;"/>
+                <span><t t-esc="state.status"/></span>
+            </div>
         </div>
+
+        <!-- Spinner keyframe animation -->
+        <style>
+            @keyframes kml-spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
     </t>
+</templates>

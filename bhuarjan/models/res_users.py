@@ -211,13 +211,6 @@ class ResUsers(models.Model):
     
     def read(self, fields=None, load='_classic_read'):
         """Override read to recompute survey_count_in_project when context has project"""
-        # Log context for debugging
-        # import logging
-        # _logger = logging.getLogger(__name__)
-        # project_id_ctx = self.env.context.get('default_project_id') or self.env.context.get('active_id')
-        # if 'survey_count_in_project' in (fields or []):
-        #     _logger.info(f"ResUsers read: fields={fields}, project_id_ctx={project_id_ctx}")
-            
         result = super().read(fields=fields, load=load)
         # Force recomputation if survey_count_in_project is being read and context has project
         if fields is None or 'survey_count_in_project' in fields:
@@ -230,6 +223,21 @@ class ResUsers(models.Model):
                     if 'survey_count_in_project' in res:
                         res['survey_count_in_project'] = record.survey_count_in_project
         return result
+
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        """Force fields as editable for privileged users in the UI."""
+        res = super(ResUsers, self).fields_get(allfields, attributes)
+        user = self.env.user
+        is_privileged = (
+            user.has_group('bhuarjan.group_bhuarjan_admin') or
+            user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        )
+        if is_privileged:
+            for field in ['name', 'login', 'mobile', 'email']:
+                if field in res:
+                    res[field]['readonly'] = False
+        return res
 
 
     assigned_project_ids = fields.Many2many(
@@ -409,4 +417,19 @@ class ResPartner(models.Model):
                 user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
             return super(ResPartner, self.sudo()).write(vals)
         return super().write(vals)
+
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        """Force partner fields as editable for privileged users in the UI."""
+        res = super(ResPartner, self).fields_get(allfields, attributes)
+        user = self.env.user
+        is_privileged = (
+            user.has_group('bhuarjan.group_bhuarjan_admin') or
+            user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        )
+        if is_privileged:
+            for field in ['name', 'email', 'mobile']:
+                if field in res:
+                    res[field]['readonly'] = False
+        return res
 

@@ -84,15 +84,15 @@
                         <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"/>
                         <div class="oe_title">
                             <label for="name"/>
-                            <h1><field name="name" placeholder="e.g. John Doe" required="1"/></h1>
+                            <h1><field name="name" placeholder="e.g. John Doe" required="1" readonly="0"/></h1>
                             <field name="email" invisible="1"/><!-- needed to update partner's email from on_change_login() -->
                             <label for="login" string="Email Address"/>
-                            <h2><field name="login" placeholder="e.g. email@yourcompany.com"/></h2>
+                            <h2><field name="login" placeholder="e.g. email@yourcompany.com" readonly="0"/></h2>
                             <group>
                                 <field name="partner_id" groups="base.group_no_one" readonly="1" required="0" invisible="not id"/>
                             </group>
                             <group>
-                                <field name="mobile"/>
+                                <field name="mobile" readonly="0"/>
                             </group>
                             <group>
                                 <field name="department_color" widget="color"/>

@@ -6,9 +6,9 @@
         <field name="model">bhu.project</field>
         <field name="arch" type="xml">
             <list>
+                <field name="name" string="Project Name"/>
                 <field name="department_id" string="Department"/>
                 <field name="district_id" string="District"/>
-                <field name="name" string="Project Name"/>
                 <field name="code" string="Project Code"/>
                 <field name="sia_exempt_display" string="SIA Exempt" widget="badge" 
                        decoration-success="sia_exempt_display == 'Yes'" 

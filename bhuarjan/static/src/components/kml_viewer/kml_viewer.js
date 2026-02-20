@@ -1,62 +1,54 @@
 /** @odoo-module **/
-/* version: v5-google-maps */
+/* version: v6-leaflet-builtin-parser */
 
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { Component, onMounted, onWillUnmount, useRef, useEffect, useState } from "@odoo/owl";
-import { loadJS } from "@web/core/assets";
-
-// REPLACE THIS WITH YOUR ACTUAL GOOGLE MAPS API KEY
-const GOOGLE_MAPS_API_KEY = "YOUR_API_KEY_HERE";
+import { loadJS, loadCSS } from "@web/core/assets";
 
 export class KmlViewer extends Component {
     static template = "bhuarjan.KmlViewer";
-    static props = {
-        ...standardFieldProps,
-    };
+    static props = { ...standardFieldProps };
 
     setup() {
         this.mapContainer = useRef("mapContainer");
         this.map = null;
+        this.layers = [];
         this.state = useState({
             isLoading: true,
             error: null,
-            status: "Starting v5...",
+            status: "V6: Starting...",
         });
 
         onMounted(async () => {
-            console.log("KML Viewer v5: Mounted");
+            console.log("KML Viewer V6: Mounted");
             try {
-                this.state.status = "Loading libraries...";
-                await this.loadDependencies();
-                console.log("KML Viewer v5: Libraries loaded");
-                this.state.status = "Initializing map...";
+                this.state.status = "Loading Leaflet...";
+                await loadCSS("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
+                await loadJS("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js");
+                await loadJS("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+                console.log("KML Viewer V6: Libraries loaded");
 
-                // Poll until google maps is ready
-                let tries = 0;
-                const checkGoogle = setInterval(() => {
-                    tries++;
-                    if (window.google && window.google.maps) {
-                        clearInterval(checkGoogle);
-                        this.initializeMap();
-                        this.renderKml();
-                        this.state.isLoading = false;
-                    } else if (tries > 50) {
-                        clearInterval(checkGoogle);
-                        this.state.error = "Google Maps failed to load. Check API key.";
-                        this.state.isLoading = false;
-                    }
-                }, 200);
+                this.state.status = "Initializing map...";
+                // Small delay to ensure DOM is ready
+                await new Promise(r => setTimeout(r, 150));
+
+                this.initMap();
+                await this.renderKml();
+                this.state.isLoading = false;
+                console.log("KML Viewer V6: Done mounting");
             } catch (e) {
-                console.error("KML Viewer v5 error:", e);
-                this.state.error = "Setup error: " + e.message;
-                this.state.status = "Failed.";
+                console.error("KML Viewer V6 error:", e);
+                this.state.error = "Error: " + e.message;
                 this.state.isLoading = false;
             }
         });
 
         onWillUnmount(() => {
-            this.map = null;
+            if (this.map) {
+                this.map.remove();
+                this.map = null;
+            }
         });
 
         useEffect(() => {
@@ -66,159 +58,167 @@ export class KmlViewer extends Component {
         }, () => [this.props.record.data[this.props.name]]);
     }
 
-    async loadDependencies() {
-        // JSZip for KMZ extraction
-        await loadJS("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-        // toGeoJSON for KML -> GeoJSON conversion (no Omnivore needed)
-        await loadJS("https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js");
-        // Google Maps JS API
-        if (!window.google || !window.google.maps) {
-            await loadJS(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`);
-        }
-    }
-
-    initializeMap() {
+    initMap() {
         const el = this.mapContainer.el;
-        if (!el) {
-            console.error("KML Viewer v5: map container not found");
-            return;
-        }
-        console.log("KML Viewer v5: Creating Google Map...");
-        this.map = new google.maps.Map(el, {
-            center: { lat: 23.5937, lng: 80.9629 }, // Center of India
-            zoom: 5,
-            mapTypeId: "terrain",
-        });
+        if (!el || this.map) return;
+        console.log("KML Viewer V6: Creating Leaflet map on", el);
+
+        this.map = L.map(el, { preferCanvas: true }).setView([22.5937, 80.9629], 5);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap contributors",
+            maxZoom: 19,
+        }).addTo(this.map);
+
+        // Force size calculation after creation
+        setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 300);
     }
 
-    // Helper: convert a base64 string to Uint8Array correctly
-    // Handles standard base64, URL-safe base64, and missing padding (all variants Odoo can return)
-    base64ToUint8Array(base64) {
-        // Step 1: Remove all whitespace (newlines, spaces, tabs)
-        let cleaned = base64.replace(/[\s\r\n]+/g, "");
-        // Step 2: Convert URL-safe base64 to standard base64
-        cleaned = cleaned.replace(/-/g, "+").replace(/_/g, "/");
-        // Step 3: Fix padding (add = signs to make length a multiple of 4)
-        const pad = cleaned.length % 4;
-        if (pad === 2) cleaned += "==";
-        else if (pad === 3) cleaned += "=";
-        // Step 4: Decode
-        const binaryStr = atob(cleaned);
-        const len = binaryStr.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binaryStr.charCodeAt(i);
-        }
+    // Robust base64 decode — handles standard, URL-safe, and missing-padding variants
+    decodeBase64ToBytes(b64) {
+        // Remove whitespace, convert URL-safe chars, fix padding
+        let s = b64.replace(/[\s\r\n]+/g, "")
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+        const mod = s.length % 4;
+        if (mod === 2) s += "==";
+        else if (mod === 3) s += "=";
+
+        const bin = atob(s);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
         return bytes;
     }
 
+    // Parse latitude/longitude pairs from a KML coordinates string
+    parseCoords(coordStr) {
+        return coordStr.trim().split(/\s+/).map(triplet => {
+            const parts = triplet.split(",");
+            const lng = parseFloat(parts[0]);
+            const lat = parseFloat(parts[1]);
+            if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
+            return null;
+        }).filter(Boolean);
+    }
+
+    // Recursively extract Leaflet layers from a KML DOM element
+    parsePlacemarks(el, layers, bounds) {
+        // Points
+        el.querySelectorAll("Point > coordinates").forEach(c => {
+            const coords = this.parseCoords(c.textContent);
+            if (coords.length > 0) {
+                const marker = L.marker(coords[0]);
+                const name = c.closest("Placemark")?.querySelector("name")?.textContent || "";
+                if (name) marker.bindPopup(name);
+                layers.push(marker);
+                bounds.extend(coords[0]);
+            }
+        });
+
+        // LineStrings
+        el.querySelectorAll("LineString > coordinates").forEach(c => {
+            const coords = this.parseCoords(c.textContent);
+            if (coords.length > 1) {
+                const line = L.polyline(coords, { color: "#3388ff", weight: 3 });
+                layers.push(line);
+                coords.forEach(pt => bounds.extend(pt));
+            }
+        });
+
+        // Polygons (outer boundary only)
+        el.querySelectorAll("Polygon").forEach(poly => {
+            const outerCoordEl = poly.querySelector("outerBoundaryIs > LinearRing > coordinates");
+            if (outerCoordEl) {
+                const outerCoords = this.parseCoords(outerCoordEl.textContent);
+                if (outerCoords.length > 2) {
+                    const polygon = L.polygon(outerCoords, {
+                        color: "#3388ff",
+                        fillColor: "#3388ff",
+                        fillOpacity: 0.3,
+                        weight: 2,
+                    });
+                    layers.push(polygon);
+                    outerCoords.forEach(pt => bounds.extend(pt));
+                }
+            }
+        });
+    }
+
     async renderKml() {
-        if (!this.map || !window.google) return;
+        if (!this.map) return;
+
+        // Clear previous layers
+        this.layers.forEach(l => this.map.removeLayer(l));
+        this.layers = [];
 
         const kmlData = this.props.record.data[this.props.name];
-
-        // Remove previous features
-        this.map.data.forEach((f) => this.map.data.remove(f));
-
         if (!kmlData) {
             this.state.status = "No file uploaded.";
             return;
         }
 
         this.state.error = null;
-        this.state.status = "Processing...";
+        this.state.status = "Decoding...";
 
         try {
-            // Decode base64 to bytes
             let bytes;
             try {
-                bytes = this.base64ToUint8Array(kmlData);
+                bytes = this.decodeBase64ToBytes(kmlData);
             } catch (e) {
-                throw new Error("Could not decode file data (Base64 error): " + e.message);
+                throw new Error("Base64 decode failed: " + e.message);
             }
 
             let kmlString = "";
 
-            // Detect ZIP signature: bytes 0x50 0x4B
-            const isZip = bytes[0] === 0x50 && bytes[1] === 0x4B;
-
-            if (isZip) {
+            // Detect ZIP  (PK = 0x50 0x4B)
+            if (bytes[0] === 0x50 && bytes[1] === 0x4B) {
                 this.state.status = "Extracting KMZ...";
                 if (!window.JSZip) throw new Error("JSZip not loaded.");
                 const zip = new JSZip();
                 const loaded = await zip.loadAsync(bytes);
-                const kmlEntries = Object.keys(loaded.files).filter(n =>
-                    n.toLowerCase().endsWith(".kml")
-                );
+                const kmlEntries = Object.keys(loaded.files).filter(n => n.toLowerCase().endsWith(".kml"));
                 const entry = kmlEntries.find(n => n.toLowerCase() === "doc.kml") || kmlEntries[0];
                 if (!entry) throw new Error("No .kml file found inside KMZ.");
                 kmlString = await loaded.file(entry).async("string");
             } else {
-                this.state.status = "Reading KML...";
-                // Decode UTF-8 bytes
-                const decoder = new TextDecoder("utf-8");
-                kmlString = decoder.decode(bytes);
+                this.state.status = "Decoding KML text...";
+                kmlString = new TextDecoder("utf-8").decode(bytes);
             }
 
-            if (!kmlString.trim()) {
-                throw new Error("KML content is empty.");
-            }
+            if (!kmlString.trim()) throw new Error("File content is empty.");
 
             this.state.status = "Parsing KML...";
             const parser = new DOMParser();
-            const kmlDom = parser.parseFromString(kmlString, "text/xml");
+            const dom = parser.parseFromString(kmlString, "text/xml");
 
-            const parseError = kmlDom.querySelector("parsererror");
-            if (parseError) {
-                throw new Error("XML parse error: " + parseError.textContent.substring(0, 100));
+            const parseErr = dom.querySelector("parsererror");
+            if (parseErr) throw new Error("XML parse error: " + parseErr.textContent.substring(0, 120));
+
+            const layers = [];
+            const bounds = L.latLngBounds([]);
+            this.parsePlacemarks(dom, layers, bounds);
+
+            if (layers.length === 0) {
+                this.state.status = "No geometry found in KML.";
+                return;
             }
-
-            // Convert to GeoJSON
-            if (!window.toGeoJSON) throw new Error("toGeoJSON library not loaded.");
-            const geoJson = toGeoJSON.kml(kmlDom);
 
             this.state.status = "Rendering...";
-            this.map.data.addGeoJson(geoJson);
-
-            // Fit map to features
-            const bounds = new google.maps.LatLngBounds();
-            let featureCount = 0;
-
-            const extendBounds = (geometry) => {
-                const type = geometry.getType();
-                if (type === "Point") {
-                    bounds.extend(geometry.get());
-                    featureCount++;
-                } else if (type === "LineString" || type === "LinearRing") {
-                    geometry.getArray().forEach(p => { bounds.extend(p); featureCount++; });
-                } else if (type === "Polygon") {
-                    geometry.getArray().forEach(ring =>
-                        ring.getArray().forEach(p => { bounds.extend(p); featureCount++; })
-                    );
-                } else if (["MultiPoint", "MultiLineString", "MultiPolygon", "GeometryCollection"].includes(type)) {
-                    geometry.getArray().forEach(extendBounds);
-                }
-            };
-
-            this.map.data.forEach(f => extendBounds(f.getGeometry()));
-
-            if (featureCount > 0 && !bounds.isEmpty()) {
-                this.map.fitBounds(bounds);
-            }
-
-            // Default styling
-            this.map.data.setStyle({
-                fillColor: "#3388ff",
-                fillOpacity: 0.4,
-                strokeColor: "#3388ff",
-                strokeWeight: 2,
+            layers.forEach(l => {
+                l.addTo(this.map);
+                this.layers.push(l);
             });
 
-            this.state.status = `✓ Rendered ${featureCount} coordinate(s).`;
-            console.log("KML Viewer v5: Rendered successfully, features:", featureCount);
+            if (bounds.isValid()) {
+                this.map.fitBounds(bounds, { padding: [30, 30] });
+            }
+
+            // Invalidate size one more time after rendering
+            setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 200);
+            this.state.status = `✓ Rendered ${layers.length} layer(s).`;
+            console.log("KML Viewer V6: Rendered", layers.length, "layers.");
 
         } catch (e) {
-            console.error("KML Viewer v5 render error:", e);
+            console.error("KML Viewer V6 render error:", e);
             this.state.error = e.message;
             this.state.status = "Error.";
         }

@@ -66,6 +66,16 @@ class ResUsers(models.Model):
         default['login'] = (self.login or '') + ' (copy)'
         return super().copy_data(default)
 
+    @api.model
+    def check_access_rights(self, operation, raise_exception=True):
+        """Allow Bhuarjan Admin and District Admin to write/create users."""
+        if operation in ('write', 'create', 'read', 'unlink'):
+            user = self.env.user
+            if (user.has_group('bhuarjan.group_bhuarjan_admin') or
+                    user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+                return True
+        return super().check_access_rights(operation, raise_exception=raise_exception)
+
     def write(self, vals):
         """Allow Bhuarjan Administrator and District Administrator to edit users."""
         current_user = self.env.user

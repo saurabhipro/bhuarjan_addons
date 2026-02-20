@@ -456,8 +456,6 @@
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
             <field name="groups" eval="[(4, ref('bhuarjan.group_bhuarjan_district_administrator'))]"/>
-        </record>
-        
-        
+        </record> 
     </data>
 </odoo>

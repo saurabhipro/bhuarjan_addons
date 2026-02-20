@@ -76,6 +76,17 @@ class ResUsers(models.Model):
                 return True
         return super().check_access_rights(operation, raise_exception=raise_exception)
 
+    def check_access_rule(self, operation):
+        """Allow Bhuarjan Admin and District Admin to bypass record-level rules on res.users.
+        This is required so the form renders as editable in the UI (the web client
+        probes check_access_rule to decide whether to show Save/Edit buttons).
+        """
+        user = self.env.user
+        if (user.has_group('bhuarjan.group_bhuarjan_admin') or
+                user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+            return  # silently allow — no exception means access granted
+        return super().check_access_rule(operation)
+
     def write(self, vals):
         """Allow Bhuarjan Administrator and District Administrator to edit users."""
         current_user = self.env.user

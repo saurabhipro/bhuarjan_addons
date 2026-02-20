@@ -200,6 +200,7 @@
             'bhuarjan/static/src/js/components/project_timeline.js',
             'bhuarjan/static/src/xml/project_timeline.xml',
             # KML Viewer Component
+            'bhuarjan/static/src/components/kml_viewer/kml_viewer.css',
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.js',
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.xml',
         ],

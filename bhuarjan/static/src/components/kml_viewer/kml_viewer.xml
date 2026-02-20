@@ -18,12 +18,12 @@
                 </p>
             </div>
 
-            <!-- Google Map fills this div -->
+            <!-- Google Map — fills entire width -->
             <div t-ref="mapContainer" class="kml-map-el"/>
 
             <!-- Status Bar -->
             <div t-if="!state.isLoading" class="kml-status-bar">
-                <i class="fa fa-map-marker" style="color:#4285f4; font-size:0.9rem;"/>
+                <i class="fa fa-map-marker" style="color:#4285f4;"/>
                 <span><t t-esc="state.status"/></span>
             </div>
 

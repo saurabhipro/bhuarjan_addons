@@ -108,10 +108,22 @@ export class KmlViewer extends Component {
         const el = this.mapContainer.el;
         if (!el || this.map) return;
 
+        // ── Force the container to full width BEFORE Google Maps reads its size ──
+        el.style.width = "100%";
+        el.style.height = "600px";
+        el.style.display = "block";
+        // Walk up to Odoo field wrapper and remove any width constraints
+        let node = el.parentElement;
+        for (let i = 0; i < 6 && node; i++) {
+            node.style.width = "100%";
+            node.style.maxWidth = "none";
+            node = node.parentElement;
+        }
+
         this.map = new google.maps.Map(el, {
             center: { lat: 22.5937, lng: 80.9629 },
             zoom: 5,
-            mapTypeId: google.maps.MapTypeId.HYBRID,   // Satellite + labels (Google Earth look)
+            mapTypeId: google.maps.MapTypeId.HYBRID,
             mapTypeControl: true,
             mapTypeControlOptions: {
                 style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
@@ -129,12 +141,84 @@ export class KmlViewer extends Component {
             gestureHandling: "greedy",
         });
 
-        // Force correct size after layout settles
-        setTimeout(() => {
-            if (this.map) google.maps.event.trigger(this.map, "resize");
-        }, 350);
+        // Trigger resize multiple times to catch late layout shifts
+        [100, 300, 600, 1000].forEach(ms =>
+            setTimeout(() => { if (this.map) google.maps.event.trigger(this.map, "resize"); }, ms)
+        );
+
+        // ── My Location button ────────────────────────────────────────────
+        this.addMyLocationButton();
 
         console.log("KML Viewer V10: Google Map initialized (HYBRID mode)");
+    }
+
+    addMyLocationButton() {
+        const btn = document.createElement("button");
+        btn.title = "My Location";
+        btn.style.cssText = `
+            background:#fff;
+            border:none;
+            border-radius:3px;
+            box-shadow:0 1px 4px rgba(0,0,0,0.3);
+            cursor:pointer;
+            margin:10px;
+            padding:8px;
+            width:40px;
+            height:40px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        `;
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#1a73e8" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+            </svg>`;
+
+        btn.addEventListener("click", () => this.goToMyLocation());
+
+        // Add button to map (RIGHT_BOTTOM position)
+        this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(btn);
+    }
+
+    goToMyLocation() {
+        if (!navigator.geolocation) {
+            this.state.status = "⚠ Geolocation not supported by this browser.";
+            return;
+        }
+        this.state.status = "Detecting your location...";
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                this.map.panTo(latlng);
+                this.map.setZoom(14);
+
+                // Remove old location marker if exists
+                if (this._locationMarker) this._locationMarker.setMap(null);
+
+                this._locationMarker = new google.maps.Marker({
+                    position: latlng,
+                    map: this.map,
+                    title: "My Location",
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: "#1a73e8",
+                        fillOpacity: 1,
+                        strokeColor: "#fff",
+                        strokeWeight: 3,
+                    },
+                    zIndex: 9999,
+                });
+
+                const iw = new google.maps.InfoWindow({ content: "<b>📍 Your Location</b>" });
+                iw.open(this.map, this._locationMarker);
+                this.state.status = `📍 Location found (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`;
+            },
+            (err) => {
+                this.state.status = `⚠ Location error: ${err.message}`;
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────

@@ -139,12 +139,14 @@
                         <page string="Map View / मानचित्र दृश्य">
                             <group>
                                 <field name="kml_filename" invisible="1"/>
-                                <field name="kml_file" filename="kml_filename" widget="binary" 
+                                <field name="kml_file" filename="kml_filename" widget="binary"
                                        options="{'accepted_file_extensions': '.kml, .kmz'}"
                                        string="Upload KML/KMZ File / KML/KMZ अपलोड करें"/>
                             </group>
-                            <div invisible="not kml_file" style="margin-top: 10px; width: 100%;">
-                                <field name="kml_file" widget="kml_viewer" nolabel="1" colspan="2"/>
+                            <!-- Full-width map viewer — no Odoo column constraints -->
+                            <div invisible="not kml_file"
+                                 style="margin: 8px -16px 0 -16px; width: calc(100% + 32px); display: block;">
+                                <field name="kml_file" widget="kml_viewer" nolabel="1"/>
                             </div>
                         </page>
                         <page string="Project Details / परियोजना विवरण">

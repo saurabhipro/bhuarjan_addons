@@ -384,3 +384,29 @@ class ResPartner(models.Model):
         groups="base.group_erp_manager,bhuarjan.group_bhuarjan_district_administrator"
     )
 
+    @api.model
+    def check_access_rights(self, operation, raise_exception=True):
+        """Allow District Admin and Bhuarjan Admin to bypass partner access checks."""
+        user = self.env.user
+        if operation in ('write', 'create', 'read'):
+            if (user.has_group('bhuarjan.group_bhuarjan_admin') or
+                    user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+                return True
+        return super().check_access_rights(operation, raise_exception=raise_exception)
+
+    def check_access_rule(self, operation):
+        """Allow District Admin and Bhuarjan Admin to bypass record rules for partners."""
+        user = self.env.user
+        if (user.has_group('bhuarjan.group_bhuarjan_admin') or
+                user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+            return None
+        return super().check_access_rule(operation)
+
+    def write(self, vals):
+        """Allow District Admin and Bhuarjan Admin to edit partners (linked to users)."""
+        user = self.env.user
+        if (user.has_group('bhuarjan.group_bhuarjan_admin') or
+                user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
+            return super(ResPartner, self.sudo()).write(vals)
+        return super().write(vals)
+

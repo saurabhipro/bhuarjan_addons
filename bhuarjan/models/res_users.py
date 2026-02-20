@@ -66,6 +66,33 @@ class ResUsers(models.Model):
         default['login'] = (self.login or '') + ' (copy)'
         return super().copy_data(default)
 
+    def write(self, vals):
+        """Allow Bhuarjan Administrator and District Administrator to edit users."""
+        current_user = self.env.user
+        is_privileged = (
+            current_user.has_group('bhuarjan.group_bhuarjan_admin') or
+            current_user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        )
+        if is_privileged:
+            # Use sudo() to bypass Odoo's internal ERP-Manager write restriction
+            # Record rules still enforce district-level scope for District Admins
+            return super(ResUsers, self.sudo()).write(vals)
+        return super().write(vals)
+
+    @api.model
+    def create(self, vals):
+        """Allow Bhuarjan Administrator and District Administrator to create users."""
+        current_user = self.env.user
+        is_admin = current_user.has_group('bhuarjan.group_bhuarjan_admin')
+        is_district_admin = current_user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        if is_admin or is_district_admin:
+            # Auto-fill district for District Admin's newly created users
+            if is_district_admin and not is_admin:
+                if 'district_id' not in vals and current_user.district_id:
+                    vals['district_id'] = current_user.district_id.id
+            return super(ResUsers, self.sudo()).create(vals)
+        return super().create(vals)
+
     @api.constrains('mobile')
     def _check_mobile_unique(self):
         """Ensure mobile number is unique across all users"""

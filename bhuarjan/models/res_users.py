@@ -68,7 +68,10 @@ class ResUsers(models.Model):
 
     @api.model
     def check_access_rights(self, operation, raise_exception=True):
-        """Allow Bhuarjan Admin and District Admin to write/create users."""
+        """Allow Bhuarjan Admin and District Admin to write/create users.
+        Bhuarjan Admin is explicitly included to ensure they bypass standard Odoo 
+        restrictions even if they aren't 'System' users.
+        """
         if operation in ('write', 'create', 'read', 'unlink'):
             user = self.env.user
             if (user.has_group('bhuarjan.group_bhuarjan_admin') or
@@ -84,7 +87,7 @@ class ResUsers(models.Model):
         user = self.env.user
         if (user.has_group('bhuarjan.group_bhuarjan_admin') or
                 user.has_group('bhuarjan.group_bhuarjan_district_administrator')):
-            return  # silently allow — no exception means access granted
+            return None  # explicitly return None to signal success
         return super().check_access_rule(operation)
 
     def write(self, vals):

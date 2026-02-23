@@ -161,8 +161,12 @@ export class FieldTimePicker extends Component {
                         [this.props.name]: selectedTime
                     });
                     document.body.removeChild(timePickerContainer);
+                    document.removeEventListener("mousedown", onClickOutside);
+                    document.removeEventListener("keydown", onEscPress);
                 } else {
                     document.body.removeChild(timePickerContainer);
+                    document.removeEventListener("mousedown", onClickOutside);
+                    document.removeEventListener("keydown", onEscPress);
                 }
             });
 

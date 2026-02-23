@@ -20,9 +20,9 @@
 }
 
 /* ── Force Odoo field containers to not restrict width ── */
-.o_field_widget,
-.o_field_widget>div,
-.o_field_widget .kml-viewer-root {
+/* ── Force Odoo field containers to not restrict width ── */
+.o_field_widget[name="kml_file"],
+.o_field_widget[name="kml_file"]>div {
     width: 100% !important;
     max-width: 100% !important;
     padding: 0 !important;

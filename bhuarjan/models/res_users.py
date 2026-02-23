@@ -103,19 +103,24 @@ class ResUsers(models.Model):
             return super(ResUsers, self.sudo()).write(vals)
         return super().write(vals)
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Allow Bhuarjan Administrator and District Administrator to create users."""
         current_user = self.env.user
         is_admin = current_user.has_group('bhuarjan.group_bhuarjan_admin')
         is_district_admin = current_user.has_group('bhuarjan.group_bhuarjan_district_administrator')
+        
+        for vals in vals_list:
+            if is_admin or is_district_admin:
+                # Auto-fill district for District Admin's newly created users
+                if is_district_admin and not is_admin:
+                    if 'district_id' not in vals and current_user.district_id:
+                        vals['district_id'] = current_user.district_id.id
+            
+        # Call super with sudo() if privileged
         if is_admin or is_district_admin:
-            # Auto-fill district for District Admin's newly created users
-            if is_district_admin and not is_admin:
-                if 'district_id' not in vals and current_user.district_id:
-                    vals['district_id'] = current_user.district_id.id
-            return super(ResUsers, self.sudo()).create(vals)
-        return super().create(vals)
+            return super(ResUsers, self.sudo()).create(vals_list)
+        return super().create(vals_list)
 
     @api.constrains('mobile')
     def _check_mobile_unique(self):

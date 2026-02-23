@@ -46,7 +46,7 @@
         <field name="name">bhu.section15.objection.form</field>
         <field name="model">bhu.section15.objection</field>
         <field name="arch" type="xml">
-            <form string="Objection / आपत्ति" edit="not (state in ('approved', 'rejected') or is_approved_readonly)">
+            <form string="Objection / आपत्ति">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>

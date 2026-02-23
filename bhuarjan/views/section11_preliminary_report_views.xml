@@ -25,7 +25,7 @@
         <field name="name">bhu.section11.preliminary.report.form</field>
         <field name="model">bhu.section11.preliminary.report</field>
         <field name="arch" type="xml">
-            <form string="Section 11 Preliminary Report" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
+            <form string="Section 11 Preliminary Report">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>

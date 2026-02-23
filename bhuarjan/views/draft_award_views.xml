@@ -25,7 +25,7 @@
         <field name="name">bhu.draft.award.form</field>
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
-            <form string="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)" edit="not (state == 'signed' or (state == 'generated' and not can_collector_edit))">
+            <form string="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>

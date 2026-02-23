@@ -40,7 +40,7 @@
         <field name="name">bhu.expert.committee.report.form</field>
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
-            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
+            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट">
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>

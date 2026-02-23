@@ -23,7 +23,7 @@
         <field name="name">bhu.section19.notification.form</field>
         <field name="model">bhu.section19.notification</field>
         <field name="arch" type="xml">
-            <form string="Section 19 Notification" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit))">
+            <form string="Section 19 Notification">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>

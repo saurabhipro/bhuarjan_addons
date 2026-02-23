@@ -41,7 +41,7 @@
         <field name="name">bhu.sia.team.form</field>
         <field name="model">bhu.sia.team</field>
         <field name="arch" type="xml">
-            <form string="SIA Team / SIA टीम" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
+            <form string="SIA Team / SIA टीम">
                     <div class="row w-100">
                         <div class="col w-100">
 

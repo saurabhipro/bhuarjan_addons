@@ -28,7 +28,7 @@
         <field name="name">bhu.section4.notification.form</field>
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
-            <form string="Section 4 Notification" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
+            <form string="Section 4 Notification">
                     <div class="row w-100">
                         <div class="col w-100">
                                 <!-- Approve Button (Collector only) -->

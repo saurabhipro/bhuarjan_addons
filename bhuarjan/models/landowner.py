@@ -154,7 +154,7 @@ class BhuLandownerPaymentStatus(models.Model):
         ('pending', 'Pending / लंबित'),
         ('paid', 'Paid / भुगतान किया गया'),
         ('failed', 'Failed / असफल'),
-    ], string='Status / स्थिति', default='pending', tracking=True)
+    ], string='Status / स्थिति', default='pending')
     
     remarks = fields.Text(string='Remarks / रिमार्क')
     

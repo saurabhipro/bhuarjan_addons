@@ -54,6 +54,7 @@ from . import section3a_nh
 from . import section3c_nh
 from . import section3d_nh
 from . import mutual_consent_policy
+from . import section247_cglrc
 from . import survey_photo
 from . import form10_export_utils
 from . import app_version

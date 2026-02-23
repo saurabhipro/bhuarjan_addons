@@ -37,6 +37,7 @@
         # 'data/sample_section19_notifications.xml',  # Disabled - not importing Section 19 notifications by default
         'data/kharsiyan_rate_master_data.xml',
         'data/section_master_data.xml',
+        'data/cglrc_master_data.xml',
         'data/qweb_report_paper_format.xml',
         'security/secrurity.xml',
         'reports/report_common_styles.xml',
@@ -55,6 +56,7 @@
         'reports/section15_objection_resolution_report.xml',
         'reports/section23_award_report.xml',
         'reports/project_master_report.xml',
+        'reports/section247_cglrc_reports.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
         'views/bhu_tehsil_views.xml',
@@ -107,6 +109,7 @@
         'views/section3a_nh_views.xml',
         'views/section3c_nh_views.xml',
         'views/section3d_nh_views.xml',
+        'views/section247_cglrc_views.xml',
         'views/mutual_consent_policy_views.xml',
         'views/photo_type_master_views.xml',
         'views/settings_master_views.xml',

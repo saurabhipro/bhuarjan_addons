@@ -301,7 +301,7 @@ class DashboardStats(models.AbstractModel):
         return project_ids_from_domain
 
     @api.model
-    def _get_section_info(self, model_name, domain, state_field='state', is_survey=False):
+    def _get_section_info(self, model_name, domain, state_field='state', is_survey=False, pending_state='submitted'):
         """Get detailed section information including first pending document
         
         Args:
@@ -309,6 +309,7 @@ class DashboardStats(models.AbstractModel):
             domain: Domain to filter records
             state_field: Field name for state (default: 'state')
             is_survey: Whether this is a survey (different completion logic)
+            pending_state: State to consider as pending (default: 'submitted')
             
         Returns:
             dict: Section information with counts and status
@@ -330,7 +331,15 @@ class DashboardStats(models.AbstractModel):
         else:
             is_completed = all_approved
         
-        first_pending = submitted[0] if submitted else False
+        # Pick first pending based on pending_state
+        if pending_state == 'submitted':
+            first_pending = submitted[0] if submitted else False
+        elif pending_state == 'draft':
+            # For CGLRC 247, draft records are considered pending SDM approval
+            first_pending = draft[0] if draft else False
+        else:
+            first_pending = submitted[0] if submitted else False
+
         first_document = records[0] if records else False
         
         return {
@@ -460,6 +469,10 @@ class DashboardStats(models.AbstractModel):
             'payment_file': self._get_section_counts('bhu.payment.file', domain_with_village, states=['draft', 'generated']),
             # Payment Reconciliation (has village_id)
             'reconciliation': self._get_section_counts('bhu.payment.reconciliation.bank', domain_with_village, states=['draft', 'processed', 'completed']),
+            # CGLRC Section 247 Sections
+            'section247_1_cglrc': self._get_section_counts('bhu.section247_1.cglrc', domain_with_village, states=workflow_states),
+            'section247_2_cglrc': self._get_section_counts('bhu.section247_2.cglrc', domain_with_village, states=workflow_states),
+            'section247_3_cglrc': self._get_section_counts('bhu.section247_3.cglrc', domain_with_village, states=workflow_states),
         }
         
         # Section 21 Notification uses standard workflow states (draft, submitted, approved, send_back)
@@ -487,6 +500,14 @@ class DashboardStats(models.AbstractModel):
         user = self.env.user
         return (user.has_group('bhuarjan.group_bhuarjan_collector') or
                 user.has_group('bhuarjan.group_bhuarjan_additional_collector') or
+                user.has_group('bhuarjan.group_bhuarjan_admin') or
+                user.has_group('base.group_system'))
+
+    @api.model
+    def is_sdm_user(self):
+        """Check if current user is SDM"""
+        user = self.env.user
+        return (user.has_group('bhuarjan.group_bhuarjan_sdm') or
                 user.has_group('bhuarjan.group_bhuarjan_admin') or
                 user.has_group('base.group_system'))
 
@@ -624,6 +645,7 @@ class DashboardStats(models.AbstractModel):
             # Build response with all statistics
             result = {
                 'is_collector': is_collector,
+                'is_sdm': self.is_sdm_user(),
                 'is_admin': user_access['user_type'] == 'admin',
                 'is_project_exempt': is_project_exempt,
                 'is_displacement': is_displacement,
@@ -875,6 +897,31 @@ class DashboardStats(models.AbstractModel):
                 ),
                 'reconciliation_info': self._get_section_info('bhu.payment.reconciliation.bank', domains['final_domain'], state_field='state'),
 
+                # CGLRC Section 247
+                'section247_1_cglrc_total': counts['section247_1_cglrc']['total'],
+                'section247_1_cglrc_draft': counts['section247_1_cglrc']['draft'],
+                'section247_1_cglrc_approved': counts['section247_1_cglrc']['approved'],
+                'section247_1_cglrc_completion_percent': self._calculate_completion_percentage(
+                    counts['section247_1_cglrc']['approved'], 0, counts['section247_1_cglrc']['total'], is_survey=False
+                ),
+                'section247_1_cglrc_info': self._get_section_info('bhu.section247_1.cglrc', domains['final_domain'], pending_state='draft'),
+
+                'section247_2_cglrc_total': counts['section247_2_cglrc']['total'],
+                'section247_2_cglrc_draft': counts['section247_2_cglrc']['draft'],
+                'section247_2_cglrc_approved': counts['section247_2_cglrc']['approved'],
+                'section247_2_cglrc_completion_percent': self._calculate_completion_percentage(
+                    counts['section247_2_cglrc']['approved'], 0, counts['section247_2_cglrc']['total'], is_survey=False
+                ),
+                'section247_2_cglrc_info': self._get_section_info('bhu.section247_2.cglrc', domains['final_domain'], pending_state='draft'),
+
+                'section247_3_cglrc_total': counts['section247_3_cglrc']['total'],
+                'section247_3_cglrc_draft': counts['section247_3_cglrc']['draft'],
+                'section247_3_cglrc_approved': counts['section247_3_cglrc']['approved'],
+                'section247_3_cglrc_completion_percent': self._calculate_completion_percentage(
+                    counts['section247_3_cglrc']['approved'], 0, counts['section247_3_cglrc']['total'], is_survey=False
+                ),
+                'section247_3_cglrc_info': self._get_section_info('bhu.section247_3.cglrc', domains['final_domain'], pending_state='draft'),
+
             }
             
             return result
@@ -896,6 +943,7 @@ class DashboardStats(models.AbstractModel):
         
         return {
             'is_collector': is_collector,
+            'is_sdm': self.is_sdm_user(),
             'is_project_exempt': False,
             'user_type': 'other',
             'allowed_section_names': [],  # Empty list when no project selected
@@ -945,6 +993,16 @@ class DashboardStats(models.AbstractModel):
             'section23_award_total': 0, 'section23_award_draft': 0, 'section23_award_submitted': 0,
             'section23_award_approved': 0, 'section23_award_send_back': 0, 'section23_award_completion_percent': 0,
             'section23_award_info': empty_info.copy(),
+            # CGLRC Section 247
+            'section247_1_cglrc_total': 0, 'section247_1_cglrc_draft': 0,
+            'section247_1_cglrc_approved': 0, 'section247_1_cglrc_completion_percent': 0,
+            'section247_1_cglrc_info': empty_info.copy(),
+            'section247_2_cglrc_total': 0, 'section247_2_cglrc_draft': 0,
+            'section247_2_cglrc_approved': 0, 'section247_2_cglrc_completion_percent': 0,
+            'section247_2_cglrc_info': empty_info.copy(),
+            'section247_3_cglrc_total': 0, 'section247_3_cglrc_draft': 0,
+            'section247_3_cglrc_approved': 0, 'section247_3_cglrc_completion_percent': 0,
+            'section247_3_cglrc_info': empty_info.copy(),
             # Payment File
             'payment_file_total': 0, 'payment_file_draft': 0, 'payment_file_generated': 0,
             'payment_file_completion_percent': 0, 'payment_file_info': empty_info.copy(),

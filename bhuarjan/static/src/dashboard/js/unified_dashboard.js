@@ -97,6 +97,21 @@ const DASHBOARD_CONFIG = {
             'reconciliation_completed': 'reconciliation_completed',
             'reconciliation_completion_percent': 'reconciliation_completion_percent',
             'reconciliation_info': 'reconciliation_info',
+            'section247_1_cglrc_total': 'section247_1_cglrc_total',
+            'section247_1_cglrc_draft': 'section247_1_cglrc_draft',
+            'section247_1_cglrc_approved': 'section247_1_cglrc_approved',
+            'section247_1_cglrc_info': 'section247_1_cglrc_info',
+            'section247_1_cglrc_completion_percent': 'section247_1_cglrc_completion_percent',
+            'section247_2_cglrc_total': 'section247_2_cglrc_total',
+            'section247_2_cglrc_draft': 'section247_2_cglrc_draft',
+            'section247_2_cglrc_approved': 'section247_2_cglrc_approved',
+            'section247_2_cglrc_info': 'section247_2_cglrc_info',
+            'section247_2_cglrc_completion_percent': 'section247_2_cglrc_completion_percent',
+            'section247_3_cglrc_total': 'section247_3_cglrc_total',
+            'section247_3_cglrc_draft': 'section247_3_cglrc_draft',
+            'section247_3_cglrc_approved': 'section247_3_cglrc_approved',
+            'section247_3_cglrc_info': 'section247_3_cglrc_info',
+            'section247_3_cglrc_completion_percent': 'section247_3_cglrc_completion_percent',
         }
     },
     'collector': {
@@ -165,6 +180,21 @@ const DASHBOARD_CONFIG = {
             'reconciliation_completed': 'reconciliation_completed',
             'reconciliation_completion_percent': 'reconciliation_completion_percent',
             'reconciliation_info': 'reconciliation_info',
+            'section247_1_cglrc_total': 'section247_1_cglrc_total',
+            'section247_1_cglrc_draft': 'section247_1_cglrc_draft',
+            'section247_1_cglrc_approved': 'section247_1_cglrc_approved',
+            'section247_1_cglrc_info': 'section247_1_cglrc_info',
+            'section247_1_cglrc_completion_percent': 'section247_1_cglrc_completion_percent',
+            'section247_2_cglrc_total': 'section247_2_cglrc_total',
+            'section247_2_cglrc_draft': 'section247_2_cglrc_draft',
+            'section247_2_cglrc_approved': 'section247_2_cglrc_approved',
+            'section247_2_cglrc_info': 'section247_2_cglrc_info',
+            'section247_2_cglrc_completion_percent': 'section247_2_cglrc_completion_percent',
+            'section247_3_cglrc_total': 'section247_3_cglrc_total',
+            'section247_3_cglrc_draft': 'section247_3_cglrc_draft',
+            'section247_3_cglrc_approved': 'section247_3_cglrc_approved',
+            'section247_3_cglrc_info': 'section247_3_cglrc_info',
+            'section247_3_cglrc_completion_percent': 'section247_3_cglrc_completion_percent',
         }
     },
     'admin': {
@@ -232,6 +262,21 @@ const DASHBOARD_CONFIG = {
             'reconciliation_completed': 'reconciliation_completed',
             'reconciliation_completion_percent': 'reconciliation_completion_percent',
             'reconciliation_info': 'reconciliation_info',
+            'section247_1_cglrc_total': 'section247_1_cglrc_total',
+            'section247_1_cglrc_draft': 'section247_1_cglrc_draft',
+            'section247_1_cglrc_approved': 'section247_1_cglrc_approved',
+            'section247_1_cglrc_info': 'section247_1_cglrc_info',
+            'section247_1_cglrc_completion_percent': 'section247_1_cglrc_completion_percent',
+            'section247_2_cglrc_total': 'section247_2_cglrc_total',
+            'section247_2_cglrc_draft': 'section247_2_cglrc_draft',
+            'section247_2_cglrc_approved': 'section247_2_cglrc_approved',
+            'section247_2_cglrc_info': 'section247_2_cglrc_info',
+            'section247_2_cglrc_completion_percent': 'section247_2_cglrc_completion_percent',
+            'section247_3_cglrc_total': 'section247_3_cglrc_total',
+            'section247_3_cglrc_draft': 'section247_3_cglrc_draft',
+            'section247_3_cglrc_approved': 'section247_3_cglrc_approved',
+            'section247_3_cglrc_info': 'section247_3_cglrc_info',
+            'section247_3_cglrc_completion_percent': 'section247_3_cglrc_completion_percent',
         }
     },
     'department': {
@@ -338,6 +383,21 @@ const DASHBOARD_CONFIG = {
             'reconciliation_completed': 'reconciliation_completed',
             'reconciliation_completion_percent': 'reconciliation_completion_percent',
             'reconciliation_info': 'reconciliation_info',
+            'section247_1_cglrc_total': 'section247_1_cglrc_total',
+            'section247_1_cglrc_draft': 'section247_1_cglrc_draft',
+            'section247_1_cglrc_approved': 'section247_1_cglrc_approved',
+            'section247_1_cglrc_info': 'section247_1_cglrc_info',
+            'section247_1_cglrc_completion_percent': 'section247_1_cglrc_completion_percent',
+            'section247_2_cglrc_total': 'section247_2_cglrc_total',
+            'section247_2_cglrc_draft': 'section247_2_cglrc_draft',
+            'section247_2_cglrc_approved': 'section247_2_cglrc_approved',
+            'section247_2_cglrc_info': 'section247_2_cglrc_info',
+            'section247_2_cglrc_completion_percent': 'section247_2_cglrc_completion_percent',
+            'section247_3_cglrc_total': 'section247_3_cglrc_total',
+            'section247_3_cglrc_draft': 'section247_3_cglrc_draft',
+            'section247_3_cglrc_approved': 'section247_3_cglrc_approved',
+            'section247_3_cglrc_info': 'section247_3_cglrc_info',
+            'section247_3_cglrc_completion_percent': 'section247_3_cglrc_completion_percent',
         }
     },
 
@@ -392,6 +452,7 @@ export class UnifiedDashboard extends Component {
             villages: [],
             isCollector: false,
             isAdmin: false,
+            isSDM: false,
             isProjectExempt: false,
             isDisplacement: false,
             isReadOnly: this.config.isReadOnly || false, // District admin is read-only
@@ -599,6 +660,9 @@ export class UnifiedDashboard extends Component {
                 // Set additional flags
                 if (stats.is_collector !== undefined) {
                     this.state.isCollector = stats.is_collector;
+                }
+                if (stats.is_sdm !== undefined) {
+                    this.state.isSDM = stats.is_sdm;
                 }
                 if (stats.is_admin !== undefined) {
                     this.state.isAdmin = stats.is_admin;
@@ -1294,6 +1358,9 @@ export class UnifiedDashboard extends Component {
             'Mutual Consent': 'आपसी सहमति की क्रय नीति (Only in रायगढ़ and पसौर)',
             'Payment File': 'Payment File',
             'Payment Reconciliation': 'Payment Reconciliation',
+            'Personal Notice generation (247.1)': 'Personal Notice generation (247.1)',
+            'Istehar प्रकाशन (247.2)': 'Istehar प्रकाशन (247.2)',
+            'Award (247.3)': 'Award (247.3)',
         };
         return mapping[dashboardSectionName] || dashboardSectionName;
     }
@@ -1311,21 +1378,42 @@ export class UnifiedDashboard extends Component {
                 'Surveys': 'Step 1',
                 'Sec 20 A (Railways)': 'Step 2',
                 'Sec 20 D (Objection) (Railways)': 'Step 3',
-                'Sec 20 E (Railways)': 'Step 4'
+                'Sec 20 E (Railways)': 'Step 4',
+                'Payment File': 'Step 5',
+                'Payment Reconciliation': 'Step 6'
             };
-            if (steps[sectionName]) return steps[sectionName];
+            const masterName = this.getSectionMasterName(sectionName);
+            if (steps[masterName]) return steps[masterName];
         }
 
-        // Check for NHAI
-        const isNHAI = this.state.allowedSectionNames.includes('Sec 3A (NH)');
-        if (isNHAI) {
+        // Check for NH
+        const isNH = this.state.allowedSectionNames.includes('Sec 3A (NH)');
+        if (isNH) {
             const steps = {
                 'Surveys': 'Step 1',
                 'Sec 3A (NH)': 'Step 2',
                 'Sec 3C (Objection) (NH)': 'Step 3',
-                'Sec 3D (NH)': 'Step 4'
+                'Sec 3D (NH)': 'Step 4',
+                'Payment File': 'Step 5',
+                'Payment Reconciliation': 'Step 6'
             };
-            if (steps[sectionName]) return steps[sectionName];
+            const masterName = this.getSectionMasterName(sectionName);
+            if (steps[masterName]) return steps[masterName];
+        }
+
+        // Check for CGLRC 247
+        const isCGLRC = this.state.allowedSectionNames.includes('Personal Notice generation (247.1)');
+        if (isCGLRC) {
+            const steps = {
+                'Surveys': 'Step 1',
+                'Personal Notice generation (247.1)': 'Step 2',
+                'Istehar प्रकाशन (247.2)': 'Step 3',
+                'Award (247.3)': 'Step 4',
+                'Payment File': 'Step 5',
+                'Payment Reconciliation': 'Step 6'
+            };
+            const masterName = this.getSectionMasterName(sectionName);
+            if (steps[masterName]) return steps[masterName];
         }
 
         return defaultText;

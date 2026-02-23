@@ -15,7 +15,7 @@ class BhuarjanIssue(models.Model):
         ('in_progress', 'In Progress'),
         ('resolved', 'Resolved'),
         ('closed', 'Closed')
-    ], default='new', string='Status', tracking=True)
+    ], default='new', string='Status')
     section = fields.Selection([
         ('general', 'General'),
         ('section_4', 'Section 4'),

@@ -167,23 +167,28 @@ export class FieldTimePicker extends Component {
             });
 
             // Close the popup if clicked outside or Escape pressed
+            // Use mousedown so we don't steal the click from other form fields
             const onClickOutside = (event) => {
                 if (!timePickerContainer.contains(event.target) && event.target !== timePicker) {
-                    timePickerContainer.remove();
-                    document.removeEventListener("click", onClickOutside);
+                    // Remove listeners FIRST so we don't block the click on the other element
+                    document.removeEventListener("mousedown", onClickOutside);
                     document.removeEventListener("keydown", onEscPress);
+                    timePickerContainer.remove();
                 }
             };
             const onEscPress = (event) => {
                 if (event.key === "Escape") {
-                    timePickerContainer.remove();
-                    document.removeEventListener("click", onClickOutside);
+                    document.removeEventListener("mousedown", onClickOutside);
                     document.removeEventListener("keydown", onEscPress);
+                    timePickerContainer.remove();
                 }
             };
 
-            document.addEventListener("click", onClickOutside);
-            document.addEventListener("keydown", onEscPress);
+            // Use setTimeout to avoid immediately triggering on the same click that opened the popup
+            setTimeout(() => {
+                document.addEventListener("mousedown", onClickOutside);
+                document.addEventListener("keydown", onEscPress);
+            }, 0);
 
         } else {
             this.env.model.dialog.add(AlertDialog, {

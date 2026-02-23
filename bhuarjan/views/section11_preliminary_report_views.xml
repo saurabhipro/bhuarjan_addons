@@ -25,7 +25,7 @@
         <field name="name">bhu.section11.preliminary.report.form</field>
         <field name="model">bhu.section11.preliminary.report</field>
         <field name="arch" type="xml">
-            <form string="Section 11 Preliminary Report" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin))">
+            <form string="Section 11 Preliminary Report" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="is_admin" invisible="1"/>
@@ -54,7 +54,7 @@
                     <!-- Prakaran Kramank Field - First and Editable -->
                     <group>
                         <field name="prakaran_kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक"
-                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin)"/>
+                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                     </group>
                     
                     <!-- Hidden Fields -->

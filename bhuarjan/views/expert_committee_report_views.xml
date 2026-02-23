@@ -40,7 +40,7 @@
         <field name="name">bhu.expert.committee.report.form</field>
         <field name="model">bhu.expert.committee.report</field>
         <field name="arch" type="xml">
-            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट" edit="not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin))">
+            <form string="Expert Committee Report / विशेषज्ञ समिति रिपोर्ट" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,send_back" options="{'clickable': True}"/>
                 </header>
@@ -70,7 +70,7 @@
                                required="1"
                                options="{'no_create': True, 'no_open': True}"/>
                         <field name="kramank" string="Letter Number / पत्र क्रमांक" placeholder="Enter Letter Number / पत्र क्रमांक दर्ज करें" 
-                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin)"/>
+                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                     </group>
                     
                     <!-- Hidden Fields (Auto-populated from context) -->
@@ -431,7 +431,7 @@
                                     <div class="mb-2">
                                         <field name="expert_group_report_file" filename="expert_group_report_filename" 
                                                widget="binary"
-                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"
+                                               readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"
                                                placeholder="Upload Expert Group Report"/>
                                         <field name="expert_group_report_filename" invisible="1"/>
                                     </div>

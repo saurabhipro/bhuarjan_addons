@@ -25,7 +25,7 @@
         <field name="name">bhu.draft.award.form</field>
         <field name="model">bhu.draft.award</field>
         <field name="arch" type="xml">
-            <form string="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)" edit="not (state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit))">
+            <form string="Section 21 Notice (Draft Award) / धारा 21 नोटिस (अवार्ड आदेश)" edit="not (state == 'signed' or (state == 'generated' and not can_collector_edit))">
                 <field name="is_sdm" invisible="1"/>
                 <field name="is_collector" invisible="1"/>
                 <field name="can_sdm_edit" invisible="1"/>
@@ -52,8 +52,8 @@
                     <group>
                         <group>
                             <!-- SDM can edit in draft/generated, Collector can edit in generated, readonly when signed -->
-                            <field name="project_id" required="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                            <field name="village_id" required="1" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"
+                            <field name="project_id" required="1" readonly="state == 'signed'"/>
+                            <field name="village_id" required="1" readonly="state == 'signed'"
                                    options="{'no_create': True, 'no_open': True}" domain="village_domain"/>
                         </group>
                         <group>
@@ -64,44 +64,44 @@
                     </group>
                     
                     <group string="Applicant / आवेदक">
-                        <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                        <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                        <field name="applicant_name" nolabel="1" placeholder="Enter applicant name..." readonly="state == 'signed'"/>
+                        <field name="applicant_designation" nolabel="1" placeholder="Enter applicant designation..." readonly="state == 'signed'"/>
                     </group>
                     
                     <notebook>
                         <page string="Publication Details / प्रकाशन विवरण">
                             <group>
                                 <group string="Section 11 Publication / धारा 11 प्रकाशन">
-                                    <field name="section11_gazette_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_gazette_part" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_gazette_page" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_newspaper_1_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_newspaper_1_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_newspaper_2_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_newspaper_2_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section11_munadi_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section11_gazette_date" readonly="state == 'signed'"/>
+                                    <field name="section11_gazette_part" readonly="state == 'signed'"/>
+                                    <field name="section11_gazette_page" readonly="state == 'signed'"/>
+                                    <field name="section11_newspaper_1_name" readonly="state == 'signed'"/>
+                                    <field name="section11_newspaper_1_date" readonly="state == 'signed'"/>
+                                    <field name="section11_newspaper_2_name" readonly="state == 'signed'"/>
+                                    <field name="section11_newspaper_2_date" readonly="state == 'signed'"/>
+                                    <field name="section11_munadi_date" readonly="state == 'signed'"/>
                                 </group>
                                 <group string="Section 19 Publication / धारा 19 प्रकाशन">
-                                    <field name="section19_gazette_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_gazette_part" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_gazette_page" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_newspaper_1_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_newspaper_1_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_newspaper_2_name" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_newspaper_2_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                    <field name="section19_munadi_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                    <field name="section19_gazette_date" readonly="state == 'signed'"/>
+                                    <field name="section19_gazette_part" readonly="state == 'signed'"/>
+                                    <field name="section19_gazette_page" readonly="state == 'signed'"/>
+                                    <field name="section19_newspaper_1_name" readonly="state == 'signed'"/>
+                                    <field name="section19_newspaper_1_date" readonly="state == 'signed'"/>
+                                    <field name="section19_newspaper_2_name" readonly="state == 'signed'"/>
+                                    <field name="section19_newspaper_2_date" readonly="state == 'signed'"/>
+                                    <field name="section19_munadi_date" readonly="state == 'signed'"/>
                                 </group>
                             </group>
                             <group string="Section 21 Details / धारा 21 विवरण">
-                                <field name="section21_notice_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                <field name="section21_hearing_date" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                <field name="section21_notice_date" readonly="state == 'signed'"/>
+                                <field name="section21_hearing_date" readonly="state == 'signed'"/>
                             </group>
                         </page>
                         <page string="Compensation / मुआवजा">
                             <group>
                                 <field name="total_compensation_amount" readonly="1"/>
-                                <field name="compensation_amount_text" placeholder="Enter amount in words..." readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
-                                <field name="is_displacement_involved" readonly="state == 'signed' or (state == 'generated' and not (can_sdm_edit or can_collector_edit)) or (state == 'draft' and not can_sdm_edit)"/>
+                                <field name="compensation_amount_text" placeholder="Enter amount in words..." readonly="state == 'signed'"/>
+                                <field name="is_displacement_involved" readonly="state == 'signed'"/>
                             </group>
                         </page>
                         <page string="References / संदर्भ">

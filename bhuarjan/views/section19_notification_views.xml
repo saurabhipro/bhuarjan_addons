@@ -61,7 +61,7 @@
                         </group>
                         <group>
                              <field name="prakaran_kramank" string="Bhu-arjan Prakaran Kramank / भू-अर्जन प्रकरण क्रमांक"
-                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit)"/>
+                                    readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                         </group>
                     </group>
                     

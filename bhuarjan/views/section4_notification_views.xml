@@ -28,7 +28,7 @@
         <field name="name">bhu.section4.notification.form</field>
         <field name="model">bhu.section4.notification</field>
         <field name="arch" type="xml">
-            <form string="Section 4 Notification" edit="not id or not (state == 'approved' or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin))">
+            <form string="Section 4 Notification" edit="not (is_approved_readonly or (state == 'submitted' and not can_collector_edit))">
                     <div class="row w-100">
                         <div class="col w-100">
                                 <!-- Approve Button (Collector only) -->
@@ -63,7 +63,7 @@
                 <field name="can_sdm_edit" invisible="1"/>
                 <field name="can_collector_edit" invisible="1"/>
                 
-                <sheet readonly="id and (has_section11 or is_approved_readonly or (state == 'submitted' and not can_collector_edit) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin))">
+                <sheet readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)">
                     <div class="oe_title" style="margin-bottom: 10px; padding-bottom: 8px;">
                         <h1 style="font-size: 28px; font-weight: 700; color: #8B4513; margin: 0;">
                             <i class="fa fa-bell" style="margin-right: 10px;"></i>Section 4 Notification / धारा 4 अधिसूचना
@@ -113,18 +113,18 @@
                         <group>
                             <field name="public_hearing_date" string="Public Hearing Date / सार्वजनिक सुनवाई दिनांक" 
                                    required="1"
-                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin and id)"/>
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                             <field name="public_hearing_time" string="Public Hearing Time / सार्वजनिक सुनवाई समय" 
                                    widget="timepicker"
                                    required="1"
                                    placeholder="⏰ Select time / समय चुनें (e.g., 10:00:00)"
-                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin and id)"/>
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                         </group>
                         <group>
                             <field name="public_hearing_place" string="Public Hearing Place / सार्वजनिक सुनवाई स्थान" 
                                    required="1"
                                    placeholder="Enter hearing location / सुनवाई स्थान दर्ज करें"
-                                   readonly="is_collector or is_approved_readonly or (state == 'submitted' and not can_collector_edit and id) or (state in ('draft', 'send_back') and not can_sdm_edit and not is_admin and id)"/>
+                                   readonly="is_approved_readonly or (state == 'submitted' and not can_collector_edit)"/>
                         </group>
                     </group>
                     

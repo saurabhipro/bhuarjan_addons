@@ -129,9 +129,11 @@ class ProcessWorkflowMixin(models.AbstractModel):
     @api.depends('state', 'is_admin')
     def _compute_approved_readonly(self):
         """Compute if record should be readonly when approved (except for admin)"""
+        current_user = self.env.user
+        is_admin_user = current_user.has_group('bhuarjan.group_bhuarjan_admin') or current_user.has_group('base.group_system')
         for record in self:
             # Record is readonly when approved, unless user is admin
-            record.is_approved_readonly = record.state == 'approved' and not record.is_admin
+            record.is_approved_readonly = record.state == 'approved' and not is_admin_user
     
     @api.depends('state', 'is_sdm', 'is_collector')
     def _compute_edit_permissions(self):
@@ -140,15 +142,17 @@ class ProcessWorkflowMixin(models.AbstractModel):
         is_sdm_user = current_user.has_group('bhuarjan.group_bhuarjan_sdm')
         is_collector_user = current_user.has_group('bhuarjan.group_bhuarjan_collector')
         is_admin_user = current_user.has_group('bhuarjan.group_bhuarjan_admin') or current_user.has_group('base.group_system')
+        # Any user who is not exclusively a Collector can fill in draft/send_back records
+        is_non_collector = not is_collector_user or is_admin_user
         
         for record in self:
-            # For new records (no id), allow editing if user is SDM or admin
+            # For new records (no id), allow editing for anyone who is not purely a collector
             if not record.id:
-                record.can_sdm_edit = is_sdm_user or is_admin_user
+                record.can_sdm_edit = is_non_collector
                 record.can_collector_edit = False  # Collectors can't create new records
             else:
-                # SDM can edit when state is 'draft' or 'send_back', readonly when 'approved'
-                record.can_sdm_edit = (is_sdm_user or is_admin_user) and record.state in ('draft', 'send_back')
+                # can_sdm_edit: True for SDM, Admin, or any non-collector user in draft/send_back
+                record.can_sdm_edit = is_non_collector and record.state in ('draft', 'send_back')
                 
                 # Collector can edit when state is 'submitted', readonly when 'approved'
                 record.can_collector_edit = (is_collector_user or is_admin_user) and record.state == 'submitted'

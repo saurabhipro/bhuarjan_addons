@@ -54,24 +54,31 @@ export class GroupDashboard extends Component {
 
     async loadDashboardData() {
         try {
-            // Fetch all projects with their current stage information
+            const companyIds = this.env.services.company.activeCompanyIds;
+
+            // Fetch all projects with their current stage information (Filtered by Company)
             const projects = await this.orm.searchRead(
                 "bhu.project",
-                [],
+                [["company_id", "in", companyIds]],
                 ["name", "code", "department_id", "district_id", "state", "village_ids", "patwari_ids", "total_cost", "create_date"],
                 { order: "create_date desc" }
             );
 
             let globalTotalBudget = 0;
+            let projectVillageIds = new Set();
 
-            // Fetch all global totals in one parallel batch for 100% accuracy
-            const [totalPatwaris, totalVillages, totalSurveys, totalLandowners] = await Promise.all([
+            // Fetch all global totals in one parallel batch for 100% accuracy (Filtered by Company)
+            const [totalPatwaris, totalSurveys, totalLandowners] = await Promise.all([
                 this.orm.searchCount("res.users", [
-                    ["bhuarjan_role", "=", "patwari"]
+                    ["bhuarjan_role", "=", "patwari"],
+                    ["company_id", "in", companyIds]
                 ]),
-                this.orm.searchCount("bhu.village", []),
-                this.orm.searchCount("bhu.survey", []),
-                this.orm.searchCount("bhu.landowner", [])
+                this.orm.searchCount("bhu.survey", [
+                    ["company_id", "in", companyIds]
+                ]),
+                this.orm.searchCount("bhu.landowner", [
+                    ["company_id", "in", companyIds]
+                ])
             ]);
 
             // For each project, determine its current stage, counts and last survey date
@@ -79,8 +86,8 @@ export class GroupDashboard extends Component {
                 project.current_stage = await this.determineProjectStage(project.id);
                 project.village_count = project.village_ids ? project.village_ids.length : 0;
 
-                // Track unique villages (optional, not used for total card now)
-                // If you want to keep project-specific village count for other logic, do it here
+                // Track unique villages from these projects
+                if (project.village_ids) project.village_ids.forEach(id => projectVillageIds.add(id));
 
                 // Parse budget using smart parser
                 globalTotalBudget += this.parseCost(project.total_cost);
@@ -110,7 +117,7 @@ export class GroupDashboard extends Component {
 
             this.state.projects = projects;
             this.state.stats.total_projects = projects.length;
-            this.state.stats.total_villages = totalVillages;
+            this.state.stats.total_villages = projectVillageIds.size;
             this.state.stats.total_patwaris = totalPatwaris;
             this.state.stats.total_surveys = totalSurveys;
             this.state.stats.total_landowners = totalLandowners;

@@ -62,20 +62,28 @@ export class GroupDashboard extends Component {
                 { order: "create_date desc" }
             );
 
-            let allVillageIds = new Set();
-            let allPatwariIds = new Set();
             let globalTotalSurveys = 0;
             let globalTotalLandowners = 0;
             let globalTotalBudget = 0;
+
+            // Fetch total counts from master data
+            const [totalPatwaris, totalVillages] = await Promise.all([
+                this.orm.searchCount("res.users", [
+                    ["bhuarjan_role", "=", "patwari"],
+                    ["company_id", "in", this.env.services.company.activeCompanyIds]
+                ]),
+                this.orm.searchCount("bhu.village", [
+                    ["company_id", "in", this.env.services.company.activeCompanyIds]
+                ])
+            ]);
 
             // For each project, determine its current stage, counts and last survey date
             for (let project of projects) {
                 project.current_stage = await this.determineProjectStage(project.id);
                 project.village_count = project.village_ids ? project.village_ids.length : 0;
 
-                // Track unique villages and patwaris
-                if (project.village_ids) project.village_ids.forEach(id => allVillageIds.add(id));
-                if (project.patwari_ids) project.patwari_ids.forEach(id => allPatwariIds.add(id));
+                // Track unique villages (optional, not used for total card now)
+                // If you want to keep project-specific village count for other logic, do it here
 
                 // Parse budget using smart parser
                 globalTotalBudget += this.parseCost(project.total_cost);
@@ -125,8 +133,8 @@ export class GroupDashboard extends Component {
 
             this.state.projects = projects;
             this.state.stats.total_projects = projects.length;
-            this.state.stats.total_villages = allVillageIds.size;
-            this.state.stats.total_patwaris = allPatwariIds.size;
+            this.state.stats.total_villages = totalVillages;
+            this.state.stats.total_patwaris = totalPatwaris;
             this.state.stats.total_surveys = globalTotalSurveys;
             this.state.stats.total_landowners = globalTotalLandowners;
             this.state.stats.total_budget = globalTotalBudget.toLocaleString('en-IN', {

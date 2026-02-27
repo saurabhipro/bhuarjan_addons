@@ -57,7 +57,7 @@ export class GroupDashboard extends Component {
             // Fetch all projects with their current stage information
             const projects = await this.orm.searchRead(
                 "bhu.project",
-                [["company_id", "in", this.env.services.company.activeCompanyIds]],
+                [],
                 ["name", "code", "department_id", "district_id", "state", "village_ids", "patwari_ids", "total_cost", "create_date"],
                 { order: "create_date desc" }
             );
@@ -67,18 +67,11 @@ export class GroupDashboard extends Component {
             // Fetch all global totals in one parallel batch for 100% accuracy
             const [totalPatwaris, totalVillages, totalSurveys, totalLandowners] = await Promise.all([
                 this.orm.searchCount("res.users", [
-                    ["bhuarjan_role", "=", "patwari"],
-                    ["company_id", "in", this.env.services.company.activeCompanyIds]
+                    ["bhuarjan_role", "=", "patwari"]
                 ]),
-                this.orm.searchCount("bhu.village", [
-                    ["company_id", "in", this.env.services.company.activeCompanyIds]
-                ]),
-                this.orm.searchCount("bhu.survey", [
-                    ["company_id", "in", this.env.services.company.activeCompanyIds]
-                ]),
-                this.orm.searchCount("bhu.landowner", [
-                    ["company_id", "in", this.env.services.company.activeCompanyIds]
-                ])
+                this.orm.searchCount("bhu.village", []),
+                this.orm.searchCount("bhu.survey", []),
+                this.orm.searchCount("bhu.landowner", [])
             ]);
 
             // For each project, determine its current stage, counts and last survey date

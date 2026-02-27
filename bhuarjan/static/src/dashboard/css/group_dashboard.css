@@ -109,6 +109,26 @@
     background: linear-gradient(135deg, #FFCA28 0%, #FFC107 100%);
 }
 
+.o_group_dashboard .bg-patwari {
+    background: linear-gradient(135deg, #A1887F 0%, #795548 100%);
+}
+
+.o_group_dashboard .bg-village {
+    background: linear-gradient(135deg, #81C784 0%, #4CAF50 100%);
+}
+
+.o_group_dashboard .bg-survey {
+    background: linear-gradient(135deg, #64B5F6 0%, #2196F3 100%);
+}
+
+.o_group_dashboard .bg-landowner {
+    background: linear-gradient(135deg, #BA68C8 0%, #9C27B0 100%);
+}
+
+.o_group_dashboard .bg-budget {
+    background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+}
+
 .o_group_dashboard .stat-card.bg-warning .stat-details h3,
 .o_group_dashboard .stat-card.bg-warning .stat-details p {
     color: #333;

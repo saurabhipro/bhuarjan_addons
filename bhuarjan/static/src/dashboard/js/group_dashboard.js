@@ -28,6 +28,11 @@ export class GroupDashboard extends Component {
                 section19_stage: 0,
                 section21_stage: 0,
                 award_stage: 0,
+                total_patwaris: 0,
+                total_villages: 0,
+                total_surveys: 0,
+                total_landowners: 0,
+                total_budget: 0,
             }
         });
 
@@ -36,20 +41,44 @@ export class GroupDashboard extends Component {
         });
     }
 
+    parseCost(value) {
+        if (!value) return 0;
+        let clean = value.toLowerCase().replace(/,/g, '');
+        let multiplier = 1;
+        if (clean.includes('lakh')) multiplier = 100000;
+        if (clean.includes('crore') || clean.includes('cr')) multiplier = 10000000;
+
+        const num = parseFloat(clean.replace(/[^0-9.]/g, ''));
+        return isNaN(num) ? 0 : num * multiplier;
+    }
+
     async loadDashboardData() {
         try {
             // Fetch all projects with their current stage information
             const projects = await this.orm.searchRead(
                 "bhu.project",
                 [["company_id", "in", this.env.services.company.activeCompanyIds]],
-                ["name", "code", "department_id", "district_id", "state", "village_ids", "create_date"],
+                ["name", "code", "department_id", "district_id", "state", "village_ids", "patwari_ids", "total_cost", "create_date"],
                 { order: "create_date desc" }
             );
+
+            let allVillageIds = new Set();
+            let allPatwariIds = new Set();
+            let globalTotalSurveys = 0;
+            let globalTotalLandowners = 0;
+            let globalTotalBudget = 0;
 
             // For each project, determine its current stage, counts and last survey date
             for (let project of projects) {
                 project.current_stage = await this.determineProjectStage(project.id);
-                project.village_count = project.village_ids.length;
+                project.village_count = project.village_ids ? project.village_ids.length : 0;
+
+                // Track unique villages and patwaris
+                if (project.village_ids) project.village_ids.forEach(id => allVillageIds.add(id));
+                if (project.patwari_ids) project.patwari_ids.forEach(id => allPatwariIds.add(id));
+
+                // Parse budget using smart parser
+                globalTotalBudget += this.parseCost(project.total_cost);
 
                 // Fetch last survey date for the project
                 try {
@@ -73,6 +102,7 @@ export class GroupDashboard extends Component {
                         ["id"]
                     );
                     project.total_khasras = khasras.length;
+                    globalTotalSurveys += project.total_khasras;
                 } catch (error) {
                     console.warn("Could not fetch khasras for project", project.id, error);
                     project.total_khasras = 0;
@@ -86,6 +116,7 @@ export class GroupDashboard extends Component {
                         ["id"]
                     );
                     project.total_landowners = landowners.length;
+                    globalTotalLandowners += project.total_landowners;
                 } catch (error) {
                     console.warn("Could not fetch landowners for project", project.id, error);
                     project.total_landowners = 0;
@@ -94,6 +125,13 @@ export class GroupDashboard extends Component {
 
             this.state.projects = projects;
             this.state.stats.total_projects = projects.length;
+            this.state.stats.total_villages = allVillageIds.size;
+            this.state.stats.total_patwaris = allPatwariIds.size;
+            this.state.stats.total_surveys = globalTotalSurveys;
+            this.state.stats.total_landowners = globalTotalLandowners;
+            this.state.stats.total_budget = globalTotalBudget.toLocaleString('en-IN', {
+                maximumFractionDigits: 0
+            });
 
             // Calculate stage statistics
             this.calculateStageStats(projects);
@@ -115,7 +153,8 @@ export class GroupDashboard extends Component {
                 (p.name && p.name.toLowerCase().includes(term)) ||
                 (p.code && p.code.toLowerCase().includes(term)) ||
                 (p.district_id && p.district_id[1].toLowerCase().includes(term)) ||
-                (p.department_id && p.department_id[1].toLowerCase().includes(term))
+                (p.department_id && p.department_id[1].toLowerCase().includes(term)) ||
+                (p.total_cost && p.total_cost.toLowerCase().includes(term))
             );
         }
 
@@ -142,6 +181,9 @@ export class GroupDashboard extends Component {
         }
         if (field === "total_khasras" || field === "total_landowners" || field === "village_count") {
             return obj[field] || 0;
+        }
+        if (field === "total_cost") {
+            return this.parseCost(obj[field]);
         }
         return obj[field];
     }

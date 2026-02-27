@@ -92,6 +92,64 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Second Row of Statistics Cards -->
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-2">
+                            <div class="stat-card bg-patwari text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-user-secret"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_patwaris"/>
+                                    <p>Total Patwaris</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-village text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-home"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_villages"/>
+                                    <p>Total Villages</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-survey text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-clipboard"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_surveys"/>
+                                    <p>Total Surveys</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="stat-card bg-landowner text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-users"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_landowners"/>
+                                    <p>Total Landowners</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card bg-budget text-white">
+                                <div class="stat-icon">
+                                    <i class="fa fa-rupee"/>
+                                </div>
+                                <div class="stat-details">
+                                    <h3 t-esc="state.stats.total_budget"/>
+                                    <p>Total Budget (Est.)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Projects Table -->
@@ -144,6 +202,9 @@
                                             <th style="width: 8%; cursor: pointer;" t-on-click="() => this.sortBy('total_landowners')">
                                                 Land <i t-att-class="'fa ms-1 ' + getSortIcon('total_landowners')"/>
                                             </th>
+                                            <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('total_cost')">
+                                                Project Cost <i t-att-class="'fa ms-1 ' + getSortIcon('total_cost')"/>
+                                            </th>
                                             <th style="width: 10%">Stage</th>
                                             <th style="width: 10%; cursor: pointer;" t-on-click="() => this.sortBy('last_survey_date')">
                                                 Survey <i t-att-class="'fa ms-1 ' + getSortIcon('last_survey_date')"/>
@@ -153,7 +214,7 @@
                                     <tbody>
                                         <t t-if="filteredProjects.length === 0">
                                             <tr>
-                                                <td colspan="10" class="text-center py-5 no-projects-state">
+                                                <td colspan="11" class="text-center py-5 no-projects-state">
                                                     <div class="empty-state-wrapper">
                                                         <i class="fa fa-folder-open-o fa-4x mb-3 text-muted opacity-50"/>
                                                         <h4 class="text-muted fw-bold">No Projects Found</h4>
@@ -186,6 +247,9 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-success" t-esc="project.total_landowners"/>
+                                                </td>
+                                                <td class="text-end">
+                                                    <strong t-esc="project.total_cost || 'N/A'"/>
                                                 </td>
                                                 <td class="text-center clickable-cell" t-on-click="() => this.showTimeline(project.id)" style="cursor: pointer;">
                                                     <span class="badge stage-badge shadow-sm" 

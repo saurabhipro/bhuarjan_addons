@@ -62,17 +62,21 @@ export class GroupDashboard extends Component {
                 { order: "create_date desc" }
             );
 
-            let globalTotalSurveys = 0;
-            let globalTotalLandowners = 0;
             let globalTotalBudget = 0;
 
-            // Fetch total counts from master data
-            const [totalPatwaris, totalVillages] = await Promise.all([
+            // Fetch all global totals in one parallel batch for 100% accuracy
+            const [totalPatwaris, totalVillages, totalSurveys, totalLandowners] = await Promise.all([
                 this.orm.searchCount("res.users", [
                     ["bhuarjan_role", "=", "patwari"],
                     ["company_id", "in", this.env.services.company.activeCompanyIds]
                 ]),
                 this.orm.searchCount("bhu.village", [
+                    ["company_id", "in", this.env.services.company.activeCompanyIds]
+                ]),
+                this.orm.searchCount("bhu.survey", [
+                    ["company_id", "in", this.env.services.company.activeCompanyIds]
+                ]),
+                this.orm.searchCount("bhu.landowner", [
                     ["company_id", "in", this.env.services.company.activeCompanyIds]
                 ])
             ]);
@@ -102,41 +106,21 @@ export class GroupDashboard extends Component {
                     project.last_survey_date = "N/A";
                 }
 
-                // Get total khasras count - with error handling
-                try {
-                    const khasras = await this.orm.searchRead(
-                        "bhu.survey",
-                        [["project_id", "=", project.id]],
-                        ["id"]
-                    );
-                    project.total_khasras = khasras.length;
-                    globalTotalSurveys += project.total_khasras;
-                } catch (error) {
-                    console.warn("Could not fetch khasras for project", project.id, error);
-                    project.total_khasras = 0;
-                }
-
-                // Get total landowners count - with error handling
-                try {
-                    const landowners = await this.orm.searchRead(
-                        "bhu.landowner",
-                        [["survey_ids.project_id", "=", project.id]],
-                        ["id"]
-                    );
-                    project.total_landowners = landowners.length;
-                    globalTotalLandowners += project.total_landowners;
-                } catch (error) {
-                    console.warn("Could not fetch landowners for project", project.id, error);
-                    project.total_landowners = 0;
-                }
+                // Get counts for the table row (Project specific)
+                const [khasraCount, landownerCount] = await Promise.all([
+                    this.orm.searchCount("bhu.survey", [["project_id", "=", project.id]]),
+                    this.orm.searchCount("bhu.landowner", [["survey_ids.project_id", "=", project.id]])
+                ]);
+                project.total_khasras = khasraCount;
+                project.total_landowners = landownerCount;
             }
 
             this.state.projects = projects;
             this.state.stats.total_projects = projects.length;
             this.state.stats.total_villages = totalVillages;
             this.state.stats.total_patwaris = totalPatwaris;
-            this.state.stats.total_surveys = globalTotalSurveys;
-            this.state.stats.total_landowners = globalTotalLandowners;
+            this.state.stats.total_surveys = totalSurveys;
+            this.state.stats.total_landowners = totalLandowners;
             this.state.stats.total_budget = globalTotalBudget.toLocaleString('en-IN', {
                 maximumFractionDigits: 0
             });

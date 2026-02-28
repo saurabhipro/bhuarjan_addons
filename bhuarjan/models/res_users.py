@@ -152,8 +152,11 @@ class ResUsers(models.Model):
     village_ids = fields.Many2many('bhu.village', string="Villages")
     bhuarjan_role = fields.Selection([
         ('patwari', 'Patwari'),
+        ('ri', 'Revenue Inspector'),
+        ('revenue_inspector', 'Revenue Inspector'),
+        ('nayab_tahsildar', 'Nayab Tahsildar'),
+        ('tahsildar', 'Tehsildar'),
         ('sdm', 'SDM'),
-        ('tahsildar', 'Tehsildar'),  # Legacy support
         ('additional_collector', 'Additional Collector'),
         ('collector', 'Collector'),
         ('district_administrator', 'District Administrator'),
@@ -286,6 +289,9 @@ class ResUsers(models.Model):
         # Clear all previous custom roles (you can add all group XML IDs here)
         all_custom_group_ids = [
             self.env.ref('bhuarjan.group_bhuarjan_patwari').id,
+            self.env.ref('bhuarjan.group_bhuarjan_ri').id,
+            self.env.ref('bhuarjan.group_bhuarjan_nayab_tahsildar').id,
+            self.env.ref('bhuarjan.group_bhuarjan_tahsildar').id,
             self.env.ref('bhuarjan.group_bhuarjan_sdm').id,
             self.env.ref('bhuarjan.group_bhuarjan_additional_collector').id,
             self.env.ref('bhuarjan.group_bhuarjan_collector').id,
@@ -303,6 +309,10 @@ class ResUsers(models.Model):
         # Assign selected group
         group_map = {
             'patwari': 'bhuarjan.group_bhuarjan_patwari',
+            'ri': 'bhuarjan.group_bhuarjan_ri',
+            'revenue_inspector': 'bhuarjan.group_bhuarjan_ri',
+            'nayab_tahsildar': 'bhuarjan.group_bhuarjan_nayab_tahsildar',
+            'tahsildar': 'bhuarjan.group_bhuarjan_tahsildar',
             'sdm': 'bhuarjan.group_bhuarjan_sdm',
             'additional_collector': 'bhuarjan.group_bhuarjan_additional_collector',
             'collector': 'bhuarjan.group_bhuarjan_collector',

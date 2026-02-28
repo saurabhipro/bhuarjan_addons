@@ -351,11 +351,34 @@
         </field>
     </record>
 
+    <!-- Section 11 Preliminary Report Graph View -->
+    <record id="view_section11_preliminary_report_graph" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.report.graph</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="arch" type="xml">
+            <graph string="Section 11 Analysis" type="bar" sample="1">
+                <field name="village_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Section 11 Preliminary Report Pivot View -->
+    <record id="view_section11_preliminary_report_pivot" model="ir.ui.view">
+        <field name="name">bhu.section11.preliminary.report.pivot</field>
+        <field name="model">bhu.section11.preliminary.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Section 11 Analysis" sample="1">
+                <field name="village_id" type="row"/>
+                <field name="project_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
     <!-- Section 11 Preliminary Report Action -->
     <record id="action_section11_preliminary_report" model="ir.actions.act_window">
         <field name="name">Section 11 Notifications</field>
         <field name="res_model">bhu.section11.preliminary.report</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,graph,pivot,form</field>
         <field name="context">{'search_default_my_reports': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

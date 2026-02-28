@@ -346,11 +346,34 @@
         </field>
     </record>
 
+    <!-- Section 4 Notification Graph View -->
+    <record id="view_section4_notification_graph" model="ir.ui.view">
+        <field name="name">bhu.section4.notification.graph</field>
+        <field name="model">bhu.section4.notification</field>
+        <field name="arch" type="xml">
+            <graph string="Section 4 Analysis" type="bar" sample="1">
+                <field name="village_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Section 4 Notification Pivot View -->
+    <record id="view_section4_notification_pivot" model="ir.ui.view">
+        <field name="name">bhu.section4.notification.pivot</field>
+        <field name="model">bhu.section4.notification</field>
+        <field name="arch" type="xml">
+            <pivot string="Section 4 Analysis" sample="1">
+                <field name="village_id" type="row"/>
+                <field name="project_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
     <!-- Section 4 Notification Action -->
     <record id="action_section4_notification" model="ir.actions.act_window">
         <field name="name">Section 4 Notifications</field>
         <field name="res_model">bhu.section4.notification</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,graph,pivot,form</field>
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

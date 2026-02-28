@@ -175,7 +175,7 @@
                                                 <i class="fa fa-heart mr-1" style="font-size: 0.75rem;" title="Spouse"></i>
                                                 <field name="spouse_name"/>
                                             </t>
-                                            <t t-if="not record.spouse_name.raw_value or record.spouse_name.raw_value == ''">
+                                            <t t-else="">
                                                 <i class="fa fa-user mr-1" style="font-size: 0.75rem;" title="Father"></i>
                                                 <field name="father_name"/>
                                             </t>
@@ -207,11 +207,34 @@
         </field>
     </record>
 
+    <!-- Landowner Graph View -->
+    <record id="view_bhu_landowner_graph" model="ir.ui.view">
+        <field name="name">bhu.landowner.graph</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <graph string="Landowners Analysis" type="bar" sample="1">
+                <field name="village_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Landowner Pivot View -->
+    <record id="view_bhu_landowner_pivot" model="ir.ui.view">
+        <field name="name">bhu.landowner.pivot</field>
+        <field name="model">bhu.landowner</field>
+        <field name="arch" type="xml">
+            <pivot string="Landowners Analysis" sample="1">
+                <field name="village_id" type="row"/>
+                <field name="district_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
     <!-- Landowner Action -->
     <record id="action_bhu_landowner" model="ir.actions.act_window">
         <field name="name">Landowners</field>
         <field name="res_model">bhu.landowner</field>
-        <field name="view_mode">list,form,kanban</field>
+        <field name="view_mode">list,kanban,graph,pivot,form</field>
         <!-- <field name="search_view_id" ref="view_bhu_landowner_search"/> -->
     </record>
 

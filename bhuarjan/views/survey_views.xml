@@ -8,6 +8,7 @@
             <list duplicate="0" string="Surveys" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'" multi_edit="1" delete="1" default_order="create_date desc" create="groups='bhuarjan.group_bhuarjan_admin' or groups='base.group_system'">
                 <field name="name" string="Survey Number"/>
                 <field name="user_id" string="User"/>
+                <field name="department_id" string="Department" optional="show"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
                 <field name="tehsil_id" string="Tehsil"/>
@@ -258,7 +259,36 @@
                     <filter string="Department / विभाग" name="group_department" context="{'group_by': 'department_id'}"/>
                     <filter string="Survey Date / सर्वे दिनाँक" name="group_survey_date" context="{'group_by': 'survey_date'}"/>
                 </group>
+                <searchpanel>
+                    <field name="department_id" icon="fa-building" string="Department" enable_counters="1"/>
+                    <field name="project_id" icon="fa-folder" string="Project" enable_counters="1"/>
+                </searchpanel>
             </search>
+        </field>
+    </record>
+
+    <!-- Survey Graph View -->
+    <record id="view_bhu_survey_graph" model="ir.ui.view">
+        <field name="name">bhu.survey.graph</field>
+        <field name="model">bhu.survey</field>
+        <field name="arch" type="xml">
+            <graph string="Surveys Analysis" type="bar" sample="1">
+                <field name="village_id"/>
+                <field name="acquired_area" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Survey Pivot View -->
+    <record id="view_bhu_survey_pivot" model="ir.ui.view">
+        <field name="name">bhu.survey.pivot</field>
+        <field name="model">bhu.survey</field>
+        <field name="arch" type="xml">
+            <pivot string="Surveys Analysis" sample="1">
+                <field name="village_id" type="row"/>
+                <field name="project_id" type="col"/>
+                <field name="acquired_area" type="measure"/>
+            </pivot>
         </field>
     </record>
 
@@ -266,7 +296,7 @@
     <record id="action_bhu_survey" model="ir.actions.act_window">
         <field name="name">Surveys</field>
         <field name="res_model">bhu.survey</field>
-        <field name="view_mode">list,kanban,form</field>
+        <field name="view_mode">list,kanban,graph,pivot,form</field>
         <field name="search_view_id" ref="view_bhu_survey_search"/>
         <field name="context">{'create_name': 'नया सर्वे'}</field>
         <field name="help" type="html">

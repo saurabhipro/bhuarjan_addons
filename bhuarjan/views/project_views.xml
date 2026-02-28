@@ -207,10 +207,35 @@
         </field>
     </record>
 
+    <!-- Project Graph View -->
+    <record id="view_bhu_project_graph" model="ir.ui.view">
+        <field name="name">bhu.project.graph</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <graph string="Projects Analysis" type="bar" sample="1">
+                <field name="district_id"/>
+                <field name="total_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Project Pivot View -->
+    <record id="view_bhu_project_pivot" model="ir.ui.view">
+        <field name="name">bhu.project.pivot</field>
+        <field name="model">bhu.project</field>
+        <field name="arch" type="xml">
+            <pivot string="Projects Analysis" sample="1">
+                <field name="district_id" type="row"/>
+                <field name="department_id" type="col"/>
+                <field name="total_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <!-- Action -->
     <record id="action_bhu_project" model="ir.actions.act_window">
         <field name="name">Projects</field>
         <field name="res_model">bhu.project</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,graph,pivot,form</field>
     </record>
 </odoo>

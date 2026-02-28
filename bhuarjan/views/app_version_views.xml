@@ -98,7 +98,7 @@
                                         <strong><field name="name"/></strong>
                                         <span class="badge badge-pill" t-attf-class="badge-#{record.is_active.raw_value ? 'success' : 'secondary'}">
                                             <t t-if="record.is_active.raw_value">Active</t>
-                                            <t t-if="not record.is_active.raw_value">Inactive</t>
+                                            <t t-else="">Inactive</t>
                                         </span>
                                         <span class="badge badge-info" t-if="record.is_latest.raw_value">Latest</span>
                                         <span class="badge badge-warning" t-if="record.force_update.raw_value">Force Update</span>

@@ -279,11 +279,34 @@
         </field>
     </record>
 
+    <!-- Section 23 Award Graph View -->
+    <record id="view_section23_award_graph" model="ir.ui.view">
+        <field name="name">bhu.section23.award.graph</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="arch" type="xml">
+            <graph string="Section 23 Award Analysis" type="bar" sample="1">
+                <field name="village_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Section 23 Award Pivot View -->
+    <record id="view_section23_award_pivot" model="ir.ui.view">
+        <field name="name">bhu.section23.award.pivot</field>
+        <field name="model">bhu.section23.award</field>
+        <field name="arch" type="xml">
+            <pivot string="Section 23 Award Analysis" sample="1">
+                <field name="village_id" type="row"/>
+                <field name="project_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
     <!-- Section 23 Award Action -->
     <record id="action_section23_award" model="ir.actions.act_window">
         <field name="name">Section 23 Award</field>
         <field name="res_model">bhu.section23.award</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,graph,pivot,form</field>
         <field name="context">{}</field>
         <field name="search_view_id" ref="view_section23_award_search"/>
         <field name="help" type="html">

@@ -594,6 +594,21 @@
 									"description": "Filter by state: submitted, approved, rejected (optional)"
 								},
 								{
+									"key": "district_id",
+									"value": "",
+									"description": "Filter by district ID (optional)"
+								},
+								{
+									"key": "tehsil_id",
+									"value": "",
+									"description": "Filter by tehsil ID (optional)"
+								},
+								{
+									"key": "q",
+									"value": "",
+									"description": "Search by Khasra number (optional)"
+								},
+								{
 									"key": "limit",
 									"value": "100",
 									"description": "Number of records to return (default: 100)"
@@ -605,7 +620,7 @@
 								}
 							]
 						},
-						"description": "List surveys with optional filters.\n\n## Query Parameters\n- `project_id` (integer, optional): Filter by project ID\n- `village_id` (integer, optional): Filter by village ID\n- `state` (string, optional): Filter by state: draft, submitted, approved, rejected\n- `limit` (integer, optional): Number of records to return (default: 100)\n- `offset` (integer, optional): Number of records to skip (default: 0)\n\n## Response Fields\nEach survey in the response includes:\n- `id`: Survey ID\n- `name`: Survey number\n- `survey_uuid`: Unique survey UUID\n- `khasra_number`: Khasra number\n- `project_id`: Project ID\n- `project_name`: Project name\n- `village_id`: Village ID\n- `village_name`: Village name\n- `survey_date`: Survey date (YYYY-MM-DD)\n- `total_area`: Total area in hectares\n- `acquired_area`: Acquired area in hectares\n- `state`: Survey state (draft, submitted, approved, rejected)\n- `is_notification_4_generated`: Boolean indicating if Notification 4 is generated\n- `surveyor_id`: ID of the user who created the survey\n- `surveyor_name`: Name of the user who created the survey\n\n## Response Example\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"SC_001_0001\",\n      \"survey_uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"khasra_number\": \"103\",\n      \"project_id\": 1,\n      \"project_name\": \"Ring Road Raigarh\",\n      \"village_id\": 1,\n      \"village_name\": \"जुर्दा\",\n      \"survey_date\": \"2024-12-15\",\n      \"total_area\": 2.5,\n      \"acquired_area\": 2.0,\n      \"state\": \"submitted\",\n      \"is_notification_4_generated\": false,\n      \"surveyor_id\": 2,\n      \"surveyor_name\": \"Administrator\"\n    }\n  ],\n  \"total\": 1,\n  \"limit\": 100,\n  \"offset\": 0\n}\n```"
+						"description": "List surveys with optional filters.\n\n## Query Parameters\n- `project_id` (integer, optional): Filter by project ID\n- `village_id` (integer, optional): Filter by village ID\n- `state` (string, optional): Filter by state: draft, submitted, approved, rejected\n- `q` (string, optional): Search by Khasra number (supports partial matching)\n- `limit` (integer, optional): Number of records to return (default: 100)\n- `offset` (integer, optional): Number of records to skip (default: 0)\n\n## Response Fields\nEach survey in the response includes:\n- `id`: Survey ID\n- `name`: Survey number\n- `survey_uuid`: Unique survey UUID\n- `khasra_number`: Khasra number\n- `project_id`: Project ID\n- `project_name`: Project name\n- `village_id`: Village ID\n- `village_name`: Village name\n- `survey_date`: Survey date (YYYY-MM-DD)\n- `total_area`: Total area in hectares\n- `acquired_area`: Acquired area in hectares\n- `state`: Survey state (draft, submitted, approved, rejected)\n- `is_notification_4_generated`: Boolean indicating if Notification 4 is generated\n- `surveyor_id`: ID of the user who created the survey\n- `surveyor_name`: Name of the user who created the survey\n\n## Response Example\n```json\n{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"SC_001_0001\",\n      \"survey_uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"khasra_number\": \"103\",\n      \"project_id\": 1,\n      \"project_name\": \"Ring Road Raigarh\",\n      \"village_id\": 1,\n      \"village_name\": \"जुर्दा\",\n      \"survey_date\": \"2024-12-15\",\n      \"total_area\": 2.5,\n      \"acquired_area\": 2.0,\n      \"state\": \"submitted\",\n      \"is_notification_4_generated\": false,\n      \"surveyor_id\": 2,\n      \"surveyor_name\": \"Administrator\"\n    }\n  ],\n  \"total\": 1,\n  \"limit\": 100,\n  \"offset\": 0\n}\n```"
 					},
 					"response": []
 				},

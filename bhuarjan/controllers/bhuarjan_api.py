@@ -1725,6 +1725,9 @@ class BhuarjanAPIController(http.Controller):
             # Get query parameters
             project_id = request.httprequest.args.get('project_id', type=int)
             village_id = request.httprequest.args.get('village_id', type=int)
+            district_id = request.httprequest.args.get('district_id', type=int)
+            tehsil_id = request.httprequest.args.get('tehsil_id', type=int)
+            q = request.httprequest.args.get('q') or request.httprequest.args.get('search')
             state = request.httprequest.args.get('state')
             survey_type = request.httprequest.args.get('survey_type')
             limit = request.httprequest.args.get('limit', type=int) or 100
@@ -1736,6 +1739,10 @@ class BhuarjanAPIController(http.Controller):
                 domain.append(('project_id', '=', project_id))
             if village_id:
                 domain.append(('village_id', '=', village_id))
+            if district_id:
+                domain.append(('village_id.district_id', '=', district_id))
+            if tehsil_id:
+                domain.append(('village_id.tehsil_id', '=', tehsil_id))
             if survey_type:
                 domain.append(('survey_type', '=', survey_type))
             if state:
@@ -1744,6 +1751,32 @@ class BhuarjanAPIController(http.Controller):
                     domain.append(('state', '!=', 'approved'))
                 else:
                     domain.append(('state', '=', state))
+
+            if q:
+                domain.append(('khasra_number', 'ilike', q))
+
+            # Role-based restriction: Patwaris can only see their own/assigned village surveys
+            # This ensures they can search Khasras across their assigned villages easily
+            current_user = getattr(request, 'user', None)
+            if current_user and current_user.bhuarjan_role == 'patwari':
+                user_village_ids = current_user.village_ids.ids
+                if village_id:
+                    if village_id not in user_village_ids:
+                        # Return empty result if they try to access a village they don't belong to
+                        return Response(
+                            json.dumps({
+                                'success': True,
+                                'data': [],
+                                'total': 0,
+                                'limit': limit,
+                                'offset': offset
+                            }),
+                            status=200,
+                            content_type='application/json'
+                        )
+                else:
+                    # If no specific village_id provided, search across ALL their assigned villages
+                    domain.append(('village_id', 'in', user_village_ids))
 
             # Search surveys
             surveys = request.env['bhu.survey'].sudo().search(domain, limit=limit, offset=offset, order='create_date desc')

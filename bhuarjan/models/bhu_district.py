@@ -1,5 +1,8 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class BhuDistrict(models.Model):
     _name = 'bhu.district'
@@ -78,3 +81,136 @@ class BhuDistrict(models.Model):
         }
     
 
+    @api.model
+    def get_detailed_hierarchy(self, district_id=None):
+        """
+        Returns a complete tree starting from Raigarh district.
+        Structure: District -> Tehsils -> Villages -> Users (by role)
+        """
+        # 1. Find the parent District
+        if district_id:
+            district = self.browse(district_id)
+        else:
+            # Try to match based on the list of currently selected companies
+            allowed_companies = self.env.companies
+            _logger.info("HIERARCHY: Selected Companies: %s", allowed_companies.mapped('name'))
+            
+            # 1. Try to find a district that matches ANY of the selected company names
+            for comp in allowed_companies:
+                c_name = (comp.name or '').strip()
+                district = self.search([('name', 'ilike', c_name)], limit=1)
+                if district:
+                    _logger.info("HIERARCHY: Matched company '%s' to district '%s'", c_name, district.name)
+                    # If we found multiple, and one is 'Raigarh', prioritize it? 
+                    # For now, we take the first match we find in the selection.
+                    break
+            
+            # 2. Try substring matching across all selected companies
+            if not district:
+                all_districts = self.search([])
+                for comp in allowed_companies:
+                    c_name = (comp.name or '').lower()
+                    for d in all_districts:
+                        d_name = (d.name or '').lower()
+                        if d_name in c_name or c_name in d_name:
+                            district = d
+                            _logger.info("HIERARCHY: Substring match: %s", d.name)
+                            break
+                    if district: break
+
+            # 3. Fallback to current user's assigned district
+            if not district:
+                district = self.env.user.district_id
+                if district:
+                    _logger.info("HIERARCHY: User district fallback: %s", district.name)
+            
+            # 4. Hard fallback to 'Raigarh'
+            if not district:
+                district = self.search([('name', 'ilike', 'Raigarh')], limit=1)
+
+            # 5. Ultimate fallback
+            if not district:
+                district = self.search([], limit=1)
+        if not district:
+            return {'error': 'No district found'}
+
+        # 2. Get all Tehsils under this district
+        tehsils = self.env['bhu.tehsil'].search([('district_id', '=', district.id)])
+        
+        # 3. Get all Users for this district
+        users = self.env['res.users'].search([('district_id', '=', district.id), ('active', '=', True)])
+        
+        # Helper to get avatar
+        def get_avatar(u):
+            return u.avatar_128.decode('utf-8') if u.avatar_128 else None
+
+        # Build the tree
+        tree = {
+            'id': f'd_{district.id}',
+            'name': district.name,
+            'type': 'district',
+            'children': []
+        }
+
+        # Sub-hierarchy for Users directly under District
+        district_users = users.filtered(lambda u: not u.tehsil_ids and not u.village_ids and u.bhuarjan_role in ['collector', 'additional_collector', 'district_administrator', 'administrator'])
+        for u in district_users:
+            tree['children'].append({
+                'id': f'u_{u.id}',
+                'name': u.name,
+                'type': 'user',
+                'role': u.bhuarjan_role,
+                'avatar': get_avatar(u),
+                'title': u.login
+            })
+
+        for tehsil in tehsils:
+            tehsil_node = {
+                'id': f't_{tehsil.id}',
+                'name': tehsil.name,
+                'type': 'tehsil',
+                'children': []
+            }
+            
+            # Users assigned to this Tehsil
+            tehsil_users = users.filtered(lambda u: tehsil.id in u.tehsil_ids.ids and not u.village_ids)
+            for u in tehsil_users:
+                tehsil_node['children'].append({
+                    'id': f'u_{u.id}',
+                    'name': u.name,
+                    'type': 'user',
+                    'role': u.bhuarjan_role,
+                    'avatar': get_avatar(u),
+                    'title': u.login
+                })
+            
+            # Villages under this Tehsil
+            villages = self.env['bhu.village'].search([('tehsil_id', '=', tehsil.id)])
+            for village in villages:
+                village_node = {
+                    'id': f'v_{village.id}',
+                    'name': village.name,
+                    'type': 'village',
+                    'children': []
+                }
+                
+                # Users assigned to this Village
+                village_users = users.filtered(lambda u: village.id in u.village_ids.ids)
+                for u in village_users:
+                    village_node['children'].append({
+                        'id': f'u_{u.id}',
+                        'name': u.name,
+                        'type': 'user',
+                        'role': u.bhuarjan_role,
+                        'avatar': get_avatar(u),
+                        'title': u.login
+                    })
+                
+                tehsil_node['children'].append(village_node)
+            
+            tree['children'].append(tehsil_node)
+            
+        return {
+            'tree': tree,
+            'available_districts': self.search_read([], ['id', 'name'])
+        }

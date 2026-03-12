@@ -90,6 +90,7 @@
         'views/process_report_views.xml',
         'views/draft_award_views.xml',
         'views/dashboard_views.xml',
+        'views/hierarchy_tree_views.xml',
         'views/expert_committee_report_views.xml',
         'views/message_wizard_views.xml',
         'views/company_switcher_views.xml',
@@ -170,6 +171,8 @@
 
             # 'bhuarjan/static/src/css/landowner_documents.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',
+            'bhuarjan/static/src/scss/hierarchy_tree.scss',
+            'bhuarjan/static/src/js/components/hierarchy_tree.js',
             # 'bhuarjan/static/src/scss/organization_chart.scss',
             # 'bhuarjan/static/src/js/hierarchy_expand.js',
             # 'bhuarjan/static/src/js/survey_form_confirm.js',
@@ -206,6 +209,7 @@
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.css',
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.js',
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.xml',
+            'bhuarjan/static/src/xml/hierarchy_tree.xml',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

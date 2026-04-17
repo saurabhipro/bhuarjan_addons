@@ -576,7 +576,25 @@ export class UnifiedDashboard extends Component {
 
     async loadDepartments() {
         try {
-            this.state.departments = await this.orm.call("bhuarjan.dashboard", "get_all_departments", []);
+            const departments = await this.orm.call("bhuarjan.dashboard", "get_all_departments", []);
+            const departmentsArray = Array.isArray(departments) ? departments : [];
+            const departmentsWithSurveyCount = await Promise.all(
+                departmentsArray.map(async (department) => {
+                    let surveyCount = 0;
+                    try {
+                        surveyCount = await this.orm.searchCount("bhu.survey", [
+                            ["project_id.department_id", "=", department.id],
+                        ]);
+                    } catch (error) {
+                        console.warn(`Could not load survey count for department ${department.id}`, error);
+                    }
+                    return {
+                        ...department,
+                        survey_count: surveyCount,
+                    };
+                })
+            );
+            this.state.departments = departmentsWithSurveyCount;
             // Auto-select department for department users (they only have one department)
             if (this.dashboardType === 'department' && this.state.departments.length === 1) {
                 this.state.selectedDepartment = this.state.departments[0].id;
@@ -614,7 +632,23 @@ export class UnifiedDashboard extends Component {
 
             // Ensure we have an array
             const projectsArray = Array.isArray(projects) ? projects : [];
-            this.state.projects = projectsArray;
+            const projectsWithSurveyCount = await Promise.all(
+                projectsArray.map(async (project) => {
+                    let surveyCount = 0;
+                    try {
+                        surveyCount = await this.orm.searchCount("bhu.survey", [
+                            ["project_id", "=", project.id]
+                        ]);
+                    } catch (error) {
+                        console.warn(`Could not load survey count for project ${project.id}`, error);
+                    }
+                    return {
+                        ...project,
+                        survey_count: surveyCount,
+                    };
+                })
+            );
+            this.state.projects = projectsWithSurveyCount;
         } catch (error) {
             console.error("Error loading projects:", error);
             this.state.projects = [];
@@ -628,11 +662,30 @@ export class UnifiedDashboard extends Component {
         }
 
         try {
-            this.state.villages = await this.orm.call(
+            const villages = await this.orm.call(
                 "bhuarjan.dashboard",
                 "get_villages_by_project",
                 [this.state.selectedProject]
             );
+            const villagesArray = Array.isArray(villages) ? villages : [];
+            const villagesWithSurveyCount = await Promise.all(
+                villagesArray.map(async (village) => {
+                    let surveyCount = 0;
+                    try {
+                        surveyCount = await this.orm.searchCount("bhu.survey", [
+                            ["project_id", "=", this.state.selectedProject],
+                            ["village_id", "=", village.id],
+                        ]);
+                    } catch (error) {
+                        console.warn(`Could not load survey count for village ${village.id}`, error);
+                    }
+                    return {
+                        ...village,
+                        survey_count: surveyCount,
+                    };
+                })
+            );
+            this.state.villages = villagesWithSurveyCount;
         } catch (error) {
             console.error("Error loading villages:", error);
             this.state.villages = [];

@@ -653,29 +653,17 @@
 .o_admin_dashboard .o_selection_panel {
     width: min(100%, 740px);
     text-align: center;
-    background:
-        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 44%),
-        linear-gradient(140deg, #fffaf3 0%, #f9efe2 54%, #f6e8da 100%);
-    border: 1px solid rgba(127, 68, 35, 0.48);
-    border-radius: 18px;
-    padding: 34px 34px 28px;
-    box-shadow:
-        0 18px 36px rgba(120, 69, 41, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 16px 12px 10px;
+    box-shadow: none;
     position: relative;
     overflow: hidden;
 }
 
 .o_admin_dashboard .o_selection_panel::after {
-    content: "";
-    position: absolute;
-    top: -44px;
-    right: -54px;
-    width: 170px;
-    height: 170px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(156, 94, 57, 0.18) 0%, rgba(156, 94, 57, 0) 72%);
-    pointer-events: none;
+    content: none;
 }
 
 .o_admin_dashboard .o_selection_panel_icons {

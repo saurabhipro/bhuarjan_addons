@@ -165,30 +165,78 @@ class AwardSimulator(models.Model):
         'bhu.award.simulator.tree.line', 'simulator_id',
         string='Trees / वृक्ष'
     )
+    tree_basic_amount = fields.Float(
+        string='Tree Basic (₹) / वृक्ष मूल',
+        digits=(16, 2), compute='_compute_tree_total', store=True
+    )
+    tree_solatium_amount = fields.Float(
+        string='Tree Solatium 100% (₹) / वृक्ष सॉलेशियम',
+        digits=(16, 2), compute='_compute_tree_total', store=True
+    )
+    tree_interest_amount = fields.Float(
+        string='Tree Interest 12% (₹) / वृक्ष ब्याज',
+        digits=(16, 2), compute='_compute_tree_total', store=True
+    )
     tree_total = fields.Float(
         string='Tree Total (₹) / वृक्ष कुल',
         digits=(16, 2), compute='_compute_tree_total', store=True
     )
+    tree_count = fields.Integer(
+        string='Tree Count / वृक्षों की संख्या',
+        compute='_compute_tree_total', store=True
+    )
 
-    @api.depends('tree_line_ids', 'tree_line_ids.line_total')
+    @api.depends('tree_line_ids', 'tree_line_ids.line_total', 'tree_line_ids.quantity', 'section4_date', 'award_date', 'interest_rate_percent')
     def _compute_tree_total(self):
         for rec in self:
-            rec.tree_total = sum(rec.tree_line_ids.mapped('line_total'))
+            basic = sum(rec.tree_line_ids.mapped('line_total'))
+            solatium = basic * 1.0
+            interest, _days = rec._calculate_interest_on_basic(basic)
+            
+            rec.tree_basic_amount = basic
+            rec.tree_solatium_amount = solatium
+            rec.tree_interest_amount = interest
+            rec.tree_total = basic + solatium + interest
+            rec.tree_count = int(sum(rec.tree_line_ids.mapped('quantity')))
 
     # ─── Structure Section ─────────────────────────────────────────────────────
     structure_line_ids = fields.One2many(
         'bhu.award.simulator.structure.line', 'simulator_id',
         string='Structures / संरचनाएं'
     )
+    structure_basic_amount = fields.Float(
+        string='Structure Basic (₹) / संरचना मूल',
+        digits=(16, 2), compute='_compute_structure_total', store=True
+    )
+    structure_solatium_amount = fields.Float(
+        string='Structure Solatium 100% (₹) / संरचना सॉलेशियम',
+        digits=(16, 2), compute='_compute_structure_total', store=True
+    )
+    structure_interest_amount = fields.Float(
+        string='Structure Interest 12% (₹) / संरचना ब्याज',
+        digits=(16, 2), compute='_compute_structure_total', store=True
+    )
     structure_total = fields.Float(
         string='Structure Total (₹) / संरचना कुल',
         digits=(16, 2), compute='_compute_structure_total', store=True
     )
+    structure_count = fields.Integer(
+        string='Structure Count / संरचना गिनती',
+        compute='_compute_structure_total', store=True
+    )
 
-    @api.depends('structure_line_ids', 'structure_line_ids.line_total')
+    @api.depends('structure_line_ids', 'structure_line_ids.line_total', 'section4_date', 'award_date', 'interest_rate_percent')
     def _compute_structure_total(self):
         for rec in self:
-            rec.structure_total = sum(rec.structure_line_ids.mapped('line_total'))
+            basic = sum(rec.structure_line_ids.mapped('line_total'))
+            solatium = basic * 1.0
+            interest, _days = rec._calculate_interest_on_basic(basic)
+            
+            rec.structure_basic_amount = basic
+            rec.structure_solatium_amount = solatium
+            rec.structure_interest_amount = interest
+            rec.structure_total = basic + solatium + interest
+            rec.structure_count = len(rec.structure_line_ids)
 
     # ─── Grand Total ───────────────────────────────────────────────────────────
     grand_total = fields.Float(

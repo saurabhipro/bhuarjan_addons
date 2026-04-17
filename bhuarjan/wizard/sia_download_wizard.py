@@ -20,7 +20,8 @@ class BhuDownloadWizard(models.TransientModel):
     
     format = fields.Selection([
         ('pdf', 'PDF Format'),
-        ('word', 'Word Format (.doc)')
+        ('word', 'Word Format (.doc)'),
+        ('excel', 'Excel Format (.xlsx)')
     ], string='Download Format', default='pdf', required=True)
 
     @api.model
@@ -53,6 +54,11 @@ class BhuDownloadWizard(models.TransientModel):
             # Download as PDF using standard report
             report = self.env.ref(self.report_xml_id)
             return report.report_action(record)
+        elif self.format == 'excel':
+            # Delegate to record's excel method if it exists
+            if hasattr(record, 'action_download_excel'):
+                return record.action_download_excel()
+            raise UserError(_("Excel export is not supported for this report."))
         else:
             # Download as Word (.doc) - HTML format that Word can open
             return self._generate_word_doc(record)
@@ -197,6 +203,15 @@ class BhuDownloadWizard(models.TransientModel):
     </xml>
     <![endif]-->
     <style type="text/css">
+        @page Section1 {{
+            size: 11.69in 8.27in;
+            mso-page-orientation: landscape;
+            margin-top: 0.2in;
+            margin-right: 0.2in;
+            margin-bottom: 0.2in;
+            margin-left: 0.2in;
+        }}
+
         /* Original report styles - inline and self-contained */
         {combined_styles}
         
@@ -304,7 +319,7 @@ class BhuDownloadWizard(models.TransientModel):
         }}
     </style>
 </head>
-<body lang="EN-IN">
+<body lang="EN-IN" class="Section1">
     {html_str}
 </body>
 </html>"""

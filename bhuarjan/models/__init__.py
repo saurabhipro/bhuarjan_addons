@@ -60,3 +60,4 @@ from . import form10_export_utils
 from . import app_version
 from . import document_template_master
 from . import issue
+from . import compat_theme_placeholders

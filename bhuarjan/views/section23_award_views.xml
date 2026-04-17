@@ -22,6 +22,10 @@
         <field name="arch" type="xml">
             <form string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
+                    <button name="action_download_award" string="Download / डाउनलोड" 
+                            type="object" class="btn-secondary" 
+                            icon="fa-download"
+                            invisible="state == 'draft' and not is_generated"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" options="{'clickable': True}"/>
                 </header>
                 <sheet>
@@ -179,12 +183,6 @@
                                     </div>
                                 </div>
 
-                                <div invisible="not award_document">
-                                     <button name="action_download_award" string="Download Generated Award" 
-                                            type="object" class="btn custom-btn-primary" 
-                                            icon="fa-download"
-                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
-                                </div>
                             </div>
 
                             <!-- Right: Upload & Submit -->
@@ -226,13 +224,6 @@
                             <!-- Left: Review Documents -->
                             <div class="col-md-6 border-right">
                                 <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 15px;">Step 1: Review Award</div>
-                                <div invisible="not award_document">
-                                     <button name="action_download_award" string="Download Signed Award" 
-                                            type="object" class="btn custom-btn-primary" 
-                                            icon="fa-download"
-                                            title="Download the signed award uploaded by SDM"
-                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
-                                </div>
                                 <div class="text-muted small">
                                     <i class="fa fa-info-circle"/> Review the signed award document before approval.
                                 </div>

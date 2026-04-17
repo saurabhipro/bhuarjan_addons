@@ -16,19 +16,19 @@
         'data/tree_rate_master_data.xml',
         'data/photo_type_master_data.xml',
         # District and Sub-Division data - commented out to prevent import
-        # 'data/chhattisgarh_districts_data.xml',
-        # 'data/raigarh_sub_division_data.xml',
-        # 'data/raipur_sub_division_data.xml',
-        # 'data/tehsil_data.xml',
-        # Village data - commented out to prevent import
-        # 'data/raigarh_village_data.xml',
+        'data/chhattisgarh_districts_data.xml',
+        'data/raigarh_sub_division_data.xml',
+        'data/raipur_sub_division_data.xml',
+        'data/tehsil_data.xml',
+        # Village data
+        'data/raigarh_village_data.xml',
         'data/department_data.xml',
         'data/settings_master_data.xml',
         # Process-related sample data - commented out to prevent default import
         'data/sample_project_data.xml',
         'data/sample_sequence_settings.xml',
         # 'data/sample_expert_committee_report.xml',
-        # 'data/sample_landowners.xml',  # Disabled - not importing sample landowners
+        #'data/sample_landowners.xml',  # Enabled sample landowners for jurda data
         # 'data/sample_surveys.xml',  # Disabled - not importing sample surveys
         # 'data/sample_section4_config.xml',
         # 'data/sample_section4_notifications.xml',
@@ -39,6 +39,8 @@
         'data/section_master_data.xml',
         'data/cglrc_master_data.xml',
         'data/qweb_report_paper_format.xml',
+        #'data/jurda_test_permutations.xml',
+        # 'data/jurda_sample_surveys.xml',
         'security/secrurity.xml',
         'reports/report_common_styles.xml',
         'reports/form10_bulk_table_report.xml',
@@ -101,6 +103,7 @@
         'views/land_rate_master_views.xml',
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
+        'reports/award_simulator_report.xml',
         'views/award_simulator_views.xml',
         'views/law_master_views.xml',
         'views/section_master_views.xml',

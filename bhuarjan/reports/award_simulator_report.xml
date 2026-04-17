@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Award Simulator Report Action -->
+        <record id="action_report_award_simulator" model="ir.actions.report">
+            <field name="name">Award Simulator Summary / अवार्ड सिमुलेटर सारांश</field>
+            <field name="model">bhu.award.simulator</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bhuarjan.section23_award_report</field>
+            <field name="report_file">bhuarjan.section23_award_report</field>
+            <field name="print_report_name">'Award_Simulator_%s' % (object.village_id.name or 'Village')</field>
+            <field name="paperformat_id" ref="bhuarjan.bhuarjan_section_23_award_paper_format"/>
+        </record>
+
+        <!-- Award Simulator Report Template -->
+        <template id="award_simulator_report">
+            <t t-call="bhuarjan.section23_award_report"/>
+        </template>
+    </data>
+</odoo>

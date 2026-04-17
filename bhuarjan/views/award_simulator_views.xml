@@ -33,138 +33,851 @@
                         <button string="Recalculate / पुनः गणना करें"
                                 name="action_calculate"
                                 type="object"
-                                class="btn-primary"/>
+                                class="btn-primary"
+                                icon="fa-refresh"/>
+                        <button string="Download / डाउनलोड"
+                                name="action_download"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-download"/>
                     </header>
                     <sheet>
+                        <style>
+                            .simulator_header {
+                                background: linear-gradient(135deg, #3f1a11 0%, #6a2d1d 55%, #8a4531 100%);
+                                color: white;
+                                padding: 14px 18px;
+                                border-radius: 12px 12px 0 0;
+                                margin: -16px -16px 12px -16px;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                box-shadow: 0 6px 18px rgba(90, 42, 31, 0.25);
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            .simulator_header::after {
+                                content: "";
+                                position: absolute;
+                                top: 0;
+                                right: -60px;
+                                width: 160px;
+                                height: 100%;
+                                background: rgba(255,255,255,0.10);
+                                transform: skewX(-20deg);
+                                pointer-events: none;
+                            }
+                            .simulator_title_h1 {
+                                color: white !important;
+                                margin: 0 !important;
+                                font-weight: 700 !important;
+                                letter-spacing: 0.5px;
+                                text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+                            }
+                            .premium_card {
+                                background: white;
+                                border: 1px solid #e0e6ed;
+                                border-radius: 12px;
+                                padding: 0 18px 16px 18px;
+                                margin-bottom: 14px;
+                                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+                                transition: transform 0.2s, box-shadow 0.2s;
+                                scroll-margin-top: 10px;
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            .premium_card.section-config { background: linear-gradient(180deg, #faf4ef 0%, #ffffff 55%); }
+                            .premium_card.section-land { background: linear-gradient(180deg, #fdf4ec 0%, #ffffff 55%); }
+                            .premium_card.section-tree { background: linear-gradient(180deg, #f1f9f4 0%, #ffffff 55%); }
+                            .premium_card.section-structure { background: linear-gradient(180deg, #fdf1ea 0%, #ffffff 55%); }
+                            .premium_card:hover {
+                                box-shadow: 0 16px 30px -15px rgba(0,0,0,0.18), 0 8px 12px -8px rgba(0,0,0,0.08);
+                                transform: translateY(-2px);
+                            }
+                            .section_banner {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding: 12px 18px;
+                                margin: 0 -18px 14px -18px;
+                                color: #fff;
+                                border-radius: 12px 12px 0 0;
+                                box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+                                letter-spacing: 0.4px;
+                                font-weight: 700;
+                                position: relative;
+                                overflow: hidden;
+                                text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+                            }
+                            .section_banner::after {
+                                content: "";
+                                position: absolute;
+                                top: 0;
+                                right: -50px;
+                                width: 140px;
+                                height: 100%;
+                                background: rgba(255,255,255,0.12);
+                                transform: skewX(-20deg);
+                                pointer-events: none;
+                            }
+                            .section_banner .sb_left {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                            }
+                            .section_banner .sb_icon {
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 10px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: rgba(255,255,255,0.22);
+                                font-size: 15px;
+                                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.12);
+                            }
+                            .section_banner .sb_title {
+                                font-size: 1rem;
+                                text-transform: uppercase;
+                                margin: 0;
+                                line-height: 1.2;
+                            }
+                            .section_banner .sb_sub {
+                                font-size: 0.72rem;
+                                opacity: 0.92;
+                                font-weight: 500;
+                                letter-spacing: 0.5px;
+                            }
+                            .sb_config { background: linear-gradient(135deg, #3d1c12 0%, #6a2d1d 55%, #8a4531 100%); }
+                            .sb_land { background: linear-gradient(135deg, #6a2d1d 0%, #9a4a2c 55%, #c1703d 100%); }
+                            .sb_tree { background: linear-gradient(135deg, #1c5037 0%, #2f6d4f 55%, #5aa87a 100%); }
+                            .sb_structure { background: linear-gradient(135deg, #5c3324 0%, #8a4b36 55%, #c47a52 100%); }
 
-                        <!-- Header -->
-                        <div class="oe_title">
-                            <h1>
-                                <span class="text-primary">Award Simulator</span>
-                                <small class="text-muted ms-2" style="font-size:0.6em;">अवार्ड सिमुलेटर</small>
-                            </h1>
+                            /* ── Collapsible section (details/summary) ───────────── */
+                            details.premium_card > summary.section_banner {
+                                cursor: pointer;
+                                list-style: none;
+                                user-select: none;
+                            }
+                            details.premium_card > summary.section_banner::-webkit-details-marker { display: none; }
+                            .sb_right {
+                                display: flex;
+                                align-items: center;
+                                gap: 14px;
+                                text-align: right;
+                            }
+                            .sb_chevron {
+                                width: 26px;
+                                height: 26px;
+                                border-radius: 8px;
+                                background: rgba(255,255,255,0.18);
+                                color: #fff;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 13px;
+                                transition: transform 0.25s ease;
+                                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+                            }
+                            details.premium_card:not([open]) .sb_chevron { transform: rotate(-90deg); }
+                            details.premium_card:not([open]) > summary.section_banner {
+                                margin-bottom: 0;
+                                border-radius: 12px;
+                            }
+                            details.premium_card:not([open]) {
+                                padding-bottom: 0;
+                            }
+                            details.premium_card > summary.section_banner:hover {
+                                filter: brightness(1.06);
+                            }
+
+                            /* ── Info popover (hover + click/focus) ──────────────── */
+                            .info_pop {
+                                position: relative;
+                                display: inline-block;
+                                margin-left: 6px;
+                                outline: none;
+                                vertical-align: middle;
+                            }
+                            .info_pop > .ip_trigger {
+                                width: 18px;
+                                height: 18px;
+                                border-radius: 50%;
+                                background: rgba(106, 52, 37, 0.12);
+                                color: #6a3425;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 11px;
+                                cursor: help;
+                                transition: all 0.2s ease;
+                            }
+                            .info_pop:hover > .ip_trigger,
+                            .info_pop:focus-within > .ip_trigger {
+                                background: #6a3425;
+                                color: #fff;
+                                transform: scale(1.1);
+                            }
+                            .info_pop .ip_tip {
+                                visibility: hidden;
+                                opacity: 0;
+                                display: block;
+                                position: absolute;
+                                z-index: 9999;
+                                right: 0;
+                                top: calc(100% + 10px);
+                                transform: translateY(-4px);
+                                width: 280px;
+                                padding: 12px 14px;
+                                background-color: #23150f;
+                                background-image: linear-gradient(135deg, #2a1710 0%, #3d241b 100%);
+                                color: #fff7ef;
+                                border-radius: 10px;
+                                font-size: 0.76rem;
+                                font-weight: 400;
+                                line-height: 1.4;
+                                letter-spacing: 0.2px;
+                                text-align: left;
+                                box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;
+                                transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+                                pointer-events: none;
+                                white-space: normal;
+                                isolation: isolate;
+                            }
+                            .info_pop .ip_tip::before {
+                                content: "";
+                                position: absolute;
+                                top: -6px;
+                                right: 8px;
+                                width: 12px;
+                                height: 12px;
+                                background: #2a1710;
+                                border-radius: 2px;
+                                transform: rotate(45deg);
+                                box-shadow: -1px -1px 0 rgba(255,255,255,0.06);
+                            }
+                            .info_pop:hover .ip_tip,
+                            .info_pop:focus-within .ip_tip,
+                            .info_pop:active .ip_tip {
+                                visibility: visible;
+                                opacity: 1;
+                                transform: translateY(0);
+                                pointer-events: auto;
+                            }
+                            .info_pop .ip_title {
+                                display: block;
+                                font-weight: 700;
+                                color: #ffd9b8;
+                                margin-bottom: 6px;
+                                padding-bottom: 6px;
+                                border-bottom: 1px solid rgba(255,255,255,0.15);
+                                font-size: 0.78rem;
+                                text-transform: uppercase;
+                                letter-spacing: 0.4px;
+                            }
+                            .info_pop .ip_row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 4px 0;
+                                border-bottom: 1px dashed rgba(255,255,255,0.12);
+                                color: #e8dcd2;
+                            }
+                            .info_pop .ip_row:last-child { border-bottom: none; padding-bottom: 0; }
+                            .info_pop .ip_row > span:first-child {
+                                color: #e8dcd2;
+                                opacity: 0.9;
+                            }
+                            .info_pop .ip_row .ip_val {
+                                font-weight: 700;
+                                white-space: nowrap;
+                                text-align: right;
+                            }
+                            .info_pop .ip_pos { color: #7cdc9a !important; }
+                            .info_pop .ip_neg { color: #ff9a8c !important; }
+                            .info_pop .ip_neu { color: #ffd9b8 !important; }
+
+                            /* ── Impact factors strip (Land section) ─────────────── */
+                            .impact_strip {
+                                display: grid;
+                                grid-template-columns: repeat(4, 1fr);
+                                gap: 8px;
+                                margin: 0 0 12px 0;
+                            }
+                            .impact_chip {
+                                border-radius: 10px;
+                                padding: 8px 10px;
+                                background: #fff;
+                                border: 1px solid rgba(122, 59, 40, 0.12);
+                                box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: transform 0.15s ease, box-shadow 0.15s ease;
+                            }
+                            .impact_chip:hover {
+                                transform: translateY(-1px);
+                                box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+                            }
+                            .impact_chip .ic_icon {
+                                width: 26px;
+                                height: 26px;
+                                border-radius: 7px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #fdf4ec;
+                                color: #7a3b28;
+                                font-size: 12px;
+                                flex-shrink: 0;
+                            }
+                            .impact_chip .ic_label {
+                                font-size: 0.68rem;
+                                font-weight: 600;
+                                color: #64748b;
+                                text-transform: uppercase;
+                                letter-spacing: 0.4px;
+                                line-height: 1.1;
+                            }
+                            .impact_chip .ic_value {
+                                font-size: 0.9rem;
+                                font-weight: 800;
+                                line-height: 1.1;
+                            }
+                            .impact_chip.pos .ic_value { color: #2f6d4f; }
+                            .impact_chip.neg .ic_value { color: #b64026; }
+                            .impact_chip.neu .ic_value { color: #6a3425; }
+
+                            /* ── Bold field labels inside the simulator ──────────── */
+                            .o_form_sheet .premium_card .o_form_label,
+                            .o_form_sheet details.premium_card .o_form_label,
+                            .o_form_sheet .premium_card label.o_form_label,
+                            .o_form_sheet .premium_card .o_inner_group > tbody > tr > td.o_td_label > label {
+                                font-weight: 700 !important;
+                                color: #3f2a22;
+                            }
+                            .o_form_sheet .premium_card .o_group > .o_horizontal_separator,
+                            .o_form_sheet .premium_card .o_inner_group > tbody > tr.o_group_row_title,
+                            .o_form_sheet .premium_card .o_inner_group .o_horizontal_separator {
+                                font-weight: 800 !important;
+                                color: #5a2a1f;
+                                letter-spacing: 0.4px;
+                            }
+
+                            /* ── Section quick toggles ──────────────────────────── */
+                            .sim_toolbar {
+                                display: flex;
+                                justify-content: flex-end;
+                                align-items: center;
+                                gap: 6px;
+                                margin: -4px 0 10px 0;
+                                font-size: 0.78rem;
+                                color: #64748b;
+                            }
+                            .sim_toolbar a {
+                                color: #6a3425 !important;
+                                text-decoration: none !important;
+                                font-weight: 600;
+                                padding: 3px 10px;
+                                border-radius: 14px;
+                                border: 1px solid rgba(106, 52, 37, 0.18);
+                                background: #fff;
+                                transition: all 0.15s ease;
+                                cursor: pointer;
+                            }
+                            .sim_toolbar a:hover {
+                                background: #6a3425;
+                                color: #fff !important;
+                                border-color: #6a3425;
+                            }
+                            .sim_toolbar a i { margin-right: 4px; }
+                            .card_icon {
+                                font-size: 18px;
+                                width: 34px;
+                                height: 34px;
+                                background: #f6f0eb;
+                                color: #6a3425;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 12px;
+                                margin-right: 10px;
+                                transition: all 0.3s ease;
+                            }
+                            .premium_card:hover .card_icon {
+                                transform: scale(1.1) rotate(5deg);
+                            }
+                            .card_title_container {
+                                display: flex;
+                                align-items: center;
+                                border-bottom: 2px solid #f1f5f9;
+                                padding-bottom: 8px;
+                                margin-bottom: 12px;
+                            }
+                            .card_title {
+                                font-size: 1.1rem;
+                                font-weight: 700;
+                                color: #3f2a22;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+                            .total_row {
+                                border-radius: 12px;
+                                padding: 10px 12px;
+                                margin-top: 10px;
+                                border-left: 6px solid #6a3425;
+                                box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+                                transition: all 0.3s ease;
+                            }
+                            .total_row:hover {
+                                filter: brightness(0.98);
+                            }
+                            .grand_total_section {
+                                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                                border: 2px solid #1a237e;
+                                border-radius: 20px;
+                                padding: 35px;
+                                margin-top: 50px;
+                                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            .grand_total_section::before {
+                                content: "";
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 5px;
+                                background: linear-gradient(to right, #1a237e, #3b82f6, #1a237e);
+                            }
+                            .component_tag {
+                                display: inline-block;
+                                padding: 4px 12px;
+                                border-radius: 20px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                                margin-bottom: 8px;
+                            }
+                            .tag_land { background: #e0f2fe; color: #0369a1; }
+                            .tag_tree { background: #f0fdf4; color: #15803d; }
+                            .tag_structure { background: #fff7ed; color: #9a3412; }
+                            .top_totals_strip {
+                                display: grid;
+                                grid-template-columns: repeat(4, 1fr);
+                                gap: 12px;
+                                margin-bottom: 14px;
+                            }
+                            .top_total_card {
+                                position: relative;
+                                border-radius: 14px;
+                                border: 1px solid rgba(15, 23, 42, 0.06);
+                                background: #fff;
+                                padding: 12px 14px 12px 16px;
+                                box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+                                overflow: hidden;
+                                isolation: isolate;
+                                transition: transform 0.2s ease, box-shadow 0.25s ease;
+                            }
+                            .top_total_card::before {
+                                content: "";
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                bottom: 0;
+                                width: 5px;
+                                border-radius: 14px 0 0 14px;
+                            }
+                            .top_total_card::after {
+                                content: "";
+                                position: absolute;
+                                right: -30px;
+                                top: -40px;
+                                width: 110px;
+                                height: 110px;
+                                border-radius: 50%;
+                                opacity: 0.12;
+                                z-index: -1;
+                                transition: transform 0.3s ease, opacity 0.3s ease;
+                            }
+                            .top_total_link {
+                                display: block;
+                                text-decoration: none !important;
+                                color: inherit !important;
+                            }
+                            .top_total_link:hover .top_total_card {
+                                transform: translateY(-3px);
+                                box-shadow: 0 14px 28px -10px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255,255,255,0.9);
+                            }
+                            .top_total_link:hover .top_total_card::after {
+                                transform: scale(1.25);
+                                opacity: 0.18;
+                            }
+                            .top_total_link:hover .top_total_icon {
+                                transform: rotate(-6deg) scale(1.08);
+                            }
+                            .top_total_head {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                            }
+                            .top_total_icon {
+                                font-size: 14px;
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 10px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: #fff;
+                                box-shadow: 0 3px 8px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.25);
+                                transition: transform 0.25s ease;
+                                flex-shrink: 0;
+                            }
+                            .top_total_label {
+                                font-size: 0.66rem;
+                                font-weight: 700;
+                                letter-spacing: 0.6px;
+                                text-transform: uppercase;
+                                color: #475569;
+                                margin-bottom: 2px;
+                                line-height: 1.2;
+                            }
+                            .top_total_value {
+                                font-size: 1.25rem;
+                                font-weight: 800;
+                                margin-top: 6px;
+                                letter-spacing: 0.3px;
+                                font-variant-numeric: tabular-nums;
+                            }
+                            .top_total_land { background: linear-gradient(135deg, #ffffff 0%, #fdf4ec 100%); }
+                            .top_total_land::before { background: linear-gradient(180deg, #6a2d1d, #c1703d); }
+                            .top_total_land::after { background: #c1703d; }
+                            .top_total_land .top_total_icon { background: linear-gradient(135deg, #6a2d1d, #c1703d); }
+                            .top_total_land .top_total_value { color: #6a2d1d; }
+
+                            .top_total_tree { background: linear-gradient(135deg, #ffffff 0%, #f1f9f4 100%); }
+                            .top_total_tree::before { background: linear-gradient(180deg, #1c5037, #5aa87a); }
+                            .top_total_tree::after { background: #5aa87a; }
+                            .top_total_tree .top_total_icon { background: linear-gradient(135deg, #1c5037, #5aa87a); }
+                            .top_total_tree .top_total_value { color: #1c5037; }
+
+                            .top_total_structure { background: linear-gradient(135deg, #ffffff 0%, #fdf1ea 100%); }
+                            .top_total_structure::before { background: linear-gradient(180deg, #5c3324, #c47a52); }
+                            .top_total_structure::after { background: #c47a52; }
+                            .top_total_structure .top_total_icon { background: linear-gradient(135deg, #5c3324, #c47a52); }
+                            .top_total_structure .top_total_value { color: #5c3324; }
+
+                            .top_total_grand {
+                                background: linear-gradient(135deg, #f7efe9 0%, #ffffff 60%, #fdf4ec 100%);
+                                border-color: rgba(90, 42, 31, 0.18);
+                            }
+                            .top_total_grand::before { background: linear-gradient(180deg, #3d1c12, #8a4531); }
+                            .top_total_grand::after { background: #8a4531; }
+                            .top_total_grand .top_total_icon { background: linear-gradient(135deg, #3d1c12, #8a4531); }
+                            .top_total_grand .top_total_label { color: #3d1c12; }
+                            .top_total_grand .top_total_value {
+                                color: #3d1c12;
+                                font-size: 1.3rem;
+                            }
+                        </style>
+
+                        <!-- Premium Header Area -->
+                        <div class="simulator_header">
+                            <div>
+                                <h1 class="simulator_title_h1" style="font-size: 1.65rem;">Award Simulator</h1>
+                                <div style="opacity: 0.8; font-size: 0.9rem;">Comprehensive Land, Tree &amp; Structure Valuation Tool</div>
+                            </div>
+                            <div class="text-end">
+                                <div style="font-size: 1.2rem; font-weight: 800;">
+                                    <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                                <div style="opacity: 0.7; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;">Current Estimate / वर्तमान अनुमान</div>
+                            </div>
                         </div>
 
-                        <!-- Survey Type -->
-                        <group string="Survey Type / सर्वे प्रकार" col="2">
-                            <field name="survey_type" widget="radio" options="{'horizontal': true}"/>
-                        </group>
+                        <!-- Compact Top Totals (clear + highlighted) -->
+                        <div class="top_totals_strip">
+                            <a href="#section_land" class="top_total_link">
+                                <div class="top_total_card top_total_land">
+                                    <div class="top_total_head">
+                                        <span class="top_total_icon"><i class="fa fa-map-o" title="Go to Land section"/></span>
+                                        <div class="top_total_label">Land Total / भूमि कुल</div>
+                                    </div>
+                                    <div class="top_total_value">
+                                        <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#section_tree" class="top_total_link">
+                                <div class="top_total_card top_total_tree">
+                                    <div class="top_total_head">
+                                        <span class="top_total_icon"><i class="fa fa-tree" title="Go to Tree section"/></span>
+                                        <div class="top_total_label">Tree Total / वृक्ष कुल</div>
+                                    </div>
+                                    <div class="top_total_value">
+                                        <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#section_structure" class="top_total_link">
+                                <div class="top_total_card top_total_structure">
+                                    <div class="top_total_head">
+                                        <span class="top_total_icon"><i class="fa fa-building-o" title="Go to Structure section"/></span>
+                                        <div class="top_total_label">Structure Total / संरचना कुल</div>
+                                    </div>
+                                    <div class="top_total_value">
+                                        <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#section_configuration" class="top_total_link">
+                                <div class="top_total_card top_total_grand">
+                                    <div class="top_total_head">
+                                        <span class="top_total_icon"><i class="fa fa-calculator" title="Go to Configuration section"/></span>
+                                        <div class="top_total_label">Grand Total / कुल अवार्ड</div>
+                                    </div>
+                                    <div class="top_total_value">
+                                        <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
 
-                        <!-- Land Section -->
-                        <group string="Land Section / भूमि अनुभाग">
+                        <!-- 1. Input Section -->
+                        <details class="premium_card section-config" id="section_configuration" open="open">
+                            <summary class="section_banner sb_config">
+                                <div class="sb_left">
+                                    <span class="sb_icon"><i class="fa fa-sliders" title="Configuration"/></span>
+                                    <div>
+                                        <div class="sb_title">Configuration / कॉन्फ़िगरेशन</div>
+                                        <div class="sb_sub">Survey, Village &amp; Dates / सर्वे, ग्राम एवं तिथियाँ</div>
+                                    </div>
+                                </div>
+                                <div class="sb_right">
+                                    <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                                </div>
+                            </summary>
                             <group>
-                                <field name="village_id" options="{'no_create': true, 'no_open': true}"/>
-                                <field name="district_id" options="{'no_create': true, 'no_open': true}"/>
-                                <field name="distance_from_road"/>
-                                <field name="road_type" widget="radio" options="{'horizontal': true}"/>
-                                <field name="base_rate" readonly="village_id != False"/>
-                            </group>
-                            <group>
-                                <field name="is_diverted"/>
-                                <field name="irrigation_type" widget="radio" options="{'horizontal': true}"/>
-                                <field name="acquired_area"/>
-                            </group>
-                        </group>
-
-                        <!-- Dates Section -->
-                        <group string="Interest &amp; Timeline / ब्याज एवं समयरेखा">
-                            <group>
-                                <field name="section4_date"/>
-                                <field name="award_date"/>
-                            </group>
-                            <group>
-                                <field name="interest_rate_percent"/>
-                            </group>
-                        </group>
-
-                        <!-- Land Calculation Summary -->
-                        <group string="Land Award Calculation / भूमि अवार्ड गणना"
-                               invisible="acquired_area == 0">
-                            <group>
-                                <field name="effective_land_rate" readonly="1"/>
-                                <field name="land_award_amount" readonly="1"/>
-                                <field name="solatium_amount" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="interest_days" readonly="1" invisible="interest_days == 0"/>
-                                <field name="interest_amount" readonly="1" invisible="interest_amount == 0"/>
-                                <field name="land_total" readonly="1" class="fw-bold"/>
-                            </group>
-                        </group>
-
-                        <!-- Trees and Structures tabs -->
-                        <notebook>
-                            <page string="Trees / वृक्ष">
-                                <field name="tree_line_ids" nolabel="1">
-                                    <list editable="bottom" decoration-warning="condition == 'unsound'">
-                                        <field name="tree_master_id" options="{'no_create': true}"/>
-                                        <field name="tree_type" optional="show"/>
-                                        <field name="development_stage"/>
-                                        <field name="girth_cm"/>
-                                        <field name="condition"/>
-                                        <field name="quantity"/>
-                                        <field name="unit_rate" readonly="1"/>
-                                        <field name="line_total" readonly="1" sum="Tree Total"/>
-                                    </list>
-                                </field>
                                 <group>
-                                    <field name="tree_total" readonly="1" string="Tree Total (Rs.)"/>
+                                    <field name="survey_type" widget="radio" options="{'horizontal': true}"
+                                        help="Rural uses &lt; 20m threshold for Main Road; Urban uses &lt; 50m threshold. Affects whether Main Road or Beyond-Main-Road base rate is applied."/>
+                                    <field name="village_id" options="{'no_create': true, 'no_open': true}"
+                                        help="Auto-loads Base Rate per Hectare from the Land Rate Master (active record) for this village."/>
+                                    <field name="district_id" readonly="1" force_save="1"/>
                                 </group>
-                            </page>
-
-                            <page string="Structures / संरचनाएं">
-                                <field name="structure_line_ids" nolabel="1">
-                                    <list editable="bottom">
-                                        <field name="structure_type"/>
-                                        <field name="description"/>
-                                        <field name="quantity"/>
-                                        <field name="area_sqft"/>
-                                        <field name="unit_rate"/>
-                                        <field name="line_total" readonly="1" sum="Structure Total"/>
-                                    </list>
-                                </field>
                                 <group>
-                                    <field name="structure_total" readonly="1" string="Structure Total (Rs.)"/>
+                                    <field name="section4_date"
+                                        help="Start date for Interest computation under Section 30(2) of the LARR Act."/>
+                                    <field name="award_date"
+                                        help="End date for Interest computation. Interest accrues for (Award Date − Section 4 Date) days."/>
+                                    <field name="interest_rate_percent"
+                                        help="Interest applied on Market Value. Default 12% p.a. as per Section 30(2) LARR Act. Formula: Land Award × rate × (days ÷ 365.25)."/>
                                 </group>
-                            </page>
-
-                            <page string="Reference Rates / संदर्भ दरें" groups="base.group_system">
-                                <group string="Village Land Rates / ग्राम भूमि दरें">
-                                    <field name="reference_land_rate_ids" nolabel="1" readonly="1">
-                                        <list>
-                                            <field name="village_id"/>
-                                            <field name="main_road_rate_hectare"/>
-                                            <field name="other_road_rate_hectare"/>
-                                            <field name="state" widget="badge" decoration-success="state == 'active'"/>
-                                        </list>
-                                    </field>
-                                </group>
-                                <group string="Selected Tree Rates / चयनित वृक्ष दरें">
-                                    <field name="reference_tree_rate_ids" nolabel="1" readonly="1">
-                                        <list>
-                                            <field name="tree_master_id"/>
-                                            <field name="development_stage"/>
-                                            <field name="girth_range_min" string="Min Girth"/>
-                                            <field name="girth_range_max" string="Max Girth"/>
-                                            <field name="rate"/>
-                                        </list>
-                                    </field>
-                                </group>
-                            </page>
-                        </notebook>
-
-                        <!-- Grand Total -->
-                        <group string="Grand Total / कुल अवार्ड">
-                            <group>
-                                <field name="land_total" readonly="1" string="Land Total (Rs.)"/>
-                                <field name="tree_total" readonly="1" string="Tree Total (Rs.)"/>
-                                <field name="structure_total" readonly="1" string="Structure Total (Rs.)"/>
-                                <field name="user_id" readonly="1" groups="base.group_no_one"/>
                             </group>
+                        </details>
+
+                        <!-- 2. Land Section -->
+                        <details class="premium_card section-land" id="section_land" open="open">
+                            <summary class="section_banner sb_land">
+                                <div class="sb_left">
+                                    <span class="sb_icon"><i class="fa fa-map-o" title="Land Component"/></span>
+                                    <div>
+                                        <div class="sb_title">Land Component / भूमि घटक</div>
+                                        <div class="sb_sub">Acquired Land Compensation / अर्जित भूमि मुआवजा</div>
+                                    </div>
+                                </div>
+                                <div class="sb_right">
+                                    <div>
+                                        <div class="sb_sub">Subtotal / उप-योग</div>
+                                        <div style="font-size: 1.05rem; font-weight: 800;">
+                                            <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        </div>
+                                    </div>
+                                    <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                                </div>
+                            </summary>
+
+                            <!-- Impact factors at-a-glance -->
+                            <div class="impact_strip">
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-tint" title="Irrigated"/></span>
+                                    <div>
+                                        <div class="ic_label">Irrigated / सिंचित</div>
+                                        <div class="ic_value">+20% (×1.20)</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info / अधिक जानकारी"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Irrigation Impact</div>
+                                            <div class="ip_row"><span>Irrigated</span><span class="ip_val ip_pos">×1.20 (+20%)</span></div>
+                                            <div class="ip_row"><span>Unirrigated</span><span class="ip_val ip_neg">×0.80 (−20%)</span></div>
+                                            <div class="ip_row"><span>Applied on</span><span class="ip_val ip_neu">Base Rate</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip neg">
+                                    <span class="ic_icon"><i class="fa fa-exchange" title="Diverted"/></span>
+                                    <div>
+                                        <div class="ic_label">Diverted / विचलित</div>
+                                        <div class="ic_value">−20% (×0.80)</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info / अधिक जानकारी"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Diverted Land</div>
+                                            <div class="ip_row"><span>When checked</span><span class="ip_val ip_neg">×0.80 (−20%)</span></div>
+                                            <div class="ip_row"><span>Applied before</span><span class="ip_val ip_neu">Irrigation factor</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip neu">
+                                    <span class="ic_icon"><i class="fa fa-road" title="Road Type"/></span>
+                                    <div>
+                                        <div class="ic_label">Road Type / सड़क</div>
+                                        <div class="ic_value">MR vs MBR</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info / अधिक जानकारी"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Road Type Impact</div>
+                                            <div class="ip_row"><span>Rural MR</span><span class="ip_val ip_pos">distance ≤ 20 m</span></div>
+                                            <div class="ip_row"><span>Urban MR</span><span class="ip_val ip_pos">distance ≤ 50 m</span></div>
+                                            <div class="ip_row"><span>MR rate</span><span class="ip_val ip_neu">Main Road master</span></div>
+                                            <div class="ip_row"><span>MBR rate</span><span class="ip_val ip_neu">Other Road master</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-gavel" title="Solatium"/></span>
+                                    <div>
+                                        <div class="ic_label">Solatium / सॉलेशियम</div>
+                                        <div class="ic_value">+100%</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info / अधिक जानकारी"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Solatium (Sec. 30)</div>
+                                            <div class="ip_row"><span>Rate</span><span class="ip_val ip_pos">100% of Land Award</span></div>
+                                            <div class="ip_row"><span>Statutory</span><span class="ip_val ip_neu">LARR Act 2013</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <group>
-                                <field name="grand_total" readonly="1" string="Grand Total Award (Rs.)" class="oe_subtotal_footer_separator"/>
+                                <group string="Basic Inputs">
+                                    <field name="distance_from_road"
+                                        help="Determines Road Type automatically. Rural: ≤ 20 m → MR, else MBR. Urban: ≤ 50 m → MR, else MBR."/>
+                                    <field name="road_type" widget="radio" options="{'horizontal': true}"
+                                        help="MR uses the Main Road rate from the Land Rate Master; MBR uses the Other Road rate. Auto-computed from distance but can be overridden."/>
+                                    <field name="irrigation_type" widget="radio" options="{'horizontal': true}"
+                                        help="Irrigated: +20% (rate × 1.20). Unirrigated: −20% (rate × 0.80). Applied to the base rate after the Diverted-Land adjustment."/>
+                                    <field name="has_traded_land"
+                                        help="If the land is Diverted (Traded / व्यापारित), the rate is reduced by 20% (× 0.80)."/>
+                                    <field name="acquired_area" class="fw-bold text-primary"
+                                        help="Total acquired area in hectares. Land Award = Effective Rate × Area."/>
+                                </group>
+                                <group string="Rates &amp; Values">
+                                    <field name="base_rate" class="fw-bold"
+                                        help="Base Rate per Hectare. Auto-fetched from the Land Rate Master (active) for the selected village using MR/MBR; or enter manually."/>
+                                    <field name="effective_land_rate" widget="monetary" options="{'currency_field': 'currency_id'}"
+                                        help="Effective Rate = Base × (0.80 if Diverted) × (1.20 if Irrigated, else 0.80)."/>
+                                    <hr style="grid-column: span 2;"/>
+                                    <field name="land_award_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
+                                        help="Land Award = Effective Rate × Acquired Area."/>
+                                    <field name="solatium_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
+                                        help="Solatium = 100% of Land Award (LARR Act, Sec. 30)."/>
+                                    <field name="interest_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
+                                        help="Interest = Land Award × (rate% ÷ 100) × (Days ÷ 365.25). Days = Award Date − Section 4 Date."/>
+                                </group>
                             </group>
-                        </group>
+                            <div class="total_row d-flex justify-content-between align-items-center" style="background: linear-gradient(to right, #ffffff, #fdf4ec); border-left: 5px solid #7a3b28;">
+                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Land Compensation / कुल भूमि मुआवजा</span>
+                                <span style="font-size: 1.4rem; font-weight: 800; color: #7a3b28;">
+                                    <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </span>
+                            </div>
+                        </details>
+
+                        <!-- 3. Tree Section -->
+                        <details class="premium_card section-tree" id="section_tree" open="open">
+                            <summary class="section_banner sb_tree">
+                                <div class="sb_left">
+                                    <span class="sb_icon"><i class="fa fa-tree" title="Tree Valuation"/></span>
+                                    <div>
+                                        <div class="sb_title">Tree Valuation / वृक्ष मूल्यांकन</div>
+                                        <div class="sb_sub">Per-tree assessment / प्रति वृक्ष मूल्यांकन</div>
+                                    </div>
+                                </div>
+                                <div class="sb_right">
+                                    <div>
+                                        <div class="sb_sub">Subtotal / उप-योग</div>
+                                        <div style="font-size: 1.05rem; font-weight: 800;">
+                                            <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        </div>
+                                    </div>
+                                    <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                                </div>
+                            </summary>
+                            <field name="tree_line_ids" nolabel="1">
+                                <list editable="bottom" decoration-warning="condition == 'unsound'">
+                                    <field name="tree_master_id" options="{'no_create': true}"/>
+                                    <field name="tree_type" optional="show"/>
+                                    <field name="development_stage"/>
+                                    <field name="girth_cm"/>
+                                    <field name="condition"/>
+                                    <field name="quantity" sum="Total Quantity"/>
+                                    <field name="unit_rate" widget="monetary"/>
+                                    <field name="line_total" widget="monetary" sum="Tree Subtotal"/>
+                                </list>
+                            </field>
+                            <div class="total_row d-flex justify-content-between align-items-center mt-3" style="background: linear-gradient(to right, #ffffff, #f3faf6); border-left-color: #2f6d4f;">
+                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Tree Compensation / कुल वृक्ष मुआवजा</span>
+                                <span style="font-size: 1.4rem; font-weight: 800; color: #2f6d4f;">
+                                    <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </span>
+                            </div>
+                        </details>
+
+                        <!-- 4. Structure Section -->
+                        <details class="premium_card section-structure" id="section_structure" open="open">
+                            <summary class="section_banner sb_structure">
+                                <div class="sb_left">
+                                    <span class="sb_icon"><i class="fa fa-building-o" title="Structure Valuation"/></span>
+                                    <div>
+                                        <div class="sb_title">Structure Valuation / संरचना मूल्यांकन</div>
+                                        <div class="sb_sub">Buildings &amp; Assets / भवन एवं परिसम्पत्ति</div>
+                                    </div>
+                                </div>
+                                <div class="sb_right">
+                                    <div>
+                                        <div class="sb_sub">Subtotal / उप-योग</div>
+                                        <div style="font-size: 1.05rem; font-weight: 800;">
+                                            <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        </div>
+                                    </div>
+                                    <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                                </div>
+                            </summary>
+                            <field name="structure_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="structure_type"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="area_sqft"/>
+                                    <field name="unit_rate" widget="monetary"/>
+                                    <field name="line_total" widget="monetary" sum="Structure Subtotal"/>
+                                </list>
+                            </field>
+                            <div class="total_row d-flex justify-content-between align-items-center mt-3" style="background: linear-gradient(to right, #ffffff, #fef6f2); border-left-color: #8a4b36;">
+                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Structure Compensation / कुल संरचना मुआवजा</span>
+                                <span style="font-size: 1.4rem; font-weight: 800; color: #8a4b36;">
+                                    <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </span>
+                            </div>
+                        </details>
 
                     </sheet>
                 </form>

@@ -58,8 +58,8 @@ class Survey(models.Model):
     has_traded_land = fields.Selection([
         ('yes', 'Yes / हाँ'),
         ('no', 'No / नहीं'),
-    ], string='Has Traded Land / व्यापारित भूमि है', default='no', tracking=True,
-                                      help='Indicates if the land has been traded')
+    ], string='Diverted (Traded) Land / विचलित (व्यापारित) भूमि', default='no', tracking=True,
+                                      help='Indicates if the land is diverted (formerly traded land)')
     traded_land_area = fields.Float(string='Traded Land Area (Hectares) / व्यापारित भूमि क्षेत्रफल (हेक्टेयर)', 
                                     digits=(10, 4), tracking=True, default=0.0,
                                     help='Area of land that has been traded in hectares')

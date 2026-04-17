@@ -331,7 +331,6 @@ class Section23Award(models.Model):
                         'landowner': None,
                         'landowner_name': '',
                         'father_name': '',
-                        'caste': '',
                         'address': '',
                         'khasra': khasra,
                         'original_area': 0.0,
@@ -360,7 +359,6 @@ class Section23Award(models.Model):
                             'landowner': landowner,
                             'landowner_name': landowner.name or '',
                             'father_name': landowner.father_name or landowner.spouse_name or '',
-                            'caste': '',  # Caste not stored in model
                             'address': landowner.owner_address or '',
                             'khasra': khasra,
                             'original_area': 0.0,
@@ -383,19 +381,51 @@ class Section23Award(models.Model):
         
         # Convert to list and calculate totals
         result = []
+        # Convert to list and calculate totals matching the 19 columns
+        result = []
         for key, data in compensation_data.items():
-            # Calculate compensation amounts (placeholder - adjust based on actual rates)
-            guide_line_rate = 2112000.0  # Default rate from screenshot
-            market_value = data['acquired_area'] * guide_line_rate * 2  # Factor = 2
-            solatium = market_value  # 100% solatium
-            interest = market_value  # Interest calculation
-            total_compensation = market_value + solatium + interest
+            # Get survey to access proper rates if possible
+            survey = self.env['bhu.survey'].search([
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', self.village_id.id),
+                ('khasra_number', '=', data['khasra'])
+            ], limit=1)
             
-            data['guide_line_rate'] = guide_line_rate
-            data['market_value'] = market_value
-            data['solatium'] = solatium
-            data['interest'] = interest
-            data['total_compensation'] = total_compensation
+            # Use computed rate from award line if available
+            award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
+            guide_line_rate = award_line[0].rate_per_hectare if award_line else 2112000.0
+            
+            # Logic matching 19-column image:
+            # 13: basic_value = rate * area
+            # 14: market_value = basic_value * factor (2)
+            # 15: solatium = market_value * 1.0
+            # 16: interest = market_value * 12% * time (approximate or precise if dates available)
+            
+            market_value_basic = data['acquired_area'] * guide_line_rate
+            market_value_factored = market_value_basic * 2.0
+            solatium = market_value_factored * 1.0 # 100%
+            
+            interest = 0.0
+            if self.award_date and survey and survey.section4_id and survey.section4_id.notification_date:
+                days = (self.award_date - survey.section4_id.notification_date).days
+                if days > 0:
+                    interest = market_value_factored * (survey.interest_rate_percent / 100.0) * (days / 365.25)
+            
+            total_compensation = market_value_factored + solatium + interest
+            
+            data.update({
+                'guide_line_rate': guide_line_rate,
+                'basic_value': market_value_basic,
+                'market_value': market_value_factored,
+                'solatium': solatium,
+                'interest': interest,
+                'total_compensation': total_compensation,
+                'paid_compensation': max(total_compensation, 0.0),
+                'remark': '',
+                'original_area': survey.total_area if survey else 0.0,
+                'lagan': survey.lagan if (survey and hasattr(survey, 'lagan')) else data['khasra'],
+                'is_within_distance': award_line[0].is_within_distance if award_line else False,
+            })
             
             result.append(data)
         
@@ -457,7 +487,6 @@ class Section23Award(models.Model):
                             'landowner': None,
                             'landowner_name': '',
                             'father_name': '',
-                            'caste': '',
                             'khasra': khasra,
                             'total_khasra': '',
                             'total_area': 0.0,
@@ -488,7 +517,6 @@ class Section23Award(models.Model):
                                 'landowner': landowner,
                                 'landowner_name': landowner.name or '',
                                 'father_name': landowner.father_name or landowner.spouse_name or '',
-                                'caste': '',
                                 'khasra': khasra,
                                 'total_khasra': khasra,
                                 'total_area': survey.acquired_area or 0.0,
@@ -530,6 +558,84 @@ class Section23Award(models.Model):
         result.sort(key=lambda x: (x['landowner_name'] or '', x['khasra'] or '', x.get('tree_type', '') or ''))
         
         return result
+
+    def get_structure_compensation_data(self):
+        """Get structure compensation data (house, well, pond, shed) grouped by landowner and khasra"""
+        self.ensure_one()
+        surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+            ('state', 'in', ['approved', 'locked']),
+            ('khasra_number', '!=', False),
+        ])
+        if not surveys:
+            return []
+        
+        structure_data = []
+        for survey in surveys:
+            # Check if survey has any assets
+            assets = []
+            if survey.has_house == 'yes':
+                assets.append({'type': 'House / मकान', 'subtype': survey.house_type, 'area': survey.house_area, 'code': 1})
+            if survey.has_well == 'yes':
+                assets.append({'type': 'Well / कुआं', 'subtype': survey.well_type, 'area': survey.well_count, 'code': 2})
+            if getattr(survey, 'has_shed', 'no') == 'yes':
+                assets.append({'type': 'Shed / शेड', 'subtype': '', 'area': getattr(survey, 'shed_area', 0.0), 'code': 3})
+            if survey.has_pond == 'yes':
+                assets.append({'type': 'Pond / तालाब', 'subtype': '', 'area': 0.0, 'code': 4})
+            if getattr(survey, 'has_tubewell', 'no') == 'yes':
+                assets.append({'type': 'Tubewell / ट्यूबवेल', 'subtype': '', 'area': getattr(survey, 'tubewell_count', 0.0), 'code': 4})
+
+            if not assets:
+                continue
+
+            khasra = survey.khasra_number or ''
+            landowners = survey.landowner_ids if survey.landowner_ids else []
+            
+            for asset in assets:
+                if not landowners:
+                    structure_data.append({
+                        'landowner_name': '',
+                        'father_name': '',
+                        'total_khasra': khasra,
+                        'total_area': survey.total_area or 0.0,
+                        'asset_khasra': khasra,
+                        'asset_land_area': 0.0, # Placeholder
+                        'asset_type': asset['type'],
+                        'asset_code': asset['code'],
+                        'asset_dimension': asset['area'],
+                        'market_value': 0.0,
+                        'solatium': 0.0,
+                        'interest': 0.0,
+                        'total': 0.0,
+                        'remark': '',
+                    })
+                else:
+                    for landowner in landowners:
+                        # Calculation for structures (Solatium 100%, Interest 12%)
+                        market_value = 0.0 # Placeholder
+                        solatium = market_value * 1.0
+                        interest = 0.0 # Placeholder
+                        total = market_value + solatium + interest
+
+                        structure_data.append({
+                            'landowner_name': landowner.name or '',
+                            'father_name': landowner.father_name or landowner.spouse_name or '',
+                            'total_khasra': khasra,
+                            'total_area': survey.total_area or 0.0,
+                            'asset_khasra': khasra,
+                            'asset_land_area': 0.0, # Placeholder
+                            'asset_type': asset['type'],
+                            'asset_code': asset['code'],
+                            'asset_dimension': asset['area'],
+                            'market_value': market_value,
+                            'solatium': solatium,
+                            'interest': interest,
+                            'total': total,
+                            'remark': '',
+                        })
+        
+        return structure_data
 
 
 class Section23AwardSurveyLine(models.Model):
@@ -678,3 +784,160 @@ class Section23AwardSurveyLine(models.Model):
         
         return lines
 
+    def format_indian_number(self, value, decimals=2):
+        """Format number with Indian numbering system (commas for thousands)"""
+        if value is None:
+            value = 0.0
+        
+        # Format the number with commas (Indian numbering system)
+        if decimals == 2:
+            formatted = f"{value:,.2f}"
+        elif decimals == 4:
+            formatted = f"{value:,.4f}"
+        else:
+            formatted = f"{value:,.{decimals}f}"
+        
+        return formatted
+
+    def action_download_excel(self):
+        """Generate and download Excel report directly using xlsxwriter"""
+        self.ensure_one()
+        import io
+        import base64
+        try:
+            import xlsxwriter
+        except ImportError:
+            raise ValidationError(_("Python library 'xlsxwriter' is not installed."))
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        sheet = workbook.add_worksheet('Section 23 Award Summary')
+
+        # Formats
+        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#8B4513', 'color': 'white', 'border': 1, 'align': 'center', 'valign': 'vcenter'})
+        title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter'})
+        label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#f8fafc'})
+        value_fmt = workbook.add_format({'border': 1})
+        money_fmt = workbook.add_format({'border': 1, 'num_format': '₹#,##0.00'})
+        total_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'num_format': '₹#,##0.00'})
+
+        sheet.set_column('A:A', 10)
+        sheet.set_column('B:B', 40)
+        sheet.set_column('C:K', 15)
+
+        # Header
+        sheet.merge_range('A1:K1', 'SECTION 23 AWARD SUMMARY / धारा 23 अवार्ड सारांश', title_fmt)
+        sheet.write(2, 0, 'Village / ग्राम', label_fmt); sheet.write(2, 1, self.village_id.name or '', value_fmt)
+        sheet.write(3, 0, 'Project / परियोजना', label_fmt); sheet.write(3, 1, self.project_id.name or '', value_fmt)
+        sheet.write(4, 0, 'Award Date', label_fmt); sheet.write(4, 1, str(self.award_date or ''), value_fmt)
+
+        row = 6
+        # Land Section
+        sheet.merge_range(row, 0, row, 18, 'LAND COMPENSATION / भूमि मुआवजा (19 Columns Format)', header_fmt)
+        row += 1
+        headers = [
+            '1. क्र.', '2. भूमिस्वामी विवरण', '3. कुल खसरा', '4. कुल रकबा', '5. लगान', 
+            '6. अर्जित खसरा', '7. अर्जित रकबा', '8. लगान', '9. मुख्य मार्ग?', '10. असिंचित?', 
+            '11. सिंचित?', 'विगत तीन वर्षों का औसत बिक्री छांट दर', '12. गाइड लाइन दर', '13. मूल्य (Basic)', '14. बाजार मूल्य (Factor=2)', 
+            '15. सोलेशियन (100%)', '16. ब्याज (12%)', '17. कुल निर्धारित', '18. देय मुआवजा', '19. रिमार्क'
+        ]
+        for col, h in enumerate(headers):
+            sheet.write(row, col, h, label_fmt)
+        row += 1
+
+        land_data = self.get_land_compensation_data()
+        total_acquired = 0.0
+        total_basic = 0.0
+        total_market = 0.0
+        total_solatium = 0.0
+        total_interest = 0.0
+        total_comp = 0.0
+        total_paid = 0.0
+        
+        for i, land in enumerate(land_data, 1):
+            details = f"{land.get('landowner_name', '')} {land.get('father_name', '')} {land.get('address', '')}"
+            sheet.write(row, 0, i, value_fmt)
+            sheet.write(row, 1, details, value_fmt)
+            sheet.write(row, 2, land.get('khasra', ''), value_fmt)
+            sheet.write(row, 3, land.get('original_area', 0.0), value_fmt)
+            sheet.write(row, 4, land.get('lagan', ''), value_fmt)
+            sheet.write(row, 5, land.get('khasra', ''), value_fmt) # Acquired Khasra
+            sheet.write(row, 6, land.get('acquired_area', 0.0), value_fmt)
+            sheet.write(row, 7, land.get('lagan', ''), value_fmt)
+            sheet.write(row, 8, 'Yes' if land.get('is_within_distance') else 'No', value_fmt)
+            sheet.write(row, 9, 'Yes' if land.get('unirrigated') else 'No', value_fmt)
+            sheet.write(row, 10, 'Yes' if land.get('irrigated') else 'No', value_fmt)
+            sheet.write(row, 11, '', value_fmt) # 3 years avg sale rate
+            sheet.write(row, 12, land.get('guide_line_rate', 0.0), money_fmt)
+            sheet.write(row, 13, land.get('basic_value', 0.0), money_fmt)
+            sheet.write(row, 14, land.get('market_value', 0.0), money_fmt)
+            sheet.write(row, 15, land.get('solatium', 0.0), money_fmt)
+            sheet.write(row, 16, land.get('interest', 0.0), money_fmt)
+            sheet.write(row, 17, land.get('total_compensation', 0.0), money_fmt)
+            sheet.write(row, 18, land.get('paid_compensation', 0.0), money_fmt)
+            sheet.write(row, 19, land.get('remark', ''), value_fmt)
+            
+            total_acquired += land.get('acquired_area', 0.0)
+            total_basic += land.get('basic_value', 0.0)
+            total_market += land.get('market_value', 0.0)
+            total_solatium += land.get('solatium', 0.0)
+            total_interest += land.get('interest', 0.0)
+            total_comp += land.get('total_compensation', 0.0)
+            total_paid += land.get('paid_compensation', 0.0)
+            row += 1
+
+        # Land Total row
+        sheet.merge_range(row, 0, row, 5, 'MAHAYOG (TOTAL) / महायोग', label_fmt)
+        sheet.write(row, 6, total_acquired, total_fmt)
+        sheet.write(row, 13, total_basic, total_fmt)
+        sheet.write(row, 14, total_market, total_fmt)
+        sheet.write(row, 15, total_solatium, total_fmt)
+        sheet.write(row, 16, total_interest, total_fmt)
+        sheet.write(row, 17, total_comp, total_fmt)
+        sheet.write(row, 18, total_paid, total_fmt)
+        
+        row += 2
+        # Tree Section (Brief)
+        sheet.merge_range(row, 0, row, 10, 'TREE COMPENSATION / वृक्ष मुआवजा', header_fmt)
+        row += 1
+        tree_data = self.get_tree_compensation_data()
+        if tree_data:
+            headers = ['S.No.', 'Landowner Name', 'Khasra', 'Tree Type', 'Count', 'Value', 'Solatium', 'Interest', 'Total']
+            for col, h in enumerate(headers):
+                sheet.write(row, col, h, label_fmt)
+            row += 1
+            
+            total_tree_comp = 0.0
+            for i, tree in enumerate(tree_data, 1):
+                sheet.write(row, 0, i, value_fmt)
+                sheet.write(row, 1, tree.get('landowner_name', ''), value_fmt)
+                sheet.write(row, 2, tree.get('khasra', ''), value_fmt)
+                sheet.write(row, 3, tree.get('tree_type', ''), value_fmt)
+                sheet.write(row, 4, tree.get('tree_count', 0), value_fmt)
+                sheet.write(row, 5, tree.get('determined_value', 0.0), money_fmt)
+                sheet.write(row, 6, tree.get('solatium', 0.0), money_fmt)
+                sheet.write(row, 7, tree.get('interest', 0.0), money_fmt)
+                sheet.write(row, 8, tree.get('total', 0.0), money_fmt)
+                total_tree_comp += tree.get('total', 0.0)
+                row += 1
+            
+            sheet.merge_range(row, 0, row, 7, 'TOTAL TREE COMPENSATION', label_fmt)
+            sheet.write(row, 8, total_tree_comp, total_fmt)
+
+        workbook.close()
+        output.seek(0)
+        file_data = base64.b64encode(output.read())
+        output.close()
+
+        attachment = self.env['ir.attachment'].create({
+            'name': f"Section23_Award_{self.village_id.name or 'Export'}.xlsx",
+            'type': 'binary',
+            'datas': file_data,
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }

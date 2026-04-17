@@ -194,7 +194,7 @@ class Section23Award(models.Model):
         return {
             'name': _('Download Section 23 Award / धारा 23 अवार्ड डाउनलोड करें'),
             'type': 'ir.actions.act_window',
-            'res_model': 'sia.download.wizard',
+            'res_model': 'bhu.award.download.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {
@@ -292,6 +292,66 @@ class Section23Award(models.Model):
         self.ensure_one()
         self.write({'state': 'sent_back'})
         self.message_post(body=_("Award sent back for correction."))
+
+    def _get_section4_approval_date(self):
+        """Return section 4 approval date for this project/village."""
+        self.ensure_one()
+        if not self.project_id or not self.village_id:
+            return False
+        section4_records = self.env['bhu.section4.notification'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+        ], order='approved_date desc, signed_date desc, id desc', limit=10)
+        for section4 in section4_records:
+            for candidate in (
+                section4.approved_date,
+                section4.signed_date,
+                section4.public_hearing_date,
+                section4.public_hearing_datetime,
+                section4.create_date,
+            ):
+                if candidate:
+                    if isinstance(candidate, str):
+                        return fields.Date.to_date(candidate)
+                    if hasattr(candidate, 'date'):
+                        return candidate.date()
+                    return candidate
+        return False
+
+    def _get_award_calculation_date(self):
+        """Return award creation date used for interest end date."""
+        self.ensure_one()
+        if self.create_date:
+            return fields.Datetime.to_datetime(self.create_date).date()
+        if self.award_date:
+            return fields.Date.to_date(self.award_date)
+        return fields.Date.context_today(self)
+
+    def _calculate_interest_on_basic(self, basic_value):
+        """Calculate 12% annual interest on basic value."""
+        self.ensure_one()
+        start_date = self._get_section4_approval_date()
+        end_date = self._get_award_calculation_date()
+        if not start_date or not end_date or not basic_value:
+            return 0.0, 0
+        if end_date < start_date:
+            start_date, end_date = end_date, start_date
+        days = (end_date - start_date).days
+        if days <= 0:
+            return 0.0, 0
+        interest = basic_value * 0.12 * (days / 365.25)
+        return interest, days
+
+    def get_interest_period_note(self):
+        """Text note for report header interest period."""
+        self.ensure_one()
+        start_date = self._get_section4_approval_date()
+        end_date = self._get_award_calculation_date()
+        if start_date and end_date:
+            if end_date < start_date:
+                start_date, end_date = end_date, start_date
+            return f"{start_date.strftime('%d/%m/%Y')} से {end_date.strftime('%d/%m/%Y')} तक"
+        return "धारा 4 स्वीकृति दिनांक से अवार्ड दिनांक तक"
     
     def get_land_compensation_data(self):
         """Get land compensation data grouped by landowner and khasra"""
@@ -399,17 +459,13 @@ class Section23Award(models.Model):
             # 13: basic_value = rate * area
             # 14: market_value = basic_value * factor (2)
             # 15: solatium = market_value * 1.0
-            # 16: interest = market_value * 12% * time (approximate or precise if dates available)
+            # 16: interest = basic value * 12% from section 4 approval to award date
             
             market_value_basic = data['acquired_area'] * guide_line_rate
             market_value_factored = market_value_basic * 2.0
             solatium = market_value_factored * 1.0 # 100%
             
-            interest = 0.0
-            if self.award_date and survey and survey.section4_id and survey.section4_id.notification_date:
-                days = (self.award_date - survey.section4_id.notification_date).days
-                if days > 0:
-                    interest = market_value_factored * (survey.interest_rate_percent / 100.0) * (days / 365.25)
+            interest, _days = self._calculate_interest_on_basic(market_value_basic)
             
             total_compensation = market_value_factored + solatium + interest
             
@@ -432,6 +488,52 @@ class Section23Award(models.Model):
         # Sort by landowner name, then khasra
         result.sort(key=lambda x: (x['landowner_name'] or '', x['khasra'] or ''))
         
+        return result
+
+    def get_land_compensation_grouped_data(self):
+        """Group land rows by owner so multiple khasras appear together."""
+        self.ensure_one()
+        land_data = self.get_land_compensation_data()
+        grouped = {}
+        ordered_keys = []
+        numeric_totals = (
+            'original_area', 'acquired_area', 'basic_value', 'market_value',
+            'solatium', 'interest', 'total_compensation', 'paid_compensation',
+        )
+        for row in land_data:
+            owner = row.get('landowner')
+            if owner:
+                key = ('owner', owner.id)
+            elif row.get('landowner_name'):
+                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+            else:
+                key = ('khasra', row.get('khasra') or '')
+            if key not in grouped:
+                grouped[key] = {
+                    'landowner_name': row.get('landowner_name', ''),
+                    'father_name': row.get('father_name', ''),
+                    'address': row.get('address', ''),
+                    'lines': [],
+                    'khasra_count': 0,
+                    'khasra_seen': set(),
+                }
+                for field_name in numeric_totals:
+                    grouped[key][field_name] = 0.0
+                ordered_keys.append(key)
+            group = grouped[key]
+            group['lines'].append(row)
+            khasra = row.get('khasra') or ''
+            if khasra and khasra not in group['khasra_seen']:
+                group['khasra_seen'].add(khasra)
+                group['khasra_count'] += 1
+            for field_name in numeric_totals:
+                group[field_name] += row.get(field_name, 0.0) or 0.0
+
+        result = []
+        for key in ordered_keys:
+            group = grouped[key]
+            group.pop('khasra_seen', None)
+            result.append(group)
         return result
     
     def format_indian_number(self, value, decimals=2):
@@ -502,10 +604,11 @@ class Section23Award(models.Model):
                             'total': 0.0,
                             'remark': '',
                         }
+                    rate_per_tree = tree_line.get_applicable_rate()
                     tree_data[key]['tree_count'] += tree_line.quantity or 0
                     tree_data[key]['girth_cm'] = tree_line.girth_cm or 0.0
-                    tree_data[key]['rate'] = tree_line.rate_per_tree or 0.0
-                    tree_data[key]['value'] += (tree_line.quantity or 0) * (tree_line.rate_per_tree or 0.0)
+                    tree_data[key]['rate'] = rate_per_tree
+                    tree_data[key]['value'] += (tree_line.quantity or 0) * rate_per_tree
             else:
                 # Process each landowner
                 for landowner in landowners:
@@ -636,6 +739,87 @@ class Section23Award(models.Model):
                         })
         
         return structure_data
+
+    def get_tree_compensation_grouped_data(self):
+        """Group tree rows by owner for report rowspans/subtotals."""
+        self.ensure_one()
+        tree_data = self.get_tree_compensation_data()
+        grouped = {}
+        ordered_keys = []
+        numeric_totals = ('total_area', 'tree_count', 'value', 'solatium', 'interest', 'total')
+        for row in tree_data:
+            owner = row.get('landowner')
+            if owner:
+                key = ('owner', owner.id)
+            elif row.get('landowner_name'):
+                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+            else:
+                key = ('khasra', row.get('khasra') or '')
+            if key not in grouped:
+                grouped[key] = {
+                    'landowner_name': row.get('landowner_name', ''),
+                    'father_name': row.get('father_name', ''),
+                    'lines': [],
+                    'khasra_count': 0,
+                    'khasra_seen': set(),
+                }
+                for field_name in numeric_totals:
+                    grouped[key][field_name] = 0.0
+                ordered_keys.append(key)
+            group = grouped[key]
+            group['lines'].append(row)
+            khasra = row.get('khasra') or ''
+            if khasra and khasra not in group['khasra_seen']:
+                group['khasra_seen'].add(khasra)
+                group['khasra_count'] += 1
+            for field_name in numeric_totals:
+                group[field_name] += row.get(field_name, 0.0) or 0.0
+
+        result = []
+        for key in ordered_keys:
+            group = grouped[key]
+            group.pop('khasra_seen', None)
+            result.append(group)
+        return result
+
+    def get_structure_compensation_grouped_data(self):
+        """Group structure rows by owner for report rowspans/subtotals."""
+        self.ensure_one()
+        structure_data = self.get_structure_compensation_data()
+        grouped = {}
+        ordered_keys = []
+        numeric_totals = ('total_area', 'asset_land_area', 'asset_dimension', 'market_value', 'solatium', 'interest', 'total')
+        for row in structure_data:
+            if row.get('landowner_name'):
+                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+            else:
+                key = ('khasra', row.get('asset_khasra') or '')
+            if key not in grouped:
+                grouped[key] = {
+                    'landowner_name': row.get('landowner_name', ''),
+                    'father_name': row.get('father_name', ''),
+                    'lines': [],
+                    'khasra_count': 0,
+                    'khasra_seen': set(),
+                }
+                for field_name in numeric_totals:
+                    grouped[key][field_name] = 0.0
+                ordered_keys.append(key)
+            group = grouped[key]
+            group['lines'].append(row)
+            khasra = row.get('asset_khasra') or row.get('total_khasra') or ''
+            if khasra and khasra not in group['khasra_seen']:
+                group['khasra_seen'].add(khasra)
+                group['khasra_count'] += 1
+            for field_name in numeric_totals:
+                group[field_name] += row.get(field_name, 0.0) or 0.0
+
+        result = []
+        for key in ordered_keys:
+            group = grouped[key]
+            group.pop('khasra_seen', None)
+            result.append(group)
+        return result
 
 
 class Section23AwardSurveyLine(models.Model):

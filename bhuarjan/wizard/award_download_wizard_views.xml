@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_award_download_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.award.download.wizard.form</field>
+        <field name="model">bhu.award.download.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Award Summary / अवार्ड सारांश डाउनलोड करें">
+                <group>
+                    <field name="res_model" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                    <field name="report_xml_id" invisible="1"/>
+                    <field name="filename" invisible="1"/>
+                    <field name="format" widget="radio" string="Select Download Format / डाउनलोड प्रारूप चुनें"/>
+                </group>
+                <footer>
+                    <button string="Download / डाउनलोड करें" name="action_download" type="object" class="btn-primary"/>
+                    <button string="Cancel / रद्द करें" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

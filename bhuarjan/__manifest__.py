@@ -74,6 +74,7 @@
         'views/sia_team_member_views.xml',
         'wizard/sia_send_back_wizard.xml',
         'wizard/sia_download_wizard_views.xml',
+        'wizard/award_download_wizard_views.xml',
         'wizard/process_send_back_wizard.xml',
         'wizard/section8_approve_reject_wizard.xml',
         'wizard/reject_survey_wizard_views.xml',
@@ -137,10 +138,6 @@
         'views/debrand_views.xml',
         # Password eyes icon views (merged from password_eyes_icon module)
         'views/password_eyes_templates.xml',
-        # Widget Owl (merged from widget_owl module)
-        'views/widget_owl_res_partner.xml',
-
-
     ],
     'assets': {
         'web.assets_backend': [
@@ -169,6 +166,9 @@
             'bhuarjan/static/src/dashboard/css/group_dashboard.css',
             'bhuarjan/static/src/dashboard/xml/group_dashboard.xml',
             'bhuarjan/static/src/dashboard/js/group_dashboard.js',
+            # Unified theme overlay – must load LAST so it wins over
+            # per-dashboard CSS (admin/sdm/group).
+            'bhuarjan/static/src/dashboard/css/dashboards_unified_theme.css',
             # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
 
@@ -192,10 +192,6 @@
             'bhuarjan/static/src/xml/timepicker.xml',
             'bhuarjan/static/src/css/timepicker.css',
             'bhuarjan/static/src/js/timepicker.js',
-            # Widget Owl (merged from widget_owl module)
-            'bhuarjan/static/src/js/components/list_renderer.js',
-            'bhuarjan/static/src/js/components/one2many_field_dialoge.js',
-            'bhuarjan/static/src/js/components/popup.js',
             # Image Capture Widget (merged from image_capture_upload_widget module)
             # 'bhuarjan/static/src/scss/image_capture.scss',
             # 'bhuarjan/static/src/js/components/image_capture.js',
@@ -205,7 +201,6 @@
             'bhuarjan/static/src/xml/image_capture_templates.xml',
             # Project Timeline Widget
             'bhuarjan/static/src/scss/project_timeline.scss',
-            'bhuarjan/static/src/js/components/project_timeline.js',
             'bhuarjan/static/src/js/components/project_timeline.js',
             'bhuarjan/static/src/xml/project_timeline.xml',
             # KML Viewer Component

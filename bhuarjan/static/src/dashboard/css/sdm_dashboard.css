@@ -1311,14 +1311,20 @@
 .o_section_list_item:hover {
     background: var(--bd-surface) !important;
     border-color: rgba(138, 69, 49, 0.35) !important;
-    box-shadow: var(--bd-shadow-md) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 26px rgba(138, 69, 49, 0.2), 0 0 0 2px rgba(205, 132, 75, 0.18) !important;
+    transform: translateY(-2px) scale(1.004) !important;
 }
 
 .o_section_list_item.o_card_no_click:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: var(--bd-shadow-sm) !important;
-    border-color: var(--bd-border) !important;
+    background: var(--bd-surface) !important;
+    border-color: rgba(138, 69, 49, 0.35) !important;
+    box-shadow: 0 10px 26px rgba(138, 69, 49, 0.2), 0 0 0 2px rgba(205, 132, 75, 0.18) !important;
+    transform: translateY(-2px) scale(1.004) !important;
+}
+
+.o_section_list_item:hover::before,
+.o_section_list_item.o_card_no_click:hover::before {
+    opacity: 0.95;
 }
 
 /* Step badge → clean side tab flush with card edges */
@@ -1351,11 +1357,18 @@
     pointer-events: none;
 }
 
-.o_step_number {
+.o_step_number,
+.o_step_number *,
+.o_section_list_step .o_step_number,
+.o_section_list_step .o_step_number * {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
     color: #fff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.o_step_number {
     font-size: 13px !important;
     font-weight: 800 !important;
     letter-spacing: 0.6px !important;
@@ -1364,7 +1377,6 @@
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     text-transform: uppercase;
     line-height: 1.15 !important;
     text-align: center;
@@ -1389,20 +1401,23 @@
 
 /* Section icon pill */
 .o_section_list_icon {
-    width: 42px !important;
-    height: 42px !important;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--bd-brand-soft) 0%, #fff 100%);
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    border: none !important;
     color: var(--bd-brand-700) !important;
-    box-shadow: inset 0 0 0 1px rgba(138, 69, 49, 0.18), 0 2px 6px rgba(138, 69, 49, 0.08);
+    box-shadow: none !important;
     align-self: center;
     margin-left: 4px;
     font-size: 18px !important;
-    transition: transform 0.2s ease;
+    padding: 0 !important;
+    min-width: 0 !important;
+    transition: none !important;
 }
 
 .o_section_list_item:hover .o_section_list_icon {
-    transform: scale(1.06) rotate(-3deg);
+    transform: none !important;
 }
 
 .o_section_list_item .o_section_list_icon .fa-clipboard {
@@ -1454,14 +1469,24 @@
 /* Count badges → soft rounded chips */
 .o_count_badge {
     border-radius: 999px !important;
-    padding: 2px 8px !important;
+    padding: 2px 9px !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     line-height: 1.4 !important;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
     border: 1px solid transparent;
+}
+
+.o_count_badge i,
+.o_count_badge .fa {
+    font-family: "FontAwesome" !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    color: inherit !important;
+    font-weight: normal !important;
 }
 
 .o_count_draft {
@@ -1505,8 +1530,16 @@
     transition: transform 0.12s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
-.o_section_list_actions .btn i {
+.o_section_list_actions .btn i,
+.o_section_list_actions .btn .fa {
     margin-right: 4px;
+    font-family: "FontAwesome" !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    color: inherit !important;
+    vertical-align: middle;
 }
 
 .o_section_list_actions .btn:hover {

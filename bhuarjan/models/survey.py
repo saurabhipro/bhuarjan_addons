@@ -987,6 +987,38 @@ class SurveyTreeLine(models.Model):
             if record.quantity and record.quantity <= 0:
                 raise ValidationError(_('Tree quantity must be greater than 0.'))
 
+    def _fallback_rate(self):
+        """Coarse fallback when no master rate matches (keeps reports working)."""
+        self.ensure_one()
+        return 6000.0 if self.tree_type == 'fruit_bearing' else 177.0
+
+    def get_applicable_rate(self):
+        """Return the applicable per-tree rate from ``bhu.tree.rate.master``.
+
+        Looked up by tree_master_id + development_stage + girth range.
+        Falls back to a coarse rate when no master entry matches, so callers
+        (award simulator, Section 23 report, downloads) never crash.
+        """
+        self.ensure_one()
+        if not self.tree_master_id:
+            return self._fallback_rate()
+        domain = [
+            ('tree_master_id', '=', self.tree_master_id.id),
+            ('active', '=', True),
+        ]
+        if self.development_stage:
+            domain.append(('development_stage', '=', self.development_stage))
+        rates = self.env['bhu.tree.rate.master'].search(domain)
+        if not rates:
+            return self._fallback_rate()
+        girth = self.girth_cm or 0.0
+        for rate in rates:
+            lo = rate.girth_range_min or 0.0
+            hi = rate.girth_range_max
+            if girth >= lo and (not hi or girth <= hi):
+                return rate.rate or self._fallback_rate()
+        return rates[0].rate or self._fallback_rate()
+
 
 class SurveyLine(models.Model):
     _name = 'bhu.survey.line'

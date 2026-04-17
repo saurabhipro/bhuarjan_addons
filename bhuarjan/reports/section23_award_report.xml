@@ -13,12 +13,14 @@
                 position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
                 opacity: 0.1; font-size: 80px; color: #ccc; z-index: -1000; width: 100%; text-align: center;
             }
-            .watermark img { width: 400px; height: auto; }
+            .watermark img { width: 400px; height: auto; border: none !important; outline: none !important; box-shadow: none !important; }
+            .container img { border: none !important; outline: none !important; box-shadow: none !important; }
             .letter_space { letter-spacing: 0.5px; }
             table { border-collapse: collapse; width: 100%; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             th { background-color: #f2f2f2; font-weight: bold; border: 1px solid #000; padding: 4px; font-size: 10px; }
             td { border: 1px solid #000; padding: 3px; font-size: 9px; vertical-align: middle; }
+            .award-hdr-note { font-size: 8px; line-height: 1.15; font-weight: 700; display: block; margin-top: 2px; color: #222; }
             .total-row { background-color: #e8eaf6; font-weight: bold; }
             .section-signatures { width: 100%; margin-top: 14px; border: none; }
             .section-signatures td {
@@ -77,9 +79,12 @@
         <t t-call="web.html_container">
             <meta charset="utf-8"/>
             <t t-foreach="docs" t-as="o">
-                <t t-set="land_data" t-value="o.get_land_compensation_data() if o._name == 'bhu.section23.award' else o.get_land_compensation_data()"/>
+                <t t-set="land_data" t-value="o.get_land_compensation_data()"/>
+                <t t-set="land_groups" t-value="o.get_land_compensation_grouped_data()"/>
                 <t t-set="tree_data" t-value="o.get_tree_compensation_data()"/>
                 <t t-set="asset_data" t-value="o.get_structure_compensation_data()"/>
+                <t t-set="tree_groups" t-value="o.get_tree_compensation_grouped_data()"/>
+                <t t-set="asset_groups" t-value="o.get_structure_compensation_grouped_data()"/>
                 <t t-call="bhuarjan.report_common_styles"/>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
@@ -94,6 +99,9 @@
                         </div>
 
                         <div style="text-align: center; margin-bottom: 10px;">
+                            <div style="margin-bottom: 6px;">
+                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
+                            </div>
                             <h2 style="margin: 0;">अर्जित भूमि का मुआवजा पत्रक</h2>
                             <div style="font-size: 11px; margin-top: 5px;">
                                 मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
@@ -109,63 +117,95 @@
                                 <tr>
                                     <th rowspan="2">1. <br/> क्र.</th>
                                     <th rowspan="2" style="width: 120px;">2. <br/> भूमिस्वामी विवरण</th>
-                                    <th colspan="3">अर्जित भूमि का विवरण</th>
-                                    <th colspan="3">अर्जित भूमि का विवरण</th>
-                                    <th rowspan="2">9. <br/> मुख्य मार्ग?</th>
-                                    <th rowspan="2">10. <br/> असिंचित?</th>
-                                    <th rowspan="2">11. <br/> सिंचित?</th>
+                                    <th colspan="2">अर्जित भूमि का विवरण</th>
+                                    <th colspan="2">अर्जित भूमि का विवरण</th>
+                                    <th colspan="2">मुख्य मार्ग के अंतर्गत</th>
                                     <th rowspan="2">विगत तीन वर्षों का औसत बिक्री छांट दर</th>
-                                    <th rowspan="2">12. <br/> गाइड लाइन दर</th>
-                                    <th rowspan="2">13. <br/> मूल्य (Basic)</th>
-                                    <th rowspan="2">14. <br/> बाजार मूल्य (Factor=2)</th>
-                                    <th rowspan="2">15. <br/> सोलेशियन (100%)</th>
-                                    <th rowspan="2">16. <br/> ब्याज (12%)</th>
-                                    <th rowspan="2">17. <br/> कुल निर्धारित</th>
-                                    <th rowspan="2">18. <br/> देय मुआवजा</th>
+                                    <th rowspan="2">10. <br/> गाइड लाइन दर</th>
+                                    <th rowspan="2">11. <br/> मूल्य (Basic)</th>
+                                    <th rowspan="2">12. <br/> बाजार मूल्य (Factor=2)</th>
+                                    <th rowspan="2">13. <br/> सोलेशियम (100%)
+                                        <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
+                                    </th>
+                                    <th rowspan="2">14. <br/> ब्याज (12%)
+                                        <span class="award-hdr-note" t-esc="o.get_interest_period_note()"/>
+                                    </th>
+                                    <th rowspan="2">17. <br/> मुआवजा राशि
+                                        <span class="award-hdr-note">यदि 6,8,16 एवं 17 में से देय</span>
+                                        <span class="award-hdr-note">मुआवजा राशि</span>
+                                    </th>
+                                    <th rowspan="2">18. <br/> देय मुआवजा
+                                        <span class="award-hdr-note">न्यूनतम राशि लागू</span>
+                                    </th>
                                     <th rowspan="2">19. <br/> रिमार्क</th>
                                 </tr>
                                 <tr>
                                     <th>3. <br/> कुल खसरा</th>
                                     <th>4. <br/> कुल रकबा</th>
-                                    <th>5. <br/> लगान</th>
-                                    <th>6. <br/> अर्जित खसरा</th>
-                                    <th>7. <br/> अर्जित रकबा</th>
-                                    <th>8. <br/> लगान</th>
+                                    <th>5. <br/> अर्जित खसरा</th>
+                                    <th>6. <br/> अर्जित रकबा</th>
+                                    <th>8. <br/> सिंचित?</th>
+                                    <th>9. <br/> असिंचित?</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-set="serial" t-value="1"/>
-                                <t t-foreach="land_data" t-as="land">
-                                    <tr>
-                                        <td style="text-align: center;" t-esc="serial"/>
-                                        <td>
-                                            <span t-esc="land.get('landowner_name', '')"/><br/>
-                                            <t t-if="land.get('father_name')">पिता/पति: <span t-esc="land.get('father_name')"/></t>
-                                        </td>
-                                        <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('original_area', 0.0), 3)"/>
-                                        <td style="text-align: center;" t-esc="land.get('lagan', '')"/>
-                                        <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 3)"/>
-                                        <td style="text-align: center;" t-esc="land.get('lagan', '')"/>
-                                        <td style="text-align: center;" t-esc="'हाँ' if land.get('is_within_distance') else 'नहीं'"/>
-                                        <td style="text-align: center;" t-esc="'हाँ' if land.get('unirrigated') else 'नहीं'"/>
-                                        <td style="text-align: center;" t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
-                                        <td style="text-align: center;">-</td>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
-                                        <td style="text-align: right;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
-                                        <td t-esc="land.get('remark', '')"/>
+                                <t t-foreach="land_groups" t-as="group">
+                                    <t t-set="group_lines" t-value="group.get('lines')"/>
+                                    <t t-set="line_count" t-value="len(group_lines)"/>
+                                    <t t-foreach="group_lines" t-as="land">
+                                        <tr>
+                                            <td t-if="land_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
+                                            <td t-if="land_index == 0" t-att-rowspan="line_count">
+                                                <span t-esc="group.get('landowner_name', '')"/><br/>
+                                                <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
+                                            </td>
+                                            <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('original_area', 0.0), 3)"/>
+                                            <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 3)"/>
+                                            <td style="text-align: center;">
+                                                <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('irrigated') else 'color:#c62828;font-weight:700;'"
+                                                      t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('unirrigated') else 'color:#c62828;font-weight:700;'"
+                                                      t-esc="'हाँ' if land.get('unirrigated') else 'नहीं'"/>
+                                            </td>
+                                            <td style="text-align: center;">-</td>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
+                                            <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
+                                            <td t-esc="land.get('remark', '')"/>
+                                        </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('original_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('acquired_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;">-</td>
+                                        <td style="text-align: center; font-weight: bold;">-</td>
+                                        <td style="text-align: center; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
+                                        <td></td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
-                                <t t-if="not land_data">
+                                <t t-if="not land_groups">
                                     <tr>
-                                        <td colspan="20" style="text-align: center; font-style: italic;">
+                                        <td colspan="17" style="text-align: center; font-style: italic;">
                                             No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)
                                         </td>
                                     </tr>
@@ -187,6 +227,9 @@
                             </div>
 
                             <div style="text-align: center; margin-bottom: 10px;">
+                                <div style="margin-bottom: 6px;">
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
+                                </div>
                                 <h2 style="margin: 0;">अर्जित भूमि पर स्थित परिसम्पत्तियों का मुआवजा पत्रक</h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
@@ -221,12 +264,15 @@
                                 </thead>
                             <tbody>
                                 <t t-set="serial" t-value="1"/>
-                                <t t-foreach="asset_data" t-as="asset">
+                                <t t-foreach="asset_groups" t-as="group">
+                                    <t t-set="group_lines" t-value="group.get('lines')"/>
+                                    <t t-set="line_count" t-value="len(group_lines)"/>
+                                    <t t-foreach="group_lines" t-as="asset">
                                         <tr>
-                                            <td style="text-align: center;" t-esc="serial"/>
-                                            <td>
-                                                <span t-esc="asset.get('landowner_name', '')"/><br/>
-                                                <t t-if="asset.get('father_name')">पिता/पति: <span t-esc="asset.get('father_name')"/></t>
+                                            <td t-if="asset_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
+                                            <td t-if="asset_index == 0" t-att-rowspan="line_count">
+                                                <span t-esc="group.get('landowner_name', '')"/><br/>
+                                                <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
                                             <td style="text-align: center;" t-esc="asset.get('total_khasra', '')"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('total_area', 0.0), 3)"/>
@@ -242,9 +288,24 @@
                                             <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(asset.get('total', 0.0), 0)"/>
                                             <td t-esc="asset.get('remark', '')"/>
                                         </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td></td>
+                                    </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
-                                <t t-if="not asset_data">
+                                <t t-if="not asset_groups">
                                     <tr>
                                         <td colspan="13" style="text-align: center; font-style: italic;">
                                             No asset/structure data available / परिसम्पत्ति डेटा उपलब्ध नहीं है (Blank)
@@ -268,6 +329,9 @@
                             </div>
 
                             <div style="text-align: center; margin-bottom: 10px;">
+                                <div style="margin-bottom: 6px;">
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
+                                </div>
                                 <h2 style="margin: 0;">वृक्षों का मुआवजा पत्रक</h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
@@ -284,49 +348,70 @@
                                         <th rowspan="2" style="width: 30px;">1.<br/>क्र.</th>
                                         <th rowspan="2" style="width: 150px;">2.<br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
                                         <th colspan="2">अर्जित भूमि का विवरण</th>
-                                        <th colspan="2">भूमि जिस पर वृक्ष स्थित है, का विवरण</th>
-                                        <th rowspan="2">7.<br/>गोलाई</th>
-                                        <th colspan="3">8. निर्धारित मूल्य</th>
-                                        <th rowspan="2">9.<br/>सोलेशियम 100%</th>
-                                        <th rowspan="2">10.<br/>12% ब्याज</th>
-                                        <th rowspan="2">11.<br/>योग</th>
-                                        <th rowspan="2">12.<br/>रिमार्क</th>
+                                        <th colspan="3">भूमि जिस पर वृक्ष स्थित है, का विवरण</th>
+                                        <th rowspan="2">8.<br/>गोलाई</th>
+                                        <th colspan="2">निर्धारित मूल्य</th>
+                                        <th rowspan="2">11.<br/>सोलेशियम 100%</th>
+                                        <th rowspan="2">12.<br/>12% ब्याज</th>
+                                        <th rowspan="2">13.<br/>योग</th>
+                                        <th rowspan="2">14.<br/>रिमार्क</th>
                                     </tr>
                                     <tr>
                                         <th>3.<br/>कुल खसरा</th>
                                         <th>4.<br/>रकबा (हे.)</th>
                                         <th>5.<br/>खसरा नं.</th>
                                         <th>6.<br/>वृक्षों का प्रकार</th>
+                                        <th>7.<br/>वृक्ष संख्या</th>
+                                        <th>9.<br/>दर</th>
+                                        <th>10.<br/>मूल्य</th>
                                     </tr>
                                 </thead>
                             <tbody>
                                 <t t-set="serial" t-value="1"/>
-                                <t t-foreach="tree_data" t-as="tree">
+                                <t t-foreach="tree_groups" t-as="group">
+                                    <t t-set="group_lines" t-value="group.get('lines')"/>
+                                    <t t-set="line_count" t-value="len(group_lines)"/>
+                                    <t t-foreach="group_lines" t-as="tree">
                                         <tr>
-                                            <td style="text-align: center;" t-esc="serial"/>
-                                            <td>
-                                                <span t-esc="tree.get('landowner_name', '')"/><br/>
-                                                <t t-if="tree.get('father_name')">पिता/पति: <span t-esc="tree.get('father_name')"/></t>
+                                            <td t-if="tree_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
+                                            <td t-if="tree_index == 0" t-att-rowspan="line_count">
+                                                <span t-esc="group.get('landowner_name', '')"/><br/>
+                                                <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
                                             <td style="text-align: center;" t-esc="tree.get('total_khasra', '')"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('total_area', 0.0), 3)"/>
                                             <td style="text-align: center;" t-esc="tree.get('khasra', '')"/>
                                             <td>
-                                                <span t-esc="tree.get('tree_type', '')"/><br/>
-                                                नग: <span t-esc="tree.get('tree_count', 0)"/>
+                                                <span t-esc="tree.get('tree_type', '')"/>
                                             </td>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('tree_count', 0), 2)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('girth_cm', 0.0), 2)"/>
-                                            <td style="text-align: right; background: #fafafa;">-</td> <!-- Misc -->
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('rate', 0.0), 0)"/> <!-- Rate -->
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('value', 0.0), 0)"/> <!-- Value -->
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('rate', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('value', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(tree.get('total', 0.0), 0)"/>
                                             <td t-esc="tree.get('remark', '')"/>
                                         </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: center; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td></td>
+                                    </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
-                                <t t-if="not tree_data">
+                                <t t-if="not tree_groups">
                                     <tr>
                                         <td colspan="14" style="text-align: center; font-style: italic;">
                                             No tree data available / वृक्ष डेटा उपलब्ध नहीं है (Blank)

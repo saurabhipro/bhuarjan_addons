@@ -49,7 +49,6 @@ class BhuDownloadWizard(models.TransientModel):
         self.ensure_one()
         
         record = self.env[self.res_model].browse(self.res_id)
-        
         if self.format == 'pdf':
             # Download as PDF using standard report
             report = self.env.ref(self.report_xml_id)
@@ -59,9 +58,10 @@ class BhuDownloadWizard(models.TransientModel):
             if hasattr(record, 'action_download_excel'):
                 return record.action_download_excel()
             raise UserError(_("Excel export is not supported for this report."))
-        else:
+        elif self.format == 'word':
             # Download as Word (.doc) - HTML format that Word can open
             return self._generate_word_doc(record)
+        raise UserError(_("Selected download format is not supported."))
     
     def _generate_word_doc(self, record):
         """Generate Word document from report HTML with embedded images and inline styles"""

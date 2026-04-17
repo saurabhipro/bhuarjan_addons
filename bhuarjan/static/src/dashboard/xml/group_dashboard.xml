@@ -3,6 +3,38 @@
     <t t-name="bhuarjan.GroupDashboard" owl="1">
         <div class="o_group_dashboard">
 
+            <!-- Unified Dashboard Header (matches SDM / Admin look) -->
+            <div class="o_group_hero">
+                <div class="w-100 d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+                    <div class="o_dashboard_title_section">
+                        <h2>
+                            <i class="fa fa-th-large"/>
+                            <span>Group Dashboard</span>
+                            <span class="o_group_hero_pill">
+                                <i class="fa fa-folder-open"/>
+                                <span>All Projects</span>
+                            </span>
+                        </h2>
+                    </div>
+                    <div class="o_dashboard_actions o_group_hero_stats" t-if="!state.loading">
+                        <span class="o_group_hero_chip" title="Total Projects">
+                            <i class="fa fa-folder-open"/>
+                            <span t-esc="state.stats.total_projects"/>
+                            <small>Projects</small>
+                        </span>
+                        <span class="o_group_hero_chip" title="Total Villages">
+                            <i class="fa fa-home"/>
+                            <span t-esc="state.stats.total_villages"/>
+                            <small>Villages</small>
+                        </span>
+                        <span class="o_group_hero_chip" title="Total Surveys">
+                            <i class="fa fa-clipboard"/>
+                            <span t-esc="state.stats.total_surveys"/>
+                            <small>Surveys</small>
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Loading State -->
             <div t-if="state.loading" class="loading-state-wrapper">

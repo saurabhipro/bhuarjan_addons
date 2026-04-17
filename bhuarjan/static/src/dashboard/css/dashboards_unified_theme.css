@@ -1,0 +1,745 @@
+/* ================================================================== *
+ *  Bhuarjan – Unified Dashboard Theme (Admin, Group, SDM,
+ *  Department, Collector, District)
+ *  ----------------------------------------------------------
+ *  Loads LAST in the asset bundle so it wins over per-dashboard CSS.
+ *  Only style overrides live here – no structural rules.
+ * ================================================================== */
+
+:root {
+    /* Warm brown / cream palette (shared with admin) */
+    --bd-brand-50:  #FDF5E6;
+    --bd-brand-100: #FAF0E6;
+    --bd-brand-200: #F0E0C8;
+    --bd-brand-300: #E3C39B;
+    --bd-brand-500: #C87941;
+    --bd-brand-600: #A0522D;
+    --bd-brand-700: #8B4513;
+    --bd-brand-800: #6B3410;
+    --bd-brand-900: #4A240B;
+
+    --bd-ink-900: #2b1910;
+    --bd-ink-700: #5a3f2b;
+    --bd-ink-500: #87654b;
+    --bd-ink-300: #b89f88;
+
+    --bd-surface: #ffffff;
+    --bd-surface-alt: #fffaf2;
+    --bd-border: #ead9c0;
+    --bd-border-strong: #d9c09a;
+
+    --bd-shadow-xs: 0 1px 2px rgba(74, 36, 11, 0.04);
+    --bd-shadow-sm: 0 2px 4px rgba(74, 36, 11, 0.06);
+    --bd-shadow-md: 0 4px 12px rgba(74, 36, 11, 0.09);
+    --bd-shadow-lg: 0 10px 28px rgba(74, 36, 11, 0.12);
+
+    --bd-radius-sm: 8px;
+    --bd-radius-md: 12px;
+    --bd-radius-lg: 16px;
+
+    /* Accent palette for KPI tiles */
+    --bd-accent-brown-a: #8B5E3C;
+    --bd-accent-brown-b: #6B4226;
+    --bd-accent-green-a: #5CB074;
+    --bd-accent-green-b: #3E8E53;
+    --bd-accent-red-a:   #E05D4B;
+    --bd-accent-red-b:   #B93A2A;
+    --bd-accent-teal-a:  #2FB3C6;
+    --bd-accent-teal-b:  #1A8796;
+    --bd-accent-amber-a: #F2B749;
+    --bd-accent-amber-b: #D1901F;
+    --bd-accent-emerald-a: #3FA97A;
+    --bd-accent-emerald-b: #2B7F58;
+    --bd-accent-taupe-a:  #A08876;
+    --bd-accent-taupe-b:  #7B5E49;
+    --bd-accent-leaf-a:   #84C26A;
+    --bd-accent-leaf-b:   #5F9B47;
+    --bd-accent-sky-a:    #5CA8E8;
+    --bd-accent-sky-b:    #2E7DC2;
+    --bd-accent-purple-a: #A671BD;
+    --bd-accent-purple-b: #7B4795;
+    --bd-accent-orange-a: #F0A44B;
+    --bd-accent-orange-b: #CF7820;
+}
+
+/* =====================================================================
+ * 1. Page shell (applies to every dashboard wrapper)
+ * ===================================================================== */
+.o_admin_dashboard,
+.o_group_dashboard {
+    background:
+        radial-gradient(at 100% 0%, rgba(200, 121, 65, 0.08) 0%, transparent 45%),
+        radial-gradient(at 0% 100%, rgba(139, 69, 19, 0.06) 0%, transparent 40%),
+        linear-gradient(180deg, #FFF8F0 0%, #FDF5E6 100%) !important;
+    color: var(--bd-ink-900);
+    padding: 14px 14px 28px !important;
+    min-height: 100vh;
+}
+
+/* =====================================================================
+ * 2. Hero header (shared for admin + group)
+ *    Group's header block uses .dashboard-header; admin uses .o_dashboard_header
+ * ===================================================================== */
+.o_admin_dashboard .o_dashboard_header,
+.o_group_dashboard .dashboard-header {
+    background: linear-gradient(135deg, var(--bd-brand-900) 0%, var(--bd-brand-700) 55%, var(--bd-brand-500) 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--bd-radius-md) !important;
+    padding: 12px 18px !important;
+    box-shadow: var(--bd-shadow-md) !important;
+    margin-bottom: 14px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.o_admin_dashboard .o_dashboard_header::after,
+.o_group_dashboard .dashboard-header::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -80px;
+    width: 220px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+
+.o_admin_dashboard .o_dashboard_header::before,
+.o_group_dashboard .dashboard-header::before {
+    content: "";
+    position: absolute;
+    left: -40px;
+    top: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.o_admin_dashboard .o_dashboard_header h2,
+.o_group_dashboard .dashboard-header h2 {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 19px !important;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+}
+
+.o_admin_dashboard .o_dashboard_header h2 i,
+.o_admin_dashboard .o_dashboard_header h2 .fa,
+.o_group_dashboard .dashboard-header h2 i,
+.o_group_dashboard .dashboard-header h2 .fa {
+    color: #ffd9b8 !important;
+}
+
+/* =====================================================================
+ * 3. KPI tiles – any dashboard that drops a .stat-card
+ * ===================================================================== */
+.o_group_dashboard .dashboard-content .row,
+.o_admin_dashboard .dashboard-content .row {
+    --bs-gutter-x: 0.85rem;
+    --bs-gutter-y: 0.85rem;
+}
+
+.o_group_dashboard .stat-card,
+.o_admin_dashboard .stat-card {
+    border-radius: var(--bd-radius-md) !important;
+    padding: 14px 16px !important;
+    min-height: 78px;
+    box-shadow: var(--bd-shadow-sm) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    transition: transform 0.25s cubic-bezier(.2, .8, .2, 1),
+                box-shadow 0.25s cubic-bezier(.2, .8, .2, 1) !important;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.o_group_dashboard .stat-card::before {
+    /* glass sheen overlay */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 10% 90%, rgba(0, 0, 0, 0.10) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.o_group_dashboard .stat-card::after {
+    /* left accent strip */
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.o_group_dashboard .stat-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.o_group_dashboard .stat-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--bd-shadow-lg) !important;
+}
+
+/* Icon circle */
+.o_group_dashboard .stat-card .stat-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem !important;
+    color: #fff !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+                0 2px 6px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(2px);
+    transition: transform 0.25s ease;
+}
+
+.o_group_dashboard .stat-card:hover .stat-icon {
+    transform: rotate(-6deg) scale(1.06);
+}
+
+.o_group_dashboard .stat-card .stat-details h3 {
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1;
+    margin: 0 0 2px 0 !important;
+    color: #fff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+    letter-spacing: 0.2px;
+}
+
+.o_group_dashboard .stat-card .stat-details p {
+    margin: 0 !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.8px !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+}
+
+/* Tile color variants – refined 3-stop gradients */
+.o_group_dashboard .stat-card.bg-primary {
+    background: linear-gradient(135deg, var(--bd-accent-brown-a) 0%, var(--bd-accent-brown-b) 60%, #4A2A14 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-success {
+    background: linear-gradient(135deg, var(--bd-accent-green-a) 0%, var(--bd-accent-green-b) 60%, #2D6A3F 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-danger {
+    background: linear-gradient(135deg, var(--bd-accent-red-a) 0%, var(--bd-accent-red-b) 60%, #8B2A1E 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-info {
+    background: linear-gradient(135deg, var(--bd-accent-teal-a) 0%, var(--bd-accent-teal-b) 60%, #125F6B 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-warning {
+    background: linear-gradient(135deg, var(--bd-accent-amber-a) 0%, var(--bd-accent-amber-b) 60%, #A06C10 100%) !important;
+    color: #fff !important;
+}
+
+.o_group_dashboard .stat-card.bg-warning .stat-details h3,
+.o_group_dashboard .stat-card.bg-warning .stat-details p,
+.o_group_dashboard .stat-card.bg-warning .stat-icon {
+    color: #fff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+.o_group_dashboard .stat-card.bg-patwari {
+    background: linear-gradient(135deg, var(--bd-accent-taupe-a) 0%, var(--bd-accent-taupe-b) 60%, #543D30 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-village {
+    background: linear-gradient(135deg, var(--bd-accent-leaf-a) 0%, var(--bd-accent-leaf-b) 60%, #446E32 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-survey {
+    background: linear-gradient(135deg, var(--bd-accent-sky-a) 0%, var(--bd-accent-sky-b) 60%, #1D5A8E 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-landowner {
+    background: linear-gradient(135deg, var(--bd-accent-purple-a) 0%, var(--bd-accent-purple-b) 60%, #56326A 100%) !important;
+}
+
+.o_group_dashboard .stat-card.bg-budget {
+    background: linear-gradient(135deg, var(--bd-accent-orange-a) 0%, var(--bd-accent-orange-b) 60%, #94560F 100%) !important;
+}
+
+/* =====================================================================
+ * 4. Projects table card (Group)
+ * ===================================================================== */
+.o_group_dashboard .dashboard-content .card {
+    border: 1px solid var(--bd-border) !important;
+    border-radius: var(--bd-radius-lg) !important;
+    background: var(--bd-surface);
+    box-shadow: var(--bd-shadow-md) !important;
+    overflow: hidden;
+}
+
+.o_group_dashboard .card-header.custom-card-header {
+    background: linear-gradient(135deg, var(--bd-brand-900) 0%, var(--bd-brand-700) 55%, var(--bd-brand-600) 100%) !important;
+    color: #fff !important;
+    padding: 14px 18px !important;
+    border-bottom: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.o_group_dashboard .card-header.custom-card-header::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -80px;
+    width: 200px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+
+.o_group_dashboard .card-header.custom-card-header h5 {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.o_group_dashboard .card-header.custom-card-header h5::before {
+    content: "";
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: #ffd9b8;
+    box-shadow: 0 0 8px rgba(255, 217, 184, 0.55);
+}
+
+/* Header search pill */
+.o_group_dashboard .header-search-container {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-radius: 999px !important;
+    height: 36px !important;
+    max-width: 420px !important;
+    padding: 0 4px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.o_group_dashboard .header-search-container:focus-within {
+    border-color: #ffd9b8 !important;
+    box-shadow: 0 0 0 3px rgba(255, 217, 184, 0.35), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.o_group_dashboard .header-search-container .input-group-text {
+    background: transparent !important;
+    color: var(--bd-brand-700) !important;
+    padding: 0 10px !important;
+}
+
+.o_group_dashboard .header-search-input {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--bd-ink-900) !important;
+    font-size: 0.88rem !important;
+    font-weight: 500;
+}
+
+.o_group_dashboard .header-search-input::placeholder {
+    color: var(--bd-ink-300) !important;
+}
+
+/* Card body padding */
+.o_group_dashboard .card .card-body {
+    padding: 0 !important;
+    background: var(--bd-surface);
+}
+
+.o_group_dashboard .card .table-responsive {
+    border-radius: 0 0 var(--bd-radius-lg) var(--bd-radius-lg);
+}
+
+/* Table header: sticky + modern */
+.o_group_dashboard .dashboard-content .table {
+    margin: 0 !important;
+    font-size: 0.88rem;
+}
+
+.o_group_dashboard .dashboard-content .table thead th {
+    background: linear-gradient(180deg, #fff9ed 0%, #fbf0dc 100%) !important;
+    color: var(--bd-brand-800) !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    padding: 12px 10px !important;
+    border-bottom: 2px solid var(--bd-border-strong) !important;
+    border-top: none !important;
+    vertical-align: middle;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.o_group_dashboard .dashboard-content .table thead th[t-on-click],
+.o_group_dashboard .dashboard-content .table thead th:hover {
+    cursor: pointer;
+    background: linear-gradient(180deg, #fff3d8 0%, #f6e4c5 100%) !important;
+    color: var(--bd-brand-900) !important;
+}
+
+.o_group_dashboard .dashboard-content .table thead th .fa-sort,
+.o_group_dashboard .dashboard-content .table thead th .fa-sort-up,
+.o_group_dashboard .dashboard-content .table thead th .fa-sort-down {
+    color: var(--bd-brand-600) !important;
+    opacity: 0.7;
+}
+
+/* Table body */
+.o_group_dashboard .dashboard-content .table tbody td {
+    border-bottom: 1px solid #f1e6d3 !important;
+    padding: 11px 10px !important;
+    vertical-align: middle;
+    color: var(--bd-ink-900);
+    font-size: 0.88rem;
+}
+
+.o_group_dashboard .dashboard-content .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 248, 236, 0.55) !important;
+}
+
+.o_group_dashboard .dashboard-content .project-row {
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.o_group_dashboard .dashboard-content .project-row:hover {
+    background-color: rgba(200, 121, 65, 0.08) !important;
+    transform: none;
+    box-shadow: inset 3px 0 0 var(--bd-brand-600);
+}
+
+/* Badges inside the table → soft chip treatment */
+.o_group_dashboard .dashboard-content .table .badge {
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    padding: 5px 10px !important;
+    border-radius: 999px !important;
+    letter-spacing: 0.3px;
+    min-width: 34px;
+    display: inline-block;
+}
+
+.o_group_dashboard .dashboard-content .table .badge.bg-secondary {
+    background: var(--bd-brand-700) !important;
+    color: #fff !important;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.o_group_dashboard .dashboard-content .table .badge.bg-info {
+    background: rgba(47, 179, 198, 0.15) !important;
+    color: #116877 !important;
+    border: 1px solid rgba(47, 179, 198, 0.45);
+    box-shadow: none;
+}
+
+.o_group_dashboard .dashboard-content .table .badge.bg-primary {
+    background: rgba(139, 94, 60, 0.15) !important;
+    color: var(--bd-brand-800) !important;
+    border: 1px solid rgba(139, 94, 60, 0.45);
+}
+
+.o_group_dashboard .dashboard-content .table .badge.bg-success {
+    background: rgba(92, 176, 116, 0.18) !important;
+    color: #2D6A3F !important;
+    border: 1px solid rgba(92, 176, 116, 0.45);
+}
+
+/* Stage badge keeps its dynamic color but gets chip shape & subtle ring */
+.o_group_dashboard .dashboard-content .table .stage-badge {
+    border-radius: 999px !important;
+    padding: 5px 12px !important;
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+                0 2px 5px rgba(0, 0, 0, 0.12) !important;
+    color: #fff !important;
+    filter: saturate(1.05);
+}
+
+/* Clickable cells get a gentle underline on hover */
+.o_group_dashboard .dashboard-content .clickable-cell {
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.o_group_dashboard .dashboard-content .clickable-cell:hover {
+    color: var(--bd-brand-700);
+}
+
+.o_group_dashboard .dashboard-content .dashboard-link,
+.o_group_dashboard .dashboard-content .dashboard-link-secondary {
+    color: var(--bd-brand-800) !important;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+}
+
+.o_group_dashboard .dashboard-content .clickable-cell:hover .dashboard-link,
+.o_group_dashboard .dashboard-content .clickable-cell:hover .dashboard-link-secondary {
+    color: var(--bd-brand-900) !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(139, 69, 19, 0.45);
+}
+
+/* Empty state on table */
+.o_group_dashboard .dashboard-content .no-projects-state {
+    background: linear-gradient(180deg, #fff8ed 0%, #fbf0dc 100%) !important;
+}
+
+.o_group_dashboard .dashboard-content .empty-state-wrapper i {
+    color: var(--bd-brand-500) !important;
+    opacity: 0.35 !important;
+}
+
+.o_group_dashboard .dashboard-content .empty-state-wrapper h4 {
+    color: var(--bd-brand-800) !important;
+}
+
+/* Scrollbar inside the group dashboard */
+.o_group_dashboard .scrollable-dashboard::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.o_group_dashboard .scrollable-dashboard::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.o_group_dashboard .scrollable-dashboard::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--bd-brand-600), var(--bd-brand-800));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.o_group_dashboard .scrollable-dashboard::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--bd-brand-700), var(--bd-brand-900));
+    background-clip: padding-box;
+}
+
+/* =====================================================================
+ * 4b. Group hero header (brand new header added to group_dashboard.xml)
+ * ===================================================================== */
+.o_group_dashboard .o_group_hero {
+    background: linear-gradient(135deg, var(--bd-brand-900) 0%, var(--bd-brand-700) 55%, var(--bd-brand-500) 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--bd-radius-md) !important;
+    padding: 12px 18px !important;
+    margin: 0 0 14px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    box-shadow: var(--bd-shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.o_group_dashboard .o_group_hero::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -80px;
+    width: 220px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+
+.o_group_dashboard .o_group_hero::before {
+    content: "";
+    position: absolute;
+    left: -40px;
+    top: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.o_group_dashboard .o_group_hero h2 {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 19px !important;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+}
+
+.o_group_dashboard .o_group_hero h2 > i {
+    color: #ffd9b8 !important;
+    font-size: 20px;
+}
+
+.o_group_dashboard .o_group_hero_pill {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.o_group_dashboard .o_group_hero_pill i {
+    color: #ffd9b8;
+    font-size: 12px;
+}
+
+.o_group_dashboard .o_group_hero_stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.o_group_dashboard .o_group_hero_chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.o_group_dashboard .o_group_hero_chip:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+.o_group_dashboard .o_group_hero_chip i {
+    color: #ffd9b8;
+    font-size: 13px;
+}
+
+.o_group_dashboard .o_group_hero_chip small {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.85;
+}
+
+/* =====================================================================
+ * 4c. Group loading / empty states match the theme
+ * ===================================================================== */
+.o_group_dashboard .loading-state-wrapper {
+    background: transparent !important;
+    min-height: 50vh;
+}
+
+.o_group_dashboard .coffee-loader .fa {
+    color: var(--bd-brand-700) !important;
+    background: none !important;
+    -webkit-text-fill-color: var(--bd-brand-700) !important;
+    filter: drop-shadow(0 4px 6px rgba(139, 69, 19, 0.25));
+}
+
+.o_group_dashboard .loading-title {
+    color: var(--bd-brand-900) !important;
+    font-weight: 800 !important;
+}
+
+.o_group_dashboard .steam span {
+    background: var(--bd-brand-600) !important;
+}
+
+/* =====================================================================
+ * 4d. Containers spacing polish
+ * ===================================================================== */
+.o_group_dashboard .container-fluid {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+}
+
+.o_group_dashboard .dashboard-content {
+    padding-top: 0 !important;
+}
+
+/* Keep KPI/table blocks aligned to full hero width (not squeezed). */
+.o_group_dashboard .dashboard-content > .container-fluid {
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* =====================================================================
+ * 5. Responsive tweaks
+ * ===================================================================== */
+@media (max-width: 992px) {
+    .o_group_dashboard .stat-card .stat-details h3 {
+        font-size: 1.35rem !important;
+    }
+
+    .o_group_dashboard .stat-card .stat-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 1.1rem !important;
+    }
+
+    .o_group_dashboard .header-search-container {
+        max-width: 100% !important;
+        margin-top: 8px;
+    }
+}

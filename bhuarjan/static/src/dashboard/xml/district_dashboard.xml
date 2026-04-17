@@ -330,7 +330,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.survey_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.survey_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.survey_info ? state.stats.survey_info.submitted_count : 0) : 0"/></span>
@@ -366,7 +366,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_1_cglrc_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_1_cglrc_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section247_1_cglrc_info ? state.stats.section247_1_cglrc_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section247_1_cglrc_info ? state.stats.section247_1_cglrc_info.approved_count : 0) : 0"/></span>
@@ -401,7 +401,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_2_cglrc_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_2_cglrc_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section247_2_cglrc_info ? state.stats.section247_2_cglrc_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section247_2_cglrc_info ? state.stats.section247_2_cglrc_info.approved_count : 0) : 0"/></span>
@@ -436,7 +436,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_3_cglrc_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section247_3_cglrc_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section247_3_cglrc_info ? state.stats.section247_3_cglrc_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section247_3_cglrc_info ? state.stats.section247_3_cglrc_info.approved_count : 0) : 0"/></span>
@@ -476,7 +476,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.sia_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.sia_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.sia_info ? state.stats.sia_info.submitted_count : 0) : 0"/></span>
@@ -524,7 +524,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section4_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section4_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section4_info ? state.stats.section4_info.submitted_count : 0) : 0"/></span>
@@ -566,7 +566,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.expert_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.expert_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.expert_info ? state.stats.expert_info.submitted_count : 0) : 0"/></span>
@@ -614,7 +614,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section11_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section11_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section11_info ? state.stats.section11_info.submitted_count : 0) : 0"/></span>
@@ -662,7 +662,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section15_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section15_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section15_info ? state.stats.section15_info.submitted_count : 0) : 0"/></span>
@@ -749,7 +749,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section19_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section19_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section19_info ? state.stats.section19_info.submitted_count : 0) : 0"/></span>
@@ -798,7 +798,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.draft_award_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.draft_award_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.draft_award_info ? state.stats.draft_award_info.submitted_count : 0) : 0"/></span>
@@ -847,7 +847,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section23_award_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section23_award_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.submitted_count : 0) : 0"/></span>
@@ -897,7 +897,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.payment_file_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.payment_file_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft" title="Total"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.payment_file_total || 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted" title="Draft"><i class="fa fa-edit"/> <t t-esc="state.stats ? (state.stats.payment_file_draft || 0) : 0"/></span>
@@ -943,7 +943,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.reconciliation_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.reconciliation_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft" title="Total"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.reconciliation_total || 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted" title="Draft"><i class="fa fa-edit"/> <t t-esc="state.stats ? (state.stats.reconciliation_draft || 0) : 0"/></span>
@@ -1022,7 +1022,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section20d_railways_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section20d_railways_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.submitted_count : 0) : 0"/></span>
@@ -1144,7 +1144,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section3c_nh_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section3c_nh_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.submitted_count : 0) : 0"/></span>
@@ -1227,7 +1227,7 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.mutual_consent_policy_completion_percent || 0) : 0"/>% Complete</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.mutual_consent_policy_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
                                         <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info.draft_count : 0) : 0"/></span>
                                         <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.mutual_consent_policy_info ? state.stats.mutual_consent_policy_info.submitted_count : 0) : 0"/></span>

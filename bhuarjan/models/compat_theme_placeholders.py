@@ -13,6 +13,8 @@ class GoogleFontFamily(models.Model):
     url = fields.Char(string='URL')
     is_selected = fields.Boolean(string='Selected', default=False)
     user_id = fields.Many2one('res.users', string='User', default=lambda self: self.env.user)
+    # Referenced by third-party theme list/form views.
+    config_id = fields.Many2one('backend.config', string='Backend Config')
     active = fields.Boolean(default=True)
 
 

@@ -424,14 +424,31 @@
                             }
                             .total_row {
                                 border-radius: 12px;
-                                padding: 10px 12px;
-                                margin-top: 10px;
+                                padding: 14px 20px;
+                                margin-top: 15px;
                                 border-left: 6px solid #6a3425;
-                                box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
                                 transition: all 0.3s ease;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
                             }
                             .total_row:hover {
-                                filter: brightness(0.98);
+                                transform: scale(1.005);
+                                box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+                            }
+                            .total_label_large {
+                                font-size: 1.05rem;
+                                font-weight: 700;
+                                color: #3f2a22;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                margin: 0;
+                            }
+                            .total_value_large {
+                                font-size: 1.6rem;
+                                font-weight: 850;
+                                letter-spacing: -0.5px;
                             }
                             .grand_total_section {
                                 background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -767,7 +784,7 @@
                             </div>
 
                             <group>
-                                <group string="Basic Inputs">
+                                <group string="Land Inputs">
                                     <field name="distance_from_road"
                                         help="Determines Road Type automatically. Rural: ≤ 20 m → MR, else MBR. Urban: ≤ 50 m → MR, else MBR."/>
                                     <field name="road_type" widget="radio" options="{'horizontal': true}"
@@ -779,7 +796,7 @@
                                     <field name="acquired_area" class="fw-bold text-primary"
                                         help="Total acquired area in hectares. Land Award = Effective Rate × Area."/>
                                 </group>
-                                <group string="Rates &amp; Values">
+                                <group string="Valuation Basis">
                                     <field name="base_rate" class="fw-bold"
                                         help="Base Rate per Hectare. Auto-fetched from the Land Rate Master (active) for the selected village using MR/MBR; or enter manually."/>
                                     <field name="effective_land_rate" widget="monetary" options="{'currency_field': 'currency_id'}"
@@ -793,9 +810,9 @@
                                         help="Interest = Land Award × (rate% ÷ 100) × (Days ÷ 365.25). Days = Award Date − Section 4 Date."/>
                                 </group>
                             </group>
-                            <div class="total_row d-flex justify-content-between align-items-center" style="background: linear-gradient(to right, #ffffff, #fdf4ec); border-left: 5px solid #7a3b28;">
-                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Land Compensation / कुल भूमि मुआवजा</span>
-                                <span style="font-size: 1.4rem; font-weight: 800; color: #7a3b28;">
+                            <div class="total_row" style="background: linear-gradient(to right, #ffffff, #fdf4ec); border-left-color: #7a3b28;">
+                                <span class="total_label_large">Total Land Compensation / कुल भूमि मुआवजा</span>
+                                <span class="total_value_large" style="color: #7a3b28;">
                                     <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </span>
                             </div>
@@ -821,6 +838,54 @@
                                     <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                                 </div>
                             </summary>
+                            <!-- Tree Impact factors -->
+                            <div class="impact_strip">
+                                <div class="impact_chip neu">
+                                    <span class="ic_icon"><i class="fa fa-leaf" title="Tree Count"/></span>
+                                    <div>
+                                        <div class="ic_label">Total Trees / कुल वृक्ष</div>
+                                        <div class="ic_value"><field name="tree_count"/> Units</div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-money" title="Basic Value"/></span>
+                                    <div>
+                                        <div class="ic_label">Basic Value / मूल मूल्य</div>
+                                        <div class="ic_value"><field name="tree_basic_amount" widget="monetary"/></div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-gavel" title="Solatium"/></span>
+                                    <div>
+                                        <div class="ic_label">Solatium / सॉलेशियम</div>
+                                        <div class="ic_value">100%</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Tree Solatium</div>
+                                            <div class="ip_row"><span>Rate</span><span class="ip_val ip_pos">100% of Basic</span></div>
+                                            <div class="ip_row"><span>Computed</span><span class="ip_val ip_neu"><field name="tree_solatium_amount" widget="monetary"/></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip neu">
+                                    <span class="ic_icon"><i class="fa fa-clock-o" title="Interest"/></span>
+                                    <div>
+                                        <div class="ic_label">Interest / ब्याज</div>
+                                        <div class="ic_value">12% p.a.</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Tree Interest</div>
+                                            <div class="ip_row"><span>Rate</span><span class="ip_val ip_pos">12.00%</span></div>
+                                            <div class="ip_row"><span>Computed</span><span class="ip_val ip_neu"><field name="tree_interest_amount" widget="monetary"/></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <field name="tree_line_ids" nolabel="1">
                                 <list editable="bottom" decoration-warning="condition == 'unsound'">
                                     <field name="tree_master_id" options="{'no_create': true}"/>
@@ -833,9 +898,9 @@
                                     <field name="line_total" widget="monetary" sum="Tree Subtotal"/>
                                 </list>
                             </field>
-                            <div class="total_row d-flex justify-content-between align-items-center mt-3" style="background: linear-gradient(to right, #ffffff, #f3faf6); border-left-color: #2f6d4f;">
-                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Tree Compensation / कुल वृक्ष मुआवजा</span>
-                                <span style="font-size: 1.4rem; font-weight: 800; color: #2f6d4f;">
+                            <div class="total_row" style="background: linear-gradient(to right, #ffffff, #f3faf6); border-left-color: #2f6d4f;">
+                                <span class="total_label_large">Total Tree Compensation / कुल वृक्ष मुआवजा</span>
+                                <span class="total_value_large" style="color: #2f6d4f;">
                                     <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </span>
                             </div>
@@ -861,6 +926,54 @@
                                     <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                                 </div>
                             </summary>
+                            <!-- Structure Impact factors -->
+                            <div class="impact_strip">
+                                <div class="impact_chip neu">
+                                    <span class="ic_icon"><i class="fa fa-home" title="Structure Count"/></span>
+                                    <div>
+                                        <div class="ic_label">Total Items / कुल संरचना</div>
+                                        <div class="ic_value"><field name="structure_count"/> Assets</div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-money" title="Basic Value"/></span>
+                                    <div>
+                                        <div class="ic_label">Basic Value / मूल मूल्य</div>
+                                        <div class="ic_value"><field name="structure_basic_amount" widget="monetary"/></div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip pos">
+                                    <span class="ic_icon"><i class="fa fa-gavel" title="Solatium"/></span>
+                                    <div>
+                                        <div class="ic_label">Solatium / सॉलेशियम</div>
+                                        <div class="ic_value">100%</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Structure Solatium</div>
+                                            <div class="ip_row"><span>Rate</span><span class="ip_val ip_pos">100% of Basic</span></div>
+                                            <div class="ip_row"><span>Computed</span><span class="ip_val ip_neu"><field name="structure_solatium_amount" widget="monetary"/></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="impact_chip neu">
+                                    <span class="ic_icon"><i class="fa fa-clock-o" title="Interest"/></span>
+                                    <div>
+                                        <div class="ic_label">Interest / ब्याज</div>
+                                        <div class="ic_value">12% p.a.</div>
+                                    </div>
+                                    <div class="info_pop" tabindex="0">
+                                        <div class="ip_trigger"><i class="fa fa-info" title="More info"/></div>
+                                        <div class="ip_tip">
+                                            <div class="ip_title">Structure Interest</div>
+                                            <div class="ip_row"><span>Rate</span><span class="ip_val ip_pos">12.00%</span></div>
+                                            <div class="ip_row"><span>Computed</span><span class="ip_val ip_neu"><field name="structure_interest_amount" widget="monetary"/></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <field name="structure_line_ids" nolabel="1">
                                 <list editable="bottom">
                                     <field name="structure_type"/>
@@ -871,9 +984,9 @@
                                     <field name="line_total" widget="monetary" sum="Structure Subtotal"/>
                                 </list>
                             </field>
-                            <div class="total_row d-flex justify-content-between align-items-center mt-3" style="background: linear-gradient(to right, #ffffff, #fef6f2); border-left-color: #8a4b36;">
-                                <span class="card_title" style="margin: 0; font-size: 0.9rem;">Total Structure Compensation / कुल संरचना मुआवजा</span>
-                                <span style="font-size: 1.4rem; font-weight: 800; color: #8a4b36;">
+                            <div class="total_row" style="background: linear-gradient(to right, #ffffff, #fef6f2); border-left-color: #8a4b36;">
+                                <span class="total_label_large">Total Structure Compensation / कुल संरचना मुआवजा</span>
+                                <span class="total_value_large" style="color: #8a4b36;">
                                     <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </span>
                             </div>

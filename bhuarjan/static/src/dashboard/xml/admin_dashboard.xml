@@ -313,7 +313,7 @@
 
                         <!-- Section 20 D (Railways) -->
                         <t t-if="this.isSectionVisible('Sec 20 D (Objection) (Railways)')">
-                        <div class="o_section_list_item o_card_no_click">
+                        <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 20;' : ''">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Sec 20 D (Objection) (Railways)', (state.isCollector or state.isAdmin) ? 'Step 13' : 'Step 12')"/></span>
                             </div>
@@ -1085,7 +1085,7 @@
 
                         <!-- Payment File -->
                         <t t-if="this.isSectionVisible('Payment File')">
-                        <div class="o_section_list_item o_card_no_click">
+                        <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 40;' : ''">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Payment File', (state.isCollector or state.isAdmin) ? 'Step 12' : 'Step 11')"/></span>
                             </div>
@@ -1134,7 +1134,7 @@
 
                         <!-- Payment Reconciliation -->
                         <t t-if="this.isSectionVisible('Payment Reconciliation')">
-                        <div class="o_section_list_item o_card_no_click">
+                        <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 50;' : ''">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Payment Reconciliation', (state.isCollector or state.isAdmin) ? 'Step 13' : 'Step 12')"/></span>
                             </div>
@@ -1184,7 +1184,7 @@
 
                         <!-- Section 20 A (Railways) -->
                         <t t-if="this.isSectionVisible('Sec 20 A (Railways)')">
-                        <div class="o_section_list_item o_card_no_click">
+                        <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 10;' : ''">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Sec 20 A (Railways)', (state.isCollector or state.isAdmin) ? 'Step 12' : 'Step 11')"/></span>
                             </div>
@@ -1237,7 +1237,7 @@
 
                         <!-- Section 20 E (Railways) -->
                         <t t-if="this.isSectionVisible('Sec 20 E (Railways)')">
-                        <div class="o_section_list_item o_card_no_click">
+                        <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 30;' : ''">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Sec 20 E (Railways)', (state.isCollector or state.isAdmin) ? 'Step 14' : 'Step 13')"/></span>
                             </div>

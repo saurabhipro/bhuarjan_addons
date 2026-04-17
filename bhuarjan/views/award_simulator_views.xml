@@ -886,7 +886,7 @@
 
         <!-- Action to open the simulator -->
         <record id="action_bhu_award_simulator" model="ir.actions.act_window">
-            <field name="name">Award Simulator / अवार्ड सिमुलेटर</field>
+            <field name="name">Award Simulator</field>
             <field name="res_model">bhu.award.simulator</field>
             <field name="view_mode">list,form</field>
             <field name="target">current</field>
@@ -896,7 +896,7 @@
         <!-- Menu item – under Master Data, admin only -->
         <menuitem
             id="menu_bhu_award_simulator"
-            name="Award Simulator / अवार्ड सिमुलेटर"
+            name="Award Simulator"
             action="action_bhu_award_simulator"
             parent="menu_bhu_master"
             sequence="99"

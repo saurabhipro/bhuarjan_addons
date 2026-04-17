@@ -639,6 +639,119 @@
     font-size: 12px;
 }
 
+/* ===========================================================
+ * Modern selection-required state (admin + department)
+ * =========================================================== */
+.o_admin_dashboard .o_dashboard_selection_gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 36px 24px;
+}
+
+.o_admin_dashboard .o_selection_panel {
+    width: min(100%, 740px);
+    text-align: center;
+    background:
+        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 44%),
+        linear-gradient(140deg, #fffaf3 0%, #f9efe2 54%, #f6e8da 100%);
+    border: 1px solid rgba(127, 68, 35, 0.48);
+    border-radius: 18px;
+    padding: 34px 34px 28px;
+    box-shadow:
+        0 18px 36px rgba(120, 69, 41, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    position: relative;
+    overflow: hidden;
+}
+
+.o_admin_dashboard .o_selection_panel::after {
+    content: "";
+    position: absolute;
+    top: -44px;
+    right: -54px;
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(156, 94, 57, 0.18) 0%, rgba(156, 94, 57, 0) 72%);
+    pointer-events: none;
+}
+
+.o_admin_dashboard .o_selection_panel_icons {
+    font-size: 48px;
+    color: #8a4b36;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.o_admin_dashboard .o_selection_panel_title {
+    margin: 0 0 10px;
+    color: #6f341d;
+    font-weight: 800;
+    font-size: 27px;
+    letter-spacing: 0.1px;
+}
+
+.o_admin_dashboard .o_selection_panel_title i {
+    margin-right: 8px;
+    color: #935130;
+}
+
+.o_admin_dashboard .o_selection_panel_text {
+    margin: 0 auto;
+    max-width: 560px;
+    color: #7f492b;
+    font-size: 16px;
+    line-height: 1.58;
+}
+
+.o_admin_dashboard .o_selection_badge_row {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.o_admin_dashboard .o_selection_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 6px 14px rgba(120, 69, 41, 0.08);
+}
+
+.o_admin_dashboard .o_selection_badge i {
+    font-size: 13px;
+}
+
+.o_admin_dashboard .o_selection_badge_missing {
+    color: #7f3d23;
+    border-color: rgba(127, 61, 35, 0.36);
+}
+
+.o_admin_dashboard .o_selection_badge_missing i {
+    color: #d9534f;
+}
+
+.o_admin_dashboard .o_selection_badge_ready {
+    color: #1f7f3f;
+    border-color: rgba(31, 127, 63, 0.36);
+}
+
+.o_admin_dashboard .o_selection_badge_ready i {
+    color: #1f9f4f;
+}
+
 .o_group_dashboard .o_group_hero_stats {
     display: flex;
     gap: 8px;

@@ -180,6 +180,8 @@
             # 'bhuarjan/static/src/js/hierarchy_expand.js',
             # 'bhuarjan/static/src/js/survey_form_confirm.js',
             'bhuarjan/static/src/js/support_issue.js',
+            # Register js_class="confirm_save_form" custom form view.
+            'bhuarjan/static/src/js/components/popup.js',
             # Debranding assets (merged from debrand_odoo module)
             'bhuarjan/static/src/js/debrand_user_menu.js',
             'bhuarjan/static/src/xml/debrand_web.xml',

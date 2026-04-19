@@ -85,6 +85,7 @@
                 <t t-set="asset_data" t-value="o.get_structure_compensation_data()"/>
                 <t t-set="tree_groups" t-value="o.get_tree_compensation_grouped_data()"/>
                 <t t-set="asset_groups" t-value="o.get_structure_compensation_grouped_data()"/>
+                <t t-set="award_headers" t-value="o.get_award_header_constants()"/>
                 <t t-call="bhuarjan.report_common_styles"/>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
@@ -95,14 +96,14 @@
                         </div>
 
                         <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                            पत्रक (भाग-1 क)
+                            <span t-esc="award_headers['sections']['land_sheet_label']"/>
                         </div>
 
                         <div style="text-align: center; margin-bottom: 10px;">
                             <div style="margin-bottom: 6px;">
                                 <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
                             </div>
-                            <h2 style="margin: 0;">अर्जित भूमि का मुआवजा पत्रक</h2>
+                            <h2 style="margin: 0;"><span t-esc="award_headers['sections']['land_title']"/></h2>
                             <div style="font-size: 11px; margin-top: 5px;">
                                 मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
                             </div>
@@ -115,37 +116,40 @@
                         <table border="1">
                             <thead>
                                 <tr>
-                                    <th rowspan="2">1. <br/> क्र.</th>
-                                    <th rowspan="2" style="width: 120px;">2. <br/> भूमिस्वामी विवरण</th>
-                                    <th colspan="2">अर्जित भूमि का विवरण</th>
-                                    <th colspan="2">अर्जित भूमि का विवरण</th>
-                                    <th colspan="2">मुख्य मार्ग के अंतर्गत</th>
-                                    <th rowspan="2">विगत तीन वर्षों का औसत बिक्री छांट दर</th>
-                                    <th rowspan="2">10. <br/> गाइड लाइन दर</th>
-                                    <th rowspan="2">11. <br/> मूल्य (Basic)</th>
-                                    <th rowspan="2">12. <br/> बाजार मूल्य (Factor=2)</th>
-                                    <th rowspan="2">13. <br/> सोलेशियम (100%)
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
+                                    <th rowspan="2" style="width: 120px;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
+                                    <th colspan="2"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
+                                    <th colspan="2"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
+                                    <th colspan="4"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
                                         <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
                                     </th>
-                                    <th rowspan="2">14. <br/> ब्याज (12%)
-                                        <span class="award-hdr-note" t-esc="o.get_interest_period_note()"/>
+                                    <th rowspan="2">
+                                        <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
+                                        <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
+                                        <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
                                     </th>
-                                    <th rowspan="2">17. <br/> मुआवजा राशि
-                                        <span class="award-hdr-note">यदि 6,8,16 एवं 17 में से देय</span>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
+                                        <span class="award-hdr-note">यदि 6,8,17 एवं 18 में से देय</span>
                                         <span class="award-hdr-note">मुआवजा राशि</span>
                                     </th>
-                                    <th rowspan="2">18. <br/> देय मुआवजा
-                                        <span class="award-hdr-note">न्यूनतम राशि लागू</span>
-                                    </th>
-                                    <th rowspan="2">19. <br/> रिमार्क</th>
+                                    <th rowspan="2" style="width: 9%;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
+                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
                                 </tr>
                                 <tr>
-                                    <th>3. <br/> कुल खसरा</th>
-                                    <th>4. <br/> कुल रकबा</th>
-                                    <th>5. <br/> अर्जित खसरा</th>
-                                    <th>6. <br/> अर्जित रकबा</th>
-                                    <th>8. <br/> सिंचित?</th>
-                                    <th>9. <br/> असिंचित?</th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
+                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,12 +169,28 @@
                                             <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 3)"/>
                                             <td style="text-align: center;">
+                                                <t t-set="dfm" t-value="land.get('distance_from_main_road') or 0.0"/>
+                                                <t t-if="dfm">
+                                                    <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('is_within_distance') else 'color:#c62828;font-weight:700;'">
+                                                        <span t-esc="'%.2f' % dfm"/> m
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('is_within_distance') else 'color:#c62828;font-weight:700;'"
+                                                          t-esc="'हाँ' if land.get('is_within_distance') else 'नहीं'"/>
+                                                </t>
+                                            </td>
+                                            <td style="text-align: center;">
                                                 <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('irrigated') else 'color:#c62828;font-weight:700;'"
                                                       t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
                                             </td>
                                             <td style="text-align: center;">
                                                 <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('unirrigated') else 'color:#c62828;font-weight:700;'"
                                                       t-esc="'हाँ' if land.get('unirrigated') else 'नहीं'"/>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('is_diverted') else 'color:#c62828;font-weight:700;'"
+                                                      t-esc="'हाँ' if land.get('is_diverted') else 'नहीं'"/>
                                             </td>
                                             <td style="text-align: center;">-</td>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
@@ -179,6 +199,7 @@
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
                                             <td t-esc="land.get('remark', '')"/>
                                         </tr>
@@ -193,11 +214,13 @@
                                         <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
                                         <td></td>
                                     </tr>
@@ -205,7 +228,7 @@
                                 </t>
                                 <t t-if="not land_groups">
                                     <tr>
-                                        <td colspan="17" style="text-align: center; font-style: italic;">
+                                        <td colspan="20" style="text-align: center; font-style: italic;">
                                             No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)
                                         </td>
                                     </tr>
@@ -223,14 +246,14 @@
                             </div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                                पत्रक (भाग-1 ख)
+                                <span t-esc="award_headers['sections']['asset_sheet_label']"/>
                             </div>
 
                             <div style="text-align: center; margin-bottom: 10px;">
                                 <div style="margin-bottom: 6px;">
                                     <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
                                 </div>
-                                <h2 style="margin: 0;">अर्जित भूमि पर स्थित परिसम्पत्तियों का मुआवजा पत्रक</h2>
+                                <h2 style="margin: 0;"><span t-esc="award_headers['sections']['asset_title']"/></h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
                                 </div>
@@ -325,14 +348,14 @@
                             </div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                                पत्रक (भाग-1 ग)
+                                <span t-esc="award_headers['sections']['tree_sheet_label']"/>
                             </div>
 
                             <div style="text-align: center; margin-bottom: 10px;">
                                 <div style="margin-bottom: 6px;">
                                     <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
                                 </div>
-                                <h2 style="margin: 0;">वृक्षों का मुआवजा पत्रक</h2>
+                                <h2 style="margin: 0;"><span t-esc="award_headers['sections']['tree_title']"/></h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
                                 </div>

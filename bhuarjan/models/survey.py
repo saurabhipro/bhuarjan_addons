@@ -82,7 +82,36 @@ class Survey(models.Model):
     
     is_within_distance_for_award = fields.Boolean(string='Within Distance for Award / अवार्ड के लिए दूरी के भीतर', 
                                                  readonly=True, tracking=True,
-                                                 help='Check if khasra is within distance from main road (20m for village, 5m for residential). Editable only from Award section.')
+                                                 help='Auto-derived from "Distance from Main Road" if provided '
+                                                      '(<= 50 m for rural surveys, <= 20 m for urban surveys). '
+                                                      'Otherwise editable only from the Award section.')
+
+    distance_from_main_road = fields.Float(
+        string='Distance from Main Road (m) / मुख्य मार्ग से दूरी (मीटर)',
+        digits=(10, 2), tracking=True,
+        help='Optional. Actual measured distance from the main road in metres. '
+             'When set, the "Within Distance for Award" flag is auto-computed '
+             'using thresholds: rural <= 50 m, urban <= 20 m.',
+    )
+
+    @api.onchange('distance_from_main_road', 'survey_type')
+    def _onchange_distance_from_main_road(self):
+        for rec in self:
+            distance = rec.distance_from_main_road or 0.0
+            threshold = 50.0 if rec.survey_type == 'rural' else 20.0
+            rec.is_within_distance_for_award = distance <= threshold
+
+    def _sync_within_distance_from_metres(self, vals):
+        """Keep is_within_distance_for_award in sync when distance is provided
+        through API/import (where onchange does not fire)."""
+        if 'distance_from_main_road' not in vals and 'survey_type' not in vals:
+            return
+        for rec in self:
+            distance = vals.get('distance_from_main_road', rec.distance_from_main_road)
+            survey_type = vals.get('survey_type', rec.survey_type)
+            distance = distance or 0.0
+            threshold = 50.0 if survey_type == 'rural' else 20.0
+            rec.sudo().write({'is_within_distance_for_award': distance <= threshold})
     
     # Rate Permutations for Village (read-only, computed)
     rate_permutation_ids = fields.One2many('bhu.rate.master.permutation.line', 'survey_id', 
@@ -104,6 +133,11 @@ class Survey(models.Model):
     photo_ids = fields.One2many('bhu.survey.photo', 'survey_id', 
                                 string='Photos / फोटो', 
                                 help='Photos uploaded for this survey with tags')
+    award_structure_ids = fields.One2many(
+        'bhu.award.structure.details',
+        'survey_id',
+        string='Award Structure Details / अवार्ड परिसम्पत्ति विवरण'
+    )
     
     # House Details
     has_house = fields.Selection([
@@ -486,12 +520,19 @@ class Survey(models.Model):
         
         records = super(Survey, self).create(vals_list)
         # Log creation
-        for record in records:
+        for record, vals in zip(records, vals_list):
+            record._sync_within_distance_from_metres(vals)
             record.message_post(
                 body=_('Survey created by %s') % self.env.user.name,
                 message_type='notification'
             )
         return records
+
+    def write(self, vals):
+        result = super(Survey, self).write(vals)
+        if 'distance_from_main_road' in vals or 'survey_type' in vals:
+            self._sync_within_distance_from_metres(vals)
+        return result
     
     def unlink(self):
         """Override unlink to reset sequence counter after deletion"""

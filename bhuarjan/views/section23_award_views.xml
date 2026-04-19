@@ -158,6 +158,26 @@
                     <div class="alert alert-info mt-2" role="alert" invisible="all_surveys_configured">
                         <strong>Note:</strong> Please select Type (Village/Residential) for all surveys before generating award.
                     </div>
+
+                    <div class="custom-section-header mt-3">
+                        Award Structure Entries / अवार्ड परिसम्पत्ति प्रविष्टियां
+                    </div>
+                    <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">
+                        <list editable="bottom">
+                            <field name="survey_id"
+                                   domain="[('village_id', '=', parent.village_id), ('khasra_number', '!=', False)]"
+                                   context="{'show_khasra': True}"
+                                   string="Khasra Number"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="structure_type" string="Structure Type"/>
+                            <field name="construction_type" string="Construction Type"/>
+                            <field name="description" string="Description"/>
+                            <field name="asset_count" string="Count"/>
+                            <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
+                            <field name="market_rate_per_sqm" string="Rate" widget="monetary"/>
+                            <field name="asset_value" string="Asset Value" widget="monetary" sum="Asset Value"/>
+                        </list>
+                    </field>
                     
                     <field name="is_sdm" invisible="1"/>
                     <field name="is_section_officer" invisible="1"/>

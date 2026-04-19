@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import json
+from .award_header_constants import get_award_header_constants
 
 class Section23Award(models.Model):
     _name = 'bhu.section23.award'
@@ -43,6 +44,11 @@ class Section23Award(models.Model):
     award_survey_line_ids = fields.One2many('bhu.section23.award.survey.line', 'award_id', 
                                             string='Approved Surveys / स्वीकृत सर्वेक्षण',
                                             help='Select type and distance for each approved survey')
+    award_structure_line_ids = fields.One2many(
+        'bhu.award.structure.details',
+        'award_id',
+        string='Award Structure Entries / अवार्ड परिसम्पत्ति प्रविष्टियां'
+    )
     
     # Rate Permutations for Village (read-only, computed)
     rate_permutation_ids = fields.One2many('bhu.rate.master.permutation.line', 'award_id', 
@@ -230,6 +236,8 @@ class Section23Award(models.Model):
                 'Please select type (Village/Residential) for all surveys before generating award.\n'
                 'Missing type selection for surveys: %s'
             ) % survey_names)
+
+        self._sync_award_structure_lines()
         
         # Get the report action and generate PDF
         report_action = self.env.ref('bhuarjan.action_report_section23_award')
@@ -267,6 +275,18 @@ class Section23Award(models.Model):
         # Fallback to standard report action if PDF generation fails
         self.write({'is_generated': True})
         return report_action.report_action(self)
+
+    def _sync_award_structure_lines(self):
+        """Link survey-level structure entries to this award."""
+        self.ensure_one()
+        survey_ids = self.award_survey_line_ids.mapped('survey_id').ids
+        if not survey_ids:
+            return
+        structure_lines = self.env['bhu.award.structure.details'].search([
+            ('survey_id', 'in', survey_ids),
+        ])
+        if structure_lines:
+            structure_lines.write({'award_id': self.id})
     
     def action_submit_award(self):
         """Submit the award after document upload"""
@@ -318,6 +338,11 @@ class Section23Award(models.Model):
                     return candidate
         return False
 
+    def get_award_header_constants(self):
+        """Shared award header labels used by Excel and PDF outputs."""
+        self.ensure_one()
+        return get_award_header_constants()
+
     def _get_award_calculation_date(self):
         """Return award creation date used for interest end date."""
         self.ensure_one()
@@ -342,6 +367,32 @@ class Section23Award(models.Model):
         interest = basic_value * 0.12 * (days / 365.25)
         return interest, days
 
+    @api.model
+    def _is_fallow_survey(self, survey):
+        """Return True when survey is fallow (पड़ती) land."""
+        if not survey or not survey.crop_type_id:
+            return False
+        crop_code = (survey.crop_type_id.code or '').upper()
+        crop_name = (survey.crop_type_id.name or '')
+        return crop_code == 'FALLOW' or 'पड़ती' in crop_name
+
+    @api.model
+    def _get_min_rehab_rate_per_acre(self, is_fallow, is_irrigated, is_unirrigated):
+        """
+        Minimum rehab policy rates (per acre):
+        - Fallow (पड़ती): 6,00,000
+        - Unirrigated (असिंचित): 8,00,000
+        - Irrigated (सिंचित): 10,00,000
+        """
+        if is_fallow:
+            return 600000.0
+        if is_irrigated:
+            return 1000000.0
+        if is_unirrigated:
+            return 800000.0
+        # Safe default when irrigation type is missing
+        return 800000.0
+
     def get_interest_period_note(self):
         """Text note for report header interest period."""
         self.ensure_one()
@@ -356,6 +407,7 @@ class Section23Award(models.Model):
     def get_land_compensation_data(self):
         """Get land compensation data grouped by landowner and khasra"""
         self.ensure_one()
+        acre_per_hectare = 2.47105381
         
         # Get approved surveys for this village and project
         surveys = self.env['bhu.survey'].search([
@@ -379,6 +431,8 @@ class Section23Award(models.Model):
             irrigation_type = survey.irrigation_type or 'unirrigated'
             is_irrigated = irrigation_type == 'irrigated'
             is_unirrigated = irrigation_type == 'unirrigated'
+            is_fallow = self._is_fallow_survey(survey)
+            is_diverted = survey.has_traded_land == 'yes'
             
             # Get landowners for this survey
             landowners = survey.landowner_ids if survey.landowner_ids else []
@@ -396,9 +450,10 @@ class Section23Award(models.Model):
                         'original_area': 0.0,
                         'acquired_area': 0.0,
                         'lagan': khasra,  # Using khasra as lagan
-                        'fallow': False,
+                        'fallow': is_fallow,
                         'unirrigated': False,
                         'irrigated': False,
+                        'is_diverted': is_diverted,
                         'guide_line_rate': 0.0,
                         'market_value': 0.0,
                         'solatium': 0.0,
@@ -424,9 +479,10 @@ class Section23Award(models.Model):
                             'original_area': 0.0,
                             'acquired_area': 0.0,
                             'lagan': khasra,
-                            'fallow': False,
+                            'fallow': is_fallow,
                             'unirrigated': is_unirrigated,
                             'irrigated': is_irrigated,
+                            'is_diverted': is_diverted,
                             'guide_line_rate': 0.0,  # Will be calculated
                             'market_value': 0.0,
                             'solatium': 0.0,
@@ -453,7 +509,15 @@ class Section23Award(models.Model):
             
             # Use computed rate from award line if available
             award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
-            guide_line_rate = award_line[0].rate_per_hectare if award_line else 2112000.0
+            has_award_line = bool(award_line)
+            guide_line_rate = award_line[0].rate_per_hectare if has_award_line else 2112000.0
+            is_within_distance = award_line[0].is_within_distance if award_line else (survey.is_within_distance_for_award or False)
+            is_diverted = survey.has_traded_land == 'yes'
+
+            # Business rule: +25% on guideline rate for diverted land within main road range.
+            # Avoid double-application when survey line already computed this uplift.
+            if (not has_award_line) and is_diverted and is_within_distance:
+                guide_line_rate *= 1.25
             
             # Logic matching 19-column image:
             # 13: basic_value = rate * area
@@ -468,6 +532,14 @@ class Section23Award(models.Model):
             interest, _days = self._calculate_interest_on_basic(market_value_basic)
             
             total_compensation = market_value_factored + solatium + interest
+            acquired_area_acre = data['acquired_area'] * acre_per_hectare
+            rehab_rate_per_acre = self._get_min_rehab_rate_per_acre(
+                data.get('fallow'),
+                data.get('irrigated'),
+                data.get('unirrigated'),
+            )
+            rehab_policy_amount = acquired_area_acre * rehab_rate_per_acre
+            payable_compensation = max(total_compensation, rehab_policy_amount)
             
             data.update({
                 'guide_line_rate': guide_line_rate,
@@ -476,11 +548,15 @@ class Section23Award(models.Model):
                 'solatium': solatium,
                 'interest': interest,
                 'total_compensation': total_compensation,
-                'paid_compensation': max(total_compensation, 0.0),
+                'rehab_policy_rate_per_acre': rehab_rate_per_acre,
+                'rehab_policy_amount': rehab_policy_amount,
+                'paid_compensation': payable_compensation,
                 'remark': '',
                 'original_area': survey.total_area if survey else 0.0,
                 'lagan': survey.lagan if (survey and hasattr(survey, 'lagan')) else data['khasra'],
-                'is_within_distance': award_line[0].is_within_distance if award_line else False,
+                'is_within_distance': is_within_distance,
+                'distance_from_main_road': (survey.distance_from_main_road or 0.0) if survey else 0.0,
+                'is_diverted': is_diverted,
             })
             
             result.append(data)
@@ -498,7 +574,7 @@ class Section23Award(models.Model):
         ordered_keys = []
         numeric_totals = (
             'original_area', 'acquired_area', 'basic_value', 'market_value',
-            'solatium', 'interest', 'total_compensation', 'paid_compensation',
+            'solatium', 'interest', 'total_compensation', 'rehab_policy_amount', 'paid_compensation',
         )
         for row in land_data:
             owner = row.get('landowner')
@@ -663,7 +739,7 @@ class Section23Award(models.Model):
         return result
 
     def get_structure_compensation_data(self):
-        """Get structure compensation data (house, well, pond, shed) grouped by landowner and khasra"""
+        """Get structure compensation data from shared award structure entries."""
         self.ensure_one()
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
@@ -673,71 +749,51 @@ class Section23Award(models.Model):
         ])
         if not surveys:
             return []
-        
+
+        structure_lines = self.env['bhu.award.structure.details'].search([
+            ('survey_id', 'in', surveys.ids),
+        ])
+        if not structure_lines:
+            return []
+
         structure_data = []
-        for survey in surveys:
-            # Check if survey has any assets
-            assets = []
-            if survey.has_house == 'yes':
-                assets.append({'type': 'House / मकान', 'subtype': survey.house_type, 'area': survey.house_area, 'code': 1})
-            if survey.has_well == 'yes':
-                assets.append({'type': 'Well / कुआं', 'subtype': survey.well_type, 'area': survey.well_count, 'code': 2})
-            if getattr(survey, 'has_shed', 'no') == 'yes':
-                assets.append({'type': 'Shed / शेड', 'subtype': '', 'area': getattr(survey, 'shed_area', 0.0), 'code': 3})
-            if survey.has_pond == 'yes':
-                assets.append({'type': 'Pond / तालाब', 'subtype': '', 'area': 0.0, 'code': 4})
-            if getattr(survey, 'has_tubewell', 'no') == 'yes':
-                assets.append({'type': 'Tubewell / ट्यूबवेल', 'subtype': '', 'area': getattr(survey, 'tubewell_count', 0.0), 'code': 4})
-
-            if not assets:
-                continue
-
-            khasra = survey.khasra_number or ''
-            landowners = survey.landowner_ids if survey.landowner_ids else []
-            
-            for asset in assets:
-                if not landowners:
+        for line in structure_lines:
+            survey = line.survey_id
+            total_value = line.line_total or 0.0
+            base_row = {
+                'total_khasra': survey.khasra_number or '',
+                'total_area': survey.total_area or 0.0,
+                'asset_khasra': survey.khasra_number or '',
+                'asset_land_area': survey.acquired_area or 0.0,
+                'asset_type': line.get_structure_type_label(),
+                'asset_code': 4,
+                'asset_dimension': (line.asset_count or 0.0) if line.structure_type == 'well' else (line.area_sqm or 0.0),
+                'remark': line.description or '',
+            }
+            owners = survey.landowner_ids
+            if owners:
+                owner_count = len(owners)
+                share = total_value / owner_count if owner_count else total_value
+                for owner in owners:
                     structure_data.append({
-                        'landowner_name': '',
-                        'father_name': '',
-                        'total_khasra': khasra,
-                        'total_area': survey.total_area or 0.0,
-                        'asset_khasra': khasra,
-                        'asset_land_area': 0.0, # Placeholder
-                        'asset_type': asset['type'],
-                        'asset_code': asset['code'],
-                        'asset_dimension': asset['area'],
-                        'market_value': 0.0,
-                        'solatium': 0.0,
+                        **base_row,
+                        'landowner_name': owner.name or '',
+                        'father_name': owner.father_name or owner.spouse_name or '',
+                        'market_value': share,
+                        'solatium': share,
                         'interest': 0.0,
-                        'total': 0.0,
-                        'remark': '',
+                        'total': share * 2.0,
                     })
-                else:
-                    for landowner in landowners:
-                        # Calculation for structures (Solatium 100%, Interest 12%)
-                        market_value = 0.0 # Placeholder
-                        solatium = market_value * 1.0
-                        interest = 0.0 # Placeholder
-                        total = market_value + solatium + interest
-
-                        structure_data.append({
-                            'landowner_name': landowner.name or '',
-                            'father_name': landowner.father_name or landowner.spouse_name or '',
-                            'total_khasra': khasra,
-                            'total_area': survey.total_area or 0.0,
-                            'asset_khasra': khasra,
-                            'asset_land_area': 0.0, # Placeholder
-                            'asset_type': asset['type'],
-                            'asset_code': asset['code'],
-                            'asset_dimension': asset['area'],
-                            'market_value': market_value,
-                            'solatium': solatium,
-                            'interest': interest,
-                            'total': total,
-                            'remark': '',
-                        })
-        
+            else:
+                structure_data.append({
+                    **base_row,
+                    'landowner_name': '',
+                    'father_name': '',
+                    'market_value': total_value,
+                    'solatium': total_value,
+                    'interest': 0.0,
+                    'total': total_value * 2.0,
+                })
         return structure_data
 
     def get_tree_compensation_grouped_data(self):
@@ -885,7 +941,7 @@ class Section23AwardSurveyLine(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency', 
                                   default=lambda self: self.env.ref('base.INR'))
     
-    @api.depends('land_type', 'is_within_distance', 'award_id.village_id', 'survey_id.irrigation_type')
+    @api.depends('land_type', 'is_within_distance', 'award_id.village_id', 'survey_id.irrigation_type', 'survey_id.has_traded_land')
     def _compute_rate_per_hectare(self):
         """Compute rate per hectare from rate master based on type and distance"""
         for line in self:
@@ -926,6 +982,10 @@ class Section23AwardSurveyLine(models.Model):
                         rate = base_rate * 0.8
                     else:
                         rate = base_rate
+
+                    # Business rule: +25% for diverted land within main-road distance.
+                    if line.survey_id.has_traded_land == 'yes' and line.is_within_distance:
+                        rate = rate * 1.25
             
             line.rate_per_hectare = rate
     
@@ -1000,8 +1060,17 @@ class Section23AwardSurveyLine(models.Model):
         # Formats
         header_fmt = workbook.add_format({'bold': True, 'bg_color': '#8B4513', 'color': 'white', 'border': 1, 'align': 'center', 'valign': 'vcenter'})
         title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter'})
-        label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#f8fafc'})
+        label_fmt = workbook.add_format({
+            'bold': True,
+            'border': 1,
+            'bg_color': '#f8fafc',
+            'align': 'center',
+            'valign': 'vcenter',
+            'text_wrap': True,
+        })
         value_fmt = workbook.add_format({'border': 1})
+        yes_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#2e7d32', 'color': 'white', 'bold': True})
+        no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
         money_fmt = workbook.add_format({'border': 1, 'num_format': '₹#,##0.00'})
         total_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'num_format': '₹#,##0.00'})
 
@@ -1017,14 +1086,11 @@ class Section23AwardSurveyLine(models.Model):
 
         row = 6
         # Land Section
-        sheet.merge_range(row, 0, row, 18, 'LAND COMPENSATION / भूमि मुआवजा (19 Columns Format)', header_fmt)
+        award_headers = self.get_award_header_constants()
+        sheet.merge_range(row, 0, row, 19, award_headers['excel']['section23_land_title'], header_fmt)
         row += 1
-        headers = [
-            '1. क्र.', '2. भूमिस्वामी विवरण', '3. कुल खसरा', '4. कुल रकबा', '5. लगान', 
-            '6. अर्जित खसरा', '7. अर्जित रकबा', '8. लगान', '9. मुख्य मार्ग?', '10. असिंचित?', 
-            '11. सिंचित?', 'विगत तीन वर्षों का औसत बिक्री छांट दर', '12. गाइड लाइन दर', '13. मूल्य (Basic)', '14. बाजार मूल्य (Factor=2)', 
-            '15. सोलेशियन (100%)', '16. ब्याज (12%)', '17. कुल निर्धारित', '18. देय मुआवजा', '19. रिमार्क'
-        ]
+        headers = award_headers['excel']['section23_land_headers']
+        sheet.set_row(row, 90)
         for col, h in enumerate(headers):
             sheet.write(row, col, h, label_fmt)
         row += 1
@@ -1036,6 +1102,7 @@ class Section23AwardSurveyLine(models.Model):
         total_solatium = 0.0
         total_interest = 0.0
         total_comp = 0.0
+        total_rehab = 0.0
         total_paid = 0.0
         
         for i, land in enumerate(land_data, 1):
@@ -1044,20 +1111,30 @@ class Section23AwardSurveyLine(models.Model):
             sheet.write(row, 1, details, value_fmt)
             sheet.write(row, 2, land.get('khasra', ''), value_fmt)
             sheet.write(row, 3, land.get('original_area', 0.0), value_fmt)
-            sheet.write(row, 4, land.get('lagan', ''), value_fmt)
-            sheet.write(row, 5, land.get('khasra', ''), value_fmt) # Acquired Khasra
-            sheet.write(row, 6, land.get('acquired_area', 0.0), value_fmt)
-            sheet.write(row, 7, land.get('lagan', ''), value_fmt)
-            sheet.write(row, 8, 'Yes' if land.get('is_within_distance') else 'No', value_fmt)
-            sheet.write(row, 9, 'Yes' if land.get('unirrigated') else 'No', value_fmt)
-            sheet.write(row, 10, 'Yes' if land.get('irrigated') else 'No', value_fmt)
-            sheet.write(row, 11, '', value_fmt) # 3 years avg sale rate
-            sheet.write(row, 12, land.get('guide_line_rate', 0.0), money_fmt)
-            sheet.write(row, 13, land.get('basic_value', 0.0), money_fmt)
-            sheet.write(row, 14, land.get('market_value', 0.0), money_fmt)
-            sheet.write(row, 15, land.get('solatium', 0.0), money_fmt)
-            sheet.write(row, 16, land.get('interest', 0.0), money_fmt)
-            sheet.write(row, 17, land.get('total_compensation', 0.0), money_fmt)
+            sheet.write(row, 4, land.get('khasra', ''), value_fmt) # Acquired Khasra
+            sheet.write(row, 5, land.get('acquired_area', 0.0), value_fmt)
+            is_within_distance = bool(land.get('is_within_distance'))
+            is_irrigated = bool(land.get('irrigated'))
+            is_unirrigated = bool(land.get('unirrigated'))
+            is_diverted = bool(land.get('is_diverted'))
+            distance_value = land.get('distance_from_main_road') or 0.0
+            if distance_value:
+                sheet.write(row, 6, f"{distance_value:.2f} m",
+                            yes_fmt if is_within_distance else no_fmt)
+            else:
+                sheet.write(row, 6, 'Yes' if is_within_distance else 'No',
+                            yes_fmt if is_within_distance else no_fmt)
+            sheet.write(row, 7, 'Yes' if is_irrigated else 'No', yes_fmt if is_irrigated else no_fmt)
+            sheet.write(row, 8, 'Yes' if is_unirrigated else 'No', yes_fmt if is_unirrigated else no_fmt)
+            sheet.write(row, 9, 'Yes' if is_diverted else 'No', yes_fmt if is_diverted else no_fmt)
+            sheet.write(row, 10, '', value_fmt) # 3 years avg sale rate
+            sheet.write(row, 11, land.get('guide_line_rate', 0.0), money_fmt)
+            sheet.write(row, 12, land.get('basic_value', 0.0), money_fmt)
+            sheet.write(row, 13, land.get('market_value', 0.0), money_fmt)
+            sheet.write(row, 14, land.get('solatium', 0.0), money_fmt)
+            sheet.write(row, 15, land.get('interest', 0.0), money_fmt)
+            sheet.write(row, 16, land.get('total_compensation', 0.0), money_fmt)
+            sheet.write(row, 17, land.get('rehab_policy_amount', 0.0), money_fmt)
             sheet.write(row, 18, land.get('paid_compensation', 0.0), money_fmt)
             sheet.write(row, 19, land.get('remark', ''), value_fmt)
             
@@ -1067,17 +1144,19 @@ class Section23AwardSurveyLine(models.Model):
             total_solatium += land.get('solatium', 0.0)
             total_interest += land.get('interest', 0.0)
             total_comp += land.get('total_compensation', 0.0)
+            total_rehab += land.get('rehab_policy_amount', 0.0)
             total_paid += land.get('paid_compensation', 0.0)
             row += 1
 
         # Land Total row
-        sheet.merge_range(row, 0, row, 5, 'MAHAYOG (TOTAL) / महायोग', label_fmt)
-        sheet.write(row, 6, total_acquired, total_fmt)
-        sheet.write(row, 13, total_basic, total_fmt)
-        sheet.write(row, 14, total_market, total_fmt)
-        sheet.write(row, 15, total_solatium, total_fmt)
-        sheet.write(row, 16, total_interest, total_fmt)
-        sheet.write(row, 17, total_comp, total_fmt)
+        sheet.merge_range(row, 0, row, 4, 'MAHAYOG (TOTAL) / महायोग', label_fmt)
+        sheet.write(row, 5, total_acquired, total_fmt)
+        sheet.write(row, 12, total_basic, total_fmt)
+        sheet.write(row, 13, total_market, total_fmt)
+        sheet.write(row, 14, total_solatium, total_fmt)
+        sheet.write(row, 15, total_interest, total_fmt)
+        sheet.write(row, 16, total_comp, total_fmt)
+        sheet.write(row, 17, total_rehab, total_fmt)
         sheet.write(row, 18, total_paid, total_fmt)
         
         row += 2
@@ -1086,7 +1165,7 @@ class Section23AwardSurveyLine(models.Model):
         row += 1
         tree_data = self.get_tree_compensation_data()
         if tree_data:
-            headers = ['S.No.', 'Landowner Name', 'Khasra', 'Tree Type', 'Count', 'Value', 'Solatium', 'Interest', 'Total']
+            headers = award_headers['excel']['section23_tree_brief_headers']
             for col, h in enumerate(headers):
                 sheet.write(row, col, h, label_fmt)
             row += 1

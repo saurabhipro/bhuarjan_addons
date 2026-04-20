@@ -196,7 +196,7 @@
                                     <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" 
                                             type="object" class="btn custom-btn-primary" 
                                             icon="fa-cogs"
-                                            invisible="state != 'draft'"
+                                            invisible="state != 'draft' or is_generated"
                                             style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
                                     <div class="text-muted small" invisible="state != 'draft'">
                                         <i class="fa fa-info-circle"/> Generates the award PDF based on the configured surveys.
@@ -271,6 +271,32 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="custom-section-header mt-3" invisible="not is_generated">
+                        Award Line Items (DB) / अवार्ड लाइन आइटम
+                    </div>
+                    <field name="award_line_item_ids" nolabel="1" readonly="1" invisible="not is_generated">
+                        <list create="0" delete="0" default_order="id">
+                            <field name="line_type" string="Component"/>
+                            <field name="landowner_name" string="Landowner"/>
+                            <field name="khasra_number" string="Khasra"/>
+                            <field name="original_area" string="Original Area"/>
+                            <field name="acquired_area" string="Acquired Area"/>
+                            <field name="is_within_distance" string="Main Road"/>
+                            <field name="irrigated" string="Irrigated"/>
+                            <field name="unirrigated" string="Unirrigated"/>
+                            <field name="is_diverted" string="Diverted"/>
+                            <field name="guide_line_rate" string="Guide Rate"/>
+                            <field name="basic_value" string="Basic Value"/>
+                            <field name="market_value" string="Market Value"/>
+                            <field name="solatium" string="Solatium"/>
+                            <field name="interest" string="Interest"/>
+                            <field name="total_compensation" string="Total"/>
+                            <field name="rehab_policy_amount" string="Rehab Policy"/>
+                            <field name="paid_compensation" string="Payable"/>
+                            <field name="remark" string="Remark"/>
+                        </list>
+                    </field>
                 </sheet>
                 <chatter/>
             </form>

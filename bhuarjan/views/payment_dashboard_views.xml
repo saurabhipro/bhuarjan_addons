@@ -51,28 +51,28 @@
                         <!-- KPI Cards: Row 1 - Counts -->
                         <div class="pd-grid">
                             <div class="pd-card pd-total">
-                                <i class="fa fa-exchange pd-icon"/>
+                                <i class="fa fa-exchange pd-icon" title="Total Payments"/>
                                 <div class="pd-label">Total Payments</div>
                                 <div class="pd-value"><field name="total_count"/></div>
                                 <div class="pd-sub">₹ <field name="total_amount" widget="float" options="{'digits': [16, 0]}" nolabel="1"/></div>
                             </div>
                             <div class="pd-card pd-success">
-                                <i class="fa fa-check-circle pd-icon"/>
+                                <i class="fa fa-check-circle pd-icon" title="Successful Payments"/>
                                 <div class="pd-label">Successful</div>
                                 <div class="pd-value"><field name="success_count"/></div>
                                 <div class="pd-sub">₹ <field name="success_amount" widget="float" options="{'digits': [16, 0]}" nolabel="1"/></div>
                             </div>
                             <div class="pd-card pd-failed">
-                                <i class="fa fa-times-circle pd-icon"/>
+                                <i class="fa fa-times-circle pd-icon" title="Failed Payments"/>
                                 <div class="pd-label">Failed</div>
                                 <div class="pd-value"><field name="failed_count"/></div>
                                 <div class="pd-sub">₹ <field name="failed_amount" widget="float" options="{'digits': [16, 0]}" nolabel="1"/></div>
                                 <button name="action_open_all_failed" type="object" class="btn btn-sm btn-light mt-2" style="font-weight: 600;">
-                                    <i class="fa fa-search me-1"/>Review Failed
+                                    <i class="fa fa-search me-1" title="Review Failed"/>Review Failed
                                 </button>
                             </div>
                             <div class="pd-card pd-pending">
-                                <i class="fa fa-clock-o pd-icon"/>
+                                <i class="fa fa-clock-o pd-icon" title="Pending Payments"/>
                                 <div class="pd-label">Pending</div>
                                 <div class="pd-value"><field name="pending_count"/></div>
                                 <div class="pd-sub">₹ <field name="pending_amount" widget="float" options="{'digits': [16, 0]}" nolabel="1"/></div>
@@ -82,7 +82,7 @@
                         <!-- KPI Cards: Row 2 - Rate + Counts -->
                         <div class="pd-grid pd-grid-3">
                             <div class="pd-card pd-rate">
-                                <i class="fa fa-percent pd-icon"/>
+                                <i class="fa fa-percent pd-icon" title="Success Rate"/>
                                 <div class="pd-label">Success Rate</div>
                                 <div class="pd-value">
                                     <field name="success_rate" widget="float" options="{'digits': [3, 2]}"/> %
@@ -90,7 +90,7 @@
                                 <div class="pd-sub">Successful / Total</div>
                             </div>
                             <div class="pd-card pd-projects">
-                                <i class="fa fa-building pd-icon"/>
+                                <i class="fa fa-building pd-icon" title="Projects Tracked"/>
                                 <div class="pd-label">Projects Tracked</div>
                                 <div class="pd-value"><field name="project_count"/></div>
                                 <div class="pd-sub">Drill down project-wise</div>
@@ -99,7 +99,7 @@
                                 </button>
                             </div>
                             <div class="pd-card pd-villages">
-                                <i class="fa fa-map-marker pd-icon"/>
+                                <i class="fa fa-map-marker pd-icon" title="Villages Covered"/>
                                 <div class="pd-label">Villages Covered</div>
                                 <div class="pd-value"><field name="village_count"/></div>
                                 <div class="pd-sub">Across all projects</div>
@@ -258,7 +258,7 @@
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #607d8b; font-weight: 600;">
-                                            <i class="fa fa-map-marker me-1"/>Village
+                                            <i class="fa fa-map-marker me-1" title="Village"/>Village
                                         </div>
                                         <div style="font-size: 17px; font-weight: 700; color: #0f1e3d;"><field name="village_name"/></div>
                                         <div style="font-size: 11px; color: #90a4ae; margin-top: 2px;"><field name="project_name"/></div>
@@ -288,7 +288,7 @@
                                         <t t-esc="'₹ ' + (record.total_amount.raw_value || 0).toLocaleString('en-IN', {maximumFractionDigits: 0})"/>
                                     </div>
                                     <button name="action_open_failed_lines" type="object" class="btn btn-sm btn-outline-danger" invisible="failed_count == 0">
-                                        <i class="fa fa-search me-1"/>Review Failed
+                                        <i class="fa fa-search me-1" title="Review Failed"/>Review Failed
                                     </button>
                                 </div>
                             </div>

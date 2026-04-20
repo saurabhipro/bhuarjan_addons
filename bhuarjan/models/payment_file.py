@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import base64
 import io
 import logging
+import re
+import uuid
+from datetime import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -166,47 +169,75 @@ class PaymentFile(models.Model):
     @api.onchange('award_id', 'village_id')
     def _onchange_award_village(self):
         """Auto-populate payment lines when award or village changes"""
+        if self.award_id:
+            # Keep file context aligned with selected award
+            if not self.project_id:
+                self.project_id = self.award_id.project_id.id
+            if not self.village_id:
+                self.village_id = self.award_id.village_id.id
         if self.award_id and self.village_id:
             self._populate_payment_lines()
     
     def _populate_payment_lines(self):
-        """Populate payment lines from award compensation data"""
+        """Populate payment lines using simulator-equivalent grouped logic.
+
+        One row per beneficiary group, total based on paid_compensation
+        (fallback to total_compensation), khasras combined and sorted.
+        """
         self.ensure_one()
         if not self.award_id or not self.village_id:
             return
-        
-        # Get compensation data from Section 23 Award
-        # This returns a list of dictionaries grouped by landowner/khasra
-        compensation_data = self.award_id.get_land_compensation_data()
-        
+
+        def _khasra_sort_key(khasra):
+            text = (khasra or '').strip()
+            if not text:
+                return (1, 10**12, 10**12, '')
+            parts = text.split('/', 1)
+            main = int(parts[0]) if parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (0, main, sub, text)
+
+        grouped_data = self.award_id.get_land_compensation_grouped_data()
+
         # Clear existing lines
         self.payment_line_ids = [(5, 0, 0)]
-        
+
         # Create payment lines
         line_vals = []
         serial = 1
-        
-        for data in compensation_data:
-            landowner_id = data.get('landowner').id if data.get('landowner') else False
-            landowner = data.get('landowner')
+
+        for group in grouped_data:
+            lines = group.get('lines', [])
+            owners = [line.get('landowner') for line in lines if line.get('landowner')]
+            landowner = owners[0] if owners else False
             if not landowner:
                 continue
-                
+
+            unique_khasras = sorted(
+                {(line.get('khasra') or '').strip() for line in lines if line.get('khasra')},
+                key=_khasra_sort_key,
+            )
+            group_paid = float(group.get('paid_compensation') or 0.0)
+            group_total = float(group.get('total_compensation') or 0.0)
+            line_paid_sum = sum(float((line.get('paid_compensation') or 0.0)) for line in lines)
+            line_total_sum = sum(float((line.get('total_compensation') or 0.0)) for line in lines)
+            amount = group_paid or group_total or line_paid_sum or line_total_sum or 0.0
+
             line_vals.append((0, 0, {
                 'serial_number': serial,
-                'award_serial_number': data.get('serial_no', str(serial)), # Use actual serial from data
-                'khasra_number': data.get('khasra', ''),
-                'landowner_id': landowner_id,
+                'award_serial_number': serial,
+                'khasra_number': ', '.join(unique_khasras),
+                'landowner_id': landowner.id,
                 'bank_name': landowner.bank_name or '',
                 'bank_branch': landowner.bank_branch or '',
                 'account_number': landowner.account_number or '',
                 'ifsc_code': landowner.ifsc_code or '',
-                'compensation_amount': data.get('total_compensation', 0.0),
-                'net_payable_amount': data.get('total_compensation', 0.0), # Assume 0 deductions for now
-                'remark': '', 
+                'compensation_amount': amount,
+                'net_payable_amount': amount,
+                'remark': '',
             }))
             serial += 1
-        
+
         if line_vals:
             self.payment_line_ids = line_vals
     
@@ -265,6 +296,225 @@ class PaymentFile(models.Model):
             'url': f'/web/content/{attachment.id}?download=true',
             'target': 'self',
         }
+
+    def action_download_generated_file(self):
+        """Download already generated payment file from form."""
+        self.ensure_one()
+        if not self.generated_file:
+            raise UserError(_('Payment file is not generated yet. Please generate it first.'))
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': (
+                '/web/content/?model=bhu.payment.file'
+                f'&id={self.id}'
+                '&field=generated_file'
+                '&filename_field=generated_file_filename'
+                '&download=true'
+            ),
+            'target': 'self',
+        }
+
+    def action_open_bank_reconciliation(self):
+        """Open one reconciliation screen for complete payment file."""
+        self.ensure_one()
+        # Always open a draft upload record so Process button is visible.
+        reconciliation = self.env['bhu.payment.reconciliation.bank'].search(
+            [
+                ('payment_file_id', '=', self.id),
+                ('state', '=', 'draft'),
+            ],
+            order='id desc',
+            limit=1,
+        )
+        if not reconciliation:
+            reconciliation = self.env['bhu.payment.reconciliation.bank'].create({
+                'payment_file_id': self.id,
+            })
+
+        popup_view = self.env.ref('bhuarjan.view_payment_reconciliation_bank_popup_form', raise_if_not_found=False)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Upload Bank Reconciliation'),
+            'res_model': 'bhu.payment.reconciliation.bank',
+            'view_mode': 'form',
+            'views': [(popup_view.id, 'form')] if popup_view else [(False, 'form')],
+            'res_id': reconciliation.id,
+            'target': 'new',
+        }
+
+    def _map_sync_status(self, status_text):
+        status = (status_text or '').strip().lower()
+        if status in ('executed', 'settled', 'success', 'successful', 'paid', 'completed'):
+            return 'settled'
+        if status in ('failed', 'failure', 'error', 'rejected'):
+            return 'failed'
+        return 'pending'
+
+    def _prepare_online_sync_results(self, lines, response_body):
+        """Build line-wise sync results from API payload."""
+        parsed = {}
+        candidate_lists = []
+        if isinstance(response_body, dict):
+            for key in ('transactions', 'results', 'data', 'items', 'lines'):
+                value = response_body.get(key)
+                if isinstance(value, list):
+                    candidate_lists.append(value)
+            if not candidate_lists and isinstance(response_body.get('result'), list):
+                candidate_lists.append(response_body.get('result'))
+        elif isinstance(response_body, list):
+            candidate_lists.append(response_body)
+
+        matched = {}
+        for entries in candidate_lists:
+            for item in entries:
+                if not isinstance(item, dict):
+                    continue
+                line_id = item.get('payment_line_id') or item.get('line_id') or item.get('id')
+                if isinstance(line_id, str) and line_id.isdigit():
+                    line_id = int(line_id)
+                if not isinstance(line_id, int):
+                    continue
+                matched[line_id] = item
+
+        for line in lines:
+            item = matched.get(line.id, {})
+            mapped_status = self._map_sync_status(
+                item.get('status') or item.get('event_status') or item.get('state')
+            )
+            parsed[line.id] = {
+                'status': mapped_status,
+                'utr_number': (
+                    item.get('utr_number') or item.get('utr') or item.get('rrn') or
+                    item.get('transaction_id') or ''
+                ),
+                'reason': (
+                    item.get('error') or item.get('reason_code') or item.get('reason') or
+                    item.get('message') or item.get('event_status') or ''
+                ),
+                'raw': item,
+            }
+        return parsed
+
+    def action_online_sync(self):
+        """Call bank API and sync pending/failed payment lines."""
+        self.ensure_one()
+
+        sync_lines = self.payment_line_ids.filtered(
+            lambda l: l.payment_status in ('pending', 'failed')
+        )
+        if not sync_lines:
+            raise UserError(_('No pending or failed payment lines available for online sync.'))
+
+        params = self.env['ir.config_parameter'].sudo()
+        api_url = params.get_param('bhuarjan.indusind_api_url')
+        bearer_token = params.get_param('bhuarjan.indusind_bearer_token')
+        api_key = params.get_param('bhuarjan.indusind_api_key')
+        client_id = params.get_param('bhuarjan.indusind_client_id')
+        if not api_url:
+            raise ValidationError(_(
+                'IndusInd API is not configured. Please set `bhuarjan.indusind_api_url` in System Parameters.'
+            ))
+
+        try:
+            import requests
+        except ImportError:
+            raise ValidationError(_("Python library 'requests' is required for online sync."))
+
+        payload_transactions = []
+        for line in sync_lines:
+            payload_transactions.append({
+                'payment_line_id': line.id,
+                'external_ref_no': f"{self.name}_{uuid.uuid4().hex.upper()}",
+                'beneficiary_name': line.landowner_name or '',
+                'account_number': line.account_number or '',
+                'ifsc_code': line.ifsc_code or '',
+                'amount': round(float(line.net_payable_amount or line.compensation_amount or 0.0), 2),
+                'khasra': line.khasra_number or '',
+            })
+
+        headers = {'Content-Type': 'application/json'}
+        if bearer_token:
+            headers['Authorization'] = f'Bearer {bearer_token}'
+        if api_key:
+            headers['x-api-key'] = api_key
+        if client_id:
+            headers['x-client-id'] = client_id
+
+        payload = {
+            'reference_no': f"PFSYNC-{self.id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+            'payment_file_no': self.name or '',
+            'project': self.project_id.name or '',
+            'village': self.village_id.name or '',
+            'transactions': payload_transactions,
+        }
+
+        try:
+            response = requests.post(api_url, json=payload, headers=headers, timeout=45)
+        except Exception as exc:
+            raise ValidationError(_('Failed to connect to bank API: %s') % str(exc))
+
+        if response.status_code >= 400:
+            raise ValidationError(
+                _('Bank API error (%s): %s') % (response.status_code, (response.text or '')[:500])
+            )
+
+        try:
+            body = response.json()
+        except Exception:
+            body = {'message': (response.text or '')[:500]}
+
+        sync_results = self._prepare_online_sync_results(sync_lines, body)
+
+        reconciliation = self.env['bhu.payment.reconciliation.bank'].search(
+            [
+                ('payment_file_id', '=', self.id),
+                ('state', 'in', ['draft', 'processed']),
+            ],
+            order='id desc',
+            limit=1,
+        )
+        if not reconciliation:
+            reconciliation = self.env['bhu.payment.reconciliation.bank'].create({
+                'payment_file_id': self.id,
+                'bank_file': base64.b64encode(b'{}'),
+                'bank_file_filename': f'online_sync_{self.name or self.id}.json',
+            })
+
+        line_vals = []
+        for line in sync_lines:
+            result = sync_results.get(line.id, {})
+            line_vals.append((0, 0, {
+                'payment_line_id': line.id,
+                'utr_number': result.get('utr_number') or '',
+                'transaction_reference': f"SYNC-{line.id}",
+                'beneficiary_account': line.account_number or '',
+                'beneficiary_name': line.landowner_name or '',
+                'beneficiary_bank_code': line.ifsc_code or '',
+                'credit_amount': float(line.net_payable_amount or line.compensation_amount or 0.0),
+                'status': result.get('status') or 'pending',
+                'event_status': (result.get('raw') or {}).get('event_status') or '',
+                'error': result.get('reason') or '',
+            }))
+        if line_vals:
+            reconciliation.write({'reconciliation_line_ids': line_vals, 'state': 'processed'})
+
+        settled = len([r for r in sync_results.values() if r.get('status') == 'settled'])
+        failed = len([r for r in sync_results.values() if r.get('status') == 'failed'])
+        pending = len(sync_lines) - settled - failed
+        message = _('Online sync completed. Settled: %s, Failed: %s, Pending: %s') % (
+            settled, failed, pending
+        )
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Online Sync'),
+                'message': message,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def _generate_excel_file(self):
         """Generate Excel file based on Template 1 (Bank Export)"""
@@ -310,10 +560,13 @@ class PaymentFile(models.Model):
         # Write data rows
         row = 1
         for line in self.payment_line_ids:
+            amount = float(line.net_payable_amount or line.compensation_amount or 0.0)
+            # Per-transaction unique reference (UUID without dashes).
+            tx_ref = f"{self.name}_{uuid.uuid4().hex.upper()}"
             worksheet.write(row, 0, 'N', cell_format)  # Bulk Transaction Type
-            worksheet.write(row, 1, self.name, cell_format)  # External Ref No
+            worksheet.write(row, 1, tx_ref, cell_format)  # External Ref No
             worksheet.write(row, 2, self.debit_account_number or '', cell_format)  # Debit Account number
-            worksheet.write(row, 3, line.net_payable_amount, cell_format)  # Amount
+            worksheet.write(row, 3, amount, cell_format)  # Amount
             worksheet.write(row, 4, line.landowner_name or '', cell_format)  # Beneficiary Name
             worksheet.write(row, 5, line.bank_name or '', cell_format)  # Beneficiary Bank Name
             worksheet.write(row, 6, line.account_number or '', cell_format)  # Beneficiary Account Number
@@ -344,6 +597,86 @@ class PaymentFile(models.Model):
         output.seek(0)
         return output.read()
 
+    def action_open_bank_details_wizard(self):
+        """Open popup to update beneficiary bank details line-wise."""
+        self.ensure_one()
+        if not self.payment_line_ids:
+            raise UserError(_('No payment lines found for this payment file.'))
+
+        wizard_line_vals = []
+        for line in self.payment_line_ids:
+            wizard_line_vals.append((0, 0, {
+                'payment_line_id': line.id,
+                'serial_number': line.serial_number,
+                'beneficiary_name': line.landowner_name or '',
+                'bank_name': line.bank_name or '',
+                'bank_branch': line.bank_branch or '',
+                'account_number': line.account_number or '',
+                'ifsc_code': line.ifsc_code or '',
+            }))
+
+        wizard = self.env['bhu.payment.file.bank.details.wizard'].create({
+            'payment_file_id': self.id,
+            'line_ids': wizard_line_vals,
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Update Beneficiary Bank Details'),
+            'res_model': 'bhu.payment.file.bank.details.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
+    def _get_bene_test_result(self):
+        """Validate beneficiary bank details and return pass/fail counts."""
+        self.ensure_one()
+        ifsc_regex = re.compile(r'^[A-Za-z]{4}0[A-Za-z0-9]{6}$')
+        passed = 0
+        failed = 0
+
+        for line in self.payment_line_ids:
+            is_valid = True
+            if not (line.bank_name or '').strip():
+                is_valid = False
+            if not (line.bank_branch or '').strip():
+                is_valid = False
+            if not (line.account_number or '').strip():
+                is_valid = False
+            if not ifsc_regex.match((line.ifsc_code or '').strip()):
+                is_valid = False
+
+            if is_valid:
+                passed += 1
+            else:
+                failed += 1
+
+        return passed, failed
+
+    def action_bene_testing(self):
+        """Run quick beneficiary bank-detail validation."""
+        self.ensure_one()
+        passed, failed = self._get_bene_test_result()
+        total = len(self.payment_line_ids)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Beneficiary Testing'),
+                'message': _(
+                    'Total: %(total)s | Passed: %(passed)s | Failed: %(failed)s'
+                ) % {
+                    'total': total,
+                    'passed': passed,
+                    'failed': failed,
+                },
+                'type': 'success' if failed == 0 else 'warning',
+                'sticky': True,
+            },
+        }
+
 
 class PaymentFileLine(models.Model):
     _name = 'bhu.payment.file.line'
@@ -373,6 +706,40 @@ class PaymentFileLine(models.Model):
     compensation_amount = fields.Float(string='Compensation Amount / मुआवजा राशि', required=True, digits=(16, 2))
     net_payable_amount = fields.Float(string='Net Payable Amount / शुद्ध भुगतान की राशि', 
                                       compute='_compute_net_payable', store=True, digits=(16, 2))
+    bene_status = fields.Selection(
+        [('pass', 'Pass'), ('fail', 'Fail')],
+        string='Bene Status',
+        compute='_compute_bene_status',
+        store=True,
+    )
+
+    # Bank reconciliation snapshot
+    reconciliation_line_ids = fields.One2many(
+        'bhu.payment.reconciliation.bank.line',
+        'payment_line_id',
+        string='Reconciliation Lines / समाधान पंक्तियां',
+        readonly=True,
+    )
+    payment_status = fields.Selection(
+        [
+            ('pending', 'Pending / लंबित'),
+            ('settled', 'Success / सफल'),
+            ('failed', 'Failed / असफल'),
+        ],
+        string='Payment Status / भुगतान स्थिति',
+        compute='_compute_reconciliation_snapshot',
+        readonly=True,
+    )
+    utr_number = fields.Char(
+        string='UTR Number / यूटीआर संख्या',
+        compute='_compute_reconciliation_snapshot',
+        readonly=True,
+    )
+    failure_reason_code = fields.Char(
+        string='Failure Reason Code / विफलता कारण कोड',
+        compute='_compute_reconciliation_snapshot',
+        readonly=True,
+    )
     
     currency_id = fields.Many2one('res.currency', string='Currency', related='payment_file_id.currency_id')
     
@@ -384,4 +751,504 @@ class PaymentFileLine(models.Model):
         """Compute net payable amount"""
         for record in self:
             record.net_payable_amount = record.compensation_amount
+
+    @api.depends('bank_name', 'bank_branch', 'account_number', 'ifsc_code')
+    def _compute_bene_status(self):
+        """Beneficiary bank detail status for quick list visibility."""
+        ifsc_regex = re.compile(r'^[A-Za-z]{4}0[A-Za-z0-9]{6}$')
+        for record in self:
+            is_valid = True
+            if not (record.bank_name or '').strip():
+                is_valid = False
+            if not (record.bank_branch or '').strip():
+                is_valid = False
+            acct = (record.account_number or '').strip().replace(' ', '')
+            if not acct or (not acct.isdigit()) or len(acct) < 9 or len(acct) > 18:
+                is_valid = False
+            ifsc = (record.ifsc_code or '').strip().upper()
+            if not ifsc_regex.match(ifsc):
+                is_valid = False
+            record.bene_status = 'pass' if is_valid else 'fail'
+
+    @api.constrains('ifsc_code', 'account_number')
+    def _check_bank_field_formats(self):
+        """Validate IFSC and account number per standard conventions."""
+        ifsc_regex = re.compile(r'^[A-Za-z]{4}0[A-Za-z0-9]{6}$')
+        for record in self:
+            ifsc = (record.ifsc_code or '').strip().upper()
+            acct = (record.account_number or '').strip().replace(' ', '')
+            if ifsc and not ifsc_regex.match(ifsc):
+                raise ValidationError(_(
+                    'Invalid IFSC Code "%s". Use standard format: 4 letters + 0 + 6 alphanumeric characters (e.g., SBIN0001234).'
+                ) % (record.ifsc_code or ''))
+            if acct and (not acct.isdigit() or len(acct) < 9 or len(acct) > 18):
+                raise ValidationError(_(
+                    'Invalid Account Number "%s". It must contain only digits and be between 9 and 18 characters.'
+                ) % (record.account_number or ''))
+
+    @api.depends(
+        'reconciliation_line_ids',
+        'reconciliation_line_ids.status',
+        'reconciliation_line_ids.utr_number',
+        'reconciliation_line_ids.error',
+        'reconciliation_line_ids.event_status',
+    )
+    def _compute_reconciliation_snapshot(self):
+        """Show latest reconciliation result directly on payment line."""
+        for record in self:
+            latest_line = record.reconciliation_line_ids.sorted('id', reverse=True)[:1]
+            if latest_line:
+                record.payment_status = latest_line.status or 'pending'
+                record.utr_number = latest_line.utr_number or ''
+                record.failure_reason_code = (
+                    (latest_line.error or latest_line.event_status or '').strip()
+                    if latest_line.status == 'failed'
+                    else ''
+                )
+            else:
+                record.payment_status = 'pending'
+                record.utr_number = ''
+                record.failure_reason_code = ''
+
+    def action_open_bank_reconciliation(self):
+        """Open bank reconciliation for this payment file to upload/process file."""
+        self.ensure_one()
+        if not self.payment_file_id:
+            raise UserError(_('This payment line is not linked to a payment file.'))
+        return self.payment_file_id.action_open_bank_reconciliation()
+
+    def action_online_sync_line(self):
+        """Sync only this payment line via parent payment file API."""
+        self.ensure_one()
+        if not self.payment_file_id:
+            raise UserError(_('This payment line is not linked to a payment file.'))
+
+        if self.payment_status not in ('pending', 'failed'):
+            raise UserError(_('Only pending or failed lines can be synced online.'))
+
+        params = self.env['ir.config_parameter'].sudo()
+        api_url = params.get_param('bhuarjan.indusind_api_url')
+        bearer_token = params.get_param('bhuarjan.indusind_bearer_token')
+        api_key = params.get_param('bhuarjan.indusind_api_key')
+        client_id = params.get_param('bhuarjan.indusind_client_id')
+        if not api_url:
+            raise ValidationError(_(
+                'IndusInd API is not configured. Please set `bhuarjan.indusind_api_url` in System Parameters.'
+            ))
+
+        try:
+            import requests
+        except ImportError:
+            raise ValidationError(_("Python library 'requests' is required for online sync."))
+
+        headers = {'Content-Type': 'application/json'}
+        if bearer_token:
+            headers['Authorization'] = f'Bearer {bearer_token}'
+        if api_key:
+            headers['x-api-key'] = api_key
+        if client_id:
+            headers['x-client-id'] = client_id
+
+        payload = {
+            'reference_no': f"PFLINE-{self.id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+            'payment_file_no': self.payment_file_id.name or '',
+            'project': self.payment_file_id.project_id.name or '',
+            'village': self.payment_file_id.village_id.name or '',
+            'transactions': [{
+                'payment_line_id': self.id,
+                'external_ref_no': f"{self.payment_file_id.name}_{uuid.uuid4().hex.upper()}",
+                'beneficiary_name': self.landowner_name or '',
+                'account_number': self.account_number or '',
+                'ifsc_code': self.ifsc_code or '',
+                'amount': round(float(self.net_payable_amount or self.compensation_amount or 0.0), 2),
+                'khasra': self.khasra_number or '',
+            }],
+        }
+
+        try:
+            response = requests.post(api_url, json=payload, headers=headers, timeout=45)
+        except Exception as exc:
+            raise ValidationError(_('Failed to connect to bank API: %s') % str(exc))
+
+        if response.status_code >= 400:
+            raise ValidationError(
+                _('Bank API error (%s): %s') % (response.status_code, (response.text or '')[:500])
+            )
+
+        try:
+            body = response.json()
+        except Exception:
+            body = {'message': (response.text or '')[:500]}
+
+        result = self.payment_file_id._prepare_online_sync_results(self, body).get(self.id, {})
+        reconciliation = self.env['bhu.payment.reconciliation.bank'].search(
+            [
+                ('payment_file_id', '=', self.payment_file_id.id),
+                ('state', 'in', ['draft', 'processed']),
+            ],
+            order='id desc',
+            limit=1,
+        )
+        if not reconciliation:
+            reconciliation = self.env['bhu.payment.reconciliation.bank'].create({
+                'payment_file_id': self.payment_file_id.id,
+                'bank_file': base64.b64encode(b'{}'),
+                'bank_file_filename': f'online_sync_{self.payment_file_id.name or self.payment_file_id.id}.json',
+            })
+
+        self.env['bhu.payment.reconciliation.bank.line'].create({
+            'reconciliation_id': reconciliation.id,
+            'payment_line_id': self.id,
+            'utr_number': result.get('utr_number') or '',
+            'transaction_reference': f"SYNC-{self.id}",
+            'beneficiary_account': self.account_number or '',
+            'beneficiary_name': self.landowner_name or '',
+            'beneficiary_bank_code': self.ifsc_code or '',
+            'credit_amount': float(self.net_payable_amount or self.compensation_amount or 0.0),
+            'status': result.get('status') or 'pending',
+            'event_status': (result.get('raw') or {}).get('event_status') or '',
+            'error': result.get('reason') or '',
+        })
+        reconciliation.state = 'processed'
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Online Sync'),
+                'message': _('Online sync completed for line %s.') % (self.award_serial_number or self.id),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def action_open_bank_reconciliation_bulk(self):
+        """Open reconciliation upload once for selected payment lines."""
+        if not self:
+            raise UserError(_('Please select at least one payment line.'))
+
+        payment_files = self.mapped('payment_file_id')
+        if len(payment_files) != 1:
+            raise UserError(_('Please select lines from one payment file only.'))
+
+        return payment_files.action_open_bank_reconciliation()
+
+    def action_open_bank_details_wizard_bulk(self):
+        """Open bank-details update popup for selected payment lines."""
+        if not self:
+            raise UserError(_('Please select at least one payment line.'))
+
+        payment_files = self.mapped('payment_file_id')
+        if len(payment_files) != 1:
+            raise UserError(_('Please select lines from one payment file only.'))
+
+        wizard_line_vals = []
+        for line in self:
+            wizard_line_vals.append((0, 0, {
+                'payment_line_id': line.id,
+                'serial_number': line.serial_number,
+                'beneficiary_name': line.landowner_name or '',
+                'bank_name': line.bank_name or '',
+                'bank_branch': line.bank_branch or '',
+                'account_number': line.account_number or '',
+                'ifsc_code': line.ifsc_code or '',
+            }))
+
+        wizard = self.env['bhu.payment.file.bank.details.wizard'].create({
+            'payment_file_id': payment_files.id,
+            'line_ids': wizard_line_vals,
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Update Beneficiary Bank Details'),
+            'res_model': 'bhu.payment.file.bank.details.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
+    def action_download_recon_template(self):
+        """Download Excel template for bank reconciliation upload testing."""
+        lines = self
+        if not lines:
+            active_ids = self.env.context.get('active_ids') or []
+            if active_ids:
+                lines = self.browse(active_ids)
+
+        payment_files = lines.mapped('payment_file_id') if lines else self.env['bhu.payment.file']
+        if len(payment_files) > 1:
+            raise UserError(_('Please select lines from one payment file only to download a prefilled template.'))
+
+        payment_file = payment_files[0] if payment_files else False
+        filename_suffix = payment_file.name if payment_file else 'Sample'
+        filename = f'Bank_Recon_Template_{filename_suffix}.xlsx'
+
+        if not HAS_XLSXWRITER:
+            raise ValidationError(_('xlsxwriter library is required for Excel template export.'))
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('ReconTemplate')
+        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#D3D3D3', 'border': 1})
+        cell_fmt = workbook.add_format({'border': 1})
+        amount_fmt = workbook.add_format({'border': 1, 'num_format': '#,##0.00'})
+
+        headers = [
+            'UTR Number',
+            'Transaction Reference',
+            'Beneficiary Account',
+            'Beneficiary Name',
+            'Beneficiary Bank Code',
+            'Credit Amount',
+            'Status',
+            'Event Status',
+            'Error',
+            'Payment Id',
+            'Date',
+        ]
+        for col, header in enumerate(headers):
+            worksheet.write(0, col, header, header_fmt)
+
+        row = 1
+        if lines:
+            for line in lines:
+                worksheet.write(row, 0, '', cell_fmt)
+                worksheet.write(row, 1, '', cell_fmt)
+                worksheet.write(row, 2, line.account_number or '', cell_fmt)
+                worksheet.write(row, 3, line.landowner_name or '', cell_fmt)
+                worksheet.write(row, 4, line.ifsc_code or '', cell_fmt)
+                worksheet.write_number(row, 5, float(line.net_payable_amount or line.compensation_amount or 0.0), amount_fmt)
+                worksheet.write(row, 6, 'pending', cell_fmt)
+                worksheet.write(row, 7, '', cell_fmt)
+                worksheet.write(row, 8, '', cell_fmt)
+                worksheet.write(row, 9, '', cell_fmt)
+                worksheet.write(row, 10, str(fields.Date.today() or ''), cell_fmt)
+                row += 1
+        else:
+            worksheet.write(row, 0, '', cell_fmt)
+            worksheet.write(row, 1, '', cell_fmt)
+            worksheet.write(row, 2, '', cell_fmt)
+            worksheet.write(row, 3, '', cell_fmt)
+            worksheet.write(row, 4, '', cell_fmt)
+            worksheet.write_number(row, 5, 0.0, amount_fmt)
+            worksheet.write(row, 6, 'pending', cell_fmt)
+            worksheet.write(row, 7, '', cell_fmt)
+            worksheet.write(row, 8, '', cell_fmt)
+            worksheet.write(row, 9, '', cell_fmt)
+            worksheet.write(row, 10, str(fields.Date.today() or ''), cell_fmt)
+
+        worksheet.set_column('A:B', 24)
+        worksheet.set_column('C:E', 28)
+        worksheet.set_column('F:F', 16)
+        worksheet.set_column('G:J', 20)
+        worksheet.set_column('K:K', 14)
+
+        workbook.close()
+        output.seek(0)
+        file_content = output.read()
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': base64.b64encode(file_content),
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'res_model': 'bhu.payment.file.line',
+            'res_id': lines[0].id if lines else False,
+        })
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }
+
+
+class PaymentFileBankDetailsWizard(models.TransientModel):
+    _name = 'bhu.payment.file.bank.details.wizard'
+    _description = 'Payment File Beneficiary Bank Details Wizard'
+
+    payment_file_id = fields.Many2one('bhu.payment.file', string='Payment File', required=True, readonly=True)
+    update_landowner_bank = fields.Boolean(
+        string='Also update Landowner master bank details',
+        default=True,
+    )
+    line_ids = fields.One2many(
+        'bhu.payment.file.bank.details.wizard.line',
+        'wizard_id',
+        string='Beneficiaries',
+    )
+
+    def action_apply_updates(self):
+        self.ensure_one()
+        updates = 0
+        skipped = []
+        ifsc_regex = re.compile(r'^[A-Za-z]{4}0[A-Za-z0-9]{6}$')
+        for line in self.line_ids:
+            payment_line = line.payment_line_id
+            if not payment_line:
+                continue
+
+            new_vals = {
+                'bank_name': (line.bank_name or '').strip(),
+                'bank_branch': (line.bank_branch or '').strip(),
+                'account_number': (line.account_number or '').strip().replace(' ', ''),
+                'ifsc_code': (line.ifsc_code or '').strip().upper(),
+            }
+
+            current_vals = {
+                'bank_name': (payment_line.bank_name or '').strip(),
+                'bank_branch': (payment_line.bank_branch or '').strip(),
+                'account_number': (payment_line.account_number or '').strip().replace(' ', ''),
+                'ifsc_code': (payment_line.ifsc_code or '').strip().upper(),
+            }
+
+            # Skip unchanged rows so existing bad rows don't block all updates.
+            if new_vals == current_vals:
+                continue
+
+            if not ifsc_regex.match(new_vals['ifsc_code']):
+                skipped.append(_(
+                    'Sr %(sr)s (%(name)s): invalid IFSC "%(ifsc)s"'
+                ) % {
+                    'sr': line.serial_number or '-',
+                    'name': line.beneficiary_name or '',
+                    'ifsc': line.ifsc_code or '',
+                })
+                continue
+
+            acct = new_vals['account_number']
+            if (not acct.isdigit()) or len(acct) < 9 or len(acct) > 18:
+                skipped.append(_(
+                    'Sr %(sr)s (%(name)s): invalid account "%(acct)s"'
+                ) % {
+                    'sr': line.serial_number or '-',
+                    'name': line.beneficiary_name or '',
+                    'acct': line.account_number or '',
+                })
+                continue
+
+            values = {
+                'bank_name': new_vals['bank_name'],
+                'bank_branch': new_vals['bank_branch'],
+                'account_number': new_vals['account_number'],
+                'ifsc_code': new_vals['ifsc_code'],
+            }
+            payment_line.write(values)
+            updates += 1
+
+            if self.update_landowner_bank and payment_line.landowner_id:
+                payment_line.landowner_id.write(values)
+
+        if skipped:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Bank Details Partially Updated'),
+                    'message': _(
+                        'Updated %(ok)s row(s). Skipped %(bad)s invalid row(s). Fix these and retry: %(rows)s'
+                    ) % {
+                        'ok': updates,
+                        'bad': len(skipped),
+                        'rows': '; '.join(skipped[:5]),
+                    },
+                    'type': 'warning',
+                    'sticky': True,
+                },
+            }
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Beneficiary Bank Details Updated'),
+                'message': _('Updated %(count)s payment lines.') % {'count': updates},
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def action_run_bene_testing(self):
+        self.ensure_one()
+        ifsc_regex = re.compile(r'^[A-Za-z]{4}0[A-Za-z0-9]{6}$')
+        passed = 0
+        failed = 0
+
+        for line in self.line_ids:
+            is_valid = True
+            if not (line.bank_name or '').strip():
+                is_valid = False
+            if not (line.bank_branch or '').strip():
+                is_valid = False
+            if not (line.account_number or '').strip():
+                is_valid = False
+            if not ifsc_regex.match((line.ifsc_code or '').strip()):
+                is_valid = False
+
+            line.bene_test_status = 'pass' if is_valid else 'fail'
+            if is_valid:
+                passed += 1
+            else:
+                failed += 1
+
+        total = len(self.line_ids)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Beneficiary Testing'),
+                'message': _(
+                    'Total: %(total)s | Passed: %(passed)s | Failed: %(failed)s'
+                ) % {
+                    'total': total,
+                    'passed': passed,
+                    'failed': failed,
+                },
+                'type': 'success' if failed == 0 else 'warning',
+                'sticky': True,
+            },
+        }
+
+
+class PaymentFileBankDetailsWizardLine(models.TransientModel):
+    _name = 'bhu.payment.file.bank.details.wizard.line'
+    _description = 'Payment File Beneficiary Bank Details Wizard Line'
+    _order = 'serial_number, id'
+
+    wizard_id = fields.Many2one('bhu.payment.file.bank.details.wizard', required=True, ondelete='cascade')
+    payment_line_id = fields.Many2one('bhu.payment.file.line', string='Payment Line', readonly=True)
+    serial_number = fields.Integer(string='Sr.', readonly=True)
+    beneficiary_name = fields.Char(string='Beneficiary', readonly=True)
+    bank_name = fields.Char(string='Bank Name', required=True)
+    bank_branch = fields.Char(string='Bank Branch', required=True)
+    account_number = fields.Char(string='Account Number', required=True)
+    ifsc_code = fields.Char(string='IFSC Code', required=True)
+    bene_test_status = fields.Selection(
+        [('na', 'Not Tested'), ('pass', 'Pass'), ('fail', 'Fail')],
+        string='Test Status',
+        default='na',
+    )
+    bene_test_sign = fields.Char(string='Sign', compute='_compute_bene_test_sign')
+
+    @api.depends('bene_test_status')
+    def _compute_bene_test_sign(self):
+        for record in self:
+            if record.bene_test_status == 'pass':
+                record.bene_test_sign = '✓'
+            elif record.bene_test_status == 'fail':
+                record.bene_test_sign = '✗'
+            else:
+                record.bene_test_sign = '-'
+
+    @api.onchange('ifsc_code')
+    def _onchange_ifsc_code_upper(self):
+        for record in self:
+            if record.ifsc_code:
+                record.ifsc_code = record.ifsc_code.strip().upper()
+
+    @api.onchange('account_number')
+    def _onchange_account_number_trim(self):
+        for record in self:
+            if record.account_number:
+                record.account_number = record.account_number.strip().replace(' ', '')
 

@@ -901,7 +901,7 @@ class AwardSimulator(models.Model):
         }
 
     def action_download_award(self):
-        """Header action alias for award download."""
+        """Simulator must stay test-only: generate files on-the-fly."""
         self.ensure_one()
         return self.action_download()
 

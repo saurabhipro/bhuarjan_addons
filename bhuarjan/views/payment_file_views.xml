@@ -28,6 +28,16 @@
                 <header>
                     <button name="action_generate_file" string="Generate Payment File" type="object" class="btn-primary" icon="fa-file-excel-o"
                             invisible="state == 'generated'"/>
+                    <button name="action_download_generated_file" string="Download Payment File" type="object" class="btn-secondary" icon="fa-download"
+                            invisible="state != 'generated' or not generated_file"/>
+                    <button name="action_open_bank_details_wizard" string="Update Beneficiary Bank Details" type="object" class="btn-secondary" icon="fa-address-card-o"
+                            invisible="state != 'generated'"/>
+                    <button name="action_bene_testing" string="Bene Testing" type="object" class="btn-secondary" icon="fa-check-circle-o"
+                            invisible="state != 'generated'"/>
+                    <button name="action_open_bank_reconciliation" string="Upload Bank Recon" type="object" class="btn-secondary" icon="fa-upload"
+                            invisible="state != 'generated'"/>
+                    <button name="action_online_sync" string="Online Sync" type="object" class="btn-danger" icon="fa-refresh"
+                            invisible="state != 'generated'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
                 </header>
                 <sheet>
@@ -86,20 +96,37 @@
                     <div class="text-muted mb-2" style="font-size: 0.85em;">
                         <i class="fa fa-info-circle"/> File Number will be generated automatically upon file generation.
                     </div>
+
+                    <group string="Bank Reconciliation / बैंक समाधान" invisible="state != 'generated'">
+                        <div class="text-muted mb-2" style="font-size: 0.9em;">
+                            Upload one bank reconciliation file for the complete payment file.
+                        </div>
+                        <button name="action_open_bank_reconciliation" string="Open Upload Screen" type="object" class="btn-primary" icon="fa-upload"/>
+                    </group>
                     
                     <group string="Payment Lines (Auto-populated from Award)">
                         <field name="payment_line_ids" nolabel="1" readonly="1">
-                            <list string="Payment Lines" create="0" delete="0" edit="0">
+                            <list string="Payment Lines" create="0" delete="0" edit="0" decoration-danger="payment_status == 'failed'">
                                 <field name="serial_number" string="Serial Number"/>
-                                <field name="award_serial_number" string="Award Serial No."/>
-                                <field name="khasra_number" string="Khasra Number"/>
+                                <field name="award_serial_number" string="Award Serial Number"/>
                                 <field name="landowner_id" string="Landowner"/>
                                 <field name="bank_name" string="Bank Name"/>
-                                <field name="bank_branch" string="Branch"/>
+                                <field name="bank_branch" string="Bank Branch"/>
                                 <field name="account_number" string="Account Number"/>
                                 <field name="ifsc_code" string="IFSC Code"/>
-                                <field name="compensation_amount" sum="Total" string="Compensation"/>
-                                <field name="net_payable_amount" sum="Total" string="Net Payable" decoration-bf="1" decoration-success="1"/>
+                                <field name="bene_status" string="Bene Status" widget="badge"
+                                       decoration-success="bene_status == 'pass'"
+                                       decoration-danger="bene_status == 'fail'"/>
+                                <field name="compensation_amount" sum="Total" string="Compensation Amount"/>
+                                <field name="net_payable_amount" sum="Total" string="Net Payable Amount" decoration-bf="1" decoration-success="1"/>
+                                <field name="payment_status" widget="badge"
+                                       string="Payment Status"
+                                       decoration-success="payment_status == 'settled'"
+                                       decoration-danger="payment_status == 'failed'"
+                                       decoration-muted="payment_status == 'pending'"/>
+                                <field name="utr_number" string="UTR Number"/>
+                                <field name="failure_reason_code" string="Failure Reason Code"/>
+                                <button name="action_online_sync_line" type="object" string="Online Sync" icon="fa-refresh" class="btn-link"/>
                                 <field name="remark" string="Remark"/>
                             </list>
                         </field>
@@ -157,18 +184,42 @@
         <field name="name">bhu.payment.file.line.list</field>
         <field name="model">bhu.payment.file.line</field>
         <field name="arch" type="xml">
-            <list string="Payment Lines">
-                <field name="payment_file_id"/>
-                <field name="award_serial_number"/>
-                <field name="khasra_number"/>
-                <field name="landowner_id"/>
-                <field name="bank_name"/>
-                <field name="account_number"/>
-                <field name="ifsc_code"/>
-                <field name="net_payable_amount" sum="Total Net Payable"/>
-                <field name="remark"/>
+            <list string="Payment Lines" decoration-danger="payment_status == 'failed'">
+                <header>
+                    <button name="action_open_bank_details_wizard_bulk" type="object" string="Update Bank Details" class="btn-secondary"/>
+                    <button name="action_open_bank_reconciliation_bulk" type="object" string="Upload Recon File" class="btn-primary"/>
+                    <button name="action_download_recon_template" type="object" string="Download Recon Template" class="btn-secondary"/>
+                </header>
+                <field name="payment_file_id" string="Payment File"/>
+                <field name="award_serial_number" string="Award Serial Number"/>
+                <field name="landowner_id" string="Landowner"/>
+                <field name="bank_name" string="Bank Name"/>
+                <field name="account_number" string="Account Number"/>
+                <field name="ifsc_code" string="IFSC Code"/>
+                <field name="bene_status" string="Bene Status" widget="badge"
+                       decoration-success="bene_status == 'pass'"
+                       decoration-danger="bene_status == 'fail'"/>
+                <field name="net_payable_amount" string="Net Payable Amount" sum="Total Net Payable"/>
+                <field name="payment_status" widget="badge"
+                       string="Payment Status"
+                       decoration-success="payment_status == 'settled'"
+                       decoration-danger="payment_status == 'failed'"
+                       decoration-muted="payment_status == 'pending'"/>
+                <field name="utr_number" string="UTR Number"/>
+                <field name="failure_reason_code" string="Failure Reason Code"/>
+                <button name="action_online_sync_line" type="object" string="Online Sync" icon="fa-refresh" class="btn-link"/>
+                <field name="remark" string="Remark"/>
             </list>
         </field>
+    </record>
+
+    <record id="action_payment_line_upload_bank_recon" model="ir.actions.server">
+        <field name="name">Upload Bank Reconciliation</field>
+        <field name="model_id" ref="model_bhu_payment_file_line"/>
+        <field name="binding_model_id" ref="model_bhu_payment_file_line"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_open_bank_reconciliation_bulk()</field>
     </record>
 
     <!-- Payment Line Search View -->
@@ -188,6 +239,68 @@
                     <filter string="Bank" name="group_bank" context="{'group_by': 'bank_name'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+
+    <!-- Beneficiary Bank Details Update Wizard -->
+    <record id="view_payment_file_bank_details_wizard_form" model="ir.ui.view">
+        <field name="name">bhu.payment.file.bank.details.wizard.form</field>
+        <field name="model">bhu.payment.file.bank.details.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Beneficiary Bank Details">
+                <sheet>
+                    <style>
+                        .pf_bank_wizard .o_list_view .o_list_table thead th {
+                            background: #7a3b28 !important;
+                            color: #ffffff !important;
+                            font-weight: 700 !important;
+                        }
+                        .pf_bank_wizard .o_list_view .o_list_table thead th.o_column_sortable:hover {
+                            background: #6a3222 !important;
+                        }
+                        .pf_bank_wizard .o_list_view .o_list_table tbody tr td {
+                            padding-top: 4px !important;
+                            padding-bottom: 4px !important;
+                            line-height: 1.2 !important;
+                        }
+                        .pf_bank_wizard .o_list_view .o_data_row {
+                            height: 28px !important;
+                        }
+                        .pf_bank_wizard .o_list_view .o_field_widget {
+                            margin-bottom: 0 !important;
+                        }
+                        .pf_bank_wizard .o_list_view .badge {
+                            padding: 2px 6px !important;
+                            font-size: 11px !important;
+                        }
+                    </style>
+                    <div class="pf_bank_wizard">
+                    <field name="payment_file_id" invisible="1"/>
+                    <field name="update_landowner_bank" invisible="1"/>
+                    <separator string="Beneficiary Bank Details"/>
+                    <field name="line_ids" nolabel="1" options="{'limit': 10}">
+                        <list string="Beneficiary Bank Details" editable="bottom" create="0" delete="0" limit="10">
+                            <field name="serial_number" string="Sr."/>
+                            <field name="beneficiary_name" string="Beneficiary"/>
+                            <field name="bank_name" string="Bank Name"/>
+                            <field name="bank_branch" string="Bank Branch"/>
+                            <field name="account_number" string="Account Number"/>
+                            <field name="ifsc_code" string="IFSC Code"/>
+                            <field name="bene_test_sign" string="Sign"/>
+                            <field name="bene_test_status" string="Bene Test" widget="badge"
+                                   decoration-success="bene_test_status == 'pass'"
+                                   decoration-danger="bene_test_status == 'fail'"
+                                   decoration-muted="bene_test_status == 'na'"/>
+                        </list>
+                    </field>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_run_bene_testing" string="Bene Testing" type="object" class="btn-secondary"/>
+                    <button name="action_apply_updates" string="Apply Updates" type="object" class="btn-primary"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
         </field>
     </record>
 

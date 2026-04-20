@@ -282,6 +282,145 @@ class PaymentDashboard(models.TransientModel):
             if p['project_id']:
                 payment_by_project[p['project_id']] = p
 
+        villages = self.env['bhu.payment.village.summary'].sudo().search_read(
+            [], [
+                'project_id', 'project_name', 'village_id', 'village_name',
+                'total_count', 'success_count', 'failed_count', 'pending_count',
+                'total_amount', 'success_amount', 'failed_amount', 'pending_amount',
+                'success_rate',
+            ], order='project_name, failed_count desc, village_name',
+        )
+        for v in villages:
+            v['project_id'] = v['project_id'][0] if v.get('project_id') else False
+            v['village_id'] = v['village_id'][0] if v.get('village_id') else False
+            v['success_rate'] = round(v.get('success_rate') or 0.0, 2)
+
+        # ------------------------------------------------------------------
+        # Pending fallback from payment files
+        # ------------------------------------------------------------------
+        # Dashboard base views aggregate only reconciliation lines. When a
+        # payment file is created for a village but bank reconciliation has not
+        # started yet, show those transactions as "pending".
+        recon_village_keys = {
+            (v.get('project_id'), v.get('village_id'))
+            for v in villages
+            if v.get('project_id') and v.get('village_id')
+        }
+        file_pending_by_village = {}
+        file_pending_by_project = {}
+
+        payment_files = self.env['bhu.payment.file'].sudo().search_read(
+            [
+                ('state', 'in', ['draft', 'generated']),
+                ('project_id', '!=', False),
+                ('village_id', '!=', False),
+            ],
+            ['project_id', 'village_id', 'payment_line_ids', 'total_net_payable', 'total_compensation'],
+            order='id desc',
+        )
+
+        for pf in payment_files:
+            project = pf.get('project_id') or []
+            village = pf.get('village_id') or []
+            project_id = project[0] if project else False
+            village_id = village[0] if village else False
+            if not project_id or not village_id:
+                continue
+
+            key = (project_id, village_id)
+            if key in recon_village_keys:
+                # Reconciliation already exists for this project-village, so
+                # avoid double counting payment file lines.
+                continue
+
+            pending_count = len(pf.get('payment_line_ids') or [])
+            pending_amount = float(pf.get('total_net_payable') or pf.get('total_compensation') or 0.0)
+            if pending_count <= 0 and pending_amount <= 0:
+                continue
+
+            if key not in file_pending_by_village:
+                file_pending_by_village[key] = {
+                    'project_id': project_id,
+                    'project_name': project[1] if len(project) > 1 else '',
+                    'village_id': village_id,
+                    'village_name': village[1] if len(village) > 1 else '',
+                    'total_count': 0,
+                    'success_count': 0,
+                    'failed_count': 0,
+                    'pending_count': 0,
+                    'total_amount': 0.0,
+                    'success_amount': 0.0,
+                    'failed_amount': 0.0,
+                    'pending_amount': 0.0,
+                    'success_rate': 0.0,
+                }
+            row = file_pending_by_village[key]
+            row['total_count'] += pending_count
+            row['pending_count'] += pending_count
+            row['total_amount'] += pending_amount
+            row['pending_amount'] += pending_amount
+
+            project_bucket = file_pending_by_project.setdefault(
+                project_id, {'count': 0, 'amount': 0.0}
+            )
+            project_bucket['count'] += pending_count
+            project_bucket['amount'] += pending_amount
+
+        if file_pending_by_village:
+            villages.extend(file_pending_by_village.values())
+            villages.sort(
+                key=lambda row: (
+                    (row.get('project_name') or '').lower(),
+                    -int(row.get('failed_count') or 0),
+                    (row.get('village_name') or '').lower(),
+                )
+            )
+
+        # Merge payment-file fallback into project aggregates and top KPIs.
+        extra_total_count = 0
+        extra_pending_count = 0
+        extra_total_amount = 0.0
+        extra_pending_amount = 0.0
+        for project_id, extra in file_pending_by_project.items():
+            base = payment_by_project.get(project_id)
+            if not base:
+                base = {
+                    'project_id': project_id,
+                    'project_name': '',
+                    'total_count': 0,
+                    'success_count': 0,
+                    'failed_count': 0,
+                    'pending_count': 0,
+                    'total_amount': 0.0,
+                    'success_amount': 0.0,
+                    'failed_amount': 0.0,
+                    'pending_amount': 0.0,
+                    'success_rate': 0.0,
+                }
+                payment_by_project[project_id] = base
+
+            base['total_count'] = int(base.get('total_count') or 0) + int(extra['count'] or 0)
+            base['pending_count'] = int(base.get('pending_count') or 0) + int(extra['count'] or 0)
+            base['total_amount'] = float(base.get('total_amount') or 0.0) + float(extra['amount'] or 0.0)
+            base['pending_amount'] = float(base.get('pending_amount') or 0.0) + float(extra['amount'] or 0.0)
+            success = float(base.get('success_count') or 0.0)
+            total = float(base.get('total_count') or 0.0)
+            base['success_rate'] = round((success / total * 100.0) if total else 0.0, 2)
+
+            extra_total_count += int(extra['count'] or 0)
+            extra_pending_count += int(extra['count'] or 0)
+            extra_total_amount += float(extra['amount'] or 0.0)
+            extra_pending_amount += float(extra['amount'] or 0.0)
+
+        if extra_total_count or extra_total_amount:
+            stats['total_count'] = int(stats.get('total_count') or 0) + extra_total_count
+            stats['pending_count'] = int(stats.get('pending_count') or 0) + extra_pending_count
+            stats['total_amount'] = float(stats.get('total_amount') or 0.0) + extra_total_amount
+            stats['pending_amount'] = float(stats.get('pending_amount') or 0.0) + extra_pending_amount
+            success = float(stats.get('success_count') or 0.0)
+            total = float(stats.get('total_count') or 0.0)
+            stats['success_rate'] = round((success / total * 100.0) if total else 0.0, 2)
+
         # Include every project in the dashboard, even if it has zero payment
         # reconciliation records so the collector gets one complete view.
         all_projects = self.env['bhu.project'].sudo().search_read(
@@ -358,19 +497,6 @@ class PaymentDashboard(models.TransientModel):
                 (row.get('project_name') or '').lower(),
             )
         )
-
-        villages = self.env['bhu.payment.village.summary'].sudo().search_read(
-            [], [
-                'project_id', 'project_name', 'village_id', 'village_name',
-                'total_count', 'success_count', 'failed_count', 'pending_count',
-                'total_amount', 'success_amount', 'failed_amount', 'pending_amount',
-                'success_rate',
-            ], order='project_name, failed_count desc, village_name',
-        )
-        for v in villages:
-            v['project_id'] = v['project_id'][0] if v.get('project_id') else False
-            v['village_id'] = v['village_id'][0] if v.get('village_id') else False
-            v['success_rate'] = round(v.get('success_rate') or 0.0, 2)
 
         recent_failures = []
         failures = self.env['bhu.payment.reconciliation.bank.line'].sudo().search(

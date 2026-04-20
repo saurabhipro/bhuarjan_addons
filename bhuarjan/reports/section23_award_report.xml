@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data>
+        <!-- Section 23 Award Report Action -->
+        <record id="action_report_section23_award" model="ir.actions.report">
+            <field name="name">Section 23 Award / धारा 23 अवार्ड</field>
+            <field name="model">bhu.section23.award</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bhuarjan.section23_award_report</field>
+            <field name="report_file">bhuarjan.section23_award_report</field>
+            <field name="print_report_name">'Section23_Award_%s' % (object.village_id.name or 'Village')</field>
+            <field name="paperformat_id" ref="bhuarjan.bhuarjan_section_23_award_paper_format"/>
+        </record>
+    </data>
+
     <template id="report_common_styles">
         <style>
             .container {
@@ -9,11 +22,20 @@
                 font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'Lohit Devanagari', 'DejaVu Sans', sans-serif;
             }
             .header-text { color: #1a237e; border-bottom: 2px solid #1a237e; }
+            .page { position: relative; }
             .watermark {
-                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
-                opacity: 0.1; font-size: 80px; color: #ccc; z-index: -1000; width: 100%; text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0.14;
+                color: #ccc;
+                z-index: 0;
+                width: 100%;
+                text-align: center;
+                pointer-events: none;
             }
-            .watermark img { width: 400px; height: auto; border: none !important; outline: none !important; box-shadow: none !important; }
+            .watermark img { width: 560px; height: auto; border: none !important; outline: none !important; box-shadow: none !important; }
             .container img { border: none !important; outline: none !important; box-shadow: none !important; }
             .letter_space { letter-spacing: 0.5px; }
             table { border-collapse: collapse; width: 100%; page-break-inside: auto; }

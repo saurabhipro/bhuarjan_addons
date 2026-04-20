@@ -21,7 +21,7 @@ class PaymentReconciliationBank(models.Model):
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', related='project_id.department_id', store=True, readonly=True)
     
     # Bank File Upload
-    bank_file = fields.Binary(string='Bank File / बैंक फ़ाइल', required=True, tracking=True)
+    bank_file = fields.Binary(string='Bank File / बैंक फ़ाइल', required=True)
     bank_file_filename = fields.Char(string='Bank File Name / बैंक फ़ाइल नाम')
     upload_date = fields.Date(string='Upload Date / अपलोड दिनांक', default=fields.Date.today, tracking=True)
     
@@ -93,8 +93,6 @@ class PaymentReconciliationBank(models.Model):
         import base64
         import csv
         import io
-        import xlrd
-        from odoo.tools import pycompat
         
         try:
             file_content = base64.b64decode(self.bank_file)
@@ -104,20 +102,59 @@ class PaymentReconciliationBank(models.Model):
             line_vals = []
 
             # Try to determine if it's Excel or CSV
-            is_excel = self.bank_file_filename and (self.bank_file_filename.endswith('.xls') or self.bank_file_filename.endswith('.xlsx'))
+            filename = (self.bank_file_filename or '').lower()
+            is_xlsx = filename.endswith('.xlsx')
+            is_xls = filename.endswith('.xls')
+            is_excel = is_xls or is_xlsx
             
             if is_excel:
-                # Process Excel
-                workbook = xlrd.open_workbook(file_contents=file_content)
-                sheet = workbook.sheet_by_index(0)
-                headers = [sheet.cell_value(0, col) for col in range(sheet.ncols)]
-                
-                for row_idx in range(1, sheet.nrows):
-                    row_data = {}
-                    for col_idx, header in enumerate(headers):
-                        row_data[header] = sheet.cell_value(row_idx, col_idx)
+                if is_xlsx:
+                    # Process XLSX via openpyxl (xlrd no longer supports xlsx).
+                    try:
+                        from openpyxl import load_workbook
+                    except ImportError:
+                        raise ValidationError(
+                            _("Python library 'openpyxl' is required to process .xlsx files.")
+                        )
+
+                    workbook = load_workbook(io.BytesIO(file_content), data_only=True, read_only=True)
+                    sheet = workbook.active
+                    header_row = next(sheet.iter_rows(min_row=1, max_row=1, values_only=True), None) or []
+                    headers = [str(h).strip() if h is not None else '' for h in header_row]
+
+                    for values in sheet.iter_rows(min_row=2, values_only=True):
+                        row_data = {}
+                        has_data = False
+                        for idx, header in enumerate(headers):
+                            if not header:
+                                continue
+                            cell_val = values[idx] if idx < len(values) else ''
+                            if cell_val is None:
+                                cell_val = ''
+                            if cell_val != '':
+                                has_data = True
+                            row_data[header] = cell_val
+                        if has_data:
+                            line_vals.append((0, 0, self._prepare_line_vals(row_data)))
+                else:
+                    # Process XLS via xlrd
+                    import xlrd
+                    workbook = xlrd.open_workbook(file_contents=file_content)
+                    sheet = workbook.sheet_by_index(0)
+                    headers = [str(sheet.cell_value(0, col)).strip() for col in range(sheet.ncols)]
                     
-                    line_vals.append((0, 0, self._prepare_line_vals(row_data)))
+                    for row_idx in range(1, sheet.nrows):
+                        row_data = {}
+                        has_data = False
+                        for col_idx, header in enumerate(headers):
+                            if not header:
+                                continue
+                            value = sheet.cell_value(row_idx, col_idx)
+                            if value not in ('', None):
+                                has_data = True
+                            row_data[header] = value
+                        if has_data:
+                            line_vals.append((0, 0, self._prepare_line_vals(row_data)))
             else:
                 # Process CSV
                 if isinstance(file_content, bytes):
@@ -133,8 +170,34 @@ class PaymentReconciliationBank(models.Model):
                 
                 # Match with payment file lines
                 self._match_payments()
+            else:
+                raise ValidationError(_('No valid rows found in uploaded bank file.'))
         except Exception as e:
             raise ValidationError(_('Error processing bank file: %s') % str(e))
+
+        lines = self.reconciliation_line_ids
+        total_processed = len(lines)
+        passed_count = len(lines.filtered(lambda l: l.status == 'settled'))
+        failed_count = len(lines.filtered(lambda l: l.status == 'failed'))
+        unmatched_count = len(lines.filtered(lambda l: not l.payment_line_id))
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Reconciliation Summary'),
+                'message': _(
+                    'Processed: %(processed)s | Passed: %(passed)s | Failed: %(failed)s | Unmatched: %(unmatched)s'
+                ) % {
+                    'processed': total_processed,
+                    'passed': passed_count,
+                    'failed': failed_count,
+                    'unmatched': unmatched_count,
+                },
+                'type': 'success',
+                'sticky': True,
+            }
+        }
 
     def _prepare_line_vals(self, row):
         """Helper to map row data to line vals"""

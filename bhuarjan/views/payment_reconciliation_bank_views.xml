@@ -89,6 +89,40 @@
         </field>
     </record>
 
+    <!-- Minimal Popup Upload View -->
+    <record id="view_payment_reconciliation_bank_popup_form" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.popup.form</field>
+        <field name="model">bhu.payment.reconciliation.bank</field>
+        <field name="arch" type="xml">
+            <form string="Upload Bank Reconciliation">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="payment_file_id" readonly="1"/>
+                            <field name="bank_file" filename="bank_file_filename" widget="binary" required="1"/>
+                            <field name="bank_file_filename" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="state" widget="badge" readonly="1"/>
+                            <field name="upload_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Summary" invisible="state == 'draft'">
+                        <field name="total_payments" readonly="1"/>
+                        <field name="settled_count" readonly="1"/>
+                        <field name="failed_count" readonly="1"/>
+                        <field name="pending_count" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_process_bank_file" string="Process File" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
     <!-- Payment Reconciliation Bank Search View -->
     <record id="view_payment_reconciliation_bank_search" model="ir.ui.view">
         <field name="name">bhu.payment.reconciliation.bank.search</field>
@@ -133,21 +167,21 @@
         <field name="model">bhu.payment.reconciliation.bank.line</field>
         <field name="arch" type="xml">
             <list string="Failed Payments">
-                <field name="reconciliation_id"/>
-                <field name="utr_number"/>
-                <field name="transaction_reference"/>
-                <field name="beneficiary_name"/>
-                <field name="beneficiary_account"/>
-                <field name="beneficiary_bank_code"/>
-                <field name="credit_amount" sum="Total Credit"/>
-                <field name="expected_amount" sum="Total Expected"/>
-                <field name="amount_difference" sum="Total Difference"/>
-                <field name="status" widget="badge"
+                <field name="reconciliation_id" string="Reconciliation"/>
+                <field name="utr_number" string="UTR Number"/>
+                <field name="transaction_reference" string="Transaction Reference"/>
+                <field name="beneficiary_name" string="Beneficiary Name"/>
+                <field name="beneficiary_account" string="Beneficiary Account"/>
+                <field name="beneficiary_bank_code" string="Beneficiary Bank Code"/>
+                <field name="credit_amount" string="Credit Amount" sum="Total Credit"/>
+                <field name="expected_amount" string="Expected Amount" sum="Total Expected"/>
+                <field name="amount_difference" string="Amount Difference" sum="Total Difference"/>
+                <field name="status" string="Status" widget="badge"
                        decoration-danger="status == 'failed'"
                        decoration-success="status == 'settled'"
                        decoration-muted="status == 'pending'"/>
-                <field name="error"/>
-                <field name="payment_line_id"/>
+                <field name="error" string="Error"/>
+                <field name="payment_line_id" string="Matched Payment Line"/>
             </list>
         </field>
     </record>
@@ -182,11 +216,27 @@
         <field name="name">Failed Payments</field>
         <field name="res_model">bhu.payment.reconciliation.bank.line</field>
         <field name="view_mode">list</field>
+        <field name="view_id" ref="view_payment_reconciliation_bank_line_list"/>
         <field name="search_view_id" ref="view_payment_reconciliation_bank_line_search"/>
         <field name="domain">[('status', '=', 'failed')]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Failed bank transfers will appear here after reconciliation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Success Payments Action -->
+    <record id="action_success_payment_lines" model="ir.actions.act_window">
+        <field name="name">Success Payments</field>
+        <field name="res_model">bhu.payment.reconciliation.bank.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_payment_reconciliation_bank_line_list"/>
+        <field name="search_view_id" ref="view_payment_reconciliation_bank_line_search"/>
+        <field name="domain">[('status', '=', 'settled')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Successful bank transfers will appear here after reconciliation.
             </p>
         </field>
     </record>

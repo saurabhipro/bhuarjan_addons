@@ -1016,7 +1016,7 @@
                             </div>
 
                             <div class="land_search_bar o_row" style="display:flex;align-items:center;gap:8px;margin:8px 0;">
-                                <i class="fa fa-search" style="color:#7a3b28;"/>
+                                <i class="fa fa-search" title="Search" style="color:#7a3b28;"/>
                                 <field name="land_search" nolabel="1" placeholder="Search by Khasra Number / खसरा नंबर खोजें"
                                        style="max-width:320px;"/>
                                 <span class="text-muted" style="font-size:0.8rem;">Type any part of a khasra to filter</span>

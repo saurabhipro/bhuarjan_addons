@@ -29,11 +29,20 @@ class AwardDownloadWizard(models.TransientModel):
     def action_download(self):
         self.ensure_one()
         record = self.env[self.res_model].browse(self.res_id)
+        if not record.exists():
+            raise UserError(_(
+                "The selected record no longer exists. "
+                "Please reopen the document and try download again."
+            ))
         if self.format == 'pdf':
             report = self.env.ref(self.report_xml_id)
             return report.report_action(record)
         if self.format == 'excel':
+            # Keep wizard generic: support standard Excel hook and
+            # Section 23 consolidated components Excel hook.
             if hasattr(record, 'action_download_excel'):
                 return record.action_download_excel()
+            if hasattr(record, 'action_download_excel_components'):
+                return record.action_download_excel_components()
             raise UserError(_("Excel export is not supported for this report."))
         raise UserError(_("Selected download format is not supported."))

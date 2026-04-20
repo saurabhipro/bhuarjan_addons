@@ -145,11 +145,13 @@ class Section23Award(models.Model):
             for survey in surveys:
                 if survey.id not in existing_survey_ids:
                     # Create new line - sync existing values from survey if available
+                    distance = survey.distance_from_main_road or 0.0
+                    threshold = 50.0 if survey.survey_type == 'rural' else 20.0
                     new_lines.append((0, 0, {
                         'survey_id': survey.id,
                         'khasra_number': survey.khasra_number or '',
                         'land_type': survey.land_type_for_award or False,
-                        'is_within_distance': survey.is_within_distance_for_award or False,
+                        'is_within_distance': distance <= threshold,
                     }))
             
             if new_lines:
@@ -507,11 +509,20 @@ class Section23Award(models.Model):
                 ('khasra_number', '=', data['khasra'])
             ], limit=1)
             
+            # Derive main-road status from measured distance.
+            # Rule: rural <= 50m is MR, urban <= 20m is MR; 0/blank counts as MR.
+            distance_from_main_road = (survey.distance_from_main_road or 0.0) if survey else 0.0
+            if survey:
+                threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+                derived_is_within_distance = distance_from_main_road <= threshold
+            else:
+                derived_is_within_distance = False
+
             # Use computed rate from award line if available
             award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
             has_award_line = bool(award_line)
             guide_line_rate = award_line[0].rate_per_hectare if has_award_line else 2112000.0
-            is_within_distance = award_line[0].is_within_distance if award_line else (survey.is_within_distance_for_award or False)
+            is_within_distance = derived_is_within_distance
             is_diverted = survey.has_traded_land == 'yes'
 
             # Business rule: +25% on guideline rate for diverted land within main road range.
@@ -555,7 +566,7 @@ class Section23Award(models.Model):
                 'original_area': survey.total_area if survey else 0.0,
                 'lagan': survey.lagan if (survey and hasattr(survey, 'lagan')) else data['khasra'],
                 'is_within_distance': is_within_distance,
-                'distance_from_main_road': (survey.distance_from_main_road or 0.0) if survey else 0.0,
+                'distance_from_main_road': distance_from_main_road,
                 'is_diverted': is_diverted,
             })
             
@@ -572,16 +583,25 @@ class Section23Award(models.Model):
         land_data = self.get_land_compensation_data()
         grouped = {}
         ordered_keys = []
+        def _khasra_sort_key(line):
+            khasra = (line.get('khasra') or '').strip()
+            if not khasra:
+                return (1, 10**12, 10**12, '')
+            parts = khasra.split('/', 1)
+            main = int(parts[0]) if parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (0, main, sub, khasra)
         numeric_totals = (
             'original_area', 'acquired_area', 'basic_value', 'market_value',
             'solatium', 'interest', 'total_compensation', 'rehab_policy_amount', 'paid_compensation',
         )
         for row in land_data:
-            owner = row.get('landowner')
-            if owner:
-                key = ('owner', owner.id)
-            elif row.get('landowner_name'):
-                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+            if row.get('landowner_name'):
+                # Group by beneficiary identity (name + father/spouse) so duplicate
+                # landowner master IDs with same beneficiary still merge in one block.
+                beneficiary_name = (row.get('landowner_name') or '').strip().lower()
+                father_name = (row.get('father_name') or '').strip().lower()
+                key = ('beneficiary', beneficiary_name, father_name)
             else:
                 key = ('khasra', row.get('khasra') or '')
             if key not in grouped:
@@ -608,6 +628,7 @@ class Section23Award(models.Model):
         result = []
         for key in ordered_keys:
             group = grouped[key]
+            group['lines'] = sorted(group.get('lines', []), key=_khasra_sort_key)
             group.pop('khasra_seen', None)
             result.append(group)
         return result
@@ -998,8 +1019,9 @@ class Section23AwardSurveyLine(models.Model):
                 # Load existing values from survey if available
                 if not line.land_type and line.survey_id.land_type_for_award:
                     line.land_type = line.survey_id.land_type_for_award
-                if line.is_within_distance is False and line.survey_id.is_within_distance_for_award:
-                    line.is_within_distance = line.survey_id.is_within_distance_for_award
+                distance = line.survey_id.distance_from_main_road or 0.0
+                threshold = 50.0 if line.survey_id.survey_type == 'rural' else 20.0
+                line.is_within_distance = distance <= threshold
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -1014,7 +1036,9 @@ class Section23AwardSurveyLine(models.Model):
                     if 'land_type' not in vals and survey.land_type_for_award:
                         vals['land_type'] = survey.land_type_for_award
                     if 'is_within_distance' not in vals:
-                        vals['is_within_distance'] = survey.is_within_distance_for_award or False
+                        distance = survey.distance_from_main_road or 0.0
+                        threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+                        vals['is_within_distance'] = distance <= threshold
         
         lines = super().create(vals_list)
         
@@ -1118,15 +1142,21 @@ class Section23AwardSurveyLine(models.Model):
             is_unirrigated = bool(land.get('unirrigated'))
             is_diverted = bool(land.get('is_diverted'))
             distance_value = land.get('distance_from_main_road') or 0.0
-            if distance_value:
+            if distance_value and is_within_distance:
                 sheet.write(row, 6, f"{distance_value:.2f} m",
                             yes_fmt if is_within_distance else no_fmt)
             else:
                 sheet.write(row, 6, 'Yes' if is_within_distance else 'No',
                             yes_fmt if is_within_distance else no_fmt)
-            sheet.write(row, 7, 'Yes' if is_irrigated else 'No', yes_fmt if is_irrigated else no_fmt)
-            sheet.write(row, 8, 'Yes' if is_unirrigated else 'No', yes_fmt if is_unirrigated else no_fmt)
-            sheet.write(row, 9, 'Yes' if is_diverted else 'No', yes_fmt if is_diverted else no_fmt)
+            if is_within_distance:
+                # Main-road khasra: irrigated/unirrigated/diverted split is not applicable.
+                sheet.write(row, 7, 'NA', value_fmt)
+                sheet.write(row, 8, 'NA', value_fmt)
+                sheet.write(row, 9, 'NA', value_fmt)
+            else:
+                sheet.write(row, 7, 'Yes' if is_irrigated else 'No', yes_fmt if is_irrigated else no_fmt)
+                sheet.write(row, 8, 'Yes' if is_unirrigated else 'No', yes_fmt if is_unirrigated else no_fmt)
+                sheet.write(row, 9, 'Yes' if is_diverted else 'No', yes_fmt if is_diverted else no_fmt)
             sheet.write(row, 10, '', value_fmt) # 3 years avg sale rate
             sheet.write(row, 11, land.get('guide_line_rate', 0.0), money_fmt)
             sheet.write(row, 12, land.get('basic_value', 0.0), money_fmt)

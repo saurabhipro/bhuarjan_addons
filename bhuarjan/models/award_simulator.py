@@ -471,7 +471,7 @@ class AwardSimulator(models.Model):
                 'original_area': 0.0,
                 'acquired_area': self.acquired_area,
                 'lagan': 'N/A',
-                'is_within_distance': False,
+                'is_within_distance': True,
                 'distance_from_main_road': 0.0,
                 'unirrigated': self.irrigation_type == 'unirrigated',
                 'irrigated': self.irrigation_type == 'irrigated',
@@ -500,8 +500,12 @@ class AwardSimulator(models.Model):
             # Use has_traded_land as the indicator for diverted land as requested
             is_diverted = survey.has_traded_land == 'yes'
             
-            # Using is_within_distance_for_award (True=Main Road, False=Other Road/BMR)
-            road_type = 'mr' if survey.is_within_distance_for_award else 'mbr'
+            # Always derive Main Road/BMR from measured distance.
+            # Rule: rural <= 50m is MR, urban <= 20m is MR; 0/blank counts as MR.
+            distance_from_main_road = survey.distance_from_main_road or 0.0
+            threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+            is_within_distance = distance_from_main_road <= threshold
+            road_type = 'mr' if is_within_distance else 'mbr'
                 
             guide_line_rate = getattr(self, 'base_rate', 0.0)
             if rate_master and not guide_line_rate:
@@ -533,8 +537,8 @@ class AwardSimulator(models.Model):
                         'original_area': survey.total_area or 0.0,
                         'acquired_area': 0.0,
                         'lagan': getattr(survey, 'lagan', khasra) or khasra,
-                        'is_within_distance': survey.is_within_distance_for_award,
-                        'distance_from_main_road': survey.distance_from_main_road or 0.0,
+                        'is_within_distance': is_within_distance,
+                        'distance_from_main_road': distance_from_main_road,
                         'unirrigated': not is_irrigated,
                         'irrigated': is_irrigated,
                         'is_diverted': is_diverted,
@@ -568,8 +572,8 @@ class AwardSimulator(models.Model):
                             'original_area': survey.total_area or 0.0,
                             'acquired_area': 0.0,
                             'lagan': getattr(survey, 'lagan', khasra) or khasra,
-                            'is_within_distance': survey.is_within_distance_for_award,
-                            'distance_from_main_road': survey.distance_from_main_road or 0.0,
+                            'is_within_distance': is_within_distance,
+                            'distance_from_main_road': distance_from_main_road,
                             'unirrigated': not is_irrigated,
                             'irrigated': is_irrigated,
                             'is_diverted': is_diverted,
@@ -601,16 +605,25 @@ class AwardSimulator(models.Model):
         land_data = self.get_land_compensation_data()
         grouped = {}
         ordered_keys = []
+        def _khasra_sort_key(line):
+            khasra = (line.get('khasra') or '').strip()
+            if not khasra:
+                return (1, 10**12, 10**12, '')
+            parts = khasra.split('/', 1)
+            main = int(parts[0]) if parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (0, main, sub, khasra)
         numeric_totals = (
             'original_area', 'acquired_area', 'basic_value', 'market_value',
             'solatium', 'interest', 'total_compensation', 'paid_compensation',
         )
         for row in land_data:
-            owner = row.get('landowner')
-            if owner:
-                key = ('owner', owner.id)
-            elif row.get('landowner_name'):
-                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+            if row.get('landowner_name'):
+                # Group by beneficiary identity (name + father/spouse) so duplicate
+                # landowner master IDs with same beneficiary still merge in one block.
+                beneficiary_name = (row.get('landowner_name') or '').strip().lower()
+                father_name = (row.get('father_name') or '').strip().lower()
+                key = ('beneficiary', beneficiary_name, father_name)
             else:
                 key = ('khasra', row.get('khasra') or '')
             if key not in grouped:
@@ -637,6 +650,7 @@ class AwardSimulator(models.Model):
         result = []
         for key in ordered_keys:
             group = grouped[key]
+            group['lines'] = sorted(group.get('lines', []), key=_khasra_sort_key)
             group.pop('khasra_seen', None)
             result.append(group)
         return result
@@ -886,6 +900,225 @@ class AwardSimulator(models.Model):
             }
         }
 
+    def action_download_award(self):
+        """Header action alias for award download."""
+        self.ensure_one()
+        return self.action_download()
+
+    def action_online_transfer(self):
+        """Send grouped beneficiary payouts to IndusInd online authorization API."""
+        self.ensure_one()
+        import requests
+
+        def _khasra_sort_key(khasra):
+            text = (khasra or '').strip()
+            if not text:
+                return (1, 10**12, 10**12, '')
+            parts = text.split('/', 1)
+            main = int(parts[0]) if parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (0, main, sub, text)
+
+        transactions = []
+        for group in self.get_land_compensation_grouped_data():
+            lines = group.get('lines', [])
+            owners = [line.get('landowner') for line in lines if line.get('landowner')]
+            if not owners:
+                continue
+            landowner = owners[0]
+            amount = float(group.get('paid_compensation') or group.get('total_compensation') or 0.0)
+            unique_khasras = sorted({(line.get('khasra') or '').strip() for line in lines if line.get('khasra')}, key=_khasra_sort_key)
+            transactions.append({
+                'beneficiary_name': group.get('landowner_name') or landowner.name or '',
+                'bank_name': landowner.bank_name or '',
+                'account_number': landowner.account_number or '',
+                'ifsc_code': landowner.ifsc_code or '',
+                'khasra': ', '.join(unique_khasras),
+                'amount': round(amount, 2),
+            })
+
+        if not transactions:
+            raise ValidationError(_('No landowner payment data found for online transfer.'))
+
+        params = self.env['ir.config_parameter'].sudo()
+        api_url = params.get_param('bhuarjan.indusind_api_url')
+        bearer_token = params.get_param('bhuarjan.indusind_bearer_token')
+        api_key = params.get_param('bhuarjan.indusind_api_key')
+        client_id = params.get_param('bhuarjan.indusind_client_id')
+
+        if not api_url:
+            raise ValidationError(_(
+                'IndusInd API is not configured. Please set `bhuarjan.indusind_api_url` in System Parameters.'
+            ))
+
+        headers = {'Content-Type': 'application/json'}
+        if bearer_token:
+            headers['Authorization'] = f'Bearer {bearer_token}'
+        if api_key:
+            headers['x-api-key'] = api_key
+        if client_id:
+            headers['x-client-id'] = client_id
+
+        payload = {
+            'reference_no': f"SIM-{self.id}",
+            'project': self.project_id.name or '',
+            'village': self.village_id.name or '',
+            'transactions': transactions,
+        }
+
+        try:
+            response = requests.post(api_url, json=payload, headers=headers, timeout=45)
+        except Exception as e:
+            raise ValidationError(_('Failed to connect to IndusInd API: %s') % str(e))
+
+        if response.status_code >= 400:
+            raise ValidationError(
+                _('IndusInd API error (%s): %s') % (response.status_code, (response.text or '')[:500])
+            )
+
+        response_message = 'Online authorization request submitted.'
+        try:
+            body = response.json()
+            response_message = body.get('message') or body.get('status') or response_message
+        except Exception:
+            if response.text:
+                response_message = response.text[:200]
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Online Transfer'),
+                'message': response_message,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def action_download_payment_file_excel(self):
+        """Download bank payment file in existing payment-file Excel format."""
+        self.ensure_one()
+        import io
+        import base64
+        try:
+            import xlsxwriter
+        except ImportError:
+            raise ValidationError(_("Python library 'xlsxwriter' is not installed."))
+
+        def _khasra_sort_key(khasra):
+            text = (khasra or '').strip()
+            if not text:
+                return (1, 10**12, 10**12, '')
+            parts = text.split('/', 1)
+            main = int(parts[0]) if parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (0, main, sub, text)
+
+        payment_rows = []
+        for group in self.get_land_compensation_grouped_data():
+            lines = group.get('lines', [])
+            owners = [line.get('landowner') for line in lines if line.get('landowner')]
+            if not owners:
+                continue
+            landowner = owners[0]
+            unique_khasras = sorted({(line.get('khasra') or '').strip() for line in lines if line.get('khasra')}, key=_khasra_sort_key)
+            amount = float(group.get('paid_compensation') or group.get('total_compensation') or 0.0)
+            payment_rows.append({
+                'khasra': ', '.join(unique_khasras),
+                'beneficiary_name': group.get('landowner_name') or landowner.name or '',
+                'bank_name': landowner.bank_name or '',
+                'account_number': landowner.account_number or '',
+                'ifsc_code': landowner.ifsc_code or '',
+                'amount': amount,
+            })
+
+        if not payment_rows:
+            raise ValidationError(_('No landowner payment data found to generate payment file.'))
+
+        debit_account = ''
+        settings_model = self.env['bhuarjan.settings.master']
+        if hasattr(settings_model, 'get_settings_master'):
+            settings = settings_model.get_settings_master()
+            debit_account = settings.debit_account_number or ''
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('PaymentData')
+
+        header_format = workbook.add_format({'bold': True, 'bg_color': '#D3D3D3', 'border': 1})
+        cell_format = workbook.add_format({'border': 1})
+        amount_format = workbook.add_format({'border': 1, 'num_format': '#,##0.00'})
+
+        headers = [
+            'Bulk Transaction Type',
+            'External Ref No',
+            'Debit Account number',
+            'Amount',
+            'Beneficiary Name',
+            'Beneficiary Bank Name',
+            'Beneficiary Account Number',
+            'IFSC',
+            'Purpose 1',
+            'Purpose 2',
+            'Cheque Number',
+            'Project',
+            'Village',
+            'Khasra'
+        ]
+
+        for col, header in enumerate(headers):
+            worksheet.write(0, col, header, header_format)
+
+        external_ref = f"SIM-{self.id}"
+        for idx, row in enumerate(payment_rows, start=1):
+            worksheet.write(idx, 0, 'N', cell_format)
+            worksheet.write(idx, 1, external_ref, cell_format)
+            worksheet.write(idx, 2, debit_account, cell_format)
+            worksheet.write_number(idx, 3, row['amount'], amount_format)
+            worksheet.write(idx, 4, row['beneficiary_name'], cell_format)
+            worksheet.write(idx, 5, row['bank_name'], cell_format)
+            worksheet.write(idx, 6, row['account_number'], cell_format)
+            worksheet.write(idx, 7, row['ifsc_code'], cell_format)
+            worksheet.write(idx, 8, self.village_id.name or '', cell_format)
+            worksheet.write(idx, 9, self.project_id.name or '', cell_format)
+            worksheet.write(idx, 10, '', cell_format)
+            worksheet.write(idx, 11, self.project_id.name or '', cell_format)
+            worksheet.write(idx, 12, self.village_id.name or '', cell_format)
+            worksheet.write(idx, 13, row['khasra'], cell_format)
+
+        worksheet.set_column('A:A', 20)
+        worksheet.set_column('B:B', 20)
+        worksheet.set_column('C:C', 25)
+        worksheet.set_column('D:D', 15)
+        worksheet.set_column('E:E', 30)
+        worksheet.set_column('F:F', 25)
+        worksheet.set_column('G:G', 25)
+        worksheet.set_column('H:H', 15)
+        worksheet.set_column('I:I', 20)
+        worksheet.set_column('J:J', 20)
+        worksheet.set_column('K:K', 15)
+        worksheet.set_column('L:N', 25)
+
+        workbook.close()
+        output.seek(0)
+        file_data = base64.b64encode(output.read())
+        output.close()
+
+        filename = f"Payment_File_AwardSimulator_{self.village_id.name or 'Unknown'}.xlsx"
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': file_data,
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'res_model': self._name,
+            'res_id': self.id,
+        })
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }
+
     def action_download_pdf(self):
         """Open the download wizard for PDF"""
         self.ensure_one()
@@ -1003,11 +1236,13 @@ class AwardSimulator(models.Model):
         land_sheet.merge_range(row, 1, row + 1, 1, sim_land_headers['rowspan_headers'][1], header_fmt)
         land_sheet.merge_range(row, 2, row, 3, sim_land_headers['group_held'], header_group_fmt)
         land_sheet.merge_range(row, 4, row, 5, sim_land_headers['group_acquired'], header_group_fmt)
-        land_sheet.merge_range(row, 6, row, 9, sim_land_headers['group_main_road'], header_group_fmt)
+        land_sheet.merge_range(row, 6, row + 1, 6, sim_land_headers['col_7_standalone'], header_fmt)
+        land_sheet.merge_range(row, 7, row, 9, sim_land_headers['group_main_road'], header_group_fmt)
         for col_offset, label in enumerate(sim_land_headers['tail_headers'], start=10):
             land_sheet.merge_range(row, col_offset, row + 1, col_offset, label, header_fmt)
         row += 1
-        for col_offset, label in enumerate(sim_land_headers['sub_headers'], start=2):
+        sub_header_columns = [2, 3, 4, 5, 7, 8, 9]
+        for col_offset, label in zip(sub_header_columns, sim_land_headers['sub_headers']):
             land_sheet.write(row, col_offset, label, header_fmt)
         land_sheet.set_row(row - 1, 36)
         land_sheet.set_row(row, 36)
@@ -1038,15 +1273,21 @@ class AwardSimulator(models.Model):
                     is_unirrigated = bool(land.get('unirrigated'))
                     is_diverted = bool(land.get('is_diverted'))
                     distance_value = land.get('distance_from_main_road') or 0.0
-                    if distance_value:
+                    if distance_value and is_within_distance:
                         land_sheet.write(row, 6, f"{distance_value:.2f} m",
                                           _yes_no_format(is_within_distance))
                     else:
                         land_sheet.write(row, 6, 'हाँ' if is_within_distance else 'नहीं',
                                           _yes_no_format(is_within_distance))
-                    land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
-                    land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
-                    land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
+                    if is_within_distance:
+                        # Main-road khasra: sub-columns 8/9/10 are not applicable.
+                        land_sheet.write(row, 7, 'NA', cell_center_fmt)
+                        land_sheet.write(row, 8, 'NA', cell_center_fmt)
+                        land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                    else:
+                        land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
+                        land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
+                        land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
                     land_sheet.write(row, 10, '-', cell_center_fmt)
                     land_sheet.write_number(row, 11, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
                     land_sheet.write_number(row, 12, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
@@ -1106,15 +1347,15 @@ class AwardSimulator(models.Model):
             land_sheet.write_blank(row, 19, None, total_label_fmt)
 
         # ASSET TAB
-        asset_col_widths = [4, 24, 10, 10, 10, 10, 22, 10, 12, 12, 12, 12, 12]
+        asset_col_widths = [4, 24, 10, 10, 22, 10, 12, 12, 12, 12, 12]
         _setup_sheet(asset_sheet, asset_col_widths, 4)
         asset_row = 0
-        asset_sheet.merge_range(asset_row, 0, asset_row, 12, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+        asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
         asset_row += 1
-        asset_sheet.merge_range(asset_row, 0, asset_row, 12, subtitle, subtitle_fmt)
+        asset_sheet.merge_range(asset_row, 0, asset_row, 10, subtitle, subtitle_fmt)
         asset_row += 2
         asset_sheet.merge_range(
-            asset_row, 0, asset_row, 12,
+            asset_row, 0, asset_row, 10,
             f"{award_headers['sections']['asset_sheet_label']} - {award_headers['sections']['asset_title']}",
             header_group_fmt
         )
@@ -1125,7 +1366,7 @@ class AwardSimulator(models.Model):
         asset_row += 1
         asset_groups = self.get_structure_compensation_grouped_data()
         if not asset_groups:
-            asset_sheet.merge_range(asset_row, 0, asset_row, 12, 'No asset/structure data available / परिसम्पत्ति डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
+            asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'No asset/structure data available / परिसम्पत्ति डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
             asset_row += 1
         else:
             for i, group in enumerate(asset_groups, 1):
@@ -1137,43 +1378,39 @@ class AwardSimulator(models.Model):
                 for idx, asset in enumerate(lines):
                     asset_sheet.write(asset_row, 0, i if idx == 0 else '', cell_center_fmt)
                     asset_sheet.write(asset_row, 1, details if idx == 0 else '', cell_fmt)
-                    asset_sheet.write(asset_row, 2, asset.get('total_khasra', ''), cell_center_fmt)
-                    asset_sheet.write_number(asset_row, 3, float(asset.get('total_area', 0.0) or 0.0), number_fmt)
-                    asset_sheet.write(asset_row, 4, asset.get('asset_khasra', ''), cell_center_fmt)
-                    asset_sheet.write_number(asset_row, 5, float(asset.get('asset_land_area', 0.0) or 0.0), number_fmt)
-                    asset_sheet.write(asset_row, 6, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
-                    asset_sheet.write_number(asset_row, 7, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
-                    asset_sheet.write_number(asset_row, 8, float(asset.get('market_value', 0.0) or 0.0), money_fmt)
-                    asset_sheet.write_number(asset_row, 9, float(asset.get('solatium', 0.0) or 0.0), money_fmt)
-                    asset_sheet.write_number(asset_row, 10, float(asset.get('interest', 0.0) or 0.0), money_fmt)
-                    asset_sheet.write_number(asset_row, 11, float(asset.get('total', 0.0) or 0.0), money_fmt)
-                    asset_sheet.write(asset_row, 12, asset.get('remark', ''), cell_fmt)
+                    asset_sheet.write(asset_row, 2, asset.get('asset_khasra', ''), cell_center_fmt)
+                    asset_sheet.write_number(asset_row, 3, float(asset.get('asset_land_area', 0.0) or 0.0), number_fmt)
+                    asset_sheet.write(asset_row, 4, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
+                    asset_sheet.write_number(asset_row, 5, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
+                    asset_sheet.write_number(asset_row, 6, float(asset.get('market_value', 0.0) or 0.0), money_fmt)
+                    asset_sheet.write_number(asset_row, 7, float(asset.get('solatium', 0.0) or 0.0), money_fmt)
+                    asset_sheet.write_number(asset_row, 8, float(asset.get('interest', 0.0) or 0.0), money_fmt)
+                    asset_sheet.write_number(asset_row, 9, float(asset.get('total', 0.0) or 0.0), money_fmt)
+                    asset_sheet.write(asset_row, 10, asset.get('remark', ''), cell_fmt)
                     asset_row += 1
 
                 asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
                 asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 3, float(group.get('total_area', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 5, float(group.get('asset_land_area', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_blank(asset_row, 6, None, total_label_fmt)
-                asset_sheet.write_number(asset_row, 7, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 8, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 9, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 10, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_number(asset_row, 11, float(group.get('total', 0.0) or 0.0), total_money_fmt)
-                asset_sheet.write_blank(asset_row, 12, None, total_label_fmt)
+                asset_sheet.write_number(asset_row, 3, float(group.get('asset_land_area', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_blank(asset_row, 4, None, total_label_fmt)
+                asset_sheet.write_number(asset_row, 5, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_number(asset_row, 6, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_number(asset_row, 7, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_number(asset_row, 8, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_number(asset_row, 9, float(group.get('total', 0.0) or 0.0), total_money_fmt)
+                asset_sheet.write_blank(asset_row, 10, None, total_label_fmt)
                 asset_row += 1
 
         # TREE TAB
-        tree_col_widths = [4, 24, 10, 10, 10, 20, 10, 10, 10, 12, 12, 12, 12, 12]
+        tree_col_widths = [4, 24, 10, 20, 10, 10, 10, 12, 12, 12, 12, 12]
         _setup_sheet(tree_sheet, tree_col_widths, 4)
         tree_row = 0
-        tree_sheet.merge_range(tree_row, 0, tree_row, 13, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+        tree_sheet.merge_range(tree_row, 0, tree_row, 11, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
         tree_row += 1
-        tree_sheet.merge_range(tree_row, 0, tree_row, 13, subtitle, subtitle_fmt)
+        tree_sheet.merge_range(tree_row, 0, tree_row, 11, subtitle, subtitle_fmt)
         tree_row += 2
         tree_sheet.merge_range(
-            tree_row, 0, tree_row, 13,
+            tree_row, 0, tree_row, 11,
             f"{award_headers['sections']['tree_sheet_label']} - {award_headers['sections']['tree_title']}",
             header_group_fmt
         )
@@ -1184,7 +1421,7 @@ class AwardSimulator(models.Model):
         tree_row += 1
         tree_groups = self.get_tree_compensation_grouped_data()
         if not tree_groups:
-            tree_sheet.merge_range(tree_row, 0, tree_row, 13, 'No tree data available / वृक्ष डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
+            tree_sheet.merge_range(tree_row, 0, tree_row, 11, 'No tree data available / वृक्ष डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
             tree_row += 1
         else:
             for i, group in enumerate(tree_groups, 1):
@@ -1196,33 +1433,29 @@ class AwardSimulator(models.Model):
                 for idx, tree in enumerate(lines):
                     tree_sheet.write(tree_row, 0, i if idx == 0 else '', cell_center_fmt)
                     tree_sheet.write(tree_row, 1, details if idx == 0 else '', cell_fmt)
-                    tree_sheet.write(tree_row, 2, tree.get('total_khasra', ''), cell_center_fmt)
-                    tree_sheet.write_number(tree_row, 3, float(tree.get('total_area', 0.0) or 0.0), number_fmt)
-                    tree_sheet.write(tree_row, 4, tree.get('khasra', ''), cell_center_fmt)
-                    tree_sheet.write(tree_row, 5, tree.get('tree_type', ''), cell_fmt)
-                    tree_sheet.write_number(tree_row, 6, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
-                    tree_sheet.write_number(tree_row, 7, float(tree.get('girth_cm', 0.0) or 0.0), number_fmt)
-                    tree_sheet.write_number(tree_row, 8, float(tree.get('rate', 0.0) or 0.0), money_fmt)
-                    tree_sheet.write_number(tree_row, 9, float(tree.get('value', 0.0) or 0.0), money_fmt)
-                    tree_sheet.write_number(tree_row, 10, float(tree.get('solatium', 0.0) or 0.0), money_fmt)
-                    tree_sheet.write_number(tree_row, 11, float(tree.get('interest', 0.0) or 0.0), money_fmt)
-                    tree_sheet.write_number(tree_row, 12, float(tree.get('total', 0.0) or 0.0), money_fmt)
-                    tree_sheet.write(tree_row, 13, tree.get('remark', ''), cell_fmt)
+                    tree_sheet.write(tree_row, 2, tree.get('khasra', ''), cell_center_fmt)
+                    tree_sheet.write(tree_row, 3, tree.get('tree_type', ''), cell_fmt)
+                    tree_sheet.write_number(tree_row, 4, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
+                    tree_sheet.write_number(tree_row, 5, float(tree.get('girth_cm', 0.0) or 0.0), number_fmt)
+                    tree_sheet.write_number(tree_row, 6, float(tree.get('rate', 0.0) or 0.0), money_fmt)
+                    tree_sheet.write_number(tree_row, 7, float(tree.get('value', 0.0) or 0.0), money_fmt)
+                    tree_sheet.write_number(tree_row, 8, float(tree.get('solatium', 0.0) or 0.0), money_fmt)
+                    tree_sheet.write_number(tree_row, 9, float(tree.get('interest', 0.0) or 0.0), money_fmt)
+                    tree_sheet.write_number(tree_row, 10, float(tree.get('total', 0.0) or 0.0), money_fmt)
+                    tree_sheet.write(tree_row, 11, tree.get('remark', ''), cell_fmt)
                     tree_row += 1
 
                 tree_sheet.merge_range(tree_row, 0, tree_row, 1, 'कुल', total_label_fmt)
                 tree_sheet.write_number(tree_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                tree_sheet.write_number(tree_row, 3, float(group.get('total_area', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_number(tree_row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
+                tree_sheet.write_blank(tree_row, 3, None, total_label_fmt)
+                tree_sheet.write_number(tree_row, 4, float(group.get('tree_count', 0.0) or 0.0), total_money_fmt)
                 tree_sheet.write_blank(tree_row, 5, None, total_label_fmt)
-                tree_sheet.write_number(tree_row, 6, float(group.get('tree_count', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_blank(tree_row, 7, None, total_label_fmt)
-                tree_sheet.write_blank(tree_row, 8, None, total_label_fmt)
-                tree_sheet.write_number(tree_row, 9, float(group.get('value', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_number(tree_row, 10, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_number(tree_row, 11, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_number(tree_row, 12, float(group.get('total', 0.0) or 0.0), total_money_fmt)
-                tree_sheet.write_blank(tree_row, 13, None, total_label_fmt)
+                tree_sheet.write_blank(tree_row, 6, None, total_label_fmt)
+                tree_sheet.write_number(tree_row, 7, float(group.get('value', 0.0) or 0.0), total_money_fmt)
+                tree_sheet.write_number(tree_row, 8, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                tree_sheet.write_number(tree_row, 9, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                tree_sheet.write_number(tree_row, 10, float(group.get('total', 0.0) or 0.0), total_money_fmt)
+                tree_sheet.write_blank(tree_row, 11, None, total_label_fmt)
                 tree_row += 1
 
         workbook.close()

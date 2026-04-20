@@ -127,5 +127,69 @@
         </field>
     </record>
 
+    <!-- Failed Payment Line List View -->
+    <record id="view_payment_reconciliation_bank_line_list" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.line.list</field>
+        <field name="model">bhu.payment.reconciliation.bank.line</field>
+        <field name="arch" type="xml">
+            <list string="Failed Payments">
+                <field name="reconciliation_id"/>
+                <field name="utr_number"/>
+                <field name="transaction_reference"/>
+                <field name="beneficiary_name"/>
+                <field name="beneficiary_account"/>
+                <field name="beneficiary_bank_code"/>
+                <field name="credit_amount" sum="Total Credit"/>
+                <field name="expected_amount" sum="Total Expected"/>
+                <field name="amount_difference" sum="Total Difference"/>
+                <field name="status" widget="badge"
+                       decoration-danger="status == 'failed'"
+                       decoration-success="status == 'settled'"
+                       decoration-muted="status == 'pending'"/>
+                <field name="error"/>
+                <field name="payment_line_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Failed Payment Line Search View -->
+    <record id="view_payment_reconciliation_bank_line_search" model="ir.ui.view">
+        <field name="name">bhu.payment.reconciliation.bank.line.search</field>
+        <field name="model">bhu.payment.reconciliation.bank.line</field>
+        <field name="arch" type="xml">
+            <search string="Failed Payments">
+                <field name="reconciliation_id"/>
+                <field name="beneficiary_name"/>
+                <field name="beneficiary_account"/>
+                <field name="transaction_reference"/>
+                <field name="utr_number"/>
+                <field name="status"/>
+                <filter string="Failed" name="failed" domain="[('status', '=', 'failed')]"/>
+                <filter string="Pending" name="pending" domain="[('status', '=', 'pending')]"/>
+                <filter string="Settled" name="settled" domain="[('status', '=', 'settled')]"/>
+                <filter string="With Error" name="with_error" domain="[('error', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Reconciliation" name="group_reconciliation" context="{'group_by': 'reconciliation_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Beneficiary" name="group_beneficiary" context="{'group_by': 'beneficiary_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Failed Payments Action -->
+    <record id="action_failed_payment_lines" model="ir.actions.act_window">
+        <field name="name">Failed Payments</field>
+        <field name="res_model">bhu.payment.reconciliation.bank.line</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_payment_reconciliation_bank_line_search"/>
+        <field name="domain">[('status', '=', 'failed')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Failed bank transfers will appear here after reconciliation.
+            </p>
+        </field>
+    </record>
+
 </odoo>
 

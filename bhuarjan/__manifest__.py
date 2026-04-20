@@ -101,6 +101,7 @@
         'views/payment_reconciliation_views.xml',
         'views/payment_file_views.xml',
         'views/payment_reconciliation_bank_views.xml',
+        'views/payment_dashboard_views.xml',
         'views/land_rate_master_views.xml',
         'views/tree_master_views.xml',
         'views/tree_rate_master_views.xml',
@@ -171,6 +172,10 @@
             'bhuarjan/static/src/dashboard/css/dashboards_unified_theme.css',
             # Role-based Dashboard (routes to appropriate dashboard based on user role)
             'bhuarjan/static/src/dashboard/js/role_based_dashboard.js',
+            # Payment Dashboard (OWL)
+            'bhuarjan/static/src/dashboard/css/payment_dashboard.css',
+            'bhuarjan/static/src/dashboard/xml/payment_dashboard.xml',
+            'bhuarjan/static/src/dashboard/js/payment_dashboard.js',
 
             # 'bhuarjan/static/src/css/landowner_documents.css',
             'bhuarjan/static/src/scss/hierarchy_view.scss',

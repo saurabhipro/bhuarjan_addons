@@ -30,16 +30,21 @@
             <field name="arch" type="xml">
                 <form string="Award Simulator / अवार्ड सिमुलेटर">
                     <header>
-                        <button string="Recalculate / पुनः गणना करें"
-                                name="action_calculate"
-                                type="object"
-                                class="btn-primary"
-                                icon="fa-refresh"/>
-                        <button string="Download / डाउनलोड"
-                                name="action_download"
+                        <button string="Download Award"
+                                name="action_download_award"
                                 type="object"
                                 class="btn-secondary"
                                 icon="fa-download"/>
+                        <button string="Download Payment File"
+                                name="action_download_payment_file_excel"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-file-excel-o"/>
+                        <button string="Online Transfer"
+                                name="action_online_transfer"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-paper-plane"/>
                     </header>
                     <sheet>
                         <style>
@@ -1246,6 +1251,49 @@
         <!-- ═══════════════════════════════════════════════════════════════════
              Award Structure Details – clean form view (hides internal links)
         ═══════════════════════════════════════════════════════════════════ -->
+        <record id="view_bhu_award_simulator_land_line_form" model="ir.ui.view">
+            <field name="name">bhu.award.simulator.land.line.form</field>
+            <field name="model">bhu.award.simulator.land.line</field>
+            <field name="arch" type="xml">
+                <form string="Land Line / भूमि लाइन" create="false" edit="false" delete="false">
+                    <sheet>
+                        <group>
+                            <group string="Khasra Details">
+                                <field name="simulator_id" invisible="1"/>
+                                <field name="survey_id" invisible="1"/>
+                                <field name="khasra_number" readonly="1"/>
+                                <field name="village_id" readonly="1"/>
+                                <field name="distance_from_main_road" string="Distance from Main Road (m)" readonly="1"/>
+                                <field name="road_type" widget="badge" readonly="1"
+                                       decoration-success="road_type == 'mr'"
+                                       decoration-warning="road_type == 'mbr'"/>
+                            </group>
+                            <group string="Land Attributes">
+                                <field name="acquired_area" string="Acquired Area (Ha)" readonly="1"/>
+                                <field name="total_area" string="Total Area (Ha)" readonly="1"/>
+                                <field name="irrigation_type" readonly="1"/>
+                                <field name="has_traded_land" string="Diverted (Traded)" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Rate &amp; Award">
+                                <field name="base_rate" widget="monetary" readonly="1"/>
+                                <field name="effective_rate" widget="monetary" readonly="1"/>
+                                <field name="land_award_amount" widget="monetary" readonly="1"/>
+                            </group>
+                            <group string="Solatium &amp; Interest">
+                                <field name="solatium_amount" widget="monetary" readonly="1"/>
+                                <field name="interest_days" readonly="1"/>
+                                <field name="interest_amount" widget="monetary" readonly="1"/>
+                                <field name="line_total" widget="monetary" readonly="1"
+                                       class="oe_inline" style="font-weight: 700;"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
         <record id="view_bhu_award_structure_details_form" model="ir.ui.view">
             <field name="name">bhu.award.structure.details.form</field>
             <field name="model">bhu.award.structure.details</field>

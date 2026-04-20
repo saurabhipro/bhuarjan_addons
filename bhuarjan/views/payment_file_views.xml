@@ -152,5 +152,57 @@
         </field>
     </record>
 
+    <!-- Payment Line List View -->
+    <record id="view_payment_file_line_list" model="ir.ui.view">
+        <field name="name">bhu.payment.file.line.list</field>
+        <field name="model">bhu.payment.file.line</field>
+        <field name="arch" type="xml">
+            <list string="Payment Lines">
+                <field name="payment_file_id"/>
+                <field name="award_serial_number"/>
+                <field name="khasra_number"/>
+                <field name="landowner_id"/>
+                <field name="bank_name"/>
+                <field name="account_number"/>
+                <field name="ifsc_code"/>
+                <field name="net_payable_amount" sum="Total Net Payable"/>
+                <field name="remark"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Payment Line Search View -->
+    <record id="view_payment_file_line_search" model="ir.ui.view">
+        <field name="name">bhu.payment.file.line.search</field>
+        <field name="model">bhu.payment.file.line</field>
+        <field name="arch" type="xml">
+            <search string="Payment Lines">
+                <field name="payment_file_id"/>
+                <field name="landowner_id"/>
+                <field name="khasra_number"/>
+                <field name="bank_name"/>
+                <field name="ifsc_code"/>
+                <group expand="0" string="Group By">
+                    <filter string="Payment File" name="group_payment_file" context="{'group_by': 'payment_file_id'}"/>
+                    <filter string="Landowner" name="group_landowner" context="{'group_by': 'landowner_id'}"/>
+                    <filter string="Bank" name="group_bank" context="{'group_by': 'bank_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Payment Line Action -->
+    <record id="action_payment_file_lines" model="ir.actions.act_window">
+        <field name="name">Payment Lines</field>
+        <field name="res_model">bhu.payment.file.line</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_payment_file_line_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Payment lines will appear here after payment file generation.
+            </p>
+        </field>
+    </record>
+
 </odoo>
 

@@ -28,6 +28,20 @@ class Survey(models.Model):
         ('rural', 'Rural / ग्रामीण'),
         ('urban', 'Urban / शहरी')
     ], string='Survey Type / सर्वे प्रकार', default='rural', tracking=True)
+
+    payment_status_line_ids = fields.One2many(
+        'bhu.landowner.payment.status',
+        'survey_id',
+        string='Payment Status Lines / भुगतान स्थिति पंक्तियां',
+        readonly=True,
+    )
+
+    payment_status = fields.Selection([
+        ('new', 'New'),
+        ('payment_under_process', 'Payment Under Process'),
+        ('payment_done', 'Payment Done'),
+        ('payment_failed', 'Payment Failed'),
+    ], string='Payment Status', compute='_compute_payment_status', readonly=True, tracking=True)
     
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -112,6 +126,44 @@ class Survey(models.Model):
             distance = distance or 0.0
             threshold = 50.0 if survey_type == 'rural' else 20.0
             rec.sudo().write({'is_within_distance_for_award': distance <= threshold})
+
+    @api.depends('payment_status_line_ids.status', 'khasra_number', 'project_id', 'village_id')
+    def _compute_payment_status(self):
+        """Reflect live payment lifecycle for each survey/khasra.
+
+        Priority:
+        1) Any failed reconciliation => Payment Failed
+        2) All available reconciled statuses paid => Payment Done
+        3) Any pending/partial status OR payment file generated => Payment Under Process
+        4) Otherwise => New
+        """
+        PaymentFileLine = self.env['bhu.payment.file.line']
+        for rec in self:
+            statuses = set(rec.payment_status_line_ids.mapped('status'))
+
+            if 'failed' in statuses:
+                rec.payment_status = 'payment_failed'
+                continue
+
+            if statuses and statuses.issubset({'paid'}):
+                rec.payment_status = 'payment_done'
+                continue
+
+            if statuses:
+                rec.payment_status = 'payment_under_process'
+                continue
+
+            # No reconciliation status lines yet:
+            # if present in a payment file, treat as under process; else new.
+            has_payment_line = False
+            if rec.khasra_number and rec.project_id and rec.village_id:
+                has_payment_line = bool(PaymentFileLine.search_count([
+                    ('khasra_number', '=ilike', rec.khasra_number.strip()),
+                    ('payment_file_id.project_id', '=', rec.project_id.id),
+                    ('payment_file_id.village_id', '=', rec.village_id.id),
+                ]))
+
+            rec.payment_status = 'payment_under_process' if has_payment_line else 'new'
     
     # Rate Permutations for Village (read-only, computed)
     rate_permutation_ids = fields.One2many('bhu.rate.master.permutation.line', 'survey_id', 

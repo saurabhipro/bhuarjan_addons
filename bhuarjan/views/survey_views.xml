@@ -65,8 +65,18 @@
                     </div>
                     
                     <field name="pending_with" invisible="1"/>
+                    <group string="Survey Controls / सर्वे नियंत्रण" col="2">
+                        <field name="survey_type" widget="radio" options="{'horizontal': true}"
+                               readonly="not is_admin and (is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly)"
+                               string="Survey Type * / सर्वे प्रकार *"/>
+                        <field name="payment_status" widget="badge" readonly="1" string="Payment Status"/>
+                    </group>
                     <group>
                         <group string="Project Information / परियोजना की जानकारी" class="survey-icon-project">
+                            <field name="survey_type" widget="radio" options="{'horizontal': true}"
+                                   readonly="not is_admin and (is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly)"
+                                   string="Survey Type * / सर्वे प्रकार *"/>
+                            <field name="payment_status" widget="badge" readonly="1" string="Payment Status"/>
                             <field name="project_id" widget="selection" readonly="not is_admin and (is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly)" required="1" string="Project * / परियोजना *" options="{'no_create': True}"/>
                             <field name="department_id" widget="selection" readonly="not is_admin and (is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly)" required="1" string="Department * / विभाग *"/>
                             <field name="survey_date" widget="date" readonly="not is_admin and (is_approved_readonly or is_notification_4_generated or state == 'submitted' or is_collector_readonly)" required="1" string="Survey Date * / सर्वे दिनाँक *" options="{'date_format': 'dd/mm/yyyy'}"/>

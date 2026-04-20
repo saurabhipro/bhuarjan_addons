@@ -144,9 +144,15 @@
     </record>
     
     <!-- Payment Menu - visible to Admin and System -->
-    <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
-    <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_bhu_payment" name="Payment" parent="menu_bhu_root" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector"/>
+    <menuitem id="menu_payment_dashboard" name="Payment Dashboard" action="action_payment_dashboard_owl" parent="menu_bhu_payment" sequence="0" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector"/>
+    <menuitem id="menu_payment_project_summary" name="Project Summary" action="action_payment_project_summary" parent="menu_bhu_payment" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system,bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_additional_collector"/>
+    <menuitem id="menu_payment_view_awards" name="View Awards" action="action_section23_award" parent="menu_bhu_payment" sequence="2" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_generate_file" name="Generate Payment File" action="action_generate_payment_file" parent="menu_bhu_payment" sequence="3" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_view_lines" name="View Payment Lines" action="action_payment_file_lines" parent="menu_bhu_payment" sequence="4" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_status" name="Payment Status" action="action_payment_reconciliation_bank" parent="menu_bhu_payment" sequence="5" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_failed_payments" name="Failed Payments" action="action_failed_payment_lines" parent="menu_bhu_payment" sequence="6" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_payment_reconciliation" name="Payment Reconciliation" action="action_payment_reconciliation" parent="menu_bhu_payment" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
     <!-- Document Vault Menu - Moved to Process -->
     <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault" parent="menu_bhu_process" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>

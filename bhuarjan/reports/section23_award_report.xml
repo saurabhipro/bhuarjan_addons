@@ -23,8 +23,12 @@
             }
             .header-text { color: #1a237e; border-bottom: 2px solid #1a237e; }
             .page { position: relative; }
-            .watermark img { border: none !important; outline: none !important; box-shadow: none !important; }
             .container img { border: none !important; outline: none !important; box-shadow: none !important; }
+            /* One sheet per page: land, then trees, then assets (wkhtmltopdf) */
+            .section23-award-section + .section23-award-section {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
             .letter_space { letter-spacing: 0.5px; }
             table { border-collapse: collapse; width: 100%; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
@@ -46,6 +50,25 @@
                 font-weight: bold;
                 margin-top: 18px;
             }
+            /* Land sheet: wkhtmltopdf often drops inner borders on the last column (empty remark);
+               force a full grid like Form 10 bulk tables. */
+            .section23-land-table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                width: 100%;
+                border: 1px solid #000;
+            }
+            .section23-land-table th,
+            .section23-land-table td {
+                box-sizing: border-box;
+                border: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+            }
+            .section23-land-table thead th { border: 1px solid #000 !important; }
+            .section23-land-table tbody tr > td:last-child { min-width: 3.5em; }
         </style>
     </template>
 
@@ -98,13 +121,10 @@
                 <t t-set="award_headers" t-value="o.get_award_header_constants()"/>
                 <t t-call="bhuarjan.report_common_styles"/>
                 <t t-call="bhuarjan.section23_award_report_styles"/>
+                <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
-                <div class="page" style="padding: 10px;">
-                        <div class="watermark">
-                             <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                             <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
-                        </div>
+                <div class="page section23-award-section" style="padding: 10px;">
 
                         <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                             <span t-esc="award_headers['sections']['land_sheet_label']"/>
@@ -124,7 +144,7 @@
                             ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                         </div>
 
-                        <table border="1">
+                        <table class="section23-land-table" border="1">
                             <thead>
                                 <tr>
                                     <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
@@ -227,7 +247,9 @@
                                             <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
-                                            <td t-esc="land.get('remark', '')"/>
+                                            <td class="section23-land-remark" style="vertical-align: top;">
+                                                <t t-esc="land.get('remark') or chr(160)"/>
+                                            </td>
                                         </tr>
                                     </t>
                                     <tr class="total-row">
@@ -248,7 +270,7 @@
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
-                                        <td></td>
+                                        <td class="section23-land-remark" style="vertical-align: top;">&#160;</td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
@@ -264,104 +286,8 @@
                         <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
 
-                <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
-                <div class="page" style="padding: 10px;">
-                            <div class="watermark">
-                                 <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                 <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
-                            </div>
-
-                            <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                                <span t-esc="award_headers['sections']['asset_sheet_label']"/>
-                            </div>
-
-                            <div style="text-align: center; margin-bottom: 10px;">
-                                <div style="margin-bottom: 6px;">
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
-                                </div>
-                                <h2 style="margin: 0;"><span t-esc="award_headers['sections']['asset_title']"/></h2>
-                                <div style="font-size: 11px; margin-top: 5px;">
-                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
-                                </div>
-                            </div>
-
-                            <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
-                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
-                            </div>
-
-                        <table border="1">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 30px;">1. <br/>क्र.</th>
-                                        <th style="width: 150px;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
-                                        <th>3. <br/>खसरा</th>
-                                        <th>4. <br/>रकबा</th>
-                                        <th style="width: 100px;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
-                                        <th>6. <br/>क्षेत्रफल</th>
-                                        <th>7. <br/>बाजार मूल्य</th>
-                                        <th>8. <br/>100% सोलेशियम</th>
-                                        <th>9. <br/>12% ब्याज</th>
-                                        <th>10. <br/>योग</th>
-                                        <th>11. <br/>रिमार्क</th>
-                                    </tr>
-                                </thead>
-                            <tbody>
-                                <t t-set="serial" t-value="1"/>
-                                <t t-foreach="asset_groups" t-as="group">
-                                    <t t-set="group_lines" t-value="group.get('lines')"/>
-                                    <t t-set="line_count" t-value="len(group_lines)"/>
-                                    <t t-foreach="group_lines" t-as="asset">
-                                        <tr>
-                                            <td t-if="asset_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
-                                            <td t-if="asset_index == 0" t-att-rowspan="line_count">
-                                                <span t-esc="group.get('landowner_name', '')"/><br/>
-                                                <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
-                                            </td>
-                                            <td style="text-align: center;" t-esc="asset.get('asset_khasra', '')"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('asset_land_area', 0.0), 3)"/>
-                                            <td>
-                                                (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
-                                            </td>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('asset_dimension', 0.0), 2)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('market_value', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('solatium', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('interest', 0.0), 0)"/>
-                                            <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(asset.get('total', 0.0), 0)"/>
-                                            <td t-esc="asset.get('remark', '')"/>
-                                        </tr>
-                                    </t>
-                                    <tr class="total-row">
-                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
-                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
-                                        <td style="text-align: center; font-weight: bold;">कुल</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
-                                        <td></td>
-                                    </tr>
-                                    <t t-set="serial" t-value="serial + 1"/>
-                                </t>
-                                <t t-if="not asset_groups">
-                                    <tr>
-                                        <td colspan="11" style="text-align: center; font-style: italic;">
-                                            No asset/structure data available / परिसम्पत्ति डेटा उपलब्ध नहीं है (Blank)
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-                        <t t-call="bhuarjan.section23_signature_block"/>
-                </div>
-
                 <!-- Part 1 (Ga) - TREE COMPENSATION -->
-                <div class="page" style="padding: 10px;">
-                            <div class="watermark">
-                                 <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                 <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
-                            </div>
+                <div class="page section23-award-section" style="padding: 10px;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -464,6 +390,94 @@
                         <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
             </t>
+                <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
+                <div class="page section23-award-section" style="padding: 10px;">
+
+                            <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
+                                <span t-esc="award_headers['sections']['asset_sheet_label']"/>
+                            </div>
+
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <div style="margin-bottom: 6px;">
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
+                                </div>
+                                <h2 style="margin: 0;"><span t-esc="award_headers['sections']['asset_title']"/></h2>
+                                <div style="font-size: 11px; margin-top: 5px;">
+                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
+                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                            </div>
+
+                        <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30px;">1. <br/>क्र.</th>
+                                        <th style="width: 150px;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
+                                        <th>3. <br/>खसरा</th>
+                                        <th>4. <br/>रकबा</th>
+                                        <th style="width: 100px;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
+                                        <th>6. <br/>क्षेत्रफल</th>
+                                        <th>7. <br/>बाजार मूल्य</th>
+                                        <th>8. <br/>100% सोलेशियम</th>
+                                        <th>9. <br/>12% ब्याज</th>
+                                        <th>10. <br/>योग</th>
+                                        <th>11. <br/>रिमार्क</th>
+                                    </tr>
+                                </thead>
+                            <tbody>
+                                <t t-set="serial" t-value="1"/>
+                                <t t-foreach="asset_groups" t-as="group">
+                                    <t t-set="group_lines" t-value="group.get('lines')"/>
+                                    <t t-set="line_count" t-value="len(group_lines)"/>
+                                    <t t-foreach="group_lines" t-as="asset">
+                                        <tr>
+                                            <td t-if="asset_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
+                                            <td t-if="asset_index == 0" t-att-rowspan="line_count">
+                                                <span t-esc="group.get('landowner_name', '')"/><br/>
+                                                <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
+                                            </td>
+                                            <td style="text-align: center;" t-esc="asset.get('asset_khasra', '')"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('asset_land_area', 0.0), 3)"/>
+                                            <td>
+                                                (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
+                                            </td>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('asset_dimension', 0.0), 2)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('market_value', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('solatium', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(asset.get('interest', 0.0), 0)"/>
+                                            <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(asset.get('total', 0.0), 0)"/>
+                                            <td t-esc="asset.get('remark', '')"/>
+                                        </tr>
+                                    </t>
+                                    <tr class="total-row">
+                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold;">कुल</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="serial" t-value="serial + 1"/>
+                                </t>
+                                <t t-if="not asset_groups">
+                                    <tr>
+                                        <td colspan="11" style="text-align: center; font-style: italic;">
+                                            No asset/structure data available / परिसम्पत्ति डेटा उपलब्ध नहीं है (Blank)
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <t t-call="bhuarjan.section23_signature_block"/>
+                </div>
+
         </t>
     </template>
 </odoo>

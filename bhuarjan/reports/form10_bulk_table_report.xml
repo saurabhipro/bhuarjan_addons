@@ -326,7 +326,8 @@
                                     <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
                                     <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
                                     <t t-set="needs_fresh_page" t-value="s_index != 0 and (lo_chunk_count &gt; 1 or lo_total_chars &gt; 220)"/>
-                                    <tr t-attf-class="survey-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'} #{'form10-row-fresh' if needs_fresh_page else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
+                                    <t t-set="form10_parity" t-value="'form10-group-even' if (s_index % 2) == 0 else 'form10-group-odd'"/>
+                                    <tr t-att-class="'survey-row ' + form10_parity + (' form10-row-fresh' if needs_fresh_page else '') + (' form10-grouped-row' if lo_count &gt; 5 else '')">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -478,7 +479,7 @@
                                             </tr>
                                     <t t-if="lo_chunk_count &gt; 1">
                                         <t t-foreach="range(1, lo_chunk_count)" t-as="chunk_idx">
-                                        <tr t-attf-class="survey-row form10-continuation-row form10-grouped-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'}">
+                                        <tr t-att-class="'survey-row form10-continuation-row form10-grouped-row ' + form10_parity">
                                             <td style="text-align:center; border: 1px solid #000;"></td>
                                             <td style="text-align:center; border: 1px solid #000;">
                                                 <t t-if="s.khasra_number">
@@ -654,7 +655,8 @@
                                     <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
                                     <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
                                     <t t-set="needs_fresh_page" t-value="s_index != 0 and (lo_chunk_count &gt; 1 or lo_total_chars &gt; 220)"/>
-                                    <tr t-attf-class="survey-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'} #{'form10-row-fresh' if needs_fresh_page else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
+                                    <t t-set="form10_parity" t-value="'form10-group-even' if (s_index % 2) == 0 else 'form10-group-odd'"/>
+                                    <tr t-att-class="'survey-row ' + form10_parity + (' form10-row-fresh' if needs_fresh_page else '') + (' form10-grouped-row' if lo_count &gt; 5 else '')">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -806,7 +808,7 @@
                                             </tr>
                                     <t t-if="lo_chunk_count &gt; 1">
                                         <t t-foreach="range(1, lo_chunk_count)" t-as="chunk_idx">
-                                        <tr t-attf-class="survey-row form10-continuation-row form10-grouped-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'}">
+                                        <tr t-att-class="'survey-row form10-continuation-row form10-grouped-row ' + form10_parity">
                                             <td style="text-align:center; border: 1px solid #000;"></td>
                                             <td style="text-align:center; border: 1px solid #000;">
                                                 <t t-if="s.khasra_number">

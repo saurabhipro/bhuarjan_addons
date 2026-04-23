@@ -13,7 +13,7 @@
         </record>
     </data>
 
-    <template id="report_common_styles">
+    <template id="section23_award_report_styles">
         <style>
             .container {
                 font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'Lohit Devanagari', 'DejaVu Sans', sans-serif;
@@ -23,19 +23,7 @@
             }
             .header-text { color: #1a237e; border-bottom: 2px solid #1a237e; }
             .page { position: relative; }
-            .watermark {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                opacity: 0.14;
-                color: #ccc;
-                z-index: 0;
-                width: 100%;
-                text-align: center;
-                pointer-events: none;
-            }
-            .watermark img { width: 560px; height: auto; border: none !important; outline: none !important; box-shadow: none !important; }
+            .watermark img { border: none !important; outline: none !important; box-shadow: none !important; }
             .container img { border: none !important; outline: none !important; box-shadow: none !important; }
             .letter_space { letter-spacing: 0.5px; }
             table { border-collapse: collapse; width: 100%; page-break-inside: auto; }
@@ -109,6 +97,7 @@
                 <t t-set="asset_groups" t-value="o.get_structure_compensation_grouped_data()"/>
                 <t t-set="award_headers" t-value="o.get_award_header_constants()"/>
                 <t t-call="bhuarjan.report_common_styles"/>
+                <t t-call="bhuarjan.section23_award_report_styles"/>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
                 <div class="page" style="padding: 10px;">

@@ -111,8 +111,8 @@
                             <t t-if="not report.project_id">........................</t>
                             में प्रभावित ग्राम
                             <t t-if="report.village_ids">
-                                <t t-foreach="report.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="report.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not report.village_ids">........................</t>

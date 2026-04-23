@@ -170,8 +170,8 @@ class ProcessReportPdfDownload(models.AbstractModel):
                             pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                             if isinstance(pdf_data, bytes):
                                 project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
-                                # SIA is project-level, use "All" for village
-                                filename = f'{project_name}_SIA_Proposal_All_{current_date}.pdf'
+                                # SIA: multiple teams per project possible — include id for unique zip names
+                                filename = f'{project_name}_SIA_Proposal_{sia_team.id}_{current_date}.pdf'
                                 zip_file.writestr(filename, pdf_data)
                                 pdf_count += 1
                     except Exception as e:
@@ -194,8 +194,7 @@ class ProcessReportPdfDownload(models.AbstractModel):
                             pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                             if isinstance(pdf_data, bytes):
                                 project_name = (sia_team.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if sia_team.project_id else 'Unknown'
-                                # SIA is project-level, use "All" for village
-                                filename = f'{project_name}_SIA_Order_All_{current_date}.pdf'
+                                filename = f'{project_name}_SIA_Order_{sia_team.id}_{current_date}.pdf'
                                 zip_file.writestr(filename, pdf_data)
                                 pdf_count += 1
                     except Exception as e:
@@ -216,8 +215,8 @@ class ProcessReportPdfDownload(models.AbstractModel):
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
                             project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if expert_committee.project_id else 'Unknown'
-                            # Expert Committee is project-level, use "All" for village
-                            filename = f'{project_name}_Expert_Committee_Proposal_All_{current_date}.pdf'
+                            # Multiple expert committee records per project — include id for unique zip names
+                            filename = f'{project_name}_Expert_Committee_Proposal_{expert_committee.id}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:
@@ -238,8 +237,7 @@ class ProcessReportPdfDownload(models.AbstractModel):
                         pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
                         if isinstance(pdf_data, bytes):
                             project_name = (expert_committee.project_id.name or 'Unknown').replace('/', '_').replace('\\', '_').replace(' ', '_') if expert_committee.project_id else 'Unknown'
-                            # Expert Committee is project-level, use "All" for village
-                            filename = f'{project_name}_Expert_Committee_Order_All_{current_date}.pdf'
+                            filename = f'{project_name}_Expert_Committee_Order_{expert_committee.id}_{current_date}.pdf'
                             zip_file.writestr(filename, pdf_data)
                             pdf_count += 1
                 except Exception as e:

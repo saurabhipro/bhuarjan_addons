@@ -135,13 +135,13 @@
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 17px !important;">
                             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>अनुविभागीय अधिकारी (राजस्व) सह भू-अर्जन अधिकारी,</strong> <span t-esc="subdivision_name if subdivision_name else '........................'"/> <strong>द्वारा विभाग</strong> <span t-esc="sia_team.requiring_body_id.name if sia_team.requiring_body_id else '........................'"/> <strong>(छ.ग.) अंतर्गत परियोजना</strong> <span t-esc="sia_team.project_id.name or '........................'"/> <strong>निर्माण हेतु प्रभावित ग्राम</strong> 
                             <t t-if="sia_team.village_ids">
-                                <t t-foreach="sia_team.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="sia_team.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not sia_team.village_ids and sia_team.project_id and sia_team.project_id.village_ids">
-                                <t t-foreach="sia_team.project_id.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="sia_team.project_id.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not sia_team.village_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">
@@ -149,15 +149,15 @@
                             </t>
                             <strong>तहसील</strong>&#160;
                             <t t-if="sia_team.tehsil_ids">
-                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="sia_team.tehsil_ids" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <!-- Fallback to project tehsils if no specific tehsils selected on SIA team -->
                             <t t-if="not sia_team.tehsil_ids and sia_team.project_id and sia_team.project_id.village_ids">
                                 <t t-set="project_tehsils" t-value="sia_team.project_id.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="project_tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">&#160;</t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="project_tehsils" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">&#160;</t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not sia_team.tehsil_ids and (not sia_team.project_id or not sia_team.project_id.village_ids)">

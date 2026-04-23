@@ -25,7 +25,7 @@
                         <div class="watermark">
                             <div class="watermark-circle"></div>
                             <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                            <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                            <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                         </div>
                         
                         <!-- Header with Logo and QR Code -->
@@ -175,16 +175,16 @@
                                         <tr>
                                             <td style="border: 1px solid #000; padding: 8px;">
                                                 <t t-if="o.original_landowner_ids">
-                                                    <t t-foreach="o.original_landowner_ids" t-as="landowner" t-first="first">
-                                                        <t t-if="not first">, </t><span t-esc="landowner.name or ''"/>
+                                                    <t t-foreach="o.original_landowner_ids" t-as="landowner">
+                                                        <t t-if="landowner_index != 0">, </t><span t-esc="landowner.name or ''"/>
                                                     </t>
                                                 </t>
                                                 <t t-if="not o.original_landowner_ids">-</t>
                                             </td>
                                             <td style="border: 1px solid #000; padding: 8px;">
                                                 <t t-if="o.resolution_landowner_ids">
-                                                    <t t-foreach="o.resolution_landowner_ids" t-as="landowner" t-first="first">
-                                                        <t t-if="not first">, </t><span t-esc="landowner.name or ''"/>
+                                                    <t t-foreach="o.resolution_landowner_ids" t-as="landowner">
+                                                        <t t-if="landowner_index != 0">, </t><span t-esc="landowner.name or ''"/>
                                                     </t>
                                                 </t>
                                                 <t t-if="not o.resolution_landowner_ids">-</t>

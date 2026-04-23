@@ -191,9 +191,10 @@ class ProcessReportWizard(models.TransientModel):
             section19_domain = domain.copy()
             section19_records = self.env['bhu.section19.notification'].search(section19_domain)
             for record in section19_records:
-                # Get total khasras and area from land parcels
-                unique_khasras = len(set(record.land_parcel_ids.mapped('khasra_number'))) if record.land_parcel_ids else 0
-                total_area = sum(record.land_parcel_ids.mapped('area_hectares')) if record.land_parcel_ids else 0.0
+                # Surveys (approved/locked) — no land_parcel_ids on this model
+                surveys_data = record._get_approved_surveys_data()
+                unique_khasras = len(surveys_data)
+                total_area = record._get_total_area_from_surveys()
                 
                 status_mark = 'Green' if record.state == 'approved' else 'Red'
                 

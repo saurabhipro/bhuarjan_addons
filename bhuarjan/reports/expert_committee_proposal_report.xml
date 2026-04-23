@@ -25,7 +25,7 @@
                     <div class="watermark">
                         <div class="watermark-circle"></div>
                         <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark" style="width: 100%; height: auto; object-fit: contain;"/>
+                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo Watermark"/>
                     </div>
                     <!-- Header with Logo and QR Code -->
                     <div style="margin-bottom: 15px; padding-bottom: 8px;">
@@ -34,8 +34,8 @@
                                 <!-- Logo on Left -->
                                 <td rowspan="2" style="width: 12%; padding: 0; text-align: center; vertical-align: middle;">
                                     <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'"
-                                         style="display: block; margin: 0 auto; object-fit: contain; width: 90%; max-width: 90%; height: auto;"/>
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo"
+                                         style="display: block; margin: 0 auto; object-fit: contain; width: 80px; height: 80px; max-width: 80px; max-height: 80px;"/>
                                 </td>
                                 <!-- Header Text - Line 1 -->
                                 <td colspan="2" style="text-align: center; vertical-align: middle; padding: 0 5px;">
@@ -117,13 +117,13 @@
                             <span style="padding-left: 20px !important; display: inline;">
                                 विभाग <span t-esc="report.requiring_body_id.name if report.requiring_body_id else '........................'"/> अंतर्गत परियोजना <span t-esc="report.project_id.name or '........................'"/> हेतु प्रभावित ग्राम 
                             <t t-if="report.village_ids">
-                                <t t-foreach="report.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="report.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not report.village_ids and report.project_id and report.project_id.village_ids">
-                                <t t-foreach="report.project_id.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="report.project_id.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not report.village_ids and (not report.project_id or not report.project_id.village_ids)">
@@ -135,14 +135,14 @@
                             </t>
                             <t t-elif="report.village_ids and len(report.village_ids) > 1">
                                 <t t-set="tehsils" t-value="report.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="tehsils" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">, </t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-elif="report.project_id and report.project_id.village_ids and len(report.project_id.village_ids) > 0">
                                 <t t-set="tehsils" t-value="report.project_id.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="tehsils" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">, </t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-else="">
@@ -163,13 +163,13 @@
                         <p class="normal-text letter_space" style="margin: 5px 0 !important; text-align: justify !important; line-height: 1.5 !important; text-indent: 0 !important; font-size: 18px !important;">
                             <strong>उपरोक्त विषयांतर्गत विभाग</strong> <span t-esc="report.requiring_body_id.name if report.requiring_body_id else '........................'"/>&#160;<strong>रायगढ़ (छ.ग.) अंतर्गत</strong> <strong>परियोजना</strong> <span t-esc="report.project_id.name or '........................'"/>&#160;<strong>हेतु प्रभावित ग्राम</strong> 
                             <t t-if="report.village_ids">
-                                <t t-foreach="report.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="report.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not report.village_ids and report.project_id and report.project_id.village_ids">
-                                <t t-foreach="report.project_id.village_ids" t-as="village" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="village.name or ''"/>
+                                <t t-foreach="report.project_id.village_ids" t-as="village">
+                                    <t t-if="village_index != 0">, </t><span t-esc="village.name or ''"/>
                                 </t>
                             </t>
                             <t t-if="not report.village_ids and (not report.project_id or not report.project_id.village_ids)">
@@ -181,14 +181,14 @@
                             </t>
                             <t t-elif="report.village_ids and len(report.village_ids) > 1">
                                 <t t-set="tehsils" t-value="report.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="tehsils" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">, </t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-elif="report.project_id and report.project_id.village_ids and len(report.project_id.village_ids) > 0">
                                 <t t-set="tehsils" t-value="report.project_id.village_ids.mapped('tehsil_id')"/>
-                                <t t-foreach="tehsils" t-as="tehsil" t-first="first">
-                                    <t t-if="not first">, </t><span t-esc="tehsil.name or ''"/>
+                                <t t-foreach="tehsils" t-as="tehsil">
+                                    <t t-if="tehsil_index != 0">, </t><span t-esc="tehsil.name or ''"/>
                                 </t>
                             </t>
                             <t t-else="">

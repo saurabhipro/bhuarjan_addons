@@ -905,7 +905,7 @@
                             <group>
                                 <group string="Project / Village">
                                     <field name="survey_type" widget="radio" options="{'horizontal': true}"
-                                        help="Rural uses ≤ 50m threshold for Main Road; Urban uses ≤ 20m threshold. Affects whether Main Road or Beyond-Main-Road base rate is applied."/>
+                                        help="Rural: 50 m, Urban: 20 m (Main Road distance, by survey type). Beyond that, BMR rates apply. Uses Land Rate Master."/>
                                     <field name="project_id" options="{'no_create': true, 'no_open': true}"
                                         help="Select project first."/>
                                     <field name="village_id" options="{'no_create': true, 'no_open': true}"
@@ -991,8 +991,8 @@
                                         <div class="ip_trigger"><i class="fa fa-info" title="More info / अधिक जानकारी"/></div>
                                         <div class="ip_tip">
                                             <div class="ip_title">Road Type Impact</div>
-                                            <div class="ip_row"><span>Rural MR</span><span class="ip_val ip_pos">distance ≤ 50 m</span></div>
-                                            <div class="ip_row"><span>Urban MR</span><span class="ip_val ip_pos">distance ≤ 20 m</span></div>
+                                            <div class="ip_row"><span>Rural MR</span><span class="ip_val ip_pos">within 50 m</span></div>
+                                            <div class="ip_row"><span>Urban MR</span><span class="ip_val ip_pos">within 20 m</span></div>
                                             <div class="ip_row"><span>MR rate</span><span class="ip_val ip_neu">Main Road master</span></div>
                                             <div class="ip_row"><span>BMR rate</span><span class="ip_val ip_neu">Other Road master</span></div>
                                         </div>

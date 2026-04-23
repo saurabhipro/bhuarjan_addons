@@ -202,7 +202,7 @@
                             </h3>
                             <div style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; min-height: 100px;">
                                 <p style="margin: 0; text-align: justify; line-height: 1.6;">
-                                    <t t-raw="o.resolution_details or ''"/>
+                                    <t t-out="o.resolution_details or ''"/>
                                 </p>
                             </div>
                         </div>
@@ -214,7 +214,7 @@
                             </h3>
                             <div style="padding: 10px; border: 1px solid #ddd; background-color: #fff; min-height: 80px;">
                                 <p style="margin: 0; text-align: justify; line-height: 1.6;">
-                                    <t t-raw="o.objection_details or ''"/>
+                                    <t t-out="o.objection_details or ''"/>
                                 </p>
                             </div>
                         </div>

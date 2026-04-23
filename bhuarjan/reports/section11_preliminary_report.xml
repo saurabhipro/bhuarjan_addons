@@ -229,7 +229,7 @@
                     <div class="paragraph-section">
                         <span class="paragraph-number">5.</span>
                         <span style="font-size: 21px !important; line-height: 1.6 !important;">
-                            <t t-raw="report.get_section5_text()"/>
+                            <t t-out="report.get_section5_text()"/>
                         </span>
                     </div>
 

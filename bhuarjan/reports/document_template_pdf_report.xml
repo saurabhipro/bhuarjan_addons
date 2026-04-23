@@ -41,7 +41,7 @@
                         </div>
                         
                         <div style="border-top: 2px solid #000; padding-top: 20px; margin-top: 20px;">
-                            <div t-raw="object.template_content or ''"/>
+                            <div t-out="object.template_content or ''"/>
                         </div>
                     </div>
                 </t>

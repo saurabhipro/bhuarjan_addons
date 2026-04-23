@@ -69,9 +69,12 @@ class Form10PDFController(http.Controller):
                 ('village_id', '=', village.id)
             ]
             
-            # Log the search domain for debugging
-            _logger.info(f"Searching surveys with domain: {domain}")
-            _logger.info(f"Expected: Project ID={project.id} (UUID={project.project_uuid}, Name={project.name}), Village ID={village.id} (UUID={village.village_uuid}, Name={village.name})")
+            _logger.debug("Searching surveys with domain: %s", domain)
+            _logger.debug(
+                "Expected: Project ID=%s (UUID=%s, Name=%s), Village ID=%s (UUID=%s, Name=%s)",
+                project.id, project.project_uuid, project.name,
+                village.id, village.village_uuid, village.name,
+            )
             
             # Clear any existing context/cache and search fresh
             # Also disable project.filter mixin by clearing bhuarjan_current_project_id
@@ -80,19 +83,25 @@ class Form10PDFController(http.Controller):
                 bhuarjan_current_project_id=False
             ).search(domain, order='id')
             
-            # Log ALL surveys found (for debugging)
-            _logger.info(f"Found {len(all_surveys)} surveys. Details:")
+            _logger.debug("Found %d surveys. Details:", len(all_surveys))
+            debug_enabled = _logger.isEnabledFor(logging.DEBUG)
             for survey in all_surveys:
-                survey_info = f"  Survey ID={survey.id}: Project ID={survey.project_id.id} (Name={survey.project_id.name}), Village ID={survey.village_id.id} (Name={survey.village_id.name}, UUID={survey.village_id.village_uuid})"
-                _logger.info(survey_info)
-                
-                # Verify each survey belongs to the correct project and village
+                if debug_enabled:
+                    _logger.debug(
+                        "  Survey ID=%s: Project ID=%s (Name=%s), Village ID=%s (Name=%s, UUID=%s)",
+                        survey.id, survey.project_id.id, survey.project_id.name,
+                        survey.village_id.id, survey.village_id.name, survey.village_id.village_uuid,
+                    )
                 if survey.project_id.id != project.id:
-                    _logger.error(f"ERROR: Survey {survey.id} has wrong project! Expected Project ID={project.id}, got {survey.project_id.id}")
+                    _logger.error("Survey %s has wrong project! Expected Project ID=%s, got %s", survey.id, project.id, survey.project_id.id)
                 if survey.village_id.id != village.id:
-                    _logger.error(f"ERROR: Survey {survey.id} has wrong village! Expected Village ID={village.id} (UUID={village.village_uuid}, Name={village.name}), got Village ID={survey.village_id.id} (UUID={survey.village_id.village_uuid}, Name={survey.village_id.name})")
+                    _logger.error(
+                        "Survey %s has wrong village! Expected Village ID=%s (UUID=%s, Name=%s), got Village ID=%s (UUID=%s, Name=%s)",
+                        survey.id, village.id, village.village_uuid, village.name,
+                        survey.village_id.id, survey.village_id.village_uuid, survey.village_id.name,
+                    )
                 if survey.village_id.village_uuid != village_uuid:
-                    _logger.error(f"ERROR: Survey {survey.id} belongs to village with different UUID! Expected {village_uuid}, got {survey.village_id.village_uuid}")
+                    _logger.error("Survey %s belongs to village with different UUID! Expected %s, got %s", survey.id, village_uuid, survey.village_id.village_uuid)
             
             if not all_surveys:
                 # Check if there are ANY surveys for this project (to help debug)
@@ -102,8 +111,11 @@ class Form10PDFController(http.Controller):
                     _logger.warning(f"Villages with surveys in this project: {set(project_surveys.mapped('village_id.id'))}")
                 return request.not_found("No surveys found for this project and village")
             
-            # Log how many surveys we're including for debugging
-            _logger.info(f"Generating PDF for {len(all_surveys)} surveys from project {project.name} (ID: {project.id}) in village {village.name} (ID: {village.id}) (Survey IDs: {all_surveys.ids})")
+            _logger.info(
+                "Generating PDF for %d surveys (project=%s[%s], village=%s[%s])",
+                len(all_surveys), project.name, project.id, village.name, village.id,
+            )
+            _logger.debug("Survey IDs: %s", all_surveys.ids)
             
             # Convert recordset to list of IDs for PDF rendering
             # Ensure we have the correct IDs
@@ -140,8 +152,7 @@ class Form10PDFController(http.Controller):
             # Update res_ids to only include correct surveys
             res_ids = correct_survey_ids
             
-            # Log the exact IDs being passed
-            _logger.info(f"Rendering PDF with res_ids: {res_ids}")
+            _logger.debug("Rendering PDF with %d res_ids", len(res_ids))
             
             # Invalidate report cache to ensure fresh generation
             # This prevents any caching issues that might cause the wrong data to appear
@@ -154,7 +165,7 @@ class Form10PDFController(http.Controller):
             
             # Verify surveys exist before rendering
             verify_surveys = request.env['bhu.survey'].sudo().browse(res_ids)
-            _logger.info(f"Verifying {len(verify_surveys)} surveys before PDF render: {verify_surveys.ids}")
+            _logger.debug("Verifying %d surveys before PDF render", len(verify_surveys))
             if not verify_surveys:
                 _logger.error("No surveys found to render PDF!")
                 return request.not_found("No surveys found for PDF generation")

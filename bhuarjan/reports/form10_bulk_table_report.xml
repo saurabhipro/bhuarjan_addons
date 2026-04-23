@@ -154,7 +154,7 @@
          t-att-data-oe-id="o and o.id"
          t-att-data-oe-lang="o and o.env.context.get('lang')"
          style="margin-top: 0;">
-        <t t-raw="0"/>
+        <t t-out="0"/>
     </div>
         
     </template>
@@ -282,7 +282,7 @@
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>कुँआ <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>तालाब <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>रिमार्क</strong></th>
+                                    <th class="table_th_2 form10-th-remark" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>रिमार्क</strong></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -551,7 +551,7 @@
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>कुँआ <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>तालाब <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>रिमार्क</strong></th>
+                                    <th class="table_th_2 form10-th-remark" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>रिमार्क</strong></th>
                                 </tr>
                             </thead>
                             <tbody>

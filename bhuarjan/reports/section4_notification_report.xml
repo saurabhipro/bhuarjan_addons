@@ -209,7 +209,7 @@
                                 <span class="question-label">(नौ) परियोजना से होने वाला लाभ।</span>
                                 <t t-set="q9_value" t-value="(wizard.project_benefits if wizard and wizard.project_benefits else (wizard.project_id.project_benefits if wizard and wizard.project_id and wizard.project_id.project_benefits else None))"/>
                                 <t t-if="q9_value">
-                                    <span class="question-answer"><t t-raw="q9_value"/></span>
+                                    <span class="question-answer"><t t-out="q9_value"/></span>
                                 </t>
                                 <t t-if="not q9_value">
                                     <span class="question-answer">........................</span>
@@ -220,7 +220,7 @@
                                 <span class="question-label" style="white-space: nowrap; flex-shrink: 0;">(दस) प्रस्तावित सामाजिक समाघात की प्रतिपूर्ति के लिये उपाय तथा उस पर होने वाला संभावित व्यय।</span>
                                 <t t-set="q10_value" t-value="(wizard.compensation_measures if wizard and wizard.compensation_measures else (wizard.project_id.compensation_measures if wizard and wizard.project_id and wizard.project_id.compensation_measures else None))"/>
                                 <t t-if="q10_value">
-                                    <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-raw="q10_value"/></span>
+                                    <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-out="q10_value"/></span>
                                 </t>
                                 <t t-if="not q10_value">
                                     <span class="question-answer" style="display: inline; margin-left: 8px;">........................</span>
@@ -231,7 +231,7 @@
                                 <span class="question-label" style="white-space: nowrap; flex-shrink: 0;">(ग्यारह) परियोजना द्वारा प्रभावित होने वाले अन्य घटक।</span>
                                 <t t-set="q11_value" t-value="(wizard.other_components if wizard and wizard.other_components else (wizard.project_id.other_components if wizard and wizard.project_id and wizard.project_id.other_components else None))"/>
                                 <t t-if="q11_value">
-                                    <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-raw="q11_value"/></span>
+                                    <span class="question-answer" style="display: inline; margin-left: 8px;"><t t-out="q11_value"/></span>
                                 </t>
                                 <t t-if="not q11_value">
                                     <span class="question-answer" style="display: inline; margin-left: 8px;">........................</span>

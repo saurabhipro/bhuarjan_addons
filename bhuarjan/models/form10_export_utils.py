@@ -222,7 +222,7 @@ class Form10ExportUtils(models.AbstractModel):
         current_row = 0
         
         # Title
-        worksheet.merge_range(current_row, 0, current_row, 17, 'भू अर्जन प्रारंभिक सर्वे प्रपत्र', title_format)
+        worksheet.merge_range(current_row, 0, current_row, 20, 'भू अर्जन प्रारंभिक सर्वे प्रपत्र', title_format)
         current_row += 1
         current_row += 1  # Spacing
         
@@ -231,20 +231,20 @@ class Form10ExportUtils(models.AbstractModel):
         worksheet.write(current_row, 0, 'परियोजना का नाम :', header_info_format)
         worksheet.merge_range(current_row, 1, current_row, 8, first.project_id.name or '', header_info_value_format)
         worksheet.write(current_row, 9, 'विभाग का नाम', header_info_format)
-        worksheet.merge_range(current_row, 10, current_row, 17, first.department_id.name or '', header_info_value_format)
+        worksheet.merge_range(current_row, 10, current_row, 20, first.department_id.name or '', header_info_value_format)
         current_row += 1
         
         # Row 2: Village and Tehsil
         worksheet.write(current_row, 0, 'ग्राम का नाम', header_info_format)
-        worksheet.merge_range(current_row, 1, current_row, 8, first.village_id.name or '', header_info_value_format)
+        worksheet.merge_range(current_row, 1, current_row, 9, first.village_id.name or '', header_info_value_format)
         worksheet.write(current_row, 9, 'तहसील का नाम', header_info_format)
-        worksheet.merge_range(current_row, 10, current_row, 16, f"{first.tehsil_id.name or ''} जिला-रायगढ़ (छ.ग.)", header_info_value_format)
+        worksheet.merge_range(current_row, 10, current_row, 20, f"{first.tehsil_id.name or ''} जिला-रायगढ़ (छ.ग.)", header_info_value_format)
         current_row += 1
         
         # Row 3: Survey Date
         survey_date_str = first.survey_date.strftime('%d/%m/%Y') if first.survey_date else ''
         worksheet.write(current_row, 0, 'सर्वे दिनाँक', header_info_format)
-        worksheet.merge_range(current_row, 1, current_row, 17, survey_date_str, header_info_value_format)
+        worksheet.merge_range(current_row, 1, current_row, 20, survey_date_str, header_info_value_format)
         current_row += 1
         current_row += 1  # Spacing
         
@@ -257,7 +257,7 @@ class Form10ExportUtils(models.AbstractModel):
         worksheet.write(current_row, 4, 'भूमिस्वामी का नाम', header_format)
         worksheet.merge_range(current_row, 5, current_row, 8, 'भूमि का प्रकार', header_format)
         worksheet.merge_range(current_row, 9, current_row, 11, 'भूमि पर स्थित वृक्ष की संख्या (प्रजातिवार)', header_format)
-        worksheet.merge_range(current_row, 12, current_row, 17, 'भूमि पर स्थित परिसंपत्तियों का विवरण', header_format)
+        worksheet.merge_range(current_row, 12, current_row, 20, 'भूमि पर स्थित परिसंपत्तियों का विवरण / सर्वे अतिरिक्त विवरण', header_format)
         current_row += 1
         
         # Second header row
@@ -279,6 +279,9 @@ class Form10ExportUtils(models.AbstractModel):
         worksheet.write(current_row, 15, 'ट्यूबवेल / सम्बमर्शिबल पम्प फिटिंग सहित (हाँ/नहीं)', header_format)
         worksheet.write(current_row, 16, 'तालाब (हाँ/नहीं)', header_format)
         worksheet.write(current_row, 17, 'रिमार्क', header_format)
+        worksheet.write(current_row, 18, 'सर्वे प्रकार', header_format)
+        worksheet.write(current_row, 19, 'मुख्य मार्ग से दूरी (मीटर)', header_format)
+        worksheet.write(current_row, 20, 'पड़ती भूमि (हाँ/नहीं)', header_format)
         current_row += 1
         
         # Data rows
@@ -344,11 +347,17 @@ class Form10ExportUtils(models.AbstractModel):
             semi_developed_str = "\n".join(semi_developed_trees) if semi_developed_trees else "नहीं"
             fully_developed_str = "\n".join(fully_developed_trees) if fully_developed_trees else "नहीं"
             
+            # Survey type / distance / fallow
+            survey_type_str = 'ग्रामीण' if survey.survey_type == 'rural' else ('शहरी' if survey.survey_type == 'urban' else 'नहीं')
+            distance_str = f"{round(survey.distance_from_main_road, 2)}" if survey.distance_from_main_road is not None else "नहीं"
+            is_fallow = bool(survey.crop_type_id and (survey.crop_type_id.code == 'FALLOW' or 'पड़ती' in (survey.crop_type_id.name or '')))
+            fallow_str = "हाँ" if is_fallow else "नहीं"
+
             # Remarks
             remarks_parts = []
             if survey.has_traded_land == 'yes' and survey.traded_land_area:
                 remarks_parts.append(f"व्यपवर्तित-{survey.traded_land_area} हेक्टेयर")
-            if survey.crop_type_id and (survey.crop_type_id.code == 'FALLOW' or 'पड़ती' in (survey.crop_type_id.name or '')):
+            if is_fallow:
                 remarks_parts.append("पड़ती भूमि")
             if survey.remarks:
                 remarks_parts.append(survey.remarks)
@@ -372,7 +381,10 @@ class Form10ExportUtils(models.AbstractModel):
                 well_str,
                 f"हाँ ({survey.tubewell_count or 1})" if (survey.has_tubewell == 'yes' and (survey.tubewell_count or 1) > 1) else ("हाँ" if survey.has_tubewell == 'yes' else "नहीं"),
                 "हाँ" if survey.has_pond == 'yes' else "नहीं",
-                remarks_str
+                remarks_str,
+                survey_type_str,
+                distance_str,
+                fallow_str,
             ]
             
             # Write data with conditional formatting for yes/no values
@@ -406,7 +418,7 @@ class Form10ExportUtils(models.AbstractModel):
         worksheet.merge_range(current_row, 0, current_row, 1, 'कुल योग', cell_format_bold)
         worksheet.write(current_row, 2, round(total_area_sum, 4), cell_format_bold)
         worksheet.write(current_row, 3, round(total_acquired_area_sum, 4), cell_format_bold)
-        for col in range(4, 18):
+        for col in range(4, 21):
              worksheet.write(current_row, col, '', cell_format_bold)
         current_row += 1
         
@@ -426,7 +438,7 @@ class Form10ExportUtils(models.AbstractModel):
         
         # Signature details
         worksheet.merge_range(current_row, 0, current_row, 4, 'नाम -', signature_format)
-        worksheet.merge_range(current_row, 5, current_row, 5, 'पदनाम', signature_format)
+        worksheet.write(current_row, 5, 'पदनाम', signature_format)
         worksheet.merge_range(current_row, 6, current_row, 9, 'नाम -', signature_format)
         worksheet.merge_range(current_row, 10, current_row, 14, 'नाम -', signature_format)
         worksheet.merge_range(current_row, 15, current_row, 16, 'नाम-', signature_format)
@@ -440,7 +452,8 @@ class Form10ExportUtils(models.AbstractModel):
         worksheet.set_column(4, 4, 30)  # Landowners
         worksheet.set_column(5, 8, 12)  # Land type columns
         worksheet.set_column(9, 11, 15)  # Tree columns
-        worksheet.set_column(12, 17, 15)  # Asset columns
+        worksheet.set_column(12, 17, 15)  # Asset + remarks columns
+        worksheet.set_column(18, 20, 14)  # Survey type / distance / fallow
         
         workbook.close()
         output.seek(0)

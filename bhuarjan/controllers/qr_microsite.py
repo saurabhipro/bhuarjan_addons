@@ -105,6 +105,69 @@ class Form10PDFController(http.Controller):
                 if project_surveys:
                     _logger.warning(f"Villages with surveys in this project: {set(project_surveys.mapped('village_id.id'))}")
                 return request.not_found("No surveys found for this project and village")
+
+            # Landowner text-size diagnostics for row chunking logic.
+            # Helps determine whether count (owners) or text length is the first pressure point.
+            count_threshold = 5
+            length_threshold = 180
+            max_count = 0
+            max_chars = 0
+            max_count_survey = None
+            max_chars_survey = None
+            first_count_survey = None
+            first_length_survey = None
+            metric_rows = []
+            for survey in all_surveys:
+                owners = survey.landowner_ids.sudo()
+                lo_count = len(owners)
+                total_chars = 0
+                for lo in owners:
+                    person = lo.name or ''
+                    if lo.father_name:
+                        person += ' पिता ' + lo.father_name
+                    elif lo.spouse_name:
+                        person += ' पति ' + lo.spouse_name
+                    total_chars += len(person)
+                metric_rows.append((survey.id, survey.khasra_number or '', lo_count, total_chars))
+                if lo_count > max_count:
+                    max_count = lo_count
+                    max_count_survey = survey
+                if total_chars > max_chars:
+                    max_chars = total_chars
+                    max_chars_survey = survey
+                if first_count_survey is None and lo_count > count_threshold:
+                    first_count_survey = survey
+                if first_length_survey is None and total_chars > length_threshold:
+                    first_length_survey = survey
+
+            first_trigger = 'none'
+            if first_count_survey and first_length_survey:
+                first_trigger = 'count' if first_count_survey.id <= first_length_survey.id else 'length'
+            elif first_count_survey:
+                first_trigger = 'count'
+            elif first_length_survey:
+                first_trigger = 'length'
+
+            _logger.info(
+                "Form10 LO metrics: max_count=%s (survey=%s, khasra=%s), "
+                "max_total_chars=%s (survey=%s, khasra=%s), first_trigger=%s "
+                "[thresholds: count>%s, chars>%s]",
+                max_count,
+                max_count_survey.id if max_count_survey else None,
+                max_count_survey.khasra_number if max_count_survey else None,
+                max_chars,
+                max_chars_survey.id if max_chars_survey else None,
+                max_chars_survey.khasra_number if max_chars_survey else None,
+                first_trigger,
+                count_threshold,
+                length_threshold,
+            )
+            if _logger.isEnabledFor(logging.DEBUG):
+                for survey_id, khasra_no, lo_count, total_chars in sorted(metric_rows, key=lambda x: (x[2], x[3]), reverse=True)[:10]:
+                    _logger.debug(
+                        "Form10 LO metric detail: survey=%s khasra=%s count=%s total_chars=%s",
+                        survey_id, khasra_no, lo_count, total_chars,
+                    )
             
             _logger.info(
                 "Generating PDF for %d surveys (project=%s[%s], village=%s[%s])",

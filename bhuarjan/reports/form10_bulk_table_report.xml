@@ -318,13 +318,15 @@
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
                                     <t t-set="lo_count" t-value="len(s.landowner_ids) if s.landowner_ids else 0"/>
-                                    <t t-set="lo_chunk_size" t-value="5"/>
+                                    <t t-set="lo_total_chars" t-value="sum(len((lo.name or '') + (' पिता ' + lo.father_name if lo.father_name else (' पति ' + lo.spouse_name if lo.spouse_name else ''))) for lo in s.landowner_ids) if s.landowner_ids else 0"/>
+                                    <t t-set="lo_max_name_chars" t-value="max([len((lo.name or '') + (' पिता ' + lo.father_name if lo.father_name else (' पति ' + lo.spouse_name if lo.spouse_name else ''))) for lo in s.landowner_ids] or [0])"/>
+                                    <t t-set="lo_chunk_size" t-value="1 if lo_max_name_chars &gt; 40 else (3 if (lo_count &gt; 20 or lo_total_chars &gt; 420) else (4 if (lo_count &gt; 12 or lo_total_chars &gt; 260) else 5))"/>
                                     <t t-set="lo_chunk_count" t-value="((lo_count + lo_chunk_size - 1) // lo_chunk_size) if lo_count else 0"/>
                                     <t t-set="is_lo_many" t-value="lo_count &gt; 5"/>
                                     <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
                                     <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
-                                    <t t-set="is_lo_huge" t-value="lo_count &gt; 20 and s_index != 0"/>
-                                    <tr t-attf-class="survey-row #{'form10-row-fresh' if is_lo_huge else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
+                                    <t t-set="needs_fresh_page" t-value="s_index != 0 and (lo_chunk_count &gt; 1 or lo_total_chars &gt; 220)"/>
+                                    <tr t-attf-class="survey-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'} #{'form10-row-fresh' if needs_fresh_page else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -476,7 +478,7 @@
                                             </tr>
                                     <t t-if="lo_chunk_count &gt; 1">
                                         <t t-foreach="range(1, lo_chunk_count)" t-as="chunk_idx">
-                                        <tr class="survey-row form10-continuation-row form10-grouped-row">
+                                        <tr t-attf-class="survey-row form10-continuation-row form10-grouped-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'}">
                                             <td style="text-align:center; border: 1px solid #000;"></td>
                                             <td style="text-align:center; border: 1px solid #000;">
                                                 <t t-if="s.khasra_number">
@@ -644,13 +646,15 @@
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
                                     <t t-set="lo_count" t-value="len(s.landowner_ids) if s.landowner_ids else 0"/>
-                                    <t t-set="lo_chunk_size" t-value="5"/>
+                                    <t t-set="lo_total_chars" t-value="sum(len((lo.name or '') + (' पिता ' + lo.father_name if lo.father_name else (' पति ' + lo.spouse_name if lo.spouse_name else ''))) for lo in s.landowner_ids) if s.landowner_ids else 0"/>
+                                    <t t-set="lo_max_name_chars" t-value="max([len((lo.name or '') + (' पिता ' + lo.father_name if lo.father_name else (' पति ' + lo.spouse_name if lo.spouse_name else ''))) for lo in s.landowner_ids] or [0])"/>
+                                    <t t-set="lo_chunk_size" t-value="1 if lo_max_name_chars &gt; 40 else (3 if (lo_count &gt; 20 or lo_total_chars &gt; 420) else (4 if (lo_count &gt; 12 or lo_total_chars &gt; 260) else 5))"/>
                                     <t t-set="lo_chunk_count" t-value="((lo_count + lo_chunk_size - 1) // lo_chunk_size) if lo_count else 0"/>
                                     <t t-set="is_lo_many" t-value="lo_count &gt; 5"/>
                                     <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
                                     <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
-                                    <t t-set="is_lo_huge" t-value="lo_count &gt; 20 and s_index != 0"/>
-                                    <tr t-attf-class="survey-row #{'form10-row-fresh' if is_lo_huge else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
+                                    <t t-set="needs_fresh_page" t-value="s_index != 0 and (lo_chunk_count &gt; 1 or lo_total_chars &gt; 220)"/>
+                                    <tr t-attf-class="survey-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'} #{'form10-row-fresh' if needs_fresh_page else ''} #{'form10-grouped-row' if lo_count &gt; 5 else ''}">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -802,7 +806,7 @@
                                             </tr>
                                     <t t-if="lo_chunk_count &gt; 1">
                                         <t t-foreach="range(1, lo_chunk_count)" t-as="chunk_idx">
-                                        <tr class="survey-row form10-continuation-row form10-grouped-row">
+                                        <tr t-attf-class="survey-row form10-continuation-row form10-grouped-row form10-group-#{'even' if (s_index % 2) == 0 else 'odd'}">
                                             <td style="text-align:center; border: 1px solid #000;"></td>
                                             <td style="text-align:center; border: 1px solid #000;">
                                                 <t t-if="s.khasra_number">

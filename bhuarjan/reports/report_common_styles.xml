@@ -599,10 +599,18 @@
                 page-break-inside: avoid !important;
                 page-break-after: auto;
             }
-            /* Visual hint: grouped rows belong to same khasra (split landowner chunks) */
-            .bulk-form10-table tbody tr.form10-grouped-row > td,
-            .bulk-form10-table-landscape tbody tr.form10-grouped-row > td {
-                background-color: #eaf7ea !important;
+            /* Group-zebra shading: all rows of same khasra keep same color */
+            .bulk-form10-table tbody tr.survey-row.form10-group-even > td,
+            .bulk-form10-table-landscape tbody tr.survey-row.form10-group-even > td {
+                background-color: #dde3ea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .bulk-form10-table tbody tr.survey-row.form10-group-odd > td,
+            .bulk-form10-table-landscape tbody tr.survey-row.form10-group-odd > td {
+                background-color: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             /*
              * For rows with a huge landowner list (lo_count above 20) start them on a
@@ -793,6 +801,7 @@
                 padding: 0 !important;
                 border-left: 0 !important;
                 border-right: 0 !important;
+                display: none !important;
             }
             /* Form 10 Column Widths - Portrait (row 1 only for cols 1–4 so sub-header row is not mis-sized) */
             .bulk-form10-table thead tr:first-child th:nth-child(1),

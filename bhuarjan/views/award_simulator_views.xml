@@ -1024,6 +1024,7 @@
                             <field name="land_line_ids" nolabel="1"
                                    domain="[('khasra_number', 'ilike', land_search or '')]">
                                 <list create="false" delete="false" edit="false">
+                                    <button name="action_edit_land_attributes" type="object" string=" " icon="fa-pencil" title="Edit distance, road rate (MR/BMR), irrigation, diverted / दूरी, मार्ग, सिंचाई, विचलन"/>
                                     <field name="survey_id" column_invisible="1" force_save="1"/>
                                     <field name="khasra_number" string="Khasra Number" readonly="1"/>
                                     <field name="village_id" string="Village" readonly="1" optional="hide"/>

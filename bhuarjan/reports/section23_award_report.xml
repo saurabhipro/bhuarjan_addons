@@ -395,22 +395,25 @@
                         <table border="1">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 30px;">1.<br/>क्र.</th>
-                                        <th rowspan="2" style="width: 150px;">2.<br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
-                                        <th colspan="3">भूमि जिस पर वृक्ष स्थित है, का विवरण</th>
-                                        <th rowspan="2">6.<br/>गोलाई</th>
-                                        <th colspan="2">निर्धारित मूल्य</th>
-                                        <th rowspan="2">9.<br/>सोलेशियम 100%</th>
-                                        <th rowspan="2">10.<br/>12% ब्याज</th>
-                                        <th rowspan="2">11.<br/>योग</th>
-                                        <th rowspan="2">12.<br/>रिमार्क</th>
+                                        <th rowspan="2" style="width: 28px;">1.<br/>क्र.</th>
+                                        <th rowspan="2" style="width: 120px;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
+                                        <th colspan="2" style="text-align: center;">अर्जित भूमि का विवरण</th>
+                                        <th colspan="10" style="text-align: center;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
+                                        <th rowspan="2" style="width: 70px;">15.<br/>रिमार्क</th>
                                     </tr>
                                     <tr>
                                         <th>3.<br/>खसरा नं.</th>
-                                        <th>4.<br/>वृक्षों का प्रकार</th>
-                                        <th>5.<br/>वृक्ष संख्या</th>
-                                        <th>7.<br/>दर</th>
-                                        <th>8.<br/>मूल्य</th>
+                                        <th>4.<br/>कुल रकबा<br/>(हे.)</th>
+                                        <th>5.<br/>खसरा नं.</th>
+                                        <th>6.<br/>वृक्ष का प्रकार</th>
+                                        <th>7.<br/>वृक्ष संख्या</th>
+                                        <th>8.<br/>गोलाई<br/>(से.मी.)</th>
+                                        <th>9.<br/>दर</th>
+                                        <th>10.<br/>मूल्य</th>
+                                        <th>11.<br/>कुल राशि</th>
+                                        <th>12.<br/>100% सोलेशियम</th>
+                                        <th>13.<br/>12% ब्याज<br/>(6 माह)</th>
+                                        <th>14.<br/>योग (11+12+13)</th>
                                     </tr>
                                 </thead>
                             <tbody>
@@ -425,14 +428,17 @@
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center;" t-esc="tree.get('khasra', '')"/>
+                                            <td style="text-align: center;" t-esc="tree.get('land_khasra') or tree.get('khasra', '')"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('land_area_ha', 0.0), 4)"/>
+                                            <td style="text-align: center;" t-esc="tree.get('tree_khasra') or tree.get('khasra', '')"/>
                                             <td>
                                                 <span t-esc="tree.get('tree_type', '')"/>
                                             </td>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('tree_count', 0), 2)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('girth_cm', 0.0), 2)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('rate', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('value', 0.0), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('mulya', tree.get('value', 0.0)), 0)"/>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('kul_rashi', tree.get('value', 0.0)), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(tree.get('total', 0.0), 0)"/>
@@ -442,11 +448,14 @@
                                     <tr class="total-row">
                                         <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
                                         <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('land_area_ha', 0.0), 4)"/>
+                                        <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
                                         <td style="text-align: right; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('mulya', group.get('value', 0.0)), 0)"/>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('kul_rashi', group.get('value', 0.0)), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
@@ -456,7 +465,7 @@
                                 </t>
                                 <t t-if="not tree_groups">
                                     <tr>
-                                        <td colspan="12" style="text-align: center; font-style: italic;">
+                                        <td colspan="15" style="text-align: center; font-style: italic;">
                                             No tree data available / वृक्ष डेटा उपलब्ध नहीं है (Blank)
                                         </td>
                                     </tr>

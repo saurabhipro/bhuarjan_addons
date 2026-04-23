@@ -83,6 +83,12 @@ class BhuLandowner(models.Model):
         # Admin sees everything - no filter
         if user.has_group('bhuarjan.group_bhuarjan_admin') or user.has_group('base.group_system'):
             return super(BhuLandowner, self)._search(args, offset=offset, limit=limit, order=order)
+
+        # SDM / Tehsildar: record rules (district OR surveys on assigned projects) must apply; a blanket
+        # district_id filter here would block landowners tied to their projects when district_id is
+        # unset or out of sync with res.users.district_id.
+        if user.has_group('bhuarjan.group_bhuarjan_sdm') or user.has_group('bhuarjan.group_bhuarjan_tahsildar'):
+            return super(BhuLandowner, self)._search(args, offset=offset, limit=limit, order=order)
             
         # For all other users, restrict to their assigned district if they have one
         if user.district_id:

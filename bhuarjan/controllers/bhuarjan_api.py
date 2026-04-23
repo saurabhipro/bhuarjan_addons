@@ -2018,32 +2018,12 @@ class BhuarjanAPIController(http.Controller):
 
             _logger.info(f"Form 10 download: PDF data extracted, size: {len(pdf_data)} bytes")
 
-            # Generate filename - sanitize to ASCII only for HTTP headers
-            def sanitize_filename(name):
-                """Remove non-ASCII characters and sanitize for HTTP headers"""
-                if not name:
-                    return 'Unknown'
-                # Convert to string and encode to ASCII, ignoring non-ASCII characters
-                try:
-                    # First, try to encode to ASCII and ignore errors
-                    name = name.encode('ascii', 'ignore').decode('ascii')
-                except (UnicodeEncodeError, UnicodeDecodeError):
-                    # If encoding fails, remove all non-ASCII characters manually
-                    name = ''.join(char for char in name if ord(char) < 128)
-                
-                # Remove any remaining non-alphanumeric characters except underscores and hyphens
-                name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
-                # Replace multiple underscores/hyphens with single underscore
-                name = re.sub(r'[_\-\s]+', '_', name)
-                # Remove leading/trailing underscores
-                name = name.strip('_')
-                return name[:50] if name else 'Unknown'
-            
-            village_name_ascii = sanitize_filename(village.name if village.name else 'Village')
-            filename = f"Form10_{village_name_ascii}.pdf"
-            if project_id:
-                project_name_ascii = sanitize_filename(project_name if project_name else 'Project')
-                filename = f"Form10_{project_name_ascii}_{village_name_ascii}.pdf"
+            filename = request.env['form10.export.utils'].generate_form10_filename(
+                surveys,
+                'pdf',
+                project_name=project_name,
+                village_name=village.name if village else None,
+            )
 
             _logger.info(f"Form 10 download: Returning PDF response with filename: {filename}")
 
@@ -2194,30 +2174,7 @@ class BhuarjanAPIController(http.Controller):
 
             _logger.info(f"Form 10 download by survey: PDF data extracted, size: {len(pdf_data)} bytes")
 
-            # Generate filename - sanitize to ASCII only for HTTP headers
-            def sanitize_filename(name):
-                """Remove non-ASCII characters and sanitize for HTTP headers"""
-                if not name:
-                    return 'Unknown'
-                # Convert to string and encode to ASCII, ignoring non-ASCII characters
-                try:
-                    # First, try to encode to ASCII and ignore errors
-                    name = name.encode('ascii', 'ignore').decode('ascii')
-                except (UnicodeEncodeError, UnicodeDecodeError):
-                    # If encoding fails, remove all non-ASCII characters manually
-                    name = ''.join(char for char in name if ord(char) < 128)
-                
-                # Remove any remaining non-alphanumeric characters except underscores and hyphens
-                name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
-                # Replace multiple underscores/hyphens with single underscore
-                name = re.sub(r'[_\-\s]+', '_', name)
-                # Remove leading/trailing underscores
-                name = name.strip('_')
-                return name[:50] if name else 'Unknown'
-            
-            # Generate filename with survey name or ID
-            survey_name_ascii = sanitize_filename(survey.name if survey.name else f"Survey_{survey_id}")
-            filename = f"Form10_{survey_name_ascii}.pdf"
+            filename = request.env['form10.export.utils'].generate_form10_filename(survey, 'pdf')
 
             _logger.info(f"Form 10 download by survey: Returning PDF response with filename: {filename}")
 

@@ -287,10 +287,11 @@ class Form10ExportUtils(models.AbstractModel):
         for idx, survey in enumerate(surveys):
             serial_num = idx + 1
             
-            # Get landowner names
+            # Get landowner names (sudo: rows are exactly those on this survey; avoids read ACL
+            # on bhu.landowner when project/district data is out of sync for SDM/Tehsildar)
             owner_names = []
             counter = 1
-            for lo in survey.landowner_ids:
+            for lo in survey.landowner_ids.sudo():
                 name = lo.name or ''
                 if lo.father_name:
                     name += f" पिता {lo.father_name}"
@@ -445,70 +446,49 @@ class Form10ExportUtils(models.AbstractModel):
         return output.read()
 
     @api.model
-    def sanitize_filename(self, name, max_length=50):
+    def sanitize_filename(self, name, max_length=80):
         """
-        Remove non-ASCII characters and sanitize for HTTP headers
-        Args:
-            name: Original filename
-            max_length: Maximum length of sanitized filename
-        Returns:
-            str: Sanitized filename
+        Make a string safe for use in file names. Keeps Unicode (e.g. Hindi/Devanagari);
+        only strips characters that are invalid in paths on common OSes.
         """
+        if name is None:
+            return 'Unknown'
+        name = str(name).strip()
         if not name:
             return 'Unknown'
-        # Convert to string and encode to ASCII, ignoring non-ASCII characters
-        try:
-            # First, try to encode to ASCII and ignore errors
-            name = name.encode('ascii', 'ignore').decode('ascii')
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            # If encoding fails, remove all non-ASCII characters manually
-            name = ''.join(char for char in name if ord(char) < 128)
-        
-        # Remove any remaining non-alphanumeric characters except underscores and hyphens
-        name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
-        # Replace multiple underscores/hyphens with single underscore
-        name = re.sub(r'[_\-\s]+', '_', name)
-        # Remove leading/trailing underscores
-        name = name.strip('_')
-        return name[:max_length] if name else 'Unknown'
+        # Remove characters invalid in file names (Windows + Unix)
+        name = re.sub(r'[\\/:*?"<>|\x00-\x1f]', '', name)
+        name = re.sub(r'\s+', '_', name)
+        name = re.sub(r'_+', '_', name)
+        name = name.strip('._')
+        if not name:
+            return 'Unknown'
+        return name[:max_length]
 
     @api.model
     def generate_form10_filename(self, surveys, file_extension='pdf', project_name=None, village_name=None):
         """
-        Generate filename for Form 10 export
-        Args:
-            surveys: Recordset of surveys
-            file_extension: File extension (pdf or xlsx)
-            project_name: Optional project name override
-            village_name: Optional village name override
-        Returns:
-            str: Sanitized filename
+        Build Form10_<project>_<village>.<ext> for PDF, Excel, and CSV.
+        Names default from the first survey; optional overrides (e.g. from the wizard) win.
         """
         if not surveys:
             return f"Form10_Unknown.{file_extension}"
-        
-        first_survey = surveys[0]
-        
-        # Use provided names or get from first survey
-        if village_name is None:
-            village_name = first_survey.village_id.name if first_survey.village_id else 'Village'
+
+        first = surveys[0]
         if project_name is None:
-            project_name = first_survey.project_id.name if first_survey.project_id else None
-        
-        village_name_ascii = self.sanitize_filename(village_name)
-        
-        if project_name and len(surveys) > 1:
-            # Multiple surveys - include project name
-            project_name_ascii = self.sanitize_filename(project_name)
-            filename = f"Form10_{project_name_ascii}_{village_name_ascii}.{file_extension}"
-        elif len(surveys) == 1:
-            # Single survey - use survey name or ID
-            survey_name = first_survey.name or f"Survey_{first_survey.id}"
-            survey_name_ascii = self.sanitize_filename(survey_name)
-            filename = f"Form10_{survey_name_ascii}.{file_extension}"
-        else:
-            # Multiple surveys, no project
-            filename = f"Form10_{village_name_ascii}.{file_extension}"
-        
-        return filename
+            project_name = first.project_id.name if first.project_id else None
+        if village_name is None:
+            village_name = first.village_id.name if first.village_id else None
+        if not project_name and first.project_id:
+            project_name = 'Project_%s' % first.project_id.id
+        elif not project_name:
+            project_name = 'Project'
+        if not village_name and first.village_id:
+            village_name = 'Village_%s' % first.village_id.id
+        elif not village_name:
+            village_name = 'Village'
+
+        p = self.sanitize_filename(project_name)
+        v = self.sanitize_filename(village_name)
+        return 'Form10_%s_%s.%s' % (p, v, file_extension)
 

@@ -1,7 +1,6 @@
 from odoo import http
 from odoo.http import request
 import logging
-import re
 import base64
 
 _logger = logging.getLogger(__name__)
@@ -200,23 +199,13 @@ class Form10PDFController(http.Controller):
                     _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
-            # Return PDF response with proper headers
-            # Use project and village name in filename
-            # Sanitize filename to avoid Unicode issues in HTTP headers (must be latin-1 compatible)
-            project_name = (project.name or 'All').replace(' ', '_')
-            village_name = (village.name or 'All').replace(' ', '_')
-            
-            # Create ASCII-safe filename (remove/replace non-ASCII characters)
-            project_name_ascii = re.sub(r'[^\x00-\x7F]+', '', project_name) or 'Project'
-            village_name_ascii = re.sub(r'[^\x00-\x7F]+', '', village_name) or 'Village'
-            
-            # If names become empty after removing non-ASCII, use project/village IDs
-            if not project_name_ascii or project_name_ascii == '_':
-                project_name_ascii = f'Project_{project.id}'
-            if not village_name_ascii or village_name_ascii == '_':
-                village_name_ascii = f'Village_{village.id}'
-            
-            filename = f"Form10_{project_name_ascii}_{village_name_ascii}.pdf"
+            # Return PDF with Form10_<project>_<village>.pdf (unicode-safe, matches other exports)
+            filename = request.env['form10.export.utils'].generate_form10_filename(
+                verify_surveys,
+                'pdf',
+                project_name=project.name,
+                village_name=village.name,
+            )
             
             return request.make_response(
                 pdf_data,

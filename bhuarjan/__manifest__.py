@@ -75,6 +75,7 @@
         'wizard/sia_send_back_wizard.xml',
         'wizard/sia_download_wizard_views.xml',
         'wizard/award_download_wizard_views.xml',
+        'wizard/award_simulator_land_edit_wizard_views.xml',
         'wizard/process_send_back_wizard.xml',
         'wizard/section8_approve_reject_wizard.xml',
         'wizard/reject_survey_wizard_views.xml',

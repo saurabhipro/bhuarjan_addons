@@ -233,8 +233,13 @@ class ReportWizard(models.TransientModel):
         export_utils = self.env['form10.export.utils']
         excel_data = export_utils.generate_form10_excel(surveys)
         
-        # Generate filename using utility function
-        filename = export_utils.generate_form10_filename(surveys, file_extension='xlsx')
+        # Generate filename (explicit project/village from wizard; keeps Hindi names)
+        filename = export_utils.generate_form10_filename(
+            surveys,
+            file_extension='xlsx',
+            project_name=self.project_id.name if self.project_id else None,
+            village_name=self.village_id.name if self.village_id else None,
+        )
         
         # Create attachment
         attachment = self.env['ir.attachment'].create({
@@ -306,10 +311,10 @@ class ReportWizard(models.TransientModel):
             for idx, survey in enumerate(chunk):
                 serial_num = start_idx + idx + 1
                 
-                # Get landowner names
+                # Get landowner names (see form10_export_utils: sudo for linked rows only)
                 owner_names = []
                 counter = 1
-                for lo in survey.landowner_ids:
+                for lo in survey.landowner_ids.sudo():
                     name = lo.name
                     if lo.father_name:
                         name += f" पिता {lo.father_name}"
@@ -371,9 +376,14 @@ class ReportWizard(models.TransientModel):
         csv_data = output.getvalue()
         output.close()
         
-        # Create attachment
-        village_name = surveys[0].village_id.name if surveys else "All"
-        filename = f"Form10_{village_name}.csv"
+        # Create attachment — same naming as PDF/Excel: Form10_<project>_<village>.csv
+        export_utils = self.env['form10.export.utils']
+        filename = export_utils.generate_form10_filename(
+            surveys,
+            file_extension='csv',
+            project_name=self.project_id.name if self.project_id else None,
+            village_name=self.village_id.name if self.village_id else None,
+        )
         
         attachment = self.env['ir.attachment'].create({
             'name': filename,

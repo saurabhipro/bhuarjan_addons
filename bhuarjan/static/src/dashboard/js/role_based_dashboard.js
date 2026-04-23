@@ -6,11 +6,11 @@ import { useService } from "@web/core/utils/hooks";
 
 export class RoleBasedDashboard extends Component {
     static template = xml`<div class="o_loading" style="text-align: center; padding: 50px;"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>`;
-    
+
     setup() {
         this.action = useService("action");
         this.orm = useService("orm");
-        
+
         // Redirect immediately without blocking
         onMounted(async () => {
             try {

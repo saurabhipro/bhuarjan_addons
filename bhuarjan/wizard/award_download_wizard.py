@@ -18,6 +18,18 @@ class AwardDownloadWizard(models.TransientModel):
         ('excel', 'Excel Format (.xlsx)'),
     ], string='Download Format', default='pdf', required=True)
 
+    export_scope = fields.Selection(
+        [
+            ('all', '📋 All sections / सभी पत्रक (भूमि + परिसम्पत्ति + वृक्ष)'),
+            ('land', '🧾 Land only (Part Ka) / केवल भूमि (भाग-1 क)'),
+            ('asset', '🏠 Structure only (Part Kh) / केवल परिसम्पत्ति (भाग-1 ख)'),
+            ('tree', '🌳 Trees only (Part Ga) / केवल वृक्ष (भाग-1 ग)'),
+        ],
+        string='Sections / पत्रक',
+        default='all',
+        required=True,
+    )
+
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
@@ -34,15 +46,20 @@ class AwardDownloadWizard(models.TransientModel):
                 "The selected record no longer exists. "
                 "Please reopen the document and try download again."
             ))
+        scope = (self.export_scope or 'all')
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
         if self.format == 'pdf':
+            # PDF always renders the full award (all sections).
+            # Scope filtering applies only to Excel (handled below).
             report = self.env.ref(self.report_xml_id)
             return report.report_action(record)
         if self.format == 'excel':
             # Keep wizard generic: support standard Excel hook and
             # Section 23 consolidated components Excel hook.
             if hasattr(record, 'action_download_excel'):
-                return record.action_download_excel()
+                return record.action_download_excel(export_scope=scope)
             if hasattr(record, 'action_download_excel_components'):
-                return record.action_download_excel_components()
+                return record.action_download_excel_components(export_scope=scope)
             raise UserError(_("Excel export is not supported for this report."))
         raise UserError(_("Selected download format is not supported."))

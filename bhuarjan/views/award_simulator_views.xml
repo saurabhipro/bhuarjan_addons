@@ -905,7 +905,7 @@
                             <group>
                                 <group string="Project / Village">
                                     <field name="survey_type" widget="radio" options="{'horizontal': true}"
-                                        help="Rural uses &lt;= 50m threshold for Main Road; Urban uses &lt;= 20m threshold. Affects whether Main Road or Beyond-Main-Road base rate is applied."/>
+                                        help="Rural uses ≤ 50m threshold for Main Road; Urban uses ≤ 20m threshold. Affects whether Main Road or Beyond-Main-Road base rate is applied."/>
                                     <field name="project_id" options="{'no_create': true, 'no_open': true}"
                                         help="Select project first."/>
                                     <field name="village_id" options="{'no_create': true, 'no_open': true}"

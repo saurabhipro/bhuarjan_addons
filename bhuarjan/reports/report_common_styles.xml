@@ -556,17 +556,42 @@
                 page-break-inside: auto !important;
             }
             
-            /* Only prevent breaking for landowner column (column 5) - keep it together */
-            .bulk-form10-table tbody td:nth-child(5),
-            .bulk-form10-table-landscape tbody td:nth-child(5) {
-                page-break-inside: avoid !important;
-                orphans: 2;
-                widows: 2;
+            /*
+             * Form 10 page breaks: one khasra = one table row (class survey-row).
+             * If we allow the row to split, wkhtmltopdf can put the tail of a tall
+             * landowner cell on the next page above the repeated thead (bad layout).
+             * Keep each survey row unsplit; use .form10-lo-many to shrink text when
+             * many land owners so the row can still (usually) fit on one page.
+             */
+            .bulk-form10-table .form10-name-cell .form10-lo-line,
+            .bulk-form10-table-landscape .form10-name-cell .form10-lo-line {
+                margin-bottom: 2px;
+                line-height: 1.35;
             }
-            
-            /* Allow rows to break across pages */
-            .bulk-form10-table tbody tr,
-            .bulk-form10-table-landscape tbody tr {
+            .bulk-form10-table tbody td:nth-child(5).form10-lo-many,
+            .bulk-form10-table-landscape tbody td:nth-child(5).form10-lo-many,
+            .bulk-form10-table tbody td.form10-name-cell.form10-lo-many,
+            .bulk-form10-table-landscape tbody td.form10-name-cell.form10-lo-many {
+                font-size: 11px !important;
+                line-height: 1.25 !important;
+            }
+            .bulk-form10-table tbody tr.survey-row,
+            .bulk-form10-table-landscape tbody tr.survey-row {
+                page-break-inside: avoid !important;
+                page-break-after: auto;
+            }
+            /* Override generic td { break: auto } so a tall landowner cell does not split */
+            .bulk-form10-table tbody tr.survey-row > td,
+            .bulk-form10-table-landscape tbody tr.survey-row > td {
+                page-break-inside: avoid !important;
+            }
+            .bulk-form10-table tbody tr.form10-totals-row,
+            .bulk-form10-table-landscape tbody tr.form10-totals-row {
+                page-break-inside: avoid !important;
+            }
+            /* Rows without .survey-row (e.g. empty-state) may still break if needed */
+            .bulk-form10-table tbody tr:not(.survey-row):not(.form10-totals-row),
+            .bulk-form10-table-landscape tbody tr:not(.survey-row):not(.form10-totals-row) {
                 page-break-inside: auto !important;
                 page-break-after: auto !important;
             }

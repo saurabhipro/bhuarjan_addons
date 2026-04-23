@@ -283,6 +283,7 @@
                                 </t>
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
+                                    <t t-set="is_lo_many" t-value="s.landowner_ids and len(s.landowner_ids) &gt; 5"/>
                                     <tr class="survey-row">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
@@ -303,11 +304,11 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="width: 18%; border: 1px solid #000;">
+                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''}" style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
-                                                            <div style="page-break-inside: avoid !important;">
+                                                            <div class="form10-lo-line">
                                                                 <t t-esc="counter"/>. <t t-esc="lo.name"/>
                                                                 <t t-if="lo.father_name">
                                                                     &#160;पिता&#160;<t t-esc="lo.father_name"/>
@@ -433,7 +434,7 @@
                                             </tr>
                                 </t>
                                 <!-- Total Row -->
-                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                <tr class="form10-totals-row" style="font-weight: bold; background-color: #f8f9fa;">
                                     <td colspan="2" style="text-align:right; border: 1px solid #000; padding: 5px;">कुल योग</td>
                                     <td style="text-align:center; border: 1px solid #000; padding: 5px;">
                                         <t t-esc="round(total_area_sum, 4)"/>
@@ -533,6 +534,7 @@
                                 </t>
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
+                                    <t t-set="is_lo_many" t-value="s.landowner_ids and len(s.landowner_ids) &gt; 5"/>
                                     <tr class="survey-row">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
@@ -553,11 +555,11 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td style="width: 18%; border: 1px solid #000;">
+                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''}" style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
-                                                            <div style="page-break-inside: avoid !important;">
+                                                            <div class="form10-lo-line">
                                                                 <t t-esc="counter"/>. <t t-esc="lo.name"/>
                                                                 <t t-if="lo.father_name">
                                                                     &#160;पिता&#160;<t t-esc="lo.father_name"/>
@@ -683,7 +685,7 @@
                                             </tr>
                                 </t>
                                 <!-- Total Row -->
-                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                <tr class="form10-totals-row" style="font-weight: bold; background-color: #f8f9fa;">
                                     <td colspan="2" style="text-align:right; border: 1px solid #000; padding: 5px;">कुल योग</td>
                                     <td style="text-align:center; border: 1px solid #000; padding: 5px;">
                                         <t t-esc="round(total_area_sum, 4)"/>

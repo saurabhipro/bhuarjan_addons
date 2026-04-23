@@ -107,12 +107,14 @@ class Form10ExcelAPIController(http.Controller):
 
             _logger.info(f"Form 10 Excel download: Returning Excel response with filename: {filename}")
 
-            # Return Excel file
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.xlsx'
+            )
             response = request.make_response(
                 excel_data,
                 headers=[
                     ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(excel_data)))
                 ]
             )
@@ -181,12 +183,14 @@ class Form10ExcelAPIController(http.Controller):
 
             _logger.info(f"Form 10 Excel download by survey: Returning Excel response with filename: {filename}")
 
-            # Return Excel file
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.xlsx'
+            )
             response = request.make_response(
                 excel_data,
                 headers=[
                     ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(excel_data)))
                 ]
             )

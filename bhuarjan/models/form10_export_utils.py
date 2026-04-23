@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 import io
 import re
 import logging
+from urllib.parse import quote
 
 _logger = logging.getLogger(__name__)
 
@@ -491,4 +492,32 @@ class Form10ExportUtils(models.AbstractModel):
         p = self.sanitize_filename(project_name)
         v = self.sanitize_filename(village_name)
         return 'Form10_%s_%s.%s' % (p, v, file_extension)
+
+    @api.model
+    def content_disposition_attachment(self, filename, ascii_fallback='Form10_Export.pdf'):
+        """
+        Build a Content-Disposition value safe for WSGI (header values are encoded as
+        latin-1). Non–Latin-1 names use RFC 5987 ``filename*``; browsers still get the
+        full Unicode name for Save As.
+        """
+        if not filename:
+            filename = ascii_fallback
+        # Short ASCII/Latin-1 name for old clients; must be header-safe
+        try:
+            af = (ascii_fallback or 'export.pdf')[:200]
+            af.encode('latin-1')
+        except UnicodeEncodeError:
+            af = 'export.pdf'
+
+        def _esc_quoted(s):
+            return s.replace('\\', '\\\\').replace('"', '\\"')
+
+        try:
+            filename.encode('latin-1')
+        except UnicodeEncodeError:
+            return 'attachment; filename="%s"; filename*=UTF-8\'\'%s' % (
+                _esc_quoted(af),
+                quote(filename, safe=''),
+            )
+        return 'attachment; filename="%s"' % _esc_quoted(filename)
 

@@ -2018,7 +2018,8 @@ class BhuarjanAPIController(http.Controller):
 
             _logger.info(f"Form 10 download: PDF data extracted, size: {len(pdf_data)} bytes")
 
-            filename = request.env['form10.export.utils'].generate_form10_filename(
+            export_utils = request.env['form10.export.utils']
+            filename = export_utils.generate_form10_filename(
                 surveys,
                 'pdf',
                 project_name=project_name,
@@ -2027,12 +2028,14 @@ class BhuarjanAPIController(http.Controller):
 
             _logger.info(f"Form 10 download: Returning PDF response with filename: {filename}")
 
-            # Return PDF
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.pdf'
+            )
             response = request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )
@@ -2174,16 +2177,19 @@ class BhuarjanAPIController(http.Controller):
 
             _logger.info(f"Form 10 download by survey: PDF data extracted, size: {len(pdf_data)} bytes")
 
-            filename = request.env['form10.export.utils'].generate_form10_filename(survey, 'pdf')
+            export_utils = request.env['form10.export.utils']
+            filename = export_utils.generate_form10_filename(survey, 'pdf')
 
             _logger.info(f"Form 10 download by survey: Returning PDF response with filename: {filename}")
 
-            # Return PDF
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.pdf'
+            )
             response = request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )

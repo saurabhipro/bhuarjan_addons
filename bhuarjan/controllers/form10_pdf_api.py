@@ -110,12 +110,15 @@ class Form10PDFAPIController(http.Controller):
 
             _logger.info(f"Form 10 download: Returning PDF response with filename: {filename}")
 
-            # Return PDF
+            # Return PDF (RFC 5987 filename* for Unicode project/village names)
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.pdf'
+            )
             response = request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )
@@ -187,12 +190,14 @@ class Form10PDFAPIController(http.Controller):
 
             _logger.info(f"Form 10 download by survey: Returning PDF response with filename: {filename}")
 
-            # Return PDF
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.pdf'
+            )
             response = request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )

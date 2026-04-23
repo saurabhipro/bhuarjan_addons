@@ -199,19 +199,22 @@ class Form10PDFController(http.Controller):
                     _logger.error(f"Unexpected PDF data type: {type(pdf_data)}")
                     return request.not_found(f"Error: Invalid PDF data type: {type(pdf_data)}")
             
-            # Return PDF with Form10_<project>_<village>.pdf (unicode-safe, matches other exports)
-            filename = request.env['form10.export.utils'].generate_form10_filename(
+            # Return PDF with Form10_<project>_<village>.pdf (unicode in filename* — header is Latin-1 safe)
+            export_utils = request.env['form10.export.utils']
+            filename = export_utils.generate_form10_filename(
                 verify_surveys,
                 'pdf',
                 project_name=project.name,
                 village_name=village.name,
             )
-            
+            content_disp = export_utils.content_disposition_attachment(
+                filename, ascii_fallback='Form10_Export.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', content_disp),
                     ('Content-Length', str(len(pdf_data)))
                 ]
             )
@@ -258,12 +261,14 @@ class Section4DownloadController(http.Controller):
                     notification.signed_document_filename
                     or f"Section4_Notification_{notification.name}_Signed.pdf"
                 )
-
+                cd = request.env['form10.export.utils'].content_disposition_attachment(
+                    filename, ascii_fallback='Section4_Notification.pdf'
+                )
                 return request.make_response(
                     pdf_data,
                     headers=[
                         ('Content-Type', 'application/pdf'),
-                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Disposition', cd),
                         ('Content-Length', str(len(pdf_data))),
                     ],
                 )
@@ -297,12 +302,14 @@ class Section4DownloadController(http.Controller):
             )
 
             filename = f"Section4_Notification_{notification.name}.pdf"
-
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='Section4_Notification.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ],
             )
@@ -348,12 +355,14 @@ class Section4DownloadController(http.Controller):
                 return request.not_found("Error: PDF rendering returned empty result")
             
             filename = f"SIA_{sia_team.name or sia_team.id}.pdf"
-            
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='SIA_Export.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
@@ -399,12 +408,14 @@ class Section4DownloadController(http.Controller):
                 return request.not_found("Error: PDF rendering returned empty result")
             
             filename = f"Expert_Committee_{expert_report.name or expert_report.id}.pdf"
-            
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='Expert_Committee.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
@@ -432,12 +443,14 @@ class Section4DownloadController(http.Controller):
                 _logger.info("Serving signed document")
                 pdf_data = base64.b64decode(report.signed_document_file)
                 filename = report.signed_document_filename or f"Section11_Preliminary_Report_{report.name}_Signed.pdf"
-                
+                cd = request.env['form10.export.utils'].content_disposition_attachment(
+                    filename, ascii_fallback='Section11_Report.pdf'
+                )
                 response = request.make_response(
                     pdf_data,
                     headers=[
                         ('Content-Type', 'application/pdf'),
-                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Disposition', cd),
                         ('Content-Length', str(len(pdf_data))),
                     ]
                 )
@@ -461,12 +474,14 @@ class Section4DownloadController(http.Controller):
                 return request.not_found("Error: PDF rendering returned empty result")
             
             filename = f"Section11_Preliminary_Report_{report.name}.pdf"
-            
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='Section11_Report.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
@@ -494,12 +509,14 @@ class Section4DownloadController(http.Controller):
                 _logger.info("Serving signed document")
                 pdf_data = base64.b64decode(notification.signed_document_file)
                 filename = notification.signed_document_filename or f"Section19_Notification_{notification.name}_Signed.pdf"
-                
+                cd = request.env['form10.export.utils'].content_disposition_attachment(
+                    filename, ascii_fallback='Section19_Notification.pdf'
+                )
                 response = request.make_response(
                     pdf_data,
                     headers=[
                         ('Content-Type', 'application/pdf'),
-                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Disposition', cd),
                         ('Content-Length', str(len(pdf_data))),
                     ]
                 )
@@ -523,12 +540,14 @@ class Section4DownloadController(http.Controller):
                 return request.not_found("Error: PDF rendering returned empty result")
             
             filename = f"Section19_Notification_{notification.name}.pdf"
-            
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='Section19_Notification.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )
@@ -556,12 +575,14 @@ class Section4DownloadController(http.Controller):
                 _logger.info("Serving signed document")
                 pdf_data = base64.b64decode(notification.signed_document_file)
                 filename = notification.signed_document_filename or f"Section21_Notification_{notification.name}_Signed.pdf"
-                
+                cd = request.env['form10.export.utils'].content_disposition_attachment(
+                    filename, ascii_fallback='Section21_Notification.pdf'
+                )
                 response = request.make_response(
                     pdf_data,
                     headers=[
                         ('Content-Type', 'application/pdf'),
-                        ('Content-Disposition', f'attachment; filename="{filename}"'),
+                        ('Content-Disposition', cd),
                         ('Content-Length', str(len(pdf_data))),
                     ]
                 )
@@ -585,12 +606,14 @@ class Section4DownloadController(http.Controller):
                 return request.not_found("Error: PDF rendering returned empty result")
             
             filename = f"Section21_Notification_{notification.name}.pdf"
-            
+            cd = request.env['form10.export.utils'].content_disposition_attachment(
+                filename, ascii_fallback='Section21_Notification.pdf'
+            )
             return request.make_response(
                 pdf_data,
                 headers=[
                     ('Content-Type', 'application/pdf'),
-                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Disposition', cd),
                     ('Content-Length', str(len(pdf_data))),
                 ]
             )

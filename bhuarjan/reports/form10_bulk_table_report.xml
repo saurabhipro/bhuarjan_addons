@@ -249,20 +249,34 @@
                                     <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>प्रभावित खसरा क्रमांक</strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 3%; border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>कुल रकबा <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हे.में.<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हेक्टेयर<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 17%; border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>भूमिस्वामी का नाम</strong></th>
+                                    <th rowspan="2" class="table_th_1 form10-th-landowner" style="width: 22%; border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>भूमिस्वामी का नाम</strong></th>
                                     <th colspan="4" class="table_th_1" style="border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>भूमि का प्रकार</strong></th>
                                     <th colspan="3" class="table_th_1" style="border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>भूमि पर स्थित वृक्ष की संख्या <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>प्रजातिवार<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th colspan="6" class="table_th_1" style="border: 1px solid #000;padding-left:2px;background-color: #e9ecef;font-weight: bold;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
 
                                 </tr>
                                 <tr>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>एक फसली</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>दो फसली</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>सिंचित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>असिंचित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>अविकसित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>अर्द्ध विकसित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>पूर्ण विकसित</strong></th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>एक फसली</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>दो फसली</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>सिंचित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>असिंचित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>अविकसित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>अर्द्ध विकसित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>पूर्ण विकसित</strong></span></div>
+                                    </th>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>मकान <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> क्षेत्रफल वर्गफुट में</strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>शेड <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>क्षेत्रफल वर्गफुट में<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;padding:2px;background-color: #e9ecef;font-weight: bold;"><strong>कुँआ <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
@@ -283,8 +297,12 @@
                                 </t>
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
-                                    <t t-set="is_lo_many" t-value="s.landowner_ids and len(s.landowner_ids) &gt; 5"/>
-                                    <tr class="survey-row">
+                                    <t t-set="lo_count" t-value="len(s.landowner_ids) if s.landowner_ids else 0"/>
+                                    <t t-set="is_lo_many" t-value="lo_count &gt; 5"/>
+                                    <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
+                                    <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
+                                    <t t-set="is_lo_huge" t-value="lo_count &gt; 20 and s_index != 0"/>
+                                    <tr t-attf-class="survey-row #{'form10-row-fresh' if is_lo_huge else ''}">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -304,7 +322,7 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''}" style="width: 18%; border: 1px solid #000;">
+                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''} #{'form10-lo-xl' if is_lo_xl else ''} #{'form10-lo-xxl' if is_lo_xxl else ''}" style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">
@@ -501,19 +519,33 @@
                                     <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>प्रभावित खसरा क्रमांक</strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 4%; border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>कुल रकबा <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हे.में.<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th rowspan="2" class="table_th_1" style="width: 5%; border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>अर्जन हेतु प्रस्तावित क्षेत्रफल <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हेक्टेयर<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
-                                    <th rowspan="2" class="table_th_1" style="width: 18%; border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>भूमिस्वामी का नाम</strong></th>
+                                    <th rowspan="2" class="table_th_1 form10-th-landowner" style="width: 22%; border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>भूमिस्वामी का नाम</strong></th>
                                     <th colspan="4" class="table_th_1" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>भूमि का प्रकार</strong></th>
                                     <th colspan="3" class="table_th_1" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>भूमि पर स्थित वृक्ष की संख्या <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>प्रजातिवार<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th colspan="6" class="table_th_1" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>भूमि पर स्थित परिसंपत्तियों का विवरण</strong></th>
                                 </tr>
                                 <tr>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>एक फसली</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>दो फसली</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>सिंचित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>असिंचित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>अविकसित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>अर्द्ध विकसित</strong></th>
-                                    <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>पूर्ण विकसित</strong></th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>एक फसली</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>दो फसली</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>सिंचित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>असिंचित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>अविकसित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>अर्द्ध विकसित</strong></span></div>
+                                    </th>
+                                    <th class="table_th_2 form10-th-rotate" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;">
+                                        <div class="form10-rotate-wrap"><span class="form10-rotate-label"><strong>पूर्ण विकसित</strong></span></div>
+                                    </th>
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>मकान <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> क्षेत्रफल वर्गफुट में</strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>शेड <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>क्षेत्रफल वर्गफुट में<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
                                     <th class="table_th_2" style="border: 1px solid #000;background-color: #e9ecef;font-weight: bold;"><strong>कुँआ <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>कच्चा/पक्का<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span> <span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">(</span>हाँ/नहीं<span class="paren-fix" style="font-family: Arial, Helvetica, sans-serif !important;">)</span></strong></th>
@@ -534,8 +566,12 @@
                                 </t>
                                 <!-- Iterate directly over docs (Odoo standard) -->
                                 <t t-foreach="docs" t-as="s">
-                                    <t t-set="is_lo_many" t-value="s.landowner_ids and len(s.landowner_ids) &gt; 5"/>
-                                    <tr class="survey-row">
+                                    <t t-set="lo_count" t-value="len(s.landowner_ids) if s.landowner_ids else 0"/>
+                                    <t t-set="is_lo_many" t-value="lo_count &gt; 5"/>
+                                    <t t-set="is_lo_xl" t-value="lo_count &gt; 10"/>
+                                    <t t-set="is_lo_xxl" t-value="lo_count &gt; 15"/>
+                                    <t t-set="is_lo_huge" t-value="lo_count &gt; 20 and s_index != 0"/>
+                                    <tr t-attf-class="survey-row #{'form10-row-fresh' if is_lo_huge else ''}">
                                         <td style="text-align:center; border: 1px solid #000;"><t t-esc="s_index + 1"/></td>
                                                 <td style="text-align:center; border: 1px solid #000;">
                                                     <t t-if="s.khasra_number">
@@ -555,7 +591,7 @@
                                                     </t>
                                                     <span t-if="s.acquired_area is None" style="color:#dc3545;font-weight:bold">नहीं</span>
                                                 </td>
-                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''}" style="width: 18%; border: 1px solid #000;">
+                                                <td t-attf-class="form10-name-cell #{'form10-lo-many' if is_lo_many else ''} #{'form10-lo-xl' if is_lo_xl else ''} #{'form10-lo-xxl' if is_lo_xxl else ''}" style="width: 18%; border: 1px solid #000;">
                                                     <t t-if="s.landowner_ids and len(s.landowner_ids) &gt; 0">
                                                         <t t-set="counter" t-value="1"/>
                                                         <t t-foreach="s.landowner_ids" t-as="lo">

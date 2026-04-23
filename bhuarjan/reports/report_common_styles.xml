@@ -723,44 +723,40 @@
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
             }
             
-            /* Form 10: 90 degree headers for land type + tree stage (cols 6–12); extra width to भूमिस्वामी */
+            /* Form 10: rotated headers for cols 6–12.
+               Column widths are enforced by colgroup col elements; CSS here handles
+               the visual rotation inside the narrow cell.
+               Uses writing-mode (supported in wkhtmltopdf 0.12.5+). */
             .bulk-form10-table th.form10-th-rotate,
             .bulk-form10-table-landscape th.form10-th-rotate {
-                width: 2.1% !important;
-                min-width: 20px;
-                max-width: 32px;
-                height: 92px;
-                padding: 4px 0 !important;
+                height: 90px;
+                padding: 2px 1px !important;
                 vertical-align: bottom;
-                position: relative;
-                overflow: visible;
+                text-align: center;
+                overflow: hidden;
                 box-sizing: border-box;
             }
             .bulk-form10-table th.form10-th-rotate .form10-rotate-wrap,
             .bulk-form10-table-landscape th.form10-th-rotate .form10-rotate-wrap {
-                position: relative;
+                display: block;
                 width: 100%;
-                height: 86px;
-                min-height: 86px;
+                height: 84px;
+                text-align: center;
+                overflow: hidden;
             }
             .bulk-form10-table th.form10-th-rotate .form10-rotate-label,
             .bulk-form10-table-landscape th.form10-th-rotate .form10-rotate-label {
-                position: absolute;
-                left: 50%;
-                bottom: 2px;
-                display: block;
-                width: 100px;
-                height: 18px;
-                margin-left: -50px;
-                line-height: 1.1;
-                text-align: center;
-                -webkit-transform: rotate(-90deg);
-                transform: rotate(-90deg);
-                -webkit-transform-origin: center center;
-                transform-origin: center center;
+                display: inline-block;
+                -webkit-writing-mode: vertical-rl;
+                -ms-writing-mode: tb-rl;
+                writing-mode: vertical-rl;
+                -webkit-transform: rotate(180deg);
+                transform: rotate(180deg);
+                white-space: nowrap;
                 font-size: 9px;
                 font-weight: bold;
-                white-space: nowrap;
+                line-height: 1;
+                vertical-align: bottom;
                 font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important;
             }
             .bulk-form10-table th.form10-th-landowner,
@@ -794,29 +790,14 @@
             .bulk-form10-table tbody td:nth-child(3) { width: 4%; }
             .bulk-form10-table thead tr:first-child th:nth-child(4),
             .bulk-form10-table tbody td:nth-child(4) { width: 5%; }
+            /* Visual-only rules for narrow data cells (cols 6–12); actual widths from colgroup */
             .bulk-form10-table tbody td:nth-child(6),
             .bulk-form10-table tbody td:nth-child(7),
             .bulk-form10-table tbody td:nth-child(8),
             .bulk-form10-table tbody td:nth-child(9),
             .bulk-form10-table tbody td:nth-child(10),
             .bulk-form10-table tbody td:nth-child(11),
-            .bulk-form10-table tbody td:nth-child(12) {
-                width: 2.1% !important;
-                min-width: 20px;
-                max-width: 32px;
-                text-align: center;
-                font-size: 9px;
-                padding: 4px 2px !important;
-            }
-            /* Form 10 Column Widths - Landscape */
-            .bulk-form10-table-landscape thead tr:first-child th:nth-child(1),
-            .bulk-form10-table-landscape tbody td:nth-child(1) { width: 3%; }
-            .bulk-form10-table-landscape thead tr:first-child th:nth-child(2),
-            .bulk-form10-table-landscape tbody td:nth-child(2) { width: 5%; }
-            .bulk-form10-table-landscape thead tr:first-child th:nth-child(3),
-            .bulk-form10-table-landscape tbody td:nth-child(3) { width: 4%; }
-            .bulk-form10-table-landscape thead tr:first-child th:nth-child(4),
-            .bulk-form10-table-landscape tbody td:nth-child(4) { width: 5%; }
+            .bulk-form10-table tbody td:nth-child(12),
             .bulk-form10-table-landscape tbody td:nth-child(6),
             .bulk-form10-table-landscape tbody td:nth-child(7),
             .bulk-form10-table-landscape tbody td:nth-child(8),
@@ -824,12 +805,10 @@
             .bulk-form10-table-landscape tbody td:nth-child(10),
             .bulk-form10-table-landscape tbody td:nth-child(11),
             .bulk-form10-table-landscape tbody td:nth-child(12) {
-                width: 2.1% !important;
-                min-width: 20px;
-                max-width: 32px;
                 text-align: center;
                 font-size: 9px;
-                padding: 4px 2px !important;
+                padding: 3px 1px !important;
+                overflow: hidden;
             }
             
             /* ============================================

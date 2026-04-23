@@ -242,6 +242,26 @@
                     </style>
                     <div class="content-wrapper">
                         <table class="bulk-form10-table" style="border: 2px solid #000; border-collapse: collapse;">
+                            <colgroup>
+                                <col style="width:3%;"/>
+                                <col style="width:4.5%;"/>
+                                <col style="width:3.5%;"/>
+                                <col style="width:4.5%;"/>
+                                <col style="width:25%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:5%;"/>
+                                <col style="width:9%;"/>
+                                <col style="width:5%;"/>
+                                <col style="width:3%;"/>
+                            </colgroup>
                             <thead>
                                 <!-- Repeat headers on each page -->
                                 <tr>
@@ -512,6 +532,26 @@
                     </style>
                     <div class="content-wrapper-landscape">
                         <table class="bulk-form10-table-landscape" style="border: 2px solid #000; border-collapse: collapse;">
+                            <colgroup>
+                                <col style="width:3%;"/>
+                                <col style="width:4.5%;"/>
+                                <col style="width:3.5%;"/>
+                                <col style="width:4.5%;"/>
+                                <col style="width:25%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:2.5%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:5%;"/>
+                                <col style="width:9%;"/>
+                                <col style="width:5%;"/>
+                                <col style="width:3%;"/>
+                            </colgroup>
                             <thead>
                                 <!-- Repeat headers on each page -->
                                 <tr>

@@ -12,45 +12,40 @@ class Form10PDFController(http.Controller):
     @http.route('/bhuarjan/form10/<path:project_uuid>/<path:village_uuid>/download', type='http', auth='public', methods=['GET'], csrf=False, website=False)
     def download_pdf(self, project_uuid, village_uuid, **kwargs):
         """Download Form 10 PDF directly using project and village UUIDs - gets all surveys for that project in that village"""
-        _logger.info(f"PDF download route called: project_uuid={project_uuid}, village_uuid={village_uuid}")
+        _logger.debug("Form10 PDF route: project_uuid=%s, village_uuid=%s", project_uuid, village_uuid)
         try:
-            # Find project by UUID - clear cache to ensure fresh lookup
             project = request.env['bhu.project'].sudo().with_context({}).search([('project_uuid', '=', project_uuid)], limit=1)
-            _logger.info(f"Project search result: found={bool(project)}, uuid={project_uuid}, project_id={project.id if project else None}, project_name={project.name if project else None}")
             if not project:
-                _logger.error(f"Project not found with UUID: {project_uuid}")
+                _logger.error("Project not found with UUID: %s", project_uuid)
                 return request.not_found("Project not found")
-            
-            # Find village by UUID - clear cache to ensure fresh lookup
-            # IMPORTANT: Check for duplicate UUIDs - if multiple villages have the same UUID, we have a problem
+
             all_villages_with_uuid = request.env['bhu.village'].sudo().with_context({}).search([('village_uuid', '=', village_uuid)])
-            _logger.info(f"Villages with UUID {village_uuid}: {len(all_villages_with_uuid)} found (IDs: {all_villages_with_uuid.ids})")
-            
+
             if len(all_villages_with_uuid) > 1:
-                _logger.error(f"DUPLICATE UUID ERROR! UUID {village_uuid} is assigned to {len(all_villages_with_uuid)} villages: {[(v.id, v.name) for v in all_villages_with_uuid]}")
-                # Regenerate UUIDs for all duplicates except the first one
+                _logger.error(
+                    "Duplicate village UUID %s assigned to %d villages: %s – deduplicating",
+                    village_uuid, len(all_villages_with_uuid),
+                    [(v.id, v.name) for v in all_villages_with_uuid],
+                )
                 for dup_village in all_villages_with_uuid[1:]:
-                    import uuid
-                    new_uuid = str(uuid.uuid4())
-                    _logger.warning(f"Regenerating UUID for village {dup_village.id} ({dup_village.name}): {village_uuid} -> {new_uuid}")
+                    import uuid as _uuid_mod
+                    new_uuid = str(_uuid_mod.uuid4())
+                    _logger.warning("Re-assigning UUID for village %s (%s): %s -> %s", dup_village.id, dup_village.name, village_uuid, new_uuid)
                     dup_village.write({'village_uuid': new_uuid})
-                # Use the first village (keep its UUID)
                 village = all_villages_with_uuid[0]
             elif len(all_villages_with_uuid) == 1:
                 village = all_villages_with_uuid[0]
             else:
                 village = False
-            
-            _logger.info(f"Village search result: found={bool(village)}, uuid={village_uuid}, village_id={village.id if village else None}, village_name={village.name if village else None}")
+
             if not village:
-                _logger.error(f"Village not found with UUID: {village_uuid}")
+                _logger.error("Village not found with UUID: %s", village_uuid)
                 return request.not_found("Village not found")
-            
-            # Verify UUIDs match to prevent any confusion
+
             if project.project_uuid != project_uuid:
-                _logger.error(f"Project UUID mismatch! Expected {project_uuid}, got {project.project_uuid}")
+                _logger.error("Project UUID mismatch! Expected %s, got %s", project_uuid, project.project_uuid)
             if village.village_uuid != village_uuid:
-                _logger.error(f"Village UUID mismatch! Expected {village_uuid}, got {village.village_uuid}")
+                _logger.error("Village UUID mismatch! Expected %s, got %s", village_uuid, village.village_uuid)
             
             # Generate PDF report using Odoo's standard rendering
             try:

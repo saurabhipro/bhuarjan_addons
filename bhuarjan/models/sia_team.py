@@ -27,7 +27,7 @@ class SiaTeam(models.Model):
     village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=False, tracking=True)
     village_ids = fields.Many2many('bhu.village', string='Affected Villages / प्रभावित ग्राम', tracking=True,
                                    help='Affected villages for this SIA Team (auto-populated from project)')
-    tehsil_ids = fields.Many2many('bhu.tehsil', string='Tehsil / तहसील', compute='_compute_tehsil_ids', store=False, readonly=True,
+    tehsil_ids = fields.Many2many('bhu.tehsil', string='Affected Tehsils / प्रभावित तहसीलें', compute='_compute_tehsil_ids', store=False, readonly=True,
                                   help='Tehsils from the selected villages')
     
     # SIA Exemption Selection (Yes/No)

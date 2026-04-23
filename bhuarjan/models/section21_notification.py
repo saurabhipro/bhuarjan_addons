@@ -10,13 +10,21 @@ class Section21Notification(models.Model):
     _description = 'Section 21 Notification / धारा 21 अधिसूचना'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'bhu.notification.mixin', 'bhu.process.workflow.mixin', 'bhu.qr.code.mixin']
     _order = 'create_date desc'
-    _sql_constraints = [
-        (
-            'unique_section21_per_project_village',
-            'unique(project_id, village_id)',
-            'A Section 21 notification already exists for this project and village. Only one is allowed.'
-        ),
-    ]
+    @api.constrains('project_id', 'village_id')
+    def _check_unique_section21_per_project_village(self):
+        for rec in self:
+            if not rec.project_id or not rec.village_id:
+                continue
+            duplicate = self.search([
+                ('project_id', '=', rec.project_id.id),
+                ('village_id', '=', rec.village_id.id),
+                ('id', '!=', rec.id),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(
+                    'A Section 21 notification already exists for this project and village. '
+                    'Only one is allowed.'
+                )
 
     name = fields.Char(string='Notification Name / अधिसूचना का नाम', default='New', tracking=True, readonly=True)
     

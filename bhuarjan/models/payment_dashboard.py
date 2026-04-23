@@ -21,7 +21,7 @@ class PaymentProjectSummary(models.Model):
     _order = 'failed_count desc, project_name'
 
     project_id = fields.Many2one('bhu.project', string='Project', readonly=True)
-    project_name = fields.Char(string='Project', readonly=True)
+    project_name = fields.Char(string='Project Name', readonly=True)
     total_count = fields.Integer(string='Total Payments', readonly=True)
     success_count = fields.Integer(string='Successful', readonly=True)
     failed_count = fields.Integer(string='Failed', readonly=True)
@@ -85,9 +85,9 @@ class PaymentVillageSummary(models.Model):
     _order = 'failed_count desc, village_name'
 
     project_id = fields.Many2one('bhu.project', string='Project', readonly=True)
-    project_name = fields.Char(string='Project', readonly=True)
+    project_name = fields.Char(string='Project Name', readonly=True)
     village_id = fields.Many2one('bhu.village', string='Village', readonly=True)
-    village_name = fields.Char(string='Village', readonly=True)
+    village_name = fields.Char(string='Village Name', readonly=True)
     total_count = fields.Integer(string='Total Payments', readonly=True)
     success_count = fields.Integer(string='Successful', readonly=True)
     failed_count = fields.Integer(string='Failed', readonly=True)

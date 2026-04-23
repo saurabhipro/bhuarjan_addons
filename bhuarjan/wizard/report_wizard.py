@@ -153,61 +153,73 @@ class ReportWizard(models.TransientModel):
                 _logger.warning(f"Village {self.village_id.id} ({self.village_id.name}) has duplicate UUID! Regenerating...")
                 self.village_id.write({'village_uuid': str(uuid.uuid4())})
         
-        # Log the exact village being used
         selected_village_id = self.village_id.id
         selected_village_name = self.village_id.name
         selected_village_uuid = self.village_id.village_uuid
         selected_project_id = self.project_id.id
         selected_project_name = self.project_id.name
-        
-        _logger.info(f"Wizard: SELECTED Village - ID={selected_village_id}, Name='{selected_village_name}', UUID={selected_village_uuid}")
-        _logger.info(f"Wizard: SELECTED Project - ID={selected_project_id}, Name='{selected_project_name}'")
-        
-        # Clear context completely to avoid any mixin interference (project.filter, etc.)
-        # Use explicit domain with AND logic
+
+        _logger.debug(
+            "Wizard: project=%s[%s], village=%s[%s] uuid=%s",
+            selected_project_name, selected_project_id,
+            selected_village_name, selected_village_id, selected_village_uuid,
+        )
+
         domain = [
-            '&',  # Explicit AND operator
+            '&',
             ('project_id', '=', selected_project_id),
-            ('village_id', '=', selected_village_id)
+            ('village_id', '=', selected_village_id),
         ]
-        
-        _logger.info(f"Wizard: Search domain: {domain}")
-        
-        # Search with completely cleared context to avoid any mixin filters
+
         all_records = self.env['bhu.survey'].sudo().with_context(
             active_test=False,
             bhuarjan_current_project_id=False
         ).search(domain, order='id')
-        
-        # STRICT VALIDATION: Filter out any surveys that don't match exactly
-        # This ensures data integrity even if there are database inconsistencies
-        _logger.info(f"Wizard: Found {len(all_records)} surveys from search. Validating each one...")
+
+        _logger.debug("Wizard: search returned %d surveys", len(all_records))
+
         correct_records = self.env['bhu.survey']
+        debug_on = _logger.isEnabledFor(logging.DEBUG)
         for survey in all_records:
             survey_village_id = survey.village_id.id
-            survey_village_name = survey.village_id.name
             survey_project_id = survey.project_id.id
-            
-            # Strict validation - must match exactly
+
             if survey_project_id != selected_project_id:
-                _logger.error(f"Wizard: FILTERING OUT Survey {survey.id} - Wrong Project! Expected Project ID={selected_project_id} ('{selected_project_name}'), got Project ID={survey_project_id} ('{survey.project_id.name}')")
+                _logger.error(
+                    "Wizard: SKIP survey %s – wrong project (got %s, expected %s)",
+                    survey.id, survey_project_id, selected_project_id,
+                )
                 continue
             if survey_village_id != selected_village_id:
-                _logger.error(f"Wizard: FILTERING OUT Survey {survey.id} - Wrong Village! Expected Village ID={selected_village_id} (Name='{selected_village_name}'), got Village ID={survey_village_id} (Name='{survey_village_name}')")
+                _logger.error(
+                    "Wizard: SKIP survey %s – wrong village (got %s, expected %s)",
+                    survey.id, survey_village_id, selected_village_id,
+                )
                 continue
-            
-            # Survey matches - include it
-            _logger.info(f"Wizard: Survey {survey.id} VALID - Project ID={survey_project_id}, Village ID={survey_village_id} (Name='{survey_village_name}')")
+
+            if debug_on:
+                _logger.debug("Wizard: survey %s valid", survey.id)
             correct_records |= survey
-        
+
         if not correct_records:
-            _logger.warning(f"Wizard: No valid records found for Project ID={self.project_id.id}, Village ID={self.village_id.id}")
-            raise UserError(f"No records found for this project ({self.project_id.name}) and village ({self.village_id.name}).")
-        
+            _logger.warning(
+                "Wizard: no valid surveys for project %s village %s",
+                selected_project_id, selected_village_id,
+            )
+            raise UserError(f"No records found for this project ({selected_project_name}) and village ({selected_village_name}).")
+
         if len(correct_records) != len(all_records):
-            _logger.warning(f"Wizard: Filtered out {len(all_records) - len(correct_records)} incorrect surveys. Using {len(correct_records)} correct surveys.")
-        
-        _logger.info(f"Wizard: Found {len(correct_records)} correct surveys: {correct_records.ids}")
+            _logger.warning(
+                "Wizard: filtered out %d wrong surveys, keeping %d",
+                len(all_records) - len(correct_records), len(correct_records),
+            )
+
+        _logger.info(
+            "Wizard: %d surveys for project=%s[%s] village=%s[%s]",
+            len(correct_records), selected_project_name, selected_project_id,
+            selected_village_name, selected_village_id,
+        )
+        _logger.debug("Wizard: survey IDs=%s", correct_records.ids)
         
         all_records = correct_records
 

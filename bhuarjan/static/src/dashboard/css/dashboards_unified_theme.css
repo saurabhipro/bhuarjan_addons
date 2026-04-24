@@ -844,3 +844,35 @@
         margin-top: 8px;
     }
 }
+
+/* =====================================================================
+ * 6. Workflow activity highlight (all step cards)
+ * ===================================================================== */
+.o_admin_dashboard .o_section_list_item.o_has_activity,
+.o_collector_dashboard .o_section_list_item.o_has_activity,
+.o_group_dashboard .o_section_list_item.o_has_activity {
+    background: linear-gradient(135deg, #f4fff8 0%, #e7f8ee 55%, #dcf4e6 100%) !important;
+    border-color: #7fc79b !important;
+    box-shadow:
+        0 1px 0 rgba(47, 109, 79, 0.16) inset,
+        0 10px 24px rgba(47, 109, 79, 0.16),
+        0 0 0 1px rgba(127, 199, 155, 0.45) !important;
+}
+
+.o_admin_dashboard .o_section_list_item.o_has_activity::after,
+.o_collector_dashboard .o_section_list_item.o_has_activity::after,
+.o_group_dashboard .o_section_list_item.o_has_activity::after {
+    content: "Active";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #1f5a3e;
+    background: #dff3e7;
+    border: 1px solid #8ec9a6;
+    border-radius: 999px;
+    padding: 2px 8px;
+    pointer-events: none;
+}

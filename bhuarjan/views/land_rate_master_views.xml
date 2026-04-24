@@ -135,16 +135,7 @@
                     </group>
                     
                     <group>
-                        <group string="💰 Rate Information (One Entry Per Village)" colspan="2">
-                            <div style="background-color: #e7f3ff; padding: 10px; margin-bottom: 10px; border-left: 4px solid #2196F3;">
-                                <p style="margin: 0; font-size: 12px; color: #1976D2;">
-                                    <strong>Note:</strong> Enter base rates for this village. System will automatically calculate:<br/>
-                                    • <strong>Irrigated:</strong> Base Rate + 20%<br/>
-                                    • <strong>Non-Irrigated:</strong> Base Rate - 20%<br/>
-                                    • <strong>Diverted:</strong> Base Rate - 20% (additional adjustment)
-                                </p>
-                            </div>
-                        </group>
+                        <group string="💰 Rate Information (One Entry Per Village)" colspan="2"/>
                     </group>
                     
                     <group>

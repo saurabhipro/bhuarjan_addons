@@ -58,7 +58,7 @@ class S23LandEditWizard(models.TransientModel):
             if self.survey_line_id and self.survey_line_id.survey_id
             else 'rural'
         )
-        return 50.0 if st == 'rural' else 20.0
+        return 50.0 if st == 'rural' else 30.0
 
     @api.depends('survey_line_id', 'survey_type')
     def _compute_distance_help(self):
@@ -68,7 +68,7 @@ class S23LandEditWizard(models.TransientModel):
                 if wiz.survey_line_id and wiz.survey_line_id.survey_id
                 else False
             )
-            th   = 50.0 if st == 'rural' else 20.0 if st == 'urban' else 50.0
+            th   = 50.0 if st == 'rural' else 30.0 if st == 'urban' else 50.0
             kind = 'Rural / ग्रामीण' if st == 'rural' else 'Urban / शहरी' if st == 'urban' else '—'
             wiz.distance_help = _(
                 'MR if ≤ %(th)s m  |  BMR if > %(th)s m  (%(kind)s)'
@@ -102,7 +102,7 @@ class S23LandEditWizard(models.TransientModel):
             return res
         s   = line.survey_id
         d   = s.distance_from_main_road or 0.0
-        th  = 50.0 if s.survey_type == 'rural' else 20.0
+        th  = 50.0 if s.survey_type == 'rural' else 30.0
         res.update({
             'survey_line_id':          line.id,
             'khasra_display':          s.khasra_number or '',
@@ -121,7 +121,7 @@ class S23LandEditWizard(models.TransientModel):
         if not survey:
             raise UserError(_('No survey linked on this line.'))
 
-        th = 50.0 if survey.survey_type == 'rural' else 20.0
+        th = 50.0 if survey.survey_type == 'rural' else 30.0
         d  = self.distance_from_main_road or 0.0
         if self.road_type == 'mr':
             d = min(d, th)

@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, onMounted, onPatched, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -472,6 +472,14 @@ export class UnifiedDashboard extends Component {
                 this.state.loading = false;
             }
         });
+
+        onMounted(() => {
+            this._applySectionActivityHighlights();
+        });
+
+        onPatched(() => {
+            this._applySectionActivityHighlights();
+        });
     }
 
     _getInitialStats() {
@@ -741,6 +749,8 @@ export class UnifiedDashboard extends Component {
             this.notification.add(_t("Error loading dashboard data"), { type: "danger" });
         } finally {
             this.state.loading = false;
+            // Ensure highlights are re-applied after async data refresh and rerender.
+            setTimeout(() => this._applySectionActivityHighlights(), 0);
         }
     }
 
@@ -1532,6 +1542,26 @@ export class UnifiedDashboard extends Component {
 
     toString(value) {
         return value ? String(value) : '';
+    }
+
+    _applySectionActivityHighlights() {
+        if (!this.el) {
+            return;
+        }
+        const cards = this.el.querySelectorAll('.o_section_list_item');
+        cards.forEach((card) => {
+            const hasCompletionTick = !!card.querySelector('.o_completion_tick');
+            const hasNonZeroBadge = Array.from(card.querySelectorAll('.o_count_badge')).some((badge) => {
+                const text = (badge.textContent || '').trim();
+                const match = text.match(/-?\d+/);
+                return match ? parseInt(match[0], 10) > 0 : false;
+            });
+            const percentEl = card.querySelector('.o_completion_percent_list');
+            const percentMatch = (percentEl?.textContent || '').match(/-?\d+(\.\d+)?/);
+            const hasNonZeroPercent = percentMatch ? parseFloat(percentMatch[0]) > 0 : false;
+
+            card.classList.toggle('o_has_activity', hasCompletionTick || hasNonZeroBadge || hasNonZeroPercent);
+        });
     }
 }
 

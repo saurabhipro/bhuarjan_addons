@@ -295,7 +295,7 @@ class Section23Award(models.Model):
             if survey.id in existing_survey_ids:
                 continue
             distance = survey.distance_from_main_road or 0.0
-            threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+            threshold = 50.0 if survey.survey_type == 'rural' else 30.0
             new_lines.append((0, 0, {
                 'survey_id': survey.id,
                 'khasra_number': survey.khasra_number or '',
@@ -1401,10 +1401,10 @@ class Section23Award(models.Model):
             ], limit=1)
             
             # Derive main-road status from measured distance.
-            # Rule: rural <= 50m is MR, urban <= 20m is MR; 0/blank counts as MR.
+            # Rule: rural <= 50m is MR, urban <= 30m is MR; 0/blank counts as MR.
             distance_from_main_road = (survey.distance_from_main_road or 0.0) if survey else 0.0
             if survey:
-                threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+                threshold = 50.0 if survey.survey_type == 'rural' else 30.0
                 derived_is_within_distance = distance_from_main_road <= threshold
             else:
                 derived_is_within_distance = False
@@ -1898,7 +1898,7 @@ class Section23AwardSurveyLine(models.Model):
     # For residential: 05 meters from main road
     is_within_distance = fields.Boolean(string='Within Distance / दूरी के भीतर', 
                                        default=False,
-                                       help='Check if khasra is within distance from main road (20m for village, 5m for residential)')
+                                       help='Check if khasra is within distance from main road (50m rural, 30m urban)')
     distance_from_main_road = fields.Float(
         string='Distance (m)', related='survey_id.distance_from_main_road', readonly=True,
     )
@@ -1943,7 +1943,7 @@ class Section23AwardSurveyLine(models.Model):
         for line in self:
             dist = line.distance_from_main_road or 0.0
             survey_type = line.survey_id.survey_type if line.survey_id else 'rural'
-            threshold = 50.0 if survey_type == 'rural' else 20.0
+            threshold = 50.0 if survey_type == 'rural' else 30.0
             line.road_type_display = 'MR' if dist <= threshold else 'BMR'
 
             # base rate (before irrigation/diverted %) from rate master — same search as simulator
@@ -2047,7 +2047,7 @@ class Section23AwardSurveyLine(models.Model):
                     # Compute within-distance fresh from actual distance (same logic as simulator)
                     dist = line.distance_from_main_road or 0.0
                     s_type = line.survey_id.survey_type if line.survey_id else 'rural'
-                    threshold = 50.0 if s_type == 'rural' else 20.0
+                    threshold = 50.0 if s_type == 'rural' else 30.0
                     within = dist <= threshold
 
                     base_rate = (rate_master.main_road_rate_hectare if within
@@ -2078,7 +2078,7 @@ class Section23AwardSurveyLine(models.Model):
                 if not line.land_type and line.survey_id.land_type_for_award:
                     line.land_type = line.survey_id.land_type_for_award
                 distance = line.survey_id.distance_from_main_road or 0.0
-                threshold = 50.0 if line.survey_id.survey_type == 'rural' else 20.0
+                threshold = 50.0 if line.survey_id.survey_type == 'rural' else 30.0
                 line.is_within_distance = distance <= threshold
     
     @api.model_create_multi
@@ -2095,7 +2095,7 @@ class Section23AwardSurveyLine(models.Model):
                         vals['land_type'] = survey.land_type_for_award
                     if 'is_within_distance' not in vals:
                         distance = survey.distance_from_main_road or 0.0
-                        threshold = 50.0 if survey.survey_type == 'rural' else 20.0
+                        threshold = 50.0 if survey.survey_type == 'rural' else 30.0
                         vals['is_within_distance'] = distance <= threshold
         
         lines = super().create(vals_list)

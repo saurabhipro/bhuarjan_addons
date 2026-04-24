@@ -1,6 +1,6 @@
 <templates xml:space="preserve">
     <t t-name="bhuarjan.CollectorDashboardTemplate" owl="1">
-        <div class="o_admin_dashboard">
+        <div class="o_admin_dashboard o_collector_dashboard">
             <!-- Header with Role Title -->
             <t t-call="bhuarjan.DashboardHeader">
                 <t t-set="title" t-value="'Collector Dashboard'"/>

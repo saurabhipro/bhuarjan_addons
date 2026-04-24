@@ -15,13 +15,32 @@ class Survey(models.Model):
     # Show latest surveys first everywhere (kanban, list, search)
     _order = 'create_date desc, id desc'
 
+
+    @api.model
+    def _auto_init(self):
+        res = super()._auto_init()
+        self._cr.execute(
+            """
+            CREATE INDEX IF NOT EXISTS bhu_survey_proj_vill_state_idx
+            ON bhu_survey (project_id, village_id, state)
+            """
+        )
+        self._cr.execute(
+            """
+            CREATE INDEX IF NOT EXISTS bhu_survey_proj_vill_state_khasra_nn_idx
+            ON bhu_survey (project_id, village_id, state, khasra_number)
+            WHERE khasra_number IS NOT NULL AND khasra_number <> ''
+            """
+        )
+        return res
+
     # Basic Information
     user_id = fields.Many2one('res.users', string="User", default=lambda self : self.env.user.id, readonly=True)
     name = fields.Char(string='Survey Number', required=True, tracking=True, readonly=True, copy=False, default='New')
     survey_uuid = fields.Char(string='Survey UUID', readonly=True, copy=False, default=lambda self: str(uuid.uuid4()))
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, index=True, ondelete='cascade')
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', required=True, tracking=True)
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True)
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम का नाम', required=True, tracking=True, index=True)
     tehsil_id = fields.Many2one('bhu.tehsil', string='Tehsil / तहसील', required=False, tracking=True)
     
     survey_type = fields.Selection([
@@ -66,7 +85,7 @@ class Survey(models.Model):
                                  default=lambda self: self.env.company, tracking=True)
     
     # Single Khasra Details - One survey per khasra
-    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, tracking=True)
+    khasra_number = fields.Char(string='Khasra Number / खसरा नंबर', required=True, tracking=True, index=True)
     total_area = fields.Float(string='Total Area (Hectares) / कुल क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     acquired_area = fields.Float(string='Acquired Area (Hectares) / अर्जन हेतु प्रस्तावित क्षेत्रफल (हेक्टेयर)', digits=(10, 4), tracking=True)
     has_traded_land = fields.Selection([
@@ -268,7 +287,7 @@ class Survey(models.Model):
         ('submitted', 'Submitted'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
-    ], string='Status', default='draft', tracking=True)
+    ], string='Status', default='draft', tracking=True, index=True)
     
     # Track submission date
     submitted_date = fields.Datetime(string='Submitted Date / प्रस्तुत दिनांक', readonly=True, tracking=True,

@@ -14,8 +14,8 @@ class Section23Award(models.Model):
     _order = 'create_date desc'
 
     name = fields.Char(string='Award Reference / अवार्ड संदर्भ', required=True, tracking=True, default='New')
-    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, ondelete='cascade')
-    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True)
+    project_id = fields.Many2one('bhu.project', string='Project / परियोजना', required=True, tracking=True, index=True, ondelete='cascade')
+    village_id = fields.Many2one('bhu.village', string='Village / ग्राम', required=True, tracking=True, index=True)
     
     # Department - computed from project (for filtering purposes)
     department_id = fields.Many2one('bhu.department', string='Department / विभाग', 
@@ -44,7 +44,7 @@ class Section23Award(models.Model):
         ('submitted', 'Submitted'),
         ('approved', 'Approved'),
         ('sent_back', 'Sent Back')
-    ], string='Status', default='draft', tracking=True)
+    ], string='Status', default='draft', tracking=True, index=True)
     
     is_generated = fields.Boolean(string='Is Generated', default=False, tracking=True)
     
@@ -122,6 +122,17 @@ class Section23Award(models.Model):
         ('project_village_unique', 'unique(project_id, village_id)', 
          'Only one award per project and village is allowed! / प्रत्येक परियोजना और गाँव के लिए केवल एक अवार्ड की अनुमति है!')
     ]
+
+    @api.model
+    def _auto_init(self):
+        res = super()._auto_init()
+        self._cr.execute(
+            """
+            CREATE INDEX IF NOT EXISTS bhu_s23_award_state_proj_vill_idx
+            ON bhu_section23_award (state, project_id, village_id)
+            """
+        )
+        return res
 
     @api.constrains('project_id', 'village_id')
     def _check_unique_award(self):
@@ -2016,8 +2027,19 @@ class Section23AwardSurveyLine(models.Model):
     _description = 'Section 23 Award Survey Line'
     _order = 'survey_id'
     
-    award_id = fields.Many2one('bhu.section23.award', string='Award', required=True, ondelete='cascade')
-    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वेक्षण', required=True, ondelete='cascade')
+    award_id = fields.Many2one('bhu.section23.award', string='Award', required=True, index=True, ondelete='cascade')
+    survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वेक्षण', required=True, index=True, ondelete='cascade')
+
+    @api.model
+    def _auto_init(self):
+        res = super()._auto_init()
+        self._cr.execute(
+            """
+            CREATE INDEX IF NOT EXISTS bhu_s23_award_survey_line_award_survey_idx
+            ON bhu_section23_award_survey_line (award_id, survey_id)
+            """
+        )
+        return res
     
     # Survey information (readonly, from survey)
     khasra_number = fields.Char(string='Khasra Number / खसरा संख्या', readonly=True)

@@ -11,6 +11,7 @@ class AwardStructureDetails(models.Model):
     survey_id = fields.Many2one(
         'bhu.survey',
         string='Khasra / खसरा',
+        index=True,
         ondelete='cascade',
         # Not required in DB: new O2M rows on an unsaved parent must be creatable; pick default in
         # default_get; generation/submit on award re-validates.
@@ -23,6 +24,7 @@ class AwardStructureDetails(models.Model):
     award_id = fields.Many2one(
         'bhu.section23.award',
         string='Section 23 Award',
+        index=True,
         ondelete='set null'
     )
 
@@ -76,6 +78,17 @@ class AwardStructureDetails(models.Model):
         compute='_compute_line_total',
         store=True
     )
+
+    @api.model
+    def _auto_init(self):
+        res = super()._auto_init()
+        self._cr.execute(
+            """
+            CREATE INDEX IF NOT EXISTS bhu_award_structure_details_award_survey_idx
+            ON bhu_award_structure_details (award_id, survey_id)
+            """
+        )
+        return res
 
     @api.model
     def default_get(self, fields_list):

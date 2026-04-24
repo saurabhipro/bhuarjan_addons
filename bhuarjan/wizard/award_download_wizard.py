@@ -70,23 +70,26 @@ class AwardDownloadWizard(models.TransientModel):
         if scope not in ('all', 'land', 'asset', 'tree'):
             scope = 'all'
 
-        if self.section23_generate and self.res_model == 'bhu.section23.award':
-            if not hasattr(record, 'apply_generate_from_download_wizard'):
-                raise UserError(_('This record does not support the generate flow.'))
+        if self.res_model == 'bhu.section23.award':
             rate = int(self.section23_avg_three_year_sales_sort_rate or 0)
-            if rate <= 0.0:
+            if self.section23_generate and rate <= 0:
                 raise UserError(_(
                     'Please enter विगत तीन वर्षों का औसत बिक्री छांट दर (must be greater than zero) '
                     'before generating the award.'
                 ))
-            record.write({'avg_three_year_sales_sort_rate': float(rate)})
+            if rate > 0:
+                record.write({'avg_three_year_sales_sort_rate': float(rate)})
+
+        if self.section23_generate and self.res_model == 'bhu.section23.award':
+            if not hasattr(record, 'apply_generate_from_download_wizard'):
+                raise UserError(_('This record does not support the generate flow.'))
             return record.apply_generate_from_download_wizard(
                 file_format=self.format, export_scope=scope
             )
 
         if self.format == 'pdf':
-            # PDF always renders the full award (all sections).
-            # Scope filtering applies only to Excel (handled below).
+            if self.res_model == 'bhu.section23.award' and hasattr(record, 'action_download_pdf_components'):
+                return record.action_download_pdf_components(export_scope=scope)
             report = self.env.ref(self.report_xml_id)
             return report.report_action(record)
         if self.format == 'excel':

@@ -1064,8 +1064,14 @@ class Section23Award(models.Model):
         file_data = base64.b64encode(output.read())
         output.close()
 
+        scope_suffix = {
+            'all': 'all',
+            'land': 'land',
+            'asset': 'asset',
+            'tree': 'tree',
+        }.get(export_scope, 'all')
         attachment = self.env['ir.attachment'].create({
-            'name': f"Section23_Award_{self.village_id.name or 'Export'}.xlsx",
+            'name': f"Section23_Award_{self.village_id.name or 'Export'}_{scope_suffix}.xlsx",
             'type': 'binary',
             'datas': file_data,
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -1082,6 +1088,16 @@ class Section23Award(models.Model):
         """Alias to keep wizard and buttons on the same simulator-format excel."""
         self.ensure_one()
         return self.action_download_excel_components(export_scope=export_scope)
+
+
+    def action_download_pdf_components(self, export_scope='all'):
+        """Download Section 23 PDF with selected section scope."""
+        self.ensure_one()
+        scope = export_scope or self.env.context.get('bhu_export_scope') or 'all'
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
+        report_action = self._get_section23_report_action()
+        return report_action.with_context(s23_pdf_scope=scope).report_action(self)
     
     def _validate_for_generate(self, require_sales_sort_rate=True):
         """Pre-checks for opening/running generate flow.
@@ -1171,8 +1187,12 @@ class Section23Award(models.Model):
         if file_format != 'pdf':
             raise ValidationError(_('Unsupported format for generate.'))
 
+        scope = export_scope or 'all'
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
+
         report_action = self._get_section23_report_action()
-        pdf_result = report_action.sudo()._render_qweb_pdf(
+        pdf_result = report_action.sudo().with_context(s23_pdf_scope=scope)._render_qweb_pdf(
             report_action.id,
             [self.id],
             data={},
@@ -1197,7 +1217,7 @@ class Section23Award(models.Model):
                 }
 
         self.write({'is_generated': True})
-        return report_action.report_action(self)
+        return report_action.with_context(s23_pdf_scope=scope).report_action(self)
 
     def _get_section23_report_action(self):
         """Get Section 23 report action with safe fallback when xmlid is missing."""

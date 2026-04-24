@@ -123,9 +123,13 @@
                 <t t-call="bhuarjan.report_common_styles"/>
                 <t t-call="bhuarjan.section23_award_report_styles"/>
                 <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+                <t t-set="s23_scope" t-value="o.env.context.get('s23_pdf_scope', 'all')"/>
+                <t t-set="show_land" t-value="s23_scope in ('all', 'land')"/>
+                <t t-set="show_tree" t-value="s23_scope in ('all', 'tree')"/>
+                <t t-set="show_asset" t-value="s23_scope in ('all', 'asset')"/>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
-                <div class="page section23-award-section" style="padding: 10px;">
+                <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
 
                         <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                             <span t-esc="award_headers['sections']['land_sheet_label']"/>
@@ -137,7 +141,7 @@
                             </div>
                             <h2 style="margin: 0;"><span t-esc="award_headers['sections']['land_title']"/></h2>
                             <div style="font-size: 11px; margin-top: 5px;">
-                                मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
+                                मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
                             </div>
                         </div>
 
@@ -293,7 +297,7 @@
                 </div>
 
                 <!-- Part 1 (Ga) - TREE COMPENSATION -->
-                <div class="page section23-award-section" style="padding: 10px;">
+                <div t-if="show_tree" class="page section23-award-section" style="padding: 10px;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -305,7 +309,7 @@
                                 </div>
                                 <h2 style="margin: 0;"><span t-esc="award_headers['sections']['tree_title']"/></h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
-                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
+                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
                                 </div>
                             </div>
 
@@ -395,9 +399,8 @@
                         </table>
                         <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
-            </t>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
-                <div class="page section23-award-section" style="padding: 10px;">
+                <div t-if="show_asset" class="page section23-award-section" style="padding: 10px;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['asset_sheet_label']"/>
@@ -409,7 +412,7 @@
                                 </div>
                                 <h2 style="margin: 0;"><span t-esc="award_headers['sections']['asset_title']"/></h2>
                                 <div style="font-size: 11px; margin-top: 5px;">
-                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name if o._name == 'bhu.section23.award' else 'Simulation'"/> / <span t-esc="o.award_document_filename if (o._name == 'bhu.section23.award' and o.award_document_filename) else 'अ-82/2022-23'"/>
+                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
                                 </div>
                             </div>
 
@@ -483,7 +486,7 @@
                         </table>
                         <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
-
+            </t>
         </t>
     </template>
 </odoo>

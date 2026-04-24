@@ -109,9 +109,6 @@ class Section23Award(models.Model):
     s23_tree_preview_html = fields.Html(
         string='Tree preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
     )
-    s23_structure_preview_html = fields.Html(
-        string='Structure preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
-    )
 
     _sql_constraints = [
         ('project_village_unique', 'unique(project_id, village_id)', 
@@ -165,15 +162,12 @@ class Section23Award(models.Model):
     @api.depends(
         'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
         'award_survey_line_ids.survey_id', 'award_survey_line_ids.rate_per_hectare',
-        'award_structure_line_ids', 'award_structure_line_ids.line_total', 'award_structure_line_ids.area_sqm',
-        'award_structure_line_ids.asset_value', 'award_structure_line_ids.structure_type',
         'village_id', 'project_id', 'award_date',
     )
     def _compute_s23_section_previews(self):
         for rec in self:
             rec.s23_land_preview_html = rec._html_s23_land_preview()
             rec.s23_tree_preview_html = rec._html_s23_tree_preview()
-            rec.s23_structure_preview_html = rec._html_s23_structure_preview()
 
     @api.depends(
         'project_id', 'village_id',
@@ -243,12 +237,48 @@ class Section23Award(models.Model):
                     line.land_type for line in record.award_survey_line_ids
                 )
     
+    def _onchange_add_award_survey_lines_if_empty(self):
+        """Pre-create land lines only when the O2M is still empty (no 5,0,0 in onchange).
+
+        A full O2M replace with (5,0,0) + (0,0,...) during @api.onchange makes the web
+        client snapshot diff crash (int ids vs NewId.origin). Full rebuild is done in
+        create() / write() only.
+        """
+        self.ensure_one()
+        if not (self.project_id and self.village_id):
+            return
+        if self.award_survey_line_ids:
+            return
+        surveys = self.env['bhu.survey'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+        ])
+        if not surveys:
+            return
+        commands = []
+        for survey in surveys:
+            distance = survey.distance_from_main_road or 0.0
+            threshold = 50.0 if survey.survey_type == 'rural' else 30.0
+            commands.append((0, 0, {
+                'survey_id': survey.id,
+                'khasra_number': survey.khasra_number or '',
+                'land_type': survey.land_type_for_award or 'village',
+                'is_within_distance': distance <= threshold,
+            }))
+        if commands:
+            self.award_survey_line_ids = commands
+            self.award_survey_line_ids._compute_rate_per_hectare()
+            self.award_survey_line_ids._compute_line_display_amounts()
+        if self.project_id and self.village_id:
+            self._sync_award_structure_lines()
+
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_surveys(self):
-        """Auto-populate available surveys when village is selected"""
+        """Pre-fill land lines on first project+village (empty list only; save refreshes the rest)."""
         for rec in self:
-            rec._populate_award_survey_lines(reset_if_empty=True)
-    
+            rec._onchange_add_award_survey_lines_if_empty()
+
     @api.onchange('project_id')
     def _onchange_project_id(self):
         """Reset village when project changes and set domain"""
@@ -258,9 +288,8 @@ class Section23Award(models.Model):
             else:
                 rec.village_domain = json.dumps([])
                 rec.village_id = False
-            # Trigger survey population if village is already set
             if rec.village_id:
-                rec._onchange_village_populate_surveys()
+                rec._onchange_add_award_survey_lines_if_empty()
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -559,57 +588,6 @@ class Section23Award(models.Model):
             parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(r.get("total"), 0)}</td>')
             parts.append('</tr>')
         parts.append('</tbody></table></div>')
-        return Markup(''.join(parts))
-
-    def _html_s23_structure_preview(self):
-        self.ensure_one()
-        if not (self.project_id and self.village_id):
-            return Markup(
-                '<p class="text-muted s23_note mb-0">'
-                'Select project and village to see structure / asset lines.'
-                '</p>'
-            )
-        rows = self.get_structure_compensation_data()
-        if not rows:
-            return Markup(
-                '<p class="text-muted s23_note mb-0">'
-                'No structure rows (add assets on surveys or structure lines for this village).'
-                '</p>'
-            )
-        try:
-            _cur = self.currency_id or self.env.company.currency_id
-            cur_sym = _cur.symbol or '₹'
-        except Exception:
-            cur_sym = '₹'
-        headers = [
-            'Owner / स्वामी', 'Khasra / खसरा', 'Asset / संपत्ति',
-            'Size / मात्रा', f'Total ({cur_sym}) / कुल',
-        ]
-        parts = [
-            '<div class="table-responsive s23-preview-wrap">',
-            '<table class="table table-sm s23-sim-table">',
-            '<thead><tr>',
-        ]
-        for col in headers:
-            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
-        parts.append('</tr></thead><tbody>')
-        for r in rows:
-            parts.append('<tr>')
-            parts.append(f'<td>{escape(r.get("landowner_name") or "")}</td>')
-            parts.append(f'<td>{escape(r.get("asset_khasra") or r.get("total_khasra") or "")}</td>')
-            parts.append(f'<td>{escape(str(r.get("asset_type") or ""))}</td>')
-            dim = r.get("asset_dimension")
-            if dim is not None:
-                parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(dim, 2)}</td>')
-            else:
-                parts.append('<td class="text-end">—</td>')
-            parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(r.get("total"), 0)}</td>')
-            parts.append('</tr>')
-        parts.append(
-            '</tbody></table><p class="s23-sim-hint text-muted small mb-0">'
-            'Per-owner shares when multiple owners; same engine as award PDF / पीडीऐफ़'
-            '</p></div>'
-        )
         return Markup(''.join(parts))
 
     def action_open_land_surveys_for_edit(self):
@@ -1086,6 +1064,12 @@ class Section23Award(models.Model):
                 'Please select type (Village/Residential) for all surveys before generating award.\n'
                 'Missing type selection for surveys: %s'
             ) % survey_names)
+        bad_struct = self.award_structure_line_ids.filtered(lambda l: not l.survey_id)
+        if bad_struct:
+            raise ValidationError(_(
+                'Select a khasra for every structure line before generating the award, or remove empty lines.\n'
+                'अवार्ड जेनरेट करने से पहले हर संरचना पंक्ति के लिए खसरा चुनें, या खाली पंक्तियाँ हटा दें।'
+            ))
 
     def action_generate_award(self):
         """Open the same download wizard as Award Simulator; confirm runs generate (PDF/Excel)."""

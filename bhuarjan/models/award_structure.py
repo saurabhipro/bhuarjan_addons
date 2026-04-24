@@ -10,8 +10,9 @@ class AwardStructureDetails(models.Model):
     survey_id = fields.Many2one(
         'bhu.survey',
         string='Khasra / खसरा',
-        required=True,
-        ondelete='cascade'
+        ondelete='cascade',
+        # Not required in DB: new O2M rows on an unsaved parent must be creatable; pick default in
+        # default_get; generation/submit on award re-validates.
     )
     simulator_id = fields.Many2one(
         'bhu.award.simulator',
@@ -51,7 +52,7 @@ class AwardStructureDetails(models.Model):
         ('maveshi_kotha', 'Maveshi Kotha / मवेशी कोठा'),
         ('poultry_farm_shed', 'Poultry Farm Shed / पोल्ट्री फार्म शेड'),
         ('other', 'Others / अन्य'),
-    ], string='Structure Type / परिसम्पत्ति विवरण', required=True)
+    ], string='Structure Type / परिसम्पत्ति विवरण', required=True, default='makan')
     construction_type = fields.Selection([
         ('kaccha', 'Kaccha / कच्चा'),
         ('pukka', 'Pukka / पक्का'),
@@ -74,6 +75,43 @@ class AwardStructureDetails(models.Model):
         compute='_compute_line_total',
         store=True
     )
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        if not fields_list:
+            return res
+        if 'structure_type' in fields_list and not res.get('structure_type'):
+            res['structure_type'] = 'makan'
+        if 'survey_id' in fields_list and not res.get('survey_id'):
+            project_id, village_id = self._s23_default_project_village_for_line()
+            if project_id and village_id:
+                survey = self.env['bhu.survey'].search([
+                    ('project_id', '=', project_id),
+                    ('village_id', '=', village_id),
+                    ('khasra_number', '!=', False),
+                    ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                ], order='khasra_number', limit=1)
+                if survey:
+                    res['survey_id'] = survey.id
+        return res
+
+    @api.model
+    def _s23_default_project_village_for_line(self):
+        """Resolve project/village for default khasra from O2M parent (works with NewId in form)."""
+        award_id = self.env.context.get('default_award_id')
+        if award_id:
+            award = self.env['bhu.section23.award'].browse(award_id)
+            if award:
+                p, v = award.project_id, award.village_id
+                if p and v:
+                    return p.id, v.id
+        sim_id = self.env.context.get('default_simulator_id')
+        if sim_id:
+            sim = self.env['bhu.award.simulator'].browse(sim_id)
+            if sim and sim.project_id and sim.village_id:
+                return sim.project_id.id, sim.village_id.id
+        return False, False
 
     @api.depends('asset_count', 'market_rate_per_sqm')
     def _compute_line_total(self):

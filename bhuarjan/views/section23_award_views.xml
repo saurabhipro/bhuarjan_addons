@@ -119,8 +119,8 @@
                         </div>
                         <group>
                             <group string="Project &amp; Village">
-                                <field name="project_id" readonly="state != 'draft'" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                                <field name="village_id" readonly="state != 'draft'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                                <field name="project_id" readonly="name != 'New'" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                                <field name="village_id" readonly="name != 'New'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
                             </group>
                             <group string="Award">
                                 <field name="award_date" readonly="state != 'draft'"/>
@@ -234,11 +234,10 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <field name="s23_structure_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
                         <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">
-                            <list editable="bottom">
+                            <list editable="bottom" create="1" delete="1">
                                 <field name="survey_id"
-                                       domain="[('village_id', '=', parent.village_id), ('khasra_number', '!=', False)]"
+                                       domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('khasra_number', '!=', False), ('state', 'in', ['draft', 'submitted', 'approved', 'locked'])]"
                                        context="{'show_khasra': True}"
                                        string="Khasra Number"
                                        options="{'no_create_edit': True}"/>
@@ -246,8 +245,8 @@
                                 <field name="construction_type" string="Construction Type"/>
                                 <field name="asset_count" string="Count"/>
                                 <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
-                                <field name="market_rate_per_sqm" string="Rate" widget="monetary"/>
-                                <field name="asset_value" string="Asset Value" widget="monetary" sum="Asset Value"/>
+                                <field name="market_rate_per_sqm" string="Rate" widget="monetary" options="{'currency_field': 'parent.currency_id'}"/>
+                                <field name="asset_value" string="Asset Value" widget="monetary" options="{'currency_field': 'parent.currency_id'}" sum="Asset Value"/>
                             </list>
                         </field>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fef6f2); border-left-color: #8a4b36;">

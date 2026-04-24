@@ -153,8 +153,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 18px;
-    margin: 0 -18px 14px -18px;
+    /* Match main award header (simulator_header) vertical rhythm — slimmer than before */
+    padding: 6px 14px;
+    min-height: 0;
+    margin: 0 -18px 10px -18px;
     color: #fff;
     border-radius: 12px 12px 0 0;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
@@ -175,36 +177,36 @@
     transform: skewX(-20deg);
     pointer-events: none;
 }
-.bhu_s23_award_premium .section_banner .sb_left { display: flex; align-items: center; gap: 12px; }
+.bhu_s23_award_premium .section_banner .sb_left { display: flex; align-items: center; gap: 8px; }
 .bhu_s23_award_premium .section_banner .sb_icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.22);
-    font-size: 15px;
+    font-size: 12px;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3), 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 .bhu_s23_award_premium .section_banner .sb_title {
-    font-size: 1rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     margin: 0;
     line-height: 1.2;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 .bhu_s23_award_premium .section_banner .sb_sub { font-size: 0.72rem; opacity: 0.92; font-weight: 500; letter-spacing: 0.5px; }
 .bhu_s23_award_premium .section_banner .s23-count-circle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 34px;
-    width: 34px;
-    height: 34px;
-    margin-left: 6px;
+    min-width: 26px;
+    width: 26px;
+    height: 26px;
+    margin-left: 0;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.26);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -213,7 +215,7 @@
 .bhu_s23_award_premium .section_banner .s23-count-circle .o_field_widget {
     color: #fff !important;
     font-weight: 800;
-    font-size: 0.95rem;
+    font-size: 0.72rem;
     line-height: 1;
     margin: 0;
 }
@@ -221,17 +223,17 @@
 .bhu_s23_award_premium .sb_land    { background: linear-gradient(135deg, #a0674e 0%, #c4896d 100%); }
 .bhu_s23_award_premium .sb_tree    { background: linear-gradient(135deg, #3a7a59 0%, #5aaa7a 100%); }
 .bhu_s23_award_premium .sb_structure { background: linear-gradient(135deg, #8a6355 0%, #b08070 100%); }
-.bhu_s23_award_premium .sb_right { display: flex; align-items: center; gap: 14px; text-align: right; }
+.bhu_s23_award_premium .sb_right { display: flex; align-items: center; gap: 8px; text-align: right; }
 .bhu_s23_award_premium .sb_chevron {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, 0.18);
     color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 11px;
     transition: transform 0.25s ease;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }

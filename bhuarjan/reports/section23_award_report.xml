@@ -30,15 +30,58 @@
                 break-before: page !important;
             }
             .letter_space { letter-spacing: 0.5px; }
-            table { border-collapse: collapse; width: 100%; page-break-inside: auto; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
-            th { background-color: #f2f2f2; font-weight: bold; border: 1px solid #000; padding: 4px; font-size: 10px; }
-            td { border: 1px solid #000; padding: 3px; font-size: 9px; vertical-align: middle; }
+            /* Explicitly protect header/footer tables from any border rules */
+            .header table, .header table td, .header table th,
+            .footer table, .footer table td, .footer table th,
+            .section-signatures, .section-signatures td, .section-signatures th {
+                border: none !important;
+                background-color: transparent !important;
+            }
+            /* Scope ALL table/cell border rules to .page only — never touch header/footer tables */
+            .page table {
+                border-collapse: collapse !important;
+                border-spacing: 0 !important;
+                width: 100%;
+                page-break-inside: auto;
+                border: 2px solid #000 !important;
+                empty-cells: show !important;
+            }
+            .page thead { display: table-header-group !important; }
+            .page tfoot { display: table-footer-group !important; }
+            .page tr { page-break-inside: avoid; page-break-after: auto; }
+            .page th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+                border: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                box-shadow: inset 0 0 0 1px #000;
+                outline: 1px solid #000 !important;
+                outline-offset: -1px;
+                padding: 4px;
+                font-size: 10px;
+            }
+            .page td {
+                border: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                box-shadow: inset 0 0 0 1px #000;
+                outline: 1px solid #000 !important;
+                outline-offset: -1px;
+                padding: 3px;
+                font-size: 9px;
+                vertical-align: middle;
+            }
             .award-hdr-note { font-size: 8px; line-height: 1.15; font-weight: 700; display: block; margin-top: 2px; color: #222; }
             .total-row { background-color: #e8eaf6; font-weight: bold; }
-            .section-signatures { width: 100%; margin-top: 14px; border: none; }
+            /* Signature table in footer — no cell borders */
+            .section-signatures { width: 100%; margin-top: 6px; border: none !important; border-collapse: collapse; }
             .section-signatures td {
-                border: none;
+                border: none !important;
                 width: 20%;
                 text-align: center;
                 vertical-align: top;
@@ -48,87 +91,135 @@
             }
             .section-signatures .sig-title {
                 font-weight: bold;
-                margin-top: 18px;
+                margin-top: 10px;
             }
-            /* Land sheet: wkhtmltopdf often drops inner borders on the last column (empty remark);
-               force a full grid like Form 10 bulk tables. */
             .section23-land-table {
-                border-collapse: collapse;
-                border-spacing: 0;
+                border-collapse: collapse !important;
+                border-spacing: 0 !important;
                 width: 100%;
-                border: 1px solid #000;
+                border: 2px solid #000 !important;
             }
             .section23-land-table th,
             .section23-land-table td {
                 box-sizing: border-box;
                 border: 1px solid #000 !important;
-                border-left: 1px solid #000 !important;
-                border-right: 1px solid #000 !important;
-                border-top: 1px solid #000 !important;
-                border-bottom: 1px solid #000 !important;
             }
-            .section23-land-table thead th { border: 1px solid #000 !important; }
             .section23-land-table tbody tr > td:last-child { min-width: 3.5em; }
-            /* Repeat signature block on every PDF page (Form 10 style) */
-            .section23-fixed-footer {
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: #fff;
-                padding: 0 10px 6px 10px;
-                z-index: 20;
+            .section23-award-section { box-sizing: border-box; }
+            /* Reset article padding so tables span full page width */
+            .article, .article.o_report_layout_standard {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
-            .section23-award-section {
-                padding-bottom: 160px !important;
-                box-sizing: border-box;
+            /* High-specificity cell borders to defeat any Odoo reset CSS */
+            html body .page table td {
+                border: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                outline: 1px solid #000 !important;
+                outline-offset: -1px;
+                padding: 3px !important;
+            }
+            html body .page table th {
+                border: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                outline: 1px solid #000 !important;
+                outline-offset: -1px;
+                padding: 4px !important;
+            }
+            html body table.section23-land-table td,
+            html body table.section23-tree-table td,
+            html body table.section23-asset-table td,
+            html body table.section23-land-table th,
+            html body table.section23-tree-table th,
+            html body table.section23-asset-table th {
+                border: 1px solid #000 !important;
+                border-top: 1px solid #000 !important;
+                border-right: 1px solid #000 !important;
+                border-bottom: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+                outline: 1px solid #000 !important;
+                outline-offset: -1px;
             }
         </style>
     </template>
 
     <template id="section23_signature_block">
-        <div style="margin-top: 12px; margin-bottom: 8px; text-align: left; font-size: 11px; font-weight: 700;">
+        <div style="margin:4px 0 4px 0; text-align:left; font-size:11px; font-weight:700; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
             <strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong>
         </div>
-        <table class="section-signatures">
+        <table style="width:100%; border-collapse:collapse; border:none !important; table-layout:fixed;" cellspacing="0" cellpadding="4">
             <tr>
-                <td>
+                <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">SDM</div>
+                    <div style="font-weight:bold; margin-top:8px;">SDM</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
-                <td>
+                <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अधिकारी 1</div>
+                    <div style="font-weight:bold; margin-top:8px;">1</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
-                <td>
+                <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अधिकारी 2</div>
+                    <div style="font-weight:bold; margin-top:8px;">2</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
-                <td>
+                <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अधिकारी 3</div>
+                    <div style="font-weight:bold; margin-top:8px;">3</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
-                <td>
+                <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अधिकारी 4</div>
+                    <div style="font-weight:bold; margin-top:8px;">4</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
             </tr>
         </table>
+    </template>
+
+    <!-- Custom external layout for section23 award report -->
+    <template id="section23_award_external_layout">
+        <!-- Custom Header - repeats on every page -->
+        <div class="header o_clearfix" style="width:100%; background:#fff; padding:0; margin:0; border:none; height:1px; overflow:hidden;">
+            <div style="font-size:1px; color:#fff;">.</div>
+        </div>
+        <!-- Custom Footer - repeats on every page -->
+        <div class="footer o_standard_footer" style="width:100%; background:#fff; border-top:2px solid #000; padding:4px 8px; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+            <!-- Style inside footer div so it is included in wkhtml footer-html file -->
+            <style>
+                * { font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important; color: #000 !important; }
+                .s23-footer-wrap { width: 100%; }
+                .s23-footer-wrap td { border: none !important; width: 20%; text-align: center; vertical-align: top; padding: 3px 2px; font-size: 10px; line-height: 1.4; }
+                .s23-sig-label { font-size: 10px; font-weight: 700; margin-top: 6px; }
+            </style>
+            <t t-call="bhuarjan.section23_signature_block"/>
+        </div>
+        <!-- Body content slot -->
+        <div class="article o_report_layout_standard"
+             t-att-data-oe-model="o and o._name"
+             t-att-data-oe-id="o and o.id"
+             style="margin-top: 0;">
+            <t t-out="0"/>
+        </div>
     </template>
 
     <template id="section23_award_report">
@@ -150,73 +241,79 @@
                 <t t-set="show_land" t-value="s23_scope in ('all', 'land')"/>
                 <t t-set="show_tree" t-value="s23_scope in ('all', 'tree')"/>
                 <t t-set="show_asset" t-value="s23_scope in ('all', 'asset')"/>
+                <t t-call="bhuarjan.section23_award_external_layout">
 
-                <div class="section23-fixed-footer">
-                    <t t-call="bhuarjan.section23_signature_block"/>
-                </div>
+                    <style>
+                        @page {
+                            margin-top: 0.8cm;
+                            margin-bottom: 5.5cm;
+                            margin-left: 0.5cm;
+                            margin-right: 0.5cm;
+                        }
+                    </style>
 
-                <!-- Part 1 (Ka) - LAND COMPENSATION -->
-                <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
-
-                        <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                            <span t-esc="award_headers['sections']['land_sheet_label']"/>
-                        </div>
-
-                        <div style="text-align: center; margin-bottom: 10px;">
-                            <div style="margin-bottom: 6px;">
-                                <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
-                            </div>
-                            <h2 style="margin: 0;"><span t-esc="award_headers['sections']['land_title']"/></h2>
-                            <div style="font-size: 11px; margin-top: 5px;">
-                                मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
-                            </div>
-                        </div>
-
-                        <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
-                            ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
-                        </div>
-                        <div style="text-align: center; font-size: 10px; margin-bottom: 8px;">
-                            विगत तीन वर्षों का औसत बिक्री छांट दर:
-                            <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
-                        </div>
-
-                        <table class="section23-land-table" border="1">
+                    <!-- Part 1 (Ka) - LAND COMPENSATION -->
+                    <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
+                        <table class="section23-land-table" border="1" rules="all" style="border: 2px solid #000 !important; border-collapse:collapse; width:100%;">
                             <thead>
                                 <tr>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
-                                    <th rowspan="2" style="width: 120px;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
-                                    <th colspan="2"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
-                                    <th colspan="2"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
-                                    <th colspan="3"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
+                                    <th colspan="20" style="border:none !important; box-shadow:none !important; background:#fff !important; padding:0 0 4px 0 !important;">
+                                        <div style="text-align:center; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
+                                            <div style="margin-bottom:4px;">
+                                                <img src="/bhuarjan/static/img/logo.png" alt="Logo" style="height:44px; width:44px; object-fit:contain;"/>
+                                            </div>
+                                            <div style="font-size:15px; font-weight:700; color:#000;">अर्जित भूमि का मुआवजा प्रपत्र</div>
+                                            <div style="font-size:10px; color:#000; margin-top:2px;">
+                                                मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> /
+                                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
+                                                प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
+                                                तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
+                                                जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                                            </div>
+                                            <div style="font-size:10px; font-weight:700; color:#000; margin-top:1px;">
+                                                विगत तीन वर्षों का औसत बिक्री छांट दर : <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
+                                            </div>
+                                            <div style="text-align:right; font-size:12px; font-weight:bold; margin-top:4px;">
+                                                <span t-esc="award_headers['sections']['land_sheet_label']"/>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
+                                    <th rowspan="2" style="width: 120px; border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
+                                    <th colspan="3" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
                                         <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
                                     </th>
-                                    <th rowspan="2">
+                                    <th rowspan="2" style="border: 1px solid #000 !important;">
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
                                     </th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
                                         <span class="award-hdr-note">यदि 6,8,17 एवं 18 में से देय</span>
                                         <span class="award-hdr-note">मुआवजा राशि</span>
                                     </th>
-                                    <th rowspan="2" style="width: 9%;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
-                                    <th rowspan="2"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
+                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
                                 </tr>
                                 <tr>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
-                                    <th><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
+                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -226,16 +323,16 @@
                                     <t t-set="line_count" t-value="len(group_lines)"/>
                                     <t t-foreach="group_lines" t-as="land">
                                         <tr>
-                                            <td t-if="land_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
-                                            <td t-if="land_index == 0" t-att-rowspan="line_count">
+                                            <td t-if="land_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="serial"/>
+                                            <td t-if="land_index == 0" t-att-rowspan="line_count" style="border: 1px solid #000 !important;">
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('original_area', 0.0), 3)"/>
-                                            <td style="text-align: center;" t-esc="land.get('khasra', '')"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 3)"/>
-                                            <td style="text-align: center;">
+                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="land.get('khasra', '')"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('original_area', 0.0), 3)"/>
+                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="land.get('khasra', '')"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 3)"/>
+                                            <td style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-set="dfm" t-value="land.get('distance_from_main_road') or 0.0"/>
                                                 <t t-if="dfm and land.get('is_within_distance')">
                                                     <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('is_within_distance') else 'color:#c62828;font-weight:700;'">
@@ -247,7 +344,7 @@
                                                           t-esc="'हाँ' if land.get('is_within_distance') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center;">
+                                            <td style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
@@ -256,7 +353,7 @@
                                                           t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center;">
+                                            <td style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
@@ -265,7 +362,7 @@
                                                           t-esc="'हाँ' if land.get('unirrigated') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center;">
+                                            <td style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
@@ -274,40 +371,40 @@
                                                           t-esc="'हाँ' if land.get('is_diverted') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
-                                            <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
-                                            <td class="section23-land-remark" style="vertical-align: top;">
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
+                                            <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
+                                            <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important;">
                                                 <t t-esc="land.get('remark') or chr(160)"/>
                                             </td>
                                         </tr>
                                     </t>
                                     <tr class="total-row">
-                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
-                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('original_area', 0.0), 3)"/>
-                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('acquired_area', 0.0), 3)"/>
-                                        <td style="text-align: center; font-weight: bold;">-</td>
-                                        <td style="text-align: center; font-weight: bold;">-</td>
-                                        <td style="text-align: center; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
-                                        <td style="text-align: right; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
-                                        <td class="section23-land-remark" style="vertical-align: top;">&#160;</td>
+                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('original_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('acquired_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
+                                        <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important;">&#160;</td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
@@ -320,10 +417,10 @@
                                 </t>
                             </tbody>
                         </table>
-                </div>
+                    </div>
 
-                <!-- Part 1 (Ga) - TREE COMPENSATION -->
-                <div t-if="show_tree" class="page section23-award-section" style="padding: 10px;">
+                    <!-- Part 1 (Ga) - TREE COMPENSATION -->
+                    <div t-if="show_tree" class="page section23-award-section" style="padding: 10px;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -343,10 +440,10 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
-                        <table border="1">
+                        <table class="section23-tree-table" border="1" rules="all" style="border: 2px solid #000 !important; border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 28px;">1.<br/>क्र.</th>
+                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important;">1.<br/>क्र.</th>
                                         <th rowspan="2" style="width: 120px;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
                                         <th colspan="2" style="text-align: center;">अर्जित भूमि का विवरण</th>
                                         <th colspan="10" style="text-align: center;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
@@ -423,9 +520,9 @@
                                 </t>
                             </tbody>
                         </table>
-                </div>
+                    </div>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
-                <div t-if="show_asset" class="page section23-award-section" style="padding: 10px;">
+                    <div t-if="show_asset" class="page section23-award-section" style="padding: 10px;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['asset_sheet_label']"/>
@@ -445,10 +542,10 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
-                        <table border="1">
+                        <table class="section23-asset-table" border="1" rules="all" style="border: 2px solid #000 !important; border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th style="width: 30px;">1. <br/>क्र.</th>
+                                        <th style="width: 30px; border: 1px solid #000 !important;">1. <br/>क्र.</th>
                                         <th style="width: 150px;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
                                         <th>3. <br/>खसरा</th>
                                         <th>4. <br/>रकबा</th>
@@ -509,7 +606,8 @@
                                 </t>
                             </tbody>
                         </table>
-                </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>

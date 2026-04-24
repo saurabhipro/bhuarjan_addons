@@ -61,11 +61,12 @@
                 box-shadow: inset 0 0 0 1px #000;
                 outline: 1px solid #000 !important;
                 outline-offset: -1px;
-                padding: 5px 4px;
-                font-size: 11px;
+                padding: 6px 4px;
+                font-size: 12px;
                 text-align: center;
                 vertical-align: middle;
-                line-height: 1.3;
+                line-height: 1.4;
+                letter-spacing: 0.5px;
             }
             .page td {
                 border: 1px solid #000 !important;
@@ -280,23 +281,23 @@
                                     <th colspan="20" style="border:none !important; box-shadow:none !important; background:#fff !important; padding:0 0 4px 0 !important;">
                                         <div style="display:flex; align-items:flex-start; gap:12px; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                                             <div style="flex-shrink:0; padding-top:2px;">
-                                                <img src="/bhuarjan/static/img/logo.png" alt="Logo" style="height:40px; width:40px; object-fit:contain;"/>
+                                                <img src="/bhuarjan/static/img/logo.png" alt="Logo" style="height:50px; width:50px; object-fit:contain;"/>
                                             </div>
                                             <div style="flex:1; text-align:center;">
-                                                <div style="font-size:15px; font-weight:700; color:#000;">अर्जित भूमि का मुआवजा प्रपत्र</div>
-                                                <div style="font-size:10px; color:#000; margin-top:2px;">
+                                                <div style="font-size:18px; font-weight:700; color:#000;">अर्जित भूमि का मुआवजा प्रपत्र</div>
+                                                <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.4;">
                                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> /
                                                     ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
                                                     प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
                                                     तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
                                                     जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                                                 </div>
-                                                <div style="font-size:10px; font-weight:700; color:#000; margin-top:1px;">
+                                                <div style="font-size:11px; font-weight:700; color:#000; margin-top:2px;">
                                                     विगत तीन वर्षों का औसत बिक्री छांट दर : <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
                                                 </div>
                                             </div>
                                             <div style="flex-shrink:0; text-align:right; padding-top:2px;">
-                                                <div style="font-size:12px; font-weight:bold;">
+                                                <div style="font-size:14px; font-weight:bold;">
                                                     <span t-esc="award_headers['sections']['land_sheet_label']"/>
                                                 </div>
                                             </div>
@@ -444,7 +445,7 @@
                     </div>
 
                     <!-- Part 1 (Ga) - TREE COMPENSATION -->
-                    <div t-if="show_tree" class="page section23-award-section" style="padding: 10px;">
+                    <div t-if="show_tree" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -464,28 +465,28 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
-                        <table class="section23-tree-table" border="1" rules="all" style="border: 2px solid #000 !important; border-collapse:collapse; width:100%;">
+                        <table class="section23-tree-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important;">1.<br/>क्र.</th>
-                                        <th rowspan="2" style="width: 120px;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
-                                        <th colspan="2" style="text-align: center;">अर्जित भूमि का विवरण</th>
-                                        <th colspan="10" style="text-align: center;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
-                                        <th rowspan="2" style="width: 70px;">15.<br/>रिमार्क</th>
+                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">1.<br/>क्र.</th>
+                                        <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
+                                        <th colspan="2" style="text-align: center; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">अर्जित भूमि का विवरण</th>
+                                        <th colspan="10" style="text-align: center; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
+                                        <th rowspan="2" style="width: 70px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">15.<br/>रिमार्क</th>
                                     </tr>
                                     <tr>
-                                        <th>3.<br/>खसरा नं.</th>
-                                        <th>4.<br/>कुल रकबा<br/>(हे.)</th>
-                                        <th>5.<br/>खसरा नं.</th>
-                                        <th>6.<br/>वृक्ष का प्रकार</th>
-                                        <th>7.<br/>वृक्ष संख्या</th>
-                                        <th>8.<br/>गोलाई<br/>(से.मी.)</th>
-                                        <th>9.<br/>दर</th>
-                                        <th>10.<br/>मूल्य</th>
-                                        <th>11.<br/>कुल राशि</th>
-                                        <th>12.<br/>100% सोलेशियम</th>
-                                        <th>13.<br/>12% ब्याज<br/>(6 माह)</th>
-                                        <th>14.<br/>योग (11+12+13)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">3.<br/>खसरा नं.</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">4.<br/>कुल रकबा<br/>(हे.)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">5.<br/>खसरा नं.</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">6.<br/>वृक्ष का प्रकार</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">7.<br/>वृक्ष संख्या</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">8.<br/>गोलाई<br/>(से.मी.)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">9.<br/>दर</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">10.<br/>मूल्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">11.<br/>कुल राशि</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">12.<br/>100% सोलेशियम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">13.<br/>12% ब्याज<br/>(6 माह)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">14.<br/>योग (11+12+13)</th>
                                     </tr>
                                 </thead>
                             <tbody>
@@ -546,7 +547,7 @@
                         </table>
                     </div>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
-                    <div t-if="show_asset" class="page section23-award-section" style="padding: 10px;">
+                    <div t-if="show_asset" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['asset_sheet_label']"/>
@@ -566,20 +567,20 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
-                        <table class="section23-asset-table" border="1" rules="all" style="border: 2px solid #000 !important; border-collapse:collapse; width:100%;">
+                        <table class="section23-asset-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th style="width: 30px; border: 1px solid #000 !important;">1. <br/>क्र.</th>
-                                        <th style="width: 150px;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
-                                        <th>3. <br/>खसरा</th>
-                                        <th>4. <br/>रकबा</th>
-                                        <th style="width: 100px;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
-                                        <th>6. <br/>क्षेत्रफल</th>
-                                        <th>7. <br/>बाजार मूल्य</th>
-                                        <th>8. <br/>100% सोलेशियम</th>
-                                        <th>9. <br/>12% ब्याज</th>
-                                        <th>10. <br/>योग</th>
-                                        <th>11. <br/>रिमार्क</th>
+                                        <th style="width: 30px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">1. <br/>क्र.</th>
+                                        <th style="width: 150px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">3. <br/>खसरा</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">4. <br/>रकबा</th>
+                                        <th style="width: 100px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">6. <br/>क्षेत्रफल</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">7. <br/>बाजार मूल्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">8. <br/>100% सोलेशियम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">9. <br/>12% ब्याज</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">10. <br/>योग</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">11. <br/>रिमार्क</th>
                                     </tr>
                                 </thead>
                             <tbody>

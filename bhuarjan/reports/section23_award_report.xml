@@ -159,35 +159,35 @@
             <tr>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div style="font-weight:bold; margin-top:8px;">SDM</div>
+                    <div style="margin-top:8px;">&#160;</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div style="font-weight:bold; margin-top:8px;">1</div>
+                    <div style="margin-top:8px;">&#160;</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div style="font-weight:bold; margin-top:8px;">2</div>
+                    <div style="margin-top:8px;">&#160;</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div style="font-weight:bold; margin-top:8px;">3</div>
+                    <div style="margin-top:8px;">&#160;</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
                 </td>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
                     <div>(हस्ताक्षर)</div>
-                    <div style="font-weight:bold; margin-top:8px;">4</div>
+                    <div style="margin-top:8px;">&#160;</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
                     <div>विभाग -</div>
@@ -280,40 +280,40 @@
                                     </th>
                                 </tr>
                                 <tr>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
-                                    <th rowspan="2" style="width: 120px; border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
-                                    <th colspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
-                                    <th colspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
-                                    <th colspan="3" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
+                                    <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
+                                    <th colspan="3" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
                                         <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;">
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;">
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
                                         <span class="award-hdr-note">यदि 6,8,17 एवं 18 में से देय</span>
                                         <span class="award-hdr-note">मुआवजा राशि</span>
                                     </th>
-                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
+                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
                                 </tr>
                                 <tr>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
-                                    <th style="border: 1px solid #000 !important;"><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
                                 </tr>
                             </thead>
                             <tbody>

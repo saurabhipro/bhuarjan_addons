@@ -50,9 +50,9 @@
             .page tfoot { display: table-footer-group !important; }
             .page tr { page-break-inside: avoid; page-break-after: auto; }
             .page th {
-                background-color: #2c3e50;
+                background-color: #d3d3d3;
                 font-weight: 900;
-                color: #fff;
+                color: #000;
                 border: 1px solid #000 !important;
                 border-top: 1px solid #000 !important;
                 border-right: 1px solid #000 !important;
@@ -83,9 +83,9 @@
             }
             .award-hdr-note { font-size: 8px; line-height: 1.15; font-weight: 700; display: block; margin-top: 2px; color: #222; }
             .total-row { background-color: #ffd54f; font-weight: bold; }
-            .section23-land-table th { background-color: #2c3e50 !important; color: #fff !important; font-weight: 900 !important; }
-            .section23-tree-table th { background-color: #2c3e50 !important; color: #fff !important; font-weight: 900 !important; }
-            .section23-asset-table th { background-color: #2c3e50 !important; color: #fff !important; font-weight: 900 !important; }
+            .section23-land-table th { background-color: #d3d3d3 !important; color: #fff !important; font-weight: 900 !important; }
+            .section23-tree-table th { background-color: #d3d3d3 !important; color: #fff !important; font-weight: 900 !important; }
+            .section23-asset-table th { background-color: #d3d3d3 !important; color: #fff !important; font-weight: 900 !important; }
             /* Signature table in footer — no cell borders */
             .section-signatures { width: 100%; margin-top: 6px; border: none !important; border-collapse: collapse; }
             .section-signatures td {
@@ -153,7 +153,7 @@
                 outline: 1px solid #000 !important;
                 outline-offset: -1px;
                 font-weight: 900 !important;
-                background-color: #2c3e50 !important;
+                background-color: #d3d3d3 !important;
                 color: #fff !important;
                 text-align: center !important;
                 padding: 5px 4px !important;
@@ -305,40 +305,40 @@
                                     </th>
                                 </tr>
                                 <tr>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
-                                    <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
-                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
-                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
-                                    <th colspan="3" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_1']"/></th>
+                                    <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['rowspan_2']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_held']"/></th>
+                                    <th colspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
+                                    <th colspan="3" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
                                         <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;">
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
                                         <span class="award-hdr-note">यदि 6,8,17 एवं 18 में से देय</span>
                                         <span class="award-hdr-note">मुआवजा राशि</span>
                                     </th>
-                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
+                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
                                 </tr>
                                 <tr>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
-                                    <th style="border: 1px solid #000 !important; background-color: #e9ecef;"><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_4']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_5']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_6']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_8']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_9']"/></th>
+                                    <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_10']"/></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -468,25 +468,25 @@
                         <table class="section23-tree-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">1.<br/>क्र.</th>
-                                        <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
-                                        <th colspan="2" style="text-align: center; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">अर्जित भूमि का विवरण</th>
-                                        <th colspan="10" style="text-align: center; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
-                                        <th rowspan="2" style="width: 70px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">15.<br/>रिमार्क</th>
+                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">1.<br/>क्र.</th>
+                                        <th rowspan="2" style="width: 120px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
+                                        <th colspan="2" style="text-align: center; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">अर्जित भूमि का विवरण</th>
+                                        <th colspan="10" style="text-align: center; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
+                                        <th rowspan="2" style="width: 70px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">15.<br/>रिमार्क</th>
                                     </tr>
                                     <tr>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">3.<br/>खसरा नं.</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">4.<br/>कुल रकबा<br/>(हे.)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">5.<br/>खसरा नं.</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">6.<br/>वृक्ष का प्रकार</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">7.<br/>वृक्ष संख्या</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">8.<br/>गोलाई<br/>(से.मी.)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">9.<br/>दर</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">10.<br/>मूल्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">11.<br/>कुल राशि</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">12.<br/>100% सोलेशियम</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">13.<br/>12% ब्याज<br/>(6 माह)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">14.<br/>योग (11+12+13)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">3.<br/>खसरा नं.</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">4.<br/>कुल रकबा<br/>(हे.)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">5.<br/>खसरा नं.</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">6.<br/>वृक्ष का प्रकार</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">7.<br/>वृक्ष संख्या</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8.<br/>गोलाई<br/>(से.मी.)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>दर</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10.<br/>मूल्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>कुल राशि</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">12.<br/>100% सोलेशियम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">13.<br/>12% ब्याज<br/>(6 माह)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">14.<br/>योग (11+12+13)</th>
                                     </tr>
                                 </thead>
                             <tbody>
@@ -570,17 +570,17 @@
                         <table class="section23-asset-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th style="width: 30px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">1. <br/>क्र.</th>
-                                        <th style="width: 150px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">3. <br/>खसरा</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">4. <br/>रकबा</th>
-                                        <th style="width: 100px; border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">6. <br/>क्षेत्रफल</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">7. <br/>बाजार मूल्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">8. <br/>100% सोलेशियम</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">9. <br/>12% ब्याज</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">10. <br/>योग</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #2c3e50; color: #fff; font-weight: 900;">11. <br/>रिमार्क</th>
+                                        <th style="width: 30px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">1. <br/>क्र.</th>
+                                        <th style="width: 150px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">2. <br/>भूमिस्वामी का नाम व पिता/पति का नाम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">3. <br/>खसरा</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">4. <br/>रकबा</th>
+                                        <th style="width: 100px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">5. <br/>परिसम्पत्ति का विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">6. <br/>क्षेत्रफल</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">7. <br/>बाजार मूल्य</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8. <br/>100% सोलेशियम</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9. <br/>12% ब्याज</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10. <br/>योग</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11. <br/>रिमार्क</th>
                                     </tr>
                                 </thead>
                             <tbody>

@@ -97,11 +97,15 @@
                             <div class="sb_left">
                                 <span class="sb_icon"><i class="fa fa-sliders" title="Configuration"/></span>
                                 <div>
-                                    <div class="sb_title">Configuration / कॉन्फ़िगरेशन</div>
-                                    <div class="sb_sub">Project, village, dates &amp; survey lines</div>
+                                    <div class="sb_title">
+                                        Configuration / कॉन्फ़िगरेशन
+                                    </div>
                                 </div>
                             </div>
                             <div class="sb_right">
+                                <span class="s23-count-circle">
+                                    <field name="s23_survey_count" readonly="1" nolabel="1" class="d-inline"/>
+                                </span>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
@@ -131,11 +135,15 @@
                             <div class="sb_left">
                                 <span class="sb_icon"><i class="fa fa-map-o" title="Land"/></span>
                                 <div>
-                                    <div class="sb_title">Land Component</div>
-                                    <div class="sb_sub">Compensation from surveys &amp; rate master</div>
+                                    <div class="sb_title">
+                                        Land Component
+                                    </div>
                                 </div>
                             </div>
                             <div class="sb_right">
+                                <span class="s23-count-circle">
+                                    <field name="s23_land_khasra_count" readonly="1" nolabel="1" class="d-inline"/>
+                                </span>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
@@ -188,11 +196,15 @@
                             <div class="sb_left">
                                 <span class="sb_icon"><i class="fa fa-tree" title="Trees"/></span>
                                 <div>
-                                    <div class="sb_title">Tree Valuation</div>
-                                    <div class="sb_sub">From approved survey data</div>
+                                    <div class="sb_title">
+                                        Tree Valuation
+                                    </div>
                                 </div>
                             </div>
                             <div class="sb_right">
+                                <span class="s23-count-circle">
+                                    <field name="s23_tree_count" readonly="1" nolabel="1" class="d-inline"/>
+                                </span>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
@@ -210,11 +222,15 @@
                             <div class="sb_left">
                                 <span class="sb_icon"><i class="fa fa-building-o" title="Structure"/></span>
                                 <div>
-                                    <div class="sb_title">Structure Valuation</div>
-                                    <div class="sb_sub">Buildings &amp; assets</div>
+                                    <div class="sb_title">
+                                        Structure Valuation
+                                    </div>
                                 </div>
                             </div>
                             <div class="sb_right">
+                                <span class="s23-count-circle">
+                                    <field name="s23_asset_count" readonly="1" nolabel="1" class="d-inline"/>
+                                </span>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>

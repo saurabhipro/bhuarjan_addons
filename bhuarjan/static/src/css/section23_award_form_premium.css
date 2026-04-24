@@ -192,8 +192,31 @@
     text-transform: uppercase;
     margin: 0;
     line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 .bhu_s23_award_premium .section_banner .sb_sub { font-size: 0.72rem; opacity: 0.92; font-weight: 500; letter-spacing: 0.5px; }
+.bhu_s23_award_premium .section_banner .s23-count-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.26);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.15);
+    vertical-align: middle;
+}
+.bhu_s23_award_premium .section_banner .s23-count-circle .o_field_widget {
+    color: #fff !important;
+    font-weight: 800;
+    font-size: 0.95rem;
+    line-height: 1;
+    margin: 0;
+}
 .bhu_s23_award_premium .sb_config  { background: linear-gradient(135deg, #7a5c52 0%, #9e7265 100%); }
 .bhu_s23_award_premium .sb_land    { background: linear-gradient(135deg, #a0674e 0%, #c4896d 100%); }
 .bhu_s23_award_premium .sb_tree    { background: linear-gradient(135deg, #3a7a59 0%, #5aaa7a 100%); }

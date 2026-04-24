@@ -91,6 +91,18 @@ class Section23Award(models.Model):
     grand_total = fields.Float(
         string='Grand Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
     )
+    s23_survey_count = fields.Integer(
+        string='Survey Count', compute='_compute_s23_header_counts', store=False,
+    )
+    s23_land_khasra_count = fields.Integer(
+        string='Land Khasra Count', compute='_compute_s23_header_counts', store=False,
+    )
+    s23_tree_count = fields.Integer(
+        string='Tree Count', compute='_compute_s23_header_counts', store=False,
+    )
+    s23_asset_count = fields.Integer(
+        string='Asset Count', compute='_compute_s23_header_counts', store=False,
+    )
     s23_land_preview_html = fields.Html(
         string='Land preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
     )
@@ -128,8 +140,13 @@ class Section23Award(models.Model):
     @api.depends('project_id', 'project_id.company_id', 'project_id.company_id.currency_id')
     def _compute_s23_premium_currency(self):
         for rec in self:
+            # Section 23 award UI must always show INR amounts.
+            try:
+                inr = rec.env.ref('base.INR')
+            except Exception:
+                inr = False
             cur = rec.project_id.company_id.currency_id if rec.project_id and rec.project_id.company_id else False
-            rec.currency_id = cur or rec.env.company.currency_id
+            rec.currency_id = inr or cur or rec.env.company.currency_id
 
     @api.depends(
         'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
@@ -157,6 +174,36 @@ class Section23Award(models.Model):
             rec.s23_land_preview_html = rec._html_s23_land_preview()
             rec.s23_tree_preview_html = rec._html_s23_tree_preview()
             rec.s23_structure_preview_html = rec._html_s23_structure_preview()
+
+    @api.depends(
+        'project_id', 'village_id',
+        'award_survey_line_ids', 'award_survey_line_ids.khasra_number', 'award_survey_line_ids.survey_id',
+        'award_structure_line_ids', 'award_structure_line_ids.asset_count',
+    )
+    def _compute_s23_header_counts(self):
+        for rec in self:
+            survey_lines = rec.award_survey_line_ids
+            rec.s23_survey_count = len(survey_lines)
+            rec.s23_land_khasra_count = len(set(filter(None, survey_lines.mapped('khasra_number'))))
+
+            # Tree count from survey tree lines (not owner-grouped rows) to avoid duplication.
+            tree_count = 0
+            if rec.project_id and rec.village_id:
+                surveys = rec.env['bhu.survey'].search([
+                    ('project_id', '=', rec.project_id.id),
+                    ('village_id', '=', rec.village_id.id),
+                    ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                ])
+                for survey in surveys:
+                    for line in getattr(survey, 'tree_line_ids', []):
+                        tree_count += int(getattr(line, 'quantity', 0) or 0)
+            rec.s23_tree_count = tree_count
+
+            # Asset count: use explicit asset_count when available, otherwise count line as 1.
+            assets = 0
+            for al in rec.award_structure_line_ids:
+                assets += int(al.asset_count or 1)
+            rec.s23_asset_count = assets
     
     @api.depends('village_id')
     def _compute_rate_permutations(self):
@@ -269,7 +316,7 @@ class Section23Award(models.Model):
     def _populate_award_survey_lines(self, reset_if_empty=False):
         """Populate survey lines from draft/submitted/approved surveys.
 
-        Keeps existing lines and appends only missing surveys.
+        Rebuilds lines deterministically for the selected project+village.
         """
         self.ensure_one()
         if not (self.project_id and self.village_id):
@@ -282,22 +329,20 @@ class Section23Award(models.Model):
             ('village_id', '=', self.village_id.id),
             ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
         ])
-        existing_survey_ids = set(self.award_survey_line_ids.mapped('survey_id').ids)
-        new_lines = []
+        # Rebuild commands from current surveys to avoid stale/empty UI rows.
+        commands = [(5, 0, 0)]
         for survey in surveys:
-            if survey.id in existing_survey_ids:
-                continue
             distance = survey.distance_from_main_road or 0.0
             threshold = 50.0 if survey.survey_type == 'rural' else 30.0
-            new_lines.append((0, 0, {
+            commands.append((0, 0, {
                 'survey_id': survey.id,
                 'khasra_number': survey.khasra_number or '',
                 'land_type': survey.land_type_for_award or 'village',
                 'is_within_distance': distance <= threshold,
             }))
-        if new_lines:
-            self.award_survey_line_ids = new_lines
-            # Force rate recompute now that award_id is fully linked on each new line
+        self.award_survey_line_ids = commands
+        # Force rate recompute now that award_id is fully linked on each line
+        if self.award_survey_line_ids:
             self.award_survey_line_ids._compute_rate_per_hectare()
             self.award_survey_line_ids._compute_line_display_amounts()
         if self.project_id and self.village_id:
@@ -307,6 +352,8 @@ class Section23Award(models.Model):
         """Clear the khasra filter and reload."""
         self.ensure_one()
         self.khasra_filter = ''
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
         return {
             'type': 'ir.actions.act_window',
             'res_model': self._name,
@@ -316,8 +363,10 @@ class Section23Award(models.Model):
         }
 
     def action_apply_khasra_search(self):
-        """Open backend filtered survey lines by khasra for this award."""
+        """Search khasra and open edit popup(s) for matching land line(s)."""
         self.ensure_one()
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
         term = (self.khasra_filter or '').strip()
         if not term:
             return {
@@ -331,20 +380,44 @@ class Section23Award(models.Model):
                 },
             }
 
-        domain = [
-            ('award_id', '=', self.id),
-            ('khasra_number', 'ilike', term),
-        ]
+        matches = self.award_survey_line_ids.filtered(
+            lambda l, t=term.lower(): t in (l.khasra_number or '').lower()
+        )
+        if not matches:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': f'No khasra matched "{term}".',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        # If exactly one match, open the same 4-field edit wizard directly.
+        if len(matches) == 1:
+            return matches.action_open_survey_for_land_edit()
+
+        # If multiple matches, open popup list with Edit button on each row.
+        tree_view = False
+        try:
+            tree_view = self.env.ref('bhuarjan.view_section23_award_survey_line_tree').id
+        except Exception:
+            tree_view = False
+
         return {
             'type': 'ir.actions.act_window',
             'name': f'Khasra Search: {term}',
             'res_model': 'bhu.section23.award.survey.line',
-            'view_mode': 'list,form',
-            'views': [(False, 'list'), (False, 'form')],
-            'domain': domain,
+            'view_mode': 'list',
+            'views': [(tree_view, 'list')],
+            'domain': [('id', 'in', matches.ids)],
             'target': 'new',
             'context': {
-                'search_default_award_id': self.id,
+                'default_award_id': self.id,
+                'create': False,
+                'edit': False,
             },
         }
 

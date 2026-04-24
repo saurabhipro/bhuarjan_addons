@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Section 23 Award Survey Line Tree View -->
-    <!-- This view will be loaded after the model is recognized -->
     <record id="view_section23_award_survey_line_tree" model="ir.ui.view">
         <field name="name">bhu.section23.award.survey.line.tree</field>
         <field name="model">bhu.section23.award.survey.line</field>
         <field name="arch" type="xml">
-            <list editable="bottom" string="Surveys" default_order="survey_id">
-                <field name="survey_id" readonly="1" string="Survey" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
-                <field name="survey_name" readonly="1" string="Survey Number" optional="show"/>
-                <field name="khasra_number" readonly="1" string="Khasra Number"/>
-                <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
-                <field name="survey_date" readonly="1" string="Survey Date" optional="show"/>
-                <field name="land_type" widget="radio" options="{'horizontal': true}" 
-                       string="Type (Village/Residential)" 
-                       help="Select Village for 20m distance check, Residential for 5m distance check"/>
-                <field name="is_within_distance" 
-                       string="Within Distance" 
-                       help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
-                <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show"/>
+            <list string="Land Lines (Search Results)" create="0" delete="0" default_order="khasra_number">
+                <field name="currency_id" column_invisible="1"/>
+                <button name="action_open_survey_for_land_edit" type="object"
+                        string="Edit" class="btn btn-sm btn-primary"
+                        title="Edit 4 fields: distance / road / irrigation / diverted"/>
+                <field name="khasra_number" readonly="1" string="Khasra"/>
+                <field name="village_name" readonly="1" string="Village"/>
+                <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>
+                <field name="road_type_display" readonly="1" string="Road"/>
+                <field name="irrigation_type" readonly="1" string="Irrigation"/>
+                <field name="has_traded_land" readonly="1" string="Diverted"/>
+                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]"/>
+                <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
             </list>
         </field>
     </record>

@@ -30,12 +30,17 @@ class AwardDownloadWizard(models.TransientModel):
         required=True,
     )
 
+    # True when opened from Section 23 "Generate award" (same UI as Award Simulator)
+    section23_generate = fields.Boolean(string='Section 23 Generate', default=False)
+
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
         if self.env.context.get('active_model') and self.env.context.get('active_id'):
             res.setdefault('res_model', self.env.context.get('active_model'))
             res.setdefault('res_id', self.env.context.get('active_id'))
+        if self.env.context.get('default_section23_generate'):
+            res['section23_generate'] = True
         return res
 
     def action_download(self):
@@ -49,6 +54,14 @@ class AwardDownloadWizard(models.TransientModel):
         scope = (self.export_scope or 'all')
         if scope not in ('all', 'land', 'asset', 'tree'):
             scope = 'all'
+
+        if self.section23_generate and self.res_model == 'bhu.section23.award':
+            if not hasattr(record, 'apply_generate_from_download_wizard'):
+                raise UserError(_('This record does not support the generate flow.'))
+            return record.apply_generate_from_download_wizard(
+                file_format=self.format, export_scope=scope
+            )
+
         if self.format == 'pdf':
             # PDF always renders the full award (all sections).
             # Scope filtering applies only to Excel (handled below).

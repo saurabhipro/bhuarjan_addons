@@ -20,283 +20,302 @@
         <field name="name">bhu.section23.award.form</field>
         <field name="model">bhu.section23.award</field>
         <field name="arch" type="xml">
-            <form string="Section 23 Award / धारा 23 अवार्ड">
+            <form class="bhu_s23_award_premium" string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-                    <button name="action_download_award" string="Download / डाउनलोड" 
-                            type="object" class="btn-secondary" 
-                            icon="fa-download"
-                            invisible="state == 'draft' and not is_generated"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" options="{'clickable': True}"/>
                 </header>
                 <sheet>
+                    <field name="currency_id" invisible="1"/>
                     <field name="is_generated" invisible="1"/>
-                    <div class="oe_title">
-                        <h1>
-                            <i class="fa fa-trophy text-primary" style="margin-right: 10px;"/>
-                            Section 23 Award / धारा 23 अवार्ड
-                        </h1>
-                    </div>
-
-                    <style>
-                        .section-card {
-                            background-color: #fff;
-                            padding: 20px;
-                            margin-bottom: 20px;
-                            border: 1px solid #e0e0e0;
-                            border-radius: 4px;
-                        }
-                        .section-header {
-                            font-size: 1.1rem;
-                            font-weight: 600;
-                            color: #6c757d;
-                            border-bottom: 2px solid #8B4513;
-                            padding-bottom: 10px;
-                            margin-bottom: 20px;
-                            text-transform: uppercase;
-                            letter-spacing: 0.5px;
-                        }
-                        .custom-section-header {
-                            background-color: #FFF8DC; /* Cornsilk */
-                            color: #8B4513;
-                            padding: 12px 15px;
-                            font-size: 1.1rem;
-                            font-weight: 600;
-                            border-radius: 6px;
-                            border-left: 5px solid #8B4513;
-                            margin: 20px 0 10px 0;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                            display: flex;
-                            align-items: center;
-                        }
-                        .custom-btn-primary {
-                            background-color: #8B4513 !important;
-                            border-color: #8B4513 !important;
-                            color: white !important;
-                        }
-                        .custom-btn-success {
-                            background-color: #28a745 !important;
-                            border-color: #28a745 !important;
-                            color: white !important;
-                            border-radius: 5px !important;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                            font-weight: 600;
-                            transition: all 0.2s;
-                            margin-right: 15px !important;
-                        }
-                        .custom-btn-success:hover {
-                            background-color: #218838 !important;
-                            transform: translateY(-1px);
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-                        }
-                        .custom-btn-danger {
-                            background-color: #dc3545 !important;
-                            border-color: #dc3545 !important;
-                            color: white !important;
-                            border-radius: 5px !important;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                            font-weight: 600;
-                            transition: all 0.2s;
-                        }
-                        .custom-btn-danger:hover {
-                            background-color: #c82333 !important;
-                            transform: translateY(-1px);
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-                        }
-                        .custom-btn-teal {
-                            background-color: #008080 !important;
-                            border-color: #008080 !important;
-                            color: white !important;
-                        }
-                    </style>
-                    
-                    <div class="alert alert-warning mb-4 mt-2" role="alert" style="border-left: 5px solid #8B4513; background-color: #fcf8f2; color: #555; padding: 15px;">
-                        <i class="fa fa-info-circle mr-2"/>
-                        Generating award for 
-                        <strong>Village:</strong> <field name="village_id" readonly="1" options="{'no_open': True}" class="text-primary"/>, 
-                        <strong>Project:</strong> <field name="project_id" readonly="1" options="{'no_open': True}" class="text-primary"/>
-                        <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary"/></span>
-                    </div>
-                    
-                    <group invisible="1">
-                        <!-- Hidden fields needed for logic but not displayed as inputs -->
-                        <group>
-                            <field name="project_id" readonly="state != 'draft'" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                            <field name="village_id" readonly="state != 'draft'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
-                            <field name="department_id"/>
-                            <field name="village_domain"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                         <field name="award_date" readonly="state != 'draft'"/>
-                    </group>
-
-
-
-                    <!-- Surveys Section -->
-                    <div class="custom-section-header">
-                        Surveys Configuration / सर्वेक्षण कॉन्फ़िगरेशन
-                    </div>
-
-                    <field name="award_survey_line_ids" nolabel="1" context="{'default_award_id': id}" readonly="state != 'draft'">
-                        <list editable="bottom" string="Surveys" default_order="survey_id" create="0">
-                            <field name="survey_id" column_invisible="True"/>
-                             <field name="survey_name" column_invisible="True"/>
-                            <field name="survey_date" column_invisible="True"/>
-                            <field name="khasra_number" readonly="1" string="Khasra Number"/>
-                            <field name="acquired_area" readonly="1" string="Area (Hectare)" widget="float"/>
-                            <field name="land_type" widget="radio" options="{'horizontal': true}" 
-                                   string="Type (Village/Residential)" 
-                                   help="Select Village for 20m distance check, Residential for 5m distance check"/>
-                            <field name="is_within_distance" 
-                                   string="Within Distance" 
-                                   help="Check if khasra is within distance from main road (20m for Village, 5m for Residential)"/>
-                            <field name="rate_per_hectare" readonly="1" string="Rate per Hectare" widget="monetary" optional="show" force_save="1"/>
-                        </list>
-                    </field>
-                    
-                    <div class="alert alert-info mt-2" role="alert" invisible="all_surveys_configured">
-                        <strong>Note:</strong> Please select Type (Village/Residential) for all surveys before generating award.
-                    </div>
-
-                    <div class="custom-section-header mt-3">
-                        Award Structure Entries / अवार्ड परिसम्पत्ति प्रविष्टियां
-                    </div>
-                    <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">
-                        <list editable="bottom">
-                            <field name="survey_id"
-                                   domain="[('village_id', '=', parent.village_id), ('khasra_number', '!=', False)]"
-                                   context="{'show_khasra': True}"
-                                   string="Khasra Number"
-                                   options="{'no_create_edit': True}"/>
-                            <field name="structure_type" string="Structure Type"/>
-                            <field name="construction_type" string="Construction Type"/>
-                            <field name="description" string="Description"/>
-                            <field name="asset_count" string="Count"/>
-                            <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
-                            <field name="market_rate_per_sqm" string="Rate" widget="monetary"/>
-                            <field name="asset_value" string="Asset Value" widget="monetary" sum="Asset Value"/>
-                        </list>
-                    </field>
-                    
                     <field name="is_sdm" invisible="1"/>
                     <field name="is_section_officer" invisible="1"/>
                     <field name="is_admin" invisible="1"/>
+                    <field name="village_domain" invisible="1"/>
+                    <field name="all_surveys_configured" invisible="1"/>
 
-                    <!-- Award Generation Section (SDM / Admin in Draft) -->
-                    <div class="section-card mt-4" 
-                         invisible="(is_section_officer and not is_admin) or (is_admin and state not in ('draft', 'sent_back'))">
-                        <div class="section-header">Award Generation (SDM) / अवार्ड निर्माण (SDM)</div>
-                        <div class="row">
-                            <!-- Left: Generation & Download -->
-                            <div class="col-md-6 border-right">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 15px;">Step 1: Generate Award</div>
-                                
-                                <div class="mb-3">
-                                    <button name="action_generate_award" string="Generate Award / अवार्ड जेनरेट करें" 
-                                            type="object" class="btn custom-btn-primary" 
-                                            icon="fa-cogs"
-                                            invisible="state != 'draft' or is_generated"
-                                            style="margin-bottom: 10px; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"/>
-                                    <div class="text-muted small" invisible="state != 'draft'">
-                                        <i class="fa fa-info-circle"/> Generates the award PDF based on the configured surveys.
-                                    </div>
-                                </div>
-
+                    <div class="simulator_header">
+                        <div>
+                            <h1 class="simulator_title_h1">Section 23 Award / धारा 23 अवार्ड</h1>
+                        </div>
+                        <div class="text-end" invisible="is_sdm">
+                            <div style="font-size: 1.1rem; font-weight: 800;">
+                                <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </div>
+                            <div style="opacity: 0.7; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;">Current Estimate / वर्तमान अनुमान</div>
+                        </div>
+                    </div>
 
-                            <!-- Right: Upload & Submit -->
-                            <div class="col-md-6">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Upload Signed &amp; Submit</div>
+                    <div class="top_totals_strip" invisible="is_sdm">
+                        <a href="#s23_section_land" class="w-100 text-decoration-none" style="color: inherit;">
+                            <div class="top_total_card top_total_land">
+                                <div class="top_total_head">
+                                    <span class="top_total_icon"><i class="fa fa-map-o" title="Land"/></span>
+                                    <div class="top_total_label">Land Total</div>
+                                </div>
+                                <div class="top_total_value">
+                                    <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#s23_section_tree" class="w-100 text-decoration-none" style="color: inherit;">
+                            <div class="top_total_card top_total_tree">
+                                <div class="top_total_head">
+                                    <span class="top_total_icon"><i class="fa fa-tree" title="Trees"/></span>
+                                    <div class="top_total_label">Tree Total</div>
+                                </div>
+                                <div class="top_total_value">
+                                    <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#s23_section_structure" class="w-100 text-decoration-none" style="color: inherit;">
+                            <div class="top_total_card top_total_structure">
+                                <div class="top_total_head">
+                                    <span class="top_total_icon"><i class="fa fa-building-o" title="Structure"/></span>
+                                    <div class="top_total_label">Structure Total</div>
+                                </div>
+                                <div class="top_total_value">
+                                    <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#s23_section_config" class="w-100 text-decoration-none" style="color: inherit;">
+                            <div class="top_total_card top_total_grand">
+                                <div class="top_total_head">
+                                    <span class="top_total_icon"><i class="fa fa-calculator" title="Configuration"/></span>
+                                    <div class="top_total_label">Grand Total / कुल अवार्ड</div>
+                                </div>
+                                <div class="top_total_value">
+                                    <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <details class="premium_card section-config" id="s23_section_config" open="open">
+                        <summary class="section_banner sb_config">
+                            <div class="sb_left">
+                                <span class="sb_icon"><i class="fa fa-sliders" title="Configuration"/></span>
+                                <div>
+                                    <div class="sb_title">Configuration / कॉन्फ़िगरेशन</div>
+                                    <div class="sb_sub">Project, village, dates &amp; survey lines</div>
+                                </div>
+                            </div>
+                            <div class="sb_right">
+                                <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                            </div>
+                        </summary>
+
+                        <div class="alert alert-light border-0 mb-3" role="alert" style="background: #fff9f2; color: #444; border-left: 4px solid #8a4531 !important; padding: 12px 14px;">
+                            <i class="fa fa-info-circle text-secondary me-1"/>
+                            <span class="s23_note">Generating award for</span>
+                            <strong>Village:</strong> <field name="village_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/>,
+                            <strong>Project:</strong> <field name="project_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/>
+                            <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/></span>
+                        </div>
+                        <group>
+                            <group string="Project &amp; Village">
+                                <field name="project_id" readonly="state != 'draft'" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                                <field name="village_id" readonly="state != 'draft'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                            </group>
+                            <group string="Award">
+                                <field name="award_date" readonly="state != 'draft'"/>
+                            </group>
+                        </group>
+
+                        <div class="o_horizontal_separator s23_workflow_title mt-2" id="s23_survey_o2m" invisible="1">Khasra configuration</div>
+                    </details>
+
+                    <details class="premium_card section-land" id="s23_section_land" open="open">
+                        <summary class="section_banner sb_land">
+                            <div class="sb_left">
+                                <span class="sb_icon"><i class="fa fa-map-o" title="Land"/></span>
+                                <div>
+                                    <div class="sb_title">Land Component</div>
+                                    <div class="sb_sub">Compensation from surveys &amp; rate master</div>
+                                </div>
+                            </div>
+                            <div class="sb_right">
+                                <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                            </div>
+                        </summary>
+                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                            <field name="khasra_filter" nolabel="1"
+                                   placeholder="Search by khasra..."
+                                   style="max-width:220px;"/>
+                            <button name="action_apply_khasra_search" type="object"
+                                    string="Search" icon="fa-search"
+                                    class="btn btn-sm s23_btn_brown"
+                                    title="Exact khasra match"/>
+                            <button name="action_clear_khasra_filter" type="object"
+                                    string="Show All" icon="fa-times"
+                                    class="btn btn-sm btn-secondary"
+                                    title="Clear filter and show all khasras"
+                                    invisible="not khasra_filter"/>
+                        </div>
+                        <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines"
+                               domain="[('khasra_number', '=', khasra_filter)] if khasra_filter else []">
+                            <list string="" create="0" delete="0" default_order="khasra_number" limit="20">
+                                <field name="currency_id" column_invisible="1"/>
+                                <button name="action_open_survey_for_land_edit" type="object"
+                                        string="Edit" class="btn btn-sm s23_btn_brown"
+                                        title="Edit: distance / road / irrigation / diverted"/>
+                                <field name="khasra_number" readonly="1" string="Khasra"/>
+                                <field name="village_name" readonly="1" string="Village"/>
+                                <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>
+                                <field name="road_type_display" readonly="1" string="Road"
+                                       decoration-success="road_type_display == 'MR'"
+                                       decoration-warning="road_type_display == 'BMR'"/>
+                                <field name="irrigation_type" readonly="1" string="Irrigation"/>
+                                <field name="has_traded_land" readonly="1" string="Diverted"/>
+                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]"/>
+                                <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Land Award"/>
+                                <field name="solatium_display" readonly="1" string="Solatium (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Solatium"/>
+                                <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest"/>
+                            </list>
+                        </field>
+                        <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fdf4ec); border-left-color: #7a3b28;">
+                            <span class="total_label_large">Land Subtotal</span>
+                            <span class="total_value_large" style="color: #6a2d1d;">
+                                <field name="land_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                        </div>
+                    </details>
+
+                    <details class="premium_card section-tree" id="s23_section_tree" open="open">
+                        <summary class="section_banner sb_tree">
+                            <div class="sb_left">
+                                <span class="sb_icon"><i class="fa fa-tree" title="Trees"/></span>
+                                <div>
+                                    <div class="sb_title">Tree Valuation</div>
+                                    <div class="sb_sub">From approved survey data</div>
+                                </div>
+                            </div>
+                            <div class="sb_right">
+                                <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                            </div>
+                        </summary>
+                        <field name="s23_tree_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
+                        <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #f1f9f4); border-left-color: #2f6d4f;">
+                            <span class="total_label_large">Tree Subtotal</span>
+                            <span class="total_value_large" style="color: #1c5037;">
+                                <field name="tree_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                        </div>
+                    </details>
+
+                    <details class="premium_card section-structure" id="s23_section_structure" open="open">
+                        <summary class="section_banner sb_structure">
+                            <div class="sb_left">
+                                <span class="sb_icon"><i class="fa fa-building-o" title="Structure"/></span>
+                                <div>
+                                    <div class="sb_title">Structure Valuation</div>
+                                    <div class="sb_sub">Buildings &amp; assets</div>
+                                </div>
+                            </div>
+                            <div class="sb_right">
+                                <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
+                            </div>
+                        </summary>
+                        <field name="s23_structure_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
+                        <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">
+                            <list editable="bottom">
+                                <field name="survey_id"
+                                       domain="[('village_id', '=', parent.village_id), ('khasra_number', '!=', False)]"
+                                       context="{'show_khasra': True}"
+                                       string="Khasra Number"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="structure_type" string="Structure Type"/>
+                                <field name="construction_type" string="Construction Type"/>
+                                <field name="asset_count" string="Count"/>
+                                <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
+                                <field name="market_rate_per_sqm" string="Rate" widget="monetary"/>
+                                <field name="asset_value" string="Asset Value" widget="monetary" sum="Asset Value"/>
+                            </list>
+                        </field>
+                        <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fef6f2); border-left-color: #8a4b36;">
+                            <span class="total_label_large">Structure Subtotal</span>
+                            <span class="total_value_large" style="color: #8a4b36;">
+                                <field name="structure_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                        </div>
+                    </details>
+
+
+                    <div class="s23_workflow_card"
+                         invisible="(is_section_officer and not is_admin) or (is_admin and state not in ('draft', 'sent_back'))">
+                        <div class="s23_workflow_title">Award generation (SDM) &amp; signed upload</div>
+                        <div class="row">
+                            <div class="col-md-6 pe-md-3 border-end">
+                                <div class="fw-bold text-secondary mb-2">Step 1: Generate award</div>
+                                <div class="mb-3 d-flex gap-2 flex-wrap">
+                                    <button name="action_generate_award" string="Generate Award" 
+                                            type="object" class="btn s23_btn_brown" 
+                                            icon="fa-cogs"
+                                            invisible="state != 'draft' or is_generated"/>
+                                    <button name="action_download_award" string="Download Award"
+                                            type="object" class="btn s23_btn_teal"
+                                            icon="fa-download"
+                                            invisible="not is_generated"/>
+                                </div>
+                                <p class="text-muted small s23_note" invisible="state != 'draft' or is_generated">Creates the Section 23 PDF / Word from configured surveys and structures.</p>
+                            </div>
+                            <div class="col-md-6 ps-md-3">
+                                <div class="fw-bold text-secondary mb-2">Step 2: Upload signed &amp; submit / चरण 2: हस्ताक्षरित अपलोड</div>
                                 <div class="bg-light p-3 rounded">
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <field name="award_document" filename="award_document_filename" 
                                                widget="binary" 
-                                               string="Upload Signed Award / हस्ताक्षरित अवार्ड अपलोड करें"
-                                               readonly="state != 'draft'"
-                                               placeholder="Upload Signed Award Document"/>
+                                               string="Upload your file / हस्ताक्षरित अवार्ड"
+                                               readonly="state != 'draft'"/>
                                         <field name="award_document_filename" invisible="1"/>
                                     </div>
-
                                     <div invisible="state != 'draft' and state != 'sent_back'">
-                                         <button name="action_submit_award" string="Submit to Collector" 
-                                                type="object" class="btn custom-btn-teal" 
+                                        <button name="action_submit_award" string="Submit to collector / जमा करें" 
+                                                type="object" class="btn s23_btn_teal" 
                                                 icon="fa-paper-plane"
                                                 invisible="not award_document or state != 'draft'"/>
-                                         
-                                         <!-- Resubmit Button -->
-                                         <button name="action_submit_award" string="Resubmit / पुनः जमा करें"
-                                                type="object" class="btn custom-btn-primary w-100"
+                                        <button name="action_submit_award" string="Resubmit / पुनः जमा"
+                                                type="object" class="btn s23_btn_brown w-100 mt-1"
                                                 icon="fa-refresh"
                                                 invisible="state != 'sent_back'"
-                                                confirm="Are you sure you want to resubmit coverage?"/>
+                                                confirm="Are you sure you want to resubmit?"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Award Approval Section (Section Officer / Admin in Submitted) -->
-                    <div class="section-card mt-4" 
+
+                    <div class="s23_workflow_card"
                          invisible="not (is_section_officer or is_admin) or (is_admin and state in ('draft', 'sent_back'))">
-                        <div class="section-header">Award Approval (Section Officer) / अवार्ड स्वीकृति</div>
+                        <div class="s23_workflow_title">Award approval</div>
                         <div class="row">
-                            <!-- Left: Review Documents -->
-                            <div class="col-md-6 border-right">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 15px;">Step 1: Review Award</div>
-                                <div class="text-muted small">
-                                    <i class="fa fa-info-circle"/> Review the signed award document before approval.
-                                </div>
+                            <div class="col-md-6 pe-md-3 border-end">
+                                <div class="fw-bold text-secondary mb-2">Step 1: Review / समीक्षा</div>
+                                <p class="text-muted small s23_note">Review the signed document attached by SDM before approving.</p>
                             </div>
-
-                            <!-- Right: Approval Actions -->
-                            <div class="col-md-6">
-                                <div style="font-weight: bold; color: #495057; display: block; margin-bottom: 5px;">Step 2: Approve or Return</div>
+                            <div class="col-md-6 ps-md-3">
+                                <div class="fw-bold text-secondary mb-2">Step 2: Decision / निर्णय</div>
                                 <div class="bg-light p-3 rounded">
-                                     <!-- Approval Buttons -->
-                                    <div class="d-flex" invisible="state != 'submitted'" style="margin-top: 5px;">
-                                        <button name="action_approve_award" string="Approve / स्वीकृत करें" type="object" 
-                                                class="btn custom-btn-success flex-fill" icon="fa-check"
+                                    <div class="d-flex gap-2" invisible="state != 'submitted'">
+                                        <button name="action_approve_award" string="Approve" type="object" 
+                                                class="btn s23_btn_ok flex-fill" icon="fa-check"
                                                 groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
-                                                confirm="Are you sure you want to approve this award?"/>
-                                        <button name="action_send_back_award" string="Send Back / वापस भेजें" type="object" 
-                                                class="btn custom-btn-danger flex-fill" icon="fa-times"
+                                                confirm="Approve this award?"/>
+                                        <button name="action_send_back_award" string="Send back" type="object" 
+                                                class="btn s23_btn_danger flex-fill" icon="fa-times"
                                                 groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
-                                                confirm="Are you sure you want to send back this award?"/>
+                                                confirm="Send this award back?"/>
                                     </div>
-                                    <div invisible="state != 'approved'" class="text-success font-weight-bold center">
-                                        <i class="fa fa-check-circle"/> Award Approved
+                                    <div invisible="state != 'approved'" class="text-success fw-bold text-center p-2">
+                                        <i class="fa fa-check-circle"/> Award approved
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="custom-section-header mt-3" invisible="not is_generated">
-                        Award Line Items (DB) / अवार्ड लाइन आइटम
-                    </div>
-                    <field name="award_line_item_ids" nolabel="1" readonly="1" invisible="not is_generated">
-                        <list create="0" delete="0" default_order="id">
-                            <field name="line_type" string="Component"/>
-                            <field name="landowner_name" string="Landowner"/>
-                            <field name="khasra_number" string="Khasra"/>
-                            <field name="original_area" string="Original Area"/>
-                            <field name="acquired_area" string="Acquired Area"/>
-                            <field name="is_within_distance" string="Main Road"/>
-                            <field name="irrigated" string="Irrigated"/>
-                            <field name="unirrigated" string="Unirrigated"/>
-                            <field name="is_diverted" string="Diverted"/>
-                            <field name="guide_line_rate" string="Guide Rate"/>
-                            <field name="basic_value" string="Basic Value"/>
-                            <field name="market_value" string="Market Value"/>
-                            <field name="solatium" string="Solatium"/>
-                            <field name="interest" string="Interest"/>
-                            <field name="total_compensation" string="Total"/>
-                            <field name="rehab_policy_amount" string="Rehab Policy"/>
-                            <field name="paid_compensation" string="Payable"/>
-                            <field name="remark" string="Remark"/>
-                        </list>
-                    </field>
                 </sheet>
                 <chatter/>
             </form>

@@ -4,6 +4,7 @@ from . import sia_send_back_wizard
 from . import sia_download_wizard
 from . import award_download_wizard
 from . import award_simulator_land_edit_wizard
+from . import s23_land_edit_wizard
 from . import process_send_back_wizard
 from . import section8_approve_reject_wizard
 from . import reject_survey_wizard

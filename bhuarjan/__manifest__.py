@@ -76,6 +76,7 @@
         'wizard/sia_download_wizard_views.xml',
         'wizard/award_download_wizard_views.xml',
         'wizard/award_simulator_land_edit_wizard_views.xml',
+        'wizard/s23_land_edit_wizard_views.xml',
         'wizard/process_send_back_wizard.xml',
         'wizard/section8_approve_reject_wizard.xml',
         'wizard/reject_survey_wizard_views.xml',
@@ -146,6 +147,7 @@
             # 'bhuarjan/static/src/xml/mail_systray_hide_button.xml',
             # 'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
+            'bhuarjan/static/src/css/section23_award_form_premium.css',
             'bhuarjan/static/src/css/search_view.css',
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import json
+from markupsafe import Markup, escape
+
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-import json
 from .award_header_constants import get_award_header_constants
 
 class Section23Award(models.Model):
@@ -44,6 +46,15 @@ class Section23Award(models.Model):
     award_survey_line_ids = fields.One2many('bhu.section23.award.survey.line', 'award_id', 
                                             string='Approved Surveys / स्वीकृत सर्वेक्षण',
                                             help='Select type and distance for each approved survey')
+    # Khasra search filter — stored so value persists across reloads
+    khasra_filter = fields.Char(string='Search Khasra', default='')
+    # Computed filtered view of survey lines (used in form view instead of raw O2M)
+    filtered_land_line_ids = fields.Many2many(
+        comodel_name='bhu.section23.award.survey.line',
+        string='Land Survey Lines (Filtered)',
+        compute='_compute_filtered_land_lines',
+        store=False,
+    )
     award_line_item_ids = fields.One2many(
         'bhu.section23.award.line.item',
         'award_id',
@@ -71,6 +82,32 @@ class Section23Award(models.Model):
     is_section_officer = fields.Boolean(compute='_compute_user_roles')
     is_admin = fields.Boolean(compute='_compute_user_roles')
 
+    # Premium form (simulator-style dashboard totals – non-stored)
+    currency_id = fields.Many2one(
+        'res.currency', string='Currency', compute='_compute_s23_premium_currency', readonly=True,
+    )
+    land_total = fields.Float(
+        string='Land Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+    )
+    tree_total = fields.Float(
+        string='Tree Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+    )
+    structure_total = fields.Float(
+        string='Structure Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+    )
+    grand_total = fields.Float(
+        string='Grand Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+    )
+    s23_land_preview_html = fields.Html(
+        string='Land preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
+    )
+    s23_tree_preview_html = fields.Html(
+        string='Tree preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
+    )
+    s23_structure_preview_html = fields.Html(
+        string='Structure preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
+    )
+
     _sql_constraints = [
         ('project_village_unique', 'unique(project_id, village_id)', 
          'Only one award per project and village is allowed! / प्रत्येक परियोजना और गाँव के लिए केवल एक अवार्ड की अनुमति है!')
@@ -94,6 +131,39 @@ class Section23Award(models.Model):
             rec.is_sdm = self.env.user.has_group('bhuarjan.group_bhuarjan_sdm')
             rec.is_section_officer = self.env.user.has_group('bhuarjan.group_bhu_section_officer')
             rec.is_admin = self.env.user.has_group('bhuarjan.group_bhuarjan_admin')
+
+    @api.depends('project_id', 'project_id.company_id', 'project_id.company_id.currency_id')
+    def _compute_s23_premium_currency(self):
+        for rec in self:
+            cur = rec.project_id.company_id.currency_id if rec.project_id and rec.project_id.company_id else False
+            rec.currency_id = cur or rec.env.company.currency_id
+
+    @api.depends(
+        'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
+        'award_survey_line_ids.survey_id', 'award_survey_line_ids.rate_per_hectare',
+        'award_structure_line_ids', 'award_structure_line_ids.line_total',
+        'village_id', 'project_id', 'award_date',
+    )
+    def _compute_s23_premium_totals(self):
+        for rec in self:
+            s = rec.get_award_village_scope_summary()
+            rec.land_total = s['land_total']
+            rec.tree_total = s['tree_total']
+            rec.structure_total = s['structure_total']
+            rec.grand_total = s['grand_total']
+
+    @api.depends(
+        'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
+        'award_survey_line_ids.survey_id', 'award_survey_line_ids.rate_per_hectare',
+        'award_structure_line_ids', 'award_structure_line_ids.line_total', 'award_structure_line_ids.area_sqm',
+        'award_structure_line_ids.asset_value', 'award_structure_line_ids.structure_type',
+        'village_id', 'project_id', 'award_date',
+    )
+    def _compute_s23_section_previews(self):
+        for rec in self:
+            rec.s23_land_preview_html = rec._html_s23_land_preview()
+            rec.s23_tree_preview_html = rec._html_s23_tree_preview()
+            rec.s23_structure_preview_html = rec._html_s23_structure_preview()
     
     @api.depends('village_id')
     def _compute_rate_permutations(self):
@@ -135,7 +205,7 @@ class Section23Award(models.Model):
     
     @api.onchange('village_id', 'project_id')
     def _onchange_village_populate_surveys(self):
-        """Auto-populate approved surveys when village is selected"""
+        """Auto-populate available surveys when village is selected"""
         for rec in self:
             rec._populate_award_survey_lines(reset_if_empty=True)
     
@@ -154,12 +224,23 @@ class Section23Award(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Generate award reference if not provided"""
+        """Generate award reference and reuse existing project+village award when present."""
+        to_create = []
+        existing_records = self.browse()
         for vals in vals_list:
+            project_id = vals.get('project_id')
+            village_id = vals.get('village_id')
+            if project_id and village_id:
+                existing = self.search([
+                    ('project_id', '=', project_id),
+                    ('village_id', '=', village_id),
+                ], limit=1)
+                if existing:
+                    existing_records |= existing
+                    continue
+            vals = dict(vals)
             if vals.get('name', 'New') == 'New':
                 # Try to use sequence settings from settings master
-                project_id = vals.get('project_id')
-                village_id = vals.get('village_id')
                 if project_id:
                     sequence_number = self.env['bhuarjan.settings.master'].get_sequence_number(
                         'section23_award', project_id, village_id=village_id
@@ -174,8 +255,10 @@ class Section23Award(models.Model):
                     # No project_id, use fallback
                     sequence = self.env['ir.sequence'].next_by_code('bhu.section23.award') or 'New'
                     vals['name'] = f'SEC23-{sequence}'
-        records = super().create(vals_list)
-        # Onchange does not run for backend create() calls; populate lines here too.
+            to_create.append(vals)
+        records = super().create(to_create) if to_create else self.browse()
+        records |= existing_records
+        # Onchange does not run for backend create() calls; ensure lines are populated/synced.
         for record in records:
             record._populate_award_survey_lines(reset_if_empty=False)
         return records
@@ -185,10 +268,13 @@ class Section23Award(models.Model):
         if 'project_id' in vals or 'village_id' in vals:
             for rec in self:
                 rec._populate_award_survey_lines(reset_if_empty=True)
+        for rec in self:
+            if rec.project_id and rec.village_id:
+                rec._sync_award_structure_lines()
         return result
 
     def _populate_award_survey_lines(self, reset_if_empty=False):
-        """Populate survey lines from approved/locked surveys.
+        """Populate survey lines from draft/submitted/approved surveys.
 
         Keeps existing lines and appends only missing surveys.
         """
@@ -201,7 +287,7 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['approved', 'locked']),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
         ])
         existing_survey_ids = set(self.award_survey_line_ids.mapped('survey_id').ids)
         new_lines = []
@@ -213,12 +299,265 @@ class Section23Award(models.Model):
             new_lines.append((0, 0, {
                 'survey_id': survey.id,
                 'khasra_number': survey.khasra_number or '',
-                'land_type': survey.land_type_for_award or False,
+                'land_type': survey.land_type_for_award or 'village',
                 'is_within_distance': distance <= threshold,
             }))
         if new_lines:
             self.award_survey_line_ids = new_lines
-    
+            # Force rate recompute now that award_id is fully linked on each new line
+            self.award_survey_line_ids._compute_rate_per_hectare()
+            self.award_survey_line_ids._compute_line_display_amounts()
+        if self.project_id and self.village_id:
+            self._sync_award_structure_lines()
+
+    @api.depends('award_survey_line_ids.khasra_number', 'khasra_filter')
+    def _compute_filtered_land_lines(self):
+        for rec in self:
+            kf = (rec.khasra_filter or '').strip().lower()
+            if kf:
+                rec.filtered_land_line_ids = rec.award_survey_line_ids.filtered(
+                    lambda l, f=kf: f in (l.khasra_number or '').lower()
+                )
+            else:
+                rec.filtered_land_line_ids = rec.award_survey_line_ids
+
+    def action_clear_khasra_filter(self):
+        """Clear the khasra filter and reload."""
+        self.ensure_one()
+        self.khasra_filter = ''
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_apply_khasra_search(self):
+        """Save khasra_filter then reload — filtered_land_line_ids recomputes automatically."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_refresh_land_rates(self):
+        """Force-recompute rate_per_hectare and display amounts for all land survey lines."""
+        self.ensure_one()
+        lines = self.award_survey_line_ids
+        if lines:
+            lines._compute_rate_per_hectare()
+            lines._compute_line_display_amounts()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Rates Refreshed',
+                'message': f'Recomputed rates for {len(lines)} land survey line(s) from the active rate master.',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def _html_s23_num(self, value, decimals=2):
+        return escape(self.format_indian_number(float(value or 0.0), decimals))
+
+    def _html_s23_land_preview(self):
+        self.ensure_one()
+        if not (self.project_id and self.village_id):
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'Select project and village to see land lines (same engine as the award / अवार्ड).'
+                '</p>'
+            )
+        rows = self.get_land_compensation_data()
+        if not rows:
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'No land rows found for this village/project. Check surveys and khasra data.'
+                '</p>'
+            )
+        try:
+            _cur = self.currency_id or self.env.company.currency_id
+            cur_sym = _cur.symbol or '₹'
+        except Exception:
+            cur_sym = '₹'
+        # Same columns as Award Simulator land grid (Khasra → Interest).
+        headers = [
+            'Khasra / खसरा', 'Village / ग्राम', 'Distance (m) / दूरी', 'Road / सड़क', 'Irrigation / सिंचाई', 'Diverted / विचलित',
+            'Acquired (Ha) / अधि.', f'Base ({cur_sym}/Ha)', f'Effective ({cur_sym}/Ha)', f'Land award ({cur_sym})',
+            f'Solatium ({cur_sym})', f'Interest ({cur_sym})',
+        ]
+        parts = [
+            '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
+            '<table class="table table-sm s23-sim-table s23-sim-table-land">',
+            '<thead><tr>',
+        ]
+        for col in headers:
+            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
+        parts.append('</tr></thead><tbody>')
+        for r in rows:
+            parts.append('<tr>')
+            parts.append(f'<td class="text-nowrap">{escape(r.get("khasra") or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(r.get("village_name") or "")}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("distance_from_main_road"), 2)}</td>')
+            road = (r.get("road_type_label") or ("MR" if r.get("is_within_distance") else "BMR"))
+            parts.append(f'<td class="text-nowrap text-center"><span class="s23-sim-badge">{escape(road)}</span></td>')
+            parts.append(f'<td class="text-nowrap small">{escape(r.get("irrigation_label") or "")}</td>')
+            div_lbl = (r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"))
+            parts.append(f'<td class="text-center text-nowrap">{escape(div_lbl)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("acquired_area"), 4)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("base_rate_hectare") or 0, 0)}</td>')
+            eff = r.get("effective_rate_hectare")
+            if eff is None:
+                eff = r.get("guide_line_rate")
+            parts.append(f'<td class="text-end tabular-nums fw-semibold">{self._html_s23_num(eff, 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("basic_value"), 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
+            parts.append('</tr>')
+        parts.append(
+            '</tbody></table><p class="s23-sim-hint text-muted small mb-0">'
+            'Values follow the same rules as the Section 23 PDF / पीडीऐफ़ के समान नियम'
+            '</p></div>'
+        )
+        return Markup(''.join(parts))
+
+    def _html_s23_tree_preview(self):
+        self.ensure_one()
+        if not (self.project_id and self.village_id):
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'Select project and village to see tree lines.'
+                '</p>'
+            )
+        rows = self.get_tree_compensation_data()
+        if not rows:
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'No tree compensation rows (no tree lines on surveys or zero quantities).'
+                '</p>'
+            )
+        try:
+            _cur = self.currency_id or self.env.company.currency_id
+            cur_sym = _cur.symbol or '₹'
+        except Exception:
+            cur_sym = '₹'
+        headers = [
+            'Owner', 'Khasra', 'Tree', 'Tree Type', 'Dev. Stage',
+            'Girth (cm)', 'Qty',
+            f'Unit Rate ({cur_sym})', f'Value ({cur_sym})',
+            f'Solatium ({cur_sym})', f'Interest ({cur_sym})', f'Total ({cur_sym})',
+        ]
+        parts = [
+            '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
+            '<table class="table table-sm s23-sim-table s23-sim-table-land">',
+            '<thead><tr>',
+        ]
+        for col in headers:
+            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
+        parts.append('</tr></thead><tbody>')
+        for r in rows:
+            parts.append('<tr>')
+            parts.append(f'<td class="text-nowrap">{escape(r.get("landowner_name") or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(r.get("tree_khasra") or r.get("khasra") or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(str(r.get("tree_type") or ""))}</td>')
+            # Tree type code label
+            tc = r.get("tree_type_code") or ""
+            tc_label = "Fruit Bearing" if tc == "fruit_bearing" else ("Timber" if tc == "timber" else tc.replace("_", " ").title())
+            parts.append(f'<td class="text-nowrap small">{escape(tc_label)}</td>')
+            _ds_map = {'undeveloped': 'Undeveloped', 'semi_developed': 'Semi-Developed', 'fully_developed': 'Fully Developed'}
+            ds_label = _ds_map.get(r.get('development_stage') or '', r.get('development_stage') or '—')
+            parts.append(f'<td class="text-nowrap small">{escape(ds_label)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("girth_cm"), 1)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("tree_count"), 0)}</td>')
+            unit_rate = r.get("unit_rate") or r.get("rate") or 0
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(unit_rate, 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("value"), 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(r.get("total"), 0)}</td>')
+            parts.append('</tr>')
+        parts.append('</tbody></table></div>')
+        return Markup(''.join(parts))
+
+    def _html_s23_structure_preview(self):
+        self.ensure_one()
+        if not (self.project_id and self.village_id):
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'Select project and village to see structure / asset lines.'
+                '</p>'
+            )
+        rows = self.get_structure_compensation_data()
+        if not rows:
+            return Markup(
+                '<p class="text-muted s23_note mb-0">'
+                'No structure rows (add assets on surveys or structure lines for this village).'
+                '</p>'
+            )
+        try:
+            _cur = self.currency_id or self.env.company.currency_id
+            cur_sym = _cur.symbol or '₹'
+        except Exception:
+            cur_sym = '₹'
+        headers = [
+            'Owner / स्वामी', 'Khasra / खसरा', 'Asset / संपत्ति',
+            'Size / मात्रा', f'Total ({cur_sym}) / कुल',
+        ]
+        parts = [
+            '<div class="table-responsive s23-preview-wrap">',
+            '<table class="table table-sm s23-sim-table">',
+            '<thead><tr>',
+        ]
+        for col in headers:
+            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
+        parts.append('</tr></thead><tbody>')
+        for r in rows:
+            parts.append('<tr>')
+            parts.append(f'<td>{escape(r.get("landowner_name") or "")}</td>')
+            parts.append(f'<td>{escape(r.get("asset_khasra") or r.get("total_khasra") or "")}</td>')
+            parts.append(f'<td>{escape(str(r.get("asset_type") or ""))}</td>')
+            dim = r.get("asset_dimension")
+            if dim is not None:
+                parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(dim, 2)}</td>')
+            else:
+                parts.append('<td class="text-end">—</td>')
+            parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(r.get("total"), 0)}</td>')
+            parts.append('</tr>')
+        parts.append(
+            '</tbody></table><p class="s23-sim-hint text-muted small mb-0">'
+            'Per-owner shares when multiple owners; same engine as award PDF / पीडीऐफ़'
+            '</p></div>'
+        )
+        return Markup(''.join(parts))
+
+    def action_open_land_surveys_for_edit(self):
+        """Open village surveys so users can edit distance/irrigation/diverted quickly."""
+        self.ensure_one()
+        if not (self.project_id and self.village_id):
+            raise ValidationError(_('Select project and village first.'))
+        return {
+            'name': _('Edit land inputs / भूमि इनपुट संपादित करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.survey',
+            'view_mode': 'list,form',
+            'target': 'current',
+            'domain': [
+                ('project_id', '=', self.project_id.id),
+                ('village_id', '=', self.village_id.id),
+                ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                ('khasra_number', '!=', False),
+            ],
+            'context': {
+                'search_default_project_id': self.project_id.id,
+                'search_default_village_id': self.village_id.id,
+            },
+        }
+
     def action_download_award(self):
         """Download award document - Open wizard for PDF/Word"""
         self.ensure_one()
@@ -642,33 +981,26 @@ class Section23Award(models.Model):
         self.ensure_one()
         return self.action_download_excel_components(export_scope=export_scope)
     
-    def action_generate_award(self):
-        """Generate Section 23 Award Report (Land + Tree Compensation merged)"""
+    def _validate_for_generate(self):
+        """Pre-checks for opening the generate wizard or running generate from the wizard."""
         self.ensure_one()
-
         if self.is_generated:
             raise ValidationError(_(
                 'Award already generated for this Project and Village. '
-                'Use Download actions instead of generating again.'
+                'Use Download instead of generating again.'
             ))
-        
         if not self.project_id:
             raise ValidationError(_('Please select a project first.'))
-        
         if not self.village_id:
             raise ValidationError(_('Please select a village first.'))
-            
-        # Ensure lines are available even when record was created from dashboard/context.
         if not self.award_survey_line_ids:
             self._populate_award_survey_lines(reset_if_empty=False)
-
         if not self.award_survey_line_ids:
-            raise ValidationError(_('No approved surveys found for this village. Cannot generate award.\n इस गाँव के लिए कोई स्वीकृत सर्वेक्षण नहीं मिला। अवार्ड उत्पन्न नहीं किया जा सकता।'))
-        
-        # Validate that all surveys have type configured
-        # is_within_distance can be True or False (both are valid - checked or unchecked means user has made a choice)
+            raise ValidationError(_(
+                'No surveys found for this village. Cannot generate award.\n'
+                'इस गाँव के लिए कोई स्वीकृत सर्वेक्षण नहीं मिला। अवार्ड उत्पन्न नहीं किया जा सकता।'
+            ))
         missing_lines = self.award_survey_line_ids.filtered(lambda l: not l.land_type)
-        
         if missing_lines:
             survey_names = ', '.join([line.survey_id.name for line in missing_lines if line.survey_id][:5])
             if len(missing_lines) > 5:
@@ -678,45 +1010,72 @@ class Section23Award(models.Model):
                 'Missing type selection for surveys: %s'
             ) % survey_names)
 
+    def action_generate_award(self):
+        """Open the same download wizard as Award Simulator; confirm runs generate (PDF/Excel)."""
+        self.ensure_one()
+        self._validate_for_generate()
+        report_action = self._get_section23_report_action()
+        xmlid = report_action.get_external_id().get(
+            report_action.id, 'bhuarjan.action_report_section23_award'
+        )
+        return {
+            'name': _('Generate Section 23 Award / अवार्ड जेनरेट करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.award.download.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+                'default_report_xml_id': xmlid,
+                'default_filename': f'Section23_Award_{self.name}.pdf',
+                'default_export_scope': 'all',
+                'default_section23_generate': True,
+            },
+        }
+
+    def apply_generate_from_download_wizard(self, file_format, export_scope='all'):
+        """Called from bhu.award.download.wizard when Section 23 generate is confirmed."""
+        self.ensure_one()
+        import base64
+        from datetime import datetime
+
+        self._validate_for_generate()
         self._sync_award_structure_lines()
         self._refresh_award_line_items()
-        
-        # Get the report action and generate PDF
+
+        if file_format == 'excel':
+            self.write({'is_generated': True})
+            return self.action_download_excel_components(export_scope=export_scope or 'all')
+
+        if file_format != 'pdf':
+            raise ValidationError(_('Unsupported format for generate.'))
+
         report_action = self._get_section23_report_action()
-        
-        # Generate PDF directly (downloads instead of opening in new tab)
-        # IMPORTANT: pass report action id (not report_name) to avoid
-        # ambiguous resolution when multiple actions share same template.
         pdf_result = report_action.sudo()._render_qweb_pdf(
             report_action.id,
             [self.id],
-            data={}
+            data={},
         )
-        
         if pdf_result:
             pdf_data = pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
             if isinstance(pdf_data, bytes):
-                # Save to award_document field
-                import base64
-                from datetime import datetime
-                
-                filename = f'Section23_Award_{self.village_id.name.replace(" ", "_") if self.village_id else ""}_{datetime.now().strftime("%Y%m%d")}.pdf'
-                
-                
+                filename = (
+                    f"Section23_Award_"
+                    f"{(self.village_id.name or '').replace(' ', '_')}_"
+                    f"{datetime.now().strftime('%Y%m%d')}.pdf"
+                )
                 self.write({
                     'award_document': base64.b64encode(pdf_data),
                     'award_document_filename': filename,
-                    'is_generated': True
+                    'is_generated': True,
                 })
-                
-                # Return download action
                 return {
                     'type': 'ir.actions.act_url',
                     'url': f'/web/content/{self._name}/{self.id}/award_document/{filename}?download=true',
                     'target': 'self',
                 }
-        
-        # Fallback to standard report action if PDF generation fails
+
         self.write({'is_generated': True})
         return report_action.report_action(self)
 
@@ -918,7 +1277,26 @@ class Section23Award(models.Model):
                 start_date, end_date = end_date, start_date
             return f"{start_date.strftime('%d/%m/%Y')} से {end_date.strftime('%d/%m/%Y')} तक"
         return "धारा 4 स्वीकृति दिनांक से अवार्ड दिनांक तक"
-    
+
+    def _s23_land_base_rate_per_hectare(self, survey, award_line, derived_within):
+        """MR/BMR line from the active land rate master (before irrigation and diverted %), for display."""
+        self.ensure_one()
+        if not self.village_id or not survey:
+            return 0.0
+        rm = self.env['bhu.rate.master'].search([
+            ('village_id', '=', self.village_id.id),
+            ('state', 'in', ['active', 'draft']),
+        ], limit=1, order='state ASC, effective_from DESC')
+        if not rm:
+            return 0.0
+        land_type = (award_line.land_type if award_line else (survey.land_type_for_award or 'village'))
+        is_within = award_line.is_within_distance if award_line else derived_within
+        if land_type not in ('village', 'residential'):
+            land_type = 'village'
+        if is_within:
+            return rm.main_road_rate_hectare or 0.0
+        return rm.other_road_rate_hectare or 0.0
+
     def get_land_compensation_data(self):
         """Get land compensation data grouped by landowner and khasra"""
         self.ensure_one()
@@ -928,7 +1306,7 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['approved', 'locked']),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
             ('khasra_number', '!=', False),
         ])
         
@@ -1064,7 +1442,19 @@ class Section23Award(models.Model):
             )
             rehab_policy_amount = acquired_area_acre * rehab_rate_per_acre
             payable_compensation = max(total_compensation, rehab_policy_amount)
-            
+
+            al_rec = award_line[:1] if has_award_line else self.env['bhu.section23.award.survey.line']
+            base_rate_ha = self._s23_land_base_rate_per_hectare(survey, al_rec, derived_is_within_distance)
+            if survey and self._is_fallow_survey(survey):
+                irrigation_label = 'Fallow / पड़ती'
+            elif survey and survey.irrigation_type == 'irrigated':
+                irrigation_label = 'Irrigated / सिंचित'
+            else:
+                irrigation_label = 'Unirrigated / असिंचित'
+            village_name = (self.village_id.name or '') if self.village_id else ''
+            road_lbl = 'MR' if is_within_distance else 'BMR'
+            diverted_lbl = 'Yes' if is_diverted else 'No'
+
             data.update({
                 'guide_line_rate': guide_line_rate,
                 'basic_value': market_value_basic,
@@ -1081,6 +1471,13 @@ class Section23Award(models.Model):
                 'is_within_distance': is_within_distance,
                 'distance_from_main_road': distance_from_main_road,
                 'is_diverted': is_diverted,
+                'village_name': village_name,
+                'base_rate_hectare': base_rate_ha,
+                'effective_rate_hectare': guide_line_rate,
+                'road_type_label': road_lbl,
+                'irrigation_label': irrigation_label,
+                'diverted_label': diverted_lbl,
+                'survey_id': survey.id if survey else False,
             })
             
             result.append(data)
@@ -1169,7 +1566,7 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['approved', 'locked']),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
             ('khasra_number', '!=', False),
         ])
         
@@ -1209,10 +1606,13 @@ class Section23Award(models.Model):
                             'mulya': 0.0,
                             'kul_rashi': 0.0,
                             'tree_type': tree_type_name,
-                            'tree_type_code': tree_line.tree_type or 'other',
+                            'tree_type_code': getattr(tree_line, 'tree_type', '') or 'other',
                             'tree_count': 0,
                             'girth_cm': 0.0,
+                            'unit_rate': 0.0,
                             'rate': 0.0,
+                            'development_stage': getattr(tree_line, 'development_stage', '') or '',
+                            'condition': getattr(tree_line, 'condition', '') or '',
                             'value': 0.0,
                             'determined_value': 0.0,
                             'solatium': 0.0,
@@ -1220,11 +1620,14 @@ class Section23Award(models.Model):
                             'total': 0.0,
                             'remark': '',
                         }
-                    rate_per_tree = tree_line.get_applicable_rate()
+                    rate_per_tree = tree_line.get_applicable_rate() if hasattr(tree_line, 'get_applicable_rate') else 0.0
                     tree_data[key]['tree_count'] += tree_line.quantity or 0
-                    tree_data[key]['girth_cm'] = tree_line.girth_cm or 0.0
+                    tree_data[key]['girth_cm'] = getattr(tree_line, 'girth_cm', 0.0) or 0.0
                     tree_data[key]['rate'] = rate_per_tree
-                    tree_data[key]['value'] += (tree_line.quantity or 0) * rate_per_tree
+                    tree_data[key]['unit_rate'] = rate_per_tree
+                    tree_data[key]['development_stage'] = getattr(tree_line, 'development_stage', '') or ''
+                    tree_data[key]['condition'] = getattr(tree_line, 'condition', '') or ''
+                    tree_data[key]['value'] += (getattr(tree_line, 'quantity', 0) or 0) * rate_per_tree
             else:
                 # Process each landowner
                 for landowner in landowners:
@@ -1246,10 +1649,13 @@ class Section23Award(models.Model):
                                 'mulya': 0.0,
                                 'kul_rashi': 0.0,
                                 'tree_type': tree_line.tree_master_id.name if tree_line.tree_master_id else 'other',
-                                'tree_type_code': tree_line.tree_type or 'other',
+                                'tree_type_code': getattr(tree_line, 'tree_type', '') or 'other',
                                 'tree_count': 0,
                                 'girth_cm': 0.0,
+                                'unit_rate': 0.0,
                                 'rate': 0.0,
+                                'development_stage': getattr(tree_line, 'development_stage', '') or '',
+                                'condition': getattr(tree_line, 'condition', '') or '',
                                 'value': 0.0,
                                 'determined_value': 0.0,
                                 'solatium': 0.0,
@@ -1257,12 +1663,14 @@ class Section23Award(models.Model):
                                 'total': 0.0,
                                 'remark': '',
                             }
-                        tree_data[key]['tree_count'] += tree_line.quantity or 0
-                        tree_data[key]['girth_cm'] = tree_line.girth_cm or 0.0
-                        # Calculate rate based on tree type and girth (placeholder - adjust based on actual rates)
-                        rate = 6000.0 if tree_line.tree_type == 'fruit_bearing' else 177.0
-                        tree_data[key]['rate'] = rate
-                        tree_data[key]['value'] += (tree_line.quantity or 0) * rate
+                        rate_per_tree = tree_line.get_applicable_rate() if hasattr(tree_line, 'get_applicable_rate') else 0.0
+                        tree_data[key]['tree_count'] += getattr(tree_line, 'quantity', 0) or 0
+                        tree_data[key]['girth_cm'] = getattr(tree_line, 'girth_cm', 0.0) or 0.0
+                        tree_data[key]['unit_rate'] = rate_per_tree
+                        tree_data[key]['rate'] = rate_per_tree
+                        tree_data[key]['development_stage'] = getattr(tree_line, 'development_stage', '') or ''
+                        tree_data[key]['condition'] = getattr(tree_line, 'condition', '') or ''
+                        tree_data[key]['value'] += (getattr(tree_line, 'quantity', 0) or 0) * rate_per_tree
         
         # Calculate compensation amounts
         result = []
@@ -1295,7 +1703,7 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['approved', 'locked']),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
             ('khasra_number', '!=', False),
         ])
         if not surveys:
@@ -1491,6 +1899,103 @@ class Section23AwardSurveyLine(models.Model):
     is_within_distance = fields.Boolean(string='Within Distance / दूरी के भीतर', 
                                        default=False,
                                        help='Check if khasra is within distance from main road (20m for village, 5m for residential)')
+    distance_from_main_road = fields.Float(
+        string='Distance (m)', related='survey_id.distance_from_main_road', readonly=True,
+    )
+    irrigation_type = fields.Selection(
+        related='survey_id.irrigation_type', string='Irrigation', readonly=True,
+    )
+    has_traded_land = fields.Selection(
+        related='survey_id.has_traded_land', string='Diverted', readonly=True,
+    )
+    village_name = fields.Char(
+        string='Village', related='award_id.village_id.name', readonly=True,
+    )
+
+    # --- computed display columns (same engine as land compensation data) ----
+    road_type_display = fields.Char(
+        string='Road', compute='_compute_line_display_amounts', store=True,
+    )
+    land_award_amount = fields.Monetary(
+        string='Land Award', currency_field='currency_id',
+        compute='_compute_line_display_amounts', store=True,
+    )
+    solatium_display = fields.Monetary(
+        string='Solatium', currency_field='currency_id',
+        compute='_compute_line_display_amounts', store=True,
+    )
+    interest_display = fields.Monetary(
+        string='Interest', currency_field='currency_id',
+        compute='_compute_line_display_amounts', store=True,
+    )
+    base_rate_display = fields.Monetary(
+        string='Base Rate', currency_field='currency_id',
+        compute='_compute_line_display_amounts', store=True,
+    )
+
+    @api.depends(
+        'rate_per_hectare', 'acquired_area',
+        'distance_from_main_road', 'survey_id.survey_type',
+        'award_id.award_date', 'award_id.project_id', 'award_id.village_id',
+        'is_within_distance', 'land_type',
+    )
+    def _compute_line_display_amounts(self):
+        for line in self:
+            dist = line.distance_from_main_road or 0.0
+            survey_type = line.survey_id.survey_type if line.survey_id else 'rural'
+            threshold = 50.0 if survey_type == 'rural' else 20.0
+            line.road_type_display = 'MR' if dist <= threshold else 'BMR'
+
+            # base rate (before irrigation/diverted %) from rate master — same search as simulator
+            base = 0.0
+            if line.award_id and line.award_id.village_id:
+                rm = self.env['bhu.rate.master'].search([
+                    ('village_id', '=', line.award_id.village_id.id),
+                    ('state', '=', 'active'),
+                ], limit=1, order='effective_from DESC')
+                if rm:
+                    base = rm.main_road_rate_hectare if (dist <= threshold) else rm.other_road_rate_hectare
+            line.base_rate_display = base
+
+            rate = line.rate_per_hectare or 0.0
+            area = line.acquired_area or 0.0
+            land_award = area * rate
+            line.land_award_amount = land_award
+            line.solatium_display = land_award  # 100%
+            interest = 0.0
+            if line.award_id:
+                try:
+                    interest, _ = line.award_id._calculate_interest_on_basic(land_award)
+                except Exception:
+                    interest = 0.0
+            line.interest_display = interest
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('land_type'):
+                vals['land_type'] = 'village'
+        return super().create(vals_list)
+
+    def action_open_survey_for_land_edit(self):
+        """Open mini popup wizard to edit 4 land inputs (distance/road/irrigation/diverted)."""
+        self.ensure_one()
+        if not self.survey_id:
+            raise ValidationError(_('No survey linked on this line.'))
+        return {
+            'name': _('Edit land inputs / भूमि इनपुट संपादित करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.s23.land.edit.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_survey_line_id': self.id},
+        }
+    
+    def write(self, vals):
+        if 'land_type' in vals and not vals.get('land_type'):
+            vals = dict(vals)
+            vals['land_type'] = 'village'
+        return super().write(vals)
     
     @api.onchange('land_type', 'is_within_distance')
     def _onchange_type_distance(self):
@@ -1524,41 +2029,32 @@ class Section23AwardSurveyLine(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency', 
                                   default=lambda self: self.env.ref('base.INR'))
     
-    @api.depends('land_type', 'is_within_distance', 'award_id.village_id', 'survey_id.irrigation_type', 'survey_id.has_traded_land')
+    @api.depends('land_type', 'is_within_distance', 'award_id.village_id',
+                 'survey_id.irrigation_type', 'survey_id.has_traded_land',
+                 'distance_from_main_road', 'survey_id.survey_type')
     def _compute_rate_per_hectare(self):
         """Compute rate per hectare from rate master based on type and distance"""
         for line in self:
             rate = 0.0
             if line.award_id and line.award_id.village_id and line.land_type:
-                # Get rate master for this village (prioritize active, but allow draft)
+                # Use same search as Award Simulator — active state only
                 rate_master = self.env['bhu.rate.master'].search([
                     ('village_id', '=', line.award_id.village_id.id),
-                    ('state', 'in', ['active', 'draft']),
-                ], limit=1, order='state ASC, effective_from DESC')
+                    ('state', '=', 'active'),
+                ], limit=1, order='effective_from DESC')
                 
                 if rate_master:
-                    # Determine which rate to use based on type and distance
-                    # Default to village rules if not set
-                    land_type = line.land_type or 'village'
-                    
-                    if land_type == 'village':
-                        # Village: 20 meters
-                        if line.is_within_distance:
-                            base_rate = rate_master.main_road_rate_hectare
-                        else:
-                            base_rate = rate_master.other_road_rate_hectare
-                    else:
-                        # Residential: 5 meters
-                        if line.is_within_distance:
-                            base_rate = rate_master.main_road_rate_hectare
-                        else:
-                            base_rate = rate_master.other_road_rate_hectare
-                    
-                    # Apply irrigation adjustment from survey
-                    # Rules from Land Rate Master get_rate_for_land:
-                    # Irrigated: +20% (1.2), Non-Irrigated: -20% (0.8)
+                    # Compute within-distance fresh from actual distance (same logic as simulator)
+                    dist = line.distance_from_main_road or 0.0
+                    s_type = line.survey_id.survey_type if line.survey_id else 'rural'
+                    threshold = 50.0 if s_type == 'rural' else 20.0
+                    within = dist <= threshold
+
+                    base_rate = (rate_master.main_road_rate_hectare if within
+                                 else rate_master.other_road_rate_hectare) or 0.0
+
+                    # Irrigation adjustment — same as simulator (+20% irrigated, -20% unirrigated)
                     irrigation_type = line.survey_id.irrigation_type if line.survey_id else False
-                    
                     if irrigation_type == 'irrigated':
                         rate = base_rate * 1.2
                     elif irrigation_type in ['non_irrigated', 'unirrigated']:
@@ -1567,7 +2063,7 @@ class Section23AwardSurveyLine(models.Model):
                         rate = base_rate
 
                     # Business rule: +25% for diverted land within main-road distance.
-                    if line.survey_id.has_traded_land == 'yes' and line.is_within_distance:
+                    if line.survey_id and line.survey_id.has_traded_land == 'yes' and within:
                         rate = rate * 1.25
             
             line.rate_per_hectare = rate

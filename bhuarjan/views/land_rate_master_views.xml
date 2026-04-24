@@ -105,7 +105,6 @@
                     <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_deactivate" string="Deactivate" type="object" class="btn-secondary" invisible="state != 'active'"/>
                     <button name="action_reset" string="Reset to Draft" type="object" class="btn-warning" invisible="state != 'inactive'"/>
-                    <button name="action_view_permutations" string="View All Rate Permutations / सभी दर क्रमचय देखें" type="object" class="btn-info" icon="fa-table"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,inactive"/>
                 </header>
                 <sheet>

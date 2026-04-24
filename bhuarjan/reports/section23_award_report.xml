@@ -119,6 +119,7 @@
                 <t t-set="tree_groups" t-value="o.get_tree_compensation_grouped_data()"/>
                 <t t-set="asset_groups" t-value="o.get_structure_compensation_grouped_data()"/>
                 <t t-set="award_headers" t-value="o.get_award_header_constants()"/>
+                <t t-set="s23_sale_sort_rate" t-value="o.avg_three_year_sales_sort_rate if o._name == 'bhu.section23.award' else 0.0"/>
                 <t t-call="bhuarjan.report_common_styles"/>
                 <t t-call="bhuarjan.section23_award_report_styles"/>
                 <t t-set="base_url" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
@@ -142,6 +143,10 @@
 
                         <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
                             ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                        </div>
+                        <div style="text-align: center; font-size: 10px; margin-bottom: 8px;">
+                            विगत तीन वर्षों का औसत बिक्री छांट दर:
+                            <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
                         </div>
 
                         <table class="section23-land-table" border="1">
@@ -238,7 +243,7 @@
                                                           t-esc="'हाँ' if land.get('is_diverted') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center;">-</td>
+                                            <td style="text-align: right;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
                                             <td style="text-align: right;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
@@ -262,6 +267,7 @@
                                         <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: center; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;">-</td>
+                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
                                         <td style="text-align: right; font-weight: bold;">-</td>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>

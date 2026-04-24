@@ -1006,6 +1006,7 @@
     gap: 6px;
     flex-shrink: 0;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .o_section_list_actions .btn {
@@ -1517,6 +1518,7 @@
 .o_section_list_actions {
     gap: 6px !important;
     padding-right: 4px;
+    flex-wrap: wrap !important;
 }
 
 .o_section_list_actions .btn {
@@ -1660,5 +1662,28 @@
 
     .o_section_list_item {
         padding: 10px 10px 10px 0 !important;
+    }
+}
+
+/* Workflow step cards: stack action buttons below title/stats on narrow widths */
+@media (max-width: 992px) {
+    .o_section_list_item {
+        flex-wrap: wrap !important;
+    }
+
+    .o_section_list_actions {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: flex-start !important;
+        padding-top: 10px !important;
+        margin-top: 4px !important;
+        border-top: 1px solid var(--bd-border, rgba(232, 220, 198, 0.95)) !important;
+        box-sizing: border-box !important;
+    }
+
+    .o_section_list_actions .btn {
+        white-space: normal !important;
+        text-align: center !important;
     }
 }

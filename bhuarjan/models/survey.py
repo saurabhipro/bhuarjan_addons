@@ -965,27 +965,14 @@ class Survey(models.Model):
 
     @api.depends('village_id')
     def _compute_rate_permutations(self):
-        """Compute rate permutations for the selected village"""
+        """Keep relation empty; do not create/link persisted lines in compute.
+
+        Same rationale as ``bhu.section23.award``: real DB ids on a computed
+        One2many during onchange break ``RecordSnapshot.diff`` in the web
+        client (int line keys vs ``NewId.origin``).
+        """
         for survey in self:
-            # Clear existing
             survey.rate_permutation_ids = [(5, 0, 0)]
-            if survey.village_id:
-                # Get active rate master for this village
-                rate_master = self.env['bhu.rate.master'].get_all_rates_for_village(survey.village_id.id)
-                if rate_master:
-                    permutations = rate_master.get_all_permutations()
-                    # Create transient records to display (no wizard needed for survey view)
-                    lines = []
-                    for perm in permutations:
-                        line = self.env['bhu.rate.master.permutation.line'].create({
-                            'survey_id': survey.id,
-                            'road_proximity': perm['road_proximity'],
-                            'irrigation_status': perm['irrigation_status'],
-                            'is_diverted': perm['is_diverted'],
-                            'calculated_rate': perm['rate'],
-                        })
-                        lines.append(line.id)
-                    survey.rate_permutation_ids = [(6, 0, lines)]
 
 
 class SurveyTreeLine(models.Model):

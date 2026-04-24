@@ -33,6 +33,12 @@ class AwardDownloadWizard(models.TransientModel):
     # True when opened from Section 23 "Generate award" (same UI as Award Simulator)
     section23_generate = fields.Boolean(string='Section 23 Generate', default=False)
 
+    section23_avg_three_year_sales_sort_rate = fields.Integer(
+        string='विगत तीन वर्षों का औसत बिक्री छांट दर',
+        default=0,
+        help='Required to generate the Section 23 award; saved on the award record (integer only).',
+    )
+
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
@@ -41,6 +47,15 @@ class AwardDownloadWizard(models.TransientModel):
             res.setdefault('res_id', self.env.context.get('active_id'))
         if self.env.context.get('default_section23_generate'):
             res['section23_generate'] = True
+        res_id = res.get('res_id') or self.env.context.get('default_res_id')
+        res_model = res.get('res_model') or self.env.context.get('default_res_model')
+        if res_model == 'bhu.section23.award' and res_id:
+            award = self.env['bhu.section23.award'].browse(res_id)
+            if award.exists():
+                res.setdefault(
+                    'section23_avg_three_year_sales_sort_rate',
+                    int(award.avg_three_year_sales_sort_rate or 0),
+                )
         return res
 
     def action_download(self):
@@ -58,6 +73,13 @@ class AwardDownloadWizard(models.TransientModel):
         if self.section23_generate and self.res_model == 'bhu.section23.award':
             if not hasattr(record, 'apply_generate_from_download_wizard'):
                 raise UserError(_('This record does not support the generate flow.'))
+            rate = int(self.section23_avg_three_year_sales_sort_rate or 0)
+            if rate <= 0.0:
+                raise UserError(_(
+                    'Please enter विगत तीन वर्षों का औसत बिक्री छांट दर (must be greater than zero) '
+                    'before generating the award.'
+                ))
+            record.write({'avg_three_year_sales_sort_rate': float(rate)})
             return record.apply_generate_from_download_wizard(
                 file_format=self.format, export_scope=scope
             )

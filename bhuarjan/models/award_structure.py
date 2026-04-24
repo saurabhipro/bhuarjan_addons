@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class AwardStructureDetails(models.Model):
@@ -113,11 +114,27 @@ class AwardStructureDetails(models.Model):
                 return sim.project_id.id, sim.village_id.id
         return False, False
 
-    @api.depends('asset_count', 'market_rate_per_sqm')
+    @api.depends('area_sqm', 'asset_count', 'market_rate_per_sqm')
     def _compute_line_total(self):
         for line in self:
-            # Unified UX: value is always Count x Rate.
-            computed_value = (line.asset_count or 0) * (line.market_rate_per_sqm or 0.0)
+            # User formula: Area x Rate x Count.
+            computed_value = (
+                (line.area_sqm or 0.0) *
+                (line.market_rate_per_sqm or 0.0) *
+                (line.asset_count or 0)
+            )
+            line.asset_value = computed_value
+            line.line_total = computed_value
+
+    @api.onchange('area_sqm', 'asset_count', 'market_rate_per_sqm')
+    def _onchange_line_total_fast(self):
+        """Immediate UI feedback in editable tree rows."""
+        for line in self:
+            computed_value = (
+                (line.area_sqm or 0.0) *
+                (line.market_rate_per_sqm or 0.0) *
+                (line.asset_count or 0)
+            )
             line.asset_value = computed_value
             line.line_total = computed_value
 
@@ -127,10 +144,22 @@ class AwardStructureDetails(models.Model):
         for line in self:
             if line.structure_type == 'well' and not line.market_rate_per_sqm:
                 line.market_rate_per_sqm = 90000.0
+            if line.structure_type != 'other':
+                line.description = False
+
+    @api.constrains('structure_type', 'description')
+    def _check_other_requires_description(self):
+        for line in self:
+            if line.structure_type == 'other' and not (line.description or '').strip():
+                raise ValidationError(_(
+                    "Please enter Description when Structure Type is 'Others / अन्य'."
+                ))
 
     def get_structure_type_label(self):
         self.ensure_one()
         base = dict(self._fields['structure_type'].selection).get(self.structure_type, self.structure_type or 'Other')
+        if self.structure_type == 'other' and (self.description or '').strip():
+            base = f"{base} - {self.description.strip()}"
         if self.construction_type:
             ctype = dict(self._fields['construction_type'].selection).get(self.construction_type, self.construction_type)
             return f"{base} ({ctype})"

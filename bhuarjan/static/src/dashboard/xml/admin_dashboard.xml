@@ -1066,16 +1066,6 @@
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
-                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-success" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.section23.award', state.stats &amp;&amp; state.stats.section23_award_first_pending_id ? state.stats.section23_award_first_pending_id : false)"
-                                        title="Approve First Pending">
-                                    <i class="fa fa-check"/> Approve
-                                </button>
-                                <button t-if="state.isCollector or state.isAdmin" class="btn btn-sm btn-danger" 
-                                        t-on-click.stop="() => this.openFirstPending('bhu.section23.award', state.stats &amp;&amp; state.stats.section23_award_first_pending_id ? state.stats.section23_award_first_pending_id : false)"
-                                        title="Return First Pending">
-                                    <i class="fa fa-times"/> Return
-                                </button>
                             </div>
                         </div>
                         </t>

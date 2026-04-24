@@ -412,3 +412,71 @@
     color: #5f2b1d;
     background: #f8ece6;
 }
+
+/* Award meta panel (under top title) */
+.bhu_s23_award_premium .s23_award_meta_panel {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+.bhu_s23_award_premium .s23_award_meta_title {
+    background: linear-gradient(135deg, #7e4a39 0%, #a8674f 55%, #bf7b60 100%);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-bottom: 1px solid #e3d3c9;
+}
+
+.bhu_s23_award_premium .s23_award_meta_grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 8px 10px;
+}
+
+.bhu_s23_award_premium .s23_meta_item {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 260px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+}
+
+.bhu_s23_award_premium .s23_meta_label {
+    color: #6b3b2c;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.bhu_s23_award_premium .s23_meta_value .o_field_widget {
+    color: #2c1e18 !important;
+    font-weight: 700 !important;
+    line-height: 1.25;
+    font-size: 0.98rem;
+}
+
+.bhu_s23_award_premium .s23_meta_value .o_input {
+    background: #fff !important;
+    border-color: #d8c5ba !important;
+    color: #2c1e18 !important;
+}
+
+@media (max-width: 768px) {
+    .bhu_s23_award_premium .s23_award_meta_grid {
+        padding: 8px;
+        gap: 0;
+    }
+
+    .bhu_s23_award_premium .s23_meta_item {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}

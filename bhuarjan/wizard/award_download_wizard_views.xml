@@ -13,6 +13,11 @@
                     <field name="section23_generate" invisible="1"/>
                     <field name="export_scope" widget="radio" string="Award sections / अवार्ड पत्रक चुनें"/>
                 </group>
+                <group string="Mandatory for generate / जेनरेट के लिए आवश्यक" invisible="not section23_generate">
+                    <field name="section23_avg_three_year_sales_sort_rate"
+                           string="विगत तीन वर्षों का औसत बिक्री छांट दर"
+                           placeholder="e.g. 125000"/>
+                </group>
                 <group>
                     <field name="format" widget="radio" string="Select download format / डाउनलोड प्रारूप चुनें"/>
                 </group>

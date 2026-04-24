@@ -23,6 +23,14 @@ class Section23Award(models.Model):
     
     # Award details
     award_date = fields.Date(string='Award Date / अवार्ड दिनांक', default=fields.Date.today, tracking=True)
+    avg_three_year_sales_sort_rate = fields.Float(
+        string='Avg. sales sort rate (3 years) / विगत तीन वर्षों का औसत बिक्री छांट दर',
+        digits=(16, 4),
+        required=True,
+        default=0.0,
+        tracking=True,
+        help='Mandatory before generating the award; shown on land schedule (Excel/PDF).',
+    )
     
     # Award document
     award_document = fields.Binary(string='Award Document / अवार्ड दस्तावेज़', tracking=False)
@@ -80,28 +88,28 @@ class Section23Award(models.Model):
         'res.currency', string='Currency', compute='_compute_s23_premium_currency', readonly=True,
     )
     land_total = fields.Float(
-        string='Land Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+        string='Land Total', digits=(16, 2), compute='_compute_land_total', store=False,
     )
     tree_total = fields.Float(
-        string='Tree Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+        string='Tree Total', digits=(16, 2), compute='_compute_tree_total', store=False,
     )
     structure_total = fields.Float(
-        string='Structure Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+        string='Structure Total', digits=(16, 2), compute='_compute_structure_total', store=False,
     )
     grand_total = fields.Float(
-        string='Grand Total', digits=(16, 2), compute='_compute_s23_premium_totals', store=False,
+        string='Grand Total', digits=(16, 2), compute='_compute_grand_total', store=False,
     )
     s23_survey_count = fields.Integer(
-        string='Survey Count', compute='_compute_s23_header_counts', store=False,
+        string='Survey Count', compute='_compute_s23_survey_count', store=False,
     )
     s23_land_khasra_count = fields.Integer(
-        string='Land Khasra Count', compute='_compute_s23_header_counts', store=False,
+        string='Land Khasra Count', compute='_compute_s23_land_khasra_count', store=False,
     )
     s23_tree_count = fields.Integer(
-        string='Tree Count', compute='_compute_s23_header_counts', store=False,
+        string='Tree Count', compute='_compute_s23_tree_count', store=False,
     )
     s23_asset_count = fields.Integer(
-        string='Asset Count', compute='_compute_s23_header_counts', store=False,
+        string='Asset Count', compute='_compute_s23_asset_count', store=False,
     )
     s23_land_preview_html = fields.Html(
         string='Land preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
@@ -146,18 +154,50 @@ class Section23Award(models.Model):
             rec.currency_id = inr or cur or rec.env.company.currency_id
 
     @api.depends(
-        'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
-        'award_survey_line_ids.survey_id', 'award_survey_line_ids.rate_per_hectare',
-        'award_structure_line_ids', 'award_structure_line_ids.line_total',
-        'village_id', 'project_id', 'award_date',
+        'award_survey_line_ids',
+        'award_survey_line_ids.land_award_amount',
+        'award_survey_line_ids.solatium_display',
+        'award_survey_line_ids.interest_display',
     )
-    def _compute_s23_premium_totals(self):
+    def _compute_land_total(self):
         for rec in self:
-            s = rec.get_award_village_scope_summary()
-            rec.land_total = s['land_total']
-            rec.tree_total = s['tree_total']
-            rec.structure_total = s['structure_total']
-            rec.grand_total = s['grand_total']
+            rec.land_total = sum(
+                (line.land_award_amount or 0.0) +
+                (line.solatium_display or 0.0) +
+                (line.interest_display or 0.0)
+                for line in rec.award_survey_line_ids
+            )
+
+    @api.depends(
+        'award_structure_line_ids',
+        'award_structure_line_ids.line_total',
+    )
+    def _compute_structure_total(self):
+        for rec in self:
+            rec.structure_total = sum((line.line_total or 0.0) * 2.0 for line in rec.award_structure_line_ids)
+
+    @api.depends('project_id', 'village_id')
+    def _compute_tree_total(self):
+        for rec in self:
+            tree_total = 0.0
+            if rec.project_id and rec.village_id:
+                surveys = rec.env['bhu.survey'].search([
+                    ('project_id', '=', rec.project_id.id),
+                    ('village_id', '=', rec.village_id.id),
+                    ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                ])
+                for survey in surveys:
+                    for tree_line in survey.tree_line_ids:
+                        qty = float(getattr(tree_line, 'quantity', 0) or 0.0)
+                        rate = float(tree_line.get_applicable_rate() if hasattr(tree_line, 'get_applicable_rate') else 0.0)
+                        base_value = qty * rate
+                        tree_total += base_value + (base_value * 0.1) + (base_value * 2.1)
+            rec.tree_total = tree_total
+
+    @api.depends('land_total', 'tree_total', 'structure_total')
+    def _compute_grand_total(self):
+        for rec in self:
+            rec.grand_total = (rec.land_total or 0.0) + (rec.tree_total or 0.0) + (rec.structure_total or 0.0)
 
     @api.depends(
         'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
@@ -169,18 +209,19 @@ class Section23Award(models.Model):
             rec.s23_land_preview_html = rec._html_s23_land_preview()
             rec.s23_tree_preview_html = rec._html_s23_tree_preview()
 
-    @api.depends(
-        'project_id', 'village_id',
-        'award_survey_line_ids', 'award_survey_line_ids.khasra_number', 'award_survey_line_ids.survey_id',
-        'award_structure_line_ids', 'award_structure_line_ids.asset_count',
-    )
-    def _compute_s23_header_counts(self):
+    @api.depends('award_survey_line_ids')
+    def _compute_s23_survey_count(self):
         for rec in self:
-            survey_lines = rec.award_survey_line_ids
-            rec.s23_survey_count = len(survey_lines)
-            rec.s23_land_khasra_count = len(set(filter(None, survey_lines.mapped('khasra_number'))))
+            rec.s23_survey_count = len(rec.award_survey_line_ids)
 
-            # Tree count from survey tree lines (not owner-grouped rows) to avoid duplication.
+    @api.depends('award_survey_line_ids', 'award_survey_line_ids.khasra_number')
+    def _compute_s23_land_khasra_count(self):
+        for rec in self:
+            rec.s23_land_khasra_count = len(set(filter(None, rec.award_survey_line_ids.mapped('khasra_number'))))
+
+    @api.depends('project_id', 'village_id')
+    def _compute_s23_tree_count(self):
+        for rec in self:
             tree_count = 0
             if rec.project_id and rec.village_id:
                 surveys = rec.env['bhu.survey'].search([
@@ -188,40 +229,33 @@ class Section23Award(models.Model):
                     ('village_id', '=', rec.village_id.id),
                     ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
                 ])
-                for survey in surveys:
-                    for line in getattr(survey, 'tree_line_ids', []):
-                        tree_count += int(getattr(line, 'quantity', 0) or 0)
+                if surveys:
+                    grouped = rec.env['bhu.survey.tree.line'].read_group(
+                        [('survey_id', 'in', surveys.ids)],
+                        ['quantity:sum'],
+                        [],
+                    )
+                    tree_count = int((grouped and grouped[0].get('quantity_sum')) or 0)
             rec.s23_tree_count = tree_count
 
-            # Asset count: use explicit asset_count when available, otherwise count line as 1.
-            assets = 0
-            for al in rec.award_structure_line_ids:
-                assets += int(al.asset_count or 1)
-            rec.s23_asset_count = assets
+    @api.depends('award_structure_line_ids', 'award_structure_line_ids.asset_count')
+    def _compute_s23_asset_count(self):
+        for rec in self:
+            rec.s23_asset_count = sum(int(al.asset_count or 1) for al in rec.award_structure_line_ids)
     
     @api.depends('village_id')
     def _compute_rate_permutations(self):
-        """Compute rate permutations for the selected village"""
+        """Keep relation empty; do not create/link persisted lines here.
+
+        Creating real ``bhu.rate.master.permutation.line`` rows and assigning
+        ``(6, 0, [db_ids...])`` on this computed One2many during web onchange
+        leaves x2many snapshot keys as plain ints; ``web``'s
+        ``RecordSnapshot.diff`` then fails with ``AttributeError: 'int' object
+        has no attribute 'origin'``. Permutations are not shown on award views;
+        use the rate master / wizard flows for matrix display.
+        """
         for award in self:
-            # Clear existing
             award.rate_permutation_ids = [(5, 0, 0)]
-            if award.village_id:
-                # Get active rate master for this village
-                rate_master = self.env['bhu.rate.master'].get_all_rates_for_village(award.village_id.id)
-                if rate_master:
-                    permutations = rate_master.get_all_permutations()
-                    # Create transient records to display
-                    lines = []
-                    for perm in permutations:
-                        line = self.env['bhu.rate.master.permutation.line'].create({
-                            'award_id': award.id,
-                            'road_proximity': perm['road_proximity'],
-                            'irrigation_status': perm['irrigation_status'],
-                            'is_diverted': perm['is_diverted'],
-                            'calculated_rate': perm['rate'],
-                        })
-                        lines.append(line.id)
-                    award.rate_permutation_ids = [(6, 0, lines)]
     
     @api.depends('award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance')
     def _compute_all_surveys_configured(self):
@@ -297,6 +331,10 @@ class Section23Award(models.Model):
         to_create = []
         existing_records = self.browse()
         for vals in vals_list:
+            vals = dict(vals)
+            # Never apply O2M from the web client: it can send CREATE rows without
+            # survey_id (required), causing SQL errors. Lines are built by _populate_award_survey_lines.
+            vals.pop('award_survey_line_ids', None)
             project_id = vals.get('project_id')
             village_id = vals.get('village_id')
             if project_id and village_id:
@@ -307,7 +345,6 @@ class Section23Award(models.Model):
                 if existing:
                     existing_records |= existing
                     continue
-            vals = dict(vals)
             if vals.get('name', 'New') == 'New':
                 # Try to use sequence settings from settings master
                 if project_id:
@@ -333,13 +370,14 @@ class Section23Award(models.Model):
         return records
 
     def write(self, vals):
+        vals = dict(vals)
+        vals.pop('award_survey_line_ids', None)
         result = super().write(vals)
         if 'project_id' in vals or 'village_id' in vals:
             for rec in self:
                 rec._populate_award_survey_lines(reset_if_empty=True)
-        for rec in self:
-            if rec.project_id and rec.village_id:
-                rec._sync_award_structure_lines()
+                if rec.project_id and rec.village_id:
+                    rec._sync_award_structure_lines()
         return result
 
     def _populate_award_survey_lines(self, reset_if_empty=False):
@@ -744,6 +782,7 @@ class Section23Award(models.Model):
         yes_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#2e7d32', 'color': 'white', 'bold': True})
         no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
         number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.000'})
+        rate_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.0000'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
         total_label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'center', 'valign': 'vcenter'})
         total_money_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'right', 'num_format': '#,##0'})
@@ -760,10 +799,12 @@ class Section23Award(models.Model):
         def _yes_no_format(flag):
             return yes_fmt if flag else no_fmt
 
+        rate_val = float(self.avg_three_year_sales_sort_rate or 0.0)
         subtitle = (
             f"Village / ग्राम: {self.village_id.name or '-'} | "
             f"Project / परियोजना: {self.project_id.name or '-'} | "
-            f"Date / तिथि: {self.award_date or fields.Date.today()}"
+            f"Date / तिथि: {self.award_date or fields.Date.today()} | "
+            f"3-yr avg sales sort rate / औसत बिक्री छांट दर: {rate_val:,.4f}"
         )
 
         if show_land:
@@ -832,7 +873,9 @@ class Section23Award(models.Model):
                             land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
                             land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
                             land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
-                        land_sheet.write(row, 10, '-', cell_center_fmt)
+                        land_sheet.write_number(
+                            row, 10, float(self.avg_three_year_sales_sort_rate or 0.0), rate_fmt
+                        )
                         land_sheet.write_number(row, 11, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 12, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 13, float(land.get('market_value', 0.0) or 0.0), money_fmt)
@@ -853,7 +896,9 @@ class Section23Award(models.Model):
                     land_sheet.write_blank(row, 7, None, total_label_fmt)
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
                     land_sheet.write_blank(row, 9, None, total_label_fmt)
-                    land_sheet.write_blank(row, 10, None, total_label_fmt)
+                    land_sheet.write_number(
+                        row, 10, float(self.avg_three_year_sales_sort_rate or 0.0), total_money_fmt
+                    )
                     land_sheet.write_blank(row, 11, None, total_label_fmt)
                     land_sheet.write_number(row, 12, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
                     land_sheet.write_number(row, 13, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
@@ -879,7 +924,9 @@ class Section23Award(models.Model):
                 land_sheet.write_blank(row, 7, None, total_label_fmt)
                 land_sheet.write_blank(row, 8, None, total_label_fmt)
                 land_sheet.write_blank(row, 9, None, total_label_fmt)
-                land_sheet.write_blank(row, 10, None, total_label_fmt)
+                land_sheet.write_number(
+                    row, 10, float(self.avg_three_year_sales_sort_rate or 0.0), total_money_fmt
+                )
                 land_sheet.write_blank(row, 11, None, total_label_fmt)
                 land_sheet.write_number(row, 12, total_basic, total_money_fmt)
                 land_sheet.write_number(row, 13, total_market, total_money_fmt)
@@ -1036,8 +1083,12 @@ class Section23Award(models.Model):
         self.ensure_one()
         return self.action_download_excel_components(export_scope=export_scope)
     
-    def _validate_for_generate(self):
-        """Pre-checks for opening the generate wizard or running generate from the wizard."""
+    def _validate_for_generate(self, require_sales_sort_rate=True):
+        """Pre-checks for opening/running generate flow.
+
+        ``require_sales_sort_rate`` should be False when only opening the popup,
+        because the value is entered in that wizard.
+        """
         self.ensure_one()
         if self.is_generated:
             raise ValidationError(_(
@@ -1070,11 +1121,19 @@ class Section23Award(models.Model):
                 'Select a khasra for every structure line before generating the award, or remove empty lines.\n'
                 'अवार्ड जेनरेट करने से पहले हर संरचना पंक्ति के लिए खसरा चुनें, या खाली पंक्तियाँ हटा दें।'
             ))
+        if require_sales_sort_rate:
+            rate = float(self.avg_three_year_sales_sort_rate or 0.0)
+            if rate <= 0.0:
+                raise ValidationError(_(
+                    'Please enter विगत तीन वर्षों का औसत बिक्री छांट दर (must be greater than zero) '
+                    'before generating the award.\n'
+                    'अवार्ड जेनरेट करने से पहले यह दर दर्ज करें।'
+                ))
 
     def action_generate_award(self):
         """Open the same download wizard as Award Simulator; confirm runs generate (PDF/Excel)."""
         self.ensure_one()
-        self._validate_for_generate()
+        self._validate_for_generate(require_sales_sort_rate=False)
         report_action = self._get_section23_report_action()
         xmlid = report_action.get_external_id().get(
             report_action.id, 'bhuarjan.action_report_section23_award'
@@ -1101,7 +1160,7 @@ class Section23Award(models.Model):
         import base64
         from datetime import datetime
 
-        self._validate_for_generate()
+        self._validate_for_generate(require_sales_sort_rate=True)
         self._sync_award_structure_lines()
         self._refresh_award_line_items()
 
@@ -1166,6 +1225,7 @@ class Section23Award(models.Model):
             return
         structure_lines = self.env['bhu.award.structure.details'].search([
             ('survey_id', 'in', survey_ids),
+            ('award_id', '!=', self.id),
         ])
         if structure_lines:
             structure_lines.write({'award_id': self.id})
@@ -2052,12 +2112,6 @@ class Section23AwardSurveyLine(models.Model):
             'context': {'default_survey_line_id': self.id},
         }
     
-    def write(self, vals):
-        if 'land_type' in vals and not vals.get('land_type'):
-            vals = dict(vals)
-            vals['land_type'] = 'village'
-        return super().write(vals)
-    
     @api.onchange('land_type', 'is_within_distance')
     def _onchange_type_distance(self):
         """Sync type and distance to survey model and trigger rate recompute"""
@@ -2069,9 +2123,11 @@ class Section23AwardSurveyLine(models.Model):
                 })
             # Force recompute for immediate UI feedback
             line._compute_rate_per_hectare()
-    
+
     def write(self, vals):
-        """Sync type and distance to survey when updating"""
+        if 'land_type' in vals and not vals.get('land_type'):
+            vals = dict(vals)
+            vals['land_type'] = 'village'
         result = super().write(vals)
         for line in self:
             if line.survey_id and ('land_type' in vals or 'is_within_distance' in vals):
@@ -2170,186 +2226,3 @@ class Section23AwardSurveyLine(models.Model):
                 })
         
         return lines
-
-    def format_indian_number(self, value, decimals=2):
-        """Format number with Indian numbering system (commas for thousands)"""
-        if value is None:
-            value = 0.0
-        
-        # Format the number with commas (Indian numbering system)
-        if decimals == 2:
-            formatted = f"{value:,.2f}"
-        elif decimals == 4:
-            formatted = f"{value:,.4f}"
-        else:
-            formatted = f"{value:,.{decimals}f}"
-        
-        return formatted
-
-    def action_download_excel(self):
-        """Generate and download Excel report directly using xlsxwriter"""
-        self.ensure_one()
-        import io
-        import base64
-        try:
-            import xlsxwriter
-        except ImportError:
-            raise ValidationError(_("Python library 'xlsxwriter' is not installed."))
-
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output)
-        sheet = workbook.add_worksheet('Section 23 Award Summary')
-
-        # Formats
-        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#8B4513', 'color': 'white', 'border': 1, 'align': 'center', 'valign': 'vcenter'})
-        title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter'})
-        label_fmt = workbook.add_format({
-            'bold': True,
-            'border': 1,
-            'bg_color': '#f8fafc',
-            'align': 'center',
-            'valign': 'vcenter',
-            'text_wrap': True,
-        })
-        value_fmt = workbook.add_format({'border': 1})
-        yes_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#2e7d32', 'color': 'white', 'bold': True})
-        no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
-        money_fmt = workbook.add_format({'border': 1, 'num_format': '₹#,##0.00'})
-        total_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'num_format': '₹#,##0.00'})
-
-        sheet.set_column('A:A', 10)
-        sheet.set_column('B:B', 40)
-        sheet.set_column('C:K', 15)
-
-        # Header
-        sheet.merge_range('A1:K1', 'SECTION 23 AWARD SUMMARY / धारा 23 अवार्ड सारांश', title_fmt)
-        sheet.write(2, 0, 'Village / ग्राम', label_fmt); sheet.write(2, 1, self.village_id.name or '', value_fmt)
-        sheet.write(3, 0, 'Project / परियोजना', label_fmt); sheet.write(3, 1, self.project_id.name or '', value_fmt)
-        sheet.write(4, 0, 'Award Date', label_fmt); sheet.write(4, 1, str(self.award_date or ''), value_fmt)
-
-        row = 6
-        # Land Section
-        award_headers = self.get_award_header_constants()
-        sheet.merge_range(row, 0, row, 19, award_headers['excel']['section23_land_title'], header_fmt)
-        row += 1
-        headers = award_headers['excel']['section23_land_headers']
-        sheet.set_row(row, 90)
-        for col, h in enumerate(headers):
-            sheet.write(row, col, h, label_fmt)
-        row += 1
-
-        land_data = self.get_land_compensation_data()
-        total_acquired = 0.0
-        total_basic = 0.0
-        total_market = 0.0
-        total_solatium = 0.0
-        total_interest = 0.0
-        total_comp = 0.0
-        total_rehab = 0.0
-        total_paid = 0.0
-        
-        for i, land in enumerate(land_data, 1):
-            details = f"{land.get('landowner_name', '')} {land.get('father_name', '')} {land.get('address', '')}"
-            sheet.write(row, 0, i, value_fmt)
-            sheet.write(row, 1, details, value_fmt)
-            sheet.write(row, 2, land.get('khasra', ''), value_fmt)
-            sheet.write(row, 3, land.get('original_area', 0.0), value_fmt)
-            sheet.write(row, 4, land.get('khasra', ''), value_fmt) # Acquired Khasra
-            sheet.write(row, 5, land.get('acquired_area', 0.0), value_fmt)
-            is_within_distance = bool(land.get('is_within_distance'))
-            is_irrigated = bool(land.get('irrigated'))
-            is_unirrigated = bool(land.get('unirrigated'))
-            is_diverted = bool(land.get('is_diverted'))
-            distance_value = land.get('distance_from_main_road') or 0.0
-            if distance_value and is_within_distance:
-                sheet.write(row, 6, f"{distance_value:.2f} m",
-                            yes_fmt if is_within_distance else no_fmt)
-            else:
-                sheet.write(row, 6, 'Yes' if is_within_distance else 'No',
-                            yes_fmt if is_within_distance else no_fmt)
-            if is_within_distance:
-                # Main-road khasra: irrigated/unirrigated/diverted split is not applicable.
-                sheet.write(row, 7, 'NA', value_fmt)
-                sheet.write(row, 8, 'NA', value_fmt)
-                sheet.write(row, 9, 'NA', value_fmt)
-            else:
-                sheet.write(row, 7, 'Yes' if is_irrigated else 'No', yes_fmt if is_irrigated else no_fmt)
-                sheet.write(row, 8, 'Yes' if is_unirrigated else 'No', yes_fmt if is_unirrigated else no_fmt)
-                sheet.write(row, 9, 'Yes' if is_diverted else 'No', yes_fmt if is_diverted else no_fmt)
-            sheet.write(row, 10, '', value_fmt) # 3 years avg sale rate
-            sheet.write(row, 11, land.get('guide_line_rate', 0.0), money_fmt)
-            sheet.write(row, 12, land.get('basic_value', 0.0), money_fmt)
-            sheet.write(row, 13, land.get('market_value', 0.0), money_fmt)
-            sheet.write(row, 14, land.get('solatium', 0.0), money_fmt)
-            sheet.write(row, 15, land.get('interest', 0.0), money_fmt)
-            sheet.write(row, 16, land.get('total_compensation', 0.0), money_fmt)
-            sheet.write(row, 17, land.get('rehab_policy_amount', 0.0), money_fmt)
-            sheet.write(row, 18, land.get('paid_compensation', 0.0), money_fmt)
-            sheet.write(row, 19, land.get('remark', ''), value_fmt)
-            
-            total_acquired += land.get('acquired_area', 0.0)
-            total_basic += land.get('basic_value', 0.0)
-            total_market += land.get('market_value', 0.0)
-            total_solatium += land.get('solatium', 0.0)
-            total_interest += land.get('interest', 0.0)
-            total_comp += land.get('total_compensation', 0.0)
-            total_rehab += land.get('rehab_policy_amount', 0.0)
-            total_paid += land.get('paid_compensation', 0.0)
-            row += 1
-
-        # Land Total row
-        sheet.merge_range(row, 0, row, 4, 'MAHAYOG (TOTAL) / महायोग', label_fmt)
-        sheet.write(row, 5, total_acquired, total_fmt)
-        sheet.write(row, 12, total_basic, total_fmt)
-        sheet.write(row, 13, total_market, total_fmt)
-        sheet.write(row, 14, total_solatium, total_fmt)
-        sheet.write(row, 15, total_interest, total_fmt)
-        sheet.write(row, 16, total_comp, total_fmt)
-        sheet.write(row, 17, total_rehab, total_fmt)
-        sheet.write(row, 18, total_paid, total_fmt)
-        
-        row += 2
-        # Tree Section (Brief)
-        sheet.merge_range(row, 0, row, 10, 'TREE COMPENSATION / वृक्ष मुआवजा', header_fmt)
-        row += 1
-        tree_data = self.get_tree_compensation_data()
-        if tree_data:
-            headers = award_headers['excel']['section23_tree_brief_headers']
-            for col, h in enumerate(headers):
-                sheet.write(row, col, h, label_fmt)
-            row += 1
-            
-            total_tree_comp = 0.0
-            for i, tree in enumerate(tree_data, 1):
-                sheet.write(row, 0, i, value_fmt)
-                sheet.write(row, 1, tree.get('landowner_name', ''), value_fmt)
-                sheet.write(row, 2, tree.get('khasra', ''), value_fmt)
-                sheet.write(row, 3, tree.get('tree_type', ''), value_fmt)
-                sheet.write(row, 4, tree.get('tree_count', 0), value_fmt)
-                sheet.write(row, 5, tree.get('determined_value', 0.0), money_fmt)
-                sheet.write(row, 6, tree.get('solatium', 0.0), money_fmt)
-                sheet.write(row, 7, tree.get('interest', 0.0), money_fmt)
-                sheet.write(row, 8, tree.get('total', 0.0), money_fmt)
-                total_tree_comp += tree.get('total', 0.0)
-                row += 1
-            
-            sheet.merge_range(row, 0, row, 7, 'TOTAL TREE COMPENSATION', label_fmt)
-            sheet.write(row, 8, total_tree_comp, total_fmt)
-
-        workbook.close()
-        output.seek(0)
-        file_data = base64.b64encode(output.read())
-        output.close()
-
-        attachment = self.env['ir.attachment'].create({
-            'name': f"Section23_Award_{self.village_id.name or 'Export'}.xlsx",
-            'type': 'binary',
-            'datas': file_data,
-            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        })
-
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=true',
-            'target': 'self',
-        }

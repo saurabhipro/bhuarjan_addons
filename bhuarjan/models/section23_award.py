@@ -48,13 +48,6 @@ class Section23Award(models.Model):
                                             help='Select type and distance for each approved survey')
     # Khasra search filter — stored so value persists across reloads
     khasra_filter = fields.Char(string='Search Khasra', default='')
-    # Computed filtered view of survey lines (used in form view instead of raw O2M)
-    filtered_land_line_ids = fields.Many2many(
-        comodel_name='bhu.section23.award.survey.line',
-        string='Land Survey Lines (Filtered)',
-        compute='_compute_filtered_land_lines',
-        store=False,
-    )
     award_line_item_ids = fields.One2many(
         'bhu.section23.award.line.item',
         'award_id',
@@ -310,17 +303,6 @@ class Section23Award(models.Model):
         if self.project_id and self.village_id:
             self._sync_award_structure_lines()
 
-    @api.depends('award_survey_line_ids.khasra_number', 'khasra_filter')
-    def _compute_filtered_land_lines(self):
-        for rec in self:
-            kf = (rec.khasra_filter or '').strip().lower()
-            if kf:
-                rec.filtered_land_line_ids = rec.award_survey_line_ids.filtered(
-                    lambda l, f=kf: f in (l.khasra_number or '').lower()
-                )
-            else:
-                rec.filtered_land_line_ids = rec.award_survey_line_ids
-
     def action_clear_khasra_filter(self):
         """Clear the khasra filter and reload."""
         self.ensure_one()
@@ -334,14 +316,36 @@ class Section23Award(models.Model):
         }
 
     def action_apply_khasra_search(self):
-        """Save khasra_filter then reload — filtered_land_line_ids recomputes automatically."""
+        """Open backend filtered survey lines by khasra for this award."""
         self.ensure_one()
+        term = (self.khasra_filter or '').strip()
+        if not term:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': 'Enter a khasra value before searching.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        domain = [
+            ('award_id', '=', self.id),
+            ('khasra_number', 'ilike', term),
+        ]
         return {
             'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'current',
+            'name': f'Khasra Search: {term}',
+            'res_model': 'bhu.section23.award.survey.line',
+            'view_mode': 'list,form',
+            'views': [(False, 'list'), (False, 'form')],
+            'domain': domain,
+            'target': 'new',
+            'context': {
+                'search_default_award_id': self.id,
+            },
         }
 
     def action_refresh_land_rates(self):

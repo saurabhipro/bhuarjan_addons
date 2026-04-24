@@ -153,7 +153,7 @@
                                     title="Clear filter and show all khasras"
                                     invisible="not khasra_filter"/>
                         </div>
-                        <field name="filtered_land_line_ids" nolabel="1" class="s23-land-edit-lines">
+                        <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines">
                             <list string="" create="0" delete="0" default_order="khasra_number" limit="20">
                                 <field name="currency_id" column_invisible="1"/>
                                 <button name="action_open_survey_for_land_edit" type="object"

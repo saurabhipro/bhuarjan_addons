@@ -69,40 +69,63 @@
             }
             .section23-land-table thead th { border: 1px solid #000 !important; }
             .section23-land-table tbody tr > td:last-child { min-width: 3.5em; }
+            /* Repeat signature block on every PDF page (Form 10 style) */
+            .section23-fixed-footer {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #fff;
+                padding: 0 10px 6px 10px;
+                z-index: 20;
+            }
+            .section23-award-section {
+                padding-bottom: 160px !important;
+                box-sizing: border-box;
+            }
         </style>
     </template>
 
     <template id="section23_signature_block">
+        <div style="margin-top: 12px; margin-bottom: 8px; text-align: left; font-size: 11px; font-weight: 700;">
+            <strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong>
+        </div>
         <table class="section-signatures">
             <tr>
                 <td>
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अपेक्षक निकाय के</div>
-                    <div class="sig-title">अधिकृत प्रतिनिधि</div>
+                    <div class="sig-title">SDM</div>
                     <div>नाम -</div>
                     <div>पदनाम -</div>
+                    <div>विभाग -</div>
                 </td>
                 <td>
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">तहसीलदार</div>
+                    <div class="sig-title">अधिकारी 1</div>
                     <div>नाम -</div>
+                    <div>पदनाम -</div>
+                    <div>विभाग -</div>
                 </td>
                 <td>
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">नायब तहसीलदार</div>
+                    <div class="sig-title">अधिकारी 2</div>
                     <div>नाम -</div>
+                    <div>पदनाम -</div>
+                    <div>विभाग -</div>
                 </td>
                 <td>
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">राजस्व निरीक्षक</div>
+                    <div class="sig-title">अधिकारी 3</div>
                     <div>नाम -</div>
-                    <div>रा.नि.मं. -</div>
+                    <div>पदनाम -</div>
+                    <div>विभाग -</div>
                 </td>
                 <td>
                     <div>(हस्ताक्षर)</div>
-                    <div class="sig-title">अनुविभागीय अधिकारी(रा.) एवं</div>
-                    <div class="sig-title">भू-अर्जन अधिकारी</div>
-                    <div>रायगढ़ (छ.ग.)</div>
+                    <div class="sig-title">अधिकारी 4</div>
+                    <div>नाम -</div>
+                    <div>पदनाम -</div>
+                    <div>विभाग -</div>
                 </td>
             </tr>
         </table>
@@ -127,6 +150,10 @@
                 <t t-set="show_land" t-value="s23_scope in ('all', 'land')"/>
                 <t t-set="show_tree" t-value="s23_scope in ('all', 'tree')"/>
                 <t t-set="show_asset" t-value="s23_scope in ('all', 'asset')"/>
+
+                <div class="section23-fixed-footer">
+                    <t t-call="bhuarjan.section23_signature_block"/>
+                </div>
 
                 <!-- Part 1 (Ka) - LAND COMPENSATION -->
                 <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
@@ -293,7 +320,6 @@
                                 </t>
                             </tbody>
                         </table>
-                        <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
 
                 <!-- Part 1 (Ga) - TREE COMPENSATION -->
@@ -397,7 +423,6 @@
                                 </t>
                             </tbody>
                         </table>
-                        <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
                 <div t-if="show_asset" class="page section23-award-section" style="padding: 10px;">
@@ -484,7 +509,6 @@
                                 </t>
                             </tbody>
                         </table>
-                        <t t-call="bhuarjan.section23_signature_block"/>
                 </div>
             </t>
         </t>

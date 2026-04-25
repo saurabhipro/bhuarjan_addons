@@ -61,63 +61,14 @@
 
             <!-- Dashboard Content -->
             <div t-if="state and !state.loading and state.selectedDepartment and state.selectedProject" class="o_dashboard_content">
-                <!-- ── Combined Legend + Collapsible Progress Timeline ── -->
-                <div class="o_e2e_timeline_section" style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); overflow:hidden;">
-
-                    <!-- Single merged header bar (always visible) -->
-                    <div style="display:flex; align-items:center; justify-content:space-between; padding:7px 14px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; gap:6px;">
-
-                        <!-- Left: Status legend -->
-                        <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap; font-size:12px; color:#555;">
-                            <i class="fa fa-info-circle" style="color:#5a67d8; margin-right:5px;"/>
-                            <span style="font-weight:700; color:#2d3748; margin-right:10px;">Status Legend</span>
-                            <span style="color:#ccc; margin:0 8px;">|</span>
-                            <div class="o_legend_item" style="margin-right:6px;"><i class="fa fa-file-o o_legend_icon_draft"/><span class="o_legend_label">Draft</span></div>
-                            <span style="color:#ccc; margin:0 6px;">|</span>
-                            <div class="o_legend_item" style="margin-right:6px;"><i class="fa fa-paper-plane o_legend_icon_submitted"/><span class="o_legend_label">Submitted</span></div>
-                            <span style="color:#ccc; margin:0 6px;">|</span>
-                            <div class="o_legend_item" style="margin-right:6px;"><i class="fa fa-check-circle o_legend_icon_approved"/><span class="o_legend_label">Approved</span></div>
-                            <span style="color:#ccc; margin:0 6px;">|</span>
-                            <div class="o_legend_item"><i class="fa fa-times-circle o_legend_icon_rejected"/><span class="o_legend_label">Returned</span></div>
-                            <span style="color:#ccc; margin:0 10px; font-size:16px;">|</span>
-                            <!-- SIA Exempt -->
-                            <div class="d-flex align-items-center me-2" t-att-style="state.isProjectExempt ? 'color:#276749;' : 'color:#c53030;'">
-                                <i t-att-class="state.isProjectExempt ? 'fa fa-check-circle me-1' : 'fa fa-times-circle me-1'" style="font-size:13px;"/>
-                                <span style="font-weight:600; font-size:12px;">SIA Exempt: <t t-esc="state.isProjectExempt ? 'Yes' : 'No'"/></span>
-                            </div>
-                            <span style="color:#ccc; margin:0 8px; font-size:16px;">|</span>
-                            <!-- Displacement -->
-                            <div class="d-flex align-items-center" t-att-style="state.isDisplacement ? 'color:#276749;' : 'color:#c53030;'">
-                                <i t-att-class="state.isDisplacement ? 'fa fa-check-circle me-1' : 'fa fa-times-circle me-1'" style="font-size:13px;"/>
-                                <span style="font-weight:600; font-size:12px;">Displacement: <t t-esc="state.isDisplacement ? 'Yes' : 'No'"/></span>
-                            </div>
-                        </div>
-
-                        <!-- Right: Progress toggle button -->
-                        <button t-on-click="() => this.toggleTimeline()"
-                                style="display:flex; align-items:center; gap:5px; background:#f7fafc; border:1px solid #cbd5e0; border-radius:6px; padding:4px 12px; font-size:12px; font-weight:600; color:#4a5568; cursor:pointer; white-space:nowrap;">
-                            <i class="fa fa-road" style="color:#5a67d8;"/>
-                            Application Progress
-                            <span t-if="state.selectedVillageName" style="font-weight:400; color:#718096;">
-                                · <t t-esc="state.selectedVillageName"/>
-                            </span>
-                            <i t-att-class="state.showTimeline ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" style="font-size:10px; margin-left:3px;"/>
-                        </button>
-                    </div>
-
-                    <!-- Collapsible timeline body -->
-                    <div t-if="state.showTimeline" style="padding:14px 16px 12px;">
-
-                    <!-- E2E Village Progress Timeline Component -->
-                    <t t-call="bhuarjan.TimelineComponent">
-                        <t t-set="stats" t-value="state.stats"/>
-                        <t t-set="allowedSectionNames" t-value="state.allowedSectionNames"/>
-                        <t t-set="showTimeline" t-value="state.showTimeline"/>
-                        <t t-set="toggleTimeline" t-value="this.toggleTimeline"/>
-                        <t t-set="selectedVillageName" t-value="state.selectedVillageName"/>
-                    </t>
-                    </div><!-- /collapsible timeline body -->
-                </div><!-- /o_e2e_timeline_section -->
+                <!-- E2E Village Progress Timeline Component -->
+                <t t-call="bhuarjan.TimelineComponent">
+                    <t t-set="stats" t-value="state.stats"/>
+                    <t t-set="allowedSectionNames" t-value="state.allowedSectionNames"/>
+                    <t t-set="showTimeline" t-value="state.showTimeline"/>
+                    <t t-set="toggleTimeline" t-value="this.toggleTimeline"/>
+                    <t t-set="selectedVillageName" t-value="state.selectedVillageName"/>
+                </t>
 
                 <!-- List View Section -->
                 <div class="o_dashboard_section">

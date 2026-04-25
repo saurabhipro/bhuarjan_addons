@@ -1364,17 +1364,17 @@ class AwardSimulator(models.Model):
 
         if show_land:
             # Land tab
-            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 10, 11, 11, 10, 10, 11, 8, 11, 10]
+            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 8, 11, 10]
             _setup_sheet(land_sheet, land_col_widths, 8)
             row = 0
-            land_sheet.merge_range(row, 0, row, 19, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+            land_sheet.merge_range(row, 0, row, 18, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
             row += 1
-            land_sheet.merge_range(row, 0, row, 19, subtitle, subtitle_fmt)
+            land_sheet.merge_range(row, 0, row, 18, subtitle, subtitle_fmt)
             row += 2
 
             # LAND TABLE
             land_sheet.merge_range(
-                row, 0, row, 19,
+                row, 0, row, 18,
                 f"{award_headers['sections']['land_sheet_label']} - {award_headers['sections']['land_title']}",
                 header_group_fmt
             )
@@ -1399,7 +1399,7 @@ class AwardSimulator(models.Model):
 
             land_groups = self.get_land_compensation_grouped_data()
             if not land_groups:
-                land_sheet.merge_range(row, 0, row, 19, 'No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
+                land_sheet.merge_range(row, 0, row, 18, 'No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
                 row += 1
             else:
                 total_basic = total_market = total_solatium = 0.0
@@ -1443,16 +1443,15 @@ class AwardSimulator(models.Model):
                                 land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
                                 land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
                                 land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
-                        land_sheet.write(row, 10, '-', cell_center_fmt)
-                        land_sheet.write_number(row, 11, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 12, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 13, float(land.get('market_value', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 14, float(land.get('solatium', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 15, float(land.get('interest', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 16, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 17, float(land.get('rehab_policy_amount', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 18, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
-                        land_sheet.write(row, 19, land.get('remark', ''), cell_fmt)
+                        land_sheet.write_number(row, 10, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 11, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 12, float(land.get('market_value', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 13, float(land.get('solatium', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 15, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 16, float(land.get('rehab_policy_amount', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
+                        land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1
 
                     land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
@@ -1465,15 +1464,14 @@ class AwardSimulator(models.Model):
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
                     land_sheet.write_blank(row, 9, None, total_label_fmt)
                     land_sheet.write_blank(row, 10, None, total_label_fmt)
-                    land_sheet.write_blank(row, 11, None, total_label_fmt)
-                    land_sheet.write_number(row, 12, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 13, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 14, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 15, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 16, float(group.get('total_compensation', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 17, float(group.get('rehab_policy_amount', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 18, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_blank(row, 19, None, total_label_fmt)
+                    land_sheet.write_number(row, 11, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 12, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 13, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 14, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 15, float(group.get('total_compensation', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 16, float(group.get('rehab_policy_amount', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 17, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_blank(row, 18, None, total_label_fmt)
                     total_acq += float(group.get('acquired_area', 0.0) or 0.0)
                     total_basic += float(group.get('basic_value', 0.0) or 0.0)
                     total_market += float(group.get('market_value', 0.0) or 0.0)
@@ -1492,15 +1490,14 @@ class AwardSimulator(models.Model):
                 land_sheet.write_blank(row, 8, None, total_label_fmt)
                 land_sheet.write_blank(row, 9, None, total_label_fmt)
                 land_sheet.write_blank(row, 10, None, total_label_fmt)
-                land_sheet.write_blank(row, 11, None, total_label_fmt)
-                land_sheet.write_number(row, 12, total_basic, total_money_fmt)
-                land_sheet.write_number(row, 13, total_market, total_money_fmt)
-                land_sheet.write_number(row, 14, total_solatium, total_money_fmt)
-                land_sheet.write_number(row, 15, total_interest, total_money_fmt)
-                land_sheet.write_number(row, 16, total_comp, total_money_fmt)
-                land_sheet.write_number(row, 17, total_rehab, total_money_fmt)
-                land_sheet.write_number(row, 18, total_paid, total_money_fmt)
-                land_sheet.write_blank(row, 19, None, total_label_fmt)
+                land_sheet.write_number(row, 11, total_basic, total_money_fmt)
+                land_sheet.write_number(row, 12, total_market, total_money_fmt)
+                land_sheet.write_number(row, 13, total_solatium, total_money_fmt)
+                land_sheet.write_number(row, 14, total_interest, total_money_fmt)
+                land_sheet.write_number(row, 15, total_comp, total_money_fmt)
+                land_sheet.write_number(row, 16, total_rehab, total_money_fmt)
+                land_sheet.write_number(row, 17, total_paid, total_money_fmt)
+                land_sheet.write_blank(row, 18, None, total_label_fmt)
 
         if show_asset:
             # ASSET TAB
@@ -1559,11 +1556,11 @@ class AwardSimulator(models.Model):
                     asset_row += 1
 
         if show_tree:
-            # TREE TAB (15 columns — पत्रक भाग-1 ग)
-            tree_col_widths = [4, 22, 10, 9, 10, 16, 8, 8, 10, 11, 11, 11, 11, 11, 14]
+            # TREE TAB (13 columns — पत्रक भाग-1 ग)
+            tree_col_widths = [4, 22, 10, 16, 8, 8, 10, 11, 11, 11, 11, 11, 14]
             _setup_sheet(tree_sheet, tree_col_widths, 4)
             tree_row = 0
-            tree_last_col = 14
+            tree_last_col = 12
             tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
             tree_row += 1
             tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, subtitle, subtitle_fmt)
@@ -1597,35 +1594,31 @@ class AwardSimulator(models.Model):
                         kul_r = float(tree.get('kul_rashi', tree.get('value', 0.0)) or 0.0)
                         tree_sheet.write(tree_row, 0, i if idx == 0 else '', cell_center_fmt)
                         tree_sheet.write(tree_row, 1, details if idx == 0 else '', cell_fmt)
-                        tree_sheet.write(tree_row, 2, tree.get('land_khasra', tree.get('khasra', '')), cell_center_fmt)
-                        tree_sheet.write_number(tree_row, 3, float(tree.get('land_area_ha', 0.0) or 0.0), number_fmt)
-                        tree_sheet.write(tree_row, 4, tree.get('tree_khasra', tree.get('khasra', '')), cell_center_fmt)
-                        tree_sheet.write(tree_row, 5, tree.get('tree_type', ''), cell_fmt)
-                        tree_sheet.write_number(tree_row, 6, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
-                        tree_sheet.write_number(tree_row, 7, float(tree.get('girth_cm', 0.0) or 0.0), number_fmt)
-                        tree_sheet.write_number(tree_row, 8, float(tree.get('rate', 0.0) or 0.0), money_fmt)
-                        tree_sheet.write_number(tree_row, 9, mulya, money_fmt)
-                        tree_sheet.write_number(tree_row, 10, kul_r, money_fmt)
-                        tree_sheet.write_number(tree_row, 11, float(tree.get('solatium', 0.0) or 0.0), money_fmt)
-                        tree_sheet.write_number(tree_row, 12, float(tree.get('interest', 0.0) or 0.0), money_fmt)
-                        tree_sheet.write_number(tree_row, 13, float(tree.get('total', 0.0) or 0.0), money_fmt)
-                        tree_sheet.write(tree_row, 14, tree.get('remark', ''), cell_fmt)
+                        tree_sheet.write(tree_row, 2, tree.get('tree_khasra', tree.get('khasra', '')), cell_center_fmt)
+                        tree_sheet.write(tree_row, 3, tree.get('tree_type', ''), cell_fmt)
+                        tree_sheet.write_number(tree_row, 4, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
+                        tree_sheet.write_number(tree_row, 5, float(tree.get('girth_cm', 0.0) or 0.0), number_fmt)
+                        tree_sheet.write_number(tree_row, 6, float(tree.get('rate', 0.0) or 0.0), money_fmt)
+                        tree_sheet.write_number(tree_row, 7, mulya, money_fmt)
+                        tree_sheet.write_number(tree_row, 8, kul_r, money_fmt)
+                        tree_sheet.write_number(tree_row, 9, float(tree.get('solatium', 0.0) or 0.0), money_fmt)
+                        tree_sheet.write_number(tree_row, 10, float(tree.get('interest', 0.0) or 0.0), money_fmt)
+                        tree_sheet.write_number(tree_row, 11, float(tree.get('total', 0.0) or 0.0), money_fmt)
+                        tree_sheet.write(tree_row, 12, tree.get('remark', ''), cell_fmt)
                         tree_row += 1
 
                     tree_sheet.merge_range(tree_row, 0, tree_row, 1, 'कुल', total_label_fmt)
-                    tree_sheet.write_number(tree_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                    tree_sheet.write_number(tree_row, 3, float(group.get('land_area_ha', 0.0) or 0.0), total_money_fmt)
-                    tree_sheet.write_blank(tree_row, 4, None, total_label_fmt)
+                    tree_sheet.write_blank(tree_row, 2, None, total_label_fmt)
+                    tree_sheet.write_blank(tree_row, 3, None, total_label_fmt)
+                    tree_sheet.write_number(tree_row, 4, float(group.get('tree_count', 0.0) or 0.0), total_money_fmt)
                     tree_sheet.write_blank(tree_row, 5, None, total_label_fmt)
-                    tree_sheet.write_number(tree_row, 6, float(group.get('tree_count', 0.0) or 0.0), total_money_fmt)
-                    tree_sheet.write_blank(tree_row, 7, None, total_label_fmt)
-                    tree_sheet.write_blank(tree_row, 8, None, total_label_fmt)
-                    tree_sheet.write_number(tree_row, 9, float(group.get('mulya', group.get('value', 0.0)) or 0.0), total_money_fmt)
-                    tree_sheet.write_number(tree_row, 10, float(group.get('kul_rashi', group.get('value', 0.0)) or 0.0), total_money_fmt)
-                    tree_sheet.write_number(tree_row, 11, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                    tree_sheet.write_number(tree_row, 12, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                    tree_sheet.write_number(tree_row, 13, float(group.get('total', 0.0) or 0.0), total_money_fmt)
-                    tree_sheet.write_blank(tree_row, 14, None, total_label_fmt)
+                    tree_sheet.write_blank(tree_row, 6, None, total_label_fmt)
+                    tree_sheet.write_number(tree_row, 7, float(group.get('mulya', group.get('value', 0.0)) or 0.0), total_money_fmt)
+                    tree_sheet.write_number(tree_row, 8, float(group.get('kul_rashi', group.get('value', 0.0)) or 0.0), total_money_fmt)
+                    tree_sheet.write_number(tree_row, 9, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                    tree_sheet.write_number(tree_row, 10, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                    tree_sheet.write_number(tree_row, 11, float(group.get('total', 0.0) or 0.0), total_money_fmt)
+                    tree_sheet.write_blank(tree_row, 12, None, total_label_fmt)
                     tree_row += 1
 
         workbook.close()

@@ -898,7 +898,7 @@ class Section23Award(models.Model):
             land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 8, 11, 10]
             _setup_sheet(land_sheet, land_col_widths, 8)
             row = 0
-            land_sheet.merge_range(row, 0, row, 18, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+            land_sheet.merge_range(row, 0, row, 18, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
             row += 1
             land_sheet.merge_range(row, 0, row, 18, subtitle, subtitle_fmt)
             row += 2
@@ -1026,7 +1026,7 @@ class Section23Award(models.Model):
             asset_col_widths = [4, 24, 10, 10, 22, 10, 12, 12, 12, 12, 12]
             _setup_sheet(asset_sheet, asset_col_widths, 4)
             asset_row = 0
-            asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+            asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
             asset_row += 1
             asset_sheet.merge_range(asset_row, 0, asset_row, 10, subtitle, subtitle_fmt)
             asset_row += 2
@@ -1079,7 +1079,7 @@ class Section23Award(models.Model):
             _setup_sheet(tree_sheet, tree_col_widths, 4)
             tree_row = 0
             tree_last_col = 12
-            tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, 'AWARD SIMULATOR / अवार्ड सिमुलेटर', title_fmt)
+            tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
             tree_row += 1
             tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, subtitle, subtitle_fmt)
             tree_row += 2
@@ -1317,7 +1317,7 @@ class Section23Award(models.Model):
             s23_pdf_scope=scope,
             s23_include_cover=bool(include_cover_letter),
         ).report_action(self)
-
+    
     def _get_section23_report_action(self):
         """Get Section 23 report action with safe fallback when xmlid is missing."""
         self.ensure_one()

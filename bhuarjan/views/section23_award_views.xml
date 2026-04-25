@@ -37,9 +37,6 @@
                     <div class="simulator_header">
                         <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 w-100">
                             <div class="flex-grow-1" style="min-width: 0;">
-                                <span style="display: inline-block; cursor: pointer; font-size: 1.2rem; margin-right: 0.5rem; vertical-align: middle;" onclick="document.querySelector('.bhu_s23_content').classList.toggle('d-none'); this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');">
-                                    <i class="fa fa-chevron-down"></i>
-                                </span>
                                 <h1 class="simulator_title_h1 d-inline">Section 23 Award / धारा 23 अवार्ड</h1>
                             </div>
                             <div class="text-end" invisible="is_sdm">
@@ -47,6 +44,9 @@
                                     <field name="grand_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </div>
                                 <div style="opacity: 0.7; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;">Current Estimate / वर्तमान अनुमान</div>
+                            </div>
+                            <div style="cursor: pointer; font-size: 1.4rem; color: #666;" onclick="document.querySelector('.bhu_s23_content').classList.toggle('d-none'); this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');" title="Collapse/Expand">
+                                <i class="fa fa-chevron-up"></i>
                             </div>
                         </div>
                     </div>

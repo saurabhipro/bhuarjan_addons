@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 from markupsafe import Markup, escape
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from .award_header_constants import get_award_header_constants
+
+_logger = logging.getLogger(__name__)
 
 class Section23Award(models.Model):
     _name = 'bhu.section23.award'
@@ -238,15 +241,15 @@ class Section23Award(models.Model):
                 surveys = rec.env['bhu.survey'].search([
                     ('project_id', '=', rec.project_id.id),
                     ('village_id', '=', rec.village_id.id),
-                    ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                    ('state', 'in', ['draft', 'submitted', 'approved', 'locked', 'rejected']),
                 ])
-                if surveys:
-                    grouped = rec.env['bhu.survey.tree.line'].read_group(
-                        [('survey_id', 'in', surveys.ids)],
-                        ['quantity:sum'],
-                        [],
-                    )
-                    tree_count = int((grouped and grouped[0].get('quantity_sum')) or 0)
+                if surveys.ids:
+                    # Sum quantities directly — read_group aggregate keys differ across Odoo
+                    # versions (e.g. quantity_sum vs quantity:sum), which caused badge to show 0.
+                    lines = rec.env['bhu.survey.tree.line'].search([
+                        ('survey_id', 'in', surveys.ids),
+                    ])
+                    tree_count = int(sum(lines.mapped('quantity')) or 0)
             rec.s23_tree_count = tree_count
 
     @api.depends('award_structure_line_ids', 'award_structure_line_ids.asset_count')
@@ -297,7 +300,7 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked', 'rejected']),
         ])
         if not surveys:
             return
@@ -307,7 +310,6 @@ class Section23Award(models.Model):
             threshold = 50.0 if survey.survey_type == 'rural' else 30.0
             commands.append((0, 0, {
                 'survey_id': survey.id,
-                'khasra_number': survey.khasra_number or '',
                 'land_type': survey.land_type_for_award or 'village',
                 'is_within_distance': distance <= threshold,
             }))
@@ -382,10 +384,27 @@ class Section23Award(models.Model):
 
     def write(self, vals):
         vals = dict(vals)
-        vals.pop('award_survey_line_ids', None)
+        # Ignore direct O2M payloads from web client by default, but allow
+        # trusted server-side flows (populate/debug) to write survey lines.
+        if not self.env.context.get('allow_award_survey_line_write'):
+            vals.pop('award_survey_line_ids', None)
+        # Only compare scope after write. Do not repopulate land lines whenever
+        # project_id/village_id *appear* in vals — the web client often re-sends
+        # the same M2O on any save, which would (5,0,0) rebuild every time and
+        # make land award rows or amounts "vanish" after Save.
+        pre_scope = {
+            rec.id: (
+                rec.project_id.id if rec.project_id else False,
+                rec.village_id.id if rec.village_id else False,
+            )
+            for rec in self
+        }
         result = super().write(vals)
-        if 'project_id' in vals or 'village_id' in vals:
-            for rec in self:
+        for rec in self:
+            old_p, old_v = pre_scope.get(rec.id, (False, False))
+            new_p = rec.project_id.id if rec.project_id else False
+            new_v = rec.village_id.id if rec.village_id else False
+            if new_p != old_p or new_v != old_v:
                 rec._populate_award_survey_lines(reset_if_empty=True)
                 if rec.project_id and rec.village_id:
                     rec._sync_award_structure_lines()
@@ -397,7 +416,11 @@ class Section23Award(models.Model):
         Rebuilds lines deterministically for the selected project+village.
         """
         self.ensure_one()
+        _logger.info(f"[DEBUG] _populate_award_survey_lines called for award {self.name} (ID {self.id})")
+        _logger.info(f"[DEBUG]   project_id={self.project_id.id if self.project_id else None}, village_id={self.village_id.id if self.village_id else None}")
+        
         if not (self.project_id and self.village_id):
+            _logger.warning(f"[DEBUG] Missing project_id or village_id. Returning early.")
             if reset_if_empty:
                 self.award_survey_line_ids = [(5, 0, 0)]
             return
@@ -405,8 +428,24 @@ class Section23Award(models.Model):
         surveys = self.env['bhu.survey'].search([
             ('project_id', '=', self.project_id.id),
             ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+            # Include rejected as fallback; standard states are draft/submitted/approved/locked
+            ('state', 'in', ['draft', 'submitted', 'approved', 'locked', 'rejected']),
         ])
+        _logger.info(f"[DEBUG] Found {len(surveys)} surveys matching project {self.project_id.id} and village {self.village_id.id}")
+        for i, s in enumerate(surveys):
+            _logger.info(f"[DEBUG]   Survey {i+1}: ID={s.id}, name={s.name}, khasra={s.khasra_number}, state={s.state}")
+        
+        if not surveys:
+            _logger.warning(f"[DEBUG] No surveys found. reset_if_empty={reset_if_empty}, current award_survey_line_ids={len(self.award_survey_line_ids)}")
+            # Never wipe existing land lines on a "soft" repopulate: if the search returns
+            # no rows (workflow timing, or state not matching yet), a full clear would
+            # remove khasra from the form — e.g. on Generate when _validate repopulates.
+            if self.award_survey_line_ids and not reset_if_empty:
+                _logger.info(f"[DEBUG] Keeping existing {len(self.award_survey_line_ids)} award_survey_line_ids (soft repopulate with no surveys)")
+                return
+            self.award_survey_line_ids = [(5, 0, 0)]
+            _logger.info(f"[DEBUG] Cleared award_survey_line_ids")
+            return
         # Rebuild commands from current surveys to avoid stale/empty UI rows.
         commands = [(5, 0, 0)]
         for survey in surveys:
@@ -414,17 +453,20 @@ class Section23Award(models.Model):
             threshold = 50.0 if survey.survey_type == 'rural' else 30.0
             commands.append((0, 0, {
                 'survey_id': survey.id,
-                'khasra_number': survey.khasra_number or '',
                 'land_type': survey.land_type_for_award or 'village',
                 'is_within_distance': distance <= threshold,
             }))
-        self.award_survey_line_ids = commands
+        _logger.info(f"[DEBUG] Creating {len(commands)-1} award_survey_line records from {len(surveys)} surveys")
+        self.with_context(allow_award_survey_line_write=True).write({
+            'award_survey_line_ids': commands,
+        })
         # Force rate recompute now that award_id is fully linked on each line
         if self.award_survey_line_ids:
             self.award_survey_line_ids._compute_rate_per_hectare()
             self.award_survey_line_ids._compute_line_display_amounts()
         if self.project_id and self.village_id:
             self._sync_award_structure_lines()
+        _logger.info(f"[DEBUG] _populate_award_survey_lines complete. Final count: {len(self.award_survey_line_ids)}")
 
     def action_clear_khasra_filter(self):
         """Clear the khasra filter and reload."""
@@ -438,6 +480,23 @@ class Section23Award(models.Model):
             'res_id': self.id,
             'view_mode': 'form',
             'target': 'current',
+        }
+
+    def action_refresh_land_lines_debug(self):
+        """[DEBUG] Manually refresh land lines from surveys. Logs details to server console."""
+        self.ensure_one()
+        _logger.info(f"\n{'='*80}")
+        _logger.info(f"[MANUAL DEBUG] User clicked 'Refresh Land Lines'")
+        _logger.info(f"Award: {self.name} (ID {self.id})")
+        _logger.info(f"Project: {self.project_id.name if self.project_id else 'None'} (ID {self.project_id.id if self.project_id else None})")
+        _logger.info(f"Village: {self.village_id.name if self.village_id else 'None'} (ID {self.village_id.id if self.village_id else None})")
+        _logger.info(f"Current award_survey_line_ids count: {len(self.award_survey_line_ids)}")
+        _logger.info(f"{'='*80}\n")
+        self._populate_award_survey_lines(reset_if_empty=True)
+        _logger.info(f"\n[MANUAL DEBUG] After populate: award_survey_line_ids count = {len(self.award_survey_line_ids)}\n")
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
         }
 
     def action_apply_khasra_search(self):
@@ -653,7 +712,7 @@ class Section23Award(models.Model):
             'domain': [
                 ('project_id', '=', self.project_id.id),
                 ('village_id', '=', self.village_id.id),
-                ('state', 'in', ['draft', 'submitted', 'approved', 'locked']),
+                ('state', 'in', ['draft', 'submitted', 'approved', 'locked', 'rejected']),
                 ('khasra_number', '!=', False),
             ],
             'context': {
@@ -1117,6 +1176,8 @@ class Section23Award(models.Model):
         because the value is entered in that wizard.
         """
         self.ensure_one()
+        # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
+        self.flush_recordset()
         if self.is_generated:
             raise ValidationError(_(
                 'Award already generated for this Project and Village. '
@@ -2042,7 +2103,10 @@ class Section23AwardSurveyLine(models.Model):
         return res
     
     # Survey information (readonly, from survey)
-    khasra_number = fields.Char(string='Khasra Number / खसरा संख्या', readonly=True)
+    khasra_number = fields.Char(
+        string='Khasra Number / खसरा संख्या',
+        related='survey_id.khasra_number', store=True, readonly=True,
+    )
     acquired_area = fields.Float(string='Acquired Area (Hectare) / अधिग्रहित क्षेत्र (हेक्टेयर)', 
                                  related='survey_id.acquired_area', readonly=True, store=True)
     survey_name = fields.Char(string='Survey Number', related='survey_id.name', readonly=True, store=True)
@@ -2173,10 +2237,38 @@ class Section23AwardSurveyLine(models.Model):
         result = super().write(vals)
         for line in self:
             if line.survey_id and ('land_type' in vals or 'is_within_distance' in vals):
+                before_land_type = line.survey_id.land_type_for_award
+                before_within = line.survey_id.is_within_distance_for_award
                 line.survey_id.write({
                     'land_type_for_award': line.land_type,
                     'is_within_distance_for_award': line.is_within_distance,
                 })
+                changed_parts = []
+                if (before_land_type or '') != (line.land_type or ''):
+                    changed_parts.append(
+                        _('Type for award: %(old)s -> %(new)s') % {
+                            'old': before_land_type or '-',
+                            'new': line.land_type or '-',
+                        }
+                    )
+                if bool(before_within) != bool(line.is_within_distance):
+                    changed_parts.append(
+                        _('Within distance: %(old)s -> %(new)s') % {
+                            'old': _('Yes') if before_within else _('No'),
+                            'new': _('Yes') if line.is_within_distance else _('No'),
+                        }
+                    )
+                if changed_parts:
+                    line.survey_id.message_post(
+                        body=_(
+                            'Survey updated from Section 23 Award by <b>%(user)s</b> (award: %(award)s, khasra: %(khasra)s).<br/>%(changes)s'
+                        ) % {
+                            'user': self.env.user.name,
+                            'award': line.award_id.name if line.award_id else '-',
+                            'khasra': line.survey_id.khasra_number or '-',
+                            'changes': '<br/>'.join(changed_parts),
+                        }
+                    )
         return result
     
     # Computed rate per hectare from rate master
@@ -2229,10 +2321,9 @@ class Section23AwardSurveyLine(models.Model):
     
     @api.onchange('survey_id')
     def _onchange_survey_id(self):
-        """Update khasra number and sync values when survey is selected"""
+        """Sync type/distance from survey when khasra (survey) changes; khasra text is related."""
         for line in self:
             if line.survey_id:
-                line.khasra_number = line.survey_id.khasra_number or ''
                 # Load existing values from survey if available
                 if not line.land_type and line.survey_id.land_type_for_award:
                     line.land_type = line.survey_id.land_type_for_award
@@ -2242,13 +2333,11 @@ class Section23AwardSurveyLine(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Auto-populate khasra number and sync to survey when creating"""
+        """Sync land type and distance from survey when creating"""
         for vals in vals_list:
-            # Auto-populate khasra number from survey
-            if 'survey_id' in vals and 'khasra_number' not in vals:
+            if 'survey_id' in vals:
                 survey = self.env['bhu.survey'].browse(vals['survey_id'])
                 if survey:
-                    vals['khasra_number'] = survey.khasra_number or ''
                     # Also sync existing values from survey if not provided
                     if 'land_type' not in vals and survey.land_type_for_award:
                         vals['land_type'] = survey.land_type_for_award

@@ -79,11 +79,17 @@
                                         <field name="village_id" readonly="name != 'New'" domain="village_domain" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
                                     </div>
                                 </div>
+                                <div class="s23_meta_item">
+                                    <div class="s23_meta_label">विगत तीन वर्षों का औसत बिक्री छांट दर</div>
+                                    <div class="s23_meta_value">
+                                        <field name="avg_three_year_sales_sort_rate" readonly="1"/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="top_totals_strip" invisible="is_sdm">
+                    <div class="top_totals_strip" invisible="1">
                         <a href="#s23_section_land" class="w-100 text-decoration-none" style="color: inherit;">
                             <div class="top_total_card top_total_land">
                                 <div class="top_total_head">

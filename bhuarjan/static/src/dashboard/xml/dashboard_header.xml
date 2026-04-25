@@ -40,7 +40,7 @@
                             <t t-foreach="state.departments" t-as="department" t-key="department.id">
                                 <option
                                     t-att-value="this.toString(department.id)"
-                                    t-att-style="(department.survey_count || 0) > 0 ? 'color: #1f7f3f; font-weight: 700;' : 'color: #333;'"
+                                    t-att-style="(department.survey_count || 0) > 0 ? 'background-color:#fff3e0; color:#7b3200; font-weight:700;' : 'background-color:#fff; color:#999;'"
                                 >
                                     <t t-esc="`${department.name} (${department.survey_count || 0})`"/>
                                 </option>
@@ -54,7 +54,7 @@
                             <t t-foreach="state.projects" t-as="project" t-key="project.id">
                                 <option
                                     t-att-value="this.toString(project.id)"
-                                    t-att-style="(project.survey_count || 0) > 0 ? 'color: #1f7f3f; font-weight: 700;' : 'color: #333;'"
+                                    t-att-style="(project.survey_count || 0) > 0 ? 'background-color:#fff3e0; color:#7b3200; font-weight:700;' : 'background-color:#fff; color:#999;'"
                                 >
                                     <t t-esc="`${project.name} (${project.survey_count || 0})`"/>
                                 </option>
@@ -68,7 +68,7 @@
                             <t t-foreach="state.villages" t-as="village" t-key="village.id">
                                 <option
                                     t-att-value="this.toString(village.id)"
-                                    t-att-style="(village.survey_count || 0) > 0 ? 'color: #1f7f3f; font-weight: 700;' : 'color: #333;'"
+                                    t-att-style="(village.survey_count || 0) > 0 ? 'background-color:#fff3e0; color:#7b3200; font-weight:700;' : 'background-color:#fff; color:#999;'"
                                 >
                                     <t t-esc="`${village.name} (${village.survey_count || 0})`"/>
                                 </option>

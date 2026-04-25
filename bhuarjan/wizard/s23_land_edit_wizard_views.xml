@@ -8,6 +8,10 @@
                 <group>
                     <field name="survey_line_id" invisible="1"/>
                     <field name="khasra_display" readonly="1"/>
+                    <button name="action_open_linked_survey"
+                            type="object"
+                            string="Open Survey for this Khasra / इस खसरे का सर्वे खोलें"
+                            class="btn-link"/>
                     <field name="survey_type" readonly="1"/>
                     <field name="distance_help" readonly="1"/>
                 </group>

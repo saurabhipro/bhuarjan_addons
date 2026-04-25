@@ -607,7 +607,7 @@ export class UnifiedDashboard extends Component {
                     };
                 })
             );
-            this.state.departments = departmentsWithSurveyCount;
+            this.state.departments = departmentsWithSurveyCount.sort((a, b) => (b.survey_count || 0) - (a.survey_count || 0));
             // Auto-select department for department users (they only have one department)
             if (this.dashboardType === 'department' && this.state.departments.length === 1) {
                 this.state.selectedDepartment = this.state.departments[0].id;
@@ -661,7 +661,7 @@ export class UnifiedDashboard extends Component {
                     };
                 })
             );
-            this.state.projects = projectsWithSurveyCount;
+            this.state.projects = projectsWithSurveyCount.sort((a, b) => (b.survey_count || 0) - (a.survey_count || 0));
         } catch (error) {
             console.error("Error loading projects:", error);
             this.state.projects = [];
@@ -698,7 +698,7 @@ export class UnifiedDashboard extends Component {
                     };
                 })
             );
-            this.state.villages = villagesWithSurveyCount;
+            this.state.villages = villagesWithSurveyCount.sort((a, b) => (b.survey_count || 0) - (a.survey_count || 0));
         } catch (error) {
             console.error("Error loading villages:", error);
             this.state.villages = [];
@@ -1196,6 +1196,84 @@ export class UnifiedDashboard extends Component {
                 });
                 return;
             }
+        }
+
+        // Section 23: one award per project+village. Open existing with message, or create on server
+        // so land (survey) lines are stored immediately; tree data lives on bhu.survey and shows here.
+        if (sectionModel === "bhu.section23.award") {
+            const projectId = parseInt(this.state.selectedProject, 10);
+            const villageId = parseInt(this.state.selectedVillage, 10);
+            if (isNaN(projectId) || isNaN(villageId)) {
+                this.notification.add(_t("Please select a project and village."), { type: "warning" });
+                return;
+            }
+            const existing = await this.orm.searchRead(
+                "bhu.section23.award",
+                [
+                    ["project_id", "=", projectId],
+                    ["village_id", "=", villageId],
+                ],
+                ["id", "name"],
+                { limit: 1 }
+            );
+            if (existing.length) {
+                this.notification.add(
+                    _t(
+                        "A Section 23 award for this project and village already exists. " +
+                        "You cannot create another; opening the existing record."
+                    ),
+                    { type: "warning", sticky: true }
+                );
+                await this.action.doAction({
+                    type: "ir.actions.act_window",
+                    name: _t("Section 23 Award"),
+                    res_model: "bhu.section23.award",
+                    res_id: existing[0].id,
+                    view_mode: "form",
+                    views: [[false, "form"]],
+                    target: "current",
+                });
+                return;
+            }
+            let awardId;
+            try {
+                const created = await this.orm.create("bhu.section23.award", [
+                    { project_id: projectId, village_id: villageId },
+                ]);
+                awardId = Array.isArray(created) ? created[0] : created;
+            } catch (e) {
+                const again = await this.orm.search("bhu.section23.award", [
+                    ["project_id", "=", projectId],
+                    ["village_id", "=", villageId],
+                ], { limit: 1 });
+                if (again.length) {
+                    awardId = again[0];
+                    this.notification.add(
+                        _t("A Section 23 award for this project and village already exists. Opened the existing record."),
+                        { type: "info" }
+                    );
+                } else {
+                    this.notification.add(e.message || String(e), { type: "danger" });
+                    return;
+                }
+            }
+            await this.action.doAction({
+                type: "ir.actions.act_window",
+                name: _t("Section 23 Award"),
+                res_model: "bhu.section23.award",
+                res_id: awardId,
+                view_mode: "form",
+                views: [[false, "form"]],
+                target: "current",
+            });
+            this.notification.add(
+                _t(
+                    "Section 23 award is saved. Land lines are built from village surveys. " +
+                    "Tree amounts follow the tree lines entered on each survey for this village."
+                ),
+                { type: "success", sticky: false }
+            );
+            return;
         }
 
         let context = {};

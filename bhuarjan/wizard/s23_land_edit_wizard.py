@@ -114,12 +114,42 @@ class S23LandEditWizard(models.TransientModel):
         return res
 
     # ------------------------------------------------------------------ apply
+    def action_open_linked_survey(self):
+        """Open the exact survey record linked to this khasra line."""
+        self.ensure_one()
+        line = self.survey_line_id
+        survey = line.survey_id if line else False
+        if not survey:
+            raise UserError(_('No survey linked on this line.'))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Survey / सर्वे'),
+            'res_model': 'bhu.survey',
+            'res_id': survey.id,
+            'view_mode': 'form',
+            'views': [(False, 'form')],
+            'target': 'new',
+            'flags': {
+                'mode': 'readonly',
+            },
+            'context': {
+                'form_view_initial_mode': 'readonly',
+                'create': False,
+                'edit': False,
+                'delete': False,
+            },
+        }
+
     def action_apply(self):
         self.ensure_one()
         line   = self.survey_line_id
         survey = line.survey_id if line else False
         if not survey:
             raise UserError(_('No survey linked on this line.'))
+
+        before_distance = survey.distance_from_main_road or 0.0
+        before_irrigation = survey.irrigation_type or ''
+        before_diverted = survey.has_traded_land or ''
 
         th = 50.0 if survey.survey_type == 'rural' else 30.0
         d  = self.distance_from_main_road or 0.0
@@ -134,11 +164,47 @@ class S23LandEditWizard(models.TransientModel):
             'irrigation_type':         self.irrigation_type,
             'has_traded_land':         self.has_traded_land,
         })
+        changed_parts = []
+        if float(before_distance or 0.0) != float(d or 0.0):
+            changed_parts.append(
+                _('Distance: %(old)s m -> %(new)s m') % {
+                    'old': round(float(before_distance or 0.0), 2),
+                    'new': round(float(d or 0.0), 2),
+                }
+            )
+        if (before_irrigation or '') != (self.irrigation_type or ''):
+            changed_parts.append(
+                _('Irrigation: %(old)s -> %(new)s') % {
+                    'old': before_irrigation or '-',
+                    'new': self.irrigation_type or '-',
+                }
+            )
+        if (before_diverted or '') != (self.has_traded_land or ''):
+            changed_parts.append(
+                _('Diverted land: %(old)s -> %(new)s') % {
+                    'old': before_diverted or '-',
+                    'new': self.has_traded_land or '-',
+                }
+            )
+        if changed_parts:
+            survey.message_post(
+                body=_(
+                    'Survey updated from Section 23 Award by <b>%(user)s</b> (award: %(award)s, khasra: %(khasra)s).<br/>%(changes)s'
+                ) % {
+                    'user': self.env.user.name,
+                    'award': line.award_id.name if line and line.award_id else '-',
+                    'khasra': survey.khasra_number or '-',
+                    'changes': '<br/>'.join(changed_parts),
+                }
+            )
         # Recompute the award line rate so it reflects immediately
         line._compute_rate_per_hectare()
         # Also refresh award totals
         if line.award_id:
             line.award_id._compute_s23_section_previews()
-            line.award_id._compute_s23_premium_totals()
+            line.award_id._compute_land_total()
+            line.award_id._compute_tree_total()
+            line.award_id._compute_structure_total()
+            line.award_id._compute_grand_total()
 
         return {'type': 'ir.actions.act_window_close'}

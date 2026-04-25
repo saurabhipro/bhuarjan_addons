@@ -23,6 +23,22 @@
             }
             .header-text { color: #1a237e; border-bottom: 2px solid #1a237e; }
             .page { position: relative; }
+            .s23-page-badge {
+                position: absolute;
+                top: 6px;
+                right: 8px;
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                border: 1.8px solid #8a4531;
+                background: #fff8ef;
+                color: #5a2f22;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 800;
+                line-height: 34px;
+                z-index: 10;
+            }
             .container img { border: none !important; outline: none !important; box-shadow: none !important; }
             /* One sheet per page: land, then trees, then assets (wkhtmltopdf) */
             .section23-award-section + .section23-award-section {
@@ -321,6 +337,7 @@
     <template id="section23_award_cover_letter">
         <!-- Cover Letter / Executive Summary -->
         <div class="page section23-award-section" style="padding: 12px 14px;">
+            <div class="s23-page-badge"><span class="page"/></div>
             <div style="border:2px solid #8a4531; border-radius:10px; padding:12px; background:#fffaf5;">
                 <table style="width:100%; border:none !important; margin-bottom:8px;" cellpadding="0" cellspacing="0">
                     <tr>
@@ -592,6 +609,7 @@
 
                     <!-- Part 1 (Ka) - LAND COMPENSATION -->
                     <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
+                        <div class="s23-page-badge"><span class="page"/></div>
                         <table class="section23-land-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                             <thead>
                                 <tr>
@@ -764,6 +782,7 @@
 
                     <!-- Part 1 (Ga) - TREE COMPENSATION -->
                     <div t-if="show_tree" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
+                        <div class="s23-page-badge"><span class="page"/></div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -859,6 +878,7 @@
                     </div>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
                     <div t-if="show_asset" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
+                        <div class="s23-page-badge"><span class="page"/></div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['asset_sheet_label']"/>

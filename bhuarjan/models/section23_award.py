@@ -1092,8 +1092,10 @@ class Section23Award(models.Model):
             )
             tree_row += 1
             tree_headers = award_headers['excel']['sim_tree_headers']
+            interest_period_note = self.get_interest_period_note()
             for col, title in enumerate(tree_headers):
-                tree_sheet.write(tree_row, col, title, header_fmt)
+                header_title = f"{title}\n{interest_period_note}" if col == 10 else title
+                tree_sheet.write(tree_row, col, header_title, header_fmt)
             tree_row += 1
             tree_groups = self.get_tree_compensation_grouped_data()
             if not tree_groups:

@@ -459,6 +459,7 @@ export class UnifiedDashboard extends Component {
             allowedSectionNames: [], // Sections mapped to project'
             stats: this._getInitialStats(),
             lastUpdate: null,
+            showTimeline: false,
         };
 
         this.state = useState(initialState);
@@ -476,6 +477,10 @@ export class UnifiedDashboard extends Component {
         onMounted(() => {
             this._applySectionActivityHighlights();
         });
+
+        this.toggleTimeline = () => {
+            this.state.showTimeline = !this.state.showTimeline;
+        };
 
         onPatched(() => {
             this._applySectionActivityHighlights();

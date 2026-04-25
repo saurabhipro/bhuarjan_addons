@@ -949,7 +949,14 @@ class Section23Award(models.Model):
                         land_sheet.write_number(row, 13, float(land.get('solatium', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 15, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 16, float(land.get('rehab_policy_amount', 0.0) or 0.0), money_fmt)
+                        rehab_amount = float(land.get('rehab_policy_amount', 0.0) or 0.0)
+                        if land.get('fallow'):
+                            land_type_hi = 'पड़ती भूमि'
+                        elif land.get('irrigated'):
+                            land_type_hi = 'सिंचित भूमि'
+                        else:
+                            land_type_hi = 'असिंचित भूमि'
+                        land_sheet.write(row, 16, f"{rehab_amount:,.2f} - {land_type_hi}", cell_fmt)
                         land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1

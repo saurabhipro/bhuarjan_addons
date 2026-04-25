@@ -715,7 +715,14 @@
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
-                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;">
+                                                <span t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/><br/>
+                                                <span style="font-size:9px; color:#333; font-weight:700;">
+                                                    <t t-if="land.get('fallow')">पड़ती भूमि</t>
+                                                    <t t-elif="land.get('irrigated')">सिंचित भूमि</t>
+                                                    <t t-else="">असिंचित भूमि</t>
+                                                </span>
+                                            </td>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
                                             <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important;">
                                                 <t t-esc="land.get('remark') or chr(160)"/>

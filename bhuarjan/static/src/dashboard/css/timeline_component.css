@@ -1,0 +1,13 @@
+/* E2E Village Progress Timeline Component Styles */
+
+@keyframes o_timeline_pulse {
+    0%   { box-shadow: 0 0 0 0px rgba(237,137,54,0.55); }
+    60%  { box-shadow: 0 0 0 8px rgba(237,137,54,0); }
+    100% { box-shadow: 0 0 0 0px rgba(237,137,54,0); }
+}
+
+.o_step_active_blink {
+    animation: o_timeline_pulse 1.4s ease-out infinite;
+    border-color: #ed8936 !important;
+    color: #ed8936 !important;
+}

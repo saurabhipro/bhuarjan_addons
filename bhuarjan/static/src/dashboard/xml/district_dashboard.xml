@@ -24,6 +24,14 @@
             <!-- Dashboard Content -->
             <div t-if="!state.loading and state.selectedProject" class="o_dashboard_content">
 
+                <!-- E2E Village Progress Timeline Component -->
+                <t t-call="bhuarjan.TimelineComponent">
+                    <t t-set="stats" t-value="state.stats"/>
+                    <t t-set="allowedSectionNames" t-value="state.allowedSectionNames"/>
+                    <t t-set="showTimeline" t-value="state.showTimeline"/>
+                    <t t-set="toggleTimeline" t-value="this.toggleTimeline"/>
+                    <t t-set="selectedVillageName" t-value="state.selectedVillageName"/>
+                </t>
 
                 <!-- Status Legend Section - At the top -->
                 <div class="o_status_legend_section">

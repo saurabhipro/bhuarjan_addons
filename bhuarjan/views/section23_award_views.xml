@@ -161,6 +161,11 @@
                                     string="Search" icon="fa-search"
                                     class="btn btn-sm s23_btn_brown"
                                     title="Exact khasra match"/>
+                            <button name="action_refresh_land_lines_debug" type="object"
+                                    string="Reload Surveys"
+                                    icon="fa-refresh"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Pull all surveys again for selected project and village"/>
                             <button name="action_clear_khasra_filter" type="object"
                                     string="Show All" icon="fa-times"
                                     class="btn btn-sm btn-secondary"

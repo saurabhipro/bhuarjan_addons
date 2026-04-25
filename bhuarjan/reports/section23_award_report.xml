@@ -496,43 +496,43 @@
                                     <t t-set="line_count" t-value="len(group_lines)"/>
                                     <t t-foreach="group_lines" t-as="tree">
                                         <tr>
-                                            <td t-if="tree_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold;" t-esc="serial"/>
-                                            <td t-if="tree_index == 0" t-att-rowspan="line_count">
+                                            <td t-if="tree_index == 0" t-att-rowspan="line_count" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="serial"/>
+                                            <td t-if="tree_index == 0" t-att-rowspan="line_count" style="border: 1px solid #000 !important;">
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center;" t-esc="tree.get('land_khasra') or tree.get('khasra', '')"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('land_area_ha', 0.0), 4)"/>
-                                            <td style="text-align: center;" t-esc="tree.get('tree_khasra') or tree.get('khasra', '')"/>
-                                            <td>
+                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="tree.get('land_khasra') or tree.get('khasra', '')"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('land_area_ha', 0.0), 4)"/>
+                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="tree.get('tree_khasra') or tree.get('khasra', '')"/>
+                                            <td style="border: 1px solid #000 !important;">
                                                 <span t-esc="tree.get('tree_type', '')"/>
                                             </td>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('tree_count', 0), 2)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('girth_cm', 0.0), 2)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('rate', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('mulya', tree.get('value', 0.0)), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('kul_rashi', tree.get('value', 0.0)), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('solatium', 0.0), 0)"/>
-                                            <td style="text-align: right;" t-esc="o.format_indian_number(tree.get('interest', 0.0), 0)"/>
-                                            <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(tree.get('total', 0.0), 0)"/>
-                                            <td t-esc="tree.get('remark', '')"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('tree_count', 0), 2)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('girth_cm', 0.0), 2)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('rate', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('mulya', tree.get('value', 0.0)), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('kul_rashi', tree.get('value', 0.0)), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('solatium', 0.0), 0)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('interest', 0.0), 0)"/>
+                                            <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(tree.get('total', 0.0), 0)"/>
+                                            <td style="border: 1px solid #000 !important;" t-esc="tree.get('remark', '')"/>
                                         </tr>
                                     </t>
                                     <tr class="total-row">
-                                        <td colspan="2" style="text-align: center; font-weight: bold;">कुल</td>
-                                        <td style="text-align: center; font-weight: bold;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('land_area_ha', 0.0), 4)"/>
-                                        <td style="text-align: center; font-weight: bold;">-</td>
-                                        <td style="text-align: center; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
-                                        <td style="text-align: right; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;">-</td>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('mulya', group.get('value', 0.0)), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('kul_rashi', group.get('value', 0.0)), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
-                                        <td></td>
+                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('land_area_ha', 0.0), 4)"/>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('mulya', group.get('value', 0.0)), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('kul_rashi', group.get('value', 0.0)), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td style="border: 1px solid #000 !important;"></td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
@@ -608,7 +608,8 @@
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('total', 0.0), 0)"/>
-                                            <td style="border: 1px solid #000 !important;" t-esc="asset.get('remark', '')"/>
+                                            <td style="border: 1px solid #000 !important;"
+                                                t-esc="'' if (str(asset.get('asset_code', '4')) == '4' and asset.get('remark', '')) else (asset.get('remark', ''))"/>
                                         </tr>
                                     </t>
                                     <tr class="total-row">

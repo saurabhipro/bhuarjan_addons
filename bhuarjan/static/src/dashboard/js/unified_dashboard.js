@@ -1207,6 +1207,33 @@ export class UnifiedDashboard extends Component {
                 this.notification.add(_t("Please select a project and village."), { type: "warning" });
                 return;
             }
+
+            // Block if Section 4 is not approved for this project+village
+            const section4Records = await this.orm.searchRead(
+                "bhu.section4.notification",
+                [
+                    ["project_id", "=", projectId],
+                    ["village_id", "=", villageId],
+                ],
+                ["approved_date", "signed_date", "public_hearing_date"],
+                { limit: 10 }
+            );
+            const hasSection4Approval = section4Records.some(r =>
+                r.approved_date || r.signed_date || r.public_hearing_date
+            );
+            if (!hasSection4Approval) {
+                this.notification.add(
+                    _t(
+                        "Section 4 notification is not approved yet for this project and village.\n" +
+                        "Please get the Section 4 approved before creating the award.\n\n" +
+                        "इस प्रोजेक्ट और गाँव के लिए धारा 4 की अधिसूचना अभी स्वीकृत नहीं हुई है। " +
+                        "अवार्ड बनाने से पहले कृपया धारा 4 की स्वीकृति प्राप्त करें।"
+                    ),
+                    { type: "danger", sticky: true }
+                );
+                return;
+            }
+
             const existing = await this.orm.searchRead(
                 "bhu.section23.award",
                 [

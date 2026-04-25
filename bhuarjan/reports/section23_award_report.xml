@@ -347,205 +347,300 @@
     </template>
 
     <template id="section23_award_cover_letter">
-        <!-- Cover Letter / Executive Summary -->
-        <div class="page section23-award-section" style="padding: 12px 14px;">
-            <div style="border:2px solid #8a4531; border-radius:10px; padding:12px; background:#fffaf5;">
-                <table style="width:100%; border:none !important; margin-bottom:8px;" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td style="width:70px; border:none !important; vertical-align:top;">
-                            <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Department Logo" style="height:52px; width:auto;"/>
-                        </td>
-                        <td style="border:none !important; text-align:center; vertical-align:top;">
-                            <div style="font-size:24px; font-weight:800; color:#4f2418; line-height:1.15;">Section 23 Award Executive Summary</div>
-                            <div style="font-size:13px; font-weight:700; color:#6f3a29; margin-top:2px;">धारा 23 अवार्ड सारांश / परियोजना रिपोर्ट</div>
-                        </td>
-                        <td style="width:120px; border:none !important; text-align:right; vertical-align:top; font-size:11px; font-weight:700; color:#6f3a29;">
-                            <div><span t-esc="award_headers['sections']['land_sheet_label']"/></div>
-                            <div style="margin-top:4px;">Date: <span t-esc="o.award_date or ''"/></div>
-                        </td>
-                    </tr>
-                </table>
-
-                <table style="width:100%; border-collapse:collapse; margin-bottom:8px; font-size:12px;">
-                    <tr>
-                        <td style="border:1px solid #d6b6a3 !important; background:#fff; padding:6px;"><strong>Department:</strong> <span t-esc="o.department_id.name if o.department_id else '-'"/></td>
-                        <td style="border:1px solid #d6b6a3 !important; background:#fff; padding:6px;"><strong>Award Ref:</strong> <span t-esc="o.name or '-'"/></td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #d6b6a3 !important; background:#fff; padding:6px;"><strong>Project:</strong> <span t-esc="o.project_id.name if o.project_id else '-'"/></td>
-                        <td style="border:1px solid #d6b6a3 !important; background:#fff; padding:6px;"><strong>Award Date:</strong> <span t-esc="o.award_date or '-'"/></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="border:1px solid #d6b6a3 !important; background:#fff; padding:6px;">
-                            <strong>Village:</strong> <span t-esc="o.village_id.name if o.village_id else '-'"/> |
-                            <strong>Tehsil:</strong> <span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else '-'"/> |
-                            <strong>District:</strong> <span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else '-'"/>
-                        </td>
-                    </tr>
-                </table>
-
-                <table style="width:100%; border-collapse:separate; border-spacing:6px; margin-bottom:8px;">
-                    <tr>
-                        <td style="width:18%; border:1px solid #d6b6a3 !important; background:#fff; text-align:center; padding:7px 5px;">
-                            <div style="font-size:11px; color:#7a4a36; font-weight:700;">Total Landowners</div>
-                            <div style="font-size:18px; color:#3b1f17; font-weight:800;"><span t-esc="cover_landowners"/></div>
-                        </td>
-                        <td style="width:18%; border:1px solid #d6b6a3 !important; background:#fff; text-align:center; padding:7px 5px;">
-                            <div style="font-size:11px; color:#7a4a36; font-weight:700;">Land Component</div>
-                            <div style="font-size:16px; color:#3b1f17; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.land_total or 0.0, 0)"/></div>
-                        </td>
-                        <td style="width:18%; border:1px solid #d6b6a3 !important; background:#fff; text-align:center; padding:7px 5px;">
-                            <div style="font-size:11px; color:#7a4a36; font-weight:700;">Tree Component</div>
-                            <div style="font-size:16px; color:#3b1f17; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.tree_total or 0.0, 0)"/></div>
-                        </td>
-                        <td style="width:18%; border:1px solid #d6b6a3 !important; background:#fff; text-align:center; padding:7px 5px;">
-                            <div style="font-size:11px; color:#7a4a36; font-weight:700;">Asset Component</div>
-                            <div style="font-size:16px; color:#3b1f17; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.structure_total or 0.0, 0)"/></div>
-                        </td>
-                        <td style="width:4%; border:none !important; text-align:center; vertical-align:middle; font-size:26px; color:#7a4a36; font-weight:800;">=</td>
-                        <td style="width:24%; border:1px solid #8a4531 !important; background:#fff; text-align:center; padding:7px 5px;">
-                            <div style="font-size:11px; color:#6f3a29; font-weight:700;">Grand Total Award Value</div>
-                            <div style="font-size:22px; color:#3b1f17; font-weight:800; margin-top:1px;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.grand_total or 0.0, 0)"/></div>
-                        </td>
-                    </tr>
-                </table>
-
-                            <table style="width:100%; border-collapse:separate; border-spacing:6px; margin-bottom:8px;">
-                    <tr>
-                        <td style="width:50%; vertical-align:top; border:1px solid #d6b6a3 !important; background:#fff; padding:7px;">
-                            <div style="font-size:12px; font-weight:800; color:#5f2f22; margin-bottom:6px;">Irrigation Mix (Land Insights)</div>
-                            <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Irrigated</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_irrigated_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_irrigated_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="o.format_indian_number(cover_irrigated_area, 3)"/> Ha</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Unirrigated</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_unirrigated_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_unirrigated_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="o.format_indian_number(cover_unirrigated_area, 3)"/> Ha</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Fallow/Other</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_fallow_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_fallow_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="o.format_indian_number(cover_fallow_area, 3)"/> Ha</td>
-                                            </tr>
-                            </table>
-                            <div style="margin-top:6px; font-size:10px; color:#6e4a39;">Distribution by acquired area (Ha)</div>
-                            <div style="margin-top:4px;">
-                                <div style="height:10px; background:#eee; border:1px solid #d9c1b2;">
-                                    <div t-att-style="'height:10px; background:#4caf50; width:' + str(((cover_irrigated_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
-                                </div>
-                                <div style="height:10px; background:#eee; border:1px solid #d9c1b2; margin-top:3px;">
-                                    <div t-att-style="'height:10px; background:#ff9800; width:' + str(((cover_unirrigated_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
-                                </div>
-                                <div style="height:10px; background:#eee; border:1px solid #d9c1b2; margin-top:3px;">
-                                    <div t-att-style="'height:10px; background:#9e9e9e; width:' + str(((cover_fallow_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="width:50%; vertical-align:top; border:1px solid #d6b6a3 !important; background:#fff; padding:7px;">
-                            <div style="font-size:12px; font-weight:800; color:#5f2f22; margin-bottom:6px;">Road Band Mix (MR vs BMR)</div>
-                            <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">MR (Main Road)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_mr_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_mr_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="o.format_indian_number(cover_mr_area, 3)"/> Ha</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">BMR (Beyond Main Road)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_bmr_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_bmr_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="o.format_indian_number(cover_bmr_area, 3)"/> Ha</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;"><strong>Total Parcels</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="cover_total_land_rows"/></strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong>100.0%</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="o.format_indian_number(cover_land_area_total, 3)"/> Ha</strong></td>
-                                            </tr>
-                            </table>
-                            <div style="margin-top:6px; font-size:10px; color:#6e4a39;">Area share by road band</div>
-                            <div style="height:10px; background:#eee; border:1px solid #d9c1b2; margin-top:4px;">
-                                <div t-att-style="'height:10px; background:#795548; width:' + str(((cover_mr_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
-                            </div>
-                            <div style="height:10px; background:#eee; border:1px solid #d9c1b2; margin-top:3px;">
-                                <div t-att-style="'height:10px; background:#c7a17f; width:' + str(((cover_bmr_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-
-                            <table style="width:100%; border-collapse:separate; border-spacing:6px; margin-bottom:8px;">
-                                <tr>
-                                    <td style="width:50%; vertical-align:top; border:1px solid #d6b6a3 !important; background:#fff; padding:7px;">
-                                        <div style="font-size:12px; font-weight:800; color:#5f2f22; margin-bottom:6px;">Tree Composition (Fruit vs Non-Fruit)</div>
-                                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Fruit Bearing</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_tree_fruit_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_tree_fruit_rows) * 100.0 / cover_total_tree_rows) if cover_total_tree_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_fruit_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Non-Fruit / Others</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_tree_non_fruit_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_tree_non_fruit_rows) * 100.0 / cover_total_tree_rows) if cover_total_tree_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_non_fruit_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;"><strong>Total</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="cover_total_tree_rows"/></strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong>100.0%</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_total_amount, 0)"/></strong></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                    <td style="width:50%; vertical-align:top; border:1px solid #d6b6a3 !important; background:#fff; padding:7px;">
-                                        <div style="font-size:12px; font-weight:800; color:#5f2f22; margin-bottom:6px;">Asset Type Mix (with %)</div>
-                                        <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">House (1)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_asset_house_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_asset_house_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_house_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Well (2)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_asset_well_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_asset_well_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_well_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Shed (3)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_asset_shed_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_asset_shed_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_shed_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;">Other (4)</td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="len(cover_asset_other_rows)"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="(('%.1f' % ((len(cover_asset_other_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_other_amount, 0)"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px;"><strong>Total</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="cover_total_asset_rows"/></strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong>100.0%</strong></td>
-                                                <td style="border:1px solid #e6cfc0 !important; padding:4px; text-align:right;"><strong><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_total_amount, 0)"/></strong></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                <div style="margin-top:6px; border-top:1px dashed #cda88f; padding-top:7px; font-size:10.8px; color:#6e4a39; line-height:1.35;">
-                    This award summary provides component-wise compensation values and analytical distributions for village-level decision support.
+        <!-- Cover Letter / Executive Summary - Premium Design -->
+        <div class="page section23-award-section" style="padding: 10px 12px; background: #faf6f0;">
+            <!-- Outer Premium Frame with Gold Border -->
+            <div style="border:3px double #8a4531; border-radius:14px; padding:0; background: linear-gradient(135deg, #fffdf9 0%, #fff5ea 50%, #fff9f2 100%); box-shadow: inset 0 0 0 1px #d4af37, inset 0 0 30px rgba(212,175,55,0.05);">
+                
+                <!-- Top Banner with Decorative Strip -->
+                <div style="background: linear-gradient(90deg, #8a4531 0%, #b85c43 50%, #8a4531 100%); padding:3px 0; border-radius: 11px 11px 0 0;">
+                    <div style="height: 4px; background: linear-gradient(90deg, transparent 0%, #d4af37 20%, #f4d564 50%, #d4af37 80%, transparent 100%);"></div>
                 </div>
+
+                <!-- Header Section with Logo and Title -->
+                <div style="padding: 14px 18px 10px 18px;">
+                    <table style="width:100%; border:none !important;" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="width:80px; border:none !important; vertical-align:middle; text-align:center;">
+                                <div style="width:64px; height:64px; border:2px solid #d4af37; border-radius:50%; padding:3px; background: radial-gradient(circle, #fff8ed 0%, #fff 70%); display:inline-block;">
+                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Department Logo" style="height:54px; width:54px; object-fit:contain;"/>
+                                </div>
+                            </td>
+                            <td style="border:none !important; text-align:center; vertical-align:middle; padding: 0 14px;">
+                                <div style="font-size:11px; color:#8a4531; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:2px;">◆ Government of Chhattisgarh ◆</div>
+                                <div style="font-size:26px; font-weight:900; color:#3d1810; line-height:1.1; letter-spacing:0.5px; text-shadow: 1px 1px 0 rgba(212,175,55,0.2);">Section 23 Award</div>
+                                <div style="font-size:14px; font-weight:800; color:#8a4531; line-height:1.15; margin-top:2px; letter-spacing:0.3px;">Executive Summary &amp; Project Insights</div>
+                                <div style="font-size:12px; font-weight:700; color:#6f3a29; margin-top:3px; font-style: italic;">धारा 23 अवार्ड सारांश एवं परियोजना विश्लेषण</div>
+                                <div style="display:inline-block; margin-top:6px; padding:2px 14px; background: linear-gradient(90deg, transparent 0%, #d4af37 30%, #f4d564 50%, #d4af37 70%, transparent 100%); border-radius:2px;"></div>
+                            </td>
+                            <td style="width:130px; border:none !important; text-align:right; vertical-align:middle;">
+                                <div style="background: linear-gradient(135deg, #8a4531 0%, #5a2d20 100%); color:#fff8ed; padding:8px 10px; border-radius:8px; box-shadow: 0 2px 6px rgba(138,69,49,0.3);">
+                                    <div style="font-size:10px; font-weight:800; letter-spacing:1px; opacity:0.9;"><span t-esc="award_headers['sections']['land_sheet_label']"/></div>
+                                    <div style="font-size:9px; margin-top:4px; opacity:0.8;">Generated</div>
+                                    <div style="font-size:11px; font-weight:800; margin-top:1px;"><span t-esc="o.award_date or ''"/></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Main Content Body -->
+                <div style="padding: 0 14px 12px 14px;">
+
+                <!-- Project Identity Card -->
+                <div style="background: linear-gradient(135deg, #ffffff 0%, #fdf6ed 100%); border:1px solid #c9926d; border-left:5px solid #8a4531; border-radius:8px; padding:10px 12px; margin-bottom:10px; box-shadow: 0 1px 3px rgba(138,69,49,0.08);">
+                    <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+                        <tr>
+                            <td style="border:none !important; padding:3px 6px; width:33%;">
+                                <span style="font-size:9px; color:#a06548; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:block;">Department / विभाग</span>
+                                <span style="font-size:12px; color:#2d1810; font-weight:800;"><span t-esc="o.department_id.name if o.department_id else '-'"/></span>
+                            </td>
+                            <td style="border:none !important; padding:3px 6px; width:33%; border-left:1px dashed #d4b39a !important;">
+                                <span style="font-size:9px; color:#a06548; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:block;">Award Reference</span>
+                                <span style="font-size:12px; color:#2d1810; font-weight:800;"><span t-esc="o.name or '-'"/></span>
+                            </td>
+                            <td style="border:none !important; padding:3px 6px; width:34%; border-left:1px dashed #d4b39a !important;">
+                                <span style="font-size:9px; color:#a06548; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:block;">Award Date / दिनांक</span>
+                                <span style="font-size:12px; color:#2d1810; font-weight:800;"><span t-esc="o.award_date or '-'"/></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border:none !important; padding:6px 6px 2px 6px; border-top:1px dashed #d4b39a !important;">
+                                <span style="font-size:9px; color:#a06548; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:block;">Project / परियोजना</span>
+                                <span style="font-size:13px; color:#2d1810; font-weight:800;"><span t-esc="o.project_id.name if o.project_id else '-'"/></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border:none !important; padding:4px 6px 0 6px; font-size:11px;">
+                                <span style="display:inline-block; background:#8a4531; color:#fff; padding:2px 8px; border-radius:10px; font-weight:800; font-size:10px; margin-right:6px;">📍 Location</span>
+                                <strong style="color:#5a2d20;">Village:</strong> <span style="color:#2d1810; font-weight:700;" t-esc="o.village_id.name if o.village_id else '-'"/>
+                                <span style="color:#c9926d; margin:0 6px;">|</span>
+                                <strong style="color:#5a2d20;">Tehsil:</strong> <span style="color:#2d1810; font-weight:700;" t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else '-'"/>
+                                <span style="color:#c9926d; margin:0 6px;">|</span>
+                                <strong style="color:#5a2d20;">District:</strong> <span style="color:#2d1810; font-weight:700;" t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else '-'"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Premium KPI Cards Row -->
+                <table style="width:100%; border-collapse:separate; border-spacing:5px; margin-bottom:10px;">
+                    <tr>
+                        <td style="width:17%; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #f3f9f4 100%); border-top:3px solid #2e7d32 !important; border-radius:8px; text-align:center; padding:9px 5px; box-shadow: 0 2px 5px rgba(46,125,50,0.12);">
+                            <div style="width:28px; height:28px; line-height:28px; border-radius:50%; background:#2e7d32; color:#fff; font-size:14px; font-weight:900; margin: 0 auto 4px auto;">👥</div>
+                            <div style="font-size:9.5px; color:#1b5e20; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Landowners</div>
+                            <div style="font-size:22px; color:#1b5e20; font-weight:900; line-height:1.1; margin-top:2px;"><span t-esc="cover_landowners"/></div>
+                            <div style="font-size:9px; color:#558b2f; font-weight:600;">भूमिस्वामी</div>
+                        </td>
+                        <td style="width:18%; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #fff9e6 100%); border-top:3px solid #f57c00 !important; border-radius:8px; text-align:center; padding:9px 5px; box-shadow: 0 2px 5px rgba(245,124,0,0.12);">
+                            <div style="width:28px; height:28px; line-height:28px; border-radius:50%; background:#f57c00; color:#fff; font-size:14px; font-weight:900; margin: 0 auto 4px auto;">🌾</div>
+                            <div style="font-size:9.5px; color:#e65100; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Land</div>
+                            <div style="font-size:14px; color:#bf360c; font-weight:900; line-height:1.1; margin-top:2px;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.land_total or 0.0, 0)"/></div>
+                            <div style="font-size:9px; color:#e65100; font-weight:600;">भूमि मुआवजा</div>
+                        </td>
+                        <td style="width:18%; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%); border-top:3px solid #689f38 !important; border-radius:8px; text-align:center; padding:9px 5px; box-shadow: 0 2px 5px rgba(104,159,56,0.12);">
+                            <div style="width:28px; height:28px; line-height:28px; border-radius:50%; background:#689f38; color:#fff; font-size:14px; font-weight:900; margin: 0 auto 4px auto;">🌳</div>
+                            <div style="font-size:9.5px; color:#33691e; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Trees</div>
+                            <div style="font-size:14px; color:#33691e; font-weight:900; line-height:1.1; margin-top:2px;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.tree_total or 0.0, 0)"/></div>
+                            <div style="font-size:9px; color:#558b2f; font-weight:600;">वृक्ष मुआवजा</div>
+                        </td>
+                        <td style="width:18%; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%); border-top:3px solid #6a1b9a !important; border-radius:8px; text-align:center; padding:9px 5px; box-shadow: 0 2px 5px rgba(106,27,154,0.12);">
+                            <div style="width:28px; height:28px; line-height:28px; border-radius:50%; background:#6a1b9a; color:#fff; font-size:14px; font-weight:900; margin: 0 auto 4px auto;">🏠</div>
+                            <div style="font-size:9.5px; color:#4a148c; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Assets</div>
+                            <div style="font-size:14px; color:#4a148c; font-weight:900; line-height:1.1; margin-top:2px;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.structure_total or 0.0, 0)"/></div>
+                            <div style="font-size:9px; color:#6a1b9a; font-weight:600;">परिसम्पत्ति</div>
+                        </td>
+                        <td style="width:3%; border:none !important; text-align:center; vertical-align:middle; font-size:32px; color:#8a4531; font-weight:900;">=</td>
+                        <td style="width:26%; border:none !important; background: linear-gradient(135deg, #fff9e6 0%, #ffe066 30%, #fff8d6 70%, #ffe066 100%); border:2px solid #d4af37 !important; border-radius:10px; text-align:center; padding:9px 6px; box-shadow: 0 3px 10px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.8);">
+                            <div style="font-size:9px; color:#5a2d20; font-weight:900; text-transform:uppercase; letter-spacing:1.2px;">★ Grand Total Award Value ★</div>
+                            <div style="font-size:11px; color:#8a4531; font-weight:700; margin-top:1px;">कुल अवार्ड राशि</div>
+                            <div style="font-size:24px; color:#3d1810; font-weight:900; margin-top:3px; line-height:1; text-shadow: 1px 1px 0 rgba(255,255,255,0.5);">
+                                <span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(o.grand_total or 0.0, 0)"/>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Analytics Row 1: Irrigation Mix & Road Band -->
+                <table style="width:100%; border-collapse:separate; border-spacing:5px; margin-bottom:8px;">
+                    <tr>
+                        <!-- Irrigation Mix Card -->
+                        <td style="width:50%; vertical-align:top; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #fafdf6 100%); border:1px solid #c5d6a8 !important; border-radius:8px; padding:0; box-shadow: 0 1px 4px rgba(46,125,50,0.08);">
+                            <div style="background: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%); color:#fff; padding:6px 10px; border-radius:7px 7px 0 0; font-size:11.5px; font-weight:800; letter-spacing:0.5px;">
+                                💧 Irrigation Mix &amp; Land Insights / सिंचाई वर्गीकरण
+                            </div>
+                            <div style="padding:8px 10px;">
+                                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                                    <tr style="background:#f1f8e9;">
+                                        <td style="border:1px solid #c5d6a8 !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#2e7d32; border-radius:50%; margin-right:5px;"></span>Irrigated / सिंचित</td>
+                                        <td style="border:1px solid #c5d6a8 !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_irrigated_rows)"/></td>
+                                        <td style="border:1px solid #c5d6a8 !important; padding:5px 6px; text-align:right; font-weight:800; color:#2e7d32;"><span t-esc="(('%.1f' % ((len(cover_irrigated_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #c5d6a8 !important; padding:5px 6px; text-align:right; font-weight:700;"><span t-esc="o.format_indian_number(cover_irrigated_area, 3)"/> Ha</td>
+                                    </tr>
+                                    <tr style="background:#fff8e1;">
+                                        <td style="border:1px solid #ffe0a3 !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#ff9800; border-radius:50%; margin-right:5px;"></span>Unirrigated / असिंचित</td>
+                                        <td style="border:1px solid #ffe0a3 !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_unirrigated_rows)"/></td>
+                                        <td style="border:1px solid #ffe0a3 !important; padding:5px 6px; text-align:right; font-weight:800; color:#ef6c00;"><span t-esc="(('%.1f' % ((len(cover_unirrigated_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #ffe0a3 !important; padding:5px 6px; text-align:right; font-weight:700;"><span t-esc="o.format_indian_number(cover_unirrigated_area, 3)"/> Ha</td>
+                                    </tr>
+                                    <tr style="background:#f5f5f5;">
+                                        <td style="border:1px solid #d6d6d6 !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#757575; border-radius:50%; margin-right:5px;"></span>Fallow / पड़ती</td>
+                                        <td style="border:1px solid #d6d6d6 !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_fallow_rows)"/></td>
+                                        <td style="border:1px solid #d6d6d6 !important; padding:5px 6px; text-align:right; font-weight:800; color:#424242;"><span t-esc="(('%.1f' % ((len(cover_fallow_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #d6d6d6 !important; padding:5px 6px; text-align:right; font-weight:700;"><span t-esc="o.format_indian_number(cover_fallow_area, 3)"/> Ha</td>
+                                    </tr>
+                                </table>
+                                <div style="margin-top:8px; font-size:9.5px; color:#558b2f; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">📊 Distribution by Acquired Area (Ha)</div>
+                                <div style="margin-top:4px;">
+                                    <div style="height:11px; background:#f5f5f5; border:1px solid #ddd; border-radius:6px; overflow:hidden;">
+                                        <div t-att-style="'height:11px; background: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%); width:' + str(((cover_irrigated_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
+                                    </div>
+                                    <div style="height:11px; background:#f5f5f5; border:1px solid #ddd; border-radius:6px; overflow:hidden; margin-top:3px;">
+                                        <div t-att-style="'height:11px; background: linear-gradient(90deg, #ef6c00 0%, #ffa726 100%); width:' + str(((cover_unirrigated_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
+                                    </div>
+                                    <div style="height:11px; background:#f5f5f5; border:1px solid #ddd; border-radius:6px; overflow:hidden; margin-top:3px;">
+                                        <div t-att-style="'height:11px; background: linear-gradient(90deg, #616161 0%, #9e9e9e 100%); width:' + str(((cover_fallow_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Road Band Mix Card -->
+                        <td style="width:50%; vertical-align:top; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #faf5ee 100%); border:1px solid #c9926d !important; border-radius:8px; padding:0; box-shadow: 0 1px 4px rgba(138,69,49,0.08);">
+                            <div style="background: linear-gradient(90deg, #5d4037 0%, #8d6e63 100%); color:#fff; padding:6px 10px; border-radius:7px 7px 0 0; font-size:11.5px; font-weight:800; letter-spacing:0.5px;">
+                                🛣️ Road Band Distribution / सड़क वर्गीकरण
+                            </div>
+                            <div style="padding:8px 10px;">
+                                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                                    <tr style="background:#efebe9;">
+                                        <td style="border:1px solid #c9926d !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#5d4037; border-radius:50%; margin-right:5px;"></span>MR (Main Road)</td>
+                                        <td style="border:1px solid #c9926d !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_mr_rows)"/></td>
+                                        <td style="border:1px solid #c9926d !important; padding:5px 6px; text-align:right; font-weight:800; color:#5d4037;"><span t-esc="(('%.1f' % ((len(cover_mr_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #c9926d !important; padding:5px 6px; text-align:right; font-weight:700;"><span t-esc="o.format_indian_number(cover_mr_area, 3)"/> Ha</td>
+                                    </tr>
+                                    <tr style="background:#fff8f0;">
+                                        <td style="border:1px solid #d4b39a !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#c7a17f; border-radius:50%; margin-right:5px;"></span>BMR (Beyond Main Road)</td>
+                                        <td style="border:1px solid #d4b39a !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_bmr_rows)"/></td>
+                                        <td style="border:1px solid #d4b39a !important; padding:5px 6px; text-align:right; font-weight:800; color:#8d6e63;"><span t-esc="(('%.1f' % ((len(cover_bmr_rows) * 100.0 / cover_total_land_rows) if cover_total_land_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #d4b39a !important; padding:5px 6px; text-align:right; font-weight:700;"><span t-esc="o.format_indian_number(cover_bmr_area, 3)"/> Ha</td>
+                                    </tr>
+                                    <tr style="background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);">
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; font-weight:900; color:#5a2d20;">⭐ Total Parcels</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:center; font-weight:900; color:#5a2d20;"><span t-esc="cover_total_land_rows"/></td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:right; font-weight:900; color:#5a2d20;">100.0%</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:right; font-weight:900; color:#5a2d20;"><span t-esc="o.format_indian_number(cover_land_area_total, 3)"/> Ha</td>
+                                    </tr>
+                                </table>
+                                <div style="margin-top:8px; font-size:9.5px; color:#6d4c41; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">📊 Area Share by Road Band</div>
+                                <div style="height:11px; background:#f5f5f5; border:1px solid #ddd; border-radius:6px; overflow:hidden; margin-top:4px;">
+                                    <div t-att-style="'height:11px; background: linear-gradient(90deg, #4e342e 0%, #795548 100%); width:' + str(((cover_mr_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
+                                </div>
+                                <div style="height:11px; background:#f5f5f5; border:1px solid #ddd; border-radius:6px; overflow:hidden; margin-top:3px;">
+                                    <div t-att-style="'height:11px; background: linear-gradient(90deg, #a1887f 0%, #d7ccc8 100%); width:' + str(((cover_bmr_area * 100.0 / cover_land_area_total) if cover_land_area_total else 0.0)) + '%;'"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Analytics Row 2: Tree Composition & Asset Mix -->
+                <table style="width:100%; border-collapse:separate; border-spacing:5px; margin-bottom:8px;">
+                    <tr>
+                        <!-- Tree Composition Card -->
+                        <td style="width:50%; vertical-align:top; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%); border:1px solid #aed581 !important; border-radius:8px; padding:0; box-shadow: 0 1px 4px rgba(104,159,56,0.08);">
+                            <div style="background: linear-gradient(90deg, #558b2f 0%, #8bc34a 100%); color:#fff; padding:6px 10px; border-radius:7px 7px 0 0; font-size:11.5px; font-weight:800; letter-spacing:0.5px;">
+                                🌳 Tree Composition / वृक्ष वर्गीकरण
+                            </div>
+                            <div style="padding:8px 10px;">
+                                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                                    <tr style="background:#fff8e1;">
+                                        <td style="border:1px solid #ffe082 !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#f57f17; border-radius:50%; margin-right:5px;"></span>🍎 Fruit Bearing / फलदार</td>
+                                        <td style="border:1px solid #ffe082 !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_tree_fruit_rows)"/></td>
+                                        <td style="border:1px solid #ffe082 !important; padding:5px 6px; text-align:right; font-weight:800; color:#e65100;"><span t-esc="(('%.1f' % ((len(cover_tree_fruit_rows) * 100.0 / cover_total_tree_rows) if cover_total_tree_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #ffe082 !important; padding:5px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_fruit_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background:#f1f8e9;">
+                                        <td style="border:1px solid #c5e1a5 !important; padding:5px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#558b2f; border-radius:50%; margin-right:5px;"></span>🌲 Non-Fruit / गैर-फलदार</td>
+                                        <td style="border:1px solid #c5e1a5 !important; padding:5px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_tree_non_fruit_rows)"/></td>
+                                        <td style="border:1px solid #c5e1a5 !important; padding:5px 6px; text-align:right; font-weight:800; color:#2e7d32;"><span t-esc="(('%.1f' % ((len(cover_tree_non_fruit_rows) * 100.0 / cover_total_tree_rows) if cover_total_tree_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #c5e1a5 !important; padding:5px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_non_fruit_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);">
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; font-weight:900; color:#5a2d20;">⭐ Total Trees</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:center; font-weight:900; color:#5a2d20;"><span t-esc="cover_total_tree_rows"/></td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:right; font-weight:900; color:#5a2d20;">100.0%</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:6px; text-align:right; font-weight:900; color:#5a2d20;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_tree_total_amount, 0)"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                        <!-- Asset Type Mix Card -->
+                        <td style="width:50%; vertical-align:top; border:none !important; background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%); border:1px solid #ce93d8 !important; border-radius:8px; padding:0; box-shadow: 0 1px 4px rgba(106,27,154,0.08);">
+                            <div style="background: linear-gradient(90deg, #6a1b9a 0%, #ab47bc 100%); color:#fff; padding:6px 10px; border-radius:7px 7px 0 0; font-size:11.5px; font-weight:800; letter-spacing:0.5px;">
+                                🏠 Asset Type Distribution / परिसम्पत्ति वर्गीकरण
+                            </div>
+                            <div style="padding:8px 10px;">
+                                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                                    <tr style="background:#fce4ec;">
+                                        <td style="border:1px solid #f48fb1 !important; padding:4px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#c2185b; border-radius:50%; margin-right:5px;"></span>🏠 House / मकान (1)</td>
+                                        <td style="border:1px solid #f48fb1 !important; padding:4px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_asset_house_rows)"/></td>
+                                        <td style="border:1px solid #f48fb1 !important; padding:4px 6px; text-align:right; font-weight:800; color:#c2185b;"><span t-esc="(('%.1f' % ((len(cover_asset_house_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #f48fb1 !important; padding:4px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_house_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background:#e3f2fd;">
+                                        <td style="border:1px solid #90caf9 !important; padding:4px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#1565c0; border-radius:50%; margin-right:5px;"></span>💧 Well / कुआँ (2)</td>
+                                        <td style="border:1px solid #90caf9 !important; padding:4px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_asset_well_rows)"/></td>
+                                        <td style="border:1px solid #90caf9 !important; padding:4px 6px; text-align:right; font-weight:800; color:#1565c0;"><span t-esc="(('%.1f' % ((len(cover_asset_well_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #90caf9 !important; padding:4px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_well_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background:#fff3e0;">
+                                        <td style="border:1px solid #ffcc80 !important; padding:4px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#ef6c00; border-radius:50%; margin-right:5px;"></span>🏚️ Shed / शेड (3)</td>
+                                        <td style="border:1px solid #ffcc80 !important; padding:4px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_asset_shed_rows)"/></td>
+                                        <td style="border:1px solid #ffcc80 !important; padding:4px 6px; text-align:right; font-weight:800; color:#ef6c00;"><span t-esc="(('%.1f' % ((len(cover_asset_shed_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #ffcc80 !important; padding:4px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_shed_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background:#f3e5f5;">
+                                        <td style="border:1px solid #ce93d8 !important; padding:4px 6px; font-weight:700;"><span style="display:inline-block; width:8px; height:8px; background:#6a1b9a; border-radius:50%; margin-right:5px;"></span>📦 Other / अन्य (4)</td>
+                                        <td style="border:1px solid #ce93d8 !important; padding:4px 6px; text-align:center; font-weight:700;"><span t-esc="len(cover_asset_other_rows)"/></td>
+                                        <td style="border:1px solid #ce93d8 !important; padding:4px 6px; text-align:right; font-weight:800; color:#6a1b9a;"><span t-esc="(('%.1f' % ((len(cover_asset_other_rows) * 100.0 / cover_total_asset_rows) if cover_total_asset_rows else 0.0)) + '%')"/></td>
+                                        <td style="border:1px solid #ce93d8 !important; padding:4px 6px; text-align:right; font-weight:800;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_other_amount, 0)"/></td>
+                                    </tr>
+                                    <tr style="background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);">
+                                        <td style="border:2px solid #d4af37 !important; padding:5px 6px; font-weight:900; color:#5a2d20;">⭐ Total Assets</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:5px 6px; text-align:center; font-weight:900; color:#5a2d20;"><span t-esc="cover_total_asset_rows"/></td>
+                                        <td style="border:2px solid #d4af37 !important; padding:5px 6px; text-align:right; font-weight:900; color:#5a2d20;">100.0%</td>
+                                        <td style="border:2px solid #d4af37 !important; padding:5px 6px; text-align:right; font-weight:900; color:#5a2d20;"><span t-esc="cover_currency"/> <span t-esc="o.format_indian_number(cover_asset_total_amount, 0)"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Premium Footer Note -->
+                <div style="margin-top:8px; background: linear-gradient(135deg, #fff8ed 0%, #fff5e6 100%); border:1px solid #d4b39a; border-left:4px solid #8a4531; border-radius:6px; padding:8px 12px;">
+                    <table style="width:100%; border:none !important;">
+                        <tr>
+                            <td style="border:none !important; vertical-align:middle; width:40px;">
+                                <div style="width:32px; height:32px; line-height:32px; border-radius:50%; background: linear-gradient(135deg, #8a4531 0%, #b85c43 100%); color:#fff; text-align:center; font-size:16px; font-weight:900;">📋</div>
+                            </td>
+                            <td style="border:none !important; vertical-align:middle; padding-left:8px;">
+                                <div style="font-size:10.5px; color:#5a2d20; font-weight:800; letter-spacing:0.3px;">Executive Summary Statement / कार्यकारी सारांश विवरण</div>
+                                <div style="font-size:10px; color:#6e4a39; line-height:1.45; margin-top:2px;">
+                                    This document presents component-wise compensation analytics, irrigation distribution, road-band analysis, and asset categorization for village-level award decision support and audit compliance.
+                                    <br/><span style="font-style:italic;">यह दस्तावेज़ ग्राम-स्तरीय अवार्ड निर्णय समर्थन एवं लेखा-परीक्षा अनुपालन के लिए घटक-वार मुआवजा विश्लेषण प्रदान करता है।</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                </div><!-- end content body -->
+
+                <!-- Bottom Decorative Strip -->
+                <div style="background: linear-gradient(90deg, #8a4531 0%, #b85c43 50%, #8a4531 100%); padding:3px 0; border-radius: 0 0 11px 11px; margin-top: 4px;">
+                    <div style="height: 4px; background: linear-gradient(90deg, transparent 0%, #d4af37 20%, #f4d564 50%, #d4af37 80%, transparent 100%);"></div>
+                </div>
+
             </div>
         </div>
     </template>
@@ -659,13 +754,10 @@
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/>
-                                        <span class="award-hdr-note">गुणांक 14 बाजार मूल्य 100% जोड़ें</span>
-                                    </th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
-                                        <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
-                                        <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
+                                        <span t-esc="o.get_interest_period_note()"/>
                                     </th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/></th>
                                     <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
@@ -826,7 +918,7 @@
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8.<br/>मूल्य</th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>कुल राशि</th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10.<br/>100% सोलेशियम</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>धारा 30(3) के अनुसार ब्याज<br/>(12% वार्षिक)<br/><t t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/><t t-esc="award_headers['pdf']['land_headers']['col_16_to']"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>धारा 30(3) के अनुसार ब्याज<br/>(1% मासिक)<br/><t t-esc="o.get_interest_period_note()"/></th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">12.<br/>वृक्ष का कुल मुआवजा राशि<br/>(9+10+11)</th>
                                     </tr>
                                 </thead>
@@ -915,7 +1007,7 @@
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">6.<br/>क्षेत्रफल<br/>(वर्ग मीटर में)</th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">7.<br/>बाजार मूल्य</th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8.<br/>100% सोलेशियम राशि</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>धारा 30(3) के अनुसार ब्याज<br/>(12% वार्षिक)<br/><t t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/><t t-esc="award_headers['pdf']['land_headers']['col_16_to']"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>धारा 30(3) के अनुसार ब्याज<br/>(1% मासिक)<br/><t t-esc="o.get_interest_period_note()"/></th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10.<br/>कुल मुआवजा राशि</th>
                                         <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>रिमार्क</th>
                                     </tr>

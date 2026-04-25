@@ -26,6 +26,13 @@ class Section23Award(models.Model):
     
     # Award details
     award_date = fields.Date(string='Award Date / अवार्ड दिनांक', default=fields.Date.today, tracking=True)
+    section4_hearing_date = fields.Date(
+        string='Section 4 Public Hearing Date / धारा 4 सार्वजनिक सुनवाई दिनांक',
+        compute='_compute_section4_hearing_date',
+        store=False,
+        readonly=True,
+        help='Automatically fetched from Section 4 notification public hearing date'
+    )
     avg_three_year_sales_sort_rate = fields.Float(
         string='Avg. sales sort rate (3 years) / विगत तीन वर्षों का औसत बिक्री छांट दर',
         digits=(16, 4),
@@ -149,6 +156,15 @@ class Section23Award(models.Model):
                 ])
                 if existing:
                     raise ValidationError(_('An award already exists for this Project and Village. / इस परियोजना और गाँव के लिए एक अवार्ड पहले से ही मौजूद है।'))
+
+    @api.depends('project_id', 'village_id')
+    def _compute_section4_hearing_date(self):
+        for rec in self:
+            if rec.project_id and rec.village_id:
+                hearing_date = rec._get_section4_public_hearing_date()
+                rec.section4_hearing_date = hearing_date
+            else:
+                rec.section4_hearing_date = False
 
     def _compute_user_roles(self):
         for rec in self:
@@ -1184,6 +1200,13 @@ class Section23Award(models.Model):
             raise ValidationError(_('Please select a project first.'))
         if not self.village_id:
             raise ValidationError(_('Please select a village first.'))
+        if not self._get_section4_approval_date():
+            raise ValidationError(_(
+                'Section 4 notification is not approved yet for this project and village.\n'
+                'Please get the Section 4 approved before creating the award.\n\n'
+                'इस प्रोजेक्ट और गाँव के लिए धारा 4 की अधिसूचना अभी स्वीकृत नहीं हुई है।\n'
+                'अवार्ड बनाने से पहले कृपया धारा 4 की स्वीकृति प्राप्त करें।'
+            ))
         if not self.award_survey_line_ids:
             self._populate_award_survey_lines(reset_if_empty=False)
         if not self.award_survey_line_ids:
@@ -1429,6 +1452,23 @@ class Section23Award(models.Model):
                     return candidate
         return False
 
+    def _get_section4_public_hearing_date(self):
+        """Return section 4 public hearing date for this project/village."""
+        self.ensure_one()
+        if not self.project_id or not self.village_id:
+            return False
+        section4_records = self.env['bhu.section4.notification'].search([
+            ('project_id', '=', self.project_id.id),
+            ('village_id', '=', self.village_id.id),
+        ], order='public_hearing_date desc, public_hearing_datetime desc, id desc', limit=10)
+        for section4 in section4_records:
+            if section4.public_hearing_date:
+                return fields.Date.to_date(section4.public_hearing_date)
+            if section4.public_hearing_datetime:
+                dt = fields.Datetime.to_datetime(section4.public_hearing_datetime)
+                return dt.date() if dt else False
+        return False
+
     def get_award_header_constants(self):
         """Shared award header labels used by Excel and PDF outputs."""
         self.ensure_one()
@@ -1444,9 +1484,9 @@ class Section23Award(models.Model):
         return fields.Date.context_today(self)
 
     def _calculate_interest_on_basic(self, basic_value):
-        """Calculate 12% annual interest on basic value."""
+        """Calculate 1% monthly interest on basic value from Section 4 public hearing to award date."""
         self.ensure_one()
-        start_date = self._get_section4_approval_date()
+        start_date = self._get_section4_public_hearing_date()
         end_date = self._get_award_calculation_date()
         if not start_date or not end_date or not basic_value:
             return 0.0, 0
@@ -1455,7 +1495,9 @@ class Section23Award(models.Model):
         days = (end_date - start_date).days
         if days <= 0:
             return 0.0, 0
-        interest = basic_value * 0.12 * (days / 365.25)
+        # 1% per month = 12% per year; interest = principal * rate * time
+        months = days / 30.44  # Average days per month
+        interest = basic_value * 0.01 * months  # 1% per month
         return interest, days
 
     @api.model
@@ -1485,15 +1527,15 @@ class Section23Award(models.Model):
         return 800000.0
 
     def get_interest_period_note(self):
-        """Text note for report header interest period."""
+        """Text note for report header interest period from Section 4 public hearing to award date."""
         self.ensure_one()
-        start_date = self._get_section4_approval_date()
+        start_date = self._get_section4_public_hearing_date()
         end_date = self._get_award_calculation_date()
         if start_date and end_date:
             if end_date < start_date:
                 start_date, end_date = end_date, start_date
             return f"{start_date.strftime('%d/%m/%Y')} से {end_date.strftime('%d/%m/%Y')} तक"
-        return "धारा 4 स्वीकृति दिनांक से अवार्ड दिनांक तक"
+        return "धारा 4 सार्वजनिक सुनवाई दिनांक से अवार्ड दिनांक तक"
 
     def _s23_land_base_rate_per_hectare(self, survey, award_line, derived_within):
         """MR/BMR line from the active land rate master (before irrigation and diverted %), for display."""
@@ -1898,8 +1940,8 @@ class Section23Award(models.Model):
             data['land_khasra'] = data.get('land_khasra') or data.get('khasra') or ''
             data['tree_khasra'] = data.get('tree_khasra') or data.get('khasra') or ''
             data['land_area_ha'] = data.get('land_area_ha', 0.0) or 0.0
-            solatium = determined_value * 0.1  # 10% solatium
-            interest = determined_value * 2.1  # Interest calculation (210%)
+            solatium = determined_value * 1.0  # 100% solatium
+            interest = determined_value * 0.21  # Interest calculation (21%)
             total = determined_value + solatium + interest
 
             data['determined_value'] = determined_value

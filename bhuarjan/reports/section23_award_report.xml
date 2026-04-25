@@ -901,25 +901,26 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
+                        <t t-set="tree_headers" t-value="award_headers['excel']['sim_tree_headers']"/>
                         <table class="section23-tree-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">1.<br/>क्र.</th>
-                                        <th rowspan="2" style="width: 130px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">2.<br/>भूमि स्वामी का नाम<br/>पिता/पति का नाम, जाति</th>
+                                        <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[0]"/></th>
+                                        <th rowspan="2" style="width: 130px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[1]"/></th>
                                         <th colspan="10" style="text-align: center; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">भूमि जिस पर वृक्ष लगे हैं, का विवरण तथा मुआवजा</th>
-                                        <th rowspan="2" style="width: 60px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">13.<br/>रिमार्क</th>
+                                        <th rowspan="2" style="width: 60px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[12]"/></th>
                                     </tr>
                                     <tr>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">3.<br/>खसरा नं.<br/>(जिसमें वृक्ष स्थित है)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">4.<br/>वृक्ष का प्रकार</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">5.<br/>वृक्ष संख्या</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">6.<br/>गोलाई<br/>(से.मी.)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">7.<br/>दर<br/>(रुपए में)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8.<br/>मूल्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>कुल राशि</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10.<br/>100% सोलेशियम</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>धारा 30(3) के अनुसार ब्याज<br/>(1% मासिक)<br/><t t-esc="o.get_interest_period_note()"/></th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">12.<br/>वृक्ष का कुल मुआवजा राशि<br/>(9+10+11)</th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[2]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[3]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[4]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[5]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[6]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[7]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[8]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[9]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[10]"/><br/><t t-esc="o.get_interest_period_note()"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[11]"/></th>
                                     </tr>
                                 </thead>
                             <tbody>
@@ -996,20 +997,21 @@
                                 ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
+                        <t t-set="asset_headers" t-value="award_headers['excel']['sim_asset_headers']"/>
                         <table class="section23-asset-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th style="width: 30px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">1.<br/>क्र.</th>
-                                        <th style="width: 150px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">2.<br/>भूमिस्वामी विवरण</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">3.<br/>खसरा नंबर<br/>(जिसमें परिसंपत्ति स्थित है)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">4.<br/>रकबा</th>
-                                        <th style="width: 110px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">5.<br/>परिसम्पत्ति विवरण<br/>(1) मकान (2) कुआं (3) शेड (4) अन्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">6.<br/>क्षेत्रफल<br/>(वर्ग मीटर में)</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">7.<br/>बाजार मूल्य</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">8.<br/>100% सोलेशियम राशि</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">9.<br/>धारा 30(3) के अनुसार ब्याज<br/>(1% मासिक)<br/><t t-esc="o.get_interest_period_note()"/></th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">10.<br/>कुल मुआवजा राशि</th>
-                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">11.<br/>रिमार्क</th>
+                                        <th style="width: 30px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[0]"/></th>
+                                        <th style="width: 150px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[1]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[2]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[3]"/></th>
+                                        <th style="width: 110px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[4]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[5]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[6]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[7]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[8]"/><br/><t t-esc="o.get_interest_period_note()"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[9]"/></th>
+                                        <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="asset_headers[10]"/></th>
                                     </tr>
                                 </thead>
                             <tbody>
@@ -1025,7 +1027,6 @@
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
                                             <td style="text-align: center; border: 1px solid #000 !important;" t-esc="asset.get('asset_khasra', '')"/>
-                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('asset_land_area', 0.0), 3)"/>
                                             <td style="border: 1px solid #000 !important;">
                                                 (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
                                                 <t t-if="str(asset.get('asset_code', '4')) == '4' and asset.get('remark', '')">
@@ -1033,6 +1034,7 @@
                                                 </t>
                                             </td>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('asset_dimension', 0.0), 2)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('rate_per_sqm', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('market_value', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('solatium', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('interest', 0.0), 0)"/>
@@ -1044,9 +1046,9 @@
                                     <tr class="total-row">
                                         <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>

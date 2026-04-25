@@ -1051,9 +1051,9 @@ class Section23Award(models.Model):
                         asset_sheet.write(asset_row, 0, i if idx == 0 else '', cell_center_fmt)
                         asset_sheet.write(asset_row, 1, details if idx == 0 else '', cell_fmt)
                         asset_sheet.write(asset_row, 2, asset.get('asset_khasra', ''), cell_center_fmt)
-                        asset_sheet.write_number(asset_row, 3, float(asset.get('asset_land_area', 0.0) or 0.0), number_fmt)
-                        asset_sheet.write(asset_row, 4, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
-                        asset_sheet.write_number(asset_row, 5, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
+                        asset_sheet.write(asset_row, 3, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
+                        asset_sheet.write_number(asset_row, 4, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
+                        asset_sheet.write_number(asset_row, 5, float(asset.get('rate_per_sqm', 0.0) or 0.0), money_fmt)
                         asset_sheet.write_number(asset_row, 6, float(asset.get('market_value', 0.0) or 0.0), money_fmt)
                         asset_sheet.write_number(asset_row, 7, float(asset.get('solatium', 0.0) or 0.0), money_fmt)
                         asset_sheet.write_number(asset_row, 8, float(asset.get('interest', 0.0) or 0.0), money_fmt)
@@ -1063,9 +1063,9 @@ class Section23Award(models.Model):
 
                     asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
                     asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                    asset_sheet.write_number(asset_row, 3, float(group.get('asset_land_area', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_blank(asset_row, 4, None, total_label_fmt)
-                    asset_sheet.write_number(asset_row, 5, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
+                    asset_sheet.write_blank(asset_row, 3, None, total_label_fmt)
+                    asset_sheet.write_number(asset_row, 4, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
+                    asset_sheet.write_blank(asset_row, 5, None, total_label_fmt)
                     asset_sheet.write_number(asset_row, 6, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
                     asset_sheet.write_number(asset_row, 7, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
                     asset_sheet.write_number(asset_row, 8, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
@@ -1484,7 +1484,7 @@ class Section23Award(models.Model):
         return fields.Date.context_today(self)
 
     def _calculate_interest_on_basic(self, basic_value):
-        """Calculate 1% monthly interest on basic value from Section 4 public hearing to award date."""
+        """Calculate 12% annual interest from Section 4 public hearing to award date."""
         self.ensure_one()
         start_date = self._get_section4_public_hearing_date()
         end_date = self._get_award_calculation_date()
@@ -1495,9 +1495,7 @@ class Section23Award(models.Model):
         days = (end_date - start_date).days
         if days <= 0:
             return 0.0, 0
-        # 1% per month = 12% per year; interest = principal * rate * time
-        months = days / 30.44  # Average days per month
-        interest = basic_value * 0.01 * months  # 1% per month
+        interest = basic_value * 0.12 * (days / 365.25)
         return interest, days
 
     @api.model
@@ -1941,7 +1939,7 @@ class Section23Award(models.Model):
             data['tree_khasra'] = data.get('tree_khasra') or data.get('khasra') or ''
             data['land_area_ha'] = data.get('land_area_ha', 0.0) or 0.0
             solatium = determined_value * 1.0  # 100% solatium
-            interest = determined_value * 0.21  # Interest calculation (21%)
+            interest, _days = self._calculate_interest_on_basic(determined_value)
             total = determined_value + solatium + interest
 
             data['determined_value'] = determined_value
@@ -1986,12 +1984,14 @@ class Section23Award(models.Model):
                 'asset_type': line.get_structure_type_label(),
                 'asset_code': 4,
                 'asset_dimension': (line.asset_count or 0.0) if line.structure_type == 'well' else (line.area_sqm or 0.0),
+                'rate_per_sqm': line.market_rate_per_sqm or 0.0,
                 'remark': line.description or '',
             }
             owners = survey.landowner_ids
             if owners:
                 owner_count = len(owners)
                 share = total_value / owner_count if owner_count else total_value
+                share_interest, _days = self._calculate_interest_on_basic(share)
                 for owner in owners:
                     structure_data.append({
                         **base_row,
@@ -1999,18 +1999,19 @@ class Section23Award(models.Model):
                         'father_name': owner.father_name or owner.spouse_name or '',
                         'market_value': share,
                         'solatium': share,
-                        'interest': 0.0,
-                        'total': share * 2.0,
+                        'interest': share_interest,
+                        'total': share + share + share_interest,
                     })
             else:
+                total_interest, _days = self._calculate_interest_on_basic(total_value)
                 structure_data.append({
                     **base_row,
                     'landowner_name': '',
                     'father_name': '',
                     'market_value': total_value,
                     'solatium': total_value,
-                    'interest': 0.0,
-                    'total': total_value * 2.0,
+                    'interest': total_interest,
+                    'total': total_value + total_value + total_interest,
                 })
         return structure_data
 

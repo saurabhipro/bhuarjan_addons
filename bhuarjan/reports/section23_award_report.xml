@@ -519,20 +519,20 @@
                                         </tr>
                                     </t>
                                     <tr class="total-row">
-                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">कुल</td>
-                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('land_area_ha', 0.0), 4)"/>
-                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
-                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">-</td>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;">-</td>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('mulya', group.get('value', 0.0)), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('kul_rashi', group.get('value', 0.0)), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
-                                        <td style="border: 1px solid #000 !important;"></td>
+                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('land_area_ha', 0.0), 4)"/>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('tree_count', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('mulya', group.get('value', 0.0)), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('kul_rashi', group.get('value', 0.0)), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td style="border: 1px solid #000 !important; background-color: #ffd54f;"></td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>
@@ -613,16 +613,16 @@
                                         </tr>
                                     </t>
                                     <tr class="total-row">
-                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">कुल</td>
-                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
-                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important;">कुल</td>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
-                                        <td style="border: 1px solid #000 !important;"></td>
+                                        <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('asset_land_area', 0.0), 3)"/>
+                                        <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('asset_dimension', 0.0), 2)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('total', 0.0), 0)"/>
+                                        <td style="border: 1px solid #000 !important; background-color: #ffd54f;"></td>
                                     </tr>
                                     <t t-set="serial" t-value="serial + 1"/>
                                 </t>

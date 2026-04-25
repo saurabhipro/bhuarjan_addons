@@ -32,6 +32,11 @@ class AwardDownloadWizard(models.TransientModel):
 
     # True when opened from Section 23 "Generate award" (same UI as Award Simulator)
     section23_generate = fields.Boolean(string='Section 23 Generate', default=False)
+    add_cover_letter = fields.Boolean(
+        string='Add Cover Letter / कवर लेटर जोड़ें',
+        default=False,
+        help='Include executive summary cover page in Section 23 PDF.',
+    )
 
     section23_avg_three_year_sales_sort_rate = fields.Integer(
         string='विगत तीन वर्षों का औसत बिक्री छांट दर',
@@ -77,19 +82,22 @@ class AwardDownloadWizard(models.TransientModel):
                     'Please enter विगत तीन वर्षों का औसत बिक्री छांट दर (must be greater than zero) '
                     'before generating the award.'
                 ))
-            if rate > 0:
+            if self.section23_generate and rate > 0:
                 record.write({'avg_three_year_sales_sort_rate': float(rate)})
 
         if self.section23_generate and self.res_model == 'bhu.section23.award':
             if not hasattr(record, 'apply_generate_from_download_wizard'):
                 raise UserError(_('This record does not support the generate flow.'))
             return record.apply_generate_from_download_wizard(
-                file_format=self.format, export_scope=scope
+                file_format=self.format, export_scope=scope, include_cover_letter=bool(self.add_cover_letter)
             )
 
         if self.format == 'pdf':
             if self.res_model == 'bhu.section23.award' and hasattr(record, 'action_download_pdf_components'):
-                return record.action_download_pdf_components(export_scope=scope)
+                return record.action_download_pdf_components(
+                    export_scope=scope,
+                    include_cover_letter=bool(self.add_cover_letter),
+                )
             report = self.env.ref(self.report_xml_id)
             return report.report_action(record)
         if self.format == 'excel':

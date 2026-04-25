@@ -737,6 +737,7 @@ class Section23Award(models.Model):
                 'default_report_xml_id': report_action.get_external_id().get(report_action.id, 'bhuarjan.action_report_section23_award'),
                 'default_filename': f'Section23_Award_{self.name}.doc',
                 'default_export_scope': 'all',
+                'default_add_cover_letter': True,
             }
         }
 
@@ -1160,14 +1161,17 @@ class Section23Award(models.Model):
         return self.action_download_excel_components(export_scope=export_scope)
 
 
-    def action_download_pdf_components(self, export_scope='all'):
+    def action_download_pdf_components(self, export_scope='all', include_cover_letter=False):
         """Download Section 23 PDF with selected section scope."""
         self.ensure_one()
         scope = export_scope or self.env.context.get('bhu_export_scope') or 'all'
         if scope not in ('all', 'land', 'asset', 'tree'):
             scope = 'all'
         report_action = self._get_section23_report_action()
-        return report_action.with_context(s23_pdf_scope=scope).report_action(self)
+        return report_action.with_context(
+            s23_pdf_scope=scope,
+            s23_include_cover=bool(include_cover_letter),
+        ).report_action(self)
     
     def _validate_for_generate(self, require_sales_sort_rate=True):
         """Pre-checks for opening/running generate flow.
@@ -1239,10 +1243,11 @@ class Section23Award(models.Model):
                 'default_filename': f'Section23_Award_{self.name}.pdf',
                 'default_export_scope': 'all',
                 'default_section23_generate': True,
+                'default_add_cover_letter': True,
             },
         }
 
-    def apply_generate_from_download_wizard(self, file_format, export_scope='all'):
+    def apply_generate_from_download_wizard(self, file_format, export_scope='all', include_cover_letter=False):
         """Called from bhu.award.download.wizard when Section 23 generate is confirmed."""
         self.ensure_one()
         import base64
@@ -1264,7 +1269,10 @@ class Section23Award(models.Model):
             scope = 'all'
 
         report_action = self._get_section23_report_action()
-        pdf_result = report_action.sudo().with_context(s23_pdf_scope=scope)._render_qweb_pdf(
+        pdf_result = report_action.sudo().with_context(
+            s23_pdf_scope=scope,
+            s23_include_cover=bool(include_cover_letter),
+        )._render_qweb_pdf(
             report_action.id,
             [self.id],
             data={},
@@ -1289,7 +1297,10 @@ class Section23Award(models.Model):
                 }
 
         self.write({'is_generated': True})
-        return report_action.with_context(s23_pdf_scope=scope).report_action(self)
+        return report_action.with_context(
+            s23_pdf_scope=scope,
+            s23_include_cover=bool(include_cover_letter),
+        ).report_action(self)
 
     def _get_section23_report_action(self):
         """Get Section 23 report action with safe fallback when xmlid is missing."""

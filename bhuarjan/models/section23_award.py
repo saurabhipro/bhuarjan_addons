@@ -1033,8 +1033,10 @@ class Section23Award(models.Model):
             asset_sheet.merge_range(asset_row, 0, asset_row, 10, f"{award_headers['sections']['asset_sheet_label']} - {award_headers['sections']['asset_title']}", header_group_fmt)
             asset_row += 1
             asset_headers = award_headers['excel']['sim_asset_headers']
+            interest_period_note = self.get_interest_period_note()
             for col, title in enumerate(asset_headers):
-                asset_sheet.write(asset_row, col, title, header_fmt)
+                header_title = f"{title}\n{interest_period_note}" if col == 8 else title
+                asset_sheet.write(asset_row, col, header_title, header_fmt)
             asset_row += 1
             asset_groups = self.get_structure_compensation_grouped_data()
             if not asset_groups:

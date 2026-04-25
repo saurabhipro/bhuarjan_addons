@@ -640,10 +640,7 @@
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_from']"/><br/>
                                         <span t-esc="award_headers['pdf']['land_headers']['col_16_to']"/>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/>
-                                        <span class="award-hdr-note">यदि 6,8,17 एवं 18 में से देय</span>
-                                        <span class="award-hdr-note">मुआवजा राशि</span>
-                                    </th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/></th>
                                     <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>

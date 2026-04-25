@@ -956,7 +956,7 @@ class Section23Award(models.Model):
                             land_type_hi = 'सिंचित भूमि'
                         else:
                             land_type_hi = 'असिंचित भूमि'
-                        land_sheet.write(row, 16, f"{rehab_amount:,.2f} - {land_type_hi}", cell_fmt)
+                        land_sheet.write(row, 16, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
                         land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1

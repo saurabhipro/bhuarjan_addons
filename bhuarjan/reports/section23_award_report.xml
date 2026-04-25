@@ -23,22 +23,6 @@
             }
             .header-text { color: #1a237e; border-bottom: 2px solid #1a237e; }
             .page { position: relative; }
-            .s23-page-badge {
-                position: absolute;
-                top: 6px;
-                right: 8px;
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                border: 1.8px solid #8a4531;
-                background: #fff8ef;
-                color: #5a2f22;
-                text-align: center;
-                font-size: 11px;
-                font-weight: 800;
-                line-height: 34px;
-                z-index: 10;
-            }
             .container img { border: none !important; outline: none !important; box-shadow: none !important; }
             /* One sheet per page: land, then trees, then assets (wkhtmltopdf) */
             .section23-award-section + .section23-award-section {
@@ -311,8 +295,10 @@
     <!-- Custom external layout for section23 award report -->
     <template id="section23_award_external_layout">
         <!-- Custom Header - repeats on every page -->
-        <div class="header o_clearfix" style="width:100%; background:#fff; padding:0; margin:0; border:none; height:1px; overflow:hidden;">
-            <div style="font-size:1px; color:#fff;">.</div>
+        <div class="header o_clearfix" style="width:100%; background:transparent; padding:0; margin:0; border:none; height:42px; overflow:visible; position:relative;">
+            <div style="position:absolute; top:4px; right:8px; width:32px; height:32px; border-radius:50%; border:1.8px solid #8a4531; background:#fff8ef; color:#5a2f22; text-align:center; line-height:32px; font-size:11px; font-weight:800;">
+                <span class="page"/>
+            </div>
         </div>
         <!-- Custom Footer - repeats on every page -->
         <div class="footer o_standard_footer" style="width:100%; background:#fff; border-top:2px solid #000; padding:4px 8px; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
@@ -337,7 +323,6 @@
     <template id="section23_award_cover_letter">
         <!-- Cover Letter / Executive Summary -->
         <div class="page section23-award-section" style="padding: 12px 14px;">
-            <div class="s23-page-badge"><span class="page"/></div>
             <div style="border:2px solid #8a4531; border-radius:10px; padding:12px; background:#fffaf5;">
                 <table style="width:100%; border:none !important; margin-bottom:8px;" cellpadding="0" cellspacing="0">
                     <tr>
@@ -609,7 +594,6 @@
 
                     <!-- Part 1 (Ka) - LAND COMPENSATION -->
                     <div t-if="show_land" class="page section23-award-section" style="padding: 10px;">
-                        <div class="s23-page-badge"><span class="page"/></div>
                         <table class="section23-land-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                             <thead>
                                 <tr>
@@ -734,12 +718,10 @@
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('interest', 0.0), 0)"/>
                                             <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;">
-                                                <span t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/><br/>
-                                                <span style="font-size:9px; color:#333; font-weight:700;">
-                                                    <t t-if="land.get('fallow')">पड़ती भूमि</t>
-                                                    <t t-elif="land.get('irrigated')">सिंचित भूमि</t>
-                                                    <t t-else="">असिंचित भूमि</t>
-                                                </span>
+                                                <span style="display:block; text-align:right;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
+                                                <div style="display:block; width:100%; text-align:center !important; font-size:9px; line-height:1.2; color:#333; font-weight:700; margin-top:2px;">
+                                                    (<t t-if="land.get('fallow')">पड़ती भूमि</t><t t-elif="land.get('irrigated')">सिंचित भूमि</t><t t-else="">असिंचित भूमि</t>)
+                                                </div>
                                             </td>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
                                             <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important;">
@@ -782,7 +764,6 @@
 
                     <!-- Part 1 (Ga) - TREE COMPENSATION -->
                     <div t-if="show_tree" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
-                        <div class="s23-page-badge"><span class="page"/></div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['tree_sheet_label']"/>
@@ -878,7 +859,6 @@
                     </div>
                 <!-- Part 1 (Kh) - ASSET / STRUCTURE COMPENSATION -->
                     <div t-if="show_asset" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
-                        <div class="s23-page-badge"><span class="page"/></div>
 
                             <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
                                 <span t-esc="award_headers['sections']['asset_sheet_label']"/>

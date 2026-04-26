@@ -89,11 +89,11 @@
                                     <t t-set="total_det"   t-value="total_det   + data['determined_total']"/>
                                     <tr>
                                         <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="data['serial']"/></td>
-                                        <td style="border:1px solid #000 !important; padding:3px 4px; font-size:10px;">
+                                        <td style="border:1px solid #000 !important; padding:4px 3px; font-size:10px; vertical-align:top; text-align:left;">
                                             <t t-foreach="data['owners']" t-as="owner">
-                                                <div t-att-style="'' if owner_last else 'border-bottom:1px dotted #bbb; margin-bottom:3px; padding-bottom:3px;'">
-                                                    <!-- Name + पिता/पति inline, exactly like Form 10 -->
-                                                    <span style="font-weight:600;"><t t-esc="owner['name']"/></span>
+                                                <div t-att-style="'' if owner_last else 'margin-bottom:2px; padding-bottom:2px; border-bottom:1px dotted #bbb;'">
+                                                    <!-- Serial number + Name + पिता/पति inline, exactly like Form 10 -->
+                                                    <span style="font-weight:600;"><t t-esc="owner_index + 1"/>. <t t-esc="owner['name']"/></span>
                                                     <t t-if="owner['father_name']">&#160;पिता&#160;<span t-esc="owner['father_name']"/></t>
                                                     <t t-elif="owner['spouse_name']">&#160;पति&#160;<span t-esc="owner['spouse_name']"/></t>
                                                     <t t-if="owner['address']">

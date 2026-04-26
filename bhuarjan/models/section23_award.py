@@ -2124,11 +2124,11 @@ class Section23Award(models.Model):
         })
         cell_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
-            'border': 1, 'valign': 'vcenter', 'align': 'center',
+            'border': 1, 'valign': 'top', 'align': 'left',
         })
         name_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
-            'border': 1, 'valign': 'vcenter', 'align': 'left', 'text_wrap': True,
+            'border': 1, 'valign': 'top', 'align': 'left', 'text_wrap': True,
         })
         num_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
@@ -2342,10 +2342,10 @@ class Section23Award(models.Model):
                 + (data['asset_compensation'] or 0.0)
                 + (data['tree_compensation'] or 0.0)
             )
-            # Build plain-text owner details for Excel — same logic as Form 10
+            # Build plain-text owner details for Excel — same logic as Form 10, with serial numbers
             owner_lines = []
-            for o in data['owners']:
-                block = o['name']
+            for idx, o in enumerate(data['owners'], 1):
+                block = f"{idx}. {o['name']}"
                 if o['father_name']:
                     block += f" पिता {o['father_name']}"
                 elif o['spouse_name']:

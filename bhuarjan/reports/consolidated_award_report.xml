@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_consolidated_award_sheet" model="ir.actions.report">
+            <field name="name">Consolidated Award Sheet / समेकित अवार्ड शीट</field>
+            <field name="model">bhu.section23.award</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bhuarjan.consolidated_award_sheet_report</field>
+            <field name="report_file">bhuarjan.consolidated_award_sheet_report</field>
+            <field name="print_report_name">'ConsolidatedAwardSheet_%s' % (object.village_id.name or 'Village')</field>
+            <field name="paperformat_id" ref="bhuarjan.bhuarjan_section_23_award_paper_format"/>
+        </record>
+    </data>
+
+    <template id="consolidated_award_sheet_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            .consolidated-container {
+                                font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'Lohit Devanagari', 'DejaVu Sans', sans-serif;
+                                font-size: 11px;
+                            }
+                            .consolidated-title {
+                                text-align: center;
+                                font-size: 16px;
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                                color: #1a237e;
+                            }
+                            .consolidated-subtitle {
+                                text-align: left;
+                                font-size: 10px;
+                                margin-bottom: 15px;
+                                color: #333;
+                            }
+                            .consolidated-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 10px;
+                            }
+                            .consolidated-table thead tr {
+                                background-color: #f2f2f2;
+                                font-weight: bold;
+                            }
+                            .consolidated-table th {
+                                border: 1px solid #333;
+                                padding: 6px 4px;
+                                text-align: center;
+                                font-size: 9px;
+                            }
+                            .consolidated-table td {
+                                border: 1px solid #333;
+                                padding: 6px 4px;
+                                text-align: left;
+                            }
+                            .consolidated-table .text-center { text-align: center; }
+                            .consolidated-table .text-right { text-align: right; }
+                            .consolidated-table tfoot tr {
+                                background-color: #e8e8e8;
+                                font-weight: bold;
+                            }
+                        </style>
+
+                        <div class="consolidated-container">
+                            <div class="consolidated-title">CONSOLIDATED AWARD SHEET / समेकित अवार्ड शीट</div>
+                            <div class="consolidated-subtitle">
+                                <t t-set="village_name" t-value="o.village_id.name or '-'"/>
+                                <t t-set="project_name" t-value="o.project_id.name or '-'"/>
+                                <t t-set="tehsil_name" t-value="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else '-'"/>
+                                <t t-set="date_str" t-value="o.award_date.strftime('%Y-%m-%d') if o.award_date else ''"/>
+                                Village: <span t-esc="village_name"/> | Project: <span t-esc="project_name"/> | तहसील: <span t-esc="tehsil_name"/> | Date: <span t-esc="date_str"/>
+                            </div>
+
+                            <t t-set="consolidated_data" t-value="o.get_consolidated_award_data()"/>
+                            <t t-set="headers" t-value="o.get_award_header_constants()['excel']['consolidated_award_headers']"/>
+
+                            <table class="consolidated-table">
+                                <thead>
+                                    <tr>
+                                        <t t-foreach="headers" t-as="header">
+                                            <th><span t-esc="header"/></th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="total_rakba_ha" t-value="0"/>
+                                    <t t-set="total_acq_ha" t-value="0"/>
+                                    <t t-set="total_acq_acre" t-value="0"/>
+                                    <t t-set="total_acq_sqm" t-value="0"/>
+                                    <t t-set="total_land" t-value="0"/>
+                                    <t t-set="total_asset" t-value="0"/>
+                                    <t t-set="total_tree" t-value="0"/>
+                                    <t t-set="total_determined" t-value="0"/>
+
+                                    <t t-foreach="consolidated_data" t-as="data">
+                                        <t t-set="total_rakba_ha" t-value="total_rakba_ha + data['total_rakba_ha']"/>
+                                        <t t-set="total_acq_ha" t-value="total_acq_ha + data['acquired_area_ha']"/>
+                                        <t t-set="total_acq_acre" t-value="total_acq_acre + data['acquired_area_acre']"/>
+                                        <t t-set="total_acq_sqm" t-value="total_acq_sqm + data['acquired_area_sqm']"/>
+                                        <t t-set="total_land" t-value="total_land + data['land_compensation']"/>
+                                        <t t-set="total_asset" t-value="total_asset + data['asset_compensation']"/>
+                                        <t t-set="total_tree" t-value="total_tree + data['tree_compensation']"/>
+                                        <t t-set="total_determined" t-value="total_determined + data['determined_total']"/>
+
+                                        <tr>
+                                            <td class="text-center"><span t-esc="data['serial']"/></td>
+                                            <td><span t-esc="data['owner_details']"/></td>
+                                            <td class="text-center"><span t-esc="data['khasra_total']"/></td>
+                                            <td class="text-right"><span t-esc="'{:.4f}'.format(data['total_rakba_ha'])"/></td>
+                                            <td class="text-center"><span t-esc="data['khasra_acquired']"/></td>
+                                            <td class="text-right"><span t-esc="'{:.4f}'.format(data['acquired_area_ha'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.4f}'.format(data['acquired_area_acre'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['acquired_area_sqm'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['land_compensation'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['asset_compensation'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['tree_compensation'])"/></td>
+                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['determined_total'])"/></td>
+                                            <td><span t-esc="data['remarks']"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class="text-center">कुल</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_rakba_ha)"/></td>
+                                        <td></td>
+                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_acq_ha)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_acq_acre)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_acq_sqm)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_land)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_asset)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_tree)"/></td>
+                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_determined)"/></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

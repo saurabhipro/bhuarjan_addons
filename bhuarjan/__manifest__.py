@@ -57,6 +57,7 @@
         'reports/expert_committee_order_report.xml',
         'reports/section15_objection_resolution_report.xml',
         'reports/section23_award_report.xml',
+        'reports/consolidated_award_report.xml',
         'reports/project_master_report.xml',
         'reports/section247_cglrc_reports.xml',
         'views/district_views.xml',

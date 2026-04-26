@@ -2061,8 +2061,244 @@ class Section23Award(models.Model):
             })
         return structure_data
 
+    def action_download_consolidated_pdf(self):
+        """Download consolidated award sheet as PDF (one row per khasra) using QWeb template."""
+        self.ensure_one()
+        consolidated_data = self.get_consolidated_award_data()
+        if not consolidated_data:
+            raise ValidationError(_('No consolidated data available for this award.'))
+
+        # Use standard report_action so Odoo passes docs/o context correctly.
+        report_action = self.env.ref('bhuarjan.action_report_consolidated_award_sheet')
+        return report_action.sudo().report_action(self)
+    
+    def action_download_consolidated_excel(self):
+        """Download consolidated award sheet as Excel (one row per khasra)."""
+        self.ensure_one()
+        import io
+        import base64
+        try:
+            import xlsxwriter
+        except ImportError:
+            raise ValidationError(_("Python library 'xlsxwriter' is not installed."))
+        
+        consolidated_data = self.get_consolidated_award_data()
+        if not consolidated_data:
+            raise ValidationError(_('No consolidated data available for this award.'))
+        
+        award_headers = self.get_award_header_constants()
+        consolidated_headers = award_headers['excel']['consolidated_award_headers']
+        
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet('Consolidated Award')
+        
+        # Formats
+        title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'border': 1})
+        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#f2f2f2', 'align': 'center', 'valign': 'vcenter', 'border': 1})
+        cell_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
+        cell_center_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
+        money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
+        
+        # Title
+        sheet.merge_range(0, 0, 0, 12, 'CONSOLIDATED AWARD SHEET / समेकित अवार्ड शीट', title_fmt)
+        
+        # Build subtitle with village, project, block, and date
+        village_name = self.village_id.name or '-'
+        project_name = self.project_id.name or '-'
+        block_name = self.village_id.tehsil_id.name if self.village_id and self.village_id.tehsil_id else '-'
+        date_str = self.award_date.strftime('%Y-%m-%d') if self.award_date else ''
+        
+        subtitle = f"Village: {village_name} | Project: {project_name} | प्रमंडल: {block_name} | Date: {date_str}"
+        subtitle_fmt = workbook.add_format({'align': 'left', 'valign': 'vcenter', 'border': 1})
+        sheet.merge_range(1, 0, 1, 12, subtitle, subtitle_fmt)
+        
+        # Headers from constants
+        row = 3
+        for col, header in enumerate(consolidated_headers):
+            sheet.write(row, col, header, header_fmt)
+        
+        # Data rows
+        row = 4
+        for data in consolidated_data:
+            sheet.write(row, 0, data['serial'], cell_center_fmt)
+            sheet.write(row, 1, data['owner_details'], cell_fmt)
+            sheet.write(row, 2, data['khasra_total'], cell_center_fmt)
+            sheet.write_number(row, 3, float(data['total_rakba_ha'] or 0.0), money_fmt)
+            sheet.write(row, 4, data['khasra_acquired'], cell_center_fmt)
+            sheet.write_number(row, 5, float(data['acquired_area_ha'] or 0.0), money_fmt)
+            sheet.write_number(row, 6, float(data['acquired_area_acre'] or 0.0), money_fmt)
+            sheet.write_number(row, 7, float(data['acquired_area_sqm'] or 0.0), money_fmt)
+            sheet.write_number(row, 8, float(data['land_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 9, float(data['asset_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 10, float(data['tree_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 11, float(data['determined_total'] or 0.0), money_fmt)
+            sheet.write(row, 12, data['remarks'], cell_fmt)
+            row += 1
+        
+        # Total row
+        total_rakba_ha = sum(d['total_rakba_ha'] for d in consolidated_data)
+        total_acq_ha = sum(d['acquired_area_ha'] for d in consolidated_data)
+        total_acq_acre = sum(d['acquired_area_acre'] for d in consolidated_data)
+        total_acq_sqm = sum(d['acquired_area_sqm'] for d in consolidated_data)
+        total_land = sum(d['land_compensation'] for d in consolidated_data)
+        total_asset = sum(d['asset_compensation'] for d in consolidated_data)
+        total_tree = sum(d['tree_compensation'] for d in consolidated_data)
+        total_determined = sum(d['determined_total'] for d in consolidated_data)
+        
+        sheet.write(row, 0, 'कुल', header_fmt)
+        sheet.write_blank(row, 1, None, header_fmt)
+        sheet.write_blank(row, 2, None, header_fmt)
+        sheet.write_number(row, 3, total_rakba_ha, money_fmt)
+        sheet.write_blank(row, 4, None, header_fmt)
+        sheet.write_number(row, 5, total_acq_ha, money_fmt)
+        sheet.write_number(row, 6, total_acq_acre, money_fmt)
+        sheet.write_number(row, 7, total_acq_sqm, money_fmt)
+        sheet.write_number(row, 8, total_land, money_fmt)
+        sheet.write_number(row, 9, total_asset, money_fmt)
+        sheet.write_number(row, 10, total_tree, money_fmt)
+        sheet.write_number(row, 11, total_determined, money_fmt)
+        sheet.write_blank(row, 12, None, header_fmt)
+        
+        # Set column widths
+        sheet.set_column(0, 0, 6)
+        sheet.set_column(1, 1, 10)
+        sheet.set_column(2, 2, 20)
+        sheet.set_column(3, 12, 14)
+        
+        workbook.close()
+        output.seek(0)
+        file_data = base64.b64encode(output.read())
+        output.close()
+        
+        attachment = self.env['ir.attachment'].create({
+            'name': f"ConsolidatedAwardSheet_{self.village_id.name or 'Award'}.xlsx",
+            'type': 'binary',
+            'datas': file_data,
+            'res_model': 'bhu.section23.award',
+            'res_id': self.id,
+        })
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }
+    
+    def get_consolidated_award_data(self):
+        """Get consolidated award data by khasra (summary sheet columns)."""
+        self.ensure_one()
+        
+        # Get all component data
+        land_data = self.get_land_compensation_grouped_data()
+        tree_data = self.get_tree_compensation_grouped_data()
+        asset_data = self.get_structure_compensation_grouped_data()
+        
+        # Build khasra-wise consolidated data
+        consolidated = {}
+        
+        # Process land data
+        for group in land_data:
+            for line in group.get('lines', []):
+                khasra = line.get('khasra', '')
+                if khasra not in consolidated:
+                    consolidated[khasra] = {
+                        'khasra': khasra,
+                        'owner_details': set(),
+                        'total_rakba_ha': 0.0,
+                        'acquired_area_ha': 0.0,
+                        'land_compensation': 0.0,
+                        'asset_compensation': 0.0,
+                        'tree_compensation': 0.0,
+                        'remarks': '',
+                    }
+                owner_name = (group.get('landowner_name') or '').strip()
+                father_name = (group.get('father_name') or '').strip()
+                owner_label = owner_name
+                if father_name:
+                    owner_label = f"{owner_name} / {father_name}" if owner_name else father_name
+                if owner_label:
+                    consolidated[khasra]['owner_details'].add(owner_label)
+                consolidated[khasra]['total_rakba_ha'] += line.get('original_area', 0.0) or 0.0
+                consolidated[khasra]['acquired_area_ha'] += line.get('acquired_area', 0.0) or 0.0
+                consolidated[khasra]['land_compensation'] += line.get('total_compensation', 0.0) or 0.0
+        
+        # Process tree data
+        for group in tree_data:
+            for line in group.get('lines', []):
+                khasra = line.get('tree_khasra', line.get('khasra', ''))
+                if khasra not in consolidated:
+                    consolidated[khasra] = {
+                        'khasra': khasra,
+                        'owner_details': set(),
+                        'total_rakba_ha': 0.0,
+                        'acquired_area_ha': 0.0,
+                        'land_compensation': 0.0,
+                        'asset_compensation': 0.0,
+                        'tree_compensation': 0.0,
+                        'remarks': '',
+                    }
+                owner_name = (group.get('landowner_name') or '').strip()
+                father_name = (group.get('father_name') or '').strip()
+                owner_label = owner_name
+                if father_name:
+                    owner_label = f"{owner_name} / {father_name}" if owner_name else father_name
+                if owner_label:
+                    consolidated[khasra]['owner_details'].add(owner_label)
+                consolidated[khasra]['tree_compensation'] += line.get('total', 0.0) or 0.0
+        
+        # Process asset data
+        for group in asset_data:
+            for line in group.get('lines', []):
+                khasra = line.get('asset_khasra', '')
+                if khasra not in consolidated:
+                    consolidated[khasra] = {
+                        'khasra': khasra,
+                        'owner_details': set(),
+                        'total_rakba_ha': 0.0,
+                        'acquired_area_ha': 0.0,
+                        'land_compensation': 0.0,
+                        'asset_compensation': 0.0,
+                        'tree_compensation': 0.0,
+                        'remarks': '',
+                    }
+                owner_name = (group.get('landowner_name') or '').strip()
+                if owner_name:
+                    consolidated[khasra]['owner_details'].add(owner_name)
+                consolidated[khasra]['asset_compensation'] += line.get('total', 0.0) or 0.0
+        
+        # Build result list
+        result = []
+        for khasra in sorted(consolidated.keys()):
+            data = consolidated[khasra]
+            owner_details = ', '.join(sorted(data['owner_details'])) if data['owner_details'] else ''
+            acquired_area_ha = data['acquired_area_ha'] or 0.0
+            acquired_area_acre = acquired_area_ha * 2.471
+            acquired_area_sqm = acquired_area_ha * 10000.0
+            determined_total = (
+                (data['land_compensation'] or 0.0)
+                + (data['asset_compensation'] or 0.0)
+                + (data['tree_compensation'] or 0.0)
+            )
+            result.append({
+                'serial': len(result) + 1,
+                'owner_details': owner_details,
+                'khasra_total': khasra,
+                'total_rakba_ha': data['total_rakba_ha'],
+                'khasra_acquired': khasra,
+                'acquired_area_ha': acquired_area_ha,
+                'acquired_area_acre': acquired_area_acre,
+                'acquired_area_sqm': acquired_area_sqm,
+                'land_compensation': data['land_compensation'],
+                'asset_compensation': data['asset_compensation'],
+                'tree_compensation': data['tree_compensation'],
+                'determined_total': determined_total,
+                'remarks': data['remarks'],
+            })
+        
+        return result
+    
     def get_tree_compensation_grouped_data(self):
-        """Group tree rows by owner+khasra for report rowspans/subtotals."""
         self.ensure_one()
         tree_data = self.get_tree_compensation_data()
         grouped = {}

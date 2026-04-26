@@ -43,6 +43,12 @@ class AwardDownloadWizard(models.TransientModel):
         default=0,
         help='Required to generate the Section 23 award; saved on the award record (integer only).',
     )
+    
+    consolidated_award_sheet = fields.Boolean(
+        string='Consolidated Award Sheet / समेकित अवार्ड शीट',
+        default=False,
+        help='Download consolidated summary by khasra (one row per khasra with totals).',
+    )
 
     @api.model
     def default_get(self, fields_list):
@@ -52,6 +58,9 @@ class AwardDownloadWizard(models.TransientModel):
             res.setdefault('res_id', self.env.context.get('active_id'))
         if self.env.context.get('default_section23_generate'):
             res['section23_generate'] = True
+        else:
+            # Show consolidated option only in download mode (not generate)
+            res.setdefault('consolidated_award_sheet', False)
         res_id = res.get('res_id') or self.env.context.get('default_res_id')
         res_model = res.get('res_model') or self.env.context.get('default_res_model')
         if res_model == 'bhu.section23.award' and res_id:
@@ -91,6 +100,15 @@ class AwardDownloadWizard(models.TransientModel):
             return record.apply_generate_from_download_wizard(
                 file_format=self.format, export_scope=scope, include_cover_letter=bool(self.add_cover_letter)
             )
+        
+        # Consolidated award sheet download
+        if self.consolidated_award_sheet and self.res_model == 'bhu.section23.award':
+            if self.format == 'pdf':
+                if hasattr(record, 'action_download_consolidated_pdf'):
+                    return record.action_download_consolidated_pdf()
+            elif self.format == 'excel':
+                if hasattr(record, 'action_download_consolidated_excel'):
+                    return record.action_download_consolidated_excel()
 
         if self.format == 'pdf':
             if self.res_model == 'bhu.section23.award' and hasattr(record, 'action_download_pdf_components'):

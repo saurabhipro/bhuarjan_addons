@@ -932,8 +932,11 @@ class Section23Award(models.Model):
             land_sheet.merge_range(row, 4, row, 5, sim_land_headers['group_acquired'], header_group_fmt)
             land_sheet.merge_range(row, 6, row + 1, 6, sim_land_headers['col_7_standalone'], header_fmt)
             land_sheet.merge_range(row, 7, row, 9, sim_land_headers['group_main_road'], header_group_fmt)
+            interest_period_note = self.get_interest_period_note()
             for col_offset, label in enumerate(sim_land_headers['tail_headers'], start=10):
-                land_sheet.merge_range(row, col_offset, row + 1, col_offset, label, header_fmt)
+                # Column 14 is the interest column (index 4 in tail_headers)
+                header_title = f"{label}\n{interest_period_note}" if col_offset == 14 else label
+                land_sheet.merge_range(row, col_offset, row + 1, col_offset, header_title, header_fmt)
             row += 1
             sub_header_columns = [2, 3, 4, 5, 7, 8, 9]
             for col_offset, label in zip(sub_header_columns, sim_land_headers['sub_headers']):
@@ -957,7 +960,18 @@ class Section23Award(models.Model):
                         details = f"{details}\nपिता/पति: {father}"
                     
                     start_row = row
+                    line_count = len(lines)
+                    
+                    # Merge serial and owner cells BEFORE the inner loop (for multi-line groups)
+                    if line_count > 1:
+                        land_sheet.merge_range(row, 0, row + line_count - 1, 0, i, cell_center_fmt)
+                        land_sheet.merge_range(row, 1, row + line_count - 1, 1, details, cell_fmt)
+                    
                     for idx, land in enumerate(lines):
+                        # For single-line groups, write serial and owner on first (only) iteration
+                        if idx == 0 and line_count == 1:
+                            land_sheet.write(row, 0, i, cell_center_fmt)
+                            land_sheet.write(row, 1, details, cell_fmt)
                         land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
                         land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
                         land_sheet.write(row, 4, land.get('khasra', ''), cell_center_fmt)
@@ -997,17 +1011,7 @@ class Section23Award(models.Model):
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1
                     
-                    # Merge serial and owner cells for all lines in this group
-                    end_row = row - 1
-                    if start_row == end_row:
-                        # Single line - just write without merge
-                        land_sheet.write(start_row, 0, i, cell_center_fmt)
-                        land_sheet.write(start_row, 1, details, cell_fmt)
-                    else:
-                        # Multiple lines - merge cells
-                        land_sheet.merge_range(start_row, 0, end_row, 0, i, cell_center_fmt)
-                        land_sheet.merge_range(start_row, 1, end_row, 1, details, cell_fmt)
-                    land_sheet.write_number(row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
+                    land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
                     land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_money_fmt)
                     land_sheet.write_number(row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
                     land_sheet.write_number(row, 5, float(group.get('acquired_area', 0.0) or 0.0), total_money_fmt)

@@ -9,7 +9,7 @@ AWARD_HEADER_CONSTANTS = {
         'asset_sheet_label': 'पत्रक (भाग-1 ख)',
         'asset_title': 'परिसंपत्तियों का मुआवजा प्रपत्र',
         'tree_sheet_label': 'पत्रक (भाग-1 ग)',
-        'tree_title': 'वृक्षों का मुआवजा पत्र',
+        'tree_title': 'वृक्षों का मुआवजा पत्रक',
     },
     'excel': {
         'section23_land_title': 'LAND COMPENSATION / भूमि मुआवजा (19 Columns Format)',

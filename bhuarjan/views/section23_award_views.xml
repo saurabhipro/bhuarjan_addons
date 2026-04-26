@@ -6,7 +6,7 @@
         <field name="model">bhu.section23.award</field>
         <field name="arch" type="xml">
             <list string="Section 23 Award">
-                <field name="name" string="Award Reference"/>
+                <field name="case_number" string="Case Number / प्रकरण क्रमांक"/>
                 <field name="project_id" string="Project"/>
                 <field name="village_id" string="Village"/>
                 <field name="award_date" string="Award Date"/>
@@ -75,6 +75,12 @@
                                     <div class="s23_meta_label">Award Date / अवार्ड दिनांक</div>
                                     <div class="s23_meta_value">
                                         <field name="award_date" readonly="state != 'draft'"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item">
+                                    <div class="s23_meta_label">Case Number / प्रकरण क्रमांक</div>
+                                    <div class="s23_meta_value">
+                                        <field name="case_number" readonly="state != 'draft'"/>
                                     </div>
                                 </div>
                                 <div class="s23_meta_item">

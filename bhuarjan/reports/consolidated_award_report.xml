@@ -40,13 +40,15 @@
                                                 <img src="/bhuarjan/static/img/logo.png" alt="Logo" style="height:44px; width:auto;"/>
                                             </div>
                                             <div style="flex:1; text-align:center;">
-                                                <div style="font-size:16px; font-weight:700; color:#000;">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)</div>
+                                                <div style="font-size:16px; font-weight:700; color:#000;">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)</div>
                                                 <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.5;">
-                                                    मू-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> /
+                                                    भू-अर्जन प्रकरण क्रमांक <span t-esc="o.case_number or ''"/> /
                                                     ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
-                                                    प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
                                                     तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
                                                     जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                                                    <t t-if="o.village_id and o.village_id.district_id and o.village_id.district_id.state_id">
+                                                        (<span t-esc="o.village_id.district_id.state_id.name"/>)
+                                                    </t>
                                                 </div>
                                             </div>
                                             <div style="flex-shrink:0; text-align:right; padding-top:2px; font-size:11px; font-weight:700;">
@@ -87,7 +89,19 @@
                                     <t t-set="total_det"   t-value="total_det   + data['determined_total']"/>
                                     <tr>
                                         <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="data['serial']"/></td>
-                                        <td style="border:1px solid #000 !important; padding:3px 4px; font-size:10px;"><span t-esc="data['owner_details']"/></td>
+                                        <td style="border:1px solid #000 !important; padding:3px 4px; font-size:10px;">
+                                            <t t-foreach="data['owners']" t-as="owner">
+                                                <div t-att-style="'' if owner_last else 'border-bottom:1px dotted #bbb; margin-bottom:3px; padding-bottom:3px;'">
+                                                    <!-- Name + पिता/पति inline, exactly like Form 10 -->
+                                                    <span style="font-weight:600;"><t t-esc="owner['name']"/></span>
+                                                    <t t-if="owner['father_name']">&#160;पिता&#160;<span t-esc="owner['father_name']"/></t>
+                                                    <t t-elif="owner['spouse_name']">&#160;पति&#160;<span t-esc="owner['spouse_name']"/></t>
+                                                    <t t-if="owner['address']">
+                                                        <div style="font-size:9px; color:#444;">निवासी: <span t-esc="owner['address']"/></div>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                        </td>
                                         <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="data['khasra_acquired']"/></td>
                                         <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:.4f}'.format(data['acquired_area_ha'])"/></td>
                                         <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:,.2f}'.format(data['land_compensation'])"/></td>

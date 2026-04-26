@@ -26,6 +26,11 @@ class Section23Award(models.Model):
     
     # Award details
     award_date = fields.Date(string='Award Date / अवार्ड दिनांक', default=fields.Date.today, tracking=True)
+    case_number = fields.Char(
+        string='Case Number / प्रकरण क्रमांक',
+        tracking=True,
+        help='Land acquisition case/proceeding number (e.g., SEC23-New, SEC23-2024-001)'
+    )
     section4_hearing_date = fields.Date(
         string='Section 4 Public Hearing Date / धारा 4 सार्वजनिक सुनवाई दिनांक',
         compute='_compute_section4_hearing_date',
@@ -1677,7 +1682,8 @@ class Section23Award(models.Model):
                         compensation_data[key] = {
                             'landowner': landowner,
                             'landowner_name': landowner.name or '',
-                            'father_name': landowner.father_name or landowner.spouse_name or '',
+                            'father_name': landowner.father_name or '',
+                            'spouse_name': landowner.spouse_name or '',
                             'address': landowner.owner_address or '',
                             'khasra': khasra,
                             'original_area': 0.0,
@@ -1830,6 +1836,7 @@ class Section23Award(models.Model):
                 grouped[key] = {
                     'landowner_name': row.get('landowner_name', ''),
                     'father_name': row.get('father_name', ''),
+                    'spouse_name': row.get('spouse_name', ''),
                     'address': row.get('address', ''),
                     'lines': [],
                     'khasra_count': 0,
@@ -1951,7 +1958,8 @@ class Section23Award(models.Model):
                             tree_data[key] = {
                                 'landowner': landowner,
                                 'landowner_name': landowner.name or '',
-                                'father_name': landowner.father_name or landowner.spouse_name or '',
+                                'father_name': landowner.father_name or '',
+                                'spouse_name': landowner.spouse_name or '',
                                 'khasra': khasra,
                                 'total_khasra': khasra,
                                 'total_area': _la,
@@ -2040,8 +2048,6 @@ class Section23Award(models.Model):
                 'structure_type': line.structure_type or '',
                 'construction_type': line.construction_type or '',
                 'asset_code': 4,
-                # Keep displayed dimension aligned with line_total formula:
-                # line_total = area_sqm * market_rate_per_sqm * asset_count
                 'asset_dimension': (
                     (line.asset_count or 0.0)
                     if line.structure_type == 'well'
@@ -2051,12 +2057,16 @@ class Section23Award(models.Model):
                 'remark': line.description or '',
             }
             owners = survey.landowner_ids
+            # Use first owner for display (consistent with land/tree)
+            first_owner = owners[0] if owners else None
             owner_names = ', '.join([o.name for o in owners if o.name]) if owners else ''
             total_interest, _days = self._calculate_interest_on_basic(total_value)
             structure_data.append({
                 **base_row,
                 'landowner_name': owner_names,
-                'father_name': '',
+                'father_name': first_owner.father_name if first_owner else '',
+                'spouse_name': first_owner.spouse_name if first_owner else '',
+                'address': first_owner.owner_address if first_owner else '',
                 'market_value': total_value,
                 'solatium': total_value,
                 'interest': total_interest,
@@ -2151,20 +2161,24 @@ class Section23Award(models.Model):
         # ── Title ──────────────────────────────────────────────────────────
         sheet.set_row(0, 24)
         sheet.merge_range(0, 0, 0, 8,
-            'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)',
+            'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)',
             title_fmt)
 
         # ── Subtitle ───────────────────────────────────────────────────────
         village_name = self.village_id.name or '-'
-        project_name = self.project_id.name or '-'
-        block_name = self.village_id.tehsil_id.name if self.village_id and self.village_id.tehsil_id else '-'
+        tehsil_name = self.village_id.tehsil_id.name if self.village_id and self.village_id.tehsil_id else '-'
+        district_name = self.village_id.district_id.name if self.village_id and self.village_id.district_id else '-'
+        state_name = (self.village_id.district_id.state_id.name
+                      if self.village_id and self.village_id.district_id and self.village_id.district_id.state_id
+                      else '')
+        district_full = f"{district_name} ({state_name})" if state_name else district_name
         date_str = self.award_date.strftime('%d-%m-%Y') if self.award_date else ''
         subtitle = (
-            f"मू-अर्जन प्रकरण क्रमांक {self.name or ''} / "
-            f"ग्राम-{village_name}  प.ह.नं.-{project_name}  "
-            f"तहसील-{block_name}  दिनांक: {date_str}"
+            f"भू-अर्जन प्रकरण क्रमांक {self.case_number or ''} / "
+            f"ग्राम-{village_name}  "
+            f"तहसील-{tehsil_name}  जिला-{district_full}  दिनांक: {date_str}"
         )
-        sheet.set_row(1, 18)
+        sheet.set_row(1, 28)
         sheet.merge_range(1, 0, 1, 8, subtitle, subtitle_fmt)
 
         # ── Two-row column headers ─────────────────────────────────────────
@@ -2183,7 +2197,10 @@ class Section23Award(models.Model):
         row = 5
         t_ha = t_land = t_asset = t_tree = t_det = 0.0
         for data in consolidated_data:
-            sheet.set_row(row, 18)
+            # Estimate row height: each owner block ~3 lines × 15pt; min 20
+            num_owners = len(data.get('owners') or [])
+            row_height = max(20, num_owners * 42)
+            sheet.set_row(row, row_height)
             sheet.write(row, 0, data['serial'], cell_fmt)
             sheet.write(row, 1, data['owner_details'], name_fmt)
             sheet.write(row, 2, data['khasra_acquired'], cell_fmt)
@@ -2242,115 +2259,117 @@ class Section23Award(models.Model):
     def get_consolidated_award_data(self):
         """Get consolidated award data by khasra (summary sheet columns)."""
         self.ensure_one()
-        
-        # Get all component data
+
         land_data = self.get_land_compensation_grouped_data()
         tree_data = self.get_tree_compensation_grouped_data()
         asset_data = self.get_structure_compensation_grouped_data()
-        
-        # Build khasra-wise consolidated data
+
+        def _blank_entry(khasra):
+            return {
+                'khasra': khasra,
+                # owners: list of dicts {name, father_name, address}
+                'owners': [],
+                'owner_keys': set(),   # dedup key: (name, father)
+                'total_rakba_ha': 0.0,
+                'acquired_area_ha': 0.0,
+                'land_compensation': 0.0,
+                'asset_compensation': 0.0,
+                'tree_compensation': 0.0,
+                'remarks': '',
+            }
+
+        def _add_owner(entry, name, father='', spouse='', address=''):
+            name = (name or '').strip()
+            father = (father or '').strip()
+            spouse = (spouse or '').strip()
+            key = (name.lower(), father.lower() or spouse.lower())
+            if name and key not in entry['owner_keys']:
+                entry['owner_keys'].add(key)
+                entry['owners'].append({
+                    'name': name,
+                    'father_name': father,
+                    'spouse_name': spouse,
+                    'address': (address or '').strip(),
+                })
+
         consolidated = {}
-        
-        # Process land data
+
         for group in land_data:
             for line in group.get('lines', []):
                 khasra = line.get('khasra', '')
                 if khasra not in consolidated:
-                    consolidated[khasra] = {
-                        'khasra': khasra,
-                        'owner_details': set(),
-                        'total_rakba_ha': 0.0,
-                        'acquired_area_ha': 0.0,
-                        'land_compensation': 0.0,
-                        'asset_compensation': 0.0,
-                        'tree_compensation': 0.0,
-                        'remarks': '',
-                    }
-                owner_name = (group.get('landowner_name') or '').strip()
-                father_name = (group.get('father_name') or '').strip()
-                owner_label = owner_name
-                if father_name:
-                    owner_label = f"{owner_name} / {father_name}" if owner_name else father_name
-                if owner_label:
-                    consolidated[khasra]['owner_details'].add(owner_label)
+                    consolidated[khasra] = _blank_entry(khasra)
+                _add_owner(consolidated[khasra],
+                           group.get('landowner_name', ''),
+                           group.get('father_name', ''),
+                           group.get('spouse_name', ''),
+                           group.get('address', ''))
                 consolidated[khasra]['total_rakba_ha'] += line.get('original_area', 0.0) or 0.0
                 acquired_ha = (line.get('acquired_area', 0.0) or line.get('original_area', 0.0) or 0.0)
                 consolidated[khasra]['acquired_area_ha'] += acquired_ha
                 consolidated[khasra]['land_compensation'] += line.get('total_compensation', 0.0) or 0.0
-        
-        # Process tree data
+
         for group in tree_data:
             for line in group.get('lines', []):
                 khasra = line.get('tree_khasra', line.get('khasra', ''))
                 if khasra not in consolidated:
-                    consolidated[khasra] = {
-                        'khasra': khasra,
-                        'owner_details': set(),
-                        'total_rakba_ha': 0.0,
-                        'acquired_area_ha': 0.0,
-                        'land_compensation': 0.0,
-                        'asset_compensation': 0.0,
-                        'tree_compensation': 0.0,
-                        'remarks': '',
-                    }
-                owner_name = (group.get('landowner_name') or '').strip()
-                father_name = (group.get('father_name') or '').strip()
-                owner_label = owner_name
-                if father_name:
-                    owner_label = f"{owner_name} / {father_name}" if owner_name else father_name
-                if owner_label:
-                    consolidated[khasra]['owner_details'].add(owner_label)
+                    consolidated[khasra] = _blank_entry(khasra)
+                _add_owner(consolidated[khasra],
+                           group.get('landowner_name', ''),
+                           group.get('father_name', ''),
+                           group.get('spouse_name', ''),
+                           group.get('address', ''))
                 consolidated[khasra]['tree_compensation'] += line.get('total', 0.0) or 0.0
-        
-        # Process asset data
+
         for group in asset_data:
             for line in group.get('lines', []):
                 khasra = line.get('asset_khasra', '')
                 if khasra not in consolidated:
-                    consolidated[khasra] = {
-                        'khasra': khasra,
-                        'owner_details': set(),
-                        'total_rakba_ha': 0.0,
-                        'acquired_area_ha': 0.0,
-                        'land_compensation': 0.0,
-                        'asset_compensation': 0.0,
-                        'tree_compensation': 0.0,
-                        'remarks': '',
-                    }
-                owner_name = (group.get('landowner_name') or '').strip()
-                if owner_name:
-                    consolidated[khasra]['owner_details'].add(owner_name)
+                    consolidated[khasra] = _blank_entry(khasra)
+                _add_owner(consolidated[khasra],
+                           group.get('landowner_name', ''),
+                           group.get('father_name', ''),
+                           group.get('spouse_name', ''),
+                           group.get('address', ''))
                 consolidated[khasra]['asset_compensation'] += line.get('total', 0.0) or 0.0
-        
-        # Build result list
+
         result = []
         for khasra in sorted(consolidated.keys()):
             data = consolidated[khasra]
-            owner_details = ', '.join(sorted(data['owner_details'])) if data['owner_details'] else ''
             acquired_area_ha = data['acquired_area_ha'] or 0.0
-            acquired_area_acre = acquired_area_ha * 2.471
-            acquired_area_sqm = acquired_area_ha * 10000.0
             determined_total = (
                 (data['land_compensation'] or 0.0)
                 + (data['asset_compensation'] or 0.0)
                 + (data['tree_compensation'] or 0.0)
             )
+            # Build plain-text owner details for Excel — same logic as Form 10
+            owner_lines = []
+            for o in data['owners']:
+                block = o['name']
+                if o['father_name']:
+                    block += f" पिता {o['father_name']}"
+                elif o['spouse_name']:
+                    block += f" पति {o['spouse_name']}"
+                if o['address']:
+                    block += f"\nनिवासी: {o['address']}"
+                owner_lines.append(block)
+            owner_details_text = '\n'.join(owner_lines) if owner_lines else ''
+
             result.append({
                 'serial': len(result) + 1,
-                'owner_details': owner_details,
+                'owners': data['owners'],            # list of dicts — used in PDF
+                'owner_details': owner_details_text, # plain text — used in Excel
                 'khasra_total': khasra,
                 'total_rakba_ha': data['total_rakba_ha'],
                 'khasra_acquired': khasra,
                 'acquired_area_ha': acquired_area_ha,
-                'acquired_area_acre': acquired_area_acre,
-                'acquired_area_sqm': acquired_area_sqm,
                 'land_compensation': data['land_compensation'],
                 'asset_compensation': data['asset_compensation'],
                 'tree_compensation': data['tree_compensation'],
                 'determined_total': determined_total,
                 'remarks': data['remarks'],
             })
-        
+
         return result
     
     def get_tree_compensation_grouped_data(self):
@@ -2375,6 +2394,8 @@ class Section23Award(models.Model):
                 grouped[key] = {
                     'landowner_name': row.get('landowner_name', ''),
                     'father_name': row.get('father_name', ''),
+                    'spouse_name': row.get('spouse_name', ''),
+                    'address': row.get('address', ''),
                     'lines': [],
                     'khasra_count': 0,
                     'khasra_seen': set(),

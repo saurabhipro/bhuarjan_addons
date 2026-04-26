@@ -918,7 +918,7 @@ class Section23Award(models.Model):
             land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 8, 11, 10]
             _setup_sheet(land_sheet, land_col_widths, 8)
             row = 0
-            land_sheet.merge_range(row, 0, row, 18, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
+            land_sheet.merge_range(row, 0, row, 18, 'अर्जित भूमि का मुआवजा पत्रक', title_fmt)
             row += 1
             land_sheet.merge_range(row, 0, row, 18, subtitle, subtitle_fmt)
             row += 2
@@ -1132,7 +1132,7 @@ class Section23Award(models.Model):
             _setup_sheet(tree_sheet, tree_col_widths, 4)
             tree_row = 0
             tree_last_col = 12
-            tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
+            tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, 'वृक्षों का मुआवजा पत्रक', title_fmt)
             tree_row += 1
             tree_sheet.merge_range(tree_row, 0, tree_row, tree_last_col, subtitle, subtitle_fmt)
             tree_row += 2

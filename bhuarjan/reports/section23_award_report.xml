@@ -883,27 +883,32 @@
                     <!-- Part 1 (Ga) - TREE COMPENSATION -->
                     <div t-if="show_tree" class="page section23-award-section" style="padding: 10px; page-break-before: always;">
 
-                            <div style="text-align: right; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
-                                <span t-esc="award_headers['sections']['tree_sheet_label']"/>
-                            </div>
-
-                            <div style="text-align: center; margin-bottom: 10px;">
-                                <div style="margin-bottom: 6px;">
-                                    <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 44px; width: auto;"/>
-                                </div>
-                                <h2 style="margin: 0;"><span t-esc="award_headers['sections']['tree_title']"/></h2>
-                                <div style="font-size: 11px; margin-top: 5px;">
-                                    मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
-                                </div>
-                            </div>
-
-                            <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
-                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
-                            </div>
-
                         <t t-set="tree_headers" t-value="award_headers['excel']['sim_tree_headers']"/>
                         <table class="section23-tree-table" border="1" rules="all" style="border-collapse:collapse; width:100%;">
                                 <thead>
+                                    <tr>
+                                        <th colspan="13" style="border: 1px solid #000 !important; background-color: #f5f5f5 !important; color:#000 !important; font-weight:700;">
+                                            <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
+                                                <div style="text-align:center; flex:1;">
+                                                    <div style="margin-bottom:4px;">
+                                                        <img t-att-src="base_url + '/bhuarjan/static/img/logo.png'" alt="Logo" style="height: 30px; width: auto;"/>
+                                                    </div>
+                                                    <div style="font-size:16px; font-weight:700; margin:0 0 2px 0;">
+                                                        <span t-esc="award_headers['sections']['tree_title']"/>
+                                                    </div>
+                                                    <div style="font-size:10px; margin:0 0 2px 0;">
+                                                        मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.name or ''"/> / <span t-esc="o.award_document_filename or ''"/>
+                                                    </div>
+                                                    <div style="font-size:10px; font-weight:700;">
+                                                        ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size:12px; font-weight:700; white-space:nowrap; padding-left:8px;">
+                                                    <span t-esc="award_headers['sections']['tree_sheet_label']"/>
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
                                     <tr>
                                         <th rowspan="2" style="width: 28px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[0]"/></th>
                                         <th rowspan="2" style="width: 130px; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="tree_headers[1]"/></th>

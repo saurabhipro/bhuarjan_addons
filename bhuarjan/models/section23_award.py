@@ -955,9 +955,9 @@ class Section23Award(models.Model):
                     father = group.get('father_name')
                     if father:
                         details = f"{details}\nपिता/पति: {father}"
+                    
+                    start_row = row
                     for idx, land in enumerate(lines):
-                        land_sheet.write(row, 0, i if idx == 0 else '', cell_center_fmt)
-                        land_sheet.write(row, 1, details if idx == 0 else '', cell_fmt)
                         land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
                         land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
                         land_sheet.write(row, 4, land.get('khasra', ''), cell_center_fmt)
@@ -996,8 +996,17 @@ class Section23Award(models.Model):
                         land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1
-
-                    land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
+                    
+                    # Merge serial and owner cells for all lines in this group
+                    end_row = row - 1
+                    if start_row == end_row:
+                        # Single line - just write without merge
+                        land_sheet.write(start_row, 0, i, cell_center_fmt)
+                        land_sheet.write(start_row, 1, details, cell_fmt)
+                    else:
+                        # Multiple lines - merge cells
+                        land_sheet.merge_range(start_row, 0, end_row, 0, i, cell_center_fmt)
+                        land_sheet.merge_range(start_row, 1, end_row, 1, details, cell_fmt)
                     land_sheet.write_number(row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
                     land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_money_fmt)
                     land_sheet.write_number(row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)

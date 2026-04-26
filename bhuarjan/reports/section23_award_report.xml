@@ -935,7 +935,7 @@
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="tree.get('tree_khasra') or tree.get('khasra', '')"/>
+                                            <td t-if="tree_index == 0" t-att-rowspan="line_count" style="text-align: center; border: 1px solid #000 !important;" t-esc="tree.get('tree_khasra') or tree.get('khasra', '')"/>
                                             <td style="border: 1px solid #000 !important;">
                                                 <span t-esc="tree.get('tree_type', '')"/>
                                             </td>
@@ -1026,7 +1026,7 @@
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="asset.get('asset_khasra', '')"/>
+                                            <td t-if="asset_index == 0" t-att-rowspan="line_count" style="text-align: center; border: 1px solid #000 !important;" t-esc="asset.get('asset_khasra', '')"/>
                                             <td style="border: 1px solid #000 !important;">
                                                 (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
                                                 <t t-if="str(asset.get('asset_code', '4')) == '4' and asset.get('remark', '')">

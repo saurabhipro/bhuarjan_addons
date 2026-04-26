@@ -1026,7 +1026,7 @@ class Section23Award(models.Model):
             asset_col_widths = [4, 24, 10, 10, 22, 10, 12, 12, 12, 12, 12]
             _setup_sheet(asset_sheet, asset_col_widths, 4)
             asset_row = 0
-            asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'SECTION 23 AWARD / धारा 23 अवार्ड', title_fmt)
+            asset_sheet.merge_range(asset_row, 0, asset_row, 10, 'परिसंपत्तियों का मुआवजा प्रपत्र', title_fmt)
             asset_row += 1
             asset_sheet.merge_range(asset_row, 0, asset_row, 10, subtitle, subtitle_fmt)
             asset_row += 2
@@ -1049,10 +1049,14 @@ class Section23Award(models.Model):
                     father = group.get('father_name')
                     if father:
                         details = f"{details}\nपिता/पति: {father}"
+                    group_start_row = asset_row
+                    group_khasra = ''
                     for idx, asset in enumerate(lines):
+                        if idx == 0:
+                            group_khasra = asset.get('asset_khasra', '')
                         asset_sheet.write(asset_row, 0, i if idx == 0 else '', cell_center_fmt)
                         asset_sheet.write(asset_row, 1, details if idx == 0 else '', cell_fmt)
-                        asset_sheet.write(asset_row, 2, asset.get('asset_khasra', ''), cell_center_fmt)
+                        asset_sheet.write(asset_row, 2, asset.get('asset_khasra', '') if idx == 0 else '', cell_center_fmt)
                         asset_sheet.write(asset_row, 3, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
                         asset_sheet.write_number(asset_row, 4, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
                         asset_sheet.write_number(asset_row, 5, float(asset.get('rate_per_sqm', 0.0) or 0.0), money_fmt)
@@ -1062,6 +1066,8 @@ class Section23Award(models.Model):
                         asset_sheet.write_number(asset_row, 9, float(asset.get('total', 0.0) or 0.0), money_fmt)
                         asset_sheet.write(asset_row, 10, asset.get('remark', ''), cell_fmt)
                         asset_row += 1
+                    if len(lines) > 1:
+                        asset_sheet.merge_range(group_start_row, 2, asset_row - 1, 2, group_khasra or '', cell_center_fmt)
 
                     asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
                     asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
@@ -1111,12 +1117,16 @@ class Section23Award(models.Model):
                     father = group.get('father_name')
                     if father:
                         details = f"{details}\nपिता/पति: {father}"
+                    group_start_row = tree_row
+                    group_khasra = ''
                     for idx, tree in enumerate(lines):
+                        if idx == 0:
+                            group_khasra = tree.get('tree_khasra', tree.get('khasra', ''))
                         mulya = float(tree.get('mulya', tree.get('value', 0.0)) or 0.0)
                         kul_r = float(tree.get('kul_rashi', tree.get('value', 0.0)) or 0.0)
                         tree_sheet.write(tree_row, 0, i if idx == 0 else '', cell_center_fmt)
                         tree_sheet.write(tree_row, 1, details if idx == 0 else '', cell_fmt)
-                        tree_sheet.write(tree_row, 2, tree.get('tree_khasra', tree.get('khasra', '')), cell_center_fmt)
+                        tree_sheet.write(tree_row, 2, tree.get('tree_khasra', tree.get('khasra', '')) if idx == 0 else '', cell_center_fmt)
                         tree_sheet.write(tree_row, 3, tree.get('tree_type', ''), cell_fmt)
                         tree_sheet.write_number(tree_row, 4, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
                         tree_sheet.write_number(tree_row, 5, float(tree.get('girth_cm', 0.0) or 0.0), number_fmt)
@@ -1128,6 +1138,8 @@ class Section23Award(models.Model):
                         tree_sheet.write_number(tree_row, 11, float(tree.get('total', 0.0) or 0.0), money_fmt)
                         tree_sheet.write(tree_row, 12, tree.get('remark', ''), cell_fmt)
                         tree_row += 1
+                    if len(lines) > 1:
+                        tree_sheet.merge_range(group_start_row, 2, tree_row - 1, 2, group_khasra or '', cell_center_fmt)
 
                     tree_sheet.merge_range(tree_row, 0, tree_row, 1, 'कुल', total_label_fmt)
                     tree_sheet.write_blank(tree_row, 2, None, total_label_fmt)
@@ -2015,7 +2027,7 @@ class Section23Award(models.Model):
         return structure_data
 
     def get_tree_compensation_grouped_data(self):
-        """Group tree rows by owner for report rowspans/subtotals."""
+        """Group tree rows by owner+khasra for report rowspans/subtotals."""
         self.ensure_one()
         tree_data = self.get_tree_compensation_data()
         grouped = {}
@@ -2026,12 +2038,13 @@ class Section23Award(models.Model):
         )
         for row in tree_data:
             owner = row.get('landowner')
+            khasra = row.get('tree_khasra') or row.get('khasra') or ''
             if owner:
-                key = ('owner', owner.id)
+                key = ('owner_khasra', owner.id, khasra)
             elif row.get('landowner_name'):
-                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
+                key = ('name_khasra', row.get('landowner_name'), row.get('father_name') or '', khasra)
             else:
-                key = ('khasra', row.get('khasra') or '')
+                key = ('khasra', khasra)
             if key not in grouped:
                 grouped[key] = {
                     'landowner_name': row.get('landowner_name', ''),
@@ -2045,7 +2058,7 @@ class Section23Award(models.Model):
                 ordered_keys.append(key)
             group = grouped[key]
             group['lines'].append(row)
-            khasra = row.get('khasra') or ''
+            khasra = row.get('tree_khasra') or row.get('khasra') or ''
             if khasra and khasra not in group['khasra_seen']:
                 group['khasra_seen'].add(khasra)
                 group['khasra_count'] += 1

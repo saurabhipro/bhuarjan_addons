@@ -33,6 +33,10 @@ from . import section21_notification
 from . import section18_rr_scheme
 from . import section8
 from . import section23_award
+from . import section23_award_data
+from . import section23_award_excel
+from . import section23_award_consolidated
+from . import section23_award_lines
 from . import draft_award
 from . import process_report_pdf_download
 from . import process_report_signed_docs_download

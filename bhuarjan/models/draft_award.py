@@ -670,9 +670,9 @@ class DraftAwardCompensationLine(models.Model):
                                                      record.solatium_amount + 
                                                      record.interest_amount)
             
-            # Rehabilitation Policy Compensation (convert hectares to acres: 1 hectare = 2.47105 acres)
+            # Rehabilitation Policy Compensation (convert hectares to acres: 1 hectare = 2.471 acres)
             if record.acquired_area and record.rehab_policy_rate_per_acre:
-                area_in_acres = record.acquired_area * 2.47105
+                area_in_acres = record.acquired_area * 2.471
                 record.rehab_policy_compensation = area_in_acres * record.rehab_policy_rate_per_acre
             else:
                 record.rehab_policy_compensation = 0.0

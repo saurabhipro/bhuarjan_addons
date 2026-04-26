@@ -733,7 +733,7 @@
                                                     जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                                                 </div>
                                                 <div style="font-size:11px; font-weight:700; color:#000; margin-top:2px;">
-                                                    विगत तीन वर्षों का औसत बिक्री छांट दर : <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
+                                                    विगत 3 वर्षों का औसत बिक्री छांट दर रुपए में (प्रति हेक्टेयर) : <span t-esc="o.format_indian_number(s23_sale_sort_rate or 0.0, 4)"/>
                                                 </div>
                                             </div>
                                             <div style="flex-shrink:0; text-align:right; padding-top:2px;">

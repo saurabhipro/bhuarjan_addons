@@ -890,7 +890,7 @@ class Section23Award(models.Model):
             f"Village / ग्राम: {self.village_id.name or '-'} | "
             f"Project / परियोजना: {self.project_id.name or '-'} | "
             f"Date / तिथि: {self.award_date or fields.Date.today()} | "
-            f"3-yr avg sales sort rate / औसत बिक्री छांट दर: {rate_val:,.4f}"
+                f"विगत 3 वर्षों का औसत बिक्री छांट दर रुपए में (प्रति हेक्टेयर): {rate_val:,.4f}"
         )
 
         if show_land:
@@ -1561,7 +1561,7 @@ class Section23Award(models.Model):
     def get_land_compensation_data(self):
         """Get land compensation data grouped by landowner and khasra"""
         self.ensure_one()
-        acre_per_hectare = 2.47105381
+        acre_per_hectare = 2.471
         
         # Get approved surveys for this village and project
         surveys = self.env['bhu.survey'].search([
@@ -1987,7 +1987,13 @@ class Section23Award(models.Model):
                 'asset_land_area': survey.acquired_area or 0.0,
                 'asset_type': line.get_structure_type_label(),
                 'asset_code': 4,
-                'asset_dimension': (line.asset_count or 0.0) if line.structure_type == 'well' else (line.area_sqm or 0.0),
+                # Keep displayed dimension aligned with line_total formula:
+                # line_total = area_sqm * market_rate_per_sqm * asset_count
+                'asset_dimension': (
+                    (line.asset_count or 0.0)
+                    if line.structure_type == 'well'
+                    else ((line.area_sqm or 0.0) * (line.asset_count or 0.0))
+                ),
                 'rate_per_sqm': line.market_rate_per_sqm or 0.0,
                 'remark': line.description or '',
             }
@@ -1995,12 +2001,14 @@ class Section23Award(models.Model):
             if owners:
                 owner_count = len(owners)
                 share = total_value / owner_count if owner_count else total_value
+                dimension_share = (base_row.get('asset_dimension', 0.0) or 0.0) / owner_count if owner_count else (base_row.get('asset_dimension', 0.0) or 0.0)
                 share_interest, _days = self._calculate_interest_on_basic(share)
                 for owner in owners:
                     structure_data.append({
                         **base_row,
                         'landowner_name': owner.name or '',
                         'father_name': owner.father_name or owner.spouse_name or '',
+                        'asset_dimension': dimension_share,
                         'market_value': share,
                         'solatium': share,
                         'interest': share_interest,

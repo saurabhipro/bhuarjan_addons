@@ -870,20 +870,21 @@ class Section23Award(models.Model):
         no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
         number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.000'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
-        asset_type_default_fmt = workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f8f9fa'})
+        asset_type_default_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
         asset_type_cell_formats = {
-            'house': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#fff4cc'}),
-            'well': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f4fd'}),
-            'shed': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f3e8ff'}),
-            'other': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f5e9'}),
+            'house': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'well': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'shed': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'other': workbook.add_format({'border': 1, 'valign': 'top'}),
         }
         asset_type_pukka_formats = {
-            'house': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#fff4cc', 'pattern': 3}),
-            'well': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f4fd', 'pattern': 3}),
-            'shed': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f3e8ff', 'pattern': 3}),
-            'other': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f5e9', 'pattern': 3}),
+            'makan': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'well': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'maveshi_kotha': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'poultry_farm_shed': workbook.add_format({'border': 1, 'valign': 'top'}),
+            'other': workbook.add_format({'border': 1, 'valign': 'top'}),
         }
-        asset_type_pukka_default = workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f8f9fa', 'pattern': 3})
+        asset_type_pukka_default = workbook.add_format({'border': 1, 'valign': 'top'})
         total_label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'center', 'valign': 'vcenter'})
         total_money_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'right', 'num_format': '#,##0'})
         blank_msg_fmt = workbook.add_format({'italic': True, 'border': 1, 'align': 'center', 'valign': 'vcenter'})

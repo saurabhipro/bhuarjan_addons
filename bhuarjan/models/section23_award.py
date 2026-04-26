@@ -1998,33 +1998,17 @@ class Section23Award(models.Model):
                 'remark': line.description or '',
             }
             owners = survey.landowner_ids
-            if owners:
-                owner_count = len(owners)
-                share = total_value / owner_count if owner_count else total_value
-                dimension_share = (base_row.get('asset_dimension', 0.0) or 0.0) / owner_count if owner_count else (base_row.get('asset_dimension', 0.0) or 0.0)
-                share_interest, _days = self._calculate_interest_on_basic(share)
-                for owner in owners:
-                    structure_data.append({
-                        **base_row,
-                        'landowner_name': owner.name or '',
-                        'father_name': owner.father_name or owner.spouse_name or '',
-                        'asset_dimension': dimension_share,
-                        'market_value': share,
-                        'solatium': share,
-                        'interest': share_interest,
-                        'total': share + share + share_interest,
-                    })
-            else:
-                total_interest, _days = self._calculate_interest_on_basic(total_value)
-                structure_data.append({
-                    **base_row,
-                    'landowner_name': '',
-                    'father_name': '',
-                    'market_value': total_value,
-                    'solatium': total_value,
-                    'interest': total_interest,
-                    'total': total_value + total_value + total_interest,
-                })
+            owner_names = ', '.join([o.name for o in owners if o.name]) if owners else ''
+            total_interest, _days = self._calculate_interest_on_basic(total_value)
+            structure_data.append({
+                **base_row,
+                'landowner_name': owner_names,
+                'father_name': '',
+                'market_value': total_value,
+                'solatium': total_value,
+                'interest': total_interest,
+                'total': total_value + total_value + total_interest,
+            })
         return structure_data
 
     def get_tree_compensation_grouped_data(self):
@@ -2073,29 +2057,33 @@ class Section23Award(models.Model):
         return result
 
     def get_structure_compensation_grouped_data(self):
-        """Group structure rows by owner for report rowspans/subtotals."""
+        """Group structure rows by khasra for report rowspans/subtotals."""
         self.ensure_one()
         structure_data = self.get_structure_compensation_data()
         grouped = {}
         ordered_keys = []
         numeric_totals = ('total_area', 'asset_land_area', 'asset_dimension', 'market_value', 'solatium', 'interest', 'total')
         for row in structure_data:
-            if row.get('landowner_name'):
-                key = ('name', row.get('landowner_name'), row.get('father_name') or '')
-            else:
-                key = ('khasra', row.get('asset_khasra') or '')
+            # Merge all landowners of the same khasra into one group cell.
+            key = ('khasra', row.get('asset_khasra') or row.get('total_khasra') or '')
             if key not in grouped:
                 grouped[key] = {
-                    'landowner_name': row.get('landowner_name', ''),
-                    'father_name': row.get('father_name', ''),
+                    'landowner_name': '',
+                    'father_name': '',
                     'lines': [],
                     'khasra_count': 0,
                     'khasra_seen': set(),
+                    'owner_names': [],
+                    'owner_seen': set(),
                 }
                 for field_name in numeric_totals:
                     grouped[key][field_name] = 0.0
                 ordered_keys.append(key)
             group = grouped[key]
+            owner_name = (row.get('landowner_name') or '').strip()
+            if owner_name and owner_name not in group['owner_seen']:
+                group['owner_seen'].add(owner_name)
+                group['owner_names'].append(owner_name)
             group['lines'].append(row)
             khasra = row.get('asset_khasra') or row.get('total_khasra') or ''
             if khasra and khasra not in group['khasra_seen']:
@@ -2107,6 +2095,9 @@ class Section23Award(models.Model):
         result = []
         for key in ordered_keys:
             group = grouped[key]
+            group['landowner_name'] = ', '.join(group['owner_names'])
+            group.pop('owner_names', None)
+            group.pop('owner_seen', None)
             group.pop('khasra_seen', None)
             result.append(group)
         return result

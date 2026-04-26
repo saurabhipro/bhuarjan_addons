@@ -130,12 +130,14 @@ class AwardStructureDetails(models.Model):
     @api.depends('area_sqm', 'asset_count', 'market_rate_per_sqm')
     def _compute_line_total(self):
         for line in self:
-            # User formula: Area x Rate x Count.
-            computed_value = (
-                (line.area_sqm or 0.0) *
-                (line.market_rate_per_sqm or 0.0) *
-                (line.asset_count or 0)
-            )
+            qty = line.asset_count or 0
+            rate = line.market_rate_per_sqm or 0.0
+            if line.structure_type == 'well':
+                # Well valuation is per unit well count.
+                computed_value = qty * rate
+            else:
+                # Other structures follow area-based valuation.
+                computed_value = (line.area_sqm or 0.0) * rate * qty
             line.asset_value = computed_value
             line.line_total = computed_value
 
@@ -143,11 +145,12 @@ class AwardStructureDetails(models.Model):
     def _onchange_line_total_fast(self):
         """Immediate UI feedback in editable tree rows."""
         for line in self:
-            computed_value = (
-                (line.area_sqm or 0.0) *
-                (line.market_rate_per_sqm or 0.0) *
-                (line.asset_count or 0)
-            )
+            qty = line.asset_count or 0
+            rate = line.market_rate_per_sqm or 0.0
+            if line.structure_type == 'well':
+                computed_value = qty * rate
+            else:
+                computed_value = (line.area_sqm or 0.0) * rate * qty
             line.asset_value = computed_value
             line.line_total = computed_value
 

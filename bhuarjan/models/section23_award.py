@@ -915,14 +915,14 @@ class Section23Award(models.Model):
 
         if show_land:
             # LAND TAB
-            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 8, 11, 10]
+            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 11, 11, 10, 10, 11, 8, 11, 10]
             _setup_sheet(land_sheet, land_col_widths, 8)
             row = 0
-            land_sheet.merge_range(row, 0, row, 18, 'अर्जित भूमि का मुआवजा पत्रक', title_fmt)
+            land_sheet.merge_range(row, 0, row, 17, 'अर्जित भूमि का मुआवजा पत्रक', title_fmt)
             row += 1
-            land_sheet.merge_range(row, 0, row, 18, subtitle, subtitle_fmt)
+            land_sheet.merge_range(row, 0, row, 17, subtitle, subtitle_fmt)
             row += 2
-            land_sheet.merge_range(row, 0, row, 18, f"{award_headers['sections']['land_sheet_label']} - {award_headers['sections']['land_title']}", header_group_fmt)
+            land_sheet.merge_range(row, 0, row, 17, f"{award_headers['sections']['land_sheet_label']} - {award_headers['sections']['land_title']}", header_group_fmt)
             row += 1
 
             sim_land_headers = award_headers['excel']['sim_land_headers']
@@ -934,8 +934,8 @@ class Section23Award(models.Model):
             land_sheet.merge_range(row, 7, row, 9, sim_land_headers['group_main_road'], header_group_fmt)
             interest_period_note = self.get_interest_period_note()
             for col_offset, label in enumerate(sim_land_headers['tail_headers'], start=10):
-                # Column 14 is the interest column (index 4 in tail_headers)
-                header_title = f"{label}\n{interest_period_note}" if col_offset == 14 else label
+                # Interest column now sits at index 13 after dropping rate column 11.
+                header_title = f"{label}\n{interest_period_note}" if col_offset == 13 else label
                 land_sheet.merge_range(row, col_offset, row + 1, col_offset, header_title, header_fmt)
             row += 1
             sub_header_columns = [2, 3, 4, 5, 7, 8, 9]
@@ -947,7 +947,7 @@ class Section23Award(models.Model):
 
             land_groups = self.get_land_compensation_grouped_data()
             if not land_groups:
-                land_sheet.merge_range(row, 0, row, 18, 'No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
+                land_sheet.merge_range(row, 0, row, 17, 'No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)', blank_msg_fmt)
                 row += 1
             else:
                 total_basic = total_market = total_solatium = 0.0
@@ -993,12 +993,11 @@ class Section23Award(models.Model):
                             land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
                             land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
                             land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
-                        land_sheet.write_number(row, 10, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 11, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 12, float(land.get('market_value', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 13, float(land.get('solatium', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 15, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 10, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 11, float(land.get('market_value', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 12, float(land.get('solatium', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 13, float(land.get('interest', 0.0) or 0.0), money_fmt)
+                        land_sheet.write_number(row, 14, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
                         rehab_amount = float(land.get('rehab_policy_amount', 0.0) or 0.0)
                         if land.get('fallow'):
                             land_type_hi = 'पड़ती भूमि'
@@ -1006,9 +1005,9 @@ class Section23Award(models.Model):
                             land_type_hi = 'सिंचित भूमि'
                         else:
                             land_type_hi = 'असिंचित भूमि'
-                        land_sheet.write(row, 16, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
-                        land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
-                        land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
+                        land_sheet.write(row, 15, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
+                        land_sheet.write_number(row, 16, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
+                        land_sheet.write(row, 17, land.get('remark', ''), cell_fmt)
                         row += 1
                     
                     land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
@@ -1019,15 +1018,14 @@ class Section23Award(models.Model):
                     land_sheet.write_blank(row, 7, None, total_label_fmt)
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
                     land_sheet.write_blank(row, 9, None, total_label_fmt)
-                    land_sheet.write_blank(row, 10, None, total_label_fmt)
-                    land_sheet.write_number(row, 11, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 12, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 13, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 14, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 15, float(group.get('total_compensation', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 16, float(group.get('rehab_policy_amount', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 17, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_blank(row, 18, None, total_label_fmt)
+                    land_sheet.write_number(row, 10, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 11, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 12, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 13, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 14, float(group.get('total_compensation', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 15, float(group.get('rehab_policy_amount', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 16, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_blank(row, 17, None, total_label_fmt)
                     total_acq += float(group.get('acquired_area', 0.0) or 0.0)
                     total_basic += float(group.get('basic_value', 0.0) or 0.0)
                     total_market += float(group.get('market_value', 0.0) or 0.0)
@@ -1044,15 +1042,14 @@ class Section23Award(models.Model):
                 land_sheet.write_blank(row, 7, None, total_label_fmt)
                 land_sheet.write_blank(row, 8, None, total_label_fmt)
                 land_sheet.write_blank(row, 9, None, total_label_fmt)
-                land_sheet.write_blank(row, 10, None, total_label_fmt)
-                land_sheet.write_number(row, 11, total_basic, total_money_fmt)
-                land_sheet.write_number(row, 12, total_market, total_money_fmt)
-                land_sheet.write_number(row, 13, total_solatium, total_money_fmt)
-                land_sheet.write_number(row, 14, total_interest, total_money_fmt)
-                land_sheet.write_number(row, 15, total_comp, total_money_fmt)
-                land_sheet.write_number(row, 16, sum(float(g.get('rehab_policy_amount', 0.0) or 0.0) for g in land_groups), total_money_fmt)
-                land_sheet.write_number(row, 17, total_paid, total_money_fmt)
-                land_sheet.write_blank(row, 18, None, total_label_fmt)
+                land_sheet.write_number(row, 10, total_basic, total_money_fmt)
+                land_sheet.write_number(row, 11, total_market, total_money_fmt)
+                land_sheet.write_number(row, 12, total_solatium, total_money_fmt)
+                land_sheet.write_number(row, 13, total_interest, total_money_fmt)
+                land_sheet.write_number(row, 14, total_comp, total_money_fmt)
+                land_sheet.write_number(row, 15, sum(float(g.get('rehab_policy_amount', 0.0) or 0.0) for g in land_groups), total_money_fmt)
+                land_sheet.write_number(row, 16, total_paid, total_money_fmt)
+                land_sheet.write_blank(row, 17, None, total_label_fmt)
 
         if show_asset:
             # ASSET TAB
@@ -1114,16 +1111,26 @@ class Section23Award(models.Model):
                     if len(lines) > 1:
                         asset_sheet.merge_range(group_start_row, 2, asset_row - 1, 2, group_khasra or '', cell_center_fmt)
 
-                    asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
-                    asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                    asset_sheet.write_blank(asset_row, 3, None, total_label_fmt)
-                    asset_sheet.write_number(asset_row, 4, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_blank(asset_row, 5, None, total_label_fmt)
-                    asset_sheet.write_number(asset_row, 6, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_number(asset_row, 7, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_number(asset_row, 8, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_number(asset_row, 9, float(group.get('total', 0.0) or 0.0), total_money_fmt)
-                    asset_sheet.write_blank(asset_row, 10, None, total_label_fmt)
+                    # Check if all assets in group are of the same type
+                    all_same_type = len(lines) > 0 and len(set(asset.get('structure_type', '') for asset in lines)) == 1
+                    
+                    # Only show total if all assets are of the same type
+                    if all_same_type:
+                        asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
+                        asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
+                        asset_sheet.write_blank(asset_row, 3, None, total_label_fmt)
+                        asset_sheet.write_number(asset_row, 4, float(group.get('asset_dimension', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_blank(asset_row, 5, None, total_label_fmt)
+                        asset_sheet.write_number(asset_row, 6, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 7, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 8, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 9, float(group.get('total', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_blank(asset_row, 10, None, total_label_fmt)
+                    else:
+                        # Show NA when types are different
+                        asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'NA', total_label_fmt)
+                        for col in range(2, 11):
+                            asset_sheet.write(asset_row, col, 'NA', total_label_fmt)
                     asset_row += 1
 
         if show_tree:

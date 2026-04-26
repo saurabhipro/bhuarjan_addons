@@ -1488,7 +1488,7 @@ class Section23Award(models.Model):
         return fields.Date.context_today(self)
 
     def _calculate_interest_on_basic(self, basic_value):
-        """Calculate 12% annual interest from Section 4 public hearing to award date."""
+        """Calculate interest at 1% per month (or part thereof)."""
         self.ensure_one()
         start_date = self._get_section4_public_hearing_date()
         end_date = self._get_award_calculation_date()
@@ -1499,7 +1499,10 @@ class Section23Award(models.Model):
         days = (end_date - start_date).days
         if days <= 0:
             return 0.0, 0
-        interest = basic_value * 0.12 * (days / 365.25)
+        # Count partial month as full month:
+        # 01/01 to 26/04 => 4 months => 4%
+        months = (days + 29) // 30
+        interest = basic_value * 0.01 * months
         return interest, days
 
     @api.model
@@ -1686,13 +1689,13 @@ class Section23Award(models.Model):
             # 13: basic_value = rate * area
             # 14: market_value = basic_value * factor (2)
             # 15: solatium = market_value * 1.0
-            # 16: interest = basic value * 12% from section 4 approval to award date
+            # 16: interest = 1% per month on market value from section 4 hearing to award date
             
             market_value_basic = data['acquired_area'] * guide_line_rate
             market_value_factored = market_value_basic * 2.0
             solatium = market_value_factored * 1.0 # 100%
             
-            interest, _days = self._calculate_interest_on_basic(market_value_basic)
+            interest, _days = self._calculate_interest_on_basic(market_value_factored)
             
             total_compensation = market_value_factored + solatium + interest
             acquired_area_acre = data['acquired_area'] * acre_per_hectare
@@ -2242,7 +2245,7 @@ class Section23AwardSurveyLine(models.Model):
             interest = 0.0
             if line.award_id:
                 try:
-                    interest, _ = line.award_id._calculate_interest_on_basic(land_award)
+                    interest, _ = line.award_id._calculate_interest_on_basic(land_award * 2.0)
                 except Exception:
                     interest = 0.0
             line.interest_display = interest

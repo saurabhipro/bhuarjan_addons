@@ -1628,6 +1628,7 @@ class Section23Award(models.Model):
         for survey in surveys:
             khasra = survey.khasra_number or ''
             acquired_area = survey.acquired_area or 0.0
+            total_area = survey.total_area or acquired_area or 0.0
             
             # Get land type from survey
             irrigation_type = survey.irrigation_type or 'unirrigated'
@@ -1666,6 +1667,7 @@ class Section23Award(models.Model):
                         'rehab_policy_amount': 0.0,
                         'dev_compensation': 0.0,
                     }
+                compensation_data[key]['original_area'] += total_area
                 compensation_data[key]['acquired_area'] += acquired_area
             else:
                 # Process each landowner
@@ -1695,6 +1697,7 @@ class Section23Award(models.Model):
                             'rehab_policy_amount': 0.0,
                             'dev_compensation': 0.0,
                         }
+                    compensation_data[key]['original_area'] += total_area
                     compensation_data[key]['acquired_area'] += acquired_area
         
         # Convert to list and calculate totals
@@ -2095,13 +2098,13 @@ class Section23Award(models.Model):
         
         # Formats
         title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'border': 1})
-        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#f2f2f2', 'align': 'center', 'valign': 'vcenter', 'border': 1})
+        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#f2f2f2', 'align': 'center', 'valign': 'vcenter', 'border': 1, 'text_wrap': True})
         cell_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
         cell_center_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
         
         # Title
-        sheet.merge_range(0, 0, 0, 12, 'CONSOLIDATED AWARD SHEET / समेकित अवार्ड शीट', title_fmt)
+        sheet.merge_range(0, 0, 0, 8, 'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)', title_fmt)
         
         # Build subtitle with village, project, block, and date
         village_name = self.village_id.name or '-'
@@ -2111,60 +2114,38 @@ class Section23Award(models.Model):
         
         subtitle = f"Village: {village_name} | Project: {project_name} | प्रमंडल: {block_name} | Date: {date_str}"
         subtitle_fmt = workbook.add_format({'align': 'left', 'valign': 'vcenter', 'border': 1})
-        sheet.merge_range(1, 0, 1, 12, subtitle, subtitle_fmt)
+        sheet.merge_range(1, 0, 1, 8, subtitle, subtitle_fmt)
         
-        # Headers from constants
-        row = 3
-        for col, header in enumerate(consolidated_headers):
-            sheet.write(row, col, header, header_fmt)
+        # Two-row header: acquired land detail group only
+        header_row = 3
+        sheet.merge_range(header_row, 0, header_row + 1, 0, consolidated_headers[0], header_fmt)
+        sheet.merge_range(header_row, 1, header_row + 1, 1, consolidated_headers[1], header_fmt)
+        sheet.merge_range(header_row, 2, header_row, 3, 'अर्जित भूमि का विवरण', header_fmt)
+        for col in range(4, 9):
+            sheet.merge_range(header_row, col, header_row + 1, col, consolidated_headers[col], header_fmt)
+        sheet.write(header_row + 1, 2, consolidated_headers[2], header_fmt)
+        sheet.write(header_row + 1, 3, consolidated_headers[3], header_fmt)
         
         # Data rows
-        row = 4
+        row = 5
         for data in consolidated_data:
             sheet.write(row, 0, data['serial'], cell_center_fmt)
             sheet.write(row, 1, data['owner_details'], cell_fmt)
-            sheet.write(row, 2, data['khasra_total'], cell_center_fmt)
-            sheet.write_number(row, 3, float(data['total_rakba_ha'] or 0.0), money_fmt)
-            sheet.write(row, 4, data['khasra_acquired'], cell_center_fmt)
-            sheet.write_number(row, 5, float(data['acquired_area_ha'] or 0.0), money_fmt)
-            sheet.write_number(row, 6, float(data['acquired_area_acre'] or 0.0), money_fmt)
-            sheet.write_number(row, 7, float(data['acquired_area_sqm'] or 0.0), money_fmt)
-            sheet.write_number(row, 8, float(data['land_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 9, float(data['asset_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 10, float(data['tree_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 11, float(data['determined_total'] or 0.0), money_fmt)
-            sheet.write(row, 12, data['remarks'], cell_fmt)
+            sheet.write(row, 2, data['khasra_acquired'], cell_center_fmt)
+            sheet.write_number(row, 3, float(data['acquired_area_ha'] or 0.0), money_fmt)
+            sheet.write_number(row, 4, float(data['land_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 5, float(data['asset_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 6, float(data['tree_compensation'] or 0.0), money_fmt)
+            sheet.write_number(row, 7, float(data['determined_total'] or 0.0), money_fmt)
+            sheet.write(row, 8, '', cell_fmt)
             row += 1
-        
-        # Total row
-        total_rakba_ha = sum(d['total_rakba_ha'] for d in consolidated_data)
-        total_acq_ha = sum(d['acquired_area_ha'] for d in consolidated_data)
-        total_acq_acre = sum(d['acquired_area_acre'] for d in consolidated_data)
-        total_acq_sqm = sum(d['acquired_area_sqm'] for d in consolidated_data)
-        total_land = sum(d['land_compensation'] for d in consolidated_data)
-        total_asset = sum(d['asset_compensation'] for d in consolidated_data)
-        total_tree = sum(d['tree_compensation'] for d in consolidated_data)
-        total_determined = sum(d['determined_total'] for d in consolidated_data)
-        
-        sheet.write(row, 0, 'कुल', header_fmt)
-        sheet.write_blank(row, 1, None, header_fmt)
-        sheet.write_blank(row, 2, None, header_fmt)
-        sheet.write_number(row, 3, total_rakba_ha, money_fmt)
-        sheet.write_blank(row, 4, None, header_fmt)
-        sheet.write_number(row, 5, total_acq_ha, money_fmt)
-        sheet.write_number(row, 6, total_acq_acre, money_fmt)
-        sheet.write_number(row, 7, total_acq_sqm, money_fmt)
-        sheet.write_number(row, 8, total_land, money_fmt)
-        sheet.write_number(row, 9, total_asset, money_fmt)
-        sheet.write_number(row, 10, total_tree, money_fmt)
-        sheet.write_number(row, 11, total_determined, money_fmt)
-        sheet.write_blank(row, 12, None, header_fmt)
         
         # Set column widths
         sheet.set_column(0, 0, 6)
-        sheet.set_column(1, 1, 10)
-        sheet.set_column(2, 2, 20)
-        sheet.set_column(3, 12, 14)
+        sheet.set_column(1, 1, 16)
+        sheet.set_column(2, 2, 10)
+        sheet.set_column(3, 3, 8)
+        sheet.set_column(4, 8, 12)
         
         workbook.close()
         output.seek(0)

@@ -15,7 +15,7 @@
     <template id="consolidated_award_sheet_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="bhuarjan.section23_award_external_layout">
                     <div class="page">
                         <style>
                             .consolidated-container {
@@ -24,10 +24,10 @@
                             }
                             .consolidated-title {
                                 text-align: center;
-                                font-size: 16px;
+                                font-size: 14px;
                                 font-weight: bold;
                                 margin-bottom: 5px;
-                                color: #1a237e;
+                                color: #000;
                             }
                             .consolidated-subtitle {
                                 text-align: left;
@@ -39,6 +39,7 @@
                                 width: 100%;
                                 border-collapse: collapse;
                                 margin-top: 10px;
+                                table-layout: fixed;
                             }
                             .consolidated-table thead tr {
                                 background-color: #f2f2f2;
@@ -49,6 +50,7 @@
                                 padding: 6px 4px;
                                 text-align: center;
                                 font-size: 9px;
+                                font-weight: 700 !important;
                             }
                             .consolidated-table td {
                                 border: 1px solid #333;
@@ -57,6 +59,7 @@
                             }
                             .consolidated-table .text-center { text-align: center; }
                             .consolidated-table .text-right { text-align: right; }
+                            .consolidated-table thead th { font-weight: 700 !important; }
                             .consolidated-table tfoot tr {
                                 background-color: #e8e8e8;
                                 font-weight: bold;
@@ -64,7 +67,7 @@
                         </style>
 
                         <div class="consolidated-container">
-                            <div class="consolidated-title">CONSOLIDATED AWARD SHEET / समेकित अवार्ड शीट</div>
+                            <div class="consolidated-title">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)</div>
                             <div class="consolidated-subtitle">
                                 <t t-set="village_name" t-value="o.village_id.name or '-'"/>
                                 <t t-set="project_name" t-value="o.project_id.name or '-'"/>
@@ -77,67 +80,48 @@
                             <t t-set="headers" t-value="o.get_award_header_constants()['excel']['consolidated_award_headers']"/>
 
                             <table class="consolidated-table">
+                                <colgroup>
+                                    <col style="width:4%;"/>
+                                    <col style="width:22%;"/>
+                                    <col style="width:10%;"/>
+                                    <col style="width:8%;"/>
+                                    <col style="width:10%;"/>
+                                    <col style="width:10%;"/>
+                                    <col style="width:8%;"/>
+                                    <col style="width:10%;"/>
+                                    <col style="width:18%;"/>
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <t t-foreach="headers" t-as="header">
-                                            <th><span t-esc="header"/></th>
-                                        </t>
+                                        <th rowspan="2"><span t-esc="headers[0]"/></th>
+                                        <th rowspan="2"><span t-esc="headers[1]"/></th>
+                                        <th colspan="2">अर्जित भूमि का विवरण</th>
+                                        <th rowspan="2"><span t-esc="headers[4]"/></th>
+                                        <th rowspan="2"><span t-esc="headers[5]"/></th>
+                                        <th rowspan="2"><span t-esc="headers[6]"/></th>
+                                        <th rowspan="2"><span t-esc="headers[7]"/></th>
+                                        <th rowspan="2"><span t-esc="headers[8]"/></th>
+                                    </tr>
+                                    <tr>
+                                        <th><span t-esc="headers[2]"/></th>
+                                        <th><span t-esc="headers[3]"/></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <t t-set="total_rakba_ha" t-value="0"/>
-                                    <t t-set="total_acq_ha" t-value="0"/>
-                                    <t t-set="total_acq_acre" t-value="0"/>
-                                    <t t-set="total_acq_sqm" t-value="0"/>
-                                    <t t-set="total_land" t-value="0"/>
-                                    <t t-set="total_asset" t-value="0"/>
-                                    <t t-set="total_tree" t-value="0"/>
-                                    <t t-set="total_determined" t-value="0"/>
-
                                     <t t-foreach="consolidated_data" t-as="data">
-                                        <t t-set="total_rakba_ha" t-value="total_rakba_ha + data['total_rakba_ha']"/>
-                                        <t t-set="total_acq_ha" t-value="total_acq_ha + data['acquired_area_ha']"/>
-                                        <t t-set="total_acq_acre" t-value="total_acq_acre + data['acquired_area_acre']"/>
-                                        <t t-set="total_acq_sqm" t-value="total_acq_sqm + data['acquired_area_sqm']"/>
-                                        <t t-set="total_land" t-value="total_land + data['land_compensation']"/>
-                                        <t t-set="total_asset" t-value="total_asset + data['asset_compensation']"/>
-                                        <t t-set="total_tree" t-value="total_tree + data['tree_compensation']"/>
-                                        <t t-set="total_determined" t-value="total_determined + data['determined_total']"/>
-
                                         <tr>
                                             <td class="text-center"><span t-esc="data['serial']"/></td>
                                             <td><span t-esc="data['owner_details']"/></td>
-                                            <td class="text-center"><span t-esc="data['khasra_total']"/></td>
-                                            <td class="text-right"><span t-esc="'{:.4f}'.format(data['total_rakba_ha'])"/></td>
                                             <td class="text-center"><span t-esc="data['khasra_acquired']"/></td>
                                             <td class="text-right"><span t-esc="'{:.4f}'.format(data['acquired_area_ha'])"/></td>
-                                            <td class="text-right"><span t-esc="'{:.4f}'.format(data['acquired_area_acre'])"/></td>
-                                            <td class="text-right"><span t-esc="'{:.2f}'.format(data['acquired_area_sqm'])"/></td>
                                             <td class="text-right"><span t-esc="'{:.2f}'.format(data['land_compensation'])"/></td>
                                             <td class="text-right"><span t-esc="'{:.2f}'.format(data['asset_compensation'])"/></td>
                                             <td class="text-right"><span t-esc="'{:.2f}'.format(data['tree_compensation'])"/></td>
                                             <td class="text-right"><span t-esc="'{:.2f}'.format(data['determined_total'])"/></td>
-                                            <td><span t-esc="data['remarks']"/></td>
+                                            <td></td>
                                         </tr>
                                     </t>
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td class="text-center">कुल</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_rakba_ha)"/></td>
-                                        <td></td>
-                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_acq_ha)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.4f}'.format(total_acq_acre)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_acq_sqm)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_land)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_asset)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_tree)"/></td>
-                                        <td class="text-right"><span t-esc="'{:.2f}'.format(total_determined)"/></td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>

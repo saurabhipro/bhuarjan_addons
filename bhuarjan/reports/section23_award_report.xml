@@ -751,17 +751,18 @@
                                     <th colspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
                                     <th colspan="3" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_11']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;">
-                                        <span t-esc="award_headers['pdf']['land_headers']['col_14']"/><br/>
+                                        <span t-esc="award_headers['pdf']['land_headers']['col_16']"/><br/>
                                         <span t-esc="o.get_interest_period_note()"/>
                                     </th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/></th>
-                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_16']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_17']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2" style="width: 9%; border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_18']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_19']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_20']"/></th>
                                 </tr>
                                 <tr>
                                     <th style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_3']"/></th>
@@ -828,6 +829,7 @@
                                                           t-esc="'हाँ' if land.get('is_diverted') else 'नहीं'"/>
                                                 </t>
                                             </td>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('guide_line_rate', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('basic_value', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('market_value', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('solatium', 0.0), 0)"/>
@@ -855,6 +857,7 @@
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
@@ -868,7 +871,7 @@
                                 </t>
                                 <t t-if="not land_groups">
                                     <tr>
-                                        <td colspan="18" style="text-align: center; font-style: italic;">
+                                        <td colspan="19" style="text-align: center; font-style: italic;">
                                             No land data available / भूमि डेटा उपलब्ध नहीं है (Blank)
                                         </td>
                                     </tr>

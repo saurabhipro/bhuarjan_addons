@@ -1027,12 +1027,12 @@
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
                                             <td t-if="asset_index == 0" t-att-rowspan="line_count" style="text-align: center; border: 1px solid #000 !important;" t-esc="asset.get('asset_khasra', '')"/>
-                                            <td style="border: 1px solid #000 !important;">
-                                                (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
-                                                <t t-if="str(asset.get('asset_code', '4')) == '4' and asset.get('remark', '')">
-                                                    <br/><span style="font-size:9px; color:#333;" t-esc="asset.get('remark', '')"/>
-                                                </t>
-                                            </td>
+                                            <td t-att-style="'border: 1px solid #000 !important; background-color: %s; %s' % ({'house': '#fff4cc', 'well': '#e8f4fd', 'shed': '#f3e8ff', 'other': '#e8f5e9'}.get(str(asset.get('structure_type') or '').lower(), '#f8f9fa'), ('background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px);' if asset.get('construction_type') == 'pukka' else ''))">
+                                                 (<span t-esc="asset.get('asset_code', '4')"/>) <span t-esc="asset.get('asset_type', '')"/>
+                                                 <t t-if="str(asset.get('asset_code', '4')) == '4' and asset.get('remark', '')">
+                                                     <br/><span style="font-size:9px; color:#333;" t-esc="asset.get('remark', '')"/>
+                                                 </t>
+                                             </td>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('asset_dimension', 0.0), 2)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('rate_per_sqm', 0.0), 0)"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(asset.get('market_value', 0.0), 0)"/>

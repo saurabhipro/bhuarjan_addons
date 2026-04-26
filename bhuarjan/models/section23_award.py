@@ -870,6 +870,20 @@ class Section23Award(models.Model):
         no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
         number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.000'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
+        asset_type_default_fmt = workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f8f9fa'})
+        asset_type_cell_formats = {
+            'house': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#fff4cc'}),
+            'well': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f4fd'}),
+            'shed': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f3e8ff'}),
+            'other': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f5e9'}),
+        }
+        asset_type_pukka_formats = {
+            'house': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#fff4cc', 'pattern': 3}),
+            'well': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f4fd', 'pattern': 3}),
+            'shed': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f3e8ff', 'pattern': 3}),
+            'other': workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#e8f5e9', 'pattern': 3}),
+        }
+        asset_type_pukka_default = workbook.add_format({'border': 1, 'valign': 'top', 'bg_color': '#f8f9fa', 'pattern': 3})
         total_label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'center', 'valign': 'vcenter'})
         total_money_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'right', 'num_format': '#,##0'})
         blank_msg_fmt = workbook.add_format({'italic': True, 'border': 1, 'align': 'center', 'valign': 'vcenter'})
@@ -1057,7 +1071,13 @@ class Section23Award(models.Model):
                         asset_sheet.write(asset_row, 0, '', cell_center_fmt)
                         asset_sheet.write(asset_row, 1, '', cell_fmt)
                         asset_sheet.write(asset_row, 2, asset.get('asset_khasra', '') if idx == 0 else '', cell_center_fmt)
-                        asset_sheet.write(asset_row, 3, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
+                        structure_type_code = str(asset.get('structure_type') or '').lower()
+                        is_pukka = asset.get('construction_type') == 'pukka'
+                        if is_pukka:
+                            asset_type_fmt = asset_type_pukka_formats.get(structure_type_code, asset_type_pukka_default)
+                        else:
+                            asset_type_fmt = asset_type_cell_formats.get(structure_type_code, asset_type_default_fmt)
+                        asset_sheet.write(asset_row, 3, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", asset_type_fmt)
                         asset_sheet.write_number(asset_row, 4, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
                         asset_sheet.write_number(asset_row, 5, float(asset.get('rate_per_sqm', 0.0) or 0.0), money_fmt)
                         asset_sheet.write_number(asset_row, 6, float(asset.get('market_value', 0.0) or 0.0), money_fmt)
@@ -2013,6 +2033,8 @@ class Section23Award(models.Model):
                 'asset_khasra': survey.khasra_number or '',
                 'asset_land_area': survey.acquired_area or 0.0,
                 'asset_type': line.get_structure_type_label(),
+                'structure_type': line.structure_type or '',
+                'construction_type': line.construction_type or '',
                 'asset_code': 4,
                 # Keep displayed dimension aligned with line_total formula:
                 # line_total = area_sqm * market_rate_per_sqm * asset_count

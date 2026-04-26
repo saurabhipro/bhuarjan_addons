@@ -1130,10 +1130,17 @@ class Section23Award(models.Model):
                         asset_sheet.write_number(asset_row, 9, float(group.get('total', 0.0) or 0.0), total_money_fmt)
                         asset_sheet.write_blank(asset_row, 10, None, total_label_fmt)
                     else:
-                        # Show NA when types are different
-                        asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'NA', total_label_fmt)
-                        for col in range(2, 11):
-                            asset_sheet.write(asset_row, col, 'NA', total_label_fmt)
+                        # Mixed asset types: keep rupee totals, mark non-comparable/unit columns as NA.
+                        asset_sheet.merge_range(asset_row, 0, asset_row, 1, 'कुल', total_label_fmt)
+                        asset_sheet.write_number(asset_row, 2, float(group.get('khasra_count', 0) or 0), total_money_fmt)
+                        asset_sheet.write(asset_row, 3, 'NA', total_label_fmt)
+                        asset_sheet.write(asset_row, 4, 'NA', total_label_fmt)
+                        asset_sheet.write(asset_row, 5, 'NA', total_label_fmt)
+                        asset_sheet.write_number(asset_row, 6, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 7, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 8, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write_number(asset_row, 9, float(group.get('total', 0.0) or 0.0), total_money_fmt)
+                        asset_sheet.write(asset_row, 10, 'NA', total_label_fmt)
                     asset_row += 1
 
         if show_tree:

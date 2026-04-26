@@ -2095,57 +2095,130 @@ class Section23Award(models.Model):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet('Consolidated Award')
-        
-        # Formats
-        title_fmt = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center', 'valign': 'vcenter', 'border': 1})
-        header_fmt = workbook.add_format({'bold': True, 'bg_color': '#f2f2f2', 'align': 'center', 'valign': 'vcenter', 'border': 1, 'text_wrap': True})
-        cell_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
-        cell_center_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
-        money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
-        
-        # Title
-        sheet.merge_range(0, 0, 0, 8, 'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)', title_fmt)
-        
-        # Build subtitle with village, project, block, and date
+
+        # ── Formats ────────────────────────────────────────────────────────
+        FONT = 'Noto Sans Devanagari'
+        title_fmt = workbook.add_format({
+            'bold': True, 'font_size': 13, 'font_name': FONT,
+            'align': 'center', 'valign': 'vcenter', 'border': 1,
+            'bg_color': '#FFFFFF',
+        })
+        subtitle_fmt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'align': 'center', 'valign': 'vcenter', 'border': 1,
+        })
+        header_fmt = workbook.add_format({
+            'bold': True, 'font_size': 9, 'font_name': FONT,
+            'bg_color': '#D3D3D3', 'align': 'center', 'valign': 'vcenter',
+            'border': 1, 'text_wrap': True,
+        })
+        cell_fmt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'valign': 'vcenter', 'align': 'center',
+        })
+        name_fmt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'valign': 'vcenter', 'align': 'left', 'text_wrap': True,
+        })
+        num_fmt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00',
+        })
+        area_fmt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '0.0000',
+        })
+        total_label_fmt = workbook.add_format({
+            'bold': True, 'font_size': 10, 'font_name': FONT,
+            'bg_color': '#D3D3D3', 'border': 1,
+            'align': 'center', 'valign': 'vcenter',
+        })
+        total_num_fmt = workbook.add_format({
+            'bold': True, 'font_size': 10, 'font_name': FONT,
+            'bg_color': '#D3D3D3', 'border': 1,
+            'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00',
+        })
+        total_area_fmt = workbook.add_format({
+            'bold': True, 'font_size': 10, 'font_name': FONT,
+            'bg_color': '#D3D3D3', 'border': 1,
+            'align': 'right', 'valign': 'vcenter',
+            'num_format': '0.0000',
+        })
+
+        # ── Title ──────────────────────────────────────────────────────────
+        sheet.set_row(0, 24)
+        sheet.merge_range(0, 0, 0, 8,
+            'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)',
+            title_fmt)
+
+        # ── Subtitle ───────────────────────────────────────────────────────
         village_name = self.village_id.name or '-'
         project_name = self.project_id.name or '-'
         block_name = self.village_id.tehsil_id.name if self.village_id and self.village_id.tehsil_id else '-'
-        date_str = self.award_date.strftime('%Y-%m-%d') if self.award_date else ''
-        
-        subtitle = f"Village: {village_name} | Project: {project_name} | प्रमंडल: {block_name} | Date: {date_str}"
-        subtitle_fmt = workbook.add_format({'align': 'left', 'valign': 'vcenter', 'border': 1})
+        date_str = self.award_date.strftime('%d-%m-%Y') if self.award_date else ''
+        subtitle = (
+            f"मू-अर्जन प्रकरण क्रमांक {self.name or ''} / "
+            f"ग्राम-{village_name}  प.ह.नं.-{project_name}  "
+            f"तहसील-{block_name}  दिनांक: {date_str}"
+        )
+        sheet.set_row(1, 18)
         sheet.merge_range(1, 0, 1, 8, subtitle, subtitle_fmt)
-        
-        # Two-row header: acquired land detail group only
+
+        # ── Two-row column headers ─────────────────────────────────────────
         header_row = 3
+        sheet.set_row(header_row, 36)
+        sheet.set_row(header_row + 1, 30)
         sheet.merge_range(header_row, 0, header_row + 1, 0, consolidated_headers[0], header_fmt)
         sheet.merge_range(header_row, 1, header_row + 1, 1, consolidated_headers[1], header_fmt)
         sheet.merge_range(header_row, 2, header_row, 3, 'अर्जित भूमि का विवरण', header_fmt)
+        sheet.write(header_row + 1, 2, 'खसरा नं.', header_fmt)
+        sheet.write(header_row + 1, 3, 'रकबा (हे.)', header_fmt)
         for col in range(4, 9):
             sheet.merge_range(header_row, col, header_row + 1, col, consolidated_headers[col], header_fmt)
-        sheet.write(header_row + 1, 2, consolidated_headers[2], header_fmt)
-        sheet.write(header_row + 1, 3, consolidated_headers[3], header_fmt)
-        
-        # Data rows
+
+        # ── Data rows ─────────────────────────────────────────────────────
         row = 5
+        t_ha = t_land = t_asset = t_tree = t_det = 0.0
         for data in consolidated_data:
-            sheet.write(row, 0, data['serial'], cell_center_fmt)
-            sheet.write(row, 1, data['owner_details'], cell_fmt)
-            sheet.write(row, 2, data['khasra_acquired'], cell_center_fmt)
-            sheet.write_number(row, 3, float(data['acquired_area_ha'] or 0.0), money_fmt)
-            sheet.write_number(row, 4, float(data['land_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 5, float(data['asset_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 6, float(data['tree_compensation'] or 0.0), money_fmt)
-            sheet.write_number(row, 7, float(data['determined_total'] or 0.0), money_fmt)
+            sheet.set_row(row, 18)
+            sheet.write(row, 0, data['serial'], cell_fmt)
+            sheet.write(row, 1, data['owner_details'], name_fmt)
+            sheet.write(row, 2, data['khasra_acquired'], cell_fmt)
+            ha = float(data['acquired_area_ha'] or 0.0)
+            land_c = float(data['land_compensation'] or 0.0)
+            asset_c = float(data['asset_compensation'] or 0.0)
+            tree_c = float(data['tree_compensation'] or 0.0)
+            det = float(data['determined_total'] or 0.0)
+            sheet.write_number(row, 3, ha, area_fmt)
+            sheet.write_number(row, 4, land_c, num_fmt)
+            sheet.write_number(row, 5, asset_c, num_fmt)
+            sheet.write_number(row, 6, tree_c, num_fmt)
+            sheet.write_number(row, 7, det, num_fmt)
             sheet.write(row, 8, '', cell_fmt)
+            t_ha += ha; t_land += land_c; t_asset += asset_c
+            t_tree += tree_c; t_det += det
             row += 1
-        
-        # Set column widths
-        sheet.set_column(0, 0, 6)
-        sheet.set_column(1, 1, 16)
-        sheet.set_column(2, 2, 10)
-        sheet.set_column(3, 3, 8)
-        sheet.set_column(4, 8, 12)
+
+        # ── Total row ─────────────────────────────────────────────────────
+        sheet.set_row(row, 20)
+        sheet.merge_range(row, 0, row, 2, 'कुल / Total', total_label_fmt)
+        sheet.write_number(row, 3, t_ha,    total_area_fmt)
+        sheet.write_number(row, 4, t_land,  total_num_fmt)
+        sheet.write_number(row, 5, t_asset, total_num_fmt)
+        sheet.write_number(row, 6, t_tree,  total_num_fmt)
+        sheet.write_number(row, 7, t_det,   total_num_fmt)
+        sheet.write(row, 8, '', total_label_fmt)
+
+        # ── Column widths ─────────────────────────────────────────────────
+        sheet.set_column(0, 0, 7)
+        sheet.set_column(1, 1, 30)
+        sheet.set_column(2, 2, 12)
+        sheet.set_column(3, 3, 10)
+        sheet.set_column(4, 7, 14)
+        sheet.set_column(8, 8, 12)
         
         workbook.close()
         output.seek(0)

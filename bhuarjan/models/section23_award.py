@@ -1054,8 +1054,8 @@ class Section23Award(models.Model):
                     for idx, asset in enumerate(lines):
                         if idx == 0:
                             group_khasra = asset.get('asset_khasra', '')
-                        asset_sheet.write(asset_row, 0, i if idx == 0 else '', cell_center_fmt)
-                        asset_sheet.write(asset_row, 1, details if idx == 0 else '', cell_fmt)
+                        asset_sheet.write(asset_row, 0, '', cell_center_fmt)
+                        asset_sheet.write(asset_row, 1, '', cell_fmt)
                         asset_sheet.write(asset_row, 2, asset.get('asset_khasra', '') if idx == 0 else '', cell_center_fmt)
                         asset_sheet.write(asset_row, 3, f"({asset.get('asset_code', '4')}) {asset.get('asset_type', '')}", cell_fmt)
                         asset_sheet.write_number(asset_row, 4, float(asset.get('asset_dimension', 0.0) or 0.0), number_fmt)
@@ -1066,6 +1066,12 @@ class Section23Award(models.Model):
                         asset_sheet.write_number(asset_row, 9, float(asset.get('total', 0.0) or 0.0), money_fmt)
                         asset_sheet.write(asset_row, 10, asset.get('remark', ''), cell_fmt)
                         asset_row += 1
+                    if len(lines) > 1:
+                        asset_sheet.merge_range(group_start_row, 0, asset_row - 1, 0, i, cell_center_fmt)
+                        asset_sheet.merge_range(group_start_row, 1, asset_row - 1, 1, details or '', cell_fmt)
+                    else:
+                        asset_sheet.write(group_start_row, 0, i, cell_center_fmt)
+                        asset_sheet.write(group_start_row, 1, details or '', cell_fmt)
                     if len(lines) > 1:
                         asset_sheet.merge_range(group_start_row, 2, asset_row - 1, 2, group_khasra or '', cell_center_fmt)
 
@@ -1124,8 +1130,8 @@ class Section23Award(models.Model):
                             group_khasra = tree.get('tree_khasra', tree.get('khasra', ''))
                         mulya = float(tree.get('mulya', tree.get('value', 0.0)) or 0.0)
                         kul_r = float(tree.get('kul_rashi', tree.get('value', 0.0)) or 0.0)
-                        tree_sheet.write(tree_row, 0, i if idx == 0 else '', cell_center_fmt)
-                        tree_sheet.write(tree_row, 1, details if idx == 0 else '', cell_fmt)
+                        tree_sheet.write(tree_row, 0, '', cell_center_fmt)
+                        tree_sheet.write(tree_row, 1, '', cell_fmt)
                         tree_sheet.write(tree_row, 2, tree.get('tree_khasra', tree.get('khasra', '')) if idx == 0 else '', cell_center_fmt)
                         tree_sheet.write(tree_row, 3, tree.get('tree_type', ''), cell_fmt)
                         tree_sheet.write_number(tree_row, 4, float(tree.get('tree_count', 0.0) or 0.0), number_fmt)
@@ -1138,6 +1144,12 @@ class Section23Award(models.Model):
                         tree_sheet.write_number(tree_row, 11, float(tree.get('total', 0.0) or 0.0), money_fmt)
                         tree_sheet.write(tree_row, 12, tree.get('remark', ''), cell_fmt)
                         tree_row += 1
+                    if len(lines) > 1:
+                        tree_sheet.merge_range(group_start_row, 0, tree_row - 1, 0, i, cell_center_fmt)
+                        tree_sheet.merge_range(group_start_row, 1, tree_row - 1, 1, details or '', cell_fmt)
+                    else:
+                        tree_sheet.write(group_start_row, 0, i, cell_center_fmt)
+                        tree_sheet.write(group_start_row, 1, details or '', cell_fmt)
                     if len(lines) > 1:
                         tree_sheet.merge_range(group_start_row, 2, tree_row - 1, 2, group_khasra or '', cell_center_fmt)
 

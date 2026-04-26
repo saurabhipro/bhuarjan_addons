@@ -67,7 +67,7 @@
                         </style>
 
                         <div class="consolidated-container">
-                            <div class="consolidated-title">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)</div>
+                            <div class="consolidated-title">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)</div>
                             <div class="consolidated-subtitle">
                                 <t t-set="village_name" t-value="o.village_id.name or '-'"/>
                                 <t t-set="project_name" t-value="o.project_id.name or '-'"/>

@@ -2104,7 +2104,7 @@ class Section23Award(models.Model):
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
         
         # Title
-        sheet.merge_range(0, 0, 0, 8, 'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)', title_fmt)
+        sheet.merge_range(0, 0, 0, 8, 'भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोषवारा भाग -1 (घ)', title_fmt)
         
         # Build subtitle with village, project, block, and date
         village_name = self.village_id.name or '-'
@@ -2201,7 +2201,8 @@ class Section23Award(models.Model):
                 if owner_label:
                     consolidated[khasra]['owner_details'].add(owner_label)
                 consolidated[khasra]['total_rakba_ha'] += line.get('original_area', 0.0) or 0.0
-                consolidated[khasra]['acquired_area_ha'] += line.get('acquired_area', 0.0) or 0.0
+                acquired_ha = (line.get('acquired_area', 0.0) or line.get('original_area', 0.0) or 0.0)
+                consolidated[khasra]['acquired_area_ha'] += acquired_ha
                 consolidated[khasra]['land_compensation'] += line.get('total_compensation', 0.0) or 0.0
         
         # Process tree data

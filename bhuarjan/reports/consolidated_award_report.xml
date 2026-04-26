@@ -87,9 +87,10 @@
                                     <t t-set="total_asset" t-value="total_asset + data['asset_compensation']"/>
                                     <t t-set="total_tree"  t-value="total_tree  + data['tree_compensation']"/>
                                     <t t-set="total_det"   t-value="total_det   + data['determined_total']"/>
-                                    <tr>
-                                        <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="data['serial']"/></td>
-                                        <td style="border:1px solid #000 !important; padding:4px 3px; font-size:10px; vertical-align:top; text-align:left;">
+                                    <t t-set="row_bg" t-value="'#F8F8F8' if data_index % 2 == 1 else '#FFFFFF'"/>
+                                    <tr t-att-style="f'background-color:{row_bg} !important;'">
+                                        <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:center; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="data['serial']"/></td>
+                                        <td style="border:1px solid #000 !important; padding:4px 3px; font-size:10px; vertical-align:top; text-align:left;" t-att-style="f'background-color:{row_bg} !important; border:1px solid #000; padding:4px 3px; font-size:10px; vertical-align:top; text-align:left;'">
                                             <t t-foreach="data['owners']" t-as="owner">
                                                 <div t-att-style="'' if owner_last else 'margin-bottom:2px; padding-bottom:2px; border-bottom:1px dotted #bbb;'">
                                                     <!-- Serial number + Name + पिता/पति inline, exactly like Form 10 -->
@@ -102,24 +103,24 @@
                                                 </div>
                                             </t>
                                         </td>
-                                        <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="data['khasra_acquired']"/></td>
-                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:.4f}'.format(data['acquired_area_ha'])"/></td>
-                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:,.2f}'.format(data['land_compensation'])"/></td>
-                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:,.2f}'.format(data['asset_compensation'])"/></td>
-                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;"><span t-esc="'{:,.2f}'.format(data['tree_compensation'])"/></td>
-                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px; font-weight:700;"><span t-esc="'{:,.2f}'.format(data['determined_total'])"/></td>
-                                        <td style="border:1px solid #000 !important; padding:3px 2px; font-size:10px;"></td>
+                                        <td style="text-align:center; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:center; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="data['khasra_acquired']"/></td>
+                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:right; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="'{:.4f}'.format(data['acquired_area_ha'])"/></td>
+                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:right; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="'{:,.2f}'.format(data['land_compensation'])"/></td>
+                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:right; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="'{:,.2f}'.format(data['asset_compensation'])"/></td>
+                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; text-align:right; border:1px solid #000; padding:3px 2px; font-size:10px;'"><span t-esc="'{:,.2f}'.format(data['tree_compensation'])"/></td>
+                                        <td style="text-align:right; border:1px solid #000 !important; padding:3px 2px; font-size:10px; font-weight:700;" t-att-style="f'background-color:{row_bg} !important; text-align:right; border:1px solid #000; padding:3px 2px; font-size:10px; font-weight:700;'"><span t-esc="'{:,.2f}'.format(data['determined_total'])"/></td>
+                                        <td style="border:1px solid #000 !important; padding:3px 2px; font-size:10px;" t-att-style="f'background-color:{row_bg} !important; border:1px solid #000; padding:3px 2px; font-size:10px;'"></td>
                                     </tr>
                                 </t>
                                 <!-- Total row -->
                                 <tr style="background-color:#d3d3d3; font-weight:900;">
-                                    <td colspan="3" style="text-align:center; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;">कुल / Total</td>
-                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;"><span t-esc="'{:.4f}'.format(total_ha)"/></td>
-                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;"><span t-esc="'{:,.2f}'.format(total_land)"/></td>
-                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;"><span t-esc="'{:,.2f}'.format(total_asset)"/></td>
-                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;"><span t-esc="'{:,.2f}'.format(total_tree)"/></td>
-                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900;"><span t-esc="'{:,.2f}'.format(total_det)"/></td>
-                                    <td style="border:1px solid #000 !important;"></td>
+                                    <td colspan="3" style="text-align:center; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;">कुल / Total</td>
+                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;"><span t-esc="'{:.4f}'.format(total_ha)"/></td>
+                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;"><span t-esc="'{:,.2f}'.format(total_land)"/></td>
+                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;"><span t-esc="'{:,.2f}'.format(total_asset)"/></td>
+                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;"><span t-esc="'{:,.2f}'.format(total_tree)"/></td>
+                                    <td style="text-align:right; border:1px solid #000 !important; padding:4px 2px; font-size:10px; font-weight:900; background-color:#d3d3d3 !important;"><span t-esc="'{:,.2f}'.format(total_det)"/></td>
+                                    <td style="border:1px solid #000 !important; background-color:#d3d3d3 !important;"></td>
                                 </tr>
                             </tbody>
                         </table>

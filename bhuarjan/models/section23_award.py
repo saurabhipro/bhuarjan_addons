@@ -2126,19 +2126,41 @@ class Section23Award(models.Model):
             'font_size': 10, 'font_name': FONT,
             'border': 1, 'valign': 'top', 'align': 'left',
         })
+        cell_fmt_alt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'valign': 'top', 'align': 'left',
+            'bg_color': '#F8F8F8',
+        })
         name_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
             'border': 1, 'valign': 'top', 'align': 'left', 'text_wrap': True,
+        })
+        name_fmt_alt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'valign': 'top', 'align': 'left', 'text_wrap': True,
+            'bg_color': '#F8F8F8',
         })
         num_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
             'border': 1, 'align': 'right', 'valign': 'vcenter',
             'num_format': '#,##0.00',
         })
+        num_fmt_alt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00',
+            'bg_color': '#F8F8F8',
+        })
         area_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
             'border': 1, 'align': 'right', 'valign': 'vcenter',
             'num_format': '0.0000',
+        })
+        area_fmt_alt = workbook.add_format({
+            'font_size': 10, 'font_name': FONT,
+            'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '0.0000',
+            'bg_color': '#F8F8F8',
         })
         total_label_fmt = workbook.add_format({
             'bold': True, 'font_size': 10, 'font_name': FONT,
@@ -2196,25 +2218,33 @@ class Section23Award(models.Model):
         # ── Data rows ─────────────────────────────────────────────────────
         row = 5
         t_ha = t_land = t_asset = t_tree = t_det = 0.0
-        for data in consolidated_data:
+        for idx, data in enumerate(consolidated_data):
+            is_alt = idx % 2 == 1
             # Estimate row height: each owner block ~3 lines × 15pt; min 20
             num_owners = len(data.get('owners') or [])
             row_height = max(20, num_owners * 42)
             sheet.set_row(row, row_height)
-            sheet.write(row, 0, data['serial'], cell_fmt)
-            sheet.write(row, 1, data['owner_details'], name_fmt)
-            sheet.write(row, 2, data['khasra_acquired'], cell_fmt)
+            
+            # Choose formats based on row color
+            cur_cell = cell_fmt_alt if is_alt else cell_fmt
+            cur_name = name_fmt_alt if is_alt else name_fmt
+            cur_area = area_fmt_alt if is_alt else area_fmt
+            cur_num = num_fmt_alt if is_alt else num_fmt
+            
+            sheet.write(row, 0, data['serial'], cur_cell)
+            sheet.write(row, 1, data['owner_details'], cur_name)
+            sheet.write(row, 2, data['khasra_acquired'], cur_cell)
             ha = float(data['acquired_area_ha'] or 0.0)
             land_c = float(data['land_compensation'] or 0.0)
             asset_c = float(data['asset_compensation'] or 0.0)
             tree_c = float(data['tree_compensation'] or 0.0)
             det = float(data['determined_total'] or 0.0)
-            sheet.write_number(row, 3, ha, area_fmt)
-            sheet.write_number(row, 4, land_c, num_fmt)
-            sheet.write_number(row, 5, asset_c, num_fmt)
-            sheet.write_number(row, 6, tree_c, num_fmt)
-            sheet.write_number(row, 7, det, num_fmt)
-            sheet.write(row, 8, '', cell_fmt)
+            sheet.write_number(row, 3, ha, cur_area)
+            sheet.write_number(row, 4, land_c, cur_num)
+            sheet.write_number(row, 5, asset_c, cur_num)
+            sheet.write_number(row, 6, tree_c, cur_num)
+            sheet.write_number(row, 7, det, cur_num)
+            sheet.write(row, 8, '', cur_cell)
             t_ha += ha; t_land += land_c; t_asset += asset_c
             t_tree += tree_c; t_det += det
             row += 1

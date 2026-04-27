@@ -128,7 +128,7 @@ class Section23AwardConsolidated(models.Model):
                       else '')
         district_full = f"{district_name} ({state_name})" if state_name else district_name
         date_str = self.award_date.strftime('%d-%m-%Y') if self.award_date else ''
-        project_name = self.project_id.name if self.project_id else ''
+        project_name = (self.sudo().project_id.name if self.sudo().project_id else '') or ''
         subtitle = (
             f"भू-अर्जन प्रकरण क्रमांक {self.case_number or ''} / "
             f"ग्राम-{village_name}  "

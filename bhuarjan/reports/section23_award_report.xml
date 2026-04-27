@@ -255,9 +255,6 @@
     </template>
 
     <template id="section23_signature_block">
-        <div style="margin:4px 0 4px 0; text-align:left; font-size:11px; font-weight:700; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
-            <strong>संलग्न :- प्रभावित भूमियों का बी-1, खसरा एवं नक्शा</strong>
-        </div>
         <table style="width:100%; border-collapse:collapse; border:none !important; table-layout:fixed;" cellspacing="0" cellpadding="4">
             <tr>
                 <td width="20%" style="border:none !important; text-align:center; vertical-align:top; padding:3px 2px; font-size:10px; line-height:1.4; color:#000; font-family:'Noto Sans Devanagari','Mangal','Arial Unicode MS','DejaVu Sans',sans-serif;">
@@ -735,7 +732,7 @@
                                                 <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.4;">
                                                     मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.case_number or ''"/>
                                                     ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
-                                                    प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
+                                                    Project <span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
                                                     तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
                                                     जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                                                 </div>
@@ -758,7 +755,7 @@
                                     <th colspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_acquired']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['sub_7']"/></th>
                                     <th colspan="3" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['group_main_road']"/></th>
-                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
+                                    <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900; white-space: pre-line;"><span t-esc="award_headers['pdf']['land_headers']['col_12']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_13']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_14']"/></th>
                                     <th rowspan="2" style="border: 1px solid #000 !important; background-color: #d3d3d3; color: #000; font-weight: 900;"><span t-esc="award_headers['pdf']['land_headers']['col_15']"/></th>
@@ -907,7 +904,10 @@
                                                         मूँ-अर्जन प्रकरण क्रमांक <span t-esc="o.case_number or ''"/>
                                                     </div>
                                                     <div style="font-size:10px; font-weight:700;">
-                                                        ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                                                        ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
+                                                        Project <span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
+                                                        तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
+                                                        जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                                                     </div>
                                                 </div>
                                                 <div style="font-size:12px; font-weight:700; white-space:nowrap; padding-left:8px;">
@@ -1006,7 +1006,10 @@
                             </div>
 
                             <div style="text-align: center; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
-                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/> प.ह.नं.-<span t-esc="o.project_id.name if o.project_id else ''"/> रा.नि.मं.-<span t-esc="''"/> तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/> जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
+                                ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
+                                Project <span t-esc="o.project_id.name if o.project_id else ''"/>&#160;
+                                तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
+                                जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                             </div>
 
                         <t t-set="asset_headers" t-value="award_headers['excel']['sim_asset_headers']"/>

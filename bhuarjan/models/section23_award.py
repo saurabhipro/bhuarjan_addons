@@ -46,6 +46,49 @@ class Section23Award(models.Model):
         tracking=True,
         help='Mandatory before generating the award; shown on land schedule (Excel/PDF).',
     )
+
+    # Rate master display (read-only, from active rate master for this village)
+    rate_master_main_road_ha = fields.Monetary(
+        string='MR Rate (₹/Ha)', currency_field='currency_id',
+        compute='_compute_village_rates', store=False,
+        help='Main Road rate per hectare from the active land rate master for this village.',
+    )
+    rate_master_other_road_ha = fields.Monetary(
+        string='BMR Rate (₹/Ha)', currency_field='currency_id',
+        compute='_compute_village_rates', store=False,
+        help='Beyond Main Road rate per hectare from the active land rate master for this village.',
+    )
+    rate_master_main_road_sqm = fields.Monetary(
+        string='MR Plot Rate (₹/sqm)', currency_field='currency_id',
+        compute='_compute_village_rates', store=False,
+    )
+    rate_master_other_road_sqm = fields.Monetary(
+        string='BMR Plot Rate (₹/sqm)', currency_field='currency_id',
+        compute='_compute_village_rates', store=False,
+    )
+
+    # Village type (read-only mirror of village_id.village_type for display)
+    village_type = fields.Selection([
+        ('rural', 'Rural / ग्रामीण'),
+        ('urban', 'Urban / नगरीय'),
+    ], string='Village Type / ग्राम प्रकार',
+       related='village_id.village_type', store=False, readonly=True)
+
+    # Urban award settings
+    urban_body_type = fields.Selection([
+        ('nagar_nigam',     'Nagar Nigam / नगर निगम'),
+        ('nagar_palika',    'Nagar Palika / नगर पालिका'),
+        ('nagar_panchayat', 'Nagar Panchayat / नगर पंचायत'),
+    ], string='Urban Body Type / नगरीय निकाय प्रकार',
+       compute='_compute_urban_body_type', store=True, readonly=False, tracking=True,
+       help='Pulled from village; override here if needed. Controls urban area-slab calculation.')
+
+    is_urban = fields.Boolean(
+        string='Is Urban / नगरीय है',
+        compute='_compute_is_urban',
+        store=False,
+        help='True when any survey in this award has survey_type = urban.',
+    )
     
     # Award document
     award_document = fields.Binary(string='Award Document / अवार्ड दस्तावेज़', tracking=False)
@@ -176,6 +219,36 @@ class Section23Award(models.Model):
             rec.is_sdm = self.env.user.has_group('bhuarjan.group_bhuarjan_sdm')
             rec.is_section_officer = self.env.user.has_group('bhuarjan.group_bhu_section_officer')
             rec.is_admin = self.env.user.has_group('bhuarjan.group_bhuarjan_admin')
+
+    @api.depends('village_id', 'village_id.urban_body_type')
+    def _compute_urban_body_type(self):
+        for rec in self:
+            if not rec.urban_body_type:
+                rec.urban_body_type = rec.village_id.urban_body_type or False
+
+    @api.depends('village_id', 'village_id.village_type',
+                 'award_survey_line_ids', 'award_survey_line_ids.survey_id',
+                 'award_survey_line_ids.survey_id.survey_type')
+    def _compute_is_urban(self):
+        for rec in self:
+            # Village-level type takes priority; fall back to survey_type check
+            if rec.village_id and rec.village_id.village_type == 'urban':
+                rec.is_urban = True
+            else:
+                surveys = rec.award_survey_line_ids.mapped('survey_id')
+                rec.is_urban = any(s.survey_type == 'urban' for s in surveys) if surveys else False
+
+    @api.depends('village_id')
+    def _compute_village_rates(self):
+        for rec in self:
+            rm = self.env['bhu.rate.master'].search([
+                ('village_id', '=', rec.village_id.id),
+                ('state', 'in', ['active', 'draft']),
+            ], limit=1, order='state ASC, effective_from DESC') if rec.village_id else False
+            rec.rate_master_main_road_ha  = rm.main_road_rate_hectare  if rm else 0.0
+            rec.rate_master_other_road_ha = rm.other_road_rate_hectare if rm else 0.0
+            rec.rate_master_main_road_sqm = rm.main_road_rate_sqm      if rm else 0.0
+            rec.rate_master_other_road_sqm = rm.other_road_rate_sqm    if rm else 0.0
 
     @api.depends('project_id', 'project_id.company_id', 'project_id.company_id.currency_id')
     def _compute_s23_premium_currency(self):
@@ -431,6 +504,20 @@ class Section23Award(models.Model):
                     rec._sync_award_structure_lines()
         return result
 
+    def unlink(self):
+        """Explicitly remove O2M children before deletion.
+
+        Cascade would handle it eventually, but stored computed fields on
+        bhu.section23.award.survey.line depend on award_id fields.  When the
+        ORM cascade fires those recomputes mid-transaction they try to read the
+        (already-deleted) award record and raise MissingError in the browser.
+        Unlinking the children first keeps the recompute queue clean.
+        """
+        for rec in self:
+            rec.award_survey_line_ids.unlink()
+            rec.award_line_item_ids.unlink()
+        return super().unlink()
+
     def _populate_award_survey_lines(self, reset_if_empty=False):
         """Populate survey lines from draft/submitted/approved surveys.
 
@@ -620,11 +707,35 @@ class Section23Award(models.Model):
             cur_sym = _cur.symbol or '₹'
         except Exception:
             cur_sym = '₹'
-        # Same columns as Award Simulator land grid (Khasra → Interest).
+        # Soft alternating palette for khasra groups
+        _SLAB_COLORS = [
+            '#e3f2fd',  # light blue
+            '#f3e5f5',  # light purple
+            '#e8f5e9',  # light green
+            '#fff3e0',  # light amber
+            '#fce4ec',  # light pink
+            '#e0f7fa',  # light cyan
+            '#f9fbe7',  # light lime
+            '#ede7f6',  # light violet
+        ]
+
+        # Build a khasra→color mapping so every slab row of the same khasra
+        # shares one color; rural (non-slab) rows get a plain white background.
+        khasra_color = {}
+        color_idx = 0
+        for r in rows:
+            if r.get('is_urban_slab'):
+                k = (r.get('khasra') or '', r.get('landowner_name') or '')
+                if k not in khasra_color:
+                    khasra_color[k] = _SLAB_COLORS[color_idx % len(_SLAB_COLORS)]
+                    color_idx += 1
+
         headers = [
-            'Khasra / खसरा', 'Village / ग्राम', 'Distance (m) / दूरी', 'Road / सड़क', 'Irrigation / सिंचाई', 'Diverted / विचलित',
-            'Acquired (Ha) / अधि.', f'Base ({cur_sym}/Ha)', f'Effective ({cur_sym}/Ha)', f'Land award ({cur_sym})',
-            f'Solatium ({cur_sym})', f'Interest ({cur_sym})',
+            'Khasra / खसरा', 'Village / ग्राम', 'Distance (m) / दूरी', 'Road / सड़क',
+            'Irrigation / सिंचाई', 'Diverted / विचलित',
+            'Acquired (Ha) / अधि.', f'Base ({cur_sym}/sqm or Ha)',
+            f'Effective Rate', f'Land award ({cur_sym})',
+            f'Solatium ({cur_sym})', f'Interest ({cur_sym})', 'Slab / Remark',
         ]
         parts = [
             '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
@@ -634,9 +745,19 @@ class Section23Award(models.Model):
         for col in headers:
             parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
         parts.append('</tr></thead><tbody>')
+
         for r in rows:
-            parts.append('<tr>')
-            parts.append(f'<td class="text-nowrap">{escape(r.get("khasra") or "")}</td>')
+            is_slab = r.get('is_urban_slab', False)
+            if is_slab:
+                k = (r.get('khasra') or '', r.get('landowner_name') or '')
+                bg = khasra_color.get(k, '#ffffff')
+                row_style = f'background:{bg};'
+            else:
+                row_style = ''
+            slab_lbl = r.get('remark', '') or ''
+
+            parts.append(f'<tr style="{row_style}">')
+            parts.append(f'<td class="text-nowrap fw-semibold">{escape(r.get("khasra") or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(r.get("village_name") or "")}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("distance_from_main_road"), 2)}</td>')
             road = (r.get("road_type_label") or ("MR" if r.get("is_within_distance") else "BMR"))
@@ -645,7 +766,7 @@ class Section23Award(models.Model):
             div_lbl = (r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"))
             parts.append(f'<td class="text-center text-nowrap">{escape(div_lbl)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("acquired_area"), 4)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("base_rate_hectare") or 0, 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("base_rate_hectare") or r.get("guide_line_rate") or 0, 0)}</td>')
             eff = r.get("effective_rate_hectare")
             if eff is None:
                 eff = r.get("guide_line_rate")
@@ -653,10 +774,13 @@ class Section23Award(models.Model):
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("basic_value"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
+            parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape(slab_lbl)}</td>')
             parts.append('</tr>')
+
         parts.append(
-            '</tbody></table><p class="s23-sim-hint text-muted small mb-0">'
-            'Values follow the same rules as the Section 23 PDF / पीडीऐफ़ के समान नियम'
+            '</tbody></table>'
+            '<p class="s23-sim-hint text-muted small mb-0">'
+            'Each colour group = one khasra split into urban slabs / एक रंग = एक खसरा के स्लैब'
             '</p></div>'
         )
         return Markup(''.join(parts))

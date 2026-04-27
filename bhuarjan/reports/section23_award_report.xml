@@ -423,6 +423,15 @@
                                 <strong style="color:#5a2d20;">Tehsil:</strong> <span style="color:#2d1810; font-weight:700;" t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else '-'"/>
                                 <span style="color:#c9926d; margin:0 6px;">|</span>
                                 <strong style="color:#5a2d20;">District:</strong> <span style="color:#2d1810; font-weight:700;" t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else '-'"/>
+                                <t t-if="o.urban_body_type">
+                                    <span style="color:#c9926d; margin:0 6px;">|</span>
+                                    <span style="display:inline-block; background:#1565c0; color:#fff; padding:2px 8px; border-radius:10px; font-weight:800; font-size:10px; margin-right:4px;">🏙 Urban</span>
+                                    <strong style="color:#0d47a1;">
+                                        <t t-if="o.urban_body_type == 'nagar_nigam'">Nagar Nigam / नगर निगम</t>
+                                        <t t-elif="o.urban_body_type == 'nagar_palika'">Nagar Palika / नगर पालिका</t>
+                                        <t t-else="">Nagar Panchayat / नगर पंचायत</t>
+                                    </strong>
+                                </t>
                             </td>
                         </tr>
                     </table>

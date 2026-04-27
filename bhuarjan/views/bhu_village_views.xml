@@ -8,6 +8,10 @@
             <list string="Villages / ग्राम">
                 <field name="village_code" string="Village Code"/>
                 <field name="name" string="Village Name"/>
+                <field name="village_type" string="Type"
+                       decoration-info="village_type == 'urban'"
+                       decoration-muted="village_type == 'rural'"/>
+                <field name="urban_body_type" string="Urban Body" optional="show"/>
                 <field name="state_id" string="State"/>
                 <field name="district_id" string="District"/>
                 <field name="sub_division_id" string="Sub Division"/>
@@ -43,6 +47,12 @@
                             <field name="sub_division_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="tehsil_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                             <field name="pincode"/>
+                            <field name="village_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="urban_body_type"
+                                   string="Urban Body Type / नगरीय निकाय प्रकार"
+                                   invisible="village_type != 'urban'"
+                                   required="village_type == 'urban'"
+                                   placeholder="Select Nagar Nigam / Palika / Panchayat…"/>
                         </group>
                     </group>
                     <group>

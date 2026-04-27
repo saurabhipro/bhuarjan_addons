@@ -440,8 +440,8 @@
 }
 
 .bhu_s23_award_premium .s23_meta_item {
-    flex: 1 1 calc(50% - 5px);
-    min-width: 260px;
+    flex: 1 1 calc(33.333% - 5px);
+    min-width: 220px;
     padding: 10px 12px;
     border: none;
     border-radius: 0;

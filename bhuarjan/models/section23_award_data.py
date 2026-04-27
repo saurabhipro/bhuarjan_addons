@@ -147,6 +147,57 @@ class Section23AwardData(models.Model):
                 if is_diverted and derived_is_within_distance:
                     effective_rate *= 1.25
 
+            if survey and self._is_fallow_survey(survey):
+                irrigation_label = 'Fallow / पड़ती'
+            elif survey and survey.irrigation_type == 'irrigated':
+                irrigation_label = 'Irrigated / सिंचित'
+            else:
+                irrigation_label = 'Unirrigated / असिंचित'
+            village_name = (self.village_id.name or '') if self.village_id else ''
+            road_lbl = 'MR' if is_within_distance else 'BMR'
+            diverted_lbl = 'Yes' if is_diverted else 'No'
+
+            # Shared meta fields written into every row regardless of rural/urban path
+            data.update({
+                'original_area': survey.total_area if survey else 0.0,
+                'lagan': survey.lagan if (survey and hasattr(survey, 'lagan')) else data['khasra'],
+                'is_within_distance': is_within_distance,
+                'distance_from_main_road': distance_from_main_road,
+                'is_diverted': is_diverted,
+                'village_name': village_name,
+                'base_rate_hectare': base_rate_ha,
+                'effective_rate_hectare': effective_rate,
+                'road_type_label': road_lbl,
+                'irrigation_label': irrigation_label,
+                'diverted_label': diverted_lbl,
+                'survey_id': survey.id if survey else False,
+                'guide_line_rate': guide_line_rate,
+                'is_urban_slab': False,
+                'slab_label': '',
+                'slab_pct': 1.0,
+            })
+
+            # --- Urban area-based slab path ---
+            # Trigger if: urban_body_type can be resolved AND
+            # either the village is marked urban OR the survey itself is urban.
+            # Fall back to the village's urban_body_type when the award field is blank
+            # (e.g. award was created before the village was marked Urban).
+            _is_urban_village = (self.village_id and self.village_id.village_type == 'urban')
+            _is_urban_survey = (survey and survey.survey_type == 'urban')
+            _body_type = self.urban_body_type or (
+                self.village_id.urban_body_type
+                if (_is_urban_village and self.village_id.urban_body_type)
+                else False
+            )
+            if _body_type and (_is_urban_village or _is_urban_survey):
+                slab_rows = self._generate_urban_slab_rows(
+                    data, is_within_distance, guide_line_rate, effective_rate, acre_per_hectare,
+                    body_type=_body_type,
+                )
+                result.extend(slab_rows)
+                continue
+
+            # --- Rural (flat rate) path ---
             # Logic matching 19-column image:
             # 13: basic_value = effective rate * area (irrigation/diverted on top of master)
             # 14: market_value = basic_value * factor (2)
@@ -169,18 +220,7 @@ class Section23AwardData(models.Model):
             rehab_policy_amount = acquired_area_acre * rehab_rate_per_acre
             payable_compensation = max(total_compensation, rehab_policy_amount)
 
-            if survey and self._is_fallow_survey(survey):
-                irrigation_label = 'Fallow / पड़ती'
-            elif survey and survey.irrigation_type == 'irrigated':
-                irrigation_label = 'Irrigated / सिंचित'
-            else:
-                irrigation_label = 'Unirrigated / असिंचित'
-            village_name = (self.village_id.name or '') if self.village_id else ''
-            road_lbl = 'MR' if is_within_distance else 'BMR'
-            diverted_lbl = 'Yes' if is_diverted else 'No'
-
             data.update({
-                'guide_line_rate': guide_line_rate,
                 'basic_value': market_value_basic,
                 'market_value': market_value_factored,
                 'solatium': solatium,
@@ -190,18 +230,6 @@ class Section23AwardData(models.Model):
                 'rehab_policy_amount': rehab_policy_amount,
                 'paid_compensation': payable_compensation,
                 'remark': '',
-                'original_area': survey.total_area if survey else 0.0,
-                'lagan': survey.lagan if (survey and hasattr(survey, 'lagan')) else data['khasra'],
-                'is_within_distance': is_within_distance,
-                'distance_from_main_road': distance_from_main_road,
-                'is_diverted': is_diverted,
-                'village_name': village_name,
-                'base_rate_hectare': base_rate_ha,
-                'effective_rate_hectare': effective_rate,
-                'road_type_label': road_lbl,
-                'irrigation_label': irrigation_label,
-                'diverted_label': diverted_lbl,
-                'survey_id': survey.id if survey else False,
             })
 
             result.append(data)
@@ -210,6 +238,154 @@ class Section23AwardData(models.Model):
         result.sort(key=lambda x: (x['landowner_name'] or '', x['khasra'] or ''))
 
         return result
+
+    # ── Urban area-based slab helper ──────────────────────────────────────────
+
+    def _generate_urban_slab_rows(self, base_data, is_within_distance,
+                                  guide_line_ha, effective_rate_ha, acre_per_hectare,
+                                  body_type=None):
+        """Split acquired area into progressive urban slab rows (Nagar Nigam / Palika / Panchayat).
+
+        Per-sqm plot rate comes from the active rate master for this village.
+        Returns a list of row dicts with all 19-column fields populated.
+        For urban land the slab value IS the market value (no ×2 multiplier).
+        The no-slab remainder (area > threshold) uses the per-hectare rate directly.
+        """
+        self.ensure_one()
+        # Prefer explicitly passed body_type; fall back to award field, then village field
+        body_type = (
+            body_type
+            or self.urban_body_type
+            or (self.village_id.urban_body_type if self.village_id else False)
+            or 'nagar_nigam'
+        )
+
+        # Slab definitions: (upper_limit_ha, fraction_of_plot_rate, english_label, pct_label)
+        if body_type == 'nagar_nigam':
+            slabs = [
+                (0.050, 1.00, 'Slab 1 (≤0.050 ha)', '100%'),
+                (0.100, 0.80, 'Slab 2 (0.050–0.100 ha)', '80%'),
+                (0.202, 0.50, 'Slab 3 (0.100–0.202 ha)', '50%'),
+            ]
+            no_slab_threshold = 0.202
+        elif body_type == 'nagar_palika':
+            slabs = [
+                (0.050, 1.00, 'Slab 1 (≤0.050 ha)', '100%'),
+                (0.100, 0.80, 'Slab 2 (0.050–0.100 ha)', '80%'),
+                (0.150, 0.50, 'Slab 3 (0.100–0.150 ha)', '50%'),
+            ]
+            no_slab_threshold = 0.150
+        else:  # nagar_panchayat
+            slabs = [
+                (0.050, 1.00, 'Slab 1 (≤0.050 ha)', '100%'),
+                (0.100, 0.25, 'Slab 2 (0.050–0.100 ha)', '25%'),
+            ]
+            no_slab_threshold = 0.100
+
+        # Per-sqm "plot rate" from rate master (MR or BMR lane)
+        rm = self.env['bhu.rate.master'].search([
+            ('village_id', '=', self.village_id.id),
+            ('state', 'in', ['active', 'draft']),
+        ], limit=1, order='state ASC, effective_from DESC')
+
+        if is_within_distance:
+            sqm_rate = (rm.main_road_rate_sqm or 0.0) if rm else 0.0
+            if not sqm_rate and rm:
+                sqm_rate = (rm.main_road_rate_hectare or 0.0) / 10000.0
+        else:
+            sqm_rate = (rm.other_road_rate_sqm or 0.0) if rm else 0.0
+            if not sqm_rate and rm:
+                sqm_rate = (rm.other_road_rate_hectare or 0.0) / 10000.0
+
+        total_area_ha = base_data['acquired_area']
+        rows = []
+        prev_limit = 0.0
+
+        for slab_limit, pct, label, pct_label in slabs:
+            if total_area_ha <= prev_limit:
+                break
+            portion_ha = min(total_area_ha, slab_limit) - prev_limit
+            if portion_ha <= 0:
+                prev_limit = slab_limit
+                continue
+
+            portion_sqm = portion_ha * 10000.0
+            # Urban market value = sqm × plot_rate × slab% (no ×2 multiplier)
+            market_value = portion_sqm * sqm_rate * pct
+            solatium = market_value * 1.0          # 100% solatium
+            interest, _ = self._calculate_interest_on_basic(market_value)
+            total_comp = market_value + solatium + interest
+
+            acquired_acre = portion_ha * acre_per_hectare
+            rehab_rate = self._get_min_rehab_rate_per_acre(
+                base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
+            )
+            rehab_amt = acquired_acre * rehab_rate
+            paid = max(total_comp, rehab_amt)
+
+            effective_sqm_rate = sqm_rate * pct   # e.g. 2600×0.80 = 2080 for Slab 2
+            row = dict(base_data)
+            row.update({
+                'acquired_area': portion_ha,
+                'guide_line_rate': effective_sqm_rate,   # effective ₹/sqm for this slab
+                'base_rate_hectare': sqm_rate,           # original plot rate (for reference)
+                'basic_value': market_value,             # = market value for urban
+                'market_value': market_value,
+                'solatium': solatium,
+                'interest': interest,
+                'total_compensation': total_comp,
+                'rehab_policy_rate_per_acre': rehab_rate,
+                'rehab_policy_amount': rehab_amt,
+                'paid_compensation': paid,
+                'remark': '',
+                'slab_label': label,
+                'slab_pct': pct,
+                'is_urban_slab': True,
+                'effective_rate_hectare': effective_sqm_rate * 10000.0,
+            })
+            rows.append(row)
+
+            prev_limit = slab_limit
+            if total_area_ha <= slab_limit:
+                break
+
+        # No-slab remainder: area above the threshold → use per-hectare rate flat
+        if total_area_ha > no_slab_threshold:
+            remaining_ha = total_area_ha - no_slab_threshold
+            market_value = remaining_ha * effective_rate_ha
+            solatium = market_value * 1.0
+            interest, _ = self._calculate_interest_on_basic(market_value)
+            total_comp = market_value + solatium + interest
+
+            acquired_acre = remaining_ha * acre_per_hectare
+            rehab_rate = self._get_min_rehab_rate_per_acre(
+                base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
+            )
+            rehab_amt = acquired_acre * rehab_rate
+            paid = max(total_comp, rehab_amt)
+
+            no_slab_label = f'No Slab (>{no_slab_threshold} ha, Ha Rate)'
+            row = dict(base_data)
+            row.update({
+                'acquired_area': remaining_ha,
+                'guide_line_rate': guide_line_ha,
+                'basic_value': market_value,
+                'market_value': market_value,
+                'solatium': solatium,
+                'interest': interest,
+                'total_compensation': total_comp,
+                'rehab_policy_rate_per_acre': rehab_rate,
+                'rehab_policy_amount': rehab_amt,
+                'paid_compensation': paid,
+                'remark': '',
+                'slab_label': no_slab_label,
+                'slab_pct': 1.0,
+                'is_urban_slab': True,
+                'effective_rate_hectare': effective_rate_ha,
+            })
+            rows.append(row)
+
+        return rows
 
     def get_land_compensation_grouped_data(self):
         """Group land rows by owner so multiple khasras appear together."""
@@ -230,7 +406,7 @@ class Section23AwardData(models.Model):
         numeric_totals = (
             'original_area', 'acquired_area', 'basic_value', 'market_value',
             'solatium', 'interest', 'total_compensation', 'rehab_policy_amount', 'paid_compensation',
-        )
+        )   
         for row in land_data:
             if row.get('landowner_name'):
                 # Group by beneficiary identity (name + father/spouse) so duplicate

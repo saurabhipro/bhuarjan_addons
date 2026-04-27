@@ -76,11 +76,19 @@ class Section23AwardExcel(models.Model):
             return yes_fmt if flag else no_fmt
 
         rate_val = float(self.avg_three_year_sales_sort_rate or 0.0)
+        _urban_body_labels = {
+            'nagar_nigam':     'Nagar Nigam / नगर निगम',
+            'nagar_palika':    'Nagar Palika / नगर पालिका',
+            'nagar_panchayat': 'Nagar Panchayat / नगर पंचायत',
+        }
+        urban_part = ''
+        if self.urban_body_type:
+            urban_part = f" | Urban Body / नगरीय निकाय: {_urban_body_labels.get(self.urban_body_type, self.urban_body_type)}"
         subtitle = (
             f"Village / ग्राम: {self.village_id.name or '-'} | "
             f"Project / परियोजना: {self.project_id.name or '-'} | "
-            f"Date / तिथि: {self.award_date or fields.Date.today()} | "
-                f"विगत 3 वर्षों का औसत बिक्री छांट दर रुपए में (प्रति हेक्टेयर): {rate_val:,.4f}"
+            f"Date / तिथि: {self.award_date or fields.Date.today()}{urban_part} | "
+            f"विगत 3 वर्षों का औसत बिक्री छांट दर रुपए में (प्रति हेक्टेयर): {rate_val:,.4f}"
         )
 
         if show_land:

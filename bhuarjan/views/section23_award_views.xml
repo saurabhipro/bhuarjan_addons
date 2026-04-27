@@ -33,6 +33,7 @@
                     <field name="is_admin" invisible="1"/>
                     <field name="village_domain" invisible="1"/>
                     <field name="all_surveys_configured" invisible="1"/>
+                    <field name="is_urban" invisible="1"/>
 
                     <div class="simulator_header">
                         <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 w-100">
@@ -99,6 +100,51 @@
                                     <div class="s23_meta_label">विगत तीन वर्षों का औसत बिक्री छांट दर</div>
                                     <div class="s23_meta_value">
                                         <field name="avg_three_year_sales_sort_rate" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item">
+                                    <div class="s23_meta_label">Village Type / ग्राम प्रकार</div>
+                                    <div class="s23_meta_value">
+                                        <field name="village_type" readonly="1" widget="badge"
+                                               decoration-success="village_type == 'rural'"
+                                               decoration-info="village_type == 'urban'"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item" invisible="not is_urban">
+                                    <div class="s23_meta_label">Urban Body Type / नगरीय निकाय प्रकार</div>
+                                    <div class="s23_meta_value">
+                                        <field name="urban_body_type"
+                                               readonly="state != 'draft'"
+                                               placeholder="Select body type for slab calculation…"
+                                               widget="selection"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item">
+                                    <div class="s23_meta_label">MR Rate / मुख्यमार्ग दर (₹/Ha)</div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_main_road_ha" readonly="1"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item">
+                                    <div class="s23_meta_label">BMR Rate / अन्य दर (₹/Ha)</div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_other_road_ha" readonly="1"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item" invisible="not is_urban">
+                                    <div class="s23_meta_label">MR Plot Rate / मुख्यमार्ग प्लॉट दर (₹/sqm)</div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_main_road_sqm" readonly="1"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item" invisible="not is_urban">
+                                    <div class="s23_meta_label">BMR Plot Rate / अन्य प्लॉट दर (₹/sqm)</div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_other_road_sqm" readonly="1"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     </div>
                                 </div>
                             </div>
@@ -210,6 +256,13 @@
                                 <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest"/>
                             </list>
                         </field>
+                        <!-- Urban slab preview: shows one row per slab per khasra -->
+                        <div invisible="not is_urban" class="mt-2">
+                            <div class="fw-bold text-secondary mb-1" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.5px;">
+                                <i class="fa fa-table me-1"/> Urban Slab Breakdown / नगरीय स्लैब विवरण
+                            </div>
+                            <field name="s23_land_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
+                        </div>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fdf4ec); border-left-color: #7a3b28;">
                             <span class="total_label_large">Land Subtotal</span>
                             <span class="total_value_large" style="color: #6a2d1d;">

@@ -110,6 +110,18 @@ class BhuVillage(models.Model):
     name = fields.Char(string='Village Name / ग्राम का नाम', required=True)
     village_code = fields.Char(string='Village Code / ग्राम कोड', required=True, tracking=True, copy=False, help='Unique code for the village')
     pincode = fields.Char(string='Pincode / पिनकोड', tracking=True)
+    village_type = fields.Selection([
+        ('rural',  'Rural / ग्रामीण'),
+        ('urban',  'Urban / नगरीय'),
+    ], string='Village Type / ग्राम प्रकार', default='rural', tracking=True,
+       help='Rural or Urban classification of this village.')
+
+    urban_body_type = fields.Selection([
+        ('nagar_nigam',     'Nagar Nigam / नगर निगम'),
+        ('nagar_palika',    'Nagar Palika / नगर पालिका'),
+        ('nagar_panchayat', 'Nagar Panchayat / नगर पंचायत'),
+    ], string='Urban Body Type / नगरीय निकाय प्रकार', tracking=True,
+       help='Applicable only for Urban villages. Controls area-based slab rates in the award.')
     
     project_ids = fields.Many2many('bhu.project', 'bhu_project_bhu_village_rel', 'bhu_village_id', 'bhu_project_id', string='Projects / परियोजनाएं', readonly=True)
     

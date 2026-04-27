@@ -122,6 +122,17 @@ class Section23AwardConsolidated(models.Model):
             'align': 'right', 'valign': 'vcenter',
             'num_format': '0.0000',
         })
+        subtotal_num_fmt = workbook.add_format({
+            'bold': True, 'font_size': 10, 'font_name': FONT,
+            'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00',
+        })
+        subtotal_num_fmt_alt = workbook.add_format({
+            'bold': True, 'font_size': 10, 'font_name': FONT,
+            'bg_color': '#F8F8F8', 'border': 1,
+            'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00',
+        })
 
         # ── Title ──────────────────────────────────────────────────────────
         sheet.set_row(0, 24)
@@ -163,39 +174,55 @@ class Section23AwardConsolidated(models.Model):
         # ── Data rows ─────────────────────────────────────────────────────
         row = 5
         t_ha = t_land = t_asset = t_tree = t_det = 0.0
-        for idx, data in enumerate(consolidated_data):
+        for idx, group in enumerate(consolidated_data):
             is_alt = idx % 2 == 1
-            # Estimate row height: each owner block ~3 lines × 15pt; min 20
-            num_owners = len(data.get('owners') or [])
-            row_height = max(20, num_owners * 42)
-            sheet.set_row(row, row_height)
-
-            # Choose formats based on row color
             cur_cell = cell_fmt_alt if is_alt else cell_fmt
             cur_name = name_fmt_alt if is_alt else name_fmt
             cur_area = area_fmt_alt if is_alt else area_fmt
             cur_num = num_fmt_alt if is_alt else num_fmt
 
-            sheet.write(row, 0, data['serial'], cur_cell)
-            sheet.write(row, 1, data['owner_details'], cur_name)
-            sheet.write(row, 2, data['khasra_acquired'], cur_cell)
-            ha = float(data['acquired_area_ha'] or 0.0)
-            land_c = float(data['land_compensation'] or 0.0)
-            asset_c = float(data['asset_compensation'] or 0.0)
-            tree_c = float(data['tree_compensation'] or 0.0)
-            det = float(data['determined_total'] or 0.0)
-            sheet.write_number(row, 3, ha, cur_area)
-            sheet.write_number(row, 4, land_c, cur_num)
-            sheet.write_number(row, 5, asset_c, cur_num)
-            sheet.write_number(row, 6, tree_c, cur_num)
-            sheet.write_number(row, 7, det, cur_num)
-            sheet.write(row, 8, '', cur_cell)
-            t_ha += ha
-            t_land += land_c
-            t_asset += asset_c
-            t_tree += tree_c
-            t_det += det
-            row += 1
+            khasra_lines = group.get('khasra_lines') or []
+            num_lines = len(khasra_lines)
+            start_row = row
+
+            # Write one Excel row per khasra line
+            for k_idx, kline in enumerate(khasra_lines):
+                row_height = 20
+                sheet.set_row(row, row_height)
+
+                sheet.write(row, 2, kline.get('khasra', ''), cur_cell)
+                ha = float(kline.get('acquired_area_ha') or 0.0)
+                land_c = float(kline.get('land_compensation') or 0.0)
+                asset_c = float(kline.get('asset_compensation') or 0.0)
+                tree_c = float(kline.get('tree_compensation') or 0.0)
+                sheet.write_number(row, 3, ha, cur_area)
+                sheet.write_number(row, 4, land_c, cur_num)
+                sheet.write_number(row, 5, asset_c, cur_num)
+                sheet.write_number(row, 6, tree_c, cur_num)
+                t_ha += ha; t_land += land_c; t_asset += asset_c
+                t_tree += tree_c
+                row += 1
+
+            end_row = row - 1
+            num_owners = len(group.get('owners') or [])
+            owner_height = max(20, num_owners * 42)
+            total_det = float(group.get('total_determined') or 0.0)
+            t_det += total_det
+
+            if num_lines > 1:
+                sheet.set_row(start_row, owner_height)
+                # Merge serial, owner name, determined total, and remark across all khasra rows
+                sheet.merge_range(start_row, 0, end_row, 0, group['serial'], cur_cell)
+                sheet.merge_range(start_row, 1, end_row, 1, group.get('owner_details', ''), cur_name)
+                cur_subtotal = subtotal_num_fmt_alt if is_alt else subtotal_num_fmt
+                sheet.merge_range(start_row, 7, end_row, 7, total_det, cur_subtotal)
+                sheet.merge_range(start_row, 8, end_row, 8, '', cur_cell)
+            else:
+                sheet.set_row(start_row, owner_height)
+                sheet.write(start_row, 0, group['serial'], cur_cell)
+                sheet.write(start_row, 1, group.get('owner_details', ''), cur_name)
+                sheet.write_number(start_row, 7, total_det, cur_num)
+                sheet.write(start_row, 8, '', cur_cell)
 
         # ── Total row ─────────────────────────────────────────────────────
         sheet.set_row(row, 20)
@@ -235,123 +262,125 @@ class Section23AwardConsolidated(models.Model):
         }
 
     def get_consolidated_award_data(self):
-        """Get consolidated award data by khasra (summary sheet columns)."""
+        """Get consolidated award data grouped by owner, with one sub-row per khasra.
+
+        Returns a list of owner-groups. Each group has:
+          serial, owners, owner_details, khasra_lines (list per khasra),
+          and grand totals for the owner block.
+        """
         self.ensure_one()
 
         land_data = self.get_land_compensation_grouped_data()
         tree_data = self.get_tree_compensation_grouped_data()
         asset_data = self.get_structure_compensation_grouped_data()
 
-        def _blank_entry(khasra):
-            return {
-                'khasra': khasra,
-                # owners: list of dicts {name, father_name, address}
-                'owners': [],
-                'owner_keys': set(),   # dedup key: (name, father)
-                'total_rakba_ha': 0.0,
-                'acquired_area_ha': 0.0,
-                'land_compensation': 0.0,
-                'asset_compensation': 0.0,
-                'tree_compensation': 0.0,
-                'remarks': '',
-            }
+        # Build flat khasra → compensation lookups for tree & asset
+        tree_by_khasra = {}
+        for grp in tree_data:
+            for line in grp.get('lines', []):
+                k = (line.get('tree_khasra') or line.get('khasra') or '').strip()
+                if k:
+                    tree_by_khasra[k] = tree_by_khasra.get(k, 0.0) + (line.get('total', 0.0) or 0.0)
 
-        def _add_owner(entry, name, father='', spouse='', address=''):
-            name = (name or '').strip()
-            father = (father or '').strip()
-            spouse = (spouse or '').strip()
-            key = (name.lower(), father.lower() or spouse.lower())
-            if name and key not in entry['owner_keys']:
-                entry['owner_keys'].add(key)
-                entry['owners'].append({
-                    'name': name,
-                    'father_name': father,
-                    'spouse_name': spouse,
-                    'address': (address or '').strip(),
-                })
+        asset_by_khasra = {}
+        for grp in asset_data:
+            for line in grp.get('lines', []):
+                k = (line.get('asset_khasra') or '').strip()
+                if k:
+                    asset_by_khasra[k] = asset_by_khasra.get(k, 0.0) + (line.get('total', 0.0) or 0.0)
 
-        consolidated = {}
+        def _khasra_sort_key(k):
+            parts = (k or '').split('/', 1)
+            main = int(parts[0]) if parts and parts[0].isdigit() else 10**12
+            sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
+            return (main, sub, k)
 
-        for group in land_data:
-            for line in group.get('lines', []):
-                khasra = line.get('khasra', '')
-                if khasra not in consolidated:
-                    consolidated[khasra] = _blank_entry(khasra)
-                _add_owner(
-                    consolidated[khasra],
-                    group.get('landowner_name', ''),
-                    group.get('father_name', ''),
-                    group.get('spouse_name', ''),
-                    group.get('address', ''),
-                )
-                consolidated[khasra]['total_rakba_ha'] += line.get('original_area', 0.0) or 0.0
-                acquired_ha = (line.get('acquired_area', 0.0) or line.get('original_area', 0.0) or 0.0)
-                consolidated[khasra]['acquired_area_ha'] += acquired_ha
-                consolidated[khasra]['land_compensation'] += line.get('total_compensation', 0.0) or 0.0
-
-        for group in tree_data:
-            for line in group.get('lines', []):
-                khasra = line.get('tree_khasra', line.get('khasra', ''))
-                if khasra not in consolidated:
-                    consolidated[khasra] = _blank_entry(khasra)
-                _add_owner(
-                    consolidated[khasra],
-                    group.get('landowner_name', ''),
-                    group.get('father_name', ''),
-                    group.get('spouse_name', ''),
-                    group.get('address', ''),
-                )
-                consolidated[khasra]['tree_compensation'] += line.get('total', 0.0) or 0.0
-
-        for group in asset_data:
-            for line in group.get('lines', []):
-                khasra = line.get('asset_khasra', '')
-                if khasra not in consolidated:
-                    consolidated[khasra] = _blank_entry(khasra)
-                _add_owner(
-                    consolidated[khasra],
-                    group.get('landowner_name', ''),
-                    group.get('father_name', ''),
-                    group.get('spouse_name', ''),
-                    group.get('address', ''),
-                )
-                consolidated[khasra]['asset_compensation'] += line.get('total', 0.0) or 0.0
+        def _owner_text(name, father, spouse, address):
+            block = f"1. {name}"
+            if father:
+                block += f" पिता {father}"
+            elif spouse:
+                block += f" पति {spouse}"
+            if address:
+                block += f"\nनिवासी: {address}"
+            return block
 
         result = []
-        for khasra in sorted(consolidated.keys()):
-            data = consolidated[khasra]
-            acquired_area_ha = data['acquired_area_ha'] or 0.0
-            determined_total = (
-                (data['land_compensation'] or 0.0)
-                + (data['asset_compensation'] or 0.0)
-                + (data['tree_compensation'] or 0.0)
-            )
-            # Build plain-text owner details for Excel — same logic as Form 10, with serial numbers
-            owner_lines = []
-            for idx, owner in enumerate(data['owners'], 1):
-                block = f"{idx}. {owner['name']}"
-                if owner['father_name']:
-                    block += f" पिता {owner['father_name']}"
-                elif owner['spouse_name']:
-                    block += f" पति {owner['spouse_name']}"
-                if owner['address']:
-                    block += f"\nनिवासी: {owner['address']}"
-                owner_lines.append(block)
-            owner_details_text = '\n'.join(owner_lines) if owner_lines else ''
+        serial = 1
 
+        # Primary pass: one group per land owner (already grouped by get_land_compensation_grouped_data)
+        seen_khasra_in_land = set()
+        for grp in land_data:
+            owner_name = (grp.get('landowner_name') or '').strip()
+            father_name = (grp.get('father_name') or '').strip()
+            spouse_name = (grp.get('spouse_name') or '').strip()
+            address = (grp.get('address') or '').strip()
+
+            # Aggregate per khasra (urban slabs produce multiple lines for the same khasra)
+            khasra_agg = {}
+            for line in grp.get('lines', []):
+                k = (line.get('khasra') or '').strip()
+                if not k:
+                    continue
+                seen_khasra_in_land.add(k)
+                if k not in khasra_agg:
+                    khasra_agg[k] = {'acquired_area_ha': 0.0, 'land_compensation': 0.0}
+                khasra_agg[k]['acquired_area_ha'] += (line.get('acquired_area', 0.0) or 0.0)
+                khasra_agg[k]['land_compensation'] += (line.get('total_compensation', 0.0) or 0.0)
+
+            khasra_lines = []
+            for k in sorted(khasra_agg.keys(), key=_khasra_sort_key):
+                land_c = khasra_agg[k]['land_compensation']
+                tree_c = tree_by_khasra.get(k, 0.0)
+                asset_c = asset_by_khasra.get(k, 0.0)
+                khasra_lines.append({
+                    'khasra': k,
+                    'acquired_area_ha': khasra_agg[k]['acquired_area_ha'],
+                    'land_compensation': land_c,
+                    'asset_compensation': asset_c,
+                    'tree_compensation': tree_c,
+                    'determined_total': land_c + asset_c + tree_c,
+                })
+
+            owners = [{'name': owner_name, 'father_name': father_name,
+                       'spouse_name': spouse_name, 'address': address}]
             result.append({
-                'serial': len(result) + 1,
-                'owners': data['owners'],            # list of dicts — used in PDF
-                'owner_details': owner_details_text, # plain text — used in Excel
-                'khasra_total': khasra,
-                'total_rakba_ha': data['total_rakba_ha'],
-                'khasra_acquired': khasra,
-                'acquired_area_ha': acquired_area_ha,
-                'land_compensation': data['land_compensation'],
-                'asset_compensation': data['asset_compensation'],
-                'tree_compensation': data['tree_compensation'],
-                'determined_total': determined_total,
-                'remarks': data['remarks'],
+                'serial': serial,
+                'owners': owners,
+                'owner_details': _owner_text(owner_name, father_name, spouse_name, address),
+                'khasra_lines': khasra_lines,
+                'total_acquired_area_ha': sum(k['acquired_area_ha'] for k in khasra_lines),
+                'total_land_compensation': sum(k['land_compensation'] for k in khasra_lines),
+                'total_asset_compensation': sum(k['asset_compensation'] for k in khasra_lines),
+                'total_tree_compensation': sum(k['tree_compensation'] for k in khasra_lines),
+                'total_determined': sum(k['determined_total'] for k in khasra_lines),
             })
+            serial += 1
+
+        # Secondary pass: khasras that have only tree/asset (no land rows)
+        extra_khasras = (set(tree_by_khasra) | set(asset_by_khasra)) - seen_khasra_in_land
+        for k in sorted(extra_khasras, key=_khasra_sort_key):
+            tree_c = tree_by_khasra.get(k, 0.0)
+            asset_c = asset_by_khasra.get(k, 0.0)
+            kline = {
+                'khasra': k,
+                'acquired_area_ha': 0.0,
+                'land_compensation': 0.0,
+                'asset_compensation': asset_c,
+                'tree_compensation': tree_c,
+                'determined_total': asset_c + tree_c,
+            }
+            result.append({
+                'serial': serial,
+                'owners': [],
+                'owner_details': '',
+                'khasra_lines': [kline],
+                'total_acquired_area_ha': 0.0,
+                'total_land_compensation': 0.0,
+                'total_asset_compensation': asset_c,
+                'total_tree_compensation': tree_c,
+                'total_determined': asset_c + tree_c,
+            })
+            serial += 1
 
         return result

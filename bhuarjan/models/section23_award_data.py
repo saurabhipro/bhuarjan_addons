@@ -122,25 +122,38 @@ class Section23AwardData(models.Model):
             else:
                 derived_is_within_distance = False
 
-            # Use computed rate from award line if available
+            # Guide column = rate master only (village + main road vs other road).
+            # Basic value uses effective rate (master × irrigation × diverted) from survey line compute.
             award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
             has_award_line = bool(award_line)
-            guide_line_rate = award_line[0].rate_per_hectare if has_award_line else 2112000.0
             is_within_distance = derived_is_within_distance
-            is_diverted = survey.has_traded_land == 'yes'
+            is_diverted = survey.has_traded_land == 'yes' if survey else False
 
-            # Business rule: +25% on guideline rate for diverted land within main road range.
-            # Avoid double-application when survey line already computed this uplift.
-            if (not has_award_line) and is_diverted and is_within_distance:
-                guide_line_rate *= 1.25
+            al_rec = award_line[:1] if has_award_line else self.env['bhu.section23.award.survey.line']
+            base_rate_ha = self._s23_land_base_rate_per_hectare(survey, al_rec, derived_is_within_distance)
+
+            if has_award_line:
+                guide_line_rate = award_line[0].guide_line_master_rate or base_rate_ha
+                effective_rate = award_line[0].rate_per_hectare or base_rate_ha
+            else:
+                guide_line_rate = base_rate_ha if base_rate_ha else 2112000.0
+                effective_rate = guide_line_rate
+                if survey:
+                    itype = survey.irrigation_type or False
+                    if itype == 'irrigated':
+                        effective_rate *= 1.2
+                    elif itype in ('non_irrigated', 'unirrigated'):
+                        effective_rate *= 0.8
+                if is_diverted and derived_is_within_distance:
+                    effective_rate *= 1.25
 
             # Logic matching 19-column image:
-            # 13: basic_value = rate * area
+            # 13: basic_value = effective rate * area (irrigation/diverted on top of master)
             # 14: market_value = basic_value * factor (2)
             # 15: solatium = market_value * 1.0
             # 16: interest = 1% per month on basic value from section 4 hearing to award date
 
-            market_value_basic = data['acquired_area'] * guide_line_rate
+            market_value_basic = data['acquired_area'] * effective_rate
             market_value_factored = market_value_basic * 2.0
             solatium = market_value_factored * 1.0  # 100%
 
@@ -156,8 +169,6 @@ class Section23AwardData(models.Model):
             rehab_policy_amount = acquired_area_acre * rehab_rate_per_acre
             payable_compensation = max(total_compensation, rehab_policy_amount)
 
-            al_rec = award_line[:1] if has_award_line else self.env['bhu.section23.award.survey.line']
-            base_rate_ha = self._s23_land_base_rate_per_hectare(survey, al_rec, derived_is_within_distance)
             if survey and self._is_fallow_survey(survey):
                 irrigation_label = 'Fallow / पड़ती'
             elif survey and survey.irrigation_type == 'irrigated':
@@ -186,7 +197,7 @@ class Section23AwardData(models.Model):
                 'is_diverted': is_diverted,
                 'village_name': village_name,
                 'base_rate_hectare': base_rate_ha,
-                'effective_rate_hectare': guide_line_rate,
+                'effective_rate_hectare': effective_rate,
                 'road_type_label': road_lbl,
                 'irrigation_label': irrigation_label,
                 'diverted_label': diverted_lbl,

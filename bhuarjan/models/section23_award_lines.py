@@ -113,7 +113,7 @@ class Section23AwardSurveyLine(models.Model):
     )
 
     @api.depends(
-        'rate_per_hectare', 'acquired_area',
+        'rate_per_hectare', 'guide_line_master_rate', 'acquired_area',
         'distance_from_main_road', 'survey_id.survey_type',
         'award_id.award_date', 'award_id.project_id', 'award_id.village_id',
         'is_within_distance', 'land_type',
@@ -125,16 +125,8 @@ class Section23AwardSurveyLine(models.Model):
             threshold = 50.0 if survey_type == 'rural' else 30.0
             line.road_type_display = 'MR' if dist <= threshold else 'BMR'
 
-            # base rate (before irrigation/diverted %) from rate master — same search as simulator
-            base = 0.0
-            if line.award_id and line.award_id.village_id:
-                rm = self.env['bhu.rate.master'].search([
-                    ('village_id', '=', line.award_id.village_id.id),
-                    ('state', '=', 'active'),
-                ], limit=1, order='effective_from DESC')
-                if rm:
-                    base = rm.main_road_rate_hectare if (dist <= threshold) else rm.other_road_rate_hectare
-            line.base_rate_display = base
+            # Same as column "guide line" / rate master: main road vs other, village only
+            line.base_rate_display = line.guide_line_master_rate or 0.0
 
             rate = line.rate_per_hectare or 0.0
             area = line.acquired_area or 0.0
@@ -223,11 +215,21 @@ class Section23AwardSurveyLine(models.Model):
                     )
         return result
 
-    # Computed rate per hectare from rate master
-    rate_per_hectare = fields.Monetary(string='Rate per Hectare / हेक्टेयर दर',
-                                      currency_field='currency_id',
-                                      compute='_compute_rate_per_hectare', store=True,
-                                      help='Rate per hectare fetched from rate master based on type and distance')
+    # Master guideline = village rate book: main road vs other road only (no irrigation / diverted).
+    guide_line_master_rate = fields.Monetary(
+        string='Guide Line Rate (Master) / गाइड लाइन दर (मास्टर)',
+        currency_field='currency_id',
+        compute='_compute_rate_per_hectare', store=True,
+        help='Per-hectare rate from the active land rate master for this village: '
+        'main road vs other road only.',
+    )
+    # Computed effective rate: master × irrigation × diverted (used for basic value / compensation).
+    rate_per_hectare = fields.Monetary(
+        string='Rate per Hectare / हेक्टेयर दर',
+        currency_field='currency_id',
+        compute='_compute_rate_per_hectare', store=True,
+        help='Effective rate per hectare (master + irrigation and diverted rules) for amount calculation.',
+    )
 
     currency_id = fields.Many2one('res.currency', string='Currency',
                                   default=lambda self: self.env.ref('base.INR'))
@@ -236,38 +238,39 @@ class Section23AwardSurveyLine(models.Model):
                  'survey_id.irrigation_type', 'survey_id.has_traded_land',
                  'distance_from_main_road', 'survey_id.survey_type')
     def _compute_rate_per_hectare(self):
-        """Compute rate per hectare from rate master based on type and distance"""
+        """Master rate = rate book (village, main road vs not). Effective = master × irrigation × diverted."""
         for line in self:
-            rate = 0.0
-            if line.award_id and line.award_id.village_id and line.land_type:
-                # Use same search as Award Simulator — active state only
-                rate_master = self.env['bhu.rate.master'].search([
-                    ('village_id', '=', line.award_id.village_id.id),
-                    ('state', '=', 'active'),
-                ], limit=1, order='effective_from DESC')
+            line.guide_line_master_rate = 0.0
+            line.rate_per_hectare = 0.0
+            if not (line.award_id and line.award_id.village_id and line.land_type):
+                continue
+            rate_master = self.env['bhu.rate.master'].search([
+                ('village_id', '=', line.award_id.village_id.id),
+                ('state', '=', 'active'),
+            ], limit=1, order='effective_from DESC')
+            if not rate_master:
+                continue
 
-                if rate_master:
-                    # Compute within-distance fresh from actual distance (same logic as simulator)
-                    dist = line.distance_from_main_road or 0.0
-                    s_type = line.survey_id.survey_type if line.survey_id else 'rural'
-                    threshold = 50.0 if s_type == 'rural' else 30.0
-                    within = dist <= threshold
+            dist = line.distance_from_main_road or 0.0
+            s_type = line.survey_id.survey_type if line.survey_id else 'rural'
+            threshold = 50.0 if s_type == 'rural' else 30.0
+            within = dist <= threshold
 
-                    base_rate = (rate_master.main_road_rate_hectare if within
-                                 else rate_master.other_road_rate_hectare) or 0.0
+            base_rate = (rate_master.main_road_rate_hectare if within
+                         else rate_master.other_road_rate_hectare) or 0.0
+            line.guide_line_master_rate = base_rate
 
-                    # Irrigation adjustment — same as simulator (+20% irrigated, -20% unirrigated)
-                    irrigation_type = line.survey_id.irrigation_type if line.survey_id else False
-                    if irrigation_type == 'irrigated':
-                        rate = base_rate * 1.2
-                    elif irrigation_type in ['non_irrigated', 'unirrigated']:
-                        rate = base_rate * 0.8
-                    else:
-                        rate = base_rate
+            # Irrigation adjustment — for compensation only (+20% irrigated, -20% unirrigated)
+            irrigation_type = line.survey_id.irrigation_type if line.survey_id else False
+            if irrigation_type == 'irrigated':
+                rate = base_rate * 1.2
+            elif irrigation_type in ['non_irrigated', 'unirrigated']:
+                rate = base_rate * 0.8
+            else:
+                rate = base_rate
 
-                    # Business rule: +25% for diverted land within main-road distance.
-                    if line.survey_id and line.survey_id.has_traded_land == 'yes' and within:
-                        rate = rate * 1.25
+            if line.survey_id and line.survey_id.has_traded_land == 'yes' and within:
+                rate = rate * 1.25
 
             line.rate_per_hectare = rate
 

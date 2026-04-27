@@ -7,6 +7,15 @@ from odoo.exceptions import ValidationError
 class Section23AwardConsolidated(models.Model):
     _inherit = 'bhu.section23.award'
 
+    def get_consolidated_report_project_name(self):
+        """Project name for consolidated PDF/Excel; sudo browse for ACL-safe display."""
+        self.ensure_one()
+        pid = self.project_id.id
+        if not pid:
+            return ''
+        project = self.env['bhu.project'].sudo().browse(pid)
+        return (project.name or '').strip()
+
     def action_download_consolidated_pdf(self):
         """Download consolidated award sheet as PDF (one row per khasra) using QWeb template."""
         self.ensure_one()
@@ -49,6 +58,7 @@ class Section23AwardConsolidated(models.Model):
         subtitle_fmt = workbook.add_format({
             'font_size': 10, 'font_name': FONT,
             'align': 'center', 'valign': 'vcenter', 'border': 1,
+            'text_wrap': True,
         })
         header_fmt = workbook.add_format({
             'bold': True, 'font_size': 9, 'font_name': FONT,
@@ -128,14 +138,14 @@ class Section23AwardConsolidated(models.Model):
                       else '')
         district_full = f"{district_name} ({state_name})" if state_name else district_name
         date_str = self.award_date.strftime('%d-%m-%Y') if self.award_date else ''
-        project_name = (self.sudo().project_id.name if self.sudo().project_id else '') or ''
+        project_name = self.get_consolidated_report_project_name()
         subtitle = (
             f"भू-अर्जन प्रकरण क्रमांक {self.case_number or ''} / "
             f"ग्राम-{village_name}  "
-            f"Project {project_name}  "
+            f"Project: {project_name}  "
             f"तहसील-{tehsil_name}  जिला-{district_full}  दिनांक: {date_str}"
         )
-        sheet.set_row(1, 28)
+        sheet.set_row(1, 36)
         sheet.merge_range(1, 0, 1, 8, subtitle, subtitle_fmt)
 
         # ── Two-row column headers ─────────────────────────────────────────

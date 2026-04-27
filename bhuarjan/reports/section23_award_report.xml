@@ -331,9 +331,10 @@
             </div>
         </div>
         <!-- Custom Footer - repeats on every page -->
-        <div class="footer o_standard_footer" style="width:100%; background:#fff; border-top:2px solid #000; padding:4px 8px; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
+        <div class="footer o_standard_footer" style="width:100%; background:#fff; border-top:none !important; box-shadow:none !important; padding:4px 8px; -webkit-print-color-adjust:exact; print-color-adjust:exact;">
             <!-- Style inside footer div so it is included in wkhtml footer-html file -->
             <style>
+                .footer, .o_standard_footer { border-top: none !important; box-shadow: none !important; }
                 * { font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'DejaVu Sans', sans-serif !important; color: #000 !important; }
                 .s23-footer-wrap { width: 100%; }
                 .s23-footer-wrap td { border: none !important; width: 20%; text-align: center; vertical-align: top; padding: 3px 2px; font-size: 10px; line-height: 1.4; }

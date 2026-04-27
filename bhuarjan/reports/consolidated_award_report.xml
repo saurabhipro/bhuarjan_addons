@@ -41,17 +41,16 @@
                                             </div>
                                             <div style="flex:1; text-align:center;">
                                                 <div style="font-size:16px; font-weight:700; color:#000;">भूमि, परिसंपत्तियों तथा वृक्षों के मुआवजा का गोशवारा भाग -1 (घ)</div>
-                                                <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.5;">
+                                                <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.55;">
                                                     भू-अर्जन प्रकरण क्रमांक <span t-esc="o.case_number or ''"/> /
                                                     ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
+                                                    <span style="font-weight:800;">Project:</span>
+                                                    <span t-esc="o.get_consolidated_report_project_name()"/>&#160;
                                                     तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;
                                                     जिला-<span t-esc="o.village_id.district_id.name if o.village_id and o.village_id.district_id else ''"/>
                                                     <t t-if="o.village_id and o.village_id.district_id and o.village_id.district_id.state_id">
                                                         (<span t-esc="o.village_id.district_id.state_id.name"/>)
                                                     </t>
-                                                </div>
-                                                <div style="font-size:11px; color:#000; margin-top:4px; line-height:1.4; font-weight:800;">
-                                                    Project: <span t-esc="o.sudo().project_id.name or ''"/>
                                                 </div>
                                             </div>
                                             <div style="flex-shrink:0; text-align:right; padding-top:2px; font-size:11px; font-weight:700;">

@@ -876,7 +876,7 @@ class DashboardStats(models.AbstractModel):
                 'section23_award_completion_percent': self._calculate_completion_percentage(
                     counts['section23_award']['approved'], 0, counts['section23_award']['total'], is_survey=False
                 ),
-                'section23_award_info': self._get_section_info('bhu.section23.award', domains['final_domain']),
+                'section23_award_info': self._get_section_info('bhu.section23.award', domains['final_domain'], pending_state='draft'),
 
                 # Payment File (has village_id)
                 'payment_file_total': counts['payment_file']['total'],

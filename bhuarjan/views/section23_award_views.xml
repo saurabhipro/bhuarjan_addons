@@ -23,7 +23,7 @@
         <field name="arch" type="xml">
             <form class="bhu_s23_award_premium" string="Section 23 Award / धारा 23 अवार्ड">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" options="{'clickable': True}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved" options="{'clickable': False}"/>
                 </header>
                 <sheet>
                     <field name="currency_id" invisible="1"/>
@@ -344,14 +344,14 @@
 
 
                     <div class="s23_workflow_card"
-                         invisible="(is_section_officer and not is_admin) or (is_admin and state not in ('draft', 'sent_back'))">
-                        <div class="s23_workflow_title">Award generation (SDM) &amp; signed upload</div>
+                         invisible="(is_section_officer and not is_admin) or (is_admin and state == 'approved' and is_generated)">
+                        <div class="s23_workflow_title">Award Generation (SDM) / अवार्ड जेनरेशन</div>
                         <div class="row">
                             <div class="col-md-6 pe-md-3 border-end">
-                                <div class="fw-bold text-secondary mb-2">Step 1: Generate award</div>
+                                <div class="fw-bold text-secondary mb-2">Generate &amp; Download / जेनरेट करें</div>
                                 <div class="mb-3 d-flex gap-2 flex-wrap">
-                                    <button name="action_generate_award" string="Generate Award" 
-                                            type="object" class="btn s23_btn_brown" 
+                                    <button name="action_generate_award" string="Generate Award"
+                                            type="object" class="btn s23_btn_brown"
                                             icon="fa-cogs"
                                             invisible="state != 'draft' or is_generated"/>
                                     <button name="action_download_award" string="Download Award"
@@ -359,58 +359,37 @@
                                             icon="fa-download"
                                             invisible="not is_generated"/>
                                 </div>
-                                <p class="text-muted small s23_note" invisible="state != 'draft' or is_generated">Creates the Section 23 PDF / Word from configured surveys and structures.</p>
+                                <p class="text-muted small s23_note" invisible="state != 'draft' or is_generated">
+                                    Generates the Section 23 PDF from configured surveys. Award is <strong>auto-approved</strong> on generation — no collector submission required.
+                                </p>
                             </div>
                             <div class="col-md-6 ps-md-3">
-                                <div class="fw-bold text-secondary mb-2">Step 2: Upload signed &amp; submit / चरण 2: हस्ताक्षरित अपलोड</div>
+                                <div class="fw-bold text-secondary mb-2">Status / स्थिति</div>
                                 <div class="bg-light p-3 rounded">
-                                    <div class="mb-2">
-                                        <field name="award_document" filename="award_document_filename" 
-                                               widget="binary" 
-                                               string="Upload your file / हस्ताक्षरित अवार्ड"
-                                               readonly="state != 'draft'"/>
-                                        <field name="award_document_filename" invisible="1"/>
+                                    <!-- Not generated yet -->
+                                    <div invisible="is_generated or state == 'approved'" class="text-muted small">
+                                        <i class="fa fa-info-circle text-info"/> Award not yet generated. Click <strong>Generate Award</strong> to proceed.
                                     </div>
-                                    <div invisible="state != 'draft' and state != 'sent_back'">
-                                        <button name="action_submit_award" string="Submit to collector / जमा करें" 
-                                                type="object" class="btn s23_btn_teal" 
-                                                icon="fa-paper-plane"
-                                                invisible="not award_document or state != 'draft'"/>
-                                        <button name="action_submit_award" string="Resubmit / पुनः जमा"
-                                                type="object" class="btn s23_btn_brown w-100 mt-1"
-                                                icon="fa-refresh"
-                                                invisible="state != 'sent_back'"
-                                                confirm="Are you sure you want to resubmit?"/>
+                                    <!-- Generated but state not yet updated (old record) -->
+                                    <div invisible="not is_generated or state == 'approved'" class="mb-2">
+                                        <div class="text-warning fw-bold small mb-1">
+                                            <i class="fa fa-exclamation-triangle"/> Award generated but status not updated.
+                                        </div>
+                                        <button name="action_approve_award" string="Mark as Generated / उत्पन्न चिह्नित करें"
+                                                type="object" class="btn btn-sm s23_btn_ok"
+                                                icon="fa-check-circle"/>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="s23_workflow_card"
-                         invisible="not (is_section_officer or is_admin) or (is_admin and state in ('draft', 'sent_back'))">
-                        <div class="s23_workflow_title">Award approval</div>
-                        <div class="row">
-                            <div class="col-md-6 pe-md-3 border-end">
-                                <div class="fw-bold text-secondary mb-2">Step 1: Review / समीक्षा</div>
-                                <p class="text-muted small s23_note">Review the signed document attached by SDM before approving.</p>
-                            </div>
-                            <div class="col-md-6 ps-md-3">
-                                <div class="fw-bold text-secondary mb-2">Step 2: Decision / निर्णय</div>
-                                <div class="bg-light p-3 rounded">
-                                    <div class="d-flex gap-2" invisible="state != 'submitted'">
-                                        <button name="action_approve_award" string="Approve" type="object" 
-                                                class="btn s23_btn_ok flex-fill" icon="fa-check"
-                                                groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
-                                                confirm="Approve this award?"/>
-                                        <button name="action_send_back_award" string="Send back" type="object" 
-                                                class="btn s23_btn_danger flex-fill" icon="fa-times"
-                                                groups="bhuarjan.group_bhu_section_officer,bhuarjan.group_bhuarjan_admin"
-                                                confirm="Send this award back?"/>
+                                    <!-- Fully generated and approved -->
+                                    <div invisible="state != 'approved'" class="text-success fw-bold">
+                                        <i class="fa fa-check-circle"/> Award Generated / अवार्ड उत्पन्न
+                                        <div class="text-muted small fw-normal mt-1">Generated by SDM. No further action required.</div>
                                     </div>
-                                    <div invisible="state != 'approved'" class="text-success fw-bold text-center p-2">
-                                        <i class="fa fa-check-circle"/> Award approved
-                                    </div>
+                                    <field name="award_document" filename="award_document_filename"
+                                           widget="binary"
+                                           string="Award Document / अवार्ड दस्तावेज़"
+                                           readonly="1"
+                                           invisible="not award_document"/>
+                                    <field name="award_document_filename" invisible="1"/>
                                 </div>
                             </div>
                         </div>

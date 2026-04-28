@@ -98,10 +98,10 @@ class Section23Award(models.Model):
     notes = fields.Text(string='Notes / नोट्स', tracking=True)
     
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('submitted', 'Submitted'),
-        ('approved', 'Approved'),
-        ('sent_back', 'Sent Back')
+        ('draft', 'Draft / प्रारूप'),
+        ('approved', 'Generated / उत्पन्न'),
+        ('submitted', 'Submitted'),   # legacy — no longer used in new flow
+        ('sent_back', 'Sent Back'),   # legacy — no longer used in new flow
     ], string='Status', default='draft', tracking=True, index=True)
     
     is_generated = fields.Boolean(string='Is Generated', default=False, tracking=True)
@@ -1071,7 +1071,8 @@ class Section23Award(models.Model):
         self._refresh_award_line_items()
 
         if file_format == 'excel':
-            self.write({'is_generated': True})
+            self.write({'is_generated': True, 'state': 'approved'})
+            self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
             return self.action_download_excel_components(export_scope=export_scope or 'all')
 
         if file_format != 'pdf':
@@ -1102,14 +1103,17 @@ class Section23Award(models.Model):
                     'award_document': base64.b64encode(pdf_data),
                     'award_document_filename': filename,
                     'is_generated': True,
+                    'state': 'approved',
                 })
+                self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
                 return {
                     'type': 'ir.actions.act_url',
                     'url': f'/web/content/{self._name}/{self.id}/award_document/{filename}?download=true',
                     'target': 'self',
                 }
 
-        self.write({'is_generated': True})
+        self.write({'is_generated': True, 'state': 'approved'})
+        self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
         return report_action.with_context(
             s23_pdf_scope=scope,
             s23_include_cover=bool(include_cover_letter),
@@ -1213,10 +1217,10 @@ class Section23Award(models.Model):
         self.message_post(body=_("Award submitted with signed document."))
 
     def action_approve_award(self):
-        """Approve the award"""
+        """Mark award as Generated/Approved (used for legacy records generated before auto-approve)."""
         self.ensure_one()
-        self.write({'state': 'approved'})
-        self.message_post(body=_("Award approved."))
+        self.write({'state': 'approved', 'is_generated': True})
+        self.message_post(body=_("Award marked as Generated / अवार्ड उत्पन्न के रूप में चिह्नित किया गया।"))
 
     def action_send_back_award(self):
         """Send back the award for correction"""

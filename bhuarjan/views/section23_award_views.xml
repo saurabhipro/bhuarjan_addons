@@ -256,13 +256,6 @@
                                 <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest"/>
                             </list>
                         </field>
-                        <!-- Urban slab preview: shows one row per slab per khasra -->
-                        <div invisible="not is_urban" class="mt-2">
-                            <div class="fw-bold text-secondary mb-1" style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.5px;">
-                                <i class="fa fa-table me-1"/> Urban Slab Breakdown / नगरीय स्लैब विवरण
-                            </div>
-                            <field name="s23_land_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
-                        </div>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fdf4ec); border-left-color: #7a3b28;">
                             <span class="total_label_large">Land Subtotal</span>
                             <span class="total_value_large" style="color: #6a2d1d;">
@@ -344,7 +337,7 @@
 
 
                     <div class="s23_workflow_card"
-                         invisible="(is_section_officer and not is_admin) or (is_admin and state == 'approved' and is_generated)">
+                         invisible="is_section_officer and not is_admin">
                         <div class="s23_workflow_title">Award Generation (SDM) / अवार्ड जेनरेशन</div>
                         <div class="row">
                             <div class="col-md-6 pe-md-3 border-end">

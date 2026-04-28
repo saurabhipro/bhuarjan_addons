@@ -5,63 +5,110 @@
     padding: 0;
 }
 
-/* ---------- Header (brown gradient like Group Dashboard) ---------- */
-.o_payment_dashboard .dashboard-header {
-    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 1rem 0;
-    border-radius: 0;
-    margin-bottom: 0;
+/* ---------- Hero header — identical to Group Dashboard ---------- */
+.o_payment_dashboard .o_group_hero {
+    background: linear-gradient(135deg, var(--bd-brand-900, #4A240B) 0%, var(--bd-brand-700, #8B4513) 55%, var(--bd-brand-500, #C87941) 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--bd-radius-md, 12px) !important;
+    padding: 12px 18px !important;
+    margin: 0 0 14px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    box-shadow: var(--bd-shadow-md, 0 4px 12px rgba(74,36,11,.09));
+    position: relative;
+    overflow: hidden;
 }
 
-.o_payment_dashboard .dashboard-header h2 {
-    color: white;
-    font-weight: 700;
-    font-size: 1.5rem;
-    margin: 0;
+.o_payment_dashboard .o_group_hero::after {
+    content: "";
+    position: absolute;
+    top: 0; right: -80px;
+    width: 220px; height: 100%;
+    background: rgba(255,255,255,0.08);
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+
+.o_payment_dashboard .o_group_hero::before {
+    content: "";
+    position: absolute;
+    left: -40px; top: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.o_payment_dashboard .o_group_hero h2 {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 19px !important;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+}
+
+.o_payment_dashboard .o_group_hero h2 > i {
+    color: #ffd9b8 !important;
+    font-size: 20px;
 }
 
 .o_payment_dashboard .o_group_hero_pill {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.18);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 999px;
-    font-size: 0.78rem;
-    padding: 3px 10px;
-    font-weight: 600;
+    backdrop-filter: blur(4px);
 }
+
+.o_payment_dashboard .o_group_hero_pill i { color: #ffd9b8; font-size: 12px; }
 
 .o_payment_dashboard .o_group_hero_stats {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .o_payment_dashboard .o_group_hero_chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.18);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 10px;
     padding: 5px 12px;
-    font-size: 1rem;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    color: #fff;
     font-weight: 700;
+    font-size: 13px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
+.o_payment_dashboard .o_group_hero_chip:hover {
+    background: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+}
+
+.o_payment_dashboard .o_group_hero_chip i  { color: #ffd9b8; font-size: 13px; }
+
 .o_payment_dashboard .o_group_hero_chip small {
-    font-size: 0.7rem;
+    font-size: 10.5px;
     font-weight: 600;
-    opacity: 0.85;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
+    opacity: 0.85;
 }
 
 .o_payment_dashboard .dashboard-content {
@@ -499,4 +546,6 @@
 
 .o_payment_dashboard .container-fluid {
     max-width: 1400px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }

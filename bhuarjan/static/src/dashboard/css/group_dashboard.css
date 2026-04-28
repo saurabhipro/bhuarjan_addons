@@ -553,6 +553,8 @@
 /* Container spacing */
 .o_group_dashboard .container-fluid {
     max-width: 1400px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* ── Loading Screen ─────────────────────────────────────────────────────── */

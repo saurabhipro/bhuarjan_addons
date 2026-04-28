@@ -66,7 +66,8 @@
  * 1. Page shell (applies to every dashboard wrapper)
  * ===================================================================== */
 .o_admin_dashboard,
-.o_group_dashboard {
+.o_group_dashboard,
+.o_payment_dashboard {
     background:
         radial-gradient(at 100% 0%, rgba(200, 121, 65, 0.08) 0%, transparent 45%),
         radial-gradient(at 0% 100%, rgba(139, 69, 19, 0.06) 0%, transparent 40%),
@@ -81,7 +82,8 @@
  *    Group's header block uses .dashboard-header; admin uses .o_dashboard_header
  * ===================================================================== */
 .o_admin_dashboard .o_dashboard_header,
-.o_group_dashboard .dashboard-header {
+.o_group_dashboard .dashboard-header,
+.o_payment_dashboard .dashboard-header {
     background: linear-gradient(135deg, var(--bd-brand-900) 0%, var(--bd-brand-700) 55%, var(--bd-brand-500) 100%) !important;
     color: #fff !important;
     border: none !important;
@@ -94,7 +96,8 @@
 }
 
 .o_admin_dashboard .o_dashboard_header::after,
-.o_group_dashboard .dashboard-header::after {
+.o_group_dashboard .dashboard-header::after,
+.o_payment_dashboard .dashboard-header::after {
     content: "";
     position: absolute;
     top: 0;
@@ -107,7 +110,8 @@
 }
 
 .o_admin_dashboard .o_dashboard_header::before,
-.o_group_dashboard .dashboard-header::before {
+.o_group_dashboard .dashboard-header::before,
+.o_payment_dashboard .dashboard-header::before {
     content: "";
     position: absolute;
     left: -40px;
@@ -120,7 +124,8 @@
 }
 
 .o_admin_dashboard .o_dashboard_header h2,
-.o_group_dashboard .dashboard-header h2 {
+.o_group_dashboard .dashboard-header h2,
+.o_payment_dashboard .dashboard-header h2 {
     color: #fff !important;
     font-weight: 700 !important;
     font-size: 19px !important;
@@ -135,7 +140,9 @@
 .o_admin_dashboard .o_dashboard_header h2 i,
 .o_admin_dashboard .o_dashboard_header h2 .fa,
 .o_group_dashboard .dashboard-header h2 i,
-.o_group_dashboard .dashboard-header h2 .fa {
+.o_group_dashboard .dashboard-header h2 .fa,
+.o_payment_dashboard .dashboard-header h2 i,
+.o_payment_dashboard .dashboard-header h2 .fa {
     color: #ffd9b8 !important;
 }
 
@@ -143,13 +150,15 @@
  * 3. KPI tiles – any dashboard that drops a .stat-card
  * ===================================================================== */
 .o_group_dashboard .dashboard-content .row,
-.o_admin_dashboard .dashboard-content .row {
+.o_admin_dashboard .dashboard-content .row,
+.o_payment_dashboard .dashboard-content .row {
     --bs-gutter-x: 0.85rem;
     --bs-gutter-y: 0.85rem;
 }
 
 .o_group_dashboard .stat-card,
-.o_admin_dashboard .stat-card {
+.o_admin_dashboard .stat-card,
+.o_payment_dashboard .stat-card {
     border-radius: var(--bd-radius-md) !important;
     padding: 14px 16px !important;
     min-height: 78px;
@@ -165,7 +174,8 @@
     isolation: isolate;
 }
 
-.o_group_dashboard .stat-card::before {
+.o_group_dashboard .stat-card::before,
+.o_payment_dashboard .stat-card::before {
     /* glass sheen overlay */
     content: "";
     position: absolute;
@@ -177,7 +187,8 @@
     z-index: 0;
 }
 
-.o_group_dashboard .stat-card::after {
+.o_group_dashboard .stat-card::after,
+.o_payment_dashboard .stat-card::after {
     /* left accent strip */
     content: "";
     position: absolute;
@@ -192,18 +203,21 @@
     z-index: 1;
 }
 
-.o_group_dashboard .stat-card > * {
+.o_group_dashboard .stat-card > *,
+.o_payment_dashboard .stat-card > * {
     position: relative;
     z-index: 2;
 }
 
-.o_group_dashboard .stat-card:hover {
+.o_group_dashboard .stat-card:hover,
+.o_payment_dashboard .stat-card:hover {
     transform: translateY(-4px) !important;
     box-shadow: var(--bd-shadow-lg) !important;
 }
 
 /* Icon circle */
-.o_group_dashboard .stat-card .stat-icon {
+.o_group_dashboard .stat-card .stat-icon,
+.o_payment_dashboard .stat-card .stat-icon {
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -220,11 +234,13 @@
     transition: transform 0.25s ease;
 }
 
-.o_group_dashboard .stat-card:hover .stat-icon {
+.o_group_dashboard .stat-card:hover .stat-icon,
+.o_payment_dashboard .stat-card:hover .stat-icon {
     transform: rotate(-6deg) scale(1.06);
 }
 
-.o_group_dashboard .stat-card .stat-details h3 {
+.o_group_dashboard .stat-card .stat-details h3,
+.o_payment_dashboard .stat-card .stat-details h3 {
     font-size: 1.55rem !important;
     font-weight: 800 !important;
     line-height: 1.1;
@@ -234,7 +250,8 @@
     letter-spacing: 0.2px;
 }
 
-.o_group_dashboard .stat-card .stat-details p {
+.o_group_dashboard .stat-card .stat-details p,
+.o_payment_dashboard .stat-card .stat-details p {
     margin: 0 !important;
     font-size: 0.72rem !important;
     font-weight: 700 !important;
@@ -245,58 +262,72 @@
 }
 
 /* Tile color variants – refined 3-stop gradients */
-.o_group_dashboard .stat-card.bg-primary {
+.o_group_dashboard .stat-card.bg-primary,
+.o_payment_dashboard .stat-card.bg-primary {
     background: linear-gradient(135deg, var(--bd-accent-brown-a) 0%, var(--bd-accent-brown-b) 60%, #4A2A14 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-success {
+.o_group_dashboard .stat-card.bg-success,
+.o_payment_dashboard .stat-card.bg-success {
     background: linear-gradient(135deg, var(--bd-accent-green-a) 0%, var(--bd-accent-green-b) 60%, #2D6A3F 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-danger {
+.o_group_dashboard .stat-card.bg-danger,
+.o_payment_dashboard .stat-card.bg-danger {
     background: linear-gradient(135deg, var(--bd-accent-red-a) 0%, var(--bd-accent-red-b) 60%, #8B2A1E 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-info {
+.o_group_dashboard .stat-card.bg-info,
+.o_payment_dashboard .stat-card.bg-info {
     background: linear-gradient(135deg, var(--bd-accent-teal-a) 0%, var(--bd-accent-teal-b) 60%, #125F6B 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-warning {
+.o_group_dashboard .stat-card.bg-warning,
+.o_payment_dashboard .stat-card.bg-warning {
     background: linear-gradient(135deg, var(--bd-accent-amber-a) 0%, var(--bd-accent-amber-b) 60%, #A06C10 100%) !important;
     color: #fff !important;
 }
 
 .o_group_dashboard .stat-card.bg-warning .stat-details h3,
 .o_group_dashboard .stat-card.bg-warning .stat-details p,
-.o_group_dashboard .stat-card.bg-warning .stat-icon {
+.o_group_dashboard .stat-card.bg-warning .stat-icon,
+.o_payment_dashboard .stat-card.bg-warning .stat-details h3,
+.o_payment_dashboard .stat-card.bg-warning .stat-details p,
+.o_payment_dashboard .stat-card.bg-warning .stat-icon {
     color: #fff !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
 }
 
-.o_group_dashboard .stat-card.bg-patwari {
+.o_group_dashboard .stat-card.bg-patwari,
+.o_payment_dashboard .stat-card.bg-patwari {
     background: linear-gradient(135deg, var(--bd-accent-taupe-a) 0%, var(--bd-accent-taupe-b) 60%, #543D30 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-village {
+.o_group_dashboard .stat-card.bg-village,
+.o_payment_dashboard .stat-card.bg-village {
     background: linear-gradient(135deg, var(--bd-accent-leaf-a) 0%, var(--bd-accent-leaf-b) 60%, #446E32 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-survey {
+.o_group_dashboard .stat-card.bg-survey,
+.o_payment_dashboard .stat-card.bg-survey {
     background: linear-gradient(135deg, var(--bd-accent-sky-a) 0%, var(--bd-accent-sky-b) 60%, #1D5A8E 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-landowner {
+.o_group_dashboard .stat-card.bg-landowner,
+.o_payment_dashboard .stat-card.bg-landowner {
     background: linear-gradient(135deg, var(--bd-accent-purple-a) 0%, var(--bd-accent-purple-b) 60%, #56326A 100%) !important;
 }
 
-.o_group_dashboard .stat-card.bg-budget {
+.o_group_dashboard .stat-card.bg-budget,
+.o_payment_dashboard .stat-card.bg-budget {
     background: linear-gradient(135deg, var(--bd-accent-orange-a) 0%, var(--bd-accent-orange-b) 60%, #94560F 100%) !important;
 }
 
 /* =====================================================================
  * 4. Projects table card (Group)
  * ===================================================================== */
-.o_group_dashboard .dashboard-content .card {
+.o_group_dashboard .dashboard-content .card,
+.o_payment_dashboard .dashboard-content .card {
     border: 1px solid var(--bd-border) !important;
     border-radius: var(--bd-radius-lg) !important;
     background: var(--bd-surface);

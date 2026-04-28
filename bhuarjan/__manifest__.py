@@ -218,6 +218,8 @@
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.js',
             'bhuarjan/static/src/components/kml_viewer/kml_viewer.xml',
             'bhuarjan/static/src/xml/hierarchy_tree.xml',
+            # Award action loader (shows overlay on generate/download button clicks)
+            'bhuarjan/static/src/js/award_action_loader.js',
         ],
         'web.assets_frontend': [
             'bhuarjan/static/src/scss/password_eyes_icon.scss',

@@ -3,37 +3,35 @@
     <t t-name="bhuarjan.PaymentDashboard" owl="1">
         <div class="o_payment_dashboard">
 
-            <!-- Unified Dashboard Header (matches Group Dashboard) -->
+            <!-- Dashboard Header — uses same .dashboard-header class as Group Dashboard -->
             <div class="dashboard-header">
-                <div class="container-fluid">
-                    <div class="w-100 d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
-                        <div class="o_dashboard_title_section">
-                            <h2>
-                                <i class="fa fa-credit-card me-2"/>
-                                <span>Payment Dashboard</span>
-                                <span class="o_group_hero_pill ms-2">
-                                    <i class="fa fa-bolt"/>
-                                    <span>Live</span>
-                                </span>
-                            </h2>
-                        </div>
-                        <div class="o_dashboard_actions o_group_hero_stats" t-if="!state.loading">
-                            <span class="o_group_hero_chip" title="Projects">
-                                <i class="fa fa-folder-open"/>
-                                <span t-esc="state.stats.project_count"/>
-                                <small>Projects</small>
+                <div class="w-100 d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+                    <div class="o_dashboard_title_section">
+                        <h2>
+                            <i class="fa fa-credit-card"/>
+                            <span>Payment Dashboard</span>
+                            <span class="o_group_hero_pill">
+                                <i class="fa fa-bolt"/>
+                                <span>Live</span>
                             </span>
-                            <span class="o_group_hero_chip" title="Villages">
-                                <i class="fa fa-home"/>
-                                <span t-esc="state.stats.village_count"/>
-                                <small>Villages</small>
-                            </span>
-                            <span class="o_group_hero_chip" title="Total Payments">
-                                <i class="fa fa-exchange"/>
-                                <span t-esc="state.stats.total_count"/>
-                                <small>Payments</small>
-                            </span>
-                        </div>
+                        </h2>
+                    </div>
+                    <div class="o_dashboard_actions o_group_hero_stats" t-if="!state.loading">
+                        <span class="o_group_hero_chip" title="Projects">
+                            <i class="fa fa-folder-open"/>
+                            <span t-esc="state.stats.project_count"/>
+                            <small>Projects</small>
+                        </span>
+                        <span class="o_group_hero_chip" title="Villages">
+                            <i class="fa fa-home"/>
+                            <span t-esc="state.stats.village_count"/>
+                            <small>Villages</small>
+                        </span>
+                        <span class="o_group_hero_chip" title="Total Payments">
+                            <i class="fa fa-exchange"/>
+                            <span t-esc="state.stats.total_count"/>
+                            <small>Payments</small>
+                        </span>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,118 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, useState, onMounted } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { ProjectTimelineDialog } from "../../js/components/project_timeline";
+import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
+
+// ── Survey Trend Chart Dialog ──────────────────────────────────────────────
+class SurveyTrendDialog extends Component {
+    static template = "bhuarjan.SurveyTrendDialog";
+    static components = { Dialog };
+    static props = { close: Function, trendData: Object };
+
+    setup() {
+        this.state = useState({ view: 'daily' }); // daily | weekly | monthly
+        onMounted(() => this._drawChart());
+    }
+
+    get currentData() {
+        return this.props.trendData[this.state.view] || [];
+    }
+
+    get maxVal() {
+        const vals = this.currentData.map(d => d.value);
+        return Math.max(...vals, 1);
+    }
+
+    setView(v) {
+        this.state.view = v;
+        // redraw on next tick after OWL re-renders
+        setTimeout(() => this._drawChart(), 50);
+    }
+
+    _drawChart() {
+        const canvas = document.getElementById('bhu_survey_chart');
+        if (!canvas) return;
+        const data = this.currentData;
+        const maxVal = this.maxVal;
+        const W = canvas.offsetWidth || 800;
+        const H = 260;
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, W, H);
+
+        const PAD_L = 42, PAD_R = 16, PAD_T = 20, PAD_B = 60;
+        const chartW = W - PAD_L - PAD_R;
+        const chartH = H - PAD_T - PAD_B;
+        const n = data.length;
+        const barW = Math.max(6, (chartW / n) * 0.62);
+        const gap = chartW / n;
+
+        // Grid lines
+        const gridSteps = 5;
+        ctx.strokeStyle = 'rgba(139,69,19,0.10)';
+        ctx.lineWidth = 1;
+        ctx.font = '11px system-ui, sans-serif';
+        ctx.fillStyle = '#888';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= gridSteps; i++) {
+            const y = PAD_T + chartH - (chartH * i / gridSteps);
+            ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(W - PAD_R, y); ctx.stroke();
+            ctx.fillText(Math.round(maxVal * i / gridSteps), PAD_L - 6, y + 4);
+        }
+
+        // Bars
+        data.forEach((d, idx) => {
+            const x = PAD_L + idx * gap + (gap - barW) / 2;
+            const barH = d.value === 0 ? 2 : Math.max(4, (d.value / maxVal) * chartH);
+            const y = PAD_T + chartH - barH;
+
+            // Gradient fill
+            const grad = ctx.createLinearGradient(x, y, x, PAD_T + chartH);
+            grad.addColorStop(0, '#C87941');
+            grad.addColorStop(1, '#6B3410');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0])
+                          : ctx.rect(x, y, barW, barH);
+            ctx.fill();
+
+            // Value on top
+            if (d.value > 0) {
+                ctx.fillStyle = '#5D2E0C';
+                ctx.font = 'bold 11px system-ui, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(d.value, x + barW / 2, y - 5);
+            }
+
+            // X-axis label (show every nth to avoid overlap)
+            const showEvery = n > 20 ? 5 : n > 10 ? 2 : 1;
+            if (idx % showEvery === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '10px system-ui, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.translate(x + barW / 2, PAD_T + chartH + 10);
+                ctx.rotate(-Math.PI / 5);
+                ctx.fillText(d.label, 0, 0);
+                ctx.restore();
+            }
+        });
+
+        // X axis line
+        ctx.strokeStyle = 'rgba(139,69,19,0.3)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(PAD_L, PAD_T + chartH);
+        ctx.lineTo(W - PAD_R, PAD_T + chartH);
+        ctx.stroke();
+    }
+}
+// ──────────────────────────────────────────────────────────────────────────
 
 export class GroupDashboard extends Component {
     setup() {
@@ -31,6 +139,7 @@ export class GroupDashboard extends Component {
                 total_patwaris: 0,
                 total_villages: 0,
                 total_surveys: 0,
+                surveys_today: 0,
                 total_landowners: 0,
                 total_budget: 0,
             }
@@ -164,8 +273,11 @@ export class GroupDashboard extends Component {
             let globalTotalBudget = 0;
             let projectVillageIds = new Set();
 
+            // Today's date string in YYYY-MM-DD format
+            const todayStr = new Date().toISOString().slice(0, 10);
+
             // Fetch all global totals in one parallel batch for 100% accuracy (Filtered by Company)
-            const [totalPatwaris, totalSurveys, totalLandowners] = await Promise.all([
+            const [totalPatwaris, totalSurveys, totalLandowners, surveysToday] = await Promise.all([
                 this.orm.searchCount("res.users", [
                     ["bhuarjan_role", "=", "patwari"],
                     ["company_id", "in", companyIds]
@@ -175,7 +287,11 @@ export class GroupDashboard extends Component {
                 ]),
                 this.orm.searchCount("bhu.landowner", [
                     ["company_id", "in", companyIds]
-                ])
+                ]),
+                this.orm.searchCount("bhu.survey", [
+                    ["company_id", "in", companyIds],
+                    ["survey_date", "=", todayStr]
+                ]),
             ]);
 
             // For each project, determine its current stage, counts and last survey date
@@ -217,6 +333,7 @@ export class GroupDashboard extends Component {
             this.state.stats.total_villages = projectVillageIds.size;
             this.state.stats.total_patwaris = totalPatwaris;
             this.state.stats.total_surveys = totalSurveys;
+            this.state.stats.surveys_today = surveysToday;
             this.state.stats.total_landowners = totalLandowners;
             this.state.stats.total_budget = globalTotalBudget.toLocaleString('en-IN', {
                 maximumFractionDigits: 0
@@ -505,6 +622,12 @@ export class GroupDashboard extends Component {
             views: [[false, "form"]],
             target: "current",
         });
+    }
+
+    async showSurveyChart() {
+        const companyIds = this.env.services.company.activeCompanyIds;
+        const trendData = await this.orm.call('bhuarjan.dashboard', 'get_survey_trend_data', [], { company_ids: companyIds });
+        this.dialog.add(SurveyTrendDialog, { trendData });
     }
 
     async refreshDashboard() {

@@ -1286,7 +1286,12 @@ class SurveyLine(models.Model):
             args = patwari_domain + args
         
         return super(Survey, self)._search(args, offset=offset, limit=limit, order=order)
-    
+
+    @api.model
+    def get_survey_trend_data(self, company_ids=None):
+        """Delegate to dashboard stats (keeps RPC working with cached assets calling bhu.survey)."""
+        return self.env['bhuarjan.dashboard'].get_survey_trend_data(company_ids=company_ids)
+
     @api.onchange('survey_id')
     def _onchange_survey_id(self):
         """Check sequence settings when survey is changed"""

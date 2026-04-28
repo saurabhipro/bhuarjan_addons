@@ -1083,6 +1083,62 @@ class DashboardStats(models.AbstractModel):
         villages = project.village_ids
         return villages.read(["id", "name"])
 
+    @api.model
+    def get_survey_trend_data(self, company_ids=None):
+        """Survey counts by day (30d), week (12w), month (12m) for chart widgets."""
+        from datetime import date, timedelta
+
+        Survey = self.env["bhu.survey"]
+        today = date.today()
+
+        def _count(domain_extra):
+            base = [("company_id", "in", company_ids)] if company_ids else []
+            return Survey.search_count(base + domain_extra)
+
+        daily = []
+        for i in range(29, -1, -1):
+            d = today - timedelta(days=i)
+            daily.append({
+                "label": d.strftime("%d %b"),
+                "value": _count([("survey_date", "=", d.isoformat())]),
+                "iso": d.isoformat(),
+            })
+
+        weekly = []
+        week_start = today - timedelta(days=today.weekday())
+        for i in range(11, -1, -1):
+            ws = week_start - timedelta(weeks=i)
+            we = ws + timedelta(days=6)
+            weekly.append({
+                "label": ws.strftime("%d %b"),
+                "value": _count([
+                    ("survey_date", ">=", ws.isoformat()),
+                    ("survey_date", "<=", we.isoformat()),
+                ]),
+                "iso": ws.isoformat(),
+            })
+
+        monthly = []
+        for i in range(11, -1, -1):
+            month_dt = date(today.year, today.month, 1)
+            total_months = month_dt.month - i - 1
+            year_offset, month_offset = divmod(total_months, 12)
+            ms = date(month_dt.year + year_offset, month_offset + 1, 1)
+            if ms.month == 12:
+                me = date(ms.year + 1, 1, 1) - timedelta(days=1)
+            else:
+                me = date(ms.year, ms.month + 1, 1) - timedelta(days=1)
+            monthly.append({
+                "label": ms.strftime("%b %Y"),
+                "value": _count([
+                    ("survey_date", ">=", ms.isoformat()),
+                    ("survey_date", "<=", me.isoformat()),
+                ]),
+                "iso": ms.isoformat(),
+            })
+
+        return {"daily": daily, "weekly": weekly, "monthly": monthly}
+
     # ========== Legacy Methods (for backward compatibility) ==========
     # These methods redirect to generic methods above
     

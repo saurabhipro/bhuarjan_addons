@@ -1,5 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+
+    <!-- Survey Trend Chart Dialog -->
+    <t t-name="bhuarjan.SurveyTrendDialog" owl="1">
+        <Dialog title="'Survey Trends / सर्वे ट्रेंड'" size="'xl'">
+            <div class="bhu-chart-dialog">
+                <!-- Tab buttons -->
+                <div class="bhu-chart-tabs mb-3">
+                    <button t-att-class="'bhu-tab-btn ' + (state.view === 'daily' ? 'active' : '')"
+                            t-on-click="() => this.setView('daily')">
+                        <i class="fa fa-calendar me-1"/> Daily (Last 30 days)
+                    </button>
+                    <button t-att-class="'bhu-tab-btn ' + (state.view === 'weekly' ? 'active' : '')"
+                            t-on-click="() => this.setView('weekly')">
+                        <i class="fa fa-calendar-o me-1"/> Weekly (Last 12 weeks)
+                    </button>
+                    <button t-att-class="'bhu-tab-btn ' + (state.view === 'monthly' ? 'active' : '')"
+                            t-on-click="() => this.setView('monthly')">
+                        <i class="fa fa-calendar-plus-o me-1"/> Monthly (Last 12 months)
+                    </button>
+                </div>
+
+                <!-- Summary strip -->
+                <div class="bhu-chart-summary mb-3">
+                    <span class="bhu-summary-chip">
+                        <i class="fa fa-hashtag"/> Total in view:
+                        <strong><t t-esc="currentData.reduce((s,d) => s + d.value, 0)"/></strong>
+                    </span>
+                    <span class="bhu-summary-chip">
+                        <i class="fa fa-arrow-up"/> Peak:
+                        <strong><t t-esc="maxVal"/></strong>
+                    </span>
+                    <span class="bhu-summary-chip">
+                        <i class="fa fa-bar-chart"/> Avg:
+                        <strong><t t-esc="currentData.length ? Math.round(currentData.reduce((s,d) => s + d.value, 0) / currentData.length) : 0"/></strong>
+                    </span>
+                </div>
+
+                <!-- Canvas chart -->
+                <div class="bhu-chart-canvas-wrap">
+                    <canvas id="bhu_survey_chart" style="width:100%; display:block;"/>
+                </div>
+
+                <!-- Inline styles -->
+                <style>
+                    .bhu-chart-dialog { padding: 4px 0; }
+                    .bhu-chart-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+                    .bhu-tab-btn {
+                        padding: 6px 16px; border-radius: 999px; font-size:0.85rem;
+                        font-weight: 600; border: 2px solid #8B4513;
+                        background: white; color: #8B4513; cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+                    .bhu-tab-btn.active, .bhu-tab-btn:hover {
+                        background: linear-gradient(135deg, #8B4513, #C87941);
+                        color: white; border-color: transparent;
+                        box-shadow: 0 2px 8px rgba(139,69,19,0.3);
+                    }
+                    .bhu-chart-summary { display:flex; gap:12px; flex-wrap:wrap; }
+                    .bhu-summary-chip {
+                        background: rgba(139,69,19,0.07); border: 1px solid rgba(139,69,19,0.18);
+                        border-radius: 8px; padding: 5px 14px; font-size:0.85rem; color:#5D2E0C;
+                    }
+                    .bhu-summary-chip strong { color:#8B4513; }
+                    .bhu-chart-canvas-wrap {
+                        background: #fffaf5; border-radius: 12px;
+                        border: 1px solid rgba(139,69,19,0.12);
+                        padding: 12px 8px 4px; overflow: hidden;
+                    }
+                </style>
+            </div>
+        </Dialog>
+    </t>
+
     <t t-name="bhuarjan.GroupDashboard" owl="1">
         <div class="o_group_dashboard">
 
@@ -66,13 +139,13 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="stat-card bg-danger text-white">
+                            <div class="stat-card bg-survey text-white" t-on-click="showSurveyChart" style="cursor:pointer;" title="Click to view survey trends">
                                 <div class="stat-icon">
-                                    <i class="fa fa-exclamation-triangle"/>
+                                    <i class="fa fa-bar-chart"/>
                                 </div>
                                 <div class="stat-details">
-                                    <h3 t-esc="state.stats.delayed_projects"/>
-                                    <p>Delayed</p>
+                                    <h3 t-esc="state.stats.surveys_today"/>
+                                    <p>Surveys Today</p>
                                 </div>
                             </div>
                         </div>

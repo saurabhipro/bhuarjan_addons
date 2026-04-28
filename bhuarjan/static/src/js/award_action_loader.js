@@ -8,10 +8,14 @@
 
 const LOADER_ID = 'bhu_award_action_loader';
 
-// Button method names that warrant a loading overlay
+// Button method names that warrant a loading overlay.
+// NOTE: 'action_download_award' is intentionally EXCLUDED because it opens
+// a wizard popup — showing a loader would cover the dialog.
+// The loader is only for actions that do heavy server-side work (PDF/Excel generation).
 const HEAVY_ACTIONS = new Set([
     'action_generate_award',
-    'action_download_award',
+    // 'action_download_award' — opens a wizard, NOT a heavy action (wizard covers loader)
+    'action_download',          // inside the download wizard — actual PDF/Excel generation
     'action_download_excel_components',
     'apply_generate_from_download_wizard',
     'action_generate_award_notification',
@@ -98,7 +102,7 @@ function _hideLoader() {
 // Label map for each action
 const ACTION_LABELS = {
     'action_generate_award':            'Generating the Section 23 Award document…<br><small>Building PDF from survey data. Please do not close this page.</small>',
-    'action_download_award':            'Preparing Award for download…<br><small>Compiling the award document.</small>',
+    'action_download':                  'Generating &amp; downloading your document…<br><small>Building PDF / Excel. This may take a moment.</small>',
     'action_download_excel_components': 'Generating Excel report…<br><small>Building Excel workbook from survey data.</small>',
     'apply_generate_from_download_wizard': 'Generating &amp; downloading Award…<br><small>Building the document. Download will start automatically.</small>',
     'action_generate_award_notification': 'Generating notification document…',
@@ -109,8 +113,7 @@ const ACTION_LABELS = {
 
 // Attach click listener using event delegation on document body
 document.addEventListener('click', (e) => {
-    // Odoo renders form buttons as <button> elements with a `name` attribute
-    // Walk up the DOM to find the button element (click may be on child icon/span)
+    // Walk up the DOM to find the actual <button> element
     let btn = e.target;
     while (btn && btn.tagName !== 'BUTTON') {
         btn = btn.parentElement;
@@ -120,39 +123,61 @@ document.addEventListener('click', (e) => {
     const name = btn.getAttribute('name') || btn.dataset.name || '';
     if (!HEAVY_ACTIONS.has(name)) return;
 
-    // Don't show if button is disabled or invisible
-    if (btn.disabled || btn.closest('[style*="display: none"]') || btn.closest('[style*="display:none"]')) return;
+    // Don't show if button is disabled
+    if (btn.disabled) return;
 
     const label = ACTION_LABELS[name] || 'Processing your request…';
+
+    // Check if button is inside a dialog/wizard
+    const dialog = btn.closest('.o_dialog, .modal, [role="dialog"]');
+
     _showLoader(label);
 
-    // Auto-hide safety net: remove loader after 3 minutes max
-    // (the page typically reloads or redirects before this)
-    const timeout = setTimeout(_hideLoader, 180000);
+    // Safety-net timeouts (generous to cover slow PDF generation)
+    const MAX_WAIT = 120000; // 2 minutes hard max
+    const safetyTimer = setTimeout(_hideLoader, MAX_WAIT);
 
-    // Hide loader if page navigates away (file download triggers this)
-    const onVisibility = () => {
-        if (document.visibilityState === 'visible') {
-            clearTimeout(timeout);
-            setTimeout(_hideLoader, 800);
-        }
-    };
-    document.addEventListener('visibilitychange', onVisibility, { once: true });
+    function done() {
+        clearTimeout(safetyTimer);
+        dialogObs && dialogObs.disconnect();
+        notifObs && notifObs.disconnect();
+        setTimeout(_hideLoader, 500);
+    }
 
-    // Also hide if Odoo triggers a "notification" (success/error) — means action completed
-    const origNotif = window.__bhu_orig_notif;
-    if (!origNotif) {
-        // Patch owl env notification service after action completes via MutationObserver
-        const obs = new MutationObserver(() => {
-            const notif = document.querySelector('.o_notification_manager .o_notification');
-            if (notif) {
-                obs.disconnect();
-                clearTimeout(timeout);
-                setTimeout(_hideLoader, 600);
+    // 1. If button was in a wizard dialog: hide loader when dialog is removed from DOM
+    let dialogObs = null;
+    if (dialog) {
+        dialogObs = new MutationObserver(() => {
+            // Dialog closed (removed from DOM or hidden)
+            if (!document.body.contains(dialog) ||
+                dialog.style.display === 'none' ||
+                !dialog.offsetParent) {
+                done();
             }
         });
-        obs.observe(document.body, { childList: true, subtree: true });
-        // Fallback: also watch for the form's "save" indicator disappearing
-        setTimeout(() => { obs.disconnect(); clearTimeout(timeout); _hideLoader(); }, 180000);
+        dialogObs.observe(document.body, { childList: true, subtree: true });
     }
-}, true); // capture phase so we get it before Odoo's handler
+
+    // 2. Hide loader when Odoo shows a notification (success OR error)
+    let notifObs = new MutationObserver(() => {
+        const notif = document.querySelector('.o_notification_manager .o_notification');
+        if (notif) { done(); }
+    });
+    notifObs.observe(document.body, { childList: true, subtree: true });
+
+    // 3. Hide when page regains focus after a file download (browser focus returns)
+    const onFocus = () => { done(); };
+    window.addEventListener('focus', onFocus, { once: true });
+
+    // 4. For non-dialog buttons: also watch for form re-render (breadcrumb change)
+    if (!dialog) {
+        const breadcrumb = document.querySelector('.o_breadcrumb, .breadcrumb');
+        if (breadcrumb) {
+            const bcObs = new MutationObserver(() => {
+                bcObs.disconnect();
+                done();
+            });
+            bcObs.observe(breadcrumb, { childList: true, subtree: true });
+        }
+    }
+}, true); // capture phase

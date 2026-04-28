@@ -66,8 +66,7 @@
  * 1. Page shell (applies to every dashboard wrapper)
  * ===================================================================== */
 .o_admin_dashboard,
-.o_group_dashboard,
-.o_payment_dashboard {
+.o_group_dashboard {
     background:
         radial-gradient(at 100% 0%, rgba(200, 121, 65, 0.08) 0%, transparent 45%),
         radial-gradient(at 0% 100%, rgba(139, 69, 19, 0.06) 0%, transparent 40%),
@@ -75,6 +74,34 @@
     color: var(--bd-ink-900);
     padding: 14px 14px 28px !important;
     min-height: 100vh;
+}
+
+/* Payment dashboard: no outer padding — header & cards go edge-to-edge */
+.o_payment_dashboard {
+    background:
+        radial-gradient(at 100% 0%, rgba(200, 121, 65, 0.08) 0%, transparent 45%),
+        radial-gradient(at 0% 100%, rgba(139, 69, 19, 0.06) 0%, transparent 40%),
+        linear-gradient(180deg, #FFF8F0 0%, #FDF5E6 100%) !important;
+    color: var(--bd-ink-900);
+    padding: 0 !important;
+    min-height: 100vh;
+}
+
+/* Payment dashboard header: flush to edges, no border-radius */
+.o_payment_dashboard .dashboard-header {
+    border-radius: 0 !important;
+    margin: 0 0 0 0 !important;
+    padding: 12px 18px !important;
+}
+
+/* Payment dashboard content: add horizontal padding to match visual spacing */
+.o_payment_dashboard .dashboard-content {
+    padding: 12px 14px 28px !important;
+}
+
+/* Payment dashboard table card: remove top margin since content already has padding */
+.o_payment_dashboard .dashboard-content .card {
+    margin-top: 0 !important;
 }
 
 /* =====================================================================

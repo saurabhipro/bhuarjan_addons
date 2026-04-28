@@ -36,24 +36,10 @@
                 </div>
             </div>
 
-            <!-- Loading State -->
-            <div t-if="state.loading" class="loading-state-wrapper">
-                <div class="loading-content">
-                    <div class="coffee-loader mb-4">
-                        <i class="fa fa-coffee fa-4x text-primary-gradient"/>
-                        <div class="steam">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                    <h3 class="loading-title">Loading your projects...</h3>
-                    <p class="loading-subtitle text-muted italic">Sit back and sip some coffee while we prepare your data.</p>
-                </div>
-            </div>
+            <!-- Loading state handled by JS body-level loader (_showBodyLoader / _hideBodyLoader) -->
 
             <!-- Dashboard Content -->
-            <div t-else="" class="dashboard-content scrollable-dashboard">
+            <div class="dashboard-content scrollable-dashboard">
                 <!-- Statistics Cards -->
                 <div class="container-fluid mb-4">
                     <div class="row g-3">

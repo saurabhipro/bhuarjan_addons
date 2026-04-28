@@ -465,6 +465,7 @@ export class UnifiedDashboard extends Component {
         this.state = useState(initialState);
 
         onWillStart(async () => {
+            this._showBodyLoader();
             try {
                 await this.loadInitialData();
                 await this.loadDashboardData();
@@ -472,6 +473,7 @@ export class UnifiedDashboard extends Component {
                 console.error("Error in onWillStart:", error);
                 this.state.loading = false;
             }
+            this._hideBodyLoader();
         });
 
         onMounted(() => {
@@ -1672,6 +1674,101 @@ export class UnifiedDashboard extends Component {
 
             card.classList.toggle('o_has_activity', hasCompletionTick || hasNonZeroBadge || hasNonZeroPercent);
         });
+    }
+
+    // ── Body-level loader (works with any Odoo theme including Spiffy) ──────
+    _showBodyLoader() {
+        if (document.getElementById('bhu_dash_loader')) return;
+        const el = document.createElement('div');
+        el.id = 'bhu_dash_loader';
+        el.style.cssText = 'position:fixed!important;inset:0!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;background:linear-gradient(135deg,#3b1a0e 0%,#6b2f0f 40%,#8B4513 70%,#c47c3e 100%)!important;';
+        el.innerHTML = `
+            <style>
+                #bhu_dash_loader {
+                    position: fixed !important;
+                    inset: 0 !important;
+                    z-index: 99999 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-direction: column !important;
+                    background: linear-gradient(135deg, #3b1a0e 0%, #6b2f0f 40%, #8B4513 70%, #c47c3e 100%) !important;
+                }
+                #bhu_dash_loader .bdl-ring {
+                    width: 96px; height: 96px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.15);
+                    border: 3px solid rgba(255,255,255,0.4);
+                    display: flex; align-items: center; justify-content: center;
+                    margin-bottom: 18px;
+                    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+                    overflow: hidden;
+                    padding: 6px;
+                }
+                #bhu_dash_loader .bdl-ring img {
+                    width: 100%; height: 100%;
+                    object-fit: contain;
+                    border-radius: 50%;
+                }
+                #bhu_dash_loader .bdl-spinner {
+                    width: 60px; height: 60px;
+                    border: 5px solid rgba(255,255,255,0.15);
+                    border-top-color: #ffd88a;
+                    border-radius: 50%;
+                    animation: bdl-spin 0.85s linear infinite;
+                    margin-bottom: 26px;
+                }
+                #bhu_dash_loader .bdl-title {
+                    color: #fff; font-size: 1.5rem; font-weight: 700;
+                    margin: 0 0 6px 0; font-family: inherit;
+                }
+                #bhu_dash_loader .bdl-sub {
+                    color: rgba(255,255,255,0.70); font-size: 0.95rem;
+                    margin: 0 0 26px 0; font-style: italic; font-family: inherit;
+                }
+                #bhu_dash_loader .bdl-dots {
+                    display: flex; gap: 9px; margin-bottom: 30px;
+                }
+                #bhu_dash_loader .bdl-dots span {
+                    width: 10px; height: 10px; border-radius: 50%;
+                    background: #ffd88a;
+                    animation: bdl-bounce 1.2s ease-in-out infinite;
+                }
+                #bhu_dash_loader .bdl-dots span:nth-child(2) { animation-delay: 0.18s; }
+                #bhu_dash_loader .bdl-dots span:nth-child(3) { animation-delay: 0.36s; }
+                #bhu_dash_loader .bdl-dots span:nth-child(4) { animation-delay: 0.54s; }
+                #bhu_dash_loader .bdl-dots span:nth-child(5) { animation-delay: 0.72s; }
+                #bhu_dash_loader .bdl-brand {
+                    color: rgba(255,255,255,0.35); font-size: 0.75rem;
+                    letter-spacing: 1.2px; text-transform: uppercase; font-family: inherit;
+                }
+                @keyframes bdl-spin {
+                    to { transform: rotate(360deg); }
+                }
+                @keyframes bdl-bounce {
+                    0%, 80%, 100% { transform: scale(0.55); opacity: 0.4; }
+                    40%           { transform: scale(1.2);  opacity: 1;   }
+                }
+            </style>
+            <div class="bdl-ring"><img src="/bhuarjan/static/img/icon.png" alt="Bhuarjan"/></div>
+            <div class="bdl-spinner"></div>
+            <div class="bdl-title">Please wait…</div>
+            <div class="bdl-sub">We are loading your dashboard</div>
+            <div class="bdl-dots">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="bdl-brand">Bhuarjan · Land Acquisition System</div>
+        `;
+        document.body.appendChild(el);
+    }
+
+    _hideBodyLoader() {
+        const el = document.getElementById('bhu_dash_loader');
+        if (el) {
+            el.style.transition = 'opacity 0.35s ease';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 380);
+        }
     }
 }
 

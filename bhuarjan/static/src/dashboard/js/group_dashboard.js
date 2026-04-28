@@ -37,8 +37,105 @@ export class GroupDashboard extends Component {
         });
 
         onWillStart(async () => {
+            this._showBodyLoader();
             await this.loadDashboardData();
+            this._hideBodyLoader();
         });
+    }
+
+    // ── Body-level loader (works with any Odoo theme including Spiffy) ──────
+    _showBodyLoader() {
+        if (document.getElementById('bhu_group_loader')) return;
+        const el = document.createElement('div');
+        el.id = 'bhu_group_loader';
+        el.style.cssText = 'position:fixed!important;inset:0!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;background:linear-gradient(135deg,#3b1a0e 0%,#6b2f0f 40%,#8B4513 70%,#c47c3e 100%)!important;';
+        el.innerHTML = `
+            <style>
+                #bhu_group_loader {
+                    position: fixed !important;
+                    inset: 0 !important;
+                    z-index: 99999 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-direction: column !important;
+                    background: linear-gradient(135deg, #3b1a0e 0%, #6b2f0f 40%, #8B4513 70%, #c47c3e 100%) !important;
+                }
+                #bhu_group_loader .bgl-ring {
+                    width: 96px; height: 96px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.15);
+                    border: 3px solid rgba(255,255,255,0.4);
+                    display: flex; align-items: center; justify-content: center;
+                    margin-bottom: 18px;
+                    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+                    overflow: hidden;
+                    padding: 6px;
+                }
+                #bhu_group_loader .bgl-ring img {
+                    width: 100%; height: 100%;
+                    object-fit: contain;
+                    border-radius: 50%;
+                }
+                #bhu_group_loader .bgl-spinner {
+                    width: 60px; height: 60px;
+                    border: 5px solid rgba(255,255,255,0.15);
+                    border-top-color: #ffd88a;
+                    border-radius: 50%;
+                    animation: bgl-spin 0.85s linear infinite;
+                    margin-bottom: 26px;
+                }
+                #bhu_group_loader .bgl-title {
+                    color: #fff; font-size: 1.5rem; font-weight: 700;
+                    margin: 0 0 6px 0; font-family: inherit;
+                }
+                #bhu_group_loader .bgl-sub {
+                    color: rgba(255,255,255,0.70); font-size: 0.95rem;
+                    margin: 0 0 26px 0; font-style: italic; font-family: inherit;
+                }
+                #bhu_group_loader .bgl-dots {
+                    display: flex; gap: 9px; margin-bottom: 30px;
+                }
+                #bhu_group_loader .bgl-dots span {
+                    width: 10px; height: 10px; border-radius: 50%;
+                    background: #ffd88a;
+                    animation: bgl-bounce 1.2s ease-in-out infinite;
+                }
+                #bhu_group_loader .bgl-dots span:nth-child(2) { animation-delay: 0.18s; }
+                #bhu_group_loader .bgl-dots span:nth-child(3) { animation-delay: 0.36s; }
+                #bhu_group_loader .bgl-dots span:nth-child(4) { animation-delay: 0.54s; }
+                #bhu_group_loader .bgl-dots span:nth-child(5) { animation-delay: 0.72s; }
+                #bhu_group_loader .bgl-brand {
+                    color: rgba(255,255,255,0.35); font-size: 0.75rem;
+                    letter-spacing: 1.2px; text-transform: uppercase; font-family: inherit;
+                }
+                @keyframes bgl-spin {
+                    to { transform: rotate(360deg); }
+                }
+                @keyframes bgl-bounce {
+                    0%, 80%, 100% { transform: scale(0.55); opacity: 0.4; }
+                    40%           { transform: scale(1.2);  opacity: 1;   }
+                }
+            </style>
+            <div class="bgl-ring"><img src="/bhuarjan/static/img/icon.png" alt="Bhuarjan"/></div>
+            <div class="bgl-spinner"></div>
+            <div class="bgl-title">Please wait…</div>
+            <div class="bgl-sub">We are loading your dashboard</div>
+            <div class="bgl-dots">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="bgl-brand">Bhuarjan · Land Acquisition System</div>
+        `;
+        document.body.appendChild(el);
+    }
+
+    _hideBodyLoader() {
+        const el = document.getElementById('bhu_group_loader');
+        if (el) {
+            el.style.transition = 'opacity 0.35s ease';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 380);
+        }
     }
 
     parseCost(value) {

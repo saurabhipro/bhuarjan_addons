@@ -286,4 +286,3 @@ class BhuarjanDashboard(models.TransientModel):
             'target': 'current',
             'context': {'create': False, 'delete': False},
         }
-

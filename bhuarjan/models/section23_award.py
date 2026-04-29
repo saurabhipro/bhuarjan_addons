@@ -666,19 +666,27 @@ class Section23Award(models.Model):
             },
         }
 
+    def _s23_recompute_award_survey_lines_for_export(self):
+        """Recompute and persist land survey line rates before PDF/Excel (current survey + master)."""
+        self.ensure_one()
+        lines = self.award_survey_line_ids
+        if not lines:
+            return
+        lines._compute_rate_per_hectare()
+        lines._compute_line_display_amounts()
+        lines.flush_recordset()
+
     def action_refresh_land_rates(self):
         """Force-recompute rate_per_hectare and display amounts for all land survey lines."""
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         lines = self.award_survey_line_ids
-        if lines:
-            lines._compute_rate_per_hectare()
-            lines._compute_line_display_amounts()
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': 'Rates Refreshed',
-                'message': f'Recomputed rates for {len(lines)} land survey line(s) from the active rate master.',
+                'message': _('Recomputed rates for %s land survey line(s) from the active rate master.') % len(lines),
                 'type': 'success',
                 'sticky': False,
             },
@@ -909,6 +917,7 @@ class Section23Award(models.Model):
 
     def _action_download_excel_village_only(self):
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         import io
         import base64
         try:
@@ -970,6 +979,7 @@ class Section23Award(models.Model):
     def action_download_pdf_components(self, export_scope='all', include_cover_letter=False):
         """Download Section 23 PDF with selected section scope."""
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         scope = export_scope or self.env.context.get('bhu_export_scope') or 'all'
         if scope not in ('all', 'land', 'asset', 'tree'):
             scope = 'all'
@@ -1313,20 +1323,29 @@ class Section23Award(models.Model):
 
     @api.model
     def _get_min_rehab_rate_per_acre(self, is_fallow, is_irrigated, is_unirrigated):
-        """
-        Minimum rehab policy rates (per acre):
-        - Fallow (पड़ती): 6,00,000
-        - Unirrigated (असिंचित): 8,00,000
-        - Irrigated (सिंचित): 10,00,000
+        """Minimum rehab policy rate per acre (flat tiers: fallow vs other only).
+
+        Irrigation / unirrigated no longer change the floor (caller still passes flags for API stability).
         """
         if is_fallow:
             return 600000.0
-        if is_irrigated:
-            return 1000000.0
-        if is_unirrigated:
-            return 800000.0
-        # Safe default when irrigation type is missing
         return 800000.0
+
+    @api.model
+    def _s23_bmr_rate_multiplier(self, is_mr_lane, is_diverted, is_irrigated):
+        """Guideline land-rate factors apply only on the BMR lane (off main-road master rate).
+
+        MR lane (``is_mr_lane``): multiplier **1.0**.
+
+        BMR lane:
+        - **Diverted**: **×1.25** on the BMR master rate (no separate non-irrigation discount).
+        - **Not diverted**: irrigated **×1.0**, non-irrigated **×0.8**.
+        """
+        if is_mr_lane:
+            return 1.0
+        if is_diverted:
+            return 1.25
+        return 1.0 if is_irrigated else 0.8
 
     def get_interest_period_note(self):
         """Text note for report header interest period from Section 4 public hearing to award date."""
@@ -1340,7 +1359,7 @@ class Section23Award(models.Model):
         return "धारा 4 सार्वजनिक सुनवाई दिनांक से अवार्ड दिनांक तक"
 
     def _s23_land_base_rate_per_hectare(self, survey, award_line, derived_within):
-        """MR/BMR line from the active land rate master (before irrigation and diverted %), for display."""
+        """MR/BMR line from the active land rate master."""
         self.ensure_one()
         if not self.village_id or not survey:
             return 0.0

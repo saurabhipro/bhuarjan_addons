@@ -114,16 +114,13 @@ class Section23AwardSurveyLine(models.Model):
 
     @api.depends(
         'rate_per_hectare', 'guide_line_master_rate', 'acquired_area',
-        'distance_from_main_road', 'survey_id.survey_type',
         'award_id.award_date', 'award_id.project_id', 'award_id.village_id',
         'is_within_distance', 'land_type',
+        'survey_id.irrigation_type', 'survey_id.has_traded_land',
     )
     def _compute_line_display_amounts(self):
         for line in self:
-            dist = line.distance_from_main_road or 0.0
-            survey_type = line.survey_id.survey_type if line.survey_id else 'rural'
-            threshold = 50.0 if survey_type == 'rural' else 30.0
-            line.road_type_display = 'MR' if dist <= threshold else 'BMR'
+            line.road_type_display = 'MR' if line.is_within_distance else 'BMR'
 
             # Same as column "guide line" / rate master: main road vs other, village only
             line.base_rate_display = line.guide_line_master_rate or 0.0
@@ -215,30 +212,30 @@ class Section23AwardSurveyLine(models.Model):
                     )
         return result
 
-    # Master guideline = village rate book: main road vs other road only (no irrigation / diverted).
+    # Master guideline = village rate book: main road vs other road only.
     guide_line_master_rate = fields.Monetary(
         string='Guide Line Rate (Master) / गाइड लाइन दर (मास्टर)',
         currency_field='currency_id',
         compute='_compute_rate_per_hectare', store=True,
         help='Per-hectare rate from the active land rate master for this village: '
-        'main road vs other road only.',
+        'main road vs BMR (other road) only — before BMR irrigation/diverted factors.',
     )
-    # Computed effective rate: master × irrigation × diverted (used for basic value / compensation).
     rate_per_hectare = fields.Monetary(
         string='Rate per Hectare / हेक्टेयर दर',
         currency_field='currency_id',
         compute='_compute_rate_per_hectare', store=True,
-        help='Effective rate per hectare (master + irrigation and diverted rules) for amount calculation.',
+        help='Master guideline rate; on BMR lane: ×1.25 if diverted, else irrigated 100% / non-irrigated 80%.',
     )
 
     currency_id = fields.Many2one('res.currency', string='Currency',
                                   default=lambda self: self.env.ref('base.INR'))
 
-    @api.depends('land_type', 'is_within_distance', 'award_id.village_id',
-                 'survey_id.irrigation_type', 'survey_id.has_traded_land',
-                 'distance_from_main_road', 'survey_id.survey_type')
+    @api.depends(
+        'land_type', 'is_within_distance', 'award_id.village_id',
+        'survey_id.irrigation_type', 'survey_id.has_traded_land',
+    )
     def _compute_rate_per_hectare(self):
-        """Master rate = rate book (village, main road vs not). Effective = master × irrigation × diverted."""
+        """Master rate by MR/BMR lane; BMR lane applies irrigation + diverted multipliers."""
         for line in self:
             line.guide_line_master_rate = 0.0
             line.rate_per_hectare = 0.0
@@ -251,28 +248,14 @@ class Section23AwardSurveyLine(models.Model):
             if not rate_master:
                 continue
 
-            dist = line.distance_from_main_road or 0.0
-            s_type = line.survey_id.survey_type if line.survey_id else 'rural'
-            threshold = 50.0 if s_type == 'rural' else 30.0
-            within = dist <= threshold
-
+            within = line.is_within_distance
             base_rate = (rate_master.main_road_rate_hectare if within
                          else rate_master.other_road_rate_hectare) or 0.0
             line.guide_line_master_rate = base_rate
-
-            # Irrigation adjustment — for compensation only (+20% irrigated, -20% unirrigated)
-            irrigation_type = line.survey_id.irrigation_type if line.survey_id else False
-            if irrigation_type == 'irrigated':
-                rate = base_rate * 1.2
-            elif irrigation_type in ['non_irrigated', 'unirrigated']:
-                rate = base_rate * 0.8
-            else:
-                rate = base_rate
-
-            if line.survey_id and line.survey_id.has_traded_land == 'yes' and within:
-                rate = rate * 1.25
-
-            line.rate_per_hectare = rate
+            is_irrigated = line.survey_id.irrigation_type == 'irrigated' if line.survey_id else False
+            is_diverted = line.survey_id.has_traded_land == 'yes' if line.survey_id else False
+            mult = line.award_id._s23_bmr_rate_multiplier(within, is_diverted, is_irrigated)
+            line.rate_per_hectare = base_rate * mult
 
     @api.onchange('survey_id')
     def _onchange_survey_id(self):

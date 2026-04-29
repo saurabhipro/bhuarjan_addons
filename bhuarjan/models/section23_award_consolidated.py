@@ -19,6 +19,7 @@ class Section23AwardConsolidated(models.Model):
     def action_download_consolidated_pdf(self):
         """Download consolidated award sheet as PDF (one row per khasra) using QWeb template."""
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         consolidated_data = self.get_consolidated_award_data()
         if not consolidated_data:
             raise ValidationError(_('No consolidated data available for this award.'))
@@ -30,6 +31,7 @@ class Section23AwardConsolidated(models.Model):
     def action_download_consolidated_excel(self):
         """Download consolidated award sheet as Excel (one row per khasra)."""
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         import io
         import base64
         try:

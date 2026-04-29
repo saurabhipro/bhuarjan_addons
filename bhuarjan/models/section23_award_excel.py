@@ -10,6 +10,7 @@ class Section23AwardExcel(models.Model):
     def action_download_excel_components(self, export_scope='all'):
         """Download Section 23 Excel in the exact Simulator format."""
         self.ensure_one()
+        self._s23_recompute_award_survey_lines_for_export()
         export_scope = export_scope or self.env.context.get('bhu_export_scope') or 'all'
         if export_scope not in ('all', 'land', 'asset', 'tree'):
             export_scope = 'all'
@@ -157,11 +158,12 @@ class Section23AwardExcel(models.Model):
                         is_irrigated = bool(land.get('irrigated'))
                         is_unirrigated = bool(land.get('unirrigated'))
                         is_diverted = bool(land.get('is_diverted'))
-                        distance_value = land.get('distance_from_main_road') or 0.0
-                        if distance_value and is_within_distance:
-                            land_sheet.write(row, 6, f"{distance_value:.2f} m", _yes_no_format(is_within_distance))
-                        else:
-                            land_sheet.write(row, 6, 'हाँ' if is_within_distance else 'नहीं', _yes_no_format(is_within_distance))
+                        # Col 7 = "on main road": always हाँ (MR) / नहीं (BMR); never raw metres (avoids 51 m vs threshold confusion).
+                        land_sheet.write(
+                            row, 6,
+                            'हाँ' if is_within_distance else 'नहीं',
+                            _yes_no_format(is_within_distance),
+                        )
                         if is_within_distance:
                             land_sheet.write(row, 7, 'NA', cell_center_fmt)
                             land_sheet.write(row, 8, 'NA', cell_center_fmt)

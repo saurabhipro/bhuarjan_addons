@@ -65,8 +65,8 @@
                     </div>
                     <div class="bhu-hero-visual">
                         <img class="bhu-hero-img-main"
-                             src="/bhuarjan_web/static/src/img/image1.png"
-                             alt="Bhuarjan land acquisition"/>
+                             src="/bhuarjan_web/static/src/img/bhuarjan_banner_2.webp"
+                             alt="Bhuarjan dashboard overview"/>
                     </div>
                 </div>
             </section>
@@ -76,15 +76,15 @@
                  ============================================================ -->
             <section class="bhu-trusted">
                 <div class="bhu-trusted-inner">
-                    <span><i class="fa fa-shield-alt" style="margin-right:8px;color:#FF6B1A;"/> Government of Chhattisgarh</span>
+                    <span><i class="fa fa-shield-alt" style="margin-right:8px;color:#8A4531;"/> Government of Chhattisgarh</span>
                     <div class="sep"/>
-                    <span><i class="fa fa-lock" style="margin-right:8px;color:#FF6B1A;"/> Bank-Grade Security</span>
+                    <span><i class="fa fa-lock" style="margin-right:8px;color:#8A4531;"/> Bank-Grade Security</span>
                     <div class="sep"/>
-                    <span><i class="fa fa-cloud" style="margin-right:8px;color:#FF6B1A;"/> Cloud Native</span>
+                    <span><i class="fa fa-cloud" style="margin-right:8px;color:#8A4531;"/> Cloud Native</span>
                     <div class="sep"/>
-                    <span><i class="fa fa-mobile-alt" style="margin-right:8px;color:#FF6B1A;"/> Mobile-First</span>
+                    <span><i class="fa fa-mobile-alt" style="margin-right:8px;color:#8A4531;"/> Mobile-First</span>
                     <div class="sep"/>
-                    <span><i class="fa fa-language" style="margin-right:8px;color:#FF6B1A;"/> Hindi &amp; English</span>
+                    <span><i class="fa fa-language" style="margin-right:8px;color:#8A4531;"/> Hindi &amp; English</span>
                 </div>
             </section>
 
@@ -94,8 +94,8 @@
             <section class="bhu-values">
                 <div class="bhu-values-inner">
                     <div class="bhu-values-img-wrap">
-                        <img src="/bhuarjan_web/static/src/img/image.png"
-                             alt="Land management"/>
+                        <img src="/bhuarjan_web/static/src/img/bhuarjan_image_3.webp"
+                             alt="Bhuarjan platform preview"/>
                     </div>
                     <div class="bhu-values-content">
                         <span class="bhu-hero-pill" style="margin-bottom:18px;">
@@ -385,28 +385,100 @@
             <section class="bhu-features-grid-wrap">
                 <div class="bhu-features-grid">
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-map-marked-alt"/></div>
+                            <span class="bhu-feature-module">Survey Module</span>
+                        </div>
                         <h3>Project Setup &amp; Land Survey</h3>
                         <p>Configure projects, villages, and parcel records with field-level tracking and verified ownership details.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Mobile-ready field data capture</li>
+                            <li>Khasra, owner, and geo details in one flow</li>
+                        </ul>
                     </article>
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-bullhorn"/></div>
+                            <span class="bhu-feature-module">Notification Module</span>
+                        </div>
                         <h3>Section 4 Notification</h3>
                         <p>Generate and monitor preliminary notifications with date-based status, workflow approvals, and digital traceability.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Automated sequence and document generation</li>
+                            <li>Approval-ready digital workflow</li>
+                        </ul>
                     </article>
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-gavel"/></div>
+                            <span class="bhu-feature-module">Objection Module</span>
+                        </div>
                         <h3>Section 11 &amp; Section 15 Processing</h3>
                         <p>Handle impact details, objection intake, hearing actions, and resolution outcomes from one structured dashboard.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Hearing and resolution tracking</li>
+                            <li>Transparent objection lifecycle</li>
+                        </ul>
                     </article>
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-file-invoice-dollar"/></div>
+                            <span class="bhu-feature-module">Award Module</span>
+                        </div>
                         <h3>Section 19, Award &amp; Compensation</h3>
                         <p>Drive final notification, award generation, beneficiary validation, and compensation calculations with ready reports.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Land, tree, and asset compensation support</li>
+                            <li>Consolidated and R&amp;R output formats</li>
+                        </ul>
                     </article>
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-user-shield"/></div>
+                            <span class="bhu-feature-module">Access Control</span>
+                        </div>
                         <h3>Approvals &amp; Role-Based Controls</h3>
                         <p>Enable Patwari, RI, Tehsildar, SDM, and Collector level actions with strict permission and approval routing.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Role-wise menu and state transitions</li>
+                            <li>Full audit trail of actions</li>
+                        </ul>
                     </article>
                     <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-chart-line"/></div>
+                            <span class="bhu-feature-module">Dashboard Module</span>
+                        </div>
                         <h3>Dashboards &amp; Monitoring</h3>
                         <p>Track project progress, timeline bottlenecks, and pending actions through district and department dashboards.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Live project and section monitoring</li>
+                            <li>Decision-ready KPI cards</li>
+                        </ul>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-folder-open"/></div>
+                            <span class="bhu-feature-module">Document Vault</span>
+                        </div>
+                        <h3>Document &amp; Template Management</h3>
+                        <p>Store, manage, and retrieve official files, templates, and signed outputs with searchable metadata.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Centralized legal document repository</li>
+                            <li>Standardized export-ready templates</li>
+                        </ul>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <div class="bhu-feature-card-head">
+                            <div class="bhu-feature-ico"><i class="fa fa-cogs"/></div>
+                            <span class="bhu-feature-module">Master Data</span>
+                        </div>
+                        <h3>Master Configuration Engine</h3>
+                        <p>Manage districts, tehsils, villages, rates, tree masters, sections, and reusable reference masters centrally.</p>
+                        <ul class="bhu-feature-points">
+                            <li>Consistent values across all modules</li>
+                            <li>Fast onboarding for new projects</li>
+                        </ul>
                     </article>
                 </div>
             </section>

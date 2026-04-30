@@ -6,9 +6,13 @@
         <field name="model">bhu.tree.master</field>
         <field name="arch" type="xml">
             <list string="Tree Rate Master">
+                <field name="tree_type_icon" string="Icon"/>
                 <field name="name"/>
                 <field name="tree_type"/>
+                <field name="display_rate" widget="monetary"/>
                 <field name="district_id"/>
+                <field name="active"/>
+                <field name="currency_id" column_invisible="True"/>
             </list>
         </field>
     </record>
@@ -19,6 +23,7 @@
         <field name="model">bhu.tree.master</field>
         <field name="arch" type="xml">
             <form string="Tree Rate Master">
+                <header/>
                 <sheet>
                     <div class="oe_title">
                         <h1>
@@ -30,13 +35,17 @@
                         <group string="Tree Information / वृक्ष जानकारी">
                             <field name="tree_type" widget="radio" options="{'horizontal': true}"/>
                             <field name="district_id" options="{'no_create': True}"/>
+                            <field name="fruit_rate" widget="monetary" invisible="tree_type != 'fruit_bearing'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active"/>
                         </group>
                     </group>
                     
                     <!-- Rate Variants - Same for both fruit and non-fruit bearing trees -->
-                    <group string="Rate Variants / दर वेरिएंट" col="1">
+                    <group string="Rate Variants / दर वेरिएंट" col="1" invisible="tree_type == 'fruit_bearing'">
                         <field name="tree_rate_ids" nolabel="1" context="{'default_tree_master_id': id}">
                             <list string="Rate Variants by Development Stage and Girth Range" editable="bottom">
+                                <field name="stage_icon" string="Sound Type" optional="show"/>
                                 <field name="development_stage" string="Development Stage" 
                                        required="1" width="200"/>
                                 <field name="girth_range_min" string="Min Girth (cm)" 
@@ -66,6 +75,11 @@
                 <field name="tree_type"/>
                 <filter string="Fruit-bearing" name="fruit_bearing" domain="[('tree_type', '=', 'fruit_bearing')]"/>
                 <filter string="Non-fruit-bearing" name="non_fruit_bearing" domain="[('tree_type', '=', 'non_fruit_bearing')]"/>
+                <filter string="Active" name="active_only" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="archived_only" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Tree Type" name="group_by_tree_type" context="{'group_by': 'tree_type'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -76,6 +90,7 @@
         <field name="res_model">bhu.tree.master</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_bhu_tree_master_search"/>
+        <field name="context">{'search_default_active_only': 1, 'search_default_group_by_tree_type': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first Tree Rate Master record!
@@ -85,5 +100,6 @@
             </p>
         </field>
     </record>
+
 </odoo>
 

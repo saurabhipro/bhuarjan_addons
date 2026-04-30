@@ -1094,13 +1094,16 @@ class SurveyTreeLine(models.Model):
     def get_applicable_rate(self):
         """Return the applicable per-tree rate from ``bhu.tree.rate.master``.
 
-        Looked up by tree_master_id + development_stage + girth range.
+        For fruit-bearing trees, uses flat rate from ``bhu.tree.master.fruit_rate``.
+        For non-fruit-bearing trees, looked up by tree_master_id + development_stage + girth range.
         Falls back to a coarse rate when no master entry matches, so callers
         (award simulator, Section 23 report, downloads) never crash.
         """
         self.ensure_one()
         if not self.tree_master_id:
             return self._fallback_rate()
+        if self.tree_type == 'fruit_bearing':
+            return self.tree_master_id.fruit_rate or self._fallback_rate()
         domain = [
             ('tree_master_id', '=', self.tree_master_id.id),
             ('active', '=', True),

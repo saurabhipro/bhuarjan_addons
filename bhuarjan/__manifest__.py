@@ -13,7 +13,6 @@
         'security/ir.model.access.csv',
         'data/land_type_data.xml',
         'data/tree_master_data.xml',
-        'data/tree_rate_master_data.xml',
         'data/photo_type_master_data.xml',
         # District and Sub-Division data - commented out to prevent import
         'data/chhattisgarh_districts_data.xml',
@@ -60,6 +59,7 @@
         'reports/consolidated_award_report.xml',
         'reports/rr_award_report.xml',
         'reports/project_master_report.xml',
+        'reports/tree_rate_master_report.xml',
         'reports/section247_cglrc_reports.xml',
         'views/district_views.xml',
         'views/bhu_sub_division_views.xml',
@@ -108,7 +108,6 @@
         'views/payment_dashboard_views.xml',
         'views/land_rate_master_views.xml',
         'views/tree_master_views.xml',
-        'views/tree_rate_master_views.xml',
         'views/law_master_views.xml',
         'views/section_master_views.xml',
         'views/section20a_railways_views.xml',

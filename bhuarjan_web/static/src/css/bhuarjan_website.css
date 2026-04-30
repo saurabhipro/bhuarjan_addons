@@ -1520,11 +1520,46 @@ button { font-family: inherit; }
     .bhu-logo-text .lt-2 { display: none; }
     .bhu-hero         { padding: 48px 18px 64px; }
     .bhu-hero h1      { font-size: 2rem; }
+    .bhu-hero-inner   { gap: 28px; }
     .bhu-hero-actions .bhu-btn { width: 100%; justify-content: center; }
-    .bhu-hero-visual { order: -1; }
+    .bhu-hero-visual {
+        order: 2;
+        margin-top: 6px;
+    }
     .bhu-values-img-wrap img { max-height: 260px; object-fit: cover; }
-    .bhu-hero-trust   { gap: 18px; flex-wrap: wrap; }
-    .bhu-hero-trust-item { min-width: 30%; }
+    .bhu-hero-trust {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 26px;
+        padding-top: 20px;
+    }
+    .bhu-hero-trust-item {
+        min-width: 0;
+        padding: 10px 6px;
+        border: 1px solid #e4ebf4;
+        border-radius: 12px;
+        background: #fff;
+        text-align: center;
+    }
+    .bhu-hero-trust-item .num { font-size: 1.45rem; }
+    .bhu-hero-trust-item .lbl { font-size: .72rem; line-height: 1.35; }
+    .bhu-trusted {
+        padding: 22px 18px;
+    }
+    .bhu-trusted-inner {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        justify-items: center;
+    }
+    .bhu-trusted .sep { display: none; }
+    .bhu-trusted span {
+        font-size: .72rem;
+        letter-spacing: .1em;
+        display: inline-flex;
+        align-items: center;
+    }
     .bhu-vp-grid      { grid-template-columns: 1fr; }
     .bhu-values, .bhu-features, .bhu-why, .bhu-insights,
     .bhu-roadmap, .bhu-cta, .bhu-stats, .bhu-footer { padding: 64px 18px; }
@@ -1551,6 +1586,17 @@ button { font-family: inherit; }
     .bhu-stat-item    { border-right: none; border-bottom: 1px solid var(--border); }
     .bhu-stat-item:last-child { border-bottom: none; }
     .bhu-footer-top   { grid-template-columns: 1fr; }
+    .bhu-footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .bhu-footer-bottom span:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+    }
+    .bhu-footer-bottom a { margin-left: 0; }
     .bhu-footer-col ul li { margin-bottom: 8px; }
     .bhu-form-row     { grid-template-columns: 1fr; }
     .bhu-contact-form { padding: 28px; }
@@ -1558,6 +1604,43 @@ button { font-family: inherit; }
     .bhu-contact-info-item { align-items: flex-start; }
     .bhu-contact-hero h1 { font-size: 2.2rem; }
     .bhu-sec-head h2  { font-size: 2rem; }
+
+    /* Odoo cookie consent: compact card on mobile */
+    .o_cookies_bar,
+    .o_cookies_discrete {
+        position: fixed !important;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 12px 12px 10px !important;
+        border-radius: 12px;
+        border: 1px solid #dbe6f3;
+        background: #ffffff !important;
+        box-shadow: 0 12px 34px rgba(15,23,42,.2);
+        z-index: 10050 !important;
+    }
+    .o_cookies_bar .container,
+    .o_cookies_discrete .container {
+        width: 100%;
+        max-width: none;
+        padding: 0 !important;
+    }
+    .o_cookies_bar p,
+    .o_cookies_discrete p {
+        margin: 0 0 8px;
+        font-size: .82rem;
+        line-height: 1.45;
+        color: #334155;
+    }
+    .o_cookies_bar .btn,
+    .o_cookies_discrete .btn {
+        border-radius: 8px !important;
+        font-size: .76rem !important;
+        padding: 7px 10px !important;
+    }
 }
 
 /* ============================================================

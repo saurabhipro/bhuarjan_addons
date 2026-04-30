@@ -260,7 +260,7 @@
                         </div>
                     </div>
                     <div class="bhu-insights-visual">
-                        <img src="/bhuarjan_web/static/src/img/dashboard_mockup.jpg"
+                        <img src="/bhuarjan_web/static/src/img/land_management.jpg"
                              alt="BHUARJAN Dashboard"/>
                         <div class="bhu-insights-stat-card">
                             <div class="ico"><i class="fa fa-arrow-trend-up"/></div>
@@ -274,40 +274,76 @@
             </section>
 
             <!-- ============================================================
-                 HOW IT WORKS
+                 ACQUISITION TIMELINE
                  ============================================================ -->
-            <section class="bhu-how">
-                <div class="bhu-how-inner">
+            <section class="bhu-roadmap">
+                <div class="bhu-roadmap-inner">
                     <div class="bhu-sec-head">
-                        <span class="tag">The Process</span>
-                        <h2>How it works</h2>
-                        <p>Five simple steps from initial entry to final acquisition approval.</p>
+                        <span class="tag">Execution Timeline</span>
+                        <h2>End-to-end statutory acquisition timeline</h2>
+                        <p>Track every core stage from survey entry to award and payment in one continuous flow.</p>
                     </div>
-                    <div class="bhu-steps">
-                        <div class="bhu-step">
-                            <div class="bhu-step-num">1</div>
-                            <h4>Form 10 Entry</h4>
-                            <p>Patwari records land details and uploads maps &amp; photos.</p>
+
+                    <div class="bhu-roadmap-wrap">
+                        <div class="bhu-roadmap-track">
+                            <div class="bhu-roadmap-step done">
+                                <div class="dot"><i class="fa fa-check"/></div>
+                                <h5>Survey</h5>
+                                <p>Form 10</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">2</div>
+                                <h5>SIA</h5>
+                                <p>Team &amp; report</p>
+                            </div>
+                            <div class="bhu-roadmap-step done">
+                                <div class="dot"><i class="fa fa-check"/></div>
+                                <h5>Sec 4</h5>
+                                <p>Notification</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">4</div>
+                                <h5>Expert</h5>
+                                <p>Committee</p>
+                            </div>
+                            <div class="bhu-roadmap-step current">
+                                <div class="dot">5</div>
+                                <h5>Sec 8</h5>
+                                <p>Govt decision</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">6</div>
+                                <h5>Sec 11</h5>
+                                <p>Preliminary</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">7</div>
+                                <h5>Sec 15</h5>
+                                <p>Objections</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">8</div>
+                                <h5>Sec 19</h5>
+                                <p>Declaration</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">9</div>
+                                <h5>Sec 21</h5>
+                                <p>Notice</p>
+                            </div>
+                            <div class="bhu-roadmap-step done">
+                                <div class="dot"><i class="fa fa-check"/></div>
+                                <h5>Sec 23</h5>
+                                <p>Award</p>
+                            </div>
+                            <div class="bhu-roadmap-step pending">
+                                <div class="dot">11</div>
+                                <h5>Payment</h5>
+                                <p>Disbursement</p>
+                            </div>
                         </div>
-                        <div class="bhu-step">
-                            <div class="bhu-step-num">2</div>
-                            <h4>Section 4 Notification</h4>
-                            <p>Collector reviews entries and issues official notification.</p>
-                        </div>
-                        <div class="bhu-step">
-                            <div class="bhu-step-num">3</div>
-                            <h4>Hearing &amp; SIA</h4>
-                            <p>SIA conducts field study and submits findings online.</p>
-                        </div>
-                        <div class="bhu-step">
-                            <div class="bhu-step-num">4</div>
-                            <h4>Expert Review</h4>
-                            <p>Committee examines reports and provides recommendations.</p>
-                        </div>
-                        <div class="bhu-step">
-                            <div class="bhu-step-num">5</div>
-                            <h4>Final Approval</h4>
-                            <p>Collector finalizes and publishes the acquisition order.</p>
+                        <div class="bhu-roadmap-note">
+                            <i class="fa fa-circle-info"/> Status colors: <strong>Green</strong> completed, <strong>Brown</strong> active, <strong>Grey</strong> pending.
                         </div>
                     </div>
                 </div>

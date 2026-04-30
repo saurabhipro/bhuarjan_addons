@@ -889,70 +889,126 @@ button { font-family: inherit; }
 }
 
 /* ============================================================
-   HOW IT WORKS — timeline
+   ACQUISITION TIMELINE
    ============================================================ */
-.bhu-how {
+.bhu-roadmap {
     padding: 100px 48px;
-    background: #fff;
+    background:
+        radial-gradient(circle at 14% 24%, rgba(138,69,49,.07), transparent 36%),
+        radial-gradient(circle at 88% 80%, rgba(27,85,133,.08), transparent 40%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
-.bhu-how-inner { max-width: 1240px; margin: 0 auto; }
+.bhu-roadmap-inner { max-width: 1280px; margin: 0 auto; }
 
-.bhu-steps {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+.bhu-roadmap-wrap {
+    margin-top: 34px;
+    background: #fff;
+    border: 1px solid #e8eef6;
+    border-radius: 20px;
+    box-shadow: 0 22px 60px rgba(8,20,42,.08);
+    padding: 22px 18px 16px;
+}
+
+.bhu-roadmap-track {
     position: relative;
-    gap: 16px;
-    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 10px 8px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #cdd8e6 transparent;
 }
-.bhu-steps::before {
-    content: '';
-    position: absolute;
-    top: 32px;
-    left: 10%; right: 10%;
-    height: 2px;
-    background: repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 16px);
-    z-index: 0;
+.bhu-roadmap-track::-webkit-scrollbar { height: 6px; }
+.bhu-roadmap-track::-webkit-scrollbar-thumb {
+    background: #cfd9e8;
+    border-radius: 10px;
 }
-.bhu-step {
+
+.bhu-roadmap-step {
+    min-width: 132px;
+    flex: 0 0 132px;
     text-align: center;
     position: relative;
-    z-index: 1;
-    padding: 0 8px;
 }
-.bhu-step-num {
-    width: 64px; height: 64px;
+.bhu-roadmap-step::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 26px);
+    width: calc(100% - 18px);
+    height: 3px;
+    border-radius: 3px;
+    background: #d9e2f0;
+}
+.bhu-roadmap-step:last-child::after { display: none; }
+
+.bhu-roadmap-step .dot {
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: #fff;
-    color: var(--primary);
+    margin: 0 auto 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 22px;
-    font-size: 1.3rem;
+    font-size: .92rem;
     font-weight: 800;
-    border: 2px solid var(--border);
-    transition: all .3s;
+    border: 2px solid transparent;
     position: relative;
+    z-index: 2;
+    transition: transform .25s ease, box-shadow .25s ease;
 }
-.bhu-step:hover .bhu-step-num {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+.bhu-roadmap-step:hover .dot {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(8,20,42,.16);
+}
+
+.bhu-roadmap-step.done .dot {
+    background: linear-gradient(135deg, #16a34a, #0f9f57);
     color: #fff;
-    border-color: transparent;
-    box-shadow: 0 12px 28px rgba(138,69,49,.4);
-    transform: scale(1.08);
 }
-.bhu-step h4 {
-    font-size: .95rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0 0 8px 0;
+.bhu-roadmap-step.done::after {
+    background: linear-gradient(90deg, #16a34a 0%, #63c778 100%);
 }
-.bhu-step p {
-    font-size: .82rem;
-    color: var(--muted);
-    line-height: 1.55;
+
+.bhu-roadmap-step.current .dot {
+    background: #fff8f2;
+    color: #8A4531;
+    border-color: #8A4531;
+    box-shadow: 0 0 0 5px rgba(138,69,49,.16);
+}
+.bhu-roadmap-step.current::after {
+    background: linear-gradient(90deg, #8A4531 0%, #d2a18c 100%);
+}
+
+.bhu-roadmap-step.pending .dot {
+    background: #edf2f8;
+    color: #6e7f95;
+    border-color: #d4deec;
+}
+
+.bhu-roadmap-step h5 {
     margin: 0;
+    font-size: .85rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: .01em;
 }
+.bhu-roadmap-step p {
+    margin: 3px 0 0;
+    font-size: .73rem;
+    color: #6d7d92;
+    font-weight: 600;
+}
+
+.bhu-roadmap-note {
+    margin-top: 12px;
+    border-top: 1px solid #edf2f7;
+    padding-top: 12px;
+    text-align: right;
+    font-size: .78rem;
+    color: #73859b;
+}
+.bhu-roadmap-note i { color: #8A4531; margin-right: 6px; }
 
 /* ============================================================
    CTA Banner
@@ -1371,7 +1427,7 @@ button { font-family: inherit; }
     .bhu-navbar       { padding: 0 32px; }
     .bhu-hero         { padding: 60px 32px 80px; }
     .bhu-hero-inner   { gap: 48px; }
-    .bhu-values, .bhu-features, .bhu-why, .bhu-insights, .bhu-how,
+    .bhu-values, .bhu-features, .bhu-why, .bhu-insights, .bhu-roadmap,
     .bhu-cta, .bhu-stats, .bhu-footer, .bhu-contact-hero, .bhu-contact-body {
         padding-left: 32px; padding-right: 32px;
     }
@@ -1384,8 +1440,8 @@ button { font-family: inherit; }
     .bhu-features-grid{ grid-template-columns: 1fr 1fr; }
     .bhu-why-grid     { grid-template-columns: 1fr 1fr; }
     .bhu-insights-inner { grid-template-columns: 1fr; gap: 48px; }
-    .bhu-steps        { grid-template-columns: repeat(3, 1fr); gap: 32px; }
-    .bhu-steps::before{ display: none; }
+    .bhu-roadmap-wrap { padding: 18px 14px 12px; }
+    .bhu-roadmap-step { min-width: 120px; flex-basis: 120px; }
     .bhu-stats-inner  { grid-template-columns: repeat(2, 1fr); gap: 16px; }
     .bhu-stat-item:nth-child(2) { border-right: none; }
     .bhu-footer-top   { grid-template-columns: 1fr 1fr; gap: 36px; }
@@ -1401,9 +1457,13 @@ button { font-family: inherit; }
     .bhu-hero-trust   { gap: 18px; flex-wrap: wrap; }
     .bhu-vp-grid      { grid-template-columns: 1fr; }
     .bhu-values, .bhu-features, .bhu-why, .bhu-insights,
-    .bhu-how, .bhu-cta, .bhu-stats, .bhu-footer { padding: 64px 18px; }
+    .bhu-roadmap, .bhu-cta, .bhu-stats, .bhu-footer { padding: 64px 18px; }
     .bhu-features-grid, .bhu-why-grid { grid-template-columns: 1fr; }
-    .bhu-steps        { grid-template-columns: 1fr; }
+    .bhu-roadmap-track { gap: 10px; }
+    .bhu-roadmap-step { min-width: 110px; flex-basis: 110px; }
+    .bhu-roadmap-step h5 { font-size: .78rem; }
+    .bhu-roadmap-step p { font-size: .68rem; }
+    .bhu-roadmap-note { text-align: left; line-height: 1.55; }
     .bhu-stats-inner  { grid-template-columns: 1fr; }
     .bhu-stat-item    { border-right: none; border-bottom: 1px solid var(--border); }
     .bhu-stat-item:last-child { border-bottom: none; }

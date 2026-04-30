@@ -17,6 +17,10 @@ class BhuarjanWebsite(http.Controller):
     def features(self, **kwargs):
         return request.render('bhuarjan_web.features_page')
 
+    @http.route('/acts', type='http', auth='public', website=True, sitemap=True)
+    def acts(self, **kwargs):
+        return request.render('bhuarjan_web.acts_page')
+
     @http.route('/contact/submit', type='http', auth='public', website=True, methods=['POST'], csrf=True)
     def contact_submit(self, **post):
         name = post.get('name', '')

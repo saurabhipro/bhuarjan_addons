@@ -9,6 +9,7 @@
     'depends': ['website', 'bhuarjan'],
     'data': [
         'views/website_templates.xml',
+        'views/acts_templates.xml',
         'views/login_templates.xml',
         'views/website_menu.xml',
     ],

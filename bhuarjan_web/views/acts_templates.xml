@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         ACTS PAGE
+         ============================================================ -->
+    <template id="acts_page" name="Bhuarjan – Acts Covered">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="1"/>
+            <t t-set="no_footer" t-value="1"/>
+            <t t-set="head">
+                <link rel="stylesheet" type="text/css"
+                      t-att-href="'/bhuarjan_web/static/src/css/bhuarjan_website.css'"/>
+                <link rel="stylesheet"
+                      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+                      rel="stylesheet"/>
+            </t>
+
+            <t t-call="bhuarjan_web.navbar"/>
+
+            <section class="bhu-acts-hero">
+                <span class="tag">Law Master</span>
+                <h1>Acts Covered &amp; Stage Workflows</h1>
+                <p>
+                    BHUARJAN supports four major acquisition laws with section-wise digital process tracking,
+                    approvals, objections, award generation, and audit-ready outputs.
+                </p>
+            </section>
+
+            <section class="bhu-acts-wrap">
+                <div class="bhu-acts-head">
+                    <span class="tag">Coverage Matrix</span>
+                    <h2>One platform for 4 acquisition laws</h2>
+                    <p>Each act has a structured stage pipeline, clear ownership, and configurable section progress in Law Master.</p>
+                </div>
+
+                <div class="bhu-acts-grid">
+                    <article class="bhu-act-card">
+                        <div class="bhu-act-top">
+                            <div class="bhu-act-icon"><i class="fa fa-landmark"/></div>
+                            <div>
+                                <h3>LARR (RFCTLARR)</h3>
+                                <p>Primary workflow for social impact assessment, hearings, declarations, and final award.</p>
+                            </div>
+                        </div>
+                        <div class="bhu-act-flow">
+                            <span>(Sec 4) Create SIA Team</span>
+                            <span>(Sec 4) Notifications</span>
+                            <span>Expert Group</span>
+                            <span>Section 11 Notifications</span>
+                            <span>Section 19 Notifications</span>
+                            <span>(Sec 15) Objections</span>
+                            <span>(Sec 21) Notice</span>
+                            <span>(Sec 23) Award</span>
+                        </div>
+                    </article>
+
+                    <article class="bhu-act-card">
+                        <div class="bhu-act-top">
+                            <div class="bhu-act-icon"><i class="fa fa-road"/></div>
+                            <div>
+                                <h3>NH Act 1956</h3>
+                                <p>National highway workflow from notification to survey and award completion.</p>
+                            </div>
+                        </div>
+                        <div class="bhu-act-flow">
+                            <span>Sec 3A (NH)</span>
+                            <span>Sec 3C Objection (NH)</span>
+                            <span>Sec 3D (NH)</span>
+                            <span>Surveys</span>
+                            <span>Award</span>
+                        </div>
+                    </article>
+
+                    <article class="bhu-act-card">
+                        <div class="bhu-act-top">
+                            <div class="bhu-act-icon"><i class="fa fa-train"/></div>
+                            <div>
+                                <h3>Railway Act</h3>
+                                <p>Railway land corridor process with objections, declaration, survey, and compensation stages.</p>
+                            </div>
+                        </div>
+                        <div class="bhu-act-flow">
+                            <span>Sec 20A (Railways)</span>
+                            <span>Sec 20D Objection (Railways)</span>
+                            <span>Sec 20E (Railways)</span>
+                            <span>Surveys</span>
+                            <span>Award</span>
+                        </div>
+                    </article>
+
+                    <article class="bhu-act-card">
+                        <div class="bhu-act-top">
+                            <div class="bhu-act-icon"><i class="fa fa-scale-balanced"/></div>
+                            <div>
+                                <h3>Section 247 CGLRC</h3>
+                                <p>State code process for notice generation, intake, survey linkage, and award finalization.</p>
+                            </div>
+                        </div>
+                        <div class="bhu-act-flow">
+                            <span>Award (247.3)</span>
+                            <span>Intake Register (247.2)</span>
+                            <span>Personal Notice generation (247.1)</span>
+                            <span>Surveys</span>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bhu-act-stage-wrap">
+                <div class="bhu-act-stage-inner">
+                    <div class="bhu-sec-head">
+                        <span class="tag">Stage Journey</span>
+                        <h2>Unified stage architecture</h2>
+                        <p>Common stage logic keeps law-specific execution aligned and easy to monitor across projects.</p>
+                    </div>
+                    <div class="bhu-act-stage-line">
+                        <div class="bhu-act-stage"><span>1</span><p>Notification</p></div>
+                        <div class="bhu-act-stage"><span>2</span><p>Survey</p></div>
+                        <div class="bhu-act-stage"><span>3</span><p>Objection</p></div>
+                        <div class="bhu-act-stage"><span>4</span><p>Hearing</p></div>
+                        <div class="bhu-act-stage"><span>5</span><p>Award</p></div>
+                        <div class="bhu-act-stage"><span>6</span><p>Payment</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <t t-call="bhuarjan_web.footer"/>
+        </t>
+    </template>
+
+</odoo>

@@ -9,6 +9,9 @@
                 <button name="action_open_survey_for_land_edit" type="object"
                         string="Edit" class="btn btn-sm btn-primary"
                         title="Edit 4 fields: distance / road / irrigation / diverted"/>
+                <button name="action_open_survey_for_tree_edit" type="object"
+                        string="Edit Trees" class="btn btn-sm btn-secondary"
+                        title="Edit/add/remove tree rows for this khasra"/>
                 <field name="khasra_number" readonly="1" string="Khasra"/>
                 <field name="village_name" readonly="1" string="Village"/>
                 <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>

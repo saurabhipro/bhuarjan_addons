@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         HOME PAGE
+         ============================================================ -->
+    <template id="homepage" name="Bhuarjan – Home">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="1"/>
+            <t t-set="no_footer" t-value="1"/>
+            <t t-set="head">
+                <link rel="stylesheet" type="text/css"
+                      t-att-href="'/bhuarjan_web/static/src/css/bhuarjan_website.css'"/>
+                <link rel="stylesheet"
+                      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+                <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+                      rel="stylesheet"/>
+                <script type="text/javascript" src="/bhuarjan_web/static/src/js/bhuarjan_website.js"/>
+            </t>
+
+            <!-- ── NAVBAR ── -->
+            <t t-call="bhuarjan_web.navbar"/>
+
+            <!-- ============================================================
+                 HERO
+                 ============================================================ -->
+            <section class="bhu-hero">
+                <div class="bhu-hero-inner">
+                    <div class="bhu-hero-left">
+                        <span class="bhu-hero-pill">
+                            <span class="dot"/> District Administration Raigarh
+                        </span>
+                        <h1>The future of <span class="accent">Land Acquisition</span> Management</h1>
+                        <p class="bhu-hero-system">Bhuarjan LAMS — A Government of Chhattisgarh Initiative</p>
+                        <p class="bhu-hero-desc">
+                            A unified digital platform streamlining every stage of the land
+                            acquisition process — from initial survey to final compensation —
+                            ensuring real‑time monitoring, full transparency, and complete
+                            accountability across all administrative levels.
+                        </p>
+                        <div class="bhu-hero-actions">
+                            <a href="/odoo" class="bhu-btn primary">
+                                Get Started <i class="fa fa-arrow-right"/>
+                            </a>
+                            <a href="/contact" class="bhu-btn ghost">
+                                <i class="fa fa-play-circle"/> Request Demo
+                            </a>
+                        </div>
+                        <div class="bhu-hero-trust">
+                            <div class="bhu-hero-trust-item">
+                                <div class="num">120+</div>
+                                <div class="lbl">Projects Managed</div>
+                            </div>
+                            <div class="bhu-hero-trust-item">
+                                <div class="num">5K+</div>
+                                <div class="lbl">Land Parcels</div>
+                            </div>
+                            <div class="bhu-hero-trust-item">
+                                <div class="num">99%</div>
+                                <div class="lbl">Uptime</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bhu-hero-visual">
+                        <img class="bhu-hero-img-main"
+                             src="/bhuarjan_web/static/src/img/image1.png"
+                             alt="Bhuarjan land acquisition"/>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TRUSTED BAR
+                 ============================================================ -->
+            <section class="bhu-trusted">
+                <div class="bhu-trusted-inner">
+                    <span><i class="fa fa-shield-alt" style="margin-right:8px;color:#FF6B1A;"/> Government of Chhattisgarh</span>
+                    <div class="sep"/>
+                    <span><i class="fa fa-lock" style="margin-right:8px;color:#FF6B1A;"/> Bank-Grade Security</span>
+                    <div class="sep"/>
+                    <span><i class="fa fa-cloud" style="margin-right:8px;color:#FF6B1A;"/> Cloud Native</span>
+                    <div class="sep"/>
+                    <span><i class="fa fa-mobile-alt" style="margin-right:8px;color:#FF6B1A;"/> Mobile-First</span>
+                    <div class="sep"/>
+                    <span><i class="fa fa-language" style="margin-right:8px;color:#FF6B1A;"/> Hindi &amp; English</span>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VALUE PROPS
+                 ============================================================ -->
+            <section class="bhu-values">
+                <div class="bhu-values-inner">
+                    <div class="bhu-values-img-wrap">
+                        <img src="/bhuarjan_web/static/src/img/image.png"
+                             alt="Land management"/>
+                    </div>
+                    <div class="bhu-values-content">
+                        <span class="bhu-hero-pill" style="margin-bottom:18px;">
+                            <span class="dot"/> Why Bhuarjan
+                        </span>
+                        <h2>Built for governance.<br/>Designed for people.</h2>
+                        <p>
+                            Empower every level of land administration — from Patwari to
+                            Collector — with real-time data, paperless workflows, and
+                            transparent processes that build community trust.
+                        </p>
+                        <div class="bhu-vp-grid">
+                            <div class="bhu-vp-item">
+                                <div class="vp-ico"><i class="fa fa-eye"/></div>
+                                <div>
+                                    <h4>Transparent</h4>
+                                    <p>Real-time tracking of every project.</p>
+                                </div>
+                            </div>
+                            <div class="bhu-vp-item">
+                                <div class="vp-ico"><i class="fa fa-users"/></div>
+                                <div>
+                                    <h4>Empowering</h4>
+                                    <p>Paperless coordination top-to-bottom.</p>
+                                </div>
+                            </div>
+                            <div class="bhu-vp-item">
+                                <div class="vp-ico"><i class="fa fa-map-marked-alt"/></div>
+                                <div>
+                                    <h4>Tech-Driven</h4>
+                                    <p>GIS mapping &amp; mobile surveys.</p>
+                                </div>
+                            </div>
+                            <div class="bhu-vp-item">
+                                <div class="vp-ico"><i class="fa fa-balance-scale"/></div>
+                                <div>
+                                    <h4>Fair &amp; Inclusive</h4>
+                                    <p>Equitable, traceable digital records.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 KEY FEATURES (DARK)
+                 ============================================================ -->
+            <section class="bhu-features dark">
+                <div class="bhu-features-inner">
+                    <div class="bhu-sec-head">
+                        <span class="tag">Platform Capabilities</span>
+                        <h2>Everything you need in one platform</h2>
+                        <p>From field data collection to final notification — every step is digitised, secured, and audit-ready.</p>
+                    </div>
+                    <div class="bhu-features-grid">
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-mobile-alt"/></div>
+                            <h4>Field Data App</h4>
+                            <p>Patwari and SIA teams record land details, GPS points, and upload photos on-site — even offline.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-file-alt"/></div>
+                            <h4>Digital Forms</h4>
+                            <p>Seamless creation and approval workflows for Sections 4, 7, 8, 11, 15, and 19.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-file-signature"/></div>
+                            <h4>Smart PDF &amp; E-Sign</h4>
+                            <p>Instant generation and digital signing of official notifications and reports.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-chart-line"/></div>
+                            <h4>Live Dashboard</h4>
+                            <p>Track acquisition progress and parcel status across all projects in real time.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-shield-alt"/></div>
+                            <h4>Role-Based Access</h4>
+                            <p>Secure logins for Collector, SDM, Tahsildar, RI, Patwari &amp; SIA teams.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                        <div class="bhu-feature">
+                            <div class="ico"><i class="fa fa-chart-bar"/></div>
+                            <h4>Analytics &amp; Reports</h4>
+                            <p>Insights with project-wise and section-wise monitoring dashboards and exports.</p>
+                            <a href="#" class="arrow">Learn more <i class="fa fa-arrow-right"/></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 WHY CHOOSE - Image cards
+                 ============================================================ -->
+            <section class="bhu-why">
+                <div class="bhu-why-inner">
+                    <div class="bhu-sec-head">
+                        <span class="tag">Our Promise</span>
+                        <h2>Why choose BHUARJAN?</h2>
+                        <p>Four core pillars that make Bhuarjan the trusted choice for land administration.</p>
+                    </div>
+                    <div class="bhu-why-grid">
+                        <div class="bhu-why-card">
+                            <img class="wi-img" src="/bhuarjan_web/static/src/img/efficiancy.webp" alt="Efficiency"/>
+                            <h4>Efficiency</h4>
+                            <p>"Streamlines workflow and reduces manual effort across all departments."</p>
+                        </div>
+                        <div class="bhu-why-card">
+                            <img class="wi-img" src="/bhuarjan_web/static/src/img/transparency.webp" alt="Transparency"/>
+                            <h4>Transparency</h4>
+                            <p>"Every process is fully traceable through immutable digital records."</p>
+                        </div>
+                        <div class="bhu-why-card">
+                            <img class="wi-img" src="/bhuarjan_web/static/src/img/timeliness.webp" alt="Timeliness"/>
+                            <h4>Timeliness</h4>
+                            <p>"Real-time progress visibility ensures no delays across all stages."</p>
+                        </div>
+                        <div class="bhu-why-card">
+                            <img class="wi-img" src="/bhuarjan_web/static/src/img/colaboration.webp" alt="Collaboration"/>
+                            <h4>Collaboration</h4>
+                            <p>"Seamless coordination between field teams and administration."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 INSIGHTS
+                 ============================================================ -->
+            <section class="bhu-insights">
+                <div class="bhu-insights-inner">
+                    <div class="bhu-insights-content">
+                        <span class="tag">Real-Time Insights</span>
+                        <h2>From the field to the Collector's desk — instantly.</h2>
+                        <div class="bhu-insights-list">
+                            <div class="item">
+                                <div class="ico"><i class="fa fa-mobile-alt"/></div>
+                                <div>
+                                    <strong>On-Ground Collection</strong>
+                                    <p>Patwaris and SIA teams record land details, GPS points, and photos from the field — even offline.</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="ico"><i class="fa fa-tachometer-alt"/></div>
+                                <div>
+                                    <strong>Central Dashboard</strong>
+                                    <p>Collectors and officials view project progress, approvals, and compensation status in real time.</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="ico"><i class="fa fa-bell"/></div>
+                                <div>
+                                    <strong>Automated Alerts</strong>
+                                    <p>Instant notifications for pending approvals, expiring deadlines, and escalation triggers.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bhu-insights-visual">
+                        <img src="/bhuarjan_web/static/src/img/dashboard_mockup.jpg"
+                             alt="BHUARJAN Dashboard"/>
+                        <div class="bhu-insights-stat-card">
+                            <div class="ico"><i class="fa fa-arrow-trend-up"/></div>
+                            <div>
+                                <div class="num">+ 47%</div>
+                                <div class="lbl">Faster turnaround</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 HOW IT WORKS
+                 ============================================================ -->
+            <section class="bhu-how">
+                <div class="bhu-how-inner">
+                    <div class="bhu-sec-head">
+                        <span class="tag">The Process</span>
+                        <h2>How it works</h2>
+                        <p>Five simple steps from initial entry to final acquisition approval.</p>
+                    </div>
+                    <div class="bhu-steps">
+                        <div class="bhu-step">
+                            <div class="bhu-step-num">1</div>
+                            <h4>Form 10 Entry</h4>
+                            <p>Patwari records land details and uploads maps &amp; photos.</p>
+                        </div>
+                        <div class="bhu-step">
+                            <div class="bhu-step-num">2</div>
+                            <h4>Section 4 Notification</h4>
+                            <p>Collector reviews entries and issues official notification.</p>
+                        </div>
+                        <div class="bhu-step">
+                            <div class="bhu-step-num">3</div>
+                            <h4>Hearing &amp; SIA</h4>
+                            <p>SIA conducts field study and submits findings online.</p>
+                        </div>
+                        <div class="bhu-step">
+                            <div class="bhu-step-num">4</div>
+                            <h4>Expert Review</h4>
+                            <p>Committee examines reports and provides recommendations.</p>
+                        </div>
+                        <div class="bhu-step">
+                            <div class="bhu-step-num">5</div>
+                            <h4>Final Approval</h4>
+                            <p>Collector finalizes and publishes the acquisition order.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 STATS
+                 ============================================================ -->
+            <section class="bhu-stats">
+                <div class="bhu-stats-inner">
+                    <div class="bhu-stat-item">
+                        <h3><span data-count="120" data-suffix="+">120+</span></h3>
+                        <p>Projects Managed</p>
+                    </div>
+                    <div class="bhu-stat-item">
+                        <h3><span data-count="5000" data-suffix="+">5,000+</span></h3>
+                        <p>Land Parcels Processed</p>
+                    </div>
+                    <div class="bhu-stat-item">
+                        <h3><span data-count="200" data-suffix="+">200+</span></h3>
+                        <p>Government Users</p>
+                    </div>
+                    <div class="bhu-stat-item">
+                        <h3><span data-count="99" data-suffix="%">99%</span></h3>
+                        <p>Platform Uptime</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 CTA
+                 ============================================================ -->
+            <section class="bhu-cta">
+                <div class="bhu-cta-inner">
+                    <h2>Ready to digitise your district?</h2>
+                    <p>Join the leading administration using Bhuarjan to deliver faster, fairer, and more transparent land governance.</p>
+                    <a href="/contact" class="bhu-btn primary">
+                        Talk to our team <i class="fa fa-arrow-right"/>
+                    </a>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <t t-call="bhuarjan_web.footer"/>
+        </t>
+    </template>
+
+    <!-- ============================================================
+         FEATURES PAGE
+         ============================================================ -->
+    <template id="features_page" name="Bhuarjan – Features">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="1"/>
+            <t t-set="no_footer" t-value="1"/>
+            <t t-set="head">
+                <link rel="stylesheet" type="text/css"
+                      t-att-href="'/bhuarjan_web/static/src/css/bhuarjan_website.css'"/>
+                <link rel="stylesheet"
+                      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+                      rel="stylesheet"/>
+            </t>
+
+            <t t-call="bhuarjan_web.navbar"/>
+
+            <section class="bhu-features-hero">
+                <span class="tag">Platform Capabilities</span>
+                <h1>Features across every acquisition stage</h1>
+                <p>
+                    BHUARJAN digitises survey, notifications, objections, awards, and payment workflows
+                    with audit trails and report-ready documentation.
+                </p>
+            </section>
+
+            <section class="bhu-features-grid-wrap">
+                <div class="bhu-features-grid">
+                    <article class="bhu-feature-card">
+                        <h3>Project Setup &amp; Land Survey</h3>
+                        <p>Configure projects, villages, and parcel records with field-level tracking and verified ownership details.</p>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <h3>Section 4 Notification</h3>
+                        <p>Generate and monitor preliminary notifications with date-based status, workflow approvals, and digital traceability.</p>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <h3>Section 11 &amp; Section 15 Processing</h3>
+                        <p>Handle impact details, objection intake, hearing actions, and resolution outcomes from one structured dashboard.</p>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <h3>Section 19, Award &amp; Compensation</h3>
+                        <p>Drive final notification, award generation, beneficiary validation, and compensation calculations with ready reports.</p>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <h3>Approvals &amp; Role-Based Controls</h3>
+                        <p>Enable Patwari, RI, Tehsildar, SDM, and Collector level actions with strict permission and approval routing.</p>
+                    </article>
+                    <article class="bhu-feature-card">
+                        <h3>Dashboards &amp; Monitoring</h3>
+                        <p>Track project progress, timeline bottlenecks, and pending actions through district and department dashboards.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bhu-pdf-shots">
+                <div class="bhu-pdf-head">
+                    <h2>PDF Screenshots</h2>
+                    <p>Sample output views used for review and department communication.</p>
+                </div>
+                <div class="bhu-pdf-grid">
+                    <article class="bhu-pdf-card">
+                        <img src="/bhuarjan_web/static/src/img/dashboard_mockup.jpg" alt="Section report PDF preview"/>
+                        <div class="meta">
+                            <h4>Section Workflow Summary</h4>
+                            <p>Overview snapshot for project progress and section-wise status.</p>
+                        </div>
+                    </article>
+                    <article class="bhu-pdf-card">
+                        <img src="/bhuarjan_web/static/src/img/hero_aerial.jpg" alt="Award statement PDF preview"/>
+                        <div class="meta">
+                            <h4>Award Statement Preview</h4>
+                            <p>Representative format for award and compensation sheets.</p>
+                        </div>
+                    </article>
+                    <article class="bhu-pdf-card">
+                        <img src="/bhuarjan_web/static/src/img/land_management.jpg" alt="Notification order PDF preview"/>
+                        <div class="meta">
+                            <h4>Notification Order Preview</h4>
+                            <p>Template-style preview for downloadable notification documents.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <t t-call="bhuarjan_web.footer"/>
+        </t>
+    </template>
+
+    <!-- ============================================================
+         CONTACT PAGE
+         ============================================================ -->
+    <template id="contact_page" name="Bhuarjan – Contact Us">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="1"/>
+            <t t-set="no_footer" t-value="1"/>
+            <t t-set="head">
+                <link rel="stylesheet" type="text/css"
+                      t-att-href="'/bhuarjan_web/static/src/css/bhuarjan_website.css'"/>
+                <link rel="stylesheet"
+                      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+                      rel="stylesheet"/>
+            </t>
+
+            <t t-call="bhuarjan_web.navbar"/>
+
+            <section class="bhu-contact-hero">
+                <span class="tag">We'd love to hear from you</span>
+                <h1>Get in touch</h1>
+                <p>Questions, demo requests, or partnership enquiries — our team is here to help.</p>
+            </section>
+
+            <div class="bhu-contact-body">
+                <div class="bhu-contact-info">
+                    <h3>Reach out</h3>
+                    <p>Choose the channel that works best for you. We typically respond within 24 hours.</p>
+                    <div class="bhu-contact-info-item">
+                        <div class="bhu-ci-icon"><i class="fa fa-map-marker-alt"/></div>
+                        <div class="bhu-ci-text">
+                            <span>Address</span>
+                            <strong>District Administration Raigarh,<br/>Chhattisgarh, India</strong>
+                        </div>
+                    </div>
+                    <div class="bhu-contact-info-item">
+                        <div class="bhu-ci-icon"><i class="fa fa-phone"/></div>
+                        <div class="bhu-ci-text">
+                            <span>Phone</span>
+                            <strong>+91 70420 38092</strong>
+                        </div>
+                    </div>
+                    <div class="bhu-contact-info-item">
+                        <div class="bhu-ci-icon"><i class="fa fa-envelope"/></div>
+                        <div class="bhu-ci-text">
+                            <span>Email</span>
+                            <strong>support@bhuarjan.com</strong>
+                        </div>
+                    </div>
+                    <div class="bhu-contact-info-item">
+                        <div class="bhu-ci-icon"><i class="fa fa-clock"/></div>
+                        <div class="bhu-ci-text">
+                            <span>Working Hours</span>
+                            <strong>Mon–Sat, 9:00 AM – 6:00 PM IST</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bhu-contact-form">
+                    <h3>Send us a message</h3>
+                    <p>Fill out the form below and we'll get back to you shortly.</p>
+                    <form action="/contact/submit" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="bhu-form-row">
+                            <div class="bhu-form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" placeholder="Your full name" required="1"/>
+                            </div>
+                            <div class="bhu-form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210"/>
+                            </div>
+                        </div>
+                        <div class="bhu-form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="you@example.com" required="1"/>
+                        </div>
+                        <div class="bhu-form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" placeholder="Describe your enquiry in detail…" required="1"/>
+                        </div>
+                        <button type="submit" class="bhu-btn-submit">
+                            <i class="fa fa-paper-plane"/> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <t t-call="bhuarjan_web.footer"/>
+        </t>
+    </template>
+
+    <!-- ============================================================
+         THANK YOU PAGE
+         ============================================================ -->
+    <template id="contact_thanks" name="Bhuarjan – Thank You">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="1"/>
+            <t t-set="no_footer" t-value="1"/>
+            <t t-set="head">
+                <link rel="stylesheet" type="text/css"
+                      t-att-href="'/bhuarjan_web/static/src/css/bhuarjan_website.css'"/>
+                <link rel="stylesheet"
+                      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+            </t>
+            <t t-call="bhuarjan_web.navbar"/>
+            <div class="bhu-thanks">
+                <div class="bhu-thanks-icon"><i class="fa fa-check"/></div>
+                <h2>Message Sent!</h2>
+                <p>Thank you for reaching out. Our team will get back to you within 24 hours.</p>
+                <a href="/" class="bhu-btn primary"><i class="fa fa-arrow-left"/> Back to Home</a>
+            </div>
+            <t t-call="bhuarjan_web.footer"/>
+        </t>
+    </template>
+
+    <!-- ============================================================
+         REMOVE "Skip to Content" (comes from portal.frontend_layout)
+         ============================================================ -->
+    <template id="remove_skip_to_content" name="Remove Skip to Content"
+              inherit_id="portal.frontend_layout" priority="100">
+        <xpath expr="//a[contains(@class,'o_skip_to_content')]" position="replace">
+            <t/>
+        </xpath>
+    </template>
+
+    <!-- ============================================================
+         SHARED: NAVBAR
+         ============================================================ -->
+    <template id="navbar" name="Bhuarjan Navbar">
+        <nav class="bhu-navbar">
+            <a href="/" class="bhu-logo-wrap">
+                <img src="/bhuarjan_web/static/src/img/bhuarjan_logo.png" alt="Bhuarjan"/>
+                <div class="bhu-logo-text">
+                    <span class="lt-1">BHUARJAN</span>
+                    <span class="lt-2">Land Acquisition Mgmt</span>
+                </div>
+            </a>
+            <ul class="bhu-nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/features">Features</a></li>
+                <li><a href="/contact">Contact us</a></li>
+            </ul>
+            <div class="bhu-nav-right">
+                <span class="bhu-nav-phone">
+                    <i class="fa fa-phone"/> +91 7042038092
+                </span>
+                <a href="/odoo" class="bhu-btn-nav login">
+                    <i class="fa fa-user"/> Login
+                </a>
+                <a href="/contact" class="bhu-btn-nav cta">
+                    Contact Us <i class="fa fa-arrow-right"/>
+                </a>
+            </div>
+        </nav>
+    </template>
+
+    <!-- ============================================================
+         SHARED: FOOTER
+         ============================================================ -->
+    <template id="footer" name="Bhuarjan Footer">
+        <footer class="bhu-footer">
+            <div class="bhu-footer-inner">
+                <div class="bhu-footer-top">
+                    <div class="bhu-footer-brand">
+                        <div class="logo-wrap">
+                            <img src="/bhuarjan_web/static/src/img/logo.png" alt="Bhuarjan"/>
+                            <span class="ft-name">BHUARJAN</span>
+                        </div>
+                        <p>
+                            A unified digital platform of District Administration Raigarh
+                            for streamlining land acquisition — from survey to compensation —
+                            with transparency and accountability.
+                        </p>
+                        <div class="bhu-social">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"/></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"/></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"/></a>
+                            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"/></a>
+                        </div>
+                    </div>
+                    <div class="bhu-footer-col">
+                        <h5>Platform</h5>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/odoo">Login Portal</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="#">Documentation</a></li>
+                        </ul>
+                    </div>
+                    <div class="bhu-footer-col">
+                        <h5>Resources</h5>
+                        <ul>
+                            <li><a href="#">RFCTLARR Act</a></li>
+                            <li><a href="#">Section Forms</a></li>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="bhu-footer-col">
+                        <h5>Get in Touch</h5>
+                        <div class="contact-li">
+                            <i class="fa fa-map-marker-alt"/>
+                            District Administration Raigarh, Chhattisgarh, India
+                        </div>
+                        <div class="contact-li">
+                            <i class="fa fa-phone"/>
+                            <a href="tel:+917042038092">+91 70420 38092</a>
+                        </div>
+                        <div class="contact-li">
+                            <i class="fa fa-envelope"/>
+                            <a href="mailto:support@bhuarjan.com">support@bhuarjan.com</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="bhu-footer-bottom">
+                    <span>© 2024–2026 District Administration Raigarh. All rights reserved.</span>
+                    <span>
+                        Powered by <a href="/">BHUARJAN LAMS</a>
+                        <a href="#">Privacy</a>
+                        <a href="#">Terms</a>
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </template>
+
+</odoo>

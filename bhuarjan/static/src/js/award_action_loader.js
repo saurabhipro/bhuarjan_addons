@@ -111,6 +111,25 @@ const ACTION_LABELS = {
     'action_consolidated_report':        'Generating Consolidated PDF report…',
 };
 
+function _isSection23Context() {
+    const hash = (window.location.hash || '').toLowerCase();
+    if (hash.includes('bhu.section23.award') || hash.includes('section23')) {
+        return true;
+    }
+    const cp = document.querySelector('.o_control_panel_breadcrumbs, .o_breadcrumb, .breadcrumb');
+    const txt = ((cp && cp.textContent) || '').toLowerCase();
+    return txt.includes('section 23 award') || txt.includes('धारा 23');
+}
+
+function _isCreateButton(btn) {
+    if (!btn) return false;
+    return (
+        btn.classList.contains('o_list_button_add') ||
+        btn.classList.contains('o-kanban-button-new') ||
+        btn.classList.contains('o_form_button_create')
+    );
+}
+
 // Attach click listener using event delegation on document body
 document.addEventListener('click', (e) => {
     // Walk up the DOM to find the actual <button> element
@@ -121,12 +140,16 @@ document.addEventListener('click', (e) => {
     if (!btn) return;
 
     const name = btn.getAttribute('name') || btn.dataset.name || '';
-    if (!HEAVY_ACTIONS.has(name)) return;
+    const isHeavy = HEAVY_ACTIONS.has(name);
+    const isCreateInS23 = _isCreateButton(btn) && _isSection23Context();
+    if (!isHeavy && !isCreateInS23) return;
 
     // Don't show if button is disabled
     if (btn.disabled) return;
 
-    const label = ACTION_LABELS[name] || 'Processing your request…';
+    const label = isCreateInS23
+        ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
+        : (ACTION_LABELS[name] || 'Processing your request…');
 
     // Check if button is inside a dialog/wizard
     const dialog = btn.closest('.o_dialog, .modal, [role="dialog"]');

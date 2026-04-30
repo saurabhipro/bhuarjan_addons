@@ -108,8 +108,6 @@
                                 <field name="active" string="Active / सक्रिय"/>
                                 <field name="bhuarjan_role"/>
                                 <field name="company_ids" widget="many2many_tags" options="{'no_create':True}" string="Allowed Companies"/>
-                                <field name="department_id" invisible="bhuarjan_role != 'department_user'" 
-                                       options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="parent_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="state_id" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>
                                 <field name="district_id" domain="[('state_id', '=', state_id)]" options="{'no_create':True,'no_create_edit':True,'no_open':True}"/>

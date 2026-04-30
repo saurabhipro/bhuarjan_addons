@@ -419,10 +419,11 @@ class Section23AwardData(models.Model):
             sub = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10**12
             return (0, main, sub, khasra)
 
-        numeric_totals = (
-            'original_area', 'acquired_area', 'basic_value', 'market_value',
-            'solatium', 'interest', 'total_compensation', 'rehab_policy_amount', 'paid_compensation',
-        )   
+        area_totals = ('original_area', 'acquired_area')
+        amount_totals = (
+            'basic_value', 'market_value', 'solatium', 'interest',
+            'total_compensation', 'rehab_policy_amount', 'paid_compensation',
+        )
         for row in land_data:
             if row.get('landowner_name'):
                 # Group by beneficiary identity (name + father/spouse) so duplicate
@@ -440,25 +441,25 @@ class Section23AwardData(models.Model):
                     'address': row.get('address', ''),
                     'lines': [],
                     'khasra_count': 0,
-                    'khasra_seen': set(),
                 }
-                for field_name in numeric_totals:
+                for field_name in area_totals + amount_totals:
                     grouped[key][field_name] = 0.0
                 ordered_keys.append(key)
             group = grouped[key]
             group['lines'].append(row)
-            khasra = row.get('khasra') or ''
-            if khasra and khasra not in group['khasra_seen']:
-                group['khasra_seen'].add(khasra)
+            khasra = (row.get('khasra') or '').strip()
+            area_present = bool((row.get('original_area', 0.0) or 0.0) or (row.get('acquired_area', 0.0) or 0.0))
+            if khasra and area_present:
                 group['khasra_count'] += 1
-            for field_name in numeric_totals:
+                for field_name in area_totals:
+                    group[field_name] += row.get(field_name, 0.0) or 0.0
+            for field_name in amount_totals:
                 group[field_name] += row.get(field_name, 0.0) or 0.0
 
         result = []
         for key in ordered_keys:
             group = grouped[key]
             group['lines'] = sorted(group.get('lines', []), key=_khasra_sort_key)
-            group.pop('khasra_seen', None)
             result.append(group)
         return result
 

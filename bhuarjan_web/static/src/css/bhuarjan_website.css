@@ -1,0 +1,1524 @@
+/* ============================================================
+   BHUARJAN WEBSITE — Corporate Theme v3
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Hide Odoo defaults on our pages ── */
+header#top, header.o_header_standard,
+footer#bottom, footer.o_footer { display: none !important; }
+#wrapwrap { padding: 0 !important; margin: 0 !important; overflow-x: hidden; }
+body      { padding: 0 !important; margin: 0 !important; overflow-x: hidden; }
+#wrapwrap > main { padding: 0 !important; margin: 0 !important; }
+
+/* Hide "Skip to Content" accessibility link */
+.o_skip_to_content,
+a.o_skip_to_content,
+[href="#wrap"],
+[href="#wrapwrap"],
+.skip-link,
+a[href="#main"]:first-child {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Hide empty containers Odoo injects */
+#wrapwrap > main > .oe_structure:empty,
+#wrapwrap > .oe_structure:empty,
+.oe_structure_solo:empty { display: none !important; }
+#wrapwrap > div:not(.bhu-navbar):not(section):not(footer):empty { display: none !important; }
+.bhu-navbar { margin-top: 0 !important; }
+
+/* ── Design tokens ── */
+:root {
+    --primary:        #0F1E36;
+    --primary-2:      #1A2B4A;
+    --accent:         #FF6B1A;
+    --accent-2:       #E55A0E;
+    --accent-soft:    #FFF1E6;
+    --gold:           #FFB800;
+    --bg:             #FFFFFF;
+    --bg-soft:        #F8FAFC;
+    --bg-soft-2:      #F1F5F9;
+    --bg-dark:        #0A1628;
+    --text:           #0F172A;
+    --text-2:         #334155;
+    --muted:          #64748B;
+    --muted-2:        #94A3B8;
+    --border:         #E2E8F0;
+    --border-2:       #CBD5E1;
+    --success:        #10B981;
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-xl: 28px;
+    --shadow-xs: 0 1px 2px rgba(15,23,42,.06);
+    --shadow-sm: 0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
+    --shadow:    0 4px 12px rgba(15,23,42,.06), 0 2px 4px rgba(15,23,42,.04);
+    --shadow-md: 0 10px 32px rgba(15,23,42,.10), 0 4px 8px rgba(15,23,42,.06);
+    --shadow-lg: 0 24px 64px rgba(15,23,42,.16), 0 8px 16px rgba(15,23,42,.08);
+    --shadow-xl: 0 40px 96px rgba(15,23,42,.20);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+img { max-width: 100%; display: block; }
+a   { text-decoration: none; color: inherit; }
+ul  { list-style: none; padding: 0; margin: 0; }
+button { font-family: inherit; }
+
+.bhu-container { max-width: 1240px; margin: 0 auto; padding: 0 48px; }
+
+/* ============================================================
+   NAVBAR — premium corporate style
+   ============================================================ */
+.bhu-navbar {
+    background: #fff !important;
+    height: 78px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 2px 16px rgba(15,23,42,.04);
+    width: 100%;
+    transition: box-shadow .25s, background .25s;
+}
+.bhu-navbar.scrolled {
+    background: rgba(255,255,255,.96) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(15,23,42,.08);
+}
+
+.bhu-logo-wrap {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none !important;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: background .2s;
+}
+.bhu-logo-wrap:hover { background: var(--bg-soft); }
+
+.bhu-logo-wrap img {
+    height: 44px;
+    width: 44px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 6px;
+    box-shadow: 0 4px 12px rgba(15,30,54,.2);
+    border: 1px solid rgba(27, 85, 133, 0.2);
+}
+
+.bhu-logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+.bhu-logo-text .lt-1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary) !important;
+    letter-spacing: .05em;
+    line-height: 1.1;
+}
+.bhu-logo-text .lt-2 {
+    font-size: .65rem;
+    font-weight: 700;
+    color: var(--muted) !important;
+    margin-top: 4px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.bhu-nav-links {
+    display: flex !important;
+    gap: 36px;
+    margin: 0 !important;
+}
+
+.bhu-nav-links a {
+    color: var(--text-2) !important;
+    font-size: .92rem;
+    font-weight: 600;
+    transition: color .2s;
+    position: relative;
+    padding: 6px 0;
+}
+.bhu-nav-links a:hover { color: var(--accent) !important; }
+.bhu-nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -28px;
+    left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+}
+
+.bhu-nav-right {
+    display: flex !important;
+    align-items: center;
+    gap: 16px;
+}
+
+.bhu-nav-phone {
+    color: var(--text-2) !important;
+    font-size: .88rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.bhu-nav-phone i {
+    color: var(--accent) !important;
+    font-size: .9rem;
+}
+
+.bhu-btn-nav {
+    padding: 11px 22px !important;
+    border-radius: 10px !important;
+    font-size: .87rem !important;
+    font-weight: 700 !important;
+    transition: all .2s !important;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none !important;
+    border: none;
+    line-height: 1 !important;
+    cursor: pointer;
+}
+
+.bhu-btn-nav.login {
+    color: var(--text) !important;
+    background: var(--bg-soft) !important;
+    border: 1.5px solid var(--border) !important;
+}
+.bhu-btn-nav.login:hover {
+    background: var(--bg-soft-2) !important;
+    border-color: var(--border-2) !important;
+}
+.bhu-btn-nav.cta {
+    color: #fff !important;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+    box-shadow: 0 4px 14px rgba(255,107,26,.35);
+}
+.bhu-btn-nav.cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(255,107,26,.45);
+}
+
+/* ============================================================
+   HERO — modern corporate with split layout
+   ============================================================ */
+.bhu-hero {
+    position: relative;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(255,107,26,.08), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(15,30,54,.06), transparent 50%),
+        linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    padding: 80px 48px 100px;
+    overflow: hidden;
+}
+.bhu-hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,107,26,.06), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.bhu-hero-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    align-items: center;
+    gap: 72px;
+    position: relative;
+    z-index: 1;
+}
+
+.bhu-hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--accent);
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 7px 16px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
+}
+.bhu-hero-pill .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,107,26,.2);
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(255,107,26,.2); }
+    50%      { box-shadow: 0 0 0 7px rgba(255,107,26,0); }
+}
+
+.bhu-hero h1 {
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--text);
+    margin: 0 0 22px 0;
+}
+.bhu-hero h1 .accent {
+    background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.bhu-hero-tagline {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0 0 4px 0;
+}
+.bhu-hero-system {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin: 0 0 20px 0;
+}
+.bhu-hero-desc {
+    font-size: 1.02rem;
+    line-height: 1.7;
+    color: var(--text-2);
+    max-width: 540px;
+    margin: 0 0 32px 0;
+}
+.bhu-hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.bhu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: .95rem;
+    font-weight: 700;
+    transition: all .25s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none !important;
+    line-height: 1;
+}
+.bhu-btn.primary {
+    color: #fff !important;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 8px 24px rgba(255,107,26,.30);
+}
+.bhu-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(255,107,26,.40);
+}
+.bhu-btn.ghost {
+    color: var(--text) !important;
+    background: #fff;
+    border: 1.5px solid var(--border-2);
+}
+.bhu-btn.ghost:hover {
+    border-color: var(--primary);
+    color: var(--primary) !important;
+}
+
+.bhu-hero-trust {
+    display: flex;
+    gap: 32px;
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+}
+.bhu-hero-trust-item .num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -.01em;
+    line-height: 1;
+}
+.bhu-hero-trust-item .lbl {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Hero image layout (no overlap) */
+.bhu-hero-visual {
+    display: block;
+}
+.bhu-hero-img-main {
+    position: static;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border);
+    z-index: 1;
+}
+.bhu-hero-img-overlay {
+    display: none;
+}
+.bhu-hero-floater {
+    display: none;
+}
+.bhu-hero-floater .fl-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.bhu-hero-floater .fl-text strong {
+    display: block;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--text);
+}
+.bhu-hero-floater .fl-text span {
+    font-size: .75rem;
+    color: var(--muted);
+}
+
+/* ============================================================
+   TRUSTED BAR
+   ============================================================ */
+.bhu-trusted {
+    background: var(--bg-soft);
+    padding: 32px 48px;
+    border-bottom: 1px solid var(--border);
+}
+.bhu-trusted-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+.bhu-trusted span {
+    font-size: .76rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-weight: 600;
+}
+.bhu-trusted .sep {
+    width: 1px; height: 24px;
+    background: var(--border);
+}
+
+/* ============================================================
+   VALUE PROPS - Modern corporate cards
+   ============================================================ */
+.bhu-values {
+    padding: 100px 48px;
+    background: #fff;
+}
+.bhu-values-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+.bhu-values-img-wrap {
+    position: relative;
+}
+.bhu-values-img-wrap img {
+    width: 100%;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+}
+.bhu-values-img-wrap::before {
+    content: '';
+    position: absolute;
+    top: 24px; left: 24px;
+    width: 100%; height: 100%;
+    border: 2px solid var(--accent);
+    border-radius: var(--r-lg);
+    z-index: -1;
+    opacity: .4;
+}
+.bhu-values-content h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.015em;
+    margin-bottom: 18px;
+    color: var(--text);
+}
+.bhu-values-content > p {
+    color: var(--text-2);
+    margin-bottom: 32px;
+    font-size: 1.02rem;
+    line-height: 1.7;
+}
+.bhu-vp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+.bhu-vp-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px;
+    background: var(--bg-soft);
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    transition: all .25s;
+}
+.bhu-vp-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--accent);
+}
+.bhu-vp-item .vp-ico {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+.bhu-vp-item h4 {
+    font-size: .94rem;
+    font-weight: 700;
+    margin: 2px 0 4px;
+    color: var(--text);
+}
+.bhu-vp-item p {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.bhu-sec-head {
+    text-align: center;
+    margin-bottom: 64px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.bhu-sec-head .tag {
+    display: inline-block;
+    font-size: .76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    padding: 6px 16px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.bhu-sec-head h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.018em;
+    margin-bottom: 14px;
+    color: var(--text);
+}
+.bhu-sec-head p {
+    font-size: 1.02rem;
+    color: var(--text-2);
+    line-height: 1.7;
+}
+
+/* dark variant */
+.dark .bhu-sec-head .tag { background: rgba(255,107,26,.15); color: #FFB088; }
+.dark .bhu-sec-head h2   { color: #fff; }
+.dark .bhu-sec-head p    { color: rgba(255,255,255,.65); }
+
+/* ============================================================
+   FEATURES — dark section with elegant cards
+   ============================================================ */
+.bhu-features {
+    background: var(--bg-dark);
+    padding: 100px 48px;
+    position: relative;
+    overflow: hidden;
+}
+.bhu-features::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255,107,26,.10), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(255,184,0,.05), transparent 40%);
+}
+.bhu-features-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+.bhu-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.bhu-feature {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--r-lg);
+    padding: 36px 32px;
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+}
+.bhu-feature::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,107,26,.08));
+    opacity: 0;
+    transition: opacity .3s;
+}
+.bhu-feature:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255,107,26,.4);
+    background: rgba(255,255,255,.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.bhu-feature:hover::before { opacity: 1; }
+.bhu-feature > * { position: relative; z-index: 1; }
+
+.bhu-feature .ico {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,107,26,.2), rgba(255,107,26,.05));
+    border: 1px solid rgba(255,107,26,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    color: #FF9352;
+    font-size: 1.4rem;
+}
+.bhu-feature h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 10px 0;
+}
+.bhu-feature p {
+    font-size: .87rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,.62);
+    margin: 0;
+}
+.bhu-feature .arrow {
+    color: var(--accent);
+    font-size: .85rem;
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    opacity: .8;
+    transition: opacity .25s, gap .25s;
+}
+.bhu-feature:hover .arrow { opacity: 1; gap: 10px; }
+
+/* ============================================================
+   WHY CHOOSE — image cards with overlay
+   ============================================================ */
+.bhu-why {
+    padding: 100px 48px;
+    background: var(--bg-soft);
+}
+.bhu-why-inner { max-width: 1240px; margin: 0 auto; }
+.bhu-why-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+.bhu-why-card {
+    background: #fff;
+    border-radius: var(--r-lg);
+    padding: 36px 28px;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+}
+.bhu-why-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s;
+}
+.bhu-why-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+}
+.bhu-why-card:hover::after { transform: scaleX(1); }
+
+.bhu-why-card .wi-img {
+    width: 96px; height: 96px;
+    object-fit: contain;
+    margin: 0 auto 20px;
+}
+.bhu-why-card h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 10px 0;
+}
+.bhu-why-card p {
+    font-size: .85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+    font-style: italic;
+}
+
+/* ============================================================
+   INSIGHTS - feature spotlight
+   ============================================================ */
+.bhu-insights {
+    padding: 100px 48px;
+    background: linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
+}
+.bhu-insights-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 80px;
+    align-items: center;
+}
+.bhu-insights-content .tag {
+    display: inline-block;
+    font-size: .76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    padding: 6px 16px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.bhu-insights-content h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.015em;
+    color: var(--text);
+    margin: 0 0 20px 0;
+}
+.bhu-insights-list { display: flex; flex-direction: column; gap: 22px; margin-top: 30px; }
+.bhu-insights-list .item {
+    display: flex;
+    gap: 18px;
+    padding: 20px;
+    background: #fff;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    transition: all .25s;
+}
+.bhu-insights-list .item:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    transform: translateX(4px);
+}
+.bhu-insights-list .item .ico {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+.bhu-insights-list .item strong {
+    font-size: .98rem;
+    color: var(--text);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+.bhu-insights-list .item p {
+    font-size: .87rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.bhu-insights-visual {
+    position: relative !important;
+    overflow: visible;
+}
+.bhu-insights-visual img {
+    width: 100%;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+}
+.bhu-insights-stat-card {
+    position: absolute;
+    bottom: -30px;
+    left: -30px;
+    background: #fff;
+    padding: 18px 22px;
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+.bhu-insights-stat-card .ico {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(16,185,129,.1);
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+.bhu-insights-stat-card .num {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+.bhu-insights-stat-card .lbl {
+    font-size: .76rem;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+/* ============================================================
+   HOW IT WORKS — timeline
+   ============================================================ */
+.bhu-how {
+    padding: 100px 48px;
+    background: #fff;
+}
+.bhu-how-inner { max-width: 1240px; margin: 0 auto; }
+
+.bhu-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+    gap: 16px;
+    margin-top: 32px;
+}
+.bhu-steps::before {
+    content: '';
+    position: absolute;
+    top: 32px;
+    left: 10%; right: 10%;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 16px);
+    z-index: 0;
+}
+.bhu-step {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 0 8px;
+}
+.bhu-step-num {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    border: 2px solid var(--border);
+    transition: all .3s;
+    position: relative;
+}
+.bhu-step:hover .bhu-step-num {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 12px 28px rgba(255,107,26,.4);
+    transform: scale(1.08);
+}
+.bhu-step h4 {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+.bhu-step p {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* ============================================================
+   CTA Banner
+   ============================================================ */
+.bhu-cta {
+    padding: 80px 48px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--bg-dark) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.bhu-cta::before, .bhu-cta::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+}
+.bhu-cta::before {
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,107,26,.2), transparent 70%);
+}
+.bhu-cta::after {
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,184,0,.08), transparent 70%);
+}
+.bhu-cta-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+.bhu-cta h2 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -.015em;
+}
+.bhu-cta p {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,.75);
+    margin: 0 auto 36px;
+    max-width: 600px;
+}
+.bhu-cta .bhu-btn.primary {
+    box-shadow: 0 12px 30px rgba(255,107,26,.5);
+}
+
+/* ============================================================
+   STATS
+   ============================================================ */
+.bhu-stats {
+    padding: 80px 48px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+.bhu-stats-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+}
+.bhu-stat-item {
+    text-align: center;
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+}
+.bhu-stat-item:last-child { border-right: none; }
+.bhu-stat-item h3 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0 0 8px 0;
+    letter-spacing: -.03em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.bhu-stat-item p {
+    font-size: .88rem;
+    color: var(--muted);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.bhu-footer {
+    background: var(--bg-dark);
+    color: rgba(255,255,255,.7);
+    padding: 80px 48px 32px;
+}
+.bhu-footer-inner { max-width: 1240px; margin: 0 auto; }
+.bhu-footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.3fr;
+    gap: 56px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.bhu-footer-brand .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.bhu-footer-brand .logo-wrap img {
+    height: 40px; width: 40px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: rgba(255,255,255,.1);
+    padding: 4px;
+}
+.bhu-footer-brand .logo-wrap .ft-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .04em;
+}
+.bhu-footer-brand p {
+    font-size: .87rem;
+    line-height: 1.75;
+    color: rgba(255,255,255,.55);
+    max-width: 340px;
+    margin: 0 0 20px 0;
+}
+.bhu-social {
+    display: flex; gap: 10px;
+}
+.bhu-social a {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,.7) !important;
+    transition: all .2s;
+}
+.bhu-social a:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff !important;
+    transform: translateY(-2px);
+}
+
+.bhu-footer-col h5 {
+    font-size: .82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #fff;
+    margin: 0 0 22px 0;
+}
+.bhu-footer-col ul li { margin-bottom: 12px; }
+.bhu-footer-col ul li a {
+    color: rgba(255,255,255,.55) !important;
+    font-size: .88rem;
+    transition: color .2s;
+}
+.bhu-footer-col ul li a:hover { color: #fff !important; }
+
+.bhu-footer-col .contact-li {
+    display: flex; gap: 10px; align-items: flex-start;
+    color: rgba(255,255,255,.55);
+    font-size: .87rem;
+    margin-bottom: 14px;
+    line-height: 1.55;
+}
+.bhu-footer-col .contact-li i {
+    color: var(--accent);
+    margin-top: 4px;
+    width: 14px;
+    flex-shrink: 0;
+}
+
+.bhu-footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    font-size: .82rem;
+    color: rgba(255,255,255,.4);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.bhu-footer-bottom a {
+    color: rgba(255,255,255,.55) !important;
+    margin-left: 18px;
+}
+.bhu-footer-bottom a:hover { color: #fff !important; }
+
+/* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+.bhu-contact-hero {
+    background: linear-gradient(135deg, var(--primary), var(--bg-dark));
+    padding: 100px 48px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.bhu-contact-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 100%, rgba(255,107,26,.2), transparent 60%);
+}
+.bhu-contact-hero > * { position: relative; z-index: 1; }
+.bhu-contact-hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,.1);
+    color: rgba(255,255,255,.85);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: .76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.15);
+}
+.bhu-contact-hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+    letter-spacing: -.02em;
+}
+.bhu-contact-hero p {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,.75);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+.bhu-contact-body {
+    padding: 80px 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 64px;
+}
+.bhu-contact-info h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+.bhu-contact-info > p {
+    color: var(--muted);
+    margin: 0 0 32px 0;
+    font-size: .94rem;
+}
+.bhu-contact-info-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    align-items: flex-start;
+    padding: 18px;
+    background: var(--bg-soft);
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    transition: all .25s;
+}
+.bhu-contact-info-item:hover {
+    background: #fff;
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.bhu-ci-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+.bhu-ci-text span {
+    display: block;
+    font-size: .76rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+.bhu-ci-text strong {
+    font-size: .92rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.bhu-contact-form {
+    background: #fff;
+    border-radius: var(--r-lg);
+    padding: 44px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+.bhu-contact-form h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+.bhu-contact-form > p {
+    color: var(--muted);
+    font-size: .92rem;
+    margin: 0 0 28px 0;
+}
+.bhu-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+.bhu-form-group { margin-bottom: 20px; }
+.bhu-form-group label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+.bhu-form-group input,
+.bhu-form-group textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: .92rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    transition: all .2s;
+    outline: none;
+}
+.bhu-form-group input:focus,
+.bhu-form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255,107,26,.10);
+}
+.bhu-form-group textarea { resize: vertical; min-height: 130px; }
+
+.bhu-btn-submit {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    border: none;
+    padding: 15px 36px;
+    border-radius: 12px;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 0 8px 22px rgba(255,107,26,.32);
+}
+.bhu-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(255,107,26,.42);
+}
+
+/* ============================================================
+   THANKS PAGE
+   ============================================================ */
+.bhu-thanks {
+    min-height: 64vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--bg-soft);
+}
+.bhu-thanks-icon {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    font-size: 2.4rem;
+    color: #fff;
+    box-shadow: 0 16px 40px rgba(16,185,129,.3);
+}
+.bhu-thanks h2 {
+    font-size: 2.2rem; font-weight: 800; color: var(--text);
+    margin: 0 0 14px 0; letter-spacing: -.015em;
+}
+.bhu-thanks p {
+    font-size: 1rem; color: var(--muted); margin: 0 0 32px 0;
+    max-width: 460px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1100px) {
+    .bhu-navbar       { padding: 0 32px; }
+    .bhu-hero         { padding: 60px 32px 80px; }
+    .bhu-hero-inner   { gap: 48px; }
+    .bhu-values, .bhu-features, .bhu-why, .bhu-insights, .bhu-how,
+    .bhu-cta, .bhu-stats, .bhu-footer, .bhu-contact-hero, .bhu-contact-body {
+        padding-left: 32px; padding-right: 32px;
+    }
+}
+
+@media (max-width: 900px) {
+    .bhu-hero-inner   { grid-template-columns: 1fr; gap: 48px; }
+    .bhu-hero h1      { font-size: 2.5rem; }
+    .bhu-values-inner { grid-template-columns: 1fr; gap: 48px; }
+    .bhu-features-grid{ grid-template-columns: 1fr 1fr; }
+    .bhu-why-grid     { grid-template-columns: 1fr 1fr; }
+    .bhu-insights-inner { grid-template-columns: 1fr; gap: 48px; }
+    .bhu-steps        { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .bhu-steps::before{ display: none; }
+    .bhu-stats-inner  { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .bhu-stat-item:nth-child(2) { border-right: none; }
+    .bhu-footer-top   { grid-template-columns: 1fr 1fr; gap: 36px; }
+    .bhu-contact-body { grid-template-columns: 1fr; padding: 56px 32px; }
+}
+
+@media (max-width: 640px) {
+    .bhu-navbar       { padding: 0 18px; height: 64px; }
+    .bhu-nav-links, .bhu-nav-phone, .bhu-btn-nav.login { display: none !important; }
+    .bhu-logo-text .lt-2 { display: none; }
+    .bhu-hero         { padding: 48px 18px 64px; }
+    .bhu-hero h1      { font-size: 2rem; }
+    .bhu-hero-trust   { gap: 18px; flex-wrap: wrap; }
+    .bhu-vp-grid      { grid-template-columns: 1fr; }
+    .bhu-values, .bhu-features, .bhu-why, .bhu-insights,
+    .bhu-how, .bhu-cta, .bhu-stats, .bhu-footer { padding: 64px 18px; }
+    .bhu-features-grid, .bhu-why-grid { grid-template-columns: 1fr; }
+    .bhu-steps        { grid-template-columns: 1fr; }
+    .bhu-stats-inner  { grid-template-columns: 1fr; }
+    .bhu-stat-item    { border-right: none; border-bottom: 1px solid var(--border); }
+    .bhu-stat-item:last-child { border-bottom: none; }
+    .bhu-footer-top   { grid-template-columns: 1fr; }
+    .bhu-form-row     { grid-template-columns: 1fr; }
+    .bhu-contact-form { padding: 28px; }
+    .bhu-contact-hero h1 { font-size: 2.2rem; }
+    .bhu-sec-head h2  { font-size: 2rem; }
+}
+
+/* ============================================================
+   FEATURES PAGE
+   ============================================================ */
+.bhu-features-hero {
+    padding: 96px 32px 40px;
+    text-align: center;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.bhu-features-hero .tag {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--brand);
+    background: rgba(27, 85, 133, 0.1);
+}
+
+.bhu-features-hero h1 {
+    margin: 18px auto 14px;
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    max-width: 760px;
+    color: var(--heading);
+}
+
+.bhu-features-hero p {
+    margin: 0 auto;
+    max-width: 760px;
+    color: var(--text);
+}
+
+.bhu-features-grid-wrap,
+.bhu-pdf-shots {
+    padding: 28px 32px 84px;
+}
+
+.bhu-features-grid,
+.bhu-pdf-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.bhu-feature-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+.bhu-feature-card h3 {
+    font-size: 1.1rem;
+    margin: 0 0 10px;
+    color: var(--heading);
+}
+
+.bhu-feature-card p {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.65;
+}
+
+.bhu-pdf-shots {
+    background: #f6f9fd;
+}
+
+.bhu-pdf-head {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+}
+
+.bhu-pdf-head h2 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    color: var(--heading);
+}
+
+.bhu-pdf-head p {
+    margin: 0;
+    color: var(--text);
+}
+
+.bhu-pdf-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 14px 42px rgba(15, 23, 42, 0.12);
+}
+
+.bhu-pdf-card img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+}
+
+.bhu-pdf-card .meta {
+    padding: 16px 18px 18px;
+}
+
+.bhu-pdf-card h4 {
+    margin: 0 0 8px;
+    color: var(--heading);
+    font-size: 1rem;
+}
+
+.bhu-pdf-card p {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.92rem;
+}
+
+@media (max-width: 1024px) {
+    .bhu-features-grid,
+    .bhu-pdf-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .bhu-features-hero,
+    .bhu-features-grid-wrap,
+    .bhu-pdf-shots {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .bhu-features-grid,
+    .bhu-pdf-grid {
+        grid-template-columns: 1fr;
+    }
+}

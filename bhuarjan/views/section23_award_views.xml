@@ -97,9 +97,9 @@
                                     </div>
                                 </div>
                                 <div class="s23_meta_item">
-                                    <div class="s23_meta_label">विगत तीन वर्षों का औसत बिक्री छांट दर</div>
+                                    <div class="s23_meta_label">विगत तीन वर्षों का औसत बिक्री छांट दर <span class="text-danger">*</span></div>
                                     <div class="s23_meta_value">
-                                        <field name="avg_three_year_sales_sort_rate" readonly="1"/>
+                                        <field name="avg_three_year_sales_sort_rate" readonly="state != 'draft'" required="1"/>
                                     </div>
                                 </div>
                                 <div class="s23_meta_item">
@@ -281,6 +281,20 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
+                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                            <field name="tree_khasra_filter" nolabel="1"
+                                   placeholder="Search by khasra to edit tree details..."
+                                   style="max-width:320px;"/>
+                            <button name="action_apply_tree_khasra_search" type="object"
+                                    string="Search Tree" icon="fa-search"
+                                    class="btn btn-sm s23_btn_brown"
+                                    title="Open popup to edit/add/remove trees for matching khasra"/>
+                            <button name="action_clear_tree_khasra_filter" type="object"
+                                    string="Show All" icon="fa-times"
+                                    class="btn btn-sm btn-secondary"
+                                    title="Clear tree search filter"
+                                    invisible="not tree_khasra_filter"/>
+                        </div>
                         <field name="s23_tree_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #f1f9f4); border-left-color: #2f6d4f;">
                             <span class="total_label_large">Tree Subtotal</span>

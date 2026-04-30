@@ -477,6 +477,8 @@ export class UnifiedDashboard extends Component {
         });
 
         onMounted(() => {
+            console.log('🎯 DASHBOARD COMPONENT MOUNTED!');
+            console.log('this.el:', this.el);
             this._applySectionActivityHighlights();
         });
 

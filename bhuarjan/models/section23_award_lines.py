@@ -159,6 +159,20 @@ class Section23AwardSurveyLine(models.Model):
             'context': {'default_survey_line_id': self.id},
         }
 
+    def action_open_survey_for_tree_edit(self):
+        """Open popup wizard to edit tree rows for this khasra's survey."""
+        self.ensure_one()
+        if not self.survey_id:
+            raise ValidationError(_('No survey linked on this line.'))
+        return {
+            'name': _('Edit tree inputs / वृक्ष इनपुट संपादित करें'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhu.s23.tree.edit.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_survey_line_id': self.id},
+        }
+
     @api.onchange('land_type', 'is_within_distance')
     def _onchange_type_distance(self):
         """Sync type and distance to survey model and trigger rate recompute"""

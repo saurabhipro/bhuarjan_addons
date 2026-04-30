@@ -44,7 +44,7 @@ class Section23AwardExcel(models.Model):
         cell_center_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
         yes_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#2e7d32', 'color': 'white', 'bold': True})
         no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
-        number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.000'})
+        number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.0000'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
         asset_type_default_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
         asset_type_cell_formats = {
@@ -63,6 +63,7 @@ class Section23AwardExcel(models.Model):
         asset_type_pukka_default = workbook.add_format({'border': 1, 'valign': 'top'})
         total_label_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'center', 'valign': 'vcenter'})
         total_money_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'right', 'num_format': '#,##0'})
+        total_number_fmt = workbook.add_format({'bold': True, 'border': 1, 'bg_color': '#e2e8f0', 'align': 'right', 'num_format': '#,##0.0000'})
         blank_msg_fmt = workbook.add_format({'italic': True, 'border': 1, 'align': 'center', 'valign': 'vcenter'})
 
         def _setup_sheet(sheet, col_widths, repeat_to_row):
@@ -191,9 +192,9 @@ class Section23AwardExcel(models.Model):
                         row += 1
 
                     land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
-                    land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_number_fmt)
                     land_sheet.write_number(row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                    land_sheet.write_number(row, 5, float(group.get('acquired_area', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 5, float(group.get('acquired_area', 0.0) or 0.0), total_number_fmt)
                     land_sheet.write_blank(row, 6, None, total_label_fmt)
                     land_sheet.write_blank(row, 7, None, total_label_fmt)
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
@@ -218,7 +219,7 @@ class Section23AwardExcel(models.Model):
 
                 land_sheet.merge_range(row, 0, row, 3, 'MAHAYOG (TOTAL) / महायोग', total_label_fmt)
                 land_sheet.write_blank(row, 4, None, total_label_fmt)
-                land_sheet.write_number(row, 5, total_acq, total_money_fmt)
+                land_sheet.write_number(row, 5, total_acq, total_number_fmt)
                 land_sheet.write_blank(row, 6, None, total_label_fmt)
                 land_sheet.write_blank(row, 7, None, total_label_fmt)
                 land_sheet.write_blank(row, 8, None, total_label_fmt)

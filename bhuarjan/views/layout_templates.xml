@@ -2,13 +2,13 @@
 <odoo>
     <template id="bhuarjan_backend_footer" inherit_id="web.layout" name="Bhuarjan Backend Footer">
         <xpath expr="//body" position="inside">
-            <div class="bhuarjan-footer bg-primary text-white" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 1000; padding: 0 24px; font-family: 'Inter', sans-serif; font-size: 13px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="bhuarjan-footer bg-primary text-white" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 1000; padding: 0 24px; font-family: 'Inter', sans-serif; font-size: 13px; display: none; align-items: center; justify-content: space-between; overflow: hidden; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); border-top: 1px solid rgba(255,255,255,0.1);">
                 <div style="display: flex; align-items: center;">
-                    <span style="opacity: 0.9;">Developed and maintained by </span>
-                    <a href="https://www.redmelon.co.in" target="_blank" class="text-white text-decoration-none mx-1" style="font-weight: 700;">
+                    <span style="opacity: 0.9;">Developed and maintained by&#160;</span>
+                    <a href="https://www.redmelon.co.in" target="_blank" class="text-white text-decoration-none" style="font-weight: 700; margin: 0 4px;">
                         Redmelon
                     </a>
-                    <span style="opacity: 0.9;"> as a technical service provider.</span>
+                    <span style="opacity: 0.9;">&#160;as a technical service provider.</span>
                 </div>
                 <div>
                     <a href="mailto:info@redmelon.co.in" class="text-white text-decoration-none mx-2 link-hover" style="transition: all 0.2s; opacity: 0.9;">
@@ -32,14 +32,15 @@
                 </style>
             </div>
             <style>
-                /* Restrict the main Odoo client height so it stops BEFORE the thin footer */
-                .o_web_client {
+                body.o_web_client .bhuarjan-footer {
+                    display: flex !important;
+                }
+                body.o_web_client {
                     height: calc(100% - 40px) !important;
                     min-height: calc(100% - 40px) !important;
-                    overflow: hidden; /* Ensure it doesn't spill out */
+                    overflow: hidden;
                 }
-                
-                /* Ensure dialogs still work but don't get covered by footer */
+
                 .o_dialog_container {
                     z-index: 1100 !important;
                 }

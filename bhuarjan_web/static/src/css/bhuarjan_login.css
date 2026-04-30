@@ -1,0 +1,316 @@
+/* ============================================================
+   BHUARJAN — Simple professional login (/web/login)
+   Reference: centred white card on deep navy, minimal chrome.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --login-bg-1: #ffedd8;
+    --login-bg-2: #ffd9b5;
+    --login-accent: #ff7a1a;
+    --login-accent-2: #ff9a3d;
+    --login-text: #1b1f28;
+    --login-muted: #687082;
+    --login-border: #eceff5;
+    --login-surface: #ffffff;
+}
+
+/* ── Page canvas ── */
+body.bhu-login-body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+    background: radial-gradient(circle at 20% 10%, #ffffff99 0%, #ffffff00 40%),
+        linear-gradient(160deg, var(--login-bg-1) 0%, var(--login-bg-2) 100%) !important;
+}
+
+body.bhu-login-body #wrapwrap {
+    min-height: 100vh !important;
+    background: transparent !important;
+}
+
+body.bhu-login-body #wrapwrap > header {
+    display: none !important;
+}
+
+body.bhu-login-body #wrapwrap > footer {
+    display: none !important;
+}
+
+body.bhu-login-body main {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    padding: 32px 20px !important;
+    margin: 0 !important;
+}
+
+body.bhu-login-body main > .container,
+body.bhu-login-body .container.py-5 {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+body.bhu-login-body .o_database_list,
+body.bhu-login-body .card {
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-radius: 14px !important;
+    background: var(--login-surface) !important;
+    box-shadow: 0 12px 38px rgba(16, 24, 40, 0.16) !important;
+    overflow: hidden !important;
+}
+
+body.bhu-login-body .card-body {
+    padding: 26px 24px 18px !important;
+}
+
+body.bhu-login-body .card-body > div.text-center.pb-3.border-bottom {
+    display: none !important;
+}
+
+/* Keep only our standalone root in login card */
+body.bhu-login-body .card-body > :not(#bhu-login-root) {
+    display: none !important;
+}
+
+body.bhu-login-body #bhu-login-root > :not(.bhu-login-head):not(.oe_login_form):not(.o_login_redirect_back):not(.bhu-login-visual):not(.bhu-login-logos) {
+    display: none !important;
+}
+
+body.bhu-login-body #bhu-login-root > .bhu-login-logos {
+    display: flex !important;
+}
+
+body.bhu-login-body .bhu-login-logos {
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 2px 8px 14px;
+}
+
+body.bhu-login-body .bhu-login-logos img {
+    display: block;
+    object-fit: cover;
+    background: #fff;
+    border-radius: 50%;
+    border: 2px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+}
+
+body.bhu-login-body .bhu-login-logos .bhu-logo-left {
+    height: 78px;
+    width: 78px;
+    max-width: none;
+}
+
+body.bhu-login-body .bhu-login-logos .bhu-logo-right {
+    height: 78px;
+    width: 78px;
+}
+
+body.bhu-login-body .bhu-login-logos .bhu-logo-divider {
+    width: 1px;
+    height: 46px;
+    background: rgba(15, 23, 42, 0.15);
+}
+
+body.bhu-login-body .bhu-login-visual,
+body.bhu-login-body .bhu-login-visual-overlay {
+    display: none !important;
+}
+
+body.bhu-login-body .bhu-login-visual {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: -4px 0 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #132540;
+}
+
+body.bhu-login-body .bhu-login-visual img {
+    display: block;
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(1.06) contrast(1.02);
+}
+
+body.bhu-login-body .bhu-login-visual-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    background: linear-gradient(180deg, rgba(10, 20, 40, 0) 0%, rgba(10, 20, 40, 0.86) 82%);
+    padding: 28px 12px 10px;
+    color: #fff;
+}
+
+body.bhu-login-body .bhu-login-visual-overlay strong {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+body.bhu-login-body .bhu-login-visual-overlay span {
+    display: block;
+    font-size: 0.68rem;
+    opacity: 0.92;
+    margin-top: 3px;
+}
+
+body.bhu-login-body #bhu-login-root .oe_login_form ~ *:not(.o_login_redirect_back) {
+    display: none !important;
+}
+
+body.bhu-login-body .bhu-login-head {
+    margin-bottom: 14px !important;
+}
+
+body.bhu-login-body .bhu-login-head h1 {
+    margin: 0 0 6px !important;
+    color: var(--login-text) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+}
+
+body.bhu-login-body .bhu-login-head p {
+    margin: 0 !important;
+    color: var(--login-muted) !important;
+    font-size: 0.9rem !important;
+}
+
+body.bhu-login-body form.oe_login_form,
+body.bhu-login-body form[role="form"] {
+    background: transparent !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 8px 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+}
+
+body.bhu-login-body form .mb-3 {
+    margin-bottom: 12px !important;
+}
+
+body.bhu-login-body form label,
+body.bhu-login-body form .form-label {
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: var(--login-text) !important;
+    margin-bottom: 7px !important;
+}
+
+body.bhu-login-body form .form-control,
+body.bhu-login-body form input.form-control {
+    display: block !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--login-border) !important;
+    padding: 10px 12px !important;
+    font-size: 0.9rem !important;
+    background: #f6f7fb !important;
+}
+
+body.bhu-login-body form .form-control:focus {
+    border-color: var(--login-accent) !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.12) !important;
+    background: #fff !important;
+    outline: none !important;
+}
+
+body.bhu-login-body .btn-primary,
+body.bhu-login-body button[type="submit"].btn-primary {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    border-radius: 8px !important;
+    border: none !important;
+    background: linear-gradient(135deg, var(--login-accent) 0%, var(--login-accent-2) 100%) !important;
+    box-shadow: 0 8px 18px rgba(255, 122, 26, 0.32) !important;
+    margin-top: 2px !important;
+}
+
+body.bhu-login-body .btn-primary:hover,
+body.bhu-login-body button[type="submit"].btn-primary:hover {
+    filter: brightness(1.05) !important;
+    transform: translateY(-1px);
+}
+
+body.bhu-login-body .oe_login_buttons {
+    padding-top: 4px !important;
+}
+
+body.bhu-login-body .o_login_auth {
+    display: none !important;
+}
+
+/* Some third-party addons inject extra forms on /web/login; hide them */
+body.bhu-login-body main form:not([role="form"]) {
+    display: none !important;
+}
+
+/* Keep only the primary login form and back link visible */
+body.bhu-login-body input[placeholder*="Search"],
+body.bhu-login-body input[placeholder*="search"],
+body.bhu-login-body .o_searchbar_form,
+body.bhu-login-body .s_searchbar_input,
+body.bhu-login-body .o_wsale_products_searchbar_form,
+body.bhu-login-body .container.py-5 > .card:not(:first-child) {
+    display: none !important;
+}
+
+body.bhu-login-body form .btn-link {
+    font-size: 0.82rem !important;
+}
+
+body.bhu-login-body .alert {
+    border-radius: 10px !important;
+    font-size: 0.86rem !important;
+}
+
+body.bhu-login-body .card-body > div.border-top.small.mt-4 {
+    display: none !important;
+}
+
+body.bhu-login-body .card-body > div.border-top.small.mt-4 a[href*="odoo.com"],
+body.bhu-login-body .card-body > div.border-top.small.mt-4 span {
+    display: none !important;
+}
+
+body.bhu-login-body .card-body > div.border-top.small.mt-4 a {
+    font-size: 0.78rem !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+body.bhu-login-body .o_login_redirect_back {
+    text-align: center !important;
+    margin-top: 22px !important;
+}
+
+body.bhu-login-body .o_login_redirect_back a {
+    color: #8a4f20 !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+body.bhu-login-body .o_login_redirect_back a:hover {
+    color: #6e3f1a !important;
+    text-decoration: underline !important;
+}
+
+body.bhu-login-body .o_skip_to_content {
+    display: none !important;
+}

@@ -36,6 +36,7 @@ from . import section23_award
 from . import section23_award_data
 from . import section23_award_excel
 from . import section23_award_consolidated
+from . import section23_award_rr
 from . import section23_award_lines
 from . import draft_award
 from . import process_report_pdf_download

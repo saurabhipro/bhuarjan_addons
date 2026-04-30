@@ -18,23 +18,6 @@ class GoogleFontFamily(models.Model):
     active = fields.Boolean(default=True)
 
 
-class BackendConfigCompatibility(models.Model):
-    """Adds missing fields referenced by third-party backend theme views."""
-    _inherit = 'backend.config'
-
-    google_font_family = fields.Many2one(
-        'google.font.family',
-        string='Google Font Family',
-    )
-    google_font_links_ids = fields.Many2many(
-        'google.font.family',
-        'backend_config_google_font_family_rel',
-        'config_id',
-        'font_id',
-        string='Google Font Links',
-    )
-
-
 class KpiProviderCompatibility(models.AbstractModel):
     """Placeholder to avoid stale model-registry warnings."""
     _name = 'kpi.provider'

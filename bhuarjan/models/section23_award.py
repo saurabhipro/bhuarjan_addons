@@ -114,6 +114,7 @@ class Section23Award(models.Model):
                                             help='Select type and distance for each approved survey')
     # Khasra search filter — stored so value persists across reloads
     khasra_filter = fields.Char(string='Search Khasra', default='')
+    tree_khasra_filter = fields.Char(string='Search Tree Khasra', default='')
     award_line_item_ids = fields.One2many(
         'bhu.section23.award.line.item',
         'award_id',
@@ -590,6 +591,20 @@ class Section23Award(models.Model):
             'target': 'current',
         }
 
+    def action_clear_tree_khasra_filter(self):
+        """Clear the tree khasra filter and reload."""
+        self.ensure_one()
+        self.tree_khasra_filter = ''
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     def action_refresh_land_lines_debug(self):
         """[DEBUG] Manually refresh land lines from surveys. Logs details to server console."""
         self.ensure_one()
@@ -654,6 +669,63 @@ class Section23Award(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': f'Khasra Search: {term}',
+            'res_model': 'bhu.section23.award.survey.line',
+            'view_mode': 'list',
+            'views': [(tree_view, 'list')],
+            'domain': [('id', 'in', matches.ids)],
+            'target': 'new',
+            'context': {
+                'default_award_id': self.id,
+                'create': False,
+                'edit': False,
+            },
+        }
+
+    def action_apply_tree_khasra_search(self):
+        """Search khasra and open popup tree editor for matching survey line(s)."""
+        self.ensure_one()
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
+        term = (self.tree_khasra_filter or '').strip()
+        if not term:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': 'Enter a khasra value before searching tree lines.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        matches = self.award_survey_line_ids.filtered(
+            lambda l, t=term.lower(): t in (l.khasra_number or '').lower()
+        )
+        if not matches:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': f'No khasra matched "{term}".',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        if len(matches) == 1:
+            return matches.action_open_survey_for_tree_edit()
+
+        tree_view = False
+        try:
+            tree_view = self.env.ref('bhuarjan.view_section23_award_survey_line_tree').id
+        except Exception:
+            tree_view = False
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Tree Khasra Search: {term}',
             'res_model': 'bhu.section23.award.survey.line',
             'view_mode': 'list',
             'views': [(tree_view, 'list')],
@@ -992,8 +1064,7 @@ class Section23Award(models.Model):
     def _validate_for_generate(self, require_sales_sort_rate=True):
         """Pre-checks for opening/running generate flow.
 
-        ``require_sales_sort_rate`` should be False when only opening the popup,
-        because the value is entered in that wizard.
+        ``require_sales_sort_rate`` keeps the generator strict on rate entry.
         """
         self.ensure_one()
         # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
@@ -1048,7 +1119,7 @@ class Section23Award(models.Model):
     def action_generate_award(self):
         """Open the same download wizard as Award Simulator; confirm runs generate (PDF/Excel)."""
         self.ensure_one()
-        self._validate_for_generate(require_sales_sort_rate=False)
+        self._validate_for_generate(require_sales_sort_rate=True)
         report_action = self._get_section23_report_action()
         xmlid = report_action.get_external_id().get(
             report_action.id, 'bhuarjan.action_report_section23_award'
@@ -1070,7 +1141,7 @@ class Section23Award(models.Model):
             },
         }
 
-    def apply_generate_from_download_wizard(self, file_format, export_scope='all', include_cover_letter=False):
+    def apply_generate_from_download_wizard(self, file_format, export_scope='all', include_cover_letter=False, generate_variant='standard'):
         """Called from bhu.award.download.wizard when Section 23 generate is confirmed."""
         self.ensure_one()
         import base64
@@ -1079,6 +1150,24 @@ class Section23Award(models.Model):
         self._validate_for_generate(require_sales_sort_rate=True)
         self._sync_award_structure_lines()
         self._refresh_award_line_items()
+
+        variant = generate_variant or 'standard'
+        if variant not in ('standard', 'consolidated', 'rr'):
+            variant = 'standard'
+
+        if variant == 'consolidated':
+            self.write({'is_generated': True, 'state': 'approved'})
+            self.message_post(body=_("Consolidated award generated and auto-approved. / समेकित अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
+            if file_format == 'excel':
+                return self.action_download_consolidated_excel()
+            return self.action_download_consolidated_pdf()
+
+        if variant == 'rr':
+            self.write({'is_generated': True, 'state': 'approved'})
+            self.message_post(body=_("R&R award generated and auto-approved. / पुनर्वास अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
+            if file_format == 'excel':
+                return self.action_download_rr_excel()
+            return self.action_download_rr_pdf()
 
         if file_format == 'excel':
             self.write({'is_generated': True, 'state': 'approved'})

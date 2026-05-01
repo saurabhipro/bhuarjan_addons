@@ -102,6 +102,17 @@ class AwardDownloadWizard(models.TransientModel):
         if self.simple_download_dialog and self.res_model == 'bhu.section23.award':
             if not hasattr(record, 'action_download_cached_award_file'):
                 raise UserError(_('This record does not support cached downloads.'))
+            # If requested file is missing in DB cache, auto-prepare both PDF+Excel first.
+            cache_exists = False
+            if hasattr(record, '_s23_get_cached_attachment'):
+                cache_exists = bool(record._s23_get_cached_attachment(scope, variant, self.format))
+            if not cache_exists:
+                if variant == 'standard' and hasattr(record, '_s23_prepare_standard_scope_cache'):
+                    record._s23_prepare_standard_scope_cache(export_scope=scope)
+                elif hasattr(record, '_s23_prepare_variant_cache'):
+                    record._s23_prepare_variant_cache(variant=variant, export_scope=scope)
+                    if hasattr(record, '_mark_variant_generated') and variant in ('consolidated', 'rr'):
+                        record._mark_variant_generated(variant=variant)
             download_action = record.action_download_cached_award_file(
                 export_scope=scope,
                 file_format=self.format,

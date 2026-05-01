@@ -298,16 +298,16 @@
                                     </div>
                                     
                                     <!-- Action Buttons -->
-                                    <div class="d-flex" invisible="state != 'submitted'" style="margin-top: 15px;">
+                                    <div class="d-flex flex-wrap gap-2" invisible="state != 'submitted'" style="margin-top: 15px;">
                                         <button name="action_approve" string="Approve / स्वीकृत करें" type="object" 
-                                                class="btn custom-btn-success flex-fill" 
+                                                class="btn custom-btn-success" 
                                                 icon="fa-check"
                                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                                 invisible="not collector_signed_file"
                                                 confirm="Are you sure want to approve this record."/>
                                         
                                         <button name="action_send_back" string="Send Back / वापस भेजें" type="object" 
-                                                class="btn custom-btn-danger flex-fill" 
+                                                class="btn custom-btn-danger" 
                                                 icon="fa-times"
                                                 groups="bhuarjan.group_bhuarjan_collector,bhuarjan.group_bhuarjan_admin"
                                                 confirm="Are you sure want to send back this record."/>

@@ -4,6 +4,7 @@ import json
 import logging
 import base64
 import re
+import time
 from markupsafe import Markup, escape
 
 from odoo import models, fields, api, _
@@ -64,11 +65,13 @@ class Section23Award(models.Model):
     )
     rate_master_main_road_sqm = fields.Monetary(
         string='MR Plot Rate (₹/sqm)', currency_field='currency_id',
-        compute='_compute_village_plot_rates', store=False,
+        default=0.0,
+        tracking=True,
     )
     rate_master_other_road_sqm = fields.Monetary(
         string='BMR Plot Rate (₹/sqm)', currency_field='currency_id',
-        compute='_compute_village_plot_rates', store=False,
+        default=0.0,
+        tracking=True,
     )
 
     # Village type (read-only mirror of village_id.village_type for display)
@@ -121,11 +124,11 @@ class Section23Award(models.Model):
     )
     s23_generation_stage = fields.Selection(
         [
-            ('draft', 'Draft / प्रारूप'),
-            ('land_generated', 'Land Generated / भूमि उत्पन्न'),
-            ('tree_generated', 'Tree Generated / वृक्ष उत्पन्न'),
-            ('asset_generated', 'Asset Generated / परिसम्पत्ति उत्पन्न'),
-            ('all_generated', 'All Generated / पूर्ण उत्पन्न'),
+            ('draft', 'Draft'),
+            ('land_generated', 'Land Generated'),
+            ('tree_generated', 'Tree Generated'),
+            ('asset_generated', 'Asset Generated'),
+            ('all_generated', 'All Generated'),
             ('consolidated_generated', 'Consolidated Generated'),
             ('rr_generated', 'R&R Generated'),
         ],
@@ -281,20 +284,19 @@ class Section23Award(models.Model):
             rm = rec._get_active_rate_master_for_village()
             mr_rate = rm.main_road_rate_hectare if rm else 0.0
             bmr_rate = rm.other_road_rate_hectare if rm else 0.0
+            mr_plot_rate = rm.main_road_rate_sqm if rm else 0.0
+            bmr_plot_rate = rm.other_road_rate_sqm if rm else 0.0
             vals = {}
             if force or not rec.rate_master_main_road_ha:
                 vals['rate_master_main_road_ha'] = mr_rate
             if force or not rec.rate_master_other_road_ha:
                 vals['rate_master_other_road_ha'] = bmr_rate
+            if force or not rec.rate_master_main_road_sqm:
+                vals['rate_master_main_road_sqm'] = mr_plot_rate
+            if force or not rec.rate_master_other_road_sqm:
+                vals['rate_master_other_road_sqm'] = bmr_plot_rate
             if vals:
                 rec.update(vals)
-
-    @api.depends('village_id')
-    def _compute_village_plot_rates(self):
-        for rec in self:
-            rm = rec._get_active_rate_master_for_village()
-            rec.rate_master_main_road_sqm = rm.main_road_rate_sqm      if rm else 0.0
-            rec.rate_master_other_road_sqm = rm.other_road_rate_sqm    if rm else 0.0
 
     @api.depends('project_id', 'project_id.company_id', 'project_id.company_id.currency_id')
     def _compute_s23_premium_currency(self):
@@ -1296,15 +1298,30 @@ class Section23Award(models.Model):
     def _generate_scope_without_download(self, export_scope='all', label=None, allow_regenerate=False):
         """Generate requested scope and update status without opening download UI."""
         self.ensure_one()
+        gen_t0 = time.perf_counter()
+        _logger.warning(
+            "[S23 GENERATE START] award=%s id=%s scope=%s project=%s village=%s",
+            self.name,
+            self.id,
+            export_scope,
+            self.project_id.id if self.project_id else None,
+            self.village_id.id if self.village_id else None,
+        )
         had_consolidated = bool(self.consolidated_generated)
         had_rr = bool(self.rr_generated)
         self._validate_for_generate(
             require_sales_sort_rate=True,
             allow_when_fully_generated=bool(allow_regenerate),
         )
+        t0 = time.perf_counter()
         self._sync_award_structure_lines()
-        self._refresh_award_line_items()
+        t_sync = time.perf_counter() - t0
+        t1 = time.perf_counter()
+        self._refresh_award_line_items(export_scope=export_scope, log_khasra=True)
+        t_refresh = time.perf_counter() - t1
+        t2 = time.perf_counter()
         self._s23_prepare_standard_scope_cache(export_scope=export_scope)
+        t_cache = time.perf_counter() - t2
         # Base section change invalidates consolidated/R&R snapshots.
         removed_count = self._s23_clear_variant_cache(variants=('consolidated', 'rr'))
         self.write({
@@ -1312,6 +1329,11 @@ class Section23Award(models.Model):
             'rr_generated': False,
         })
         self._mark_generated_scope(export_scope=export_scope)
+        total_sec = time.perf_counter() - gen_t0
+        _logger.warning(
+            "[S23 GENERATE] award=%s id=%s scope=%s timings: sync=%.3fs refresh=%.3fs cache=%.3fs total=%.3fs",
+            self.name, self.id, export_scope, t_sync, t_refresh, t_cache, total_sec
+        )
         reset_note = ''
         if had_consolidated or had_rr:
             reset_note = _(
@@ -1648,6 +1670,15 @@ class Section23Award(models.Model):
                 'Please enter both MR Rate and BMR Rate (greater than zero) before generating the award.\n'
                 'अवार्ड जेनरेट करने से पहले MR Rate और BMR Rate दोनों दर्ज करें।'
             ))
+        is_urban_record = bool(self.is_urban or self.village_type == 'urban')
+        if is_urban_record:
+            mr_plot_rate = float(self.rate_master_main_road_sqm or 0.0)
+            bmr_plot_rate = float(self.rate_master_other_road_sqm or 0.0)
+            if mr_plot_rate <= 0.0 or bmr_plot_rate <= 0.0:
+                raise ValidationError(_(
+                    'For Urban award generation, MR Plot Rate and BMR Plot Rate (₹/sqm) must be greater than zero.\n'
+                    'नगरीय अवार्ड जेनरेट करने के लिए MR Plot Rate और BMR Plot Rate (₹/sqm) शून्य से अधिक होना आवश्यक है।'
+                ))
 
     def action_generate_award(self):
         """Generate all section scopes without download prompt."""
@@ -1662,10 +1693,14 @@ class Section23Award(models.Model):
         self.ensure_one()
         import base64
         from datetime import datetime
+        _logger.warning(
+            "[S23 GENERATE WIZARD START] award=%s id=%s scope=%s variant=%s format=%s",
+            self.name, self.id, export_scope, generate_variant, file_format
+        )
 
         self._validate_for_generate(require_sales_sort_rate=True)
         self._sync_award_structure_lines()
-        self._refresh_award_line_items()
+        self._refresh_award_line_items(export_scope=export_scope or 'all', log_khasra=True)
 
         variant = generate_variant or 'standard'
         if variant not in ('standard', 'consolidated', 'rr'):
@@ -1766,55 +1801,94 @@ class Section23Award(models.Model):
         if structure_lines:
             structure_lines.write({'award_id': self.id})
 
-    def _refresh_award_line_items(self):
-        """Persist generated line-items so users can review rows from DB later."""
+    def _refresh_award_line_items(self, export_scope='all', log_khasra=False):
+        """Persist generated line-items so users can review rows from DB later.
+
+        Optimized: for section-wise generation, only refresh requested scope.
+        """
         self.ensure_one()
         self.award_line_item_ids.unlink()
+        scope = (export_scope or 'all').lower()
+        if scope not in ('all', 'land', 'tree', 'asset'):
+            scope = 'all'
+        def _safe_amount(val):
+            try:
+                if val in (None, False, ''):
+                    return 0.0
+                if isinstance(val, str):
+                    val = val.replace(',', '').replace('₹', '').strip()
+                return float(val)
+            except Exception:
+                return 0.0
 
         line_vals = []
-        for row in self.get_land_compensation_data():
-            line_vals.append((0, 0, {
-                'line_type': 'land',
-                'landowner_name': row.get('landowner_name', ''),
-                'khasra_number': row.get('khasra', ''),
-                'original_area': row.get('original_area', 0.0) or 0.0,
-                'acquired_area': row.get('acquired_area', 0.0) or 0.0,
-                'is_within_distance': bool(row.get('is_within_distance')),
-                'irrigated': bool(row.get('irrigated')),
-                'unirrigated': bool(row.get('unirrigated')),
-                'is_diverted': bool(row.get('is_diverted')),
-                'guide_line_rate': row.get('guide_line_rate', 0.0) or 0.0,
-                'basic_value': row.get('basic_value', 0.0) or 0.0,
-                'market_value': row.get('market_value', 0.0) or 0.0,
-                'solatium': row.get('solatium', 0.0) or 0.0,
-                'interest': row.get('interest', 0.0) or 0.0,
-                'total_compensation': row.get('total_compensation', 0.0) or 0.0,
-                'rehab_policy_amount': row.get('rehab_policy_amount', 0.0) or 0.0,
-                'paid_compensation': row.get('paid_compensation', 0.0) or 0.0,
-                'remark': row.get('remark', '') or '',
-            }))
+        if scope in ('all', 'land'):
+            for row in self.get_land_compensation_data():
+                khasra = row.get('khasra', '')
+                if log_khasra:
+                    _logger.warning(
+                        "[S23 GENERATE][LAND] award=%s id=%s khasra=%s owner=%s amount=%.2f",
+                        self.name, self.id, khasra, row.get('landowner_name', ''),
+                        _safe_amount(row.get('total_compensation', 0.0)),
+                    )
+                line_vals.append((0, 0, {
+                    'line_type': 'land',
+                    'landowner_name': row.get('landowner_name', ''),
+                    'khasra_number': khasra,
+                    'original_area': row.get('original_area', 0.0) or 0.0,
+                    'acquired_area': row.get('acquired_area', 0.0) or 0.0,
+                    'is_within_distance': bool(row.get('is_within_distance')),
+                    'irrigated': bool(row.get('irrigated')),
+                    'unirrigated': bool(row.get('unirrigated')),
+                    'is_diverted': bool(row.get('is_diverted')),
+                    'guide_line_rate': row.get('guide_line_rate', 0.0) or 0.0,
+                    'basic_value': row.get('basic_value', 0.0) or 0.0,
+                    'market_value': row.get('market_value', 0.0) or 0.0,
+                    'solatium': row.get('solatium', 0.0) or 0.0,
+                    'interest': row.get('interest', 0.0) or 0.0,
+                    'total_compensation': row.get('total_compensation', 0.0) or 0.0,
+                    'rehab_policy_amount': row.get('rehab_policy_amount', 0.0) or 0.0,
+                    'paid_compensation': row.get('paid_compensation', 0.0) or 0.0,
+                    'remark': row.get('remark', '') or '',
+                }))
 
-        for row in self.get_tree_compensation_data():
-            line_vals.append((0, 0, {
-                'line_type': 'tree',
-                'landowner_name': row.get('landowner_name', ''),
-                'khasra_number': row.get('khasra', ''),
-                'total_compensation': row.get('total', 0.0) or 0.0,
-                'remark': row.get('tree_type', '') or '',
-            }))
+        if scope in ('all', 'tree'):
+            for row in self.get_tree_compensation_data():
+                khasra = row.get('khasra', '')
+                if log_khasra:
+                    _logger.warning(
+                        "[S23 GENERATE][TREE] award=%s id=%s khasra=%s owner=%s amount=%.2f",
+                        self.name, self.id, khasra, row.get('landowner_name', ''),
+                        _safe_amount(row.get('total', 0.0)),
+                    )
+                line_vals.append((0, 0, {
+                    'line_type': 'tree',
+                    'landowner_name': row.get('landowner_name', ''),
+                    'khasra_number': khasra,
+                    'total_compensation': row.get('total', 0.0) or 0.0,
+                    'remark': row.get('tree_type', '') or '',
+                }))
 
-        for row in self.get_structure_compensation_data():
-            line_vals.append((0, 0, {
-                'line_type': 'structure',
-                'landowner_name': row.get('landowner_name', ''),
-                'khasra_number': row.get('asset_khasra', ''),
-                'acquired_area': row.get('total_area', 0.0) or 0.0,
-                'guide_line_rate': row.get('market_value', 0.0) or 0.0,
-                'solatium': row.get('solatium', 0.0) or 0.0,
-                'interest': row.get('interest', 0.0) or 0.0,
-                'total_compensation': row.get('total', 0.0) or 0.0,
-                'remark': row.get('asset_type', '') or '',
-            }))
+        if scope in ('all', 'asset'):
+            for row in self.get_structure_compensation_data():
+                khasra = row.get('asset_khasra', '')
+                if log_khasra:
+                    _logger.warning(
+                        "[S23 GENERATE][ASSET] award=%s id=%s khasra=%s owner=%s amount=%.2f",
+                        self.name, self.id, khasra, row.get('landowner_name', ''),
+                        _safe_amount(row.get('total', 0.0)),
+                    )
+                line_vals.append((0, 0, {
+                    'line_type': 'structure',
+                    'landowner_name': row.get('landowner_name', ''),
+                    'khasra_number': khasra,
+                    'acquired_area': row.get('total_area', 0.0) or 0.0,
+                    'guide_line_rate': row.get('market_value', 0.0) or 0.0,
+                    'solatium': row.get('solatium', 0.0) or 0.0,
+                    'interest': row.get('interest', 0.0) or 0.0,
+                    'total_compensation': row.get('total', 0.0) or 0.0,
+                    'remark': row.get('asset_type', '') or '',
+                }))
 
         if line_vals:
             self.write({'award_line_item_ids': line_vals})

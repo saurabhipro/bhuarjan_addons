@@ -641,7 +641,7 @@ class TreeRateMaster(models.Model):
         ('fully_developed', 'Fully Developed / पूर्ण विकसित')
     ], string='Development Stage / विकास स्तर', required=True, tracking=True)
     stage_icon = fields.Char(
-        string='Icon',
+        string='Stage Icon',
         compute='_compute_stage_icon',
         help='Visual indicator for Sound / Semi Sound / Un Sound stages.',
     )

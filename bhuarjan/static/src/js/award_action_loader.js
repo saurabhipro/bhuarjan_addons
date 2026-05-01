@@ -36,7 +36,7 @@ function _setPopupButtonsDisabled(disabled) {
         '.modal.show .modal-footer button, .o_dialog .modal-footer button, [role="dialog"] .modal-footer button, .modal.show .btn-close, .o_dialog .btn-close, [role="dialog"] .btn-close'
     );
     buttons.forEach((btn) => {
-        if (disabled) {
+        if (disabled) { 
             if (!btn.dataset.bhuPrevDisabled) {
                 btn.dataset.bhuPrevDisabled = btn.disabled ? '1' : '0';
             }
@@ -79,7 +79,85 @@ const HEAVY_ACTIONS = new Set([
     'action_consolidated_report',
 ]);
 
-function _showLoader(label) {
+const PRECHECK_GENERATE_ACTIONS = new Set([
+    'action_generate_award',
+    'action_generate_land_award',
+    'action_generate_tree_award',
+    'action_generate_asset_award',
+    'action_regenerate_land_award',
+    'action_regenerate_tree_award',
+    'action_regenerate_asset_award',
+]);
+
+function _fieldWidget(fieldName) {
+    return document.querySelector(`.o_form_view .o_field_widget[name="${fieldName}"]`);
+}
+
+function _fieldRawValue(fieldName) {
+    const widget = _fieldWidget(fieldName);
+    if (!widget) return '';
+    const input = widget.querySelector('input, textarea, select');
+    if (input) return (input.value || '').trim();
+    return (widget.textContent || '').trim();
+}
+
+function _toNumber(raw) {
+    const cleaned = String(raw || '')
+        .replace(/[,₹\s]/g, '')
+        .replace(/[^\d.\-]/g, '');
+    const num = parseFloat(cleaned);
+    return Number.isFinite(num) ? num : 0.0;
+}
+
+function _isUrbanRecord() {
+    const direct = (_fieldRawValue('is_urban') || '').toLowerCase();
+    if (['1', 'true', 'yes'].includes(direct)) return true;
+    const villageType = (_fieldRawValue('village_type') || '').toLowerCase();
+    if (villageType.includes('urban') || villageType.includes('नगरीय')) return true;
+    // Fallback: if urban plot rate widgets are present/visible, treat as urban context.
+    const mrWidget = _fieldWidget('rate_master_main_road_sqm');
+    const bmrWidget = _fieldWidget('rate_master_other_road_sqm');
+    const visible = (el) => !!(el && el.offsetParent !== null);
+    return visible(mrWidget) || visible(bmrWidget);
+}
+
+function _section23GeneratePrecheckError() {
+    const caseNumber = _fieldRawValue('case_number');
+    if (!caseNumber) {
+        return 'Please enter Case Number before generating the award.';
+    }
+    const vikarDar = _toNumber(_fieldRawValue('avg_three_year_sales_sort_rate'));
+    if (vikarDar <= 0) {
+        return 'Please enter Vikray/Vikar Dar (3-year average sales rate) greater than zero before generating.';
+    }
+    const mrHa = _toNumber(_fieldRawValue('rate_master_main_road_ha'));
+    const bmrHa = _toNumber(_fieldRawValue('rate_master_other_road_ha'));
+    if (mrHa <= 0 || bmrHa <= 0) {
+        return 'Please enter MR Rate and BMR Rate (per hectare) greater than zero before generating.';
+    }
+    if (_isUrbanRecord()) {
+        const mrSqm = _toNumber(_fieldRawValue('rate_master_main_road_sqm'));
+        const bmrSqm = _toNumber(_fieldRawValue('rate_master_other_road_sqm'));
+        if (mrSqm <= 0 || bmrSqm <= 0) {
+            return 'For Urban records, please enter MR Plot Rate and BMR Plot Rate (per sq.m) greater than zero before generating.';
+        }
+    }
+    return '';
+}
+
+const ACTION_ICONS = {
+    action_generate_land_award: '🧾',
+    action_regenerate_land_award: '🧾',
+    action_generate_tree_award: '🌳',
+    action_regenerate_tree_award: '🌳',
+    action_generate_asset_award: '🏠',
+    action_regenerate_asset_award: '🏠',
+    action_generate_consolidated_award: '📘',
+    action_generate_rr_award: '📗',
+    action_generate_award: '✅',
+};
+
+function _showLoader(label, actionName = '') {
     if (document.getElementById(LOADER_ID)) return;
     _setPopupButtonsDisabled(true);
     const el = document.createElement('div');
@@ -110,13 +188,28 @@ function _showLoader(label) {
                 animation: aal-spin 0.85s linear infinite; margin-bottom: 26px;
             }
             #${LOADER_ID} .aal-title {
-                color:#fff; font-size:1.5rem; font-weight:700;
-                margin:0 0 6px 0; font-family:inherit; text-align:center;
+                color:#fff; font-size:2rem; font-weight:800;
+                margin:0 0 10px 0; font-family:inherit; text-align:center;
+            }
+            #${LOADER_ID} .aal-action-icon {
+                width:48px; height:48px; border-radius:14px;
+                display:flex; align-items:center; justify-content:center;
+                background:rgba(255,255,255,0.2);
+                color:#fff; font-size:1.7rem; line-height:1;
+                margin:0 0 12px 0;
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 4px 10px rgba(0,0,0,0.2);
             }
             #${LOADER_ID} .aal-sub {
-                color:rgba(255,255,255,0.75); font-size:0.95rem;
-                margin:0 0 26px 0; font-style:italic; font-family:inherit; text-align:center;
-                max-width: 360px; line-height: 1.5;
+                color:rgba(255,255,255,0.9); font-size:1.18rem;
+                margin:0 0 28px 0; font-style:italic; font-family:inherit; text-align:center;
+                max-width: 520px; line-height: 1.6;
+            }
+            #${LOADER_ID} .aal-sub small {
+                display:block;
+                font-size:0.98rem;
+                line-height:1.5;
+                margin-top:6px;
+                color:rgba(255,255,255,0.88);
             }
             #${LOADER_ID} .aal-dots { display:flex; gap:9px; margin-bottom:30px; }
             #${LOADER_ID} .aal-dots span {
@@ -139,6 +232,7 @@ function _showLoader(label) {
         </style>
         <div class="aal-ring"><img src="/bhuarjan/static/img/icon.png" alt="Bhuarjan"/></div>
         <div class="aal-spinner"></div>
+        <div class="aal-action-icon">${ACTION_ICONS[actionName] || '📄'}</div>
         <div class="aal-title">Please wait…</div>
         <div class="aal-sub">${label || 'Processing your request. This may take a few moments.'}</div>
         <div class="aal-dots"><span></span><span></span><span></span><span></span><span></span></div>
@@ -176,12 +270,12 @@ const ACTION_LABELS = {
     'action_consolidated_report':        'Generating Consolidated PDF report…',
 };
 
-function _showLoaderAfterConfirmDialogClose(confirmDialog, label) {
+function _showLoaderAfterConfirmDialogClose(confirmDialog, label, actionName = '') {
     let shown = false;
     const showOnce = () => {
         if (shown) return;
         shown = true;
-        _showLoader(label);
+        _showLoader(label, actionName);
     };
     if (!confirmDialog || !document.body.contains(confirmDialog)) {
         showOnce();
@@ -202,7 +296,7 @@ function _showLoaderAfterConfirmDialogClose(confirmDialog, label) {
     setTimeout(() => { obs.disconnect(); showOnce(); }, 400);
 }
 
-function _attachConfirmDialogListener(label) {
+function _attachConfirmDialogListener(label, actionName = '') {
     // Called after a heavy form button click; waits for confirm dialog to appear,
     // then attaches a one-time listener to its footer to detect OK vs Cancel.
     let attached = false;
@@ -224,7 +318,7 @@ function _attachConfirmDialogListener(label) {
             const isOk = cls.includes('btn-primary') || cls.includes('btn-success') ||
                 txt === 'ok' || txt === 'yes' || txt === 'confirm';
             if (isOk) {
-                _showLoaderAfterConfirmDialogClose(dialog, label);
+                _showLoaderAfterConfirmDialogClose(dialog, label, actionName);
             }
             // Cancel: do nothing — no loader.
         }, true);
@@ -239,7 +333,7 @@ function _attachConfirmDialogListener(label) {
             if (!attached) {
                 // No confirm dialog appeared — action ran directly, show loader now.
                 if (!document.getElementById(LOADER_ID)) {
-                    _showLoader(label);
+                    _showLoader(label, actionName);
                 }
             }
         }
@@ -296,7 +390,7 @@ function _isAwardMenuTarget(node) {
 }
 
 function _showSection23OpenLoader() {
-    _showLoader('Opening Section 23 Award…<br><small>Loading award data. Please wait.</small>');
+    _showLoader('Opening Section 23 Award…<br><small>Loading award data. Please wait.</small>', 'action_generate_award');
 
     const startedAt = Date.now();
     const MAX_WAIT = 25000;
@@ -379,6 +473,19 @@ document.addEventListener('click', (e) => {
     const isCreateInS23 = _isCreateButton(btn) && _isSection23Context();
     if (!isHeavy && !isCreateInS23) return;
 
+    // For Section 23 generate/regenerate, validate mandatory rates first
+    // and block confirm popup until data is valid.
+    if (PRECHECK_GENERATE_ACTIONS.has(name)) {
+        const precheckError = _section23GeneratePrecheckError();
+        if (precheckError) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.alert(precheckError);
+            return;
+        }
+    }
+
     const label = isCreateInS23
         ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
         : (ACTION_LABELS[name] || 'Processing your request…');
@@ -386,14 +493,14 @@ document.addEventListener('click', (e) => {
     // If button is INSIDE a wizard/download dialog: show loader immediately.
     const insideDialog = !!btn.closest('.o_dialog, .modal, [role="dialog"]');
     if (insideDialog) {
-        _showLoader(label);
+        _showLoader(label, name);
         _setupLoaderDone(btn.closest('.o_dialog, .modal, [role="dialog"]'));
         return;
     }
 
     // For form-level buttons: Odoo may render a confirm dialog first (OWL async).
     // Wait and attach to dialog's footer, then show loader only after user clicks OK.
-    _attachConfirmDialogListener(label);
+    _attachConfirmDialogListener(label, name);
 
 }, true); // capture phase
 

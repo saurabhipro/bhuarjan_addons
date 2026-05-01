@@ -28,6 +28,10 @@
                 <sheet>
                     <field name="currency_id" invisible="1"/>
                     <field name="is_generated" invisible="1"/>
+                    <field name="land_generated" invisible="1"/>
+                    <field name="tree_generated" invisible="1"/>
+                    <field name="asset_generated" invisible="1"/>
+                    <field name="all_components_generated" invisible="1"/>
                     <field name="is_sdm" invisible="1"/>
                     <field name="is_section_officer" invisible="1"/>
                     <field name="is_admin" invisible="1"/>
@@ -198,6 +202,52 @@
                         </a>
                     </div>
 
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <div class="small text-muted">Draft</div>
+                                <div class="fw-bold text-warning" invisible="land_generated or tree_generated or asset_generated">
+                                    <i class="fa fa-clock-o"/> Active
+                                </div>
+                                <div class="fw-bold text-muted" invisible="not (land_generated or tree_generated or asset_generated)">
+                                    <i class="fa fa-minus-circle"/> Passed
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <div class="small text-muted">Land</div>
+                                <div class="fw-bold text-success" invisible="not land_generated"><i class="fa fa-check-circle"/> Generated</div>
+                                <div class="fw-bold text-secondary" invisible="land_generated"><i class="fa fa-circle-o"/> Pending</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <div class="small text-muted">Tree</div>
+                                <div class="fw-bold text-success" invisible="not tree_generated"><i class="fa fa-check-circle"/> Generated</div>
+                                <div class="fw-bold text-secondary" invisible="tree_generated"><i class="fa fa-circle-o"/> Pending</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <div class="small text-muted">Asset</div>
+                                <div class="fw-bold text-success" invisible="not asset_generated"><i class="fa fa-check-circle"/> Generated</div>
+                                <div class="fw-bold text-secondary" invisible="asset_generated"><i class="fa fa-circle-o"/> Pending</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-2 h-100" style="background:#f5fff8;">
+                                <div class="small text-muted">All Generated</div>
+                                <div class="fw-bold text-success" invisible="not all_components_generated">
+                                    <i class="fa fa-trophy"/> Ready for Standard + Consolidated + R&amp;R downloads
+                                </div>
+                                <div class="fw-bold text-secondary" invisible="all_components_generated">
+                                    <i class="fa fa-hourglass-half"/> Complete Land + Tree + Asset generation first
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <details class="premium_card section-land" id="s23_section_land" open="open">
                         <summary class="section_banner sb_land">
                             <div class="sb_left">
@@ -215,10 +265,10 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
                             <field name="khasra_filter" nolabel="1"
                                    placeholder="Search by khasra..."
-                                   style="max-width:220px;"/>
+                                   style="max-width:200px;"/>
                             <button name="action_apply_khasra_search" type="object"
                                     string="Search" icon="fa-search"
                                     class="btn btn-sm s23_btn_brown"
@@ -233,6 +283,20 @@
                                     class="btn btn-sm btn-secondary"
                                     title="Clear filter and show all khasras"
                                     invisible="not khasra_filter"/>
+                            <button name="action_generate_land_award" type="object"
+                                    string="Generate Land Award"
+                                    icon="fa-cogs"
+                                    class="btn btn-sm s23_btn_brown"
+                                    confirm="Do you want to create the Land Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
+                                    invisible="land_generated"/>
+                            <button name="action_download_land_award" type="object"
+                                    string="Download Land Award (PDF/Excel)"
+                                    icon="fa-download"
+                                    class="btn btn-sm s23_btn_teal"
+                                    confirm="Do you want to download the Land Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not land_generated"/>
+                            <span class="badge bg-success text-white" invisible="not land_generated">Land Generated</span>
+                            <span class="badge bg-secondary text-white" invisible="land_generated">Land Pending</span>
                         </div>
                         <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines">
                             <list string="" create="0" delete="0" default_order="khasra_number" limit="20">
@@ -295,6 +359,22 @@
                                     title="Clear tree search filter"
                                     invisible="not tree_khasra_filter"/>
                         </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <button name="action_generate_tree_award" type="object"
+                                    string="Generate Tree Award"
+                                    icon="fa-cogs"
+                                    class="btn btn-sm s23_btn_brown"
+                                    confirm="Do you want to create the Tree Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
+                                    invisible="tree_generated"/>
+                            <button name="action_download_tree_award" type="object"
+                                    string="Download Tree Award (PDF/Excel)"
+                                    icon="fa-download"
+                                    class="btn btn-sm s23_btn_teal"
+                                    confirm="Do you want to download the Tree Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not tree_generated"/>
+                            <span class="badge text-bg-success" invisible="not tree_generated">Tree Generated</span>
+                            <span class="badge text-bg-secondary" invisible="tree_generated">Tree Pending</span>
+                        </div>
                         <field name="s23_tree_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #f1f9f4); border-left-color: #2f6d4f;">
                             <span class="total_label_large">Tree Subtotal</span>
@@ -341,6 +421,22 @@
                                 <field name="asset_value" string="Asset Value" widget="monetary" options="{'currency_field': 'parent.currency_id'}" sum="Asset Value"/>
                             </list>
                         </field>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <button name="action_generate_asset_award" type="object"
+                                    string="Generate Asset Award"
+                                    icon="fa-cogs"
+                                    class="btn btn-sm s23_btn_brown"
+                                    confirm="Do you want to create the Asset Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
+                                    invisible="asset_generated"/>
+                            <button name="action_download_asset_award" type="object"
+                                    string="Download Asset Award (PDF/Excel)"
+                                    icon="fa-download"
+                                    class="btn btn-sm s23_btn_teal"
+                                    confirm="Do you want to download the Asset Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not asset_generated"/>
+                            <span class="badge text-bg-success" invisible="not asset_generated">Asset Generated</span>
+                            <span class="badge text-bg-secondary" invisible="asset_generated">Asset Pending</span>
+                        </div>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fef6f2); border-left-color: #8a4b36;">
                             <span class="total_label_large">Structure Subtotal</span>
                             <span class="total_value_large" style="color: #8a4b36;">
@@ -353,53 +449,41 @@
                     <div class="s23_workflow_card"
                          invisible="is_section_officer and not is_admin">
                         <div class="s23_workflow_title">Award Generation (SDM) / अवार्ड जेनरेशन</div>
-                        <div class="row">
-                            <div class="col-md-6 pe-md-3 border-end">
-                                <div class="fw-bold text-secondary mb-2">Generate &amp; Download / जेनरेट करें</div>
-                                <div class="mb-3 d-flex gap-2 flex-wrap">
-                                    <button name="action_generate_award" string="Generate Award"
-                                            type="object" class="btn s23_btn_brown"
-                                            icon="fa-cogs"
-                                            invisible="state != 'draft' or is_generated"/>
-                                    <button name="action_download_award" string="Download Award"
-                                            type="object" class="btn s23_btn_teal"
-                                            icon="fa-download"
-                                            invisible="not is_generated"/>
-                                </div>
-                                <p class="text-muted small s23_note" invisible="state != 'draft' or is_generated">
-                                    Generates the Section 23 PDF from configured surveys. Award is <strong>auto-approved</strong> on generation — no collector submission required.
-                                </p>
-                            </div>
-                            <div class="col-md-6 ps-md-3">
-                                <div class="fw-bold text-secondary mb-2">Status / स्थिति</div>
-                                <div class="bg-light p-3 rounded">
-                                    <!-- Not generated yet -->
-                                    <div invisible="is_generated or state == 'approved'" class="text-muted small">
-                                        <i class="fa fa-info-circle text-info"/> Award not yet generated. Click <strong>Generate Award</strong> to proceed.
-                                    </div>
-                                    <!-- Generated but state not yet updated (old record) -->
-                                    <div invisible="not is_generated or state == 'approved'" class="mb-2">
-                                        <div class="text-warning fw-bold small mb-1">
-                                            <i class="fa fa-exclamation-triangle"/> Award generated but status not updated.
-                                        </div>
-                                        <button name="action_approve_award" string="Mark as Generated / उत्पन्न चिह्नित करें"
-                                                type="object" class="btn btn-sm s23_btn_ok"
-                                                icon="fa-check-circle"/>
-                                    </div>
-                                    <!-- Fully generated and approved -->
-                                    <div invisible="state != 'approved'" class="text-success fw-bold">
-                                        <i class="fa fa-check-circle"/> Award Generated / अवार्ड उत्पन्न
-                                        <div class="text-muted small fw-normal mt-1">Generated by SDM. No further action required.</div>
-                                    </div>
-                                    <field name="award_document" filename="award_document_filename"
-                                           widget="binary"
-                                           string="Award Document / अवार्ड दस्तावेज़"
-                                           readonly="1"
-                                           invisible="not award_document"/>
-                                    <field name="award_document_filename" invisible="1"/>
-                                </div>
-                            </div>
+                        <div class="fw-bold text-secondary mb-2">Full Award Options (after all sections generated)</div>
+                        <div class="mb-3 d-flex gap-2 flex-wrap">
+                            <button name="action_generate_award" string="Generate All Sections"
+                                    type="object" class="btn s23_btn_brown"
+                                    icon="fa-cogs"
+                                    confirm="Do you want to create the full Award (Land + Tree + Asset) for this project and village? Please note: this generation will be treated as final and cannot be edited later."
+                                    invisible="all_components_generated"/>
+                            <button name="action_download_standard_full_award" string="Download Standard (PDF/Excel)"
+                                    type="object" class="btn s23_btn_teal"
+                                    icon="fa-download"
+                                    confirm="Do you want to download the full Standard Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not all_components_generated"/>
+                            <button name="action_download_consolidated_full_award" string="Download Consolidated (PDF/Excel)"
+                                    type="object" class="btn s23_btn_teal"
+                                    icon="fa-table"
+                                    confirm="Do you want to download the full Consolidated Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not all_components_generated"/>
+                            <button name="action_download_rr_full_award" string="Download R&amp;R (PDF/Excel)"
+                                    type="object" class="btn s23_btn_teal"
+                                    icon="fa-files-o"
+                                    confirm="Do you want to download the full R&amp;R Award now? Next popup will ask you to choose PDF or Excel."
+                                    invisible="not all_components_generated"/>
                         </div>
+                        <p class="text-muted small s23_note mb-2" invisible="all_components_generated">
+                            First generate each section (Land + Tree + Asset). After that, full Standard/Consolidated/R&amp;R downloads will unlock.
+                        </p>
+                        <p class="text-success small mb-2" invisible="not all_components_generated">
+                            <i class="fa fa-check-circle"/> Full award downloads are ready in both PDF and Excel.
+                        </p>
+                        <field name="award_document" filename="award_document_filename"
+                               widget="binary"
+                               string="Latest Generated PDF / नवीनतम पीडीएफ"
+                               readonly="1"
+                               invisible="not award_document"/>
+                        <field name="award_document_filename" invisible="1"/>
                     </div>
                     </div><!-- close bhu_s23_content -->
                 </sheet>

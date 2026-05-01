@@ -130,6 +130,104 @@ function _isCreateButton(btn) {
     );
 }
 
+function _isSection23Hash(hashValue) {
+    const hash = (hashValue || '').toLowerCase();
+    return hash.includes('model=bhu.section23.award') || hash.includes('section23');
+}
+
+function _isAwardMenuTarget(node) {
+    const target = node && node.closest('a, button, [role="menuitem"]');
+    if (!target) return false;
+    const haystack = [
+        target.getAttribute('data-menu-xmlid') || '',
+        target.getAttribute('data-action-xmlid') || '',
+        target.getAttribute('data-action-id') || '',
+        target.getAttribute('name') || '',
+        target.getAttribute('href') || '',
+        target.getAttribute('title') || '',
+        target.textContent || '',
+    ].join(' ').toLowerCase();
+    return (
+        haystack.includes('menu_sec23_award') ||
+        haystack.includes('menu_payment_view_awards') ||
+        haystack.includes('action_section23_award') ||
+        haystack.includes('bhu.section23.award') ||
+        haystack.includes('section 23 awards') ||
+        haystack.includes('section 23 award') ||
+        haystack.includes('view awards')
+    );
+}
+
+function _showSection23OpenLoader() {
+    _showLoader('Opening Section 23 Award…<br><small>Loading award data. Please wait.</small>');
+
+    const startedAt = Date.now();
+    const MAX_WAIT = 25000;
+    const MIN_VISIBLE_MS = 550;
+    let done = false;
+    let pollTimer = null;
+    let observer = null;
+
+    const isViewReady = () => {
+        if (!_isSection23Context() && !_isSection23Hash(window.location.hash)) return false;
+        const hasList = !!document.querySelector('.o_content .o_list_view .o_list_table');
+        const hasForm = !!document.querySelector('.o_content .o_form_view .o_form_sheet');
+        const hasBreadcrumb = !!document.querySelector(
+            '.o_control_panel_breadcrumbs, .o_breadcrumb, .breadcrumb'
+        );
+        return hasList || hasForm || hasBreadcrumb;
+    };
+
+    const finish = () => {
+        if (done) return;
+        done = true;
+        if (observer) observer.disconnect();
+        if (pollTimer) clearInterval(pollTimer);
+        const elapsed = Date.now() - startedAt;
+        const waitMore = Math.max(0, MIN_VISIBLE_MS - elapsed);
+        setTimeout(_hideLoader, waitMore);
+    };
+
+    if (isViewReady()) {
+        finish();
+        return;
+    }
+
+    pollTimer = setInterval(() => {
+        if (isViewReady() || (Date.now() - startedAt) > MAX_WAIT) {
+            finish();
+        }
+    }, 220);
+
+    observer = new MutationObserver(() => {
+        if (isViewReady()) {
+            finish();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Show loader when user opens the Section 23 Award action from menu.
+document.addEventListener('click', (e) => {
+    if (!_isAwardMenuTarget(e.target)) return;
+    if (_isSection23Context()) return;
+    _showSection23OpenLoader();
+}, true);
+
+// Also catch hash-based navigation into Section 23 (dashboard shortcuts etc.).
+let _lastHash = window.location.hash;
+window.addEventListener('hashchange', () => {
+    const previous = (_lastHash || '').toLowerCase();
+    const current = (window.location.hash || '').toLowerCase();
+    _lastHash = window.location.hash;
+    if (_isSection23Hash(current) && !_isSection23Hash(previous)) {
+        _showSection23OpenLoader();
+    } else if (_isSection23Hash(current) && !document.getElementById(LOADER_ID)) {
+        // Fallback for SPA transitions where previous/current hash values are noisy.
+        _showSection23OpenLoader();
+    }
+});
+
 // Attach click listener using event delegation on document body
 document.addEventListener('click', (e) => {
     // Walk up the DOM to find the actual <button> element

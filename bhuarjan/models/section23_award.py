@@ -105,6 +105,14 @@ class Section23Award(models.Model):
     ], string='Status', default='draft', tracking=True, index=True)
     
     is_generated = fields.Boolean(string='Is Generated', default=False, tracking=True)
+    land_generated = fields.Boolean(string='Land Generated', default=False, tracking=True)
+    tree_generated = fields.Boolean(string='Tree Generated', default=False, tracking=True)
+    asset_generated = fields.Boolean(string='Asset Generated', default=False, tracking=True)
+    all_components_generated = fields.Boolean(
+        string='All Components Generated',
+        compute='_compute_all_components_generated',
+        store=False,
+    )
     
     village_domain = fields.Char()
     
@@ -365,6 +373,13 @@ class Section23Award(models.Model):
         """
         for award in self:
             award.rate_permutation_ids = [(5, 0, 0)]
+
+    @api.depends('land_generated', 'tree_generated', 'asset_generated', 'is_generated')
+    def _compute_all_components_generated(self):
+        for rec in self:
+            rec.all_components_generated = bool(
+                (rec.land_generated and rec.tree_generated and rec.asset_generated) or rec.is_generated
+            )
     
     @api.depends('award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance')
     def _compute_all_surveys_configured(self):
@@ -949,9 +964,32 @@ class Section23Award(models.Model):
     def action_download_award(self):
         """Download award document - Open wizard for PDF/Word"""
         self.ensure_one()
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='all',
+            variant='standard',
+            title=_('Download Section 23 Award / धारा 23 अवार्ड डाउनलोड करें'),
+        )
+
+    def _open_award_download_wizard(
+        self,
+        generate=False,
+        export_scope='all',
+        variant='standard',
+        default_format='pdf',
+        title=None,
+        simple_download_dialog=False,
+    ):
+        self.ensure_one()
         report_action = self._get_section23_report_action()
+        scope = export_scope or 'all'
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
+        sheet_variant = variant or 'standard'
+        if sheet_variant not in ('standard', 'consolidated', 'rr'):
+            sheet_variant = 'standard'
         return {
-            'name': _('Download Section 23 Award / धारा 23 अवार्ड डाउनलोड करें'),
+            'name': title or _('Download Award / अवार्ड डाउनलोड करें'),
             'type': 'ir.actions.act_window',
             'res_model': 'bhu.award.download.wizard',
             'view_mode': 'form',
@@ -959,12 +997,156 @@ class Section23Award(models.Model):
             'context': {
                 'default_res_model': self._name,
                 'default_res_id': self.id,
-                'default_report_xml_id': report_action.get_external_id().get(report_action.id, 'bhuarjan.action_report_section23_award'),
-                'default_filename': f'Section23_Award_{self.name}.doc',
-                'default_export_scope': 'all',
+                'default_report_xml_id': report_action.get_external_id().get(
+                    report_action.id, 'bhuarjan.action_report_section23_award'
+                ),
+                'default_filename': f'Section23_Award_{self.name}.pdf',
+                'default_export_scope': scope,
                 'default_add_cover_letter': True,
+                'default_section23_generate': bool(generate),
+                'default_section23_sheet_variant': sheet_variant,
+                'default_format': default_format if default_format in ('pdf', 'excel') else 'pdf',
+                'default_simple_download_dialog': bool(simple_download_dialog),
             }
         }
+
+    def _mark_generated_scope(self, export_scope='all'):
+        self.ensure_one()
+        scope = export_scope or 'all'
+        vals = {}
+        if scope in ('all', 'land'):
+            vals['land_generated'] = True
+        if scope in ('all', 'asset'):
+            vals['asset_generated'] = True
+        if scope in ('all', 'tree'):
+            vals['tree_generated'] = True
+        if vals:
+            self.write(vals)
+        all_done = bool(self.land_generated and self.asset_generated and self.tree_generated)
+        self.write({
+            'is_generated': all_done,
+            'state': 'approved' if all_done else 'draft',
+        })
+
+    def _ensure_all_components_generated(self):
+        self.ensure_one()
+        all_generated = bool(
+            (self.land_generated and self.asset_generated and self.tree_generated) or self.is_generated
+        )
+        if not all_generated:
+            raise ValidationError(_(
+                'All section awards must be generated first (Land + Asset + Tree), '
+                'then you can download Standard/Consolidated/R&R full sheets.'
+            ))
+
+    def _generate_scope_without_download(self, export_scope='all', label=None):
+        """Generate requested scope and update status without opening download UI."""
+        self.ensure_one()
+        self._validate_for_generate(require_sales_sort_rate=True)
+        self._sync_award_structure_lines()
+        self._refresh_award_line_items()
+        self._mark_generated_scope(export_scope=export_scope)
+        self.message_post(body=_("Section generated successfully. / पत्रक सफलतापूर्वक जेनरेट किया गया।"))
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Generated'),
+                'message': label or _('Section generated. Now use Download button for PDF/Excel.'),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def action_generate_land_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='land',
+            label=_('Land award generated. Use Download Land Award for PDF/Excel.'),
+        )
+
+    def action_generate_tree_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='tree',
+            label=_('Tree award generated. Use Download Tree Award for PDF/Excel.'),
+        )
+
+    def action_generate_asset_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='asset',
+            label=_('Asset award generated. Use Download Asset Award for PDF/Excel.'),
+        )
+
+    def action_download_land_award(self):
+        self.ensure_one()
+        if not self.land_generated:
+            raise ValidationError(_('Generate Land Award first, then download.'))
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='land',
+            variant='standard',
+            title=_('Download Land Award / भूमि अवार्ड डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
+
+    def action_download_tree_award(self):
+        self.ensure_one()
+        if not self.tree_generated:
+            raise ValidationError(_('Generate Tree Award first, then download.'))
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='tree',
+            variant='standard',
+            title=_('Download Tree Award / वृक्ष अवार्ड डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
+
+    def action_download_asset_award(self):
+        self.ensure_one()
+        if not self.asset_generated:
+            raise ValidationError(_('Generate Asset Award first, then download.'))
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='asset',
+            variant='standard',
+            title=_('Download Asset Award / परिसम्पत्ति अवार्ड डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
+
+    def action_download_standard_full_award(self):
+        self.ensure_one()
+        self._ensure_all_components_generated()
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='all',
+            variant='standard',
+            title=_('Download Standard Award (Full) / मानक अवार्ड (पूर्ण) डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
+
+    def action_download_consolidated_full_award(self):
+        self.ensure_one()
+        self._ensure_all_components_generated()
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='all',
+            variant='consolidated',
+            title=_('Download Consolidated Award (Full) / समेकित अवार्ड (पूर्ण) डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
+
+    def action_download_rr_full_award(self):
+        self.ensure_one()
+        self._ensure_all_components_generated()
+        return self._open_award_download_wizard(
+            generate=False,
+            export_scope='all',
+            variant='rr',
+            title=_('Download R&R Award (Full) / पुनर्वास अवार्ड (पूर्ण) डाउनलोड करें'),
+            simple_download_dialog=True,
+        )
 
     def get_award_village_scope_summary(self):
         """Village + component totals (Section 23, for summary export)."""
@@ -1069,10 +1251,10 @@ class Section23Award(models.Model):
         self.ensure_one()
         # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
         self.flush_recordset()
-        if self.is_generated:
+        if self.land_generated and self.tree_generated and self.asset_generated:
             raise ValidationError(_(
-                'Award already generated for this Project and Village. '
-                'Use Download instead of generating again.'
+                'All section awards are already generated for this Project and Village. '
+                'Use Download options instead of generating again.'
             ))
         if not self.project_id:
             raise ValidationError(_('Please select a project first.'))
@@ -1117,29 +1299,12 @@ class Section23Award(models.Model):
                 ))
 
     def action_generate_award(self):
-        """Open the same download wizard as Award Simulator; confirm runs generate (PDF/Excel)."""
+        """Generate all section scopes without download prompt."""
         self.ensure_one()
-        self._validate_for_generate(require_sales_sort_rate=True)
-        report_action = self._get_section23_report_action()
-        xmlid = report_action.get_external_id().get(
-            report_action.id, 'bhuarjan.action_report_section23_award'
+        return self._generate_scope_without_download(
+            export_scope='all',
+            label=_('All sections generated. Full Standard/Consolidated/R&R downloads are now enabled.'),
         )
-        return {
-            'name': _('Generate Section 23 Award / अवार्ड जेनरेट करें'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'bhu.award.download.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_res_model': self._name,
-                'default_res_id': self.id,
-                'default_report_xml_id': xmlid,
-                'default_filename': f'Section23_Award_{self.name}.pdf',
-                'default_export_scope': 'all',
-                'default_section23_generate': True,
-                'default_add_cover_letter': True,
-            },
-        }
 
     def apply_generate_from_download_wizard(self, file_format, export_scope='all', include_cover_letter=False, generate_variant='standard'):
         """Called from bhu.award.download.wizard when Section 23 generate is confirmed."""
@@ -1156,6 +1321,7 @@ class Section23Award(models.Model):
             variant = 'standard'
 
         if variant == 'consolidated':
+            self._ensure_all_components_generated()
             self.write({'is_generated': True, 'state': 'approved'})
             self.message_post(body=_("Consolidated award generated and auto-approved. / समेकित अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
             if file_format == 'excel':
@@ -1163,6 +1329,7 @@ class Section23Award(models.Model):
             return self.action_download_consolidated_pdf()
 
         if variant == 'rr':
+            self._ensure_all_components_generated()
             self.write({'is_generated': True, 'state': 'approved'})
             self.message_post(body=_("R&R award generated and auto-approved. / पुनर्वास अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
             if file_format == 'excel':
@@ -1170,8 +1337,8 @@ class Section23Award(models.Model):
             return self.action_download_rr_pdf()
 
         if file_format == 'excel':
-            self.write({'is_generated': True, 'state': 'approved'})
-            self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
+            self._mark_generated_scope(export_scope=export_scope or 'all')
+            self.message_post(body=_("Section award generated. / संबंधित पत्रक जेनरेट किया गया।"))
             return self.action_download_excel_components(export_scope=export_scope or 'all')
 
         if file_format != 'pdf':
@@ -1201,18 +1368,17 @@ class Section23Award(models.Model):
                 self.write({
                     'award_document': base64.b64encode(pdf_data),
                     'award_document_filename': filename,
-                    'is_generated': True,
-                    'state': 'approved',
                 })
-                self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
+                self._mark_generated_scope(export_scope=scope)
+                self.message_post(body=_("Section award generated. / संबंधित पत्रक जेनरेट किया गया।"))
                 return {
                     'type': 'ir.actions.act_url',
                     'url': f'/web/content/{self._name}/{self.id}/award_document/{filename}?download=true',
                     'target': 'self',
                 }
 
-        self.write({'is_generated': True, 'state': 'approved'})
-        self.message_post(body=_("Award generated and auto-approved. / अवार्ड जेनरेट किया गया और स्वतः अनुमोदित हुआ।"))
+        self._mark_generated_scope(export_scope=scope)
+        self.message_post(body=_("Section award generated. / संबंधित पत्रक जेनरेट किया गया।"))
         return report_action.with_context(
             s23_pdf_scope=scope,
             s23_include_cover=bool(include_cover_letter),

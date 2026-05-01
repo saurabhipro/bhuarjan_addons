@@ -32,6 +32,11 @@ class AwardDownloadWizard(models.TransientModel):
 
     # True when opened from Section 23 "Generate award" (same UI as Award Simulator)
     section23_generate = fields.Boolean(string='Section 23 Generate', default=False)
+    simple_download_dialog = fields.Boolean(
+        string='Simple Download Dialog',
+        default=False,
+        help='When enabled, only format (PDF/Excel) is shown in popup.',
+    )
     add_cover_letter = fields.Boolean(
         string='Add Cover Letter / कवर लेटर जोड़ें',
         default=False,
@@ -63,8 +68,16 @@ class AwardDownloadWizard(models.TransientModel):
             res.setdefault('res_id', self.env.context.get('active_id'))
         if self.env.context.get('default_section23_generate'):
             res['section23_generate'] = True
+        if self.env.context.get('default_simple_download_dialog'):
+            res['simple_download_dialog'] = True
         res.setdefault('section23_sheet_variant', 'standard')
         return res
+
+    @api.onchange('section23_sheet_variant')
+    def _onchange_section23_sheet_variant(self):
+        for wizard in self:
+            if wizard.section23_sheet_variant in ('consolidated', 'rr'):
+                wizard.export_scope = 'all'
 
     def action_download(self):
         self.ensure_one()

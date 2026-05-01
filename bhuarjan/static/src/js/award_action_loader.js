@@ -7,6 +7,53 @@
  */
 
 const LOADER_ID = 'bhu_award_action_loader';
+const LOADING_BODY_CLASS = 'bhu_award_loading_state';
+const POPUP_DISABLE_STYLE_ID = 'bhu_award_popup_disable_style';
+
+function _ensurePopupDisableStyles() {
+    if (document.getElementById(POPUP_DISABLE_STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = POPUP_DISABLE_STYLE_ID;
+    style.textContent = `
+        body.${LOADING_BODY_CLASS} .modal.show .modal-footer button,
+        body.${LOADING_BODY_CLASS} .o_dialog .modal-footer button,
+        body.${LOADING_BODY_CLASS} [role="dialog"] .modal-footer button,
+        body.${LOADING_BODY_CLASS} .modal.show .btn-close,
+        body.${LOADING_BODY_CLASS} .o_dialog .btn-close,
+        body.${LOADING_BODY_CLASS} [role="dialog"] .btn-close {
+            pointer-events: none !important;
+            opacity: 0.55 !important;
+            filter: grayscale(0.2);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function _setPopupButtonsDisabled(disabled) {
+    _ensurePopupDisableStyles();
+    document.body.classList.toggle(LOADING_BODY_CLASS, !!disabled);
+    const buttons = document.querySelectorAll(
+        '.modal.show .modal-footer button, .o_dialog .modal-footer button, [role="dialog"] .modal-footer button, .modal.show .btn-close, .o_dialog .btn-close, [role="dialog"] .btn-close'
+    );
+    buttons.forEach((btn) => {
+        if (disabled) {
+            if (!btn.dataset.bhuPrevDisabled) {
+                btn.dataset.bhuPrevDisabled = btn.disabled ? '1' : '0';
+            }
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+        } else {
+            const prev = btn.dataset.bhuPrevDisabled;
+            if (prev !== undefined) {
+                btn.disabled = prev === '1';
+                delete btn.dataset.bhuPrevDisabled;
+            } else {
+                btn.disabled = false;
+            }
+            btn.removeAttribute('aria-disabled');
+        }
+    });
+}
 
 // Button method names that warrant a loading overlay.
 // NOTE: 'action_download_award' is intentionally EXCLUDED because it opens
@@ -14,6 +61,14 @@ const LOADER_ID = 'bhu_award_action_loader';
 // The loader is only for actions that do heavy server-side work (PDF/Excel generation).
 const HEAVY_ACTIONS = new Set([
     'action_generate_award',
+    'action_generate_land_award',
+    'action_generate_tree_award',
+    'action_generate_asset_award',
+    'action_regenerate_land_award',
+    'action_regenerate_tree_award',
+    'action_regenerate_asset_award',
+    'action_generate_consolidated_award',
+    'action_generate_rr_award',
     // 'action_download_award' — opens a wizard, NOT a heavy action (wizard covers loader)
     'action_download',          // inside the download wizard — actual PDF/Excel generation
     'action_download_excel_components',
@@ -26,6 +81,7 @@ const HEAVY_ACTIONS = new Set([
 
 function _showLoader(label) {
     if (document.getElementById(LOADER_ID)) return;
+    _setPopupButtonsDisabled(true);
     const el = document.createElement('div');
     el.id = LOADER_ID;
     el.style.cssText = [
@@ -93,6 +149,7 @@ function _showLoader(label) {
 
 function _hideLoader() {
     const el = document.getElementById(LOADER_ID);
+    _setPopupButtonsDisabled(false);
     if (!el) return;
     el.style.transition = 'opacity 0.35s ease';
     el.style.opacity = '0';
@@ -102,6 +159,14 @@ function _hideLoader() {
 // Label map for each action
 const ACTION_LABELS = {
     'action_generate_award':            'Generating the Section 23 Award document…<br><small>Building PDF from survey data. Please do not close this page.</small>',
+    'action_generate_land_award':       'Generating Land Award…<br><small>Preparing PDF and Excel cache files. Please wait.</small>',
+    'action_generate_tree_award':       'Generating Tree Award…<br><small>Preparing PDF and Excel cache files. Please wait.</small>',
+    'action_generate_asset_award':      'Generating Asset Award…<br><small>Preparing PDF and Excel cache files. Please wait.</small>',
+    'action_regenerate_land_award':     'Regenerating Land Award…<br><small>Refreshing cached PDF and Excel files.</small>',
+    'action_regenerate_tree_award':     'Regenerating Tree Award…<br><small>Refreshing cached PDF and Excel files.</small>',
+    'action_regenerate_asset_award':    'Regenerating Asset Award…<br><small>Refreshing cached PDF and Excel files.</small>',
+    'action_generate_consolidated_award': 'Generating Consolidated Award…<br><small>Preparing cached PDF and Excel files.</small>',
+    'action_generate_rr_award':         'Generating R&amp;R Award…<br><small>Preparing cached PDF and Excel files.</small>',
     'action_download':                  'Generating &amp; downloading your document…<br><small>Building PDF / Excel. This may take a moment.</small>',
     'action_download_excel_components': 'Generating Excel report…<br><small>Building Excel workbook from survey data.</small>',
     'apply_generate_from_download_wizard': 'Generating &amp; downloading Award…<br><small>Building the document. Download will start automatically.</small>',

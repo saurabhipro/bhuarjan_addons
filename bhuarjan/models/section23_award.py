@@ -2,6 +2,8 @@
 
 import json
 import logging
+import base64
+import re
 from markupsafe import Markup, escape
 
 from odoo import models, fields, api, _
@@ -47,24 +49,26 @@ class Section23Award(models.Model):
         help='Mandatory before generating the award; shown on land schedule (Excel/PDF).',
     )
 
-    # Rate master display (read-only, from active rate master for this village)
+    # Award rate inputs (defaulted from active rate master; editable on the award)
     rate_master_main_road_ha = fields.Monetary(
         string='MR Rate (₹/Ha)', currency_field='currency_id',
-        compute='_compute_village_rates', store=False,
+        default=0.0,
+        tracking=True,
         help='Main Road rate per hectare from the active land rate master for this village.',
     )
     rate_master_other_road_ha = fields.Monetary(
         string='BMR Rate (₹/Ha)', currency_field='currency_id',
-        compute='_compute_village_rates', store=False,
+        default=0.0,
+        tracking=True,
         help='Beyond Main Road rate per hectare from the active land rate master for this village.',
     )
     rate_master_main_road_sqm = fields.Monetary(
         string='MR Plot Rate (₹/sqm)', currency_field='currency_id',
-        compute='_compute_village_rates', store=False,
+        compute='_compute_village_plot_rates', store=False,
     )
     rate_master_other_road_sqm = fields.Monetary(
         string='BMR Plot Rate (₹/sqm)', currency_field='currency_id',
-        compute='_compute_village_rates', store=False,
+        compute='_compute_village_plot_rates', store=False,
     )
 
     # Village type (read-only mirror of village_id.village_type for display)
@@ -108,9 +112,23 @@ class Section23Award(models.Model):
     land_generated = fields.Boolean(string='Land Generated', default=False, tracking=True)
     tree_generated = fields.Boolean(string='Tree Generated', default=False, tracking=True)
     asset_generated = fields.Boolean(string='Asset Generated', default=False, tracking=True)
+    consolidated_generated = fields.Boolean(string='Consolidated Generated', default=False, tracking=True)
+    rr_generated = fields.Boolean(string='R&R Generated', default=False, tracking=True)
     all_components_generated = fields.Boolean(
         string='All Components Generated',
         compute='_compute_all_components_generated',
+        store=False,
+    )
+    s23_generation_stage = fields.Selection(
+        [
+            ('draft', 'Draft / प्रारूप'),
+            ('land_generated', 'Land Generated / भूमि उत्पन्न'),
+            ('tree_generated', 'Tree Generated / वृक्ष उत्पन्न'),
+            ('asset_generated', 'Asset Generated / परिसम्पत्ति उत्पन्न'),
+            ('all_generated', 'All Generated / पूर्ण उत्पन्न'),
+        ],
+        string='Generation Progress',
+        compute='_compute_s23_generation_stage',
         store=False,
     )
     
@@ -247,15 +265,32 @@ class Section23Award(models.Model):
                 surveys = rec.award_survey_line_ids.mapped('survey_id')
                 rec.is_urban = any(s.survey_type == 'urban' for s in surveys) if surveys else False
 
-    @api.depends('village_id')
-    def _compute_village_rates(self):
+    def _get_active_rate_master_for_village(self):
+        self.ensure_one()
+        if not self.village_id:
+            return False
+        return self.env['bhu.rate.master'].search([
+            ('village_id', '=', self.village_id.id),
+            ('state', 'in', ['active', 'draft']),
+        ], limit=1, order='state ASC, effective_from DESC')
+
+    def _sync_rate_fields_from_master(self, force=False):
         for rec in self:
-            rm = self.env['bhu.rate.master'].search([
-                ('village_id', '=', rec.village_id.id),
-                ('state', 'in', ['active', 'draft']),
-            ], limit=1, order='state ASC, effective_from DESC') if rec.village_id else False
-            rec.rate_master_main_road_ha  = rm.main_road_rate_hectare  if rm else 0.0
-            rec.rate_master_other_road_ha = rm.other_road_rate_hectare if rm else 0.0
+            rm = rec._get_active_rate_master_for_village()
+            mr_rate = rm.main_road_rate_hectare if rm else 0.0
+            bmr_rate = rm.other_road_rate_hectare if rm else 0.0
+            vals = {}
+            if force or not rec.rate_master_main_road_ha:
+                vals['rate_master_main_road_ha'] = mr_rate
+            if force or not rec.rate_master_other_road_ha:
+                vals['rate_master_other_road_ha'] = bmr_rate
+            if vals:
+                rec.update(vals)
+
+    @api.depends('village_id')
+    def _compute_village_plot_rates(self):
+        for rec in self:
+            rm = rec._get_active_rate_master_for_village()
             rec.rate_master_main_road_sqm = rm.main_road_rate_sqm      if rm else 0.0
             rec.rate_master_other_road_sqm = rm.other_road_rate_sqm    if rm else 0.0
 
@@ -380,6 +415,20 @@ class Section23Award(models.Model):
             rec.all_components_generated = bool(
                 (rec.land_generated and rec.tree_generated and rec.asset_generated) or rec.is_generated
             )
+
+    @api.depends('land_generated', 'tree_generated', 'asset_generated', 'all_components_generated')
+    def _compute_s23_generation_stage(self):
+        for rec in self:
+            if rec.all_components_generated:
+                rec.s23_generation_stage = 'all_generated'
+            elif rec.asset_generated:
+                rec.s23_generation_stage = 'asset_generated'
+            elif rec.tree_generated:
+                rec.s23_generation_stage = 'tree_generated'
+            elif rec.land_generated:
+                rec.s23_generation_stage = 'land_generated'
+            else:
+                rec.s23_generation_stage = 'draft'
     
     @api.depends('award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance')
     def _compute_all_surveys_configured(self):
@@ -434,6 +483,7 @@ class Section23Award(models.Model):
     def _onchange_village_populate_surveys(self):
         """Pre-fill land lines on first project+village (empty list only; save refreshes the rest)."""
         for rec in self:
+            rec._sync_rate_fields_from_master(force=bool(rec.village_id))
             rec._onchange_add_award_survey_lines_if_empty()
 
     @api.onchange('project_id')
@@ -489,6 +539,7 @@ class Section23Award(models.Model):
         records |= existing_records
         # Onchange does not run for backend create() calls; ensure lines are populated/synced.
         for record in records:
+            record._sync_rate_fields_from_master(force=False)
             record._populate_award_survey_lines(reset_if_empty=False)
         return records
 
@@ -515,6 +566,7 @@ class Section23Award(models.Model):
             new_p = rec.project_id.id if rec.project_id else False
             new_v = rec.village_id.id if rec.village_id else False
             if new_p != old_p or new_v != old_v:
+                rec._sync_rate_fields_from_master(force=True)
                 rec._populate_award_survey_lines(reset_if_empty=True)
                 if rec.project_id and rec.village_id:
                     rec._sync_award_structure_lines()
@@ -1010,6 +1062,167 @@ class Section23Award(models.Model):
             }
         }
 
+    def _s23_cache_attachment_name(self, export_scope='all', variant='standard', file_format='pdf'):
+        self.ensure_one()
+        scope = (export_scope or 'all').lower()
+        var = (variant or 'standard').lower()
+        fmt = 'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'excel'
+        ext = 'pdf' if fmt == 'pdf' else 'xlsx'
+        return f"S23_CACHE__{var}__{scope}__{fmt}__{self.id}.{ext}"
+
+    def _s23_cache_filename_for_user(self, export_scope='all', variant='standard', file_format='pdf'):
+        self.ensure_one()
+        scope_label = {
+            'all': 'All',
+            'land': 'Land',
+            'tree': 'Tree',
+            'asset': 'Asset',
+        }.get((export_scope or 'all').lower(), 'All')
+        var_label = {
+            'standard': 'Standard',
+            'consolidated': 'Consolidated',
+            'rr': 'RR',
+        }.get((variant or 'standard').lower(), 'Standard')
+        ext = 'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'xlsx'
+        safe_name = (self.name or f"S23_{self.id}").replace(' ', '_')
+        return f"Section23_{var_label}_{scope_label}_{safe_name}.{ext}"
+
+    def _s23_get_cached_attachment(self, export_scope='all', variant='standard', file_format='pdf'):
+        self.ensure_one()
+        cache_name = self._s23_cache_attachment_name(export_scope, variant, file_format)
+        return self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('name', '=', cache_name),
+        ], limit=1)
+
+    def _s23_store_cached_attachment(self, binary_data, export_scope='all', variant='standard', file_format='pdf'):
+        self.ensure_one()
+        if not binary_data:
+            return False
+        cache_name = self._s23_cache_attachment_name(export_scope, variant, file_format)
+        user_name = self._s23_cache_filename_for_user(export_scope, variant, file_format)
+        mimetype = 'application/pdf' if (file_format or 'pdf') == 'pdf' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        old = self._s23_get_cached_attachment(export_scope, variant, file_format)
+        if old:
+            old.unlink()
+        return self.env['ir.attachment'].create({
+            'name': cache_name,
+            'type': 'binary',
+            'datas': base64.b64encode(binary_data),
+            'mimetype': mimetype,
+            'res_model': self._name,
+            'res_id': self.id,
+            'description': f'S23 cached export ({variant}/{export_scope}/{file_format})',
+        })
+
+    @api.model
+    def _extract_attachment_id_from_action(self, action):
+        if not isinstance(action, dict):
+            return False
+        if action.get('type') != 'ir.actions.act_url':
+            return False
+        url = action.get('url') or ''
+        if not url:
+            return False
+        match = re.search(r'/web/content/(\d+)', url)
+        return int(match.group(1)) if match else False
+
+    def _s23_render_pdf_bytes(self, export_scope='all'):
+        self.ensure_one()
+        scope = export_scope or 'all'
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
+        report_action = self._get_section23_report_action()
+        pdf_result = report_action.sudo().with_context(
+            s23_pdf_scope=scope,
+            s23_include_cover=False,
+        )._render_qweb_pdf(report_action.id, [self.id], data={})
+        if not pdf_result:
+            return b''
+        return pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+
+    def _s23_render_variant_pdf_bytes(self, variant='standard', export_scope='all'):
+        self.ensure_one()
+        var = (variant or 'standard').lower()
+        if var == 'standard':
+            return self._s23_render_pdf_bytes(export_scope=export_scope)
+        if var == 'consolidated':
+            report_action = self.env.ref('bhuarjan.action_report_consolidated_award_sheet')
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.id, [self.id], data={})
+            if not pdf_result:
+                return b''
+            return pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+        if var == 'rr':
+            report_action = self.env.ref('bhuarjan.action_report_rr_award_sheet')
+            pdf_result = report_action.sudo()._render_qweb_pdf(report_action.id, [self.id], data={})
+            if not pdf_result:
+                return b''
+            return pdf_result[0] if isinstance(pdf_result, (tuple, list)) else pdf_result
+        return b''
+
+    def _s23_prepare_variant_cache(self, variant='standard', export_scope='all'):
+        """Generate and cache BOTH PDF and Excel for a variant."""
+        self.ensure_one()
+        var = (variant or 'standard').lower()
+        scope = export_scope or 'all'
+        if scope not in ('all', 'land', 'asset', 'tree'):
+            scope = 'all'
+        if var not in ('standard', 'consolidated', 'rr'):
+            var = 'standard'
+
+        pdf_bytes = self._s23_render_variant_pdf_bytes(variant=var, export_scope=scope)
+        if pdf_bytes:
+            self._s23_store_cached_attachment(
+                pdf_bytes, export_scope=scope, variant=var, file_format='pdf'
+            )
+
+        excel_action = False
+        if var == 'standard':
+            excel_action = self.action_download_excel_components(export_scope=scope)
+        elif var == 'consolidated':
+            excel_action = self.action_download_consolidated_excel()
+        elif var == 'rr':
+            excel_action = self.action_download_rr_excel()
+
+        excel_attachment_id = self._extract_attachment_id_from_action(excel_action)
+        if excel_attachment_id:
+            tmp_att = self.env['ir.attachment'].browse(excel_attachment_id)
+            if tmp_att.exists() and tmp_att.datas:
+                excel_bytes = base64.b64decode(tmp_att.datas)
+                self._s23_store_cached_attachment(
+                    excel_bytes, export_scope=scope, variant=var, file_format='excel'
+                )
+                # Keep DB clean: remove temporary one created by exporter.
+                tmp_att.unlink()
+
+    def _s23_prepare_standard_scope_cache(self, export_scope='all'):
+        """Generate and cache BOTH PDF and Excel for a standard scope."""
+        self.ensure_one()
+        self._s23_prepare_variant_cache(variant='standard', export_scope=export_scope)
+
+    def action_download_cached_award_file(self, export_scope='all', file_format='pdf', variant='standard'):
+        """Download pre-generated file from DB cache (no regeneration)."""
+        self.ensure_one()
+        scope = export_scope or 'all'
+        fmt = (file_format or 'pdf').lower()
+        var = (variant or 'standard').lower()
+        if fmt not in ('pdf', 'excel'):
+            fmt = 'pdf'
+        if var not in ('standard', 'consolidated', 'rr'):
+            var = 'standard'
+        att = self._s23_get_cached_attachment(scope, var, fmt)
+        if not att:
+            raise ValidationError(_(
+                'No cached %s file found for %s/%s. '
+                'Please generate first and then download.'
+            ) % (fmt.upper(), var.title(), scope.title()))
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{att.id}?download=true',
+            'target': 'self',
+        }
+
     def _mark_generated_scope(self, export_scope='all'):
         self.ensure_one()
         scope = export_scope or 'all'
@@ -1028,6 +1241,14 @@ class Section23Award(models.Model):
             'state': 'approved' if all_done else 'draft',
         })
 
+    def _mark_variant_generated(self, variant='standard'):
+        self.ensure_one()
+        var = (variant or 'standard').lower()
+        if var == 'consolidated':
+            self.write({'consolidated_generated': True})
+        elif var == 'rr':
+            self.write({'rr_generated': True})
+
     def _ensure_all_components_generated(self):
         self.ensure_one()
         all_generated = bool(
@@ -1039,12 +1260,21 @@ class Section23Award(models.Model):
                 'then you can download Standard/Consolidated/R&R full sheets.'
             ))
 
-    def _generate_scope_without_download(self, export_scope='all', label=None):
+    def _generate_scope_without_download(self, export_scope='all', label=None, allow_regenerate=False):
         """Generate requested scope and update status without opening download UI."""
         self.ensure_one()
-        self._validate_for_generate(require_sales_sort_rate=True)
+        self._validate_for_generate(
+            require_sales_sort_rate=True,
+            allow_when_fully_generated=bool(allow_regenerate),
+        )
         self._sync_award_structure_lines()
         self._refresh_award_line_items()
+        self._s23_prepare_standard_scope_cache(export_scope=export_scope)
+        # Base section change invalidates consolidated/R&R snapshots.
+        self.write({
+            'consolidated_generated': False,
+            'rr_generated': False,
+        })
         self._mark_generated_scope(export_scope=export_scope)
         self.message_post(body=_("Section generated successfully. / पत्रक सफलतापूर्वक जेनरेट किया गया।"))
         return {
@@ -1078,6 +1308,61 @@ class Section23Award(models.Model):
             export_scope='asset',
             label=_('Asset award generated. Use Download Asset Award for PDF/Excel.'),
         )
+
+    def action_regenerate_land_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='land',
+            label=_('Land award regenerated. Latest PDF/Excel cached and ready to download.'),
+            allow_regenerate=True,
+        )
+
+    def action_regenerate_tree_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='tree',
+            label=_('Tree award regenerated. Latest PDF/Excel cached and ready to download.'),
+            allow_regenerate=True,
+        )
+
+    def action_regenerate_asset_award(self):
+        self.ensure_one()
+        return self._generate_scope_without_download(
+            export_scope='asset',
+            label=_('Asset award regenerated. Latest PDF/Excel cached and ready to download.'),
+            allow_regenerate=True,
+        )
+
+    def _generate_variant_without_download(self, variant='consolidated'):
+        self.ensure_one()
+        self._ensure_all_components_generated()
+        var = (variant or 'consolidated').lower()
+        if var not in ('consolidated', 'rr'):
+            var = 'consolidated'
+        self._s23_prepare_variant_cache(variant=var, export_scope='all')
+        self._mark_variant_generated(variant=var)
+        lbl = _('Consolidated award generated. Download is ready from DB cache.')
+        if var == 'rr':
+            lbl = _('R&R award generated. Download is ready from DB cache.')
+        self.message_post(body=lbl)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Generated'),
+                'message': lbl,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    def action_generate_consolidated_award(self):
+        self.ensure_one()
+        return self._generate_variant_without_download(variant='consolidated')
+
+    def action_generate_rr_award(self):
+        self.ensure_one()
+        return self._generate_variant_without_download(variant='rr')
 
     def action_download_land_award(self):
         self.ensure_one()
@@ -1129,6 +1414,8 @@ class Section23Award(models.Model):
     def action_download_consolidated_full_award(self):
         self.ensure_one()
         self._ensure_all_components_generated()
+        if not self.consolidated_generated:
+            raise ValidationError(_('Generate Consolidated Award first, then download.'))
         return self._open_award_download_wizard(
             generate=False,
             export_scope='all',
@@ -1140,6 +1427,8 @@ class Section23Award(models.Model):
     def action_download_rr_full_award(self):
         self.ensure_one()
         self._ensure_all_components_generated()
+        if not self.rr_generated:
+            raise ValidationError(_('Generate R&R Award first, then download.'))
         return self._open_award_download_wizard(
             generate=False,
             export_scope='all',
@@ -1243,7 +1532,7 @@ class Section23Award(models.Model):
             s23_include_cover=bool(include_cover_letter),
         ).report_action(self)
     
-    def _validate_for_generate(self, require_sales_sort_rate=True):
+    def _validate_for_generate(self, require_sales_sort_rate=True, allow_when_fully_generated=False):
         """Pre-checks for opening/running generate flow.
 
         ``require_sales_sort_rate`` keeps the generator strict on rate entry.
@@ -1251,7 +1540,7 @@ class Section23Award(models.Model):
         self.ensure_one()
         # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
         self.flush_recordset()
-        if self.land_generated and self.tree_generated and self.asset_generated:
+        if (not allow_when_fully_generated) and self.land_generated and self.tree_generated and self.asset_generated:
             raise ValidationError(_(
                 'All section awards are already generated for this Project and Village. '
                 'Use Download options instead of generating again.'
@@ -1297,6 +1586,13 @@ class Section23Award(models.Model):
                     'before generating the award.\n'
                     'अवार्ड जेनरेट करने से पहले यह दर दर्ज करें।'
                 ))
+        mr_rate = float(self.rate_master_main_road_ha or 0.0)
+        bmr_rate = float(self.rate_master_other_road_ha or 0.0)
+        if mr_rate <= 0.0 or bmr_rate <= 0.0:
+            raise ValidationError(_(
+                'Please enter both MR Rate and BMR Rate (greater than zero) before generating the award.\n'
+                'अवार्ड जेनरेट करने से पहले MR Rate और BMR Rate दोनों दर्ज करें।'
+            ))
 
     def action_generate_award(self):
         """Generate all section scopes without download prompt."""
@@ -1614,21 +1910,24 @@ class Section23Award(models.Model):
         return "धारा 4 सार्वजनिक सुनवाई दिनांक से अवार्ड दिनांक तक"
 
     def _s23_land_base_rate_per_hectare(self, survey, award_line, derived_within):
-        """MR/BMR line from the active land rate master."""
+        """MR/BMR rate from award values; fallback to active land rate master."""
         self.ensure_one()
         if not self.village_id or not survey:
             return 0.0
-        rm = self.env['bhu.rate.master'].search([
-            ('village_id', '=', self.village_id.id),
-            ('state', 'in', ['active', 'draft']),
-        ], limit=1, order='state ASC, effective_from DESC')
-        if not rm:
-            return 0.0
+        mr_rate = float(self.rate_master_main_road_ha or 0.0)
+        bmr_rate = float(self.rate_master_other_road_ha or 0.0)
+        if mr_rate <= 0.0 or bmr_rate <= 0.0:
+            rm = self._get_active_rate_master_for_village()
+            if rm:
+                if mr_rate <= 0.0:
+                    mr_rate = float(rm.main_road_rate_hectare or 0.0)
+                if bmr_rate <= 0.0:
+                    bmr_rate = float(rm.other_road_rate_hectare or 0.0)
         land_type = (award_line.land_type if award_line else (survey.land_type_for_award or 'village'))
         is_within = award_line.is_within_distance if award_line else derived_within
         if land_type not in ('village', 'residential'):
             land_type = 'village'
         if is_within:
-            return rm.main_road_rate_hectare or 0.0
-        return rm.other_road_rate_hectare or 0.0
+            return mr_rate
+        return bmr_rate
 

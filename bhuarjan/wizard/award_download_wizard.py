@@ -98,6 +98,17 @@ class AwardDownloadWizard(models.TransientModel):
         if variant not in ('standard', 'consolidated', 'rr'):
             variant = 'standard'
 
+        # Simple download dialog path: return DB-cached file directly (no regeneration).
+        if self.simple_download_dialog and self.res_model == 'bhu.section23.award':
+            if not hasattr(record, 'action_download_cached_award_file'):
+                raise UserError(_('This record does not support cached downloads.'))
+            download_action = record.action_download_cached_award_file(
+                export_scope=scope,
+                file_format=self.format,
+                variant=variant,
+            )
+            return self._wrap_download_action_for_autoclose(download_action)
+
         if self.section23_generate and self.res_model == 'bhu.section23.award':
             if not hasattr(record, 'apply_generate_from_download_wizard'):
                 raise UserError(_('This record does not support the generate flow.'))
@@ -138,3 +149,17 @@ class AwardDownloadWizard(models.TransientModel):
                 return record.action_download_excel_components(export_scope=scope)
             raise UserError(_("Excel export is not supported for this report."))
         raise UserError(_("Selected download format is not supported."))
+
+    def _wrap_download_action_for_autoclose(self, action):
+        """For wizard downloads: trigger file, then close popup and refresh form."""
+        if not isinstance(action, dict):
+            return action
+        if action.get('type') != 'ir.actions.act_url':
+            return action
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'bhuarjan_s23_download_and_refresh',
+            'params': {
+                'url': action.get('url'),
+            },
+        }

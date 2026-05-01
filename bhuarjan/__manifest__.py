@@ -189,6 +189,7 @@
             # 'bhuarjan/static/src/js/hierarchy_expand.js',
             # 'bhuarjan/static/src/js/survey_form_confirm.js',
             'bhuarjan/static/src/js/support_issue.js',
+            'bhuarjan/static/src/js/s23_download_and_refresh.js',
             # Register js_class="confirm_save_form" custom form view.
             'bhuarjan/static/src/js/components/popup.js',
             # Debranding assets (merged from debrand_odoo module)

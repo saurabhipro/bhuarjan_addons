@@ -109,18 +109,6 @@ function _toNumber(raw) {
     return Number.isFinite(num) ? num : 0.0;
 }
 
-function _isUrbanRecord() {
-    const direct = (_fieldRawValue('is_urban') || '').toLowerCase();
-    if (['1', 'true', 'yes'].includes(direct)) return true;
-    const villageType = (_fieldRawValue('village_type') || '').toLowerCase();
-    if (villageType.includes('urban') || villageType.includes('नगरीय')) return true;
-    // Fallback: if urban plot rate widgets are present/visible, treat as urban context.
-    const mrWidget = _fieldWidget('rate_master_main_road_sqm');
-    const bmrWidget = _fieldWidget('rate_master_other_road_sqm');
-    const visible = (el) => !!(el && el.offsetParent !== null);
-    return visible(mrWidget) || visible(bmrWidget);
-}
-
 function _section23GeneratePrecheckError() {
     const caseNumber = _fieldRawValue('case_number');
     if (!caseNumber) {
@@ -134,13 +122,6 @@ function _section23GeneratePrecheckError() {
     const bmrHa = _toNumber(_fieldRawValue('rate_master_other_road_ha'));
     if (mrHa <= 0 || bmrHa <= 0) {
         return 'Please enter MR Rate and BMR Rate (per hectare) greater than zero before generating.';
-    }
-    if (_isUrbanRecord()) {
-        const mrSqm = _toNumber(_fieldRawValue('rate_master_main_road_sqm'));
-        const bmrSqm = _toNumber(_fieldRawValue('rate_master_other_road_sqm'));
-        if (mrSqm <= 0 || bmrSqm <= 0) {
-            return 'For Urban records, please enter MR Plot Rate and BMR Plot Rate (per sq.m) greater than zero before generating.';
-        }
     }
     return '';
 }

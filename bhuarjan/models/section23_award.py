@@ -282,21 +282,23 @@ class Section23Award(models.Model):
     def _sync_rate_fields_from_master(self, force=False):
         for rec in self:
             rm = rec._get_active_rate_master_for_village()
-            mr_rate = rm.main_road_rate_hectare if rm else 0.0
-            bmr_rate = rm.other_road_rate_hectare if rm else 0.0
-            mr_plot_rate = rm.main_road_rate_sqm if rm else 0.0
-            bmr_plot_rate = rm.other_road_rate_sqm if rm else 0.0
-            vals = {}
+            mr_rate = float(rm.main_road_rate_hectare or 0.0) if rm else 0.0
+            bmr_rate = float(rm.other_road_rate_hectare or 0.0) if rm else 0.0
+            mr_plot_rate = float(rm.main_road_rate_sqm or 0.0) if rm else 0.0
+            bmr_plot_rate = float(rm.other_road_rate_sqm or 0.0) if rm else 0.0
+            # Fallback: when sq.m rates are not maintained in master, derive from hectare.
+            if mr_plot_rate <= 0.0 and mr_rate > 0.0:
+                mr_plot_rate = mr_rate / 10000.0
+            if bmr_plot_rate <= 0.0 and bmr_rate > 0.0:
+                bmr_plot_rate = bmr_rate / 10000.0
             if force or not rec.rate_master_main_road_ha:
-                vals['rate_master_main_road_ha'] = mr_rate
+                rec.rate_master_main_road_ha = mr_rate
             if force or not rec.rate_master_other_road_ha:
-                vals['rate_master_other_road_ha'] = bmr_rate
+                rec.rate_master_other_road_ha = bmr_rate
             if force or not rec.rate_master_main_road_sqm:
-                vals['rate_master_main_road_sqm'] = mr_plot_rate
+                rec.rate_master_main_road_sqm = mr_plot_rate
             if force or not rec.rate_master_other_road_sqm:
-                vals['rate_master_other_road_sqm'] = bmr_plot_rate
-            if vals:
-                rec.update(vals)
+                rec.rate_master_other_road_sqm = bmr_plot_rate
 
     @api.depends('project_id', 'project_id.company_id', 'project_id.company_id.currency_id')
     def _compute_s23_premium_currency(self):
@@ -1611,6 +1613,9 @@ class Section23Award(models.Model):
         ``require_sales_sort_rate`` keeps the generator strict on rate entry.
         """
         self.ensure_one()
+        # Ensure missing rate fields are auto-filled from village master first.
+        # User-edited non-zero values are preserved (force=False).
+        self._sync_rate_fields_from_master(force=False)
         # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
         self.flush_recordset()
         if (not allow_when_fully_generated) and self.land_generated and self.tree_generated and self.asset_generated:
@@ -1670,15 +1675,6 @@ class Section23Award(models.Model):
                 'Please enter both MR Rate and BMR Rate (greater than zero) before generating the award.\n'
                 'अवार्ड जेनरेट करने से पहले MR Rate और BMR Rate दोनों दर्ज करें।'
             ))
-        is_urban_record = bool(self.is_urban or self.village_type == 'urban')
-        if is_urban_record:
-            mr_plot_rate = float(self.rate_master_main_road_sqm or 0.0)
-            bmr_plot_rate = float(self.rate_master_other_road_sqm or 0.0)
-            if mr_plot_rate <= 0.0 or bmr_plot_rate <= 0.0:
-                raise ValidationError(_(
-                    'For Urban award generation, MR Plot Rate and BMR Plot Rate (₹/sqm) must be greater than zero.\n'
-                    'नगरीय अवार्ड जेनरेट करने के लिए MR Plot Rate और BMR Plot Rate (₹/sqm) शून्य से अधिक होना आवश्यक है।'
-                ))
 
     def action_generate_award(self):
         """Generate all section scopes without download prompt."""
@@ -1968,10 +1964,10 @@ class Section23Award(models.Model):
     def _get_award_calculation_date(self):
         """Return award creation date used for interest end date."""
         self.ensure_one()
-        if self.create_date:
-            return fields.Datetime.to_datetime(self.create_date).date()
         if self.award_date:
             return fields.Date.to_date(self.award_date)
+        if self.create_date:
+            return fields.Datetime.to_datetime(self.create_date).date()
         return fields.Date.context_today(self)
 
     def _calculate_interest_on_basic(self, basic_value):

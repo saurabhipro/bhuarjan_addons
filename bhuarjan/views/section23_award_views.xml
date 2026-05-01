@@ -133,20 +133,6 @@
                                                widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     </div>
                                 </div>
-                                <div class="s23_meta_item" invisible="not is_urban">
-                                    <div class="s23_meta_label">MR Plot Rate / मुख्यमार्ग प्लॉट दर (₹/sqm)</div>
-                                    <div class="s23_meta_value">
-                                        <field name="rate_master_main_road_sqm" readonly="0" force_save="1"
-                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    </div>
-                                </div>
-                                <div class="s23_meta_item" invisible="not is_urban">
-                                    <div class="s23_meta_label">BMR Plot Rate / अन्य प्लॉट दर (₹/sqm)</div>
-                                    <div class="s23_meta_value">
-                                        <field name="rate_master_other_road_sqm" readonly="0" force_save="1"
-                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

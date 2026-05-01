@@ -227,6 +227,7 @@ class Section23AwardData(models.Model):
                 data.get('unirrigated'),
             )
             rehab_policy_amount = acquired_area_acre * rehab_rate_per_acre
+            # Col 18 is payable amount: compare Col 16 and Col 17, take higher.
             payable_compensation = max(total_compensation, rehab_policy_amount)
 
             data.update({
@@ -328,9 +329,10 @@ class Section23AwardData(models.Model):
                 continue
 
             portion_sqm = portion_ha * 10000.0
-            market_value = portion_sqm * sqm_plot * pct
+            basic_value = portion_sqm * sqm_plot * pct
+            market_value = basic_value * 2.0
             solatium = market_value * 1.0
-            interest, _ = self._calculate_interest_on_basic(market_value)
+            interest, _ = self._calculate_interest_on_basic(basic_value)
             total_comp = market_value + solatium + interest
 
             acquired_acre = portion_ha * acre_per_hectare
@@ -338,6 +340,7 @@ class Section23AwardData(models.Model):
                 base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
             )
             rehab_amt = acquired_acre * rehab_rate
+            # Col 18 is payable amount: compare Col 16 and Col 17, take higher.
             paid = max(total_comp, rehab_amt)
 
             effective_sqm_rate = sqm_plot * pct
@@ -346,7 +349,7 @@ class Section23AwardData(models.Model):
                 'acquired_area': portion_ha,
                 'guide_line_rate': effective_sqm_rate,
                 'base_rate_hectare': sqm_plot,
-                'basic_value': market_value,
+                'basic_value': basic_value,
                 'market_value': market_value,
                 'solatium': solatium,
                 'interest': interest,
@@ -368,9 +371,10 @@ class Section23AwardData(models.Model):
 
         if total_area_ha > no_slab_threshold:
             remaining_ha = total_area_ha - no_slab_threshold
-            market_value = remaining_ha * effective_rate_ha
+            basic_value = remaining_ha * effective_rate_ha
+            market_value = basic_value * 2.0
             solatium = market_value * 1.0
-            interest, _ = self._calculate_interest_on_basic(market_value)
+            interest, _ = self._calculate_interest_on_basic(basic_value)
             total_comp = market_value + solatium + interest
 
             acquired_acre = remaining_ha * acre_per_hectare
@@ -378,6 +382,7 @@ class Section23AwardData(models.Model):
                 base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
             )
             rehab_amt = acquired_acre * rehab_rate
+            # Col 18 is payable amount: compare Col 16 and Col 17, take higher.
             paid = max(total_comp, rehab_amt)
 
             row = dict(base_data)
@@ -385,7 +390,7 @@ class Section23AwardData(models.Model):
                 'acquired_area': remaining_ha,
                 'guide_line_rate': effective_rate_ha,
                 'base_rate_hectare': sqm_raw,
-                'basic_value': market_value,
+                'basic_value': basic_value,
                 'market_value': market_value,
                 'solatium': solatium,
                 'interest': interest,

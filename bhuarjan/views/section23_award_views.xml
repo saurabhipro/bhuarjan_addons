@@ -64,16 +64,6 @@
                     <div class="bhu_s23_content">
 
                     <div id="s23_award_meta" class="mt-2">
-                        <div class="alert alert-light border-0 mb-3" role="alert" style="background: #fff9f2; color: #444; border-left: 4px solid #8a4531 !important; padding: 12px 14px;">
-                            <i class="fa fa-info-circle text-secondary me-1"/>
-                            <span class="s23_note">Generating award for</span>
-                            <strong>Village:</strong> <field name="village_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/>,
-                            <strong>Project:</strong> <field name="project_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/>
-                            <span invisible="not department_id">, <strong>Department:</strong> <field name="department_id" readonly="1" options="{'no_open': True}" class="text-primary d-inline"/></span>
-                            <span class="ms-2 badge rounded-pill text-bg-secondary" title="Survey count">
-                                <field name="s23_survey_count" readonly="1" nolabel="1" class="d-inline"/> surveys
-                            </span>
-                        </div>
                         <div class="s23_award_meta_panel">
                             <div class="s23_award_meta_grid">
                                 <div class="s23_meta_item">
@@ -89,9 +79,9 @@
                                     </div>
                                 </div>
                                 <div class="s23_meta_item">
-                                    <div class="s23_meta_label">Case Number / प्रकरण क्रमांक</div>
+                                    <div class="s23_meta_label">Case Number / प्रकरण क्रमांक <span class="text-danger">*</span></div>
                                     <div class="s23_meta_value">
-                                        <field name="case_number" readonly="state != 'draft'"/>
+                                        <field name="case_number" readonly="state != 'draft'" required="1"/>
                                     </div>
                                 </div>
                                 <div class="s23_meta_item">
@@ -336,7 +326,7 @@
                                     string="Regenerate Land Award"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
-                                    confirm="Do you want to regenerate the Land Award? Existing cached files will be replaced with latest data."
+                                    confirm="Do you want to regenerate the Land Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not land_generated"/>
                         </div>
                         <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines">
@@ -423,7 +413,7 @@
                                     string="Regenerate Tree Award"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
-                                    confirm="Do you want to regenerate the Tree Award? Existing cached files will be replaced with latest data."
+                                    confirm="Do you want to regenerate the Tree Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not tree_generated"/>
                         </div>
                         <field name="s23_tree_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
@@ -477,7 +467,7 @@
                                     string="Regenerate Asset Award"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
-                                    confirm="Do you want to regenerate the Asset Award? Existing cached files will be replaced with latest data."
+                                    confirm="Do you want to regenerate the Asset Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not asset_generated"/>
                         </div>
                         <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">

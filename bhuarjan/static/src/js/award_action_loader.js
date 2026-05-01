@@ -176,24 +176,76 @@ const ACTION_LABELS = {
     'action_consolidated_report':        'Generating Consolidated PDF report…',
 };
 
-let _pendingConfirmLoader = null;
-
-function _isLikelyConfirmOkButton(btn) {
-    if (!btn) return false;
-    if (!btn.closest('.modal-footer, .o_dialog_footer')) return false;
-    const cls = btn.className || '';
-    const txt = (btn.textContent || '').trim().toLowerCase();
-    return (
-        cls.includes('btn-primary') ||
-        cls.includes('btn-success') ||
-        txt === 'ok' ||
-        txt === 'yes' ||
-        txt === 'confirm'
-    );
+function _showLoaderAfterConfirmDialogClose(confirmDialog, label) {
+    let shown = false;
+    const showOnce = () => {
+        if (shown) return;
+        shown = true;
+        _showLoader(label);
+    };
+    if (!confirmDialog || !document.body.contains(confirmDialog)) {
+        showOnce();
+        return;
+    }
+    const obs = new MutationObserver(() => {
+        if (
+            !document.body.contains(confirmDialog) ||
+            confirmDialog.style.display === 'none' ||
+            !confirmDialog.offsetParent
+        ) {
+            obs.disconnect();
+            showOnce();
+        }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    // Hard fallback in case MutationObserver misses the close.
+    setTimeout(() => { obs.disconnect(); showOnce(); }, 400);
 }
 
-function _clearPendingConfirmLoader() {
-    _pendingConfirmLoader = null;
+function _attachConfirmDialogListener(label) {
+    // Called after a heavy form button click; waits for confirm dialog to appear,
+    // then attaches a one-time listener to its footer to detect OK vs Cancel.
+    let attached = false;
+    let cancelled = false;
+    const tryAttach = () => {
+        if (attached || cancelled) return;
+        const dialog = document.querySelector('.o_dialog:not([style*="display:none"]):not([style*="display: none"])');
+        if (!dialog) return;
+        const footer = dialog.querySelector('.o_dialog_footer, .modal-footer');
+        if (!footer) return;
+        attached = true;
+        footer.addEventListener('click', function onFooterClick(e) {
+            footer.removeEventListener('click', onFooterClick);
+            let b = e.target;
+            while (b && b.tagName !== 'BUTTON') b = b.parentElement;
+            if (!b) return;
+            const cls = b.className || '';
+            const txt = (b.textContent || '').trim().toLowerCase();
+            const isOk = cls.includes('btn-primary') || cls.includes('btn-success') ||
+                txt === 'ok' || txt === 'yes' || txt === 'confirm';
+            if (isOk) {
+                _showLoaderAfterConfirmDialogClose(dialog, label);
+            }
+            // Cancel: do nothing — no loader.
+        }, true);
+    };
+    // Poll briefly for dialog to appear (Odoo renders it async via OWL).
+    let polls = 0;
+    const poll = setInterval(() => {
+        polls++;
+        tryAttach();
+        if (attached || polls > 30) {  // 30 × 50ms = 1.5s max wait
+            clearInterval(poll);
+            if (!attached) {
+                // No confirm dialog appeared — action ran directly, show loader now.
+                if (!document.getElementById(LOADER_ID)) {
+                    _showLoader(label);
+                }
+            }
+        }
+    }, 50);
+    // Allow cancellation if a Cancel/Close click detected within 1.5s.
+    return { cancel: () => { cancelled = true; clearInterval(poll); } };
 }
 
 function _isSection23Context() {
@@ -313,60 +365,40 @@ window.addEventListener('hashchange', () => {
     }
 });
 
-// Attach click listener using event delegation on document body
+// Attach click listener using event delegation on document body (capture phase).
 document.addEventListener('click', (e) => {
-    // Walk up the DOM to find the actual <button> element
+    // Walk up the DOM to find the actual <button> element.
     let btn = e.target;
     while (btn && btn.tagName !== 'BUTTON') {
         btn = btn.parentElement;
     }
-    if (!btn) return;
+    if (!btn || btn.disabled) return;
 
     const name = btn.getAttribute('name') || btn.dataset.name || '';
     const isHeavy = HEAVY_ACTIONS.has(name);
     const isCreateInS23 = _isCreateButton(btn) && _isSection23Context();
-    const isConfirmSource = !!btn.getAttribute('confirm');
-    const isConfirmOkClick = _pendingConfirmLoader && _isLikelyConfirmOkButton(btn);
+    if (!isHeavy && !isCreateInS23) return;
 
-    if (!isHeavy && !isCreateInS23 && !isConfirmOkClick) {
-        // If user clicks Cancel/Close on confirmation popup, clear pending loader intent.
-        if (_pendingConfirmLoader && btn.closest('.modal-footer, .o_dialog_footer')) {
-            _clearPendingConfirmLoader();
-        }
+    const label = isCreateInS23
+        ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
+        : (ACTION_LABELS[name] || 'Processing your request…');
+
+    // If button is INSIDE a wizard/download dialog: show loader immediately.
+    const insideDialog = !!btn.closest('.o_dialog, .modal, [role="dialog"]');
+    if (insideDialog) {
+        _showLoader(label);
+        _setupLoaderDone(btn.closest('.o_dialog, .modal, [role="dialog"]'));
         return;
     }
 
-    // Don't show if button is disabled
-    if (btn.disabled) return;
+    // For form-level buttons: Odoo may render a confirm dialog first (OWL async).
+    // Wait and attach to dialog's footer, then show loader only after user clicks OK.
+    _attachConfirmDialogListener(label);
 
-    // For buttons with Odoo confirm popup: wait for user confirmation first.
-    if (isHeavy && isConfirmSource) {
-        _pendingConfirmLoader = {
-            label: ACTION_LABELS[name] || 'Processing your request…',
-            at: Date.now(),
-        };
-        return;
-    }
+}, true); // capture phase
 
-    // If user clicked "Ok" in confirm popup, use the pending action label.
-    const label = isConfirmOkClick
-        ? (_pendingConfirmLoader && _pendingConfirmLoader.label) || 'Processing your request…'
-        : (
-            isCreateInS23
-                ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
-                : (ACTION_LABELS[name] || 'Processing your request…')
-        );
-    if (isConfirmOkClick) {
-        _clearPendingConfirmLoader();
-    }
-
-    // Check if button is inside a dialog/wizard
-    const dialog = btn.closest('.o_dialog, .modal, [role="dialog"]');
-
-    _showLoader(label);
-
-    // Safety-net timeouts (generous to cover slow PDF generation)
-    const MAX_WAIT = 120000; // 2 minutes hard max
+function _setupLoaderDone(wizardDialog) {
+    const MAX_WAIT = 120000;
     const safetyTimer = setTimeout(_hideLoader, MAX_WAIT);
 
     function done() {
@@ -376,40 +408,47 @@ document.addEventListener('click', (e) => {
         setTimeout(_hideLoader, 500);
     }
 
-    // 1. If button was in a wizard dialog: hide loader when dialog is removed from DOM
+    // 1. Hide when wizard dialog is removed.
     let dialogObs = null;
-    if (dialog) {
+    if (wizardDialog) {
         dialogObs = new MutationObserver(() => {
-            // Dialog closed (removed from DOM or hidden)
-            if (!document.body.contains(dialog) ||
-                dialog.style.display === 'none' ||
-                !dialog.offsetParent) {
+            if (!document.body.contains(wizardDialog) ||
+                wizardDialog.style.display === 'none' ||
+                !wizardDialog.offsetParent) {
                 done();
             }
         });
         dialogObs.observe(document.body, { childList: true, subtree: true });
     }
 
-    // 2. Hide loader when Odoo shows a notification (success OR error)
+    // 2. Hide when Odoo shows a notification.
     let notifObs = new MutationObserver(() => {
         const notif = document.querySelector('.o_notification_manager .o_notification');
         if (notif) { done(); }
     });
     notifObs.observe(document.body, { childList: true, subtree: true });
 
-    // 3. Hide when page regains focus after a file download (browser focus returns)
-    const onFocus = () => { done(); };
-    window.addEventListener('focus', onFocus, { once: true });
+    // 3. Hide on focus return (file download finished).
+    window.addEventListener('focus', () => done(), { once: true });
+}
 
-    // 4. For non-dialog buttons: also watch for form re-render (breadcrumb change)
-    if (!dialog) {
-        const breadcrumb = document.querySelector('.o_breadcrumb, .breadcrumb');
-        if (breadcrumb) {
-            const bcObs = new MutationObserver(() => {
-                bcObs.disconnect();
-                done();
-            });
-            bcObs.observe(breadcrumb, { childList: true, subtree: true });
+// Watch notifications and close loader after success/error.
+// Important: guard against early module load when `document.body` is not ready yet.
+function _startLoaderHideWatcher() {
+    const target = document.body || document.documentElement;
+    if (!target) return;
+    const obs = new MutationObserver(() => {
+        if (!document.getElementById(LOADER_ID)) return;
+        const notif = document.querySelector('.o_notification_manager .o_notification');
+        if (notif) {
+            setTimeout(_hideLoader, 600);
         }
-    }
-}, true); // capture phase
+    });
+    obs.observe(target, { childList: true, subtree: true });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _startLoaderHideWatcher, { once: true });
+} else {
+    _startLoaderHideWatcher();
+}

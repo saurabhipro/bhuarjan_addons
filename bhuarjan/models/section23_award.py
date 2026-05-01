@@ -1116,6 +1116,26 @@ class Section23Award(models.Model):
             'description': f'S23 cached export ({variant}/{export_scope}/{file_format})',
         })
 
+    def _s23_clear_variant_cache(self, variants=None):
+        """Delete cached files for selected variant(s) from DB."""
+        self.ensure_one()
+        variants = variants or ('consolidated', 'rr')
+        vars_clean = tuple(v for v in variants if v in ('standard', 'consolidated', 'rr'))
+        if not vars_clean:
+            return 0
+        atts = self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('name', 'ilike', 'S23_CACHE__'),
+        ])
+        to_remove = atts.filtered(
+            lambda att: any(f"S23_CACHE__{var}__" in (att.name or '') for var in vars_clean)
+        )
+        count = len(to_remove)
+        if to_remove:
+            to_remove.unlink()
+        return count
+
     @api.model
     def _extract_attachment_id_from_action(self, action):
         if not isinstance(action, dict):
@@ -1263,6 +1283,8 @@ class Section23Award(models.Model):
     def _generate_scope_without_download(self, export_scope='all', label=None, allow_regenerate=False):
         """Generate requested scope and update status without opening download UI."""
         self.ensure_one()
+        had_consolidated = bool(self.consolidated_generated)
+        had_rr = bool(self.rr_generated)
         self._validate_for_generate(
             require_sales_sort_rate=True,
             allow_when_fully_generated=bool(allow_regenerate),
@@ -1271,18 +1293,32 @@ class Section23Award(models.Model):
         self._refresh_award_line_items()
         self._s23_prepare_standard_scope_cache(export_scope=export_scope)
         # Base section change invalidates consolidated/R&R snapshots.
+        removed_count = self._s23_clear_variant_cache(variants=('consolidated', 'rr'))
         self.write({
             'consolidated_generated': False,
             'rr_generated': False,
         })
         self._mark_generated_scope(export_scope=export_scope)
-        self.message_post(body=_("Section generated successfully. / पत्रक सफलतापूर्वक जेनरेट किया गया।"))
+        reset_note = ''
+        if had_consolidated or had_rr:
+            reset_note = _(
+                ' Consolidated and R&R caches were reset. Please regenerate both before download.'
+            )
+        self.message_post(
+            body=_("Section generated successfully. / पत्रक सफलतापूर्वक जेनरेट किया गया।") + reset_note
+        )
+        message = label or _('Section generated. Now use Download button for PDF/Excel.')
+        if had_consolidated or had_rr:
+            message = _(
+                '%s Consolidated and R&R were reset and their cached files were deleted from DB (%s file(s)). '
+                'Please regenerate Consolidated and R&R.'
+            ) % (message, removed_count)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Generated'),
-                'message': label or _('Section generated. Now use Download button for PDF/Excel.'),
+                'message': message,
                 'type': 'success',
                 'sticky': False,
             },
@@ -1549,6 +1585,10 @@ class Section23Award(models.Model):
             raise ValidationError(_('Please select a project first.'))
         if not self.village_id:
             raise ValidationError(_('Please select a village first.'))
+        if not (self.case_number or '').strip():
+            raise ValidationError(_(
+                'Please enter the Case Number / प्रकरण क्रमांक before generating the award.'
+            ))
         if not self._get_section4_approval_date():
             raise ValidationError(_(
                 'Section 4 notification is not approved yet for this project and village.\n'

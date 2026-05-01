@@ -25,7 +25,7 @@
                 <header>
                     <field name="s23_generation_stage"
                            widget="statusbar"
-                           statusbar_visible="draft,land_generated,tree_generated,asset_generated,all_generated"
+                           statusbar_visible="draft,land_generated,tree_generated,asset_generated,all_generated,consolidated_generated,rr_generated"
                            options="{'clickable': False}"/>
                 </header>
                 <sheet>
@@ -253,14 +253,22 @@
                         </div>
                         <div class="col-6 col-md-2">
                             <div class="border rounded p-2 bg-light h-100">
-                                <div class="small text-muted">Consolidated</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="small text-muted">Consolidated</div>
+                                    <span class="badge rounded-pill text-white" style="background:#2f6798;" invisible="not consolidated_generated"><i class="fa fa-check" title="Generated"/></span>
+                                    <span class="badge rounded-pill bg-secondary text-white" invisible="consolidated_generated"><i class="fa fa-circle-o" title="Pending"/></span>
+                                </div>
                                 <div class="fw-bold text-success" invisible="not consolidated_generated"><i class="fa fa-check-circle" title="Generated"/> Generated</div>
                                 <div class="fw-bold text-secondary" invisible="consolidated_generated"><i class="fa fa-circle-o" title="Pending"/> Pending</div>
                             </div>
                         </div>
                         <div class="col-6 col-md-2">
                             <div class="border rounded p-2 bg-light h-100">
-                                <div class="small text-muted">R&amp;R</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="small text-muted">R&amp;R</div>
+                                    <span class="badge rounded-pill text-white" style="background:#66538f;" invisible="not rr_generated"><i class="fa fa-check" title="Generated"/></span>
+                                    <span class="badge rounded-pill bg-secondary text-white" invisible="rr_generated"><i class="fa fa-circle-o" title="Pending"/></span>
+                                </div>
                                 <div class="fw-bold text-success" invisible="not rr_generated"><i class="fa fa-check-circle" title="Generated"/> Generated</div>
                                 <div class="fw-bold text-secondary" invisible="rr_generated"><i class="fa fa-circle-o" title="Pending"/> Pending</div>
                             </div>

@@ -126,6 +126,8 @@ class Section23Award(models.Model):
             ('tree_generated', 'Tree Generated / वृक्ष उत्पन्न'),
             ('asset_generated', 'Asset Generated / परिसम्पत्ति उत्पन्न'),
             ('all_generated', 'All Generated / पूर्ण उत्पन्न'),
+            ('consolidated_generated', 'Consolidated Generated'),
+            ('rr_generated', 'R&R Generated'),
         ],
         string='Generation Progress',
         compute='_compute_s23_generation_stage',
@@ -416,10 +418,21 @@ class Section23Award(models.Model):
                 (rec.land_generated and rec.tree_generated and rec.asset_generated) or rec.is_generated
             )
 
-    @api.depends('land_generated', 'tree_generated', 'asset_generated', 'all_components_generated')
+    @api.depends(
+        'land_generated',
+        'tree_generated',
+        'asset_generated',
+        'all_components_generated',
+        'consolidated_generated',
+        'rr_generated',
+    )
     def _compute_s23_generation_stage(self):
         for rec in self:
-            if rec.all_components_generated:
+            if rec.rr_generated:
+                rec.s23_generation_stage = 'rr_generated'
+            elif rec.consolidated_generated:
+                rec.s23_generation_stage = 'consolidated_generated'
+            elif rec.all_components_generated:
                 rec.s23_generation_stage = 'all_generated'
             elif rec.asset_generated:
                 rec.s23_generation_stage = 'asset_generated'
@@ -1321,6 +1334,7 @@ class Section23Award(models.Model):
                 'message': message,
                 'type': 'success',
                 'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
             },
         }
 
@@ -1389,6 +1403,7 @@ class Section23Award(models.Model):
                 'message': lbl,
                 'type': 'success',
                 'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
             },
         }
 

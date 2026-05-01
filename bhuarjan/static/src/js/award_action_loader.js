@@ -176,6 +176,26 @@ const ACTION_LABELS = {
     'action_consolidated_report':        'Generating Consolidated PDF report…',
 };
 
+let _pendingConfirmLoader = null;
+
+function _isLikelyConfirmOkButton(btn) {
+    if (!btn) return false;
+    if (!btn.closest('.modal-footer, .o_dialog_footer')) return false;
+    const cls = btn.className || '';
+    const txt = (btn.textContent || '').trim().toLowerCase();
+    return (
+        cls.includes('btn-primary') ||
+        cls.includes('btn-success') ||
+        txt === 'ok' ||
+        txt === 'yes' ||
+        txt === 'confirm'
+    );
+}
+
+function _clearPendingConfirmLoader() {
+    _pendingConfirmLoader = null;
+}
+
 function _isSection23Context() {
     const hash = (window.location.hash || '').toLowerCase();
     if (hash.includes('bhu.section23.award') || hash.includes('section23')) {
@@ -305,14 +325,40 @@ document.addEventListener('click', (e) => {
     const name = btn.getAttribute('name') || btn.dataset.name || '';
     const isHeavy = HEAVY_ACTIONS.has(name);
     const isCreateInS23 = _isCreateButton(btn) && _isSection23Context();
-    if (!isHeavy && !isCreateInS23) return;
+    const isConfirmSource = !!btn.getAttribute('confirm');
+    const isConfirmOkClick = _pendingConfirmLoader && _isLikelyConfirmOkButton(btn);
+
+    if (!isHeavy && !isCreateInS23 && !isConfirmOkClick) {
+        // If user clicks Cancel/Close on confirmation popup, clear pending loader intent.
+        if (_pendingConfirmLoader && btn.closest('.modal-footer, .o_dialog_footer')) {
+            _clearPendingConfirmLoader();
+        }
+        return;
+    }
 
     // Don't show if button is disabled
     if (btn.disabled) return;
 
-    const label = isCreateInS23
-        ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
-        : (ACTION_LABELS[name] || 'Processing your request…');
+    // For buttons with Odoo confirm popup: wait for user confirmation first.
+    if (isHeavy && isConfirmSource) {
+        _pendingConfirmLoader = {
+            label: ACTION_LABELS[name] || 'Processing your request…',
+            at: Date.now(),
+        };
+        return;
+    }
+
+    // If user clicked "Ok" in confirm popup, use the pending action label.
+    const label = isConfirmOkClick
+        ? (_pendingConfirmLoader && _pendingConfirmLoader.label) || 'Processing your request…'
+        : (
+            isCreateInS23
+                ? 'Opening Section 23 Award form…<br><small>Preparing the next screen.</small>'
+                : (ACTION_LABELS[name] || 'Processing your request…')
+        );
+    if (isConfirmOkClick) {
+        _clearPendingConfirmLoader();
+    }
 
     // Check if button is inside a dialog/wizard
     const dialog = btn.closest('.o_dialog, .modal, [role="dialog"]');

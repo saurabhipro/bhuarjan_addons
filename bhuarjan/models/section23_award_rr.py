@@ -6,12 +6,7 @@ from odoo.exceptions import ValidationError
 class Section23AwardRR(models.Model):
     _inherit = 'bhu.section23.award'
 
-    RR_TITLE_TEXT = (
-        "यह अर्जन तथा पुनर्वास के मामले में सिविल कि प्रवर्तनों के विरुद्ध पुनर्वास अनुदान की राशि के भुगतान हेतु "
-        "योजना है जिसमें पात्र अनुसूचित जाति/अनुसूचित जनजाति के सदस्य 1 x 2.5 मीटर प्लाट्स की 3000 वर्ग फीट "
-        "(लगभग) तक भूमि पर आवास निर्माण के लिए 2 x 25 के पैकेज अनुदान तथा ग्राम-क्षेत्र विकास योजना, राजस्व "
-        "तथा अन्य विभागों से समन्वय स्थापित किया जाता है (योजना/नियमों के अनुसार)।"
-    )
+    RR_TITLE_TEXT = ""
 
     def get_rr_title_text(self):
         self.ensure_one()
@@ -127,10 +122,6 @@ class Section23AwardRR(models.Model):
             'bold': True, 'font_size': 13, 'font_name': font, 'align': 'center',
             'valign': 'vcenter', 'border': 1,
         })
-        title_text_fmt = wb.add_format({
-            'font_name': font, 'font_size': 10, 'align': 'left',
-            'valign': 'vcenter', 'border': 1, 'text_wrap': True,
-        })
         head_fmt = wb.add_format({
             'bold': True, 'font_size': 9, 'font_name': font, 'align': 'center',
             'valign': 'vcenter', 'border': 1, 'text_wrap': True, 'bg_color': '#D3D3D3',
@@ -149,16 +140,14 @@ class Section23AwardRR(models.Model):
         total_num4_fmt = wb.add_format({'font_name': font, 'bold': True, 'border': 1, 'align': 'right', 'num_format': '0.0000', 'bg_color': '#E8E8E8'})
 
         ws.merge_range(0, 0, 0, 8, 'R&R Award Sheet / पुनर्वास अवार्ड पत्रक', title_fmt)
-        ws.merge_range(1, 0, 1, 8, self.RR_TITLE_TEXT, title_text_fmt)
-        ws.set_row(1, 60)
         for idx, h in enumerate(headers):
-            ws.write(3, idx, h, head_fmt)
+            ws.write(2, idx, h, head_fmt)
         number_row = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
         for idx, n in enumerate(number_row):
-            ws.write(4, idx, n, number_head_fmt)
+            ws.write(3, idx, n, number_head_fmt)
 
         total_area = total_land = total_asset = total_tree = total_det = total_final = 0.0
-        row_idx = 5
+        row_idx = 4
         for group in rr_rows:
             lines = group.get('lines', [])
             if not lines:

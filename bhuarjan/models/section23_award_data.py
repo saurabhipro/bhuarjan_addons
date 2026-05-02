@@ -297,12 +297,20 @@ class Section23AwardData(models.Model):
         ], limit=1, order='state ASC, effective_from DESC')
 
         if is_within_distance:
-            sqm_raw = (rm.main_road_rate_sqm or 0.0) if rm else 0.0
-            if not sqm_raw and rm:
+            sqm_raw = float(self.rate_master_main_road_sqm or 0.0)
+            if sqm_raw <= 0.0:
+                sqm_raw = (rm.main_road_rate_sqm or 0.0) if rm else 0.0
+            if sqm_raw <= 0.0:
+                sqm_raw = float(self.rate_master_main_road_ha or 0.0) / 10000.0
+            if sqm_raw <= 0.0 and rm:
                 sqm_raw = (rm.main_road_rate_hectare or 0.0) / 10000.0
         else:
-            sqm_raw = (rm.other_road_rate_sqm or 0.0) if rm else 0.0
-            if not sqm_raw and rm:
+            sqm_raw = float(self.rate_master_other_road_sqm or 0.0)
+            if sqm_raw <= 0.0:
+                sqm_raw = (rm.other_road_rate_sqm or 0.0) if rm else 0.0
+            if sqm_raw <= 0.0:
+                sqm_raw = float(self.rate_master_other_road_ha or 0.0) / 10000.0
+            if sqm_raw <= 0.0 and rm:
                 sqm_raw = (rm.other_road_rate_hectare or 0.0) / 10000.0
 
         _urban_mult = self._s23_bmr_rate_multiplier(
@@ -548,6 +556,12 @@ class Section23AwardData(models.Model):
         # Get all tree lines from surveys
         tree_data = {}
 
+        def _tree_label(tree_line):
+            base = tree_line.tree_master_id.name if tree_line.tree_master_id else 'Other / अन्य'
+            if getattr(tree_line, 'is_other_tree', False) and (getattr(tree_line, 'tree_description', '') or '').strip():
+                return '%s - %s' % (base, tree_line.tree_description.strip())
+            return base
+
         for survey in surveys:
             khasra = survey.khasra_number or ''
             landowners = survey.landowner_ids if survey.landowner_ids else []
@@ -561,7 +575,7 @@ class Section23AwardData(models.Model):
             if not landowners:
                 # If no landowners, create entry with empty landowner
                 for tree_line in tree_lines:
-                    tree_type_name = tree_line.tree_master_id.name if tree_line.tree_master_id else 'other'
+                    tree_type_name = _tree_label(tree_line)
                     key = (False, khasra, tree_type_name)
                     if key not in tree_data:
                         _la = (survey.acquired_area or 0.0) or (survey.total_area or 0.0)
@@ -604,7 +618,7 @@ class Section23AwardData(models.Model):
                 # Process each landowner
                 for landowner in landowners:
                     for tree_line in tree_lines:
-                        tree_type_name = tree_line.tree_master_id.name if tree_line.tree_master_id else 'other'
+                        tree_type_name = _tree_label(tree_line)
                         key = (landowner.id, khasra, tree_type_name)
                         if key not in tree_data:
                             _la = (survey.acquired_area or 0.0) or (survey.total_area or 0.0)
@@ -621,7 +635,7 @@ class Section23AwardData(models.Model):
                                 'tree_khasra': khasra,
                                 'mulya': 0.0,
                                 'kul_rashi': 0.0,
-                                'tree_type': tree_line.tree_master_id.name if tree_line.tree_master_id else 'other',
+                                'tree_type': tree_type_name,
                                 'tree_type_code': getattr(tree_line, 'tree_type', '') or 'other',
                                 'tree_count': 0,
                                 'girth_cm': 0.0,

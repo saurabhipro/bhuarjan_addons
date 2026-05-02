@@ -19,6 +19,10 @@
                     <field name="export_scope" widget="radio" string="Award sections / अवार्ड पत्रक चुनें"
                            invisible="simple_download_dialog or (res_model == 'bhu.section23.award' and section23_sheet_variant != 'standard')"/>
                 </group>
+                <group string="Download Type / डाउनलोड प्रकार"
+                       invisible="not simple_download_dialog or res_model != 'bhu.section23.award'">
+                    <field name="section23_download_copy" widget="radio"/>
+                </group>
                 <group string="PDF options / पीडीएफ विकल्प" invisible="simple_download_dialog or res_model != 'bhu.section23.award' or section23_generate">
                     <field name="add_cover_letter"/>
                 </group>

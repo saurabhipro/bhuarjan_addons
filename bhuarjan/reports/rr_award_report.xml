@@ -60,9 +60,6 @@
                                                         (<span t-esc="o.village_id.district_id.state_id.name"/>)
                                                     </t>
                                                 </div>
-                                                <div style="font-size:10px; color:#000; margin-top:4px; line-height:1.45; text-align:left;">
-                                                    <span t-esc="o.get_rr_title_text()"/>
-                                                </div>
                                             </div>
                                             <div style="flex-shrink:0; text-align:right; padding-top:2px; font-size:11px; font-weight:700;">
                                                 दिनांक: <span t-esc="o.award_date.strftime('%d-%m-%Y') if o.award_date else ''"/>

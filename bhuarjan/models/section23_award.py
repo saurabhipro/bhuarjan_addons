@@ -74,12 +74,12 @@ class Section23Award(models.Model):
         tracking=True,
     )
 
-    # Village type (read-only mirror of village_id.village_type for display)
+    # Village profile for this award (defaulted from village master; editable on award)
     village_type = fields.Selection([
         ('rural', 'Rural / ग्रामीण'),
         ('urban', 'Urban / नगरीय'),
     ], string='Village Type / ग्राम प्रकार',
-       related='village_id.village_type', store=False, readonly=True)
+       default='rural', tracking=True)
 
     # Urban award settings
     urban_body_type = fields.Selection([
@@ -87,7 +87,7 @@ class Section23Award(models.Model):
         ('nagar_palika',    'Nagar Palika / नगर पालिका'),
         ('nagar_panchayat', 'Nagar Panchayat / नगर पंचायत'),
     ], string='Urban Body Type / नगरीय निकाय प्रकार',
-       compute='_compute_urban_body_type', store=True, readonly=False, tracking=True,
+       tracking=True,
        help='Pulled from village; override here if needed. Controls urban area-slab calculation.')
 
     is_urban = fields.Boolean(
@@ -100,6 +100,16 @@ class Section23Award(models.Model):
     # Award document
     award_document = fields.Binary(string='Award Document / अवार्ड दस्तावेज़', tracking=False)
     award_document_filename = fields.Char(string='Document Filename / दस्तावेज़ फ़ाइल नाम', tracking=True)
+    signed_land_award_document = fields.Binary(string='Signed Land Award PDF', tracking=False)
+    signed_land_award_filename = fields.Char(string='Signed Land Award Filename', tracking=True)
+    signed_tree_award_document = fields.Binary(string='Signed Tree Award PDF', tracking=False)
+    signed_tree_award_filename = fields.Char(string='Signed Tree Award Filename', tracking=True)
+    signed_asset_award_document = fields.Binary(string='Signed Asset Award PDF', tracking=False)
+    signed_asset_award_filename = fields.Char(string='Signed Asset Award Filename', tracking=True)
+    signed_consolidated_award_document = fields.Binary(string='Signed Consolidated Award PDF', tracking=False)
+    signed_consolidated_award_filename = fields.Char(string='Signed Consolidated Award Filename', tracking=True)
+    signed_rr_award_document = fields.Binary(string='Signed R&R Award PDF', tracking=False)
+    signed_rr_award_filename = fields.Char(string='Signed R&R Award Filename', tracking=True)
     
     # Notes
     notes = fields.Text(string='Notes / नोट्स', tracking=True)
@@ -252,17 +262,37 @@ class Section23Award(models.Model):
             rec.is_section_officer = self.env.user.has_group('bhuarjan.group_bhu_section_officer')
             rec.is_admin = self.env.user.has_group('bhuarjan.group_bhuarjan_admin')
 
-    @api.depends('village_id', 'village_id.urban_body_type')
-    def _compute_urban_body_type(self):
+    def _sync_village_profile_from_master(self, force=False):
         for rec in self:
-            if not rec.urban_body_type:
-                rec.urban_body_type = rec.village_id.urban_body_type or False
+            if not rec.village_id:
+                continue
+            master_vtype = rec.village_id.village_type or 'rural'
+            master_ubody = rec.village_id.urban_body_type or False
+            if force or not rec.village_type:
+                rec.village_type = master_vtype
+            if force or not rec.urban_body_type:
+                rec.urban_body_type = master_ubody
 
-    @api.depends('village_id', 'village_id.village_type')
+    def _sync_village_profile_to_master(self):
+        for rec in self:
+            if not rec.village_id:
+                continue
+            rec.village_id.sudo().write({
+                'village_type': rec.village_type or 'rural',
+                'urban_body_type': rec.urban_body_type if rec.village_type == 'urban' else False,
+            })
+
+    @api.onchange('village_type')
+    def _onchange_village_type_clear_urban_body(self):
+        for rec in self:
+            if rec.village_type != 'urban':
+                rec.urban_body_type = False
+
+    @api.depends('village_type', 'village_id', 'village_id.village_type')
     def _compute_is_urban(self):
         for rec in self:
-            # Award urban/rural behavior is controlled strictly by village master.
-            rec.is_urban = bool(rec.village_id and rec.village_id.village_type == 'urban')
+            vtype = rec.village_type or (rec.village_id.village_type if rec.village_id else 'rural')
+            rec.is_urban = (vtype == 'urban')
 
     def _get_active_rate_master_for_village(self):
         self.ensure_one()
@@ -274,9 +304,10 @@ class Section23Award(models.Model):
         ], limit=1, order='state ASC, effective_from DESC')
 
     def _s23_distance_threshold(self):
-        """MR/BMR threshold in meters from village master type."""
+        """MR/BMR threshold in meters from effective village type."""
         self.ensure_one()
-        return 20.0 if (self.village_id and self.village_id.village_type == 'urban') else 50.0
+        vtype = self.village_type or (self.village_id.village_type if self.village_id else 'rural')
+        return 20.0 if vtype == 'urban' else 50.0
 
     def _sync_rate_fields_from_master(self, force=False):
         for rec in self:
@@ -499,6 +530,7 @@ class Section23Award(models.Model):
     def _onchange_village_populate_surveys(self):
         """Pre-fill land lines on first project+village (empty list only; save refreshes the rest)."""
         for rec in self:
+            rec._sync_village_profile_from_master(force=bool(rec.village_id))
             rec._sync_rate_fields_from_master(force=bool(rec.village_id))
             rec._onchange_add_award_survey_lines_if_empty()
 
@@ -555,6 +587,7 @@ class Section23Award(models.Model):
         records |= existing_records
         # Onchange does not run for backend create() calls; ensure lines are populated/synced.
         for record in records:
+            record._sync_village_profile_from_master(force=False)
             record._sync_rate_fields_from_master(force=False)
             record._populate_award_survey_lines(reset_if_empty=False)
         return records
@@ -577,15 +610,19 @@ class Section23Award(models.Model):
             for rec in self
         }
         result = super().write(vals)
+        village_profile_changed = any(k in vals for k in ('village_type', 'urban_body_type'))
         for rec in self:
             old_p, old_v = pre_scope.get(rec.id, (False, False))
             new_p = rec.project_id.id if rec.project_id else False
             new_v = rec.village_id.id if rec.village_id else False
             if new_p != old_p or new_v != old_v:
+                rec._sync_village_profile_from_master(force=True)
                 rec._sync_rate_fields_from_master(force=True)
                 rec._populate_award_survey_lines(reset_if_empty=True)
                 if rec.project_id and rec.village_id:
                     rec._sync_award_structure_lines()
+            if village_profile_changed and rec.village_id:
+                rec._sync_village_profile_to_master()
         return result
 
     def unlink(self):
@@ -1259,6 +1296,47 @@ class Section23Award(models.Model):
             'target': 'self',
         }
 
+    def _s23_signed_field_map(self, export_scope='all', variant='standard'):
+        self.ensure_one()
+        scope = (export_scope or 'all').lower()
+        var = (variant or 'standard').lower()
+        if var == 'consolidated':
+            return ('signed_consolidated_award_document', 'signed_consolidated_award_filename', 'Consolidated')
+        if var == 'rr':
+            return ('signed_rr_award_document', 'signed_rr_award_filename', 'R&R')
+        if scope == 'land':
+            return ('signed_land_award_document', 'signed_land_award_filename', 'Land')
+        if scope == 'tree':
+            return ('signed_tree_award_document', 'signed_tree_award_filename', 'Tree')
+        if scope == 'asset':
+            return ('signed_asset_award_document', 'signed_asset_award_filename', 'Asset')
+        return (False, False, False)
+
+    def action_download_signed_award_file(self, export_scope='all', variant='standard', file_format='pdf'):
+        """Download uploaded signed award PDF for selected section/variant."""
+        self.ensure_one()
+        fmt = (file_format or 'pdf').lower()
+        if fmt != 'pdf':
+            raise ValidationError(_(
+                'Signed award is supported only for PDF downloads.'
+            ))
+        file_field, name_field, label = self._s23_signed_field_map(export_scope, variant)
+        if not file_field:
+            raise ValidationError(_(
+                'Signed download is available only for Land, Tree, Asset, Consolidated, and R&R award sections.'
+            ))
+        binary_data = self[file_field]
+        filename = (self[name_field] or f"Signed_{label}_Award.pdf") if name_field else f"Signed_{label}_Award.pdf"
+        if not binary_data:
+            raise ValidationError(_(
+                'No signed %s award PDF is uploaded yet. Please upload it first.'
+            ) % label)
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{self._name}/{self.id}/{file_field}/{filename}?download=true',
+            'target': 'self',
+        }
+
     def _mark_generated_scope(self, export_scope='all'):
         self.ensure_one()
         scope = export_scope or 'all'
@@ -1674,6 +1752,14 @@ class Section23Award(models.Model):
                 'Please enter both MR Rate and BMR Rate (greater than zero) before generating the award.\n'
                 'अवार्ड जेनरेट करने से पहले MR Rate और BMR Rate दोनों दर्ज करें।'
             ))
+        if self.is_urban:
+            mr_sqm = float(self.rate_master_main_road_sqm or 0.0)
+            bmr_sqm = float(self.rate_master_other_road_sqm or 0.0)
+            if mr_sqm <= 0.0 or bmr_sqm <= 0.0:
+                raise ValidationError(_(
+                    'For Urban awards, please enter both MR and BMR rates in square meter (greater than zero).\n'
+                    'नगरीय अवार्ड के लिए MR और BMR दोनों वर्गमीटर दरें दर्ज करना आवश्यक है।'
+                ))
 
     def action_generate_award(self):
         """Generate all section scopes without download prompt."""

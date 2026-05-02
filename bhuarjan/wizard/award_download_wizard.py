@@ -53,6 +53,15 @@ class AwardDownloadWizard(models.TransientModel):
         default='standard',
         required=True,
     )
+    section23_download_copy = fields.Selection(
+        [
+            ('unsigned', 'Unsigned Award / अनसाइंड अवार्ड'),
+            ('signed', 'Signed Award / हस्ताक्षरित अवार्ड'),
+        ],
+        string='Download Type / डाउनलोड प्रकार',
+        default='unsigned',
+        required=True,
+    )
     # Backward compatibility for stale web clients still sending this field in onchange payload.
     consolidated_award_sheet = fields.Boolean(
         string='Consolidated Award Sheet (Legacy)',
@@ -100,6 +109,15 @@ class AwardDownloadWizard(models.TransientModel):
 
         # Simple download dialog path: return DB-cached file directly (no regeneration).
         if self.simple_download_dialog and self.res_model == 'bhu.section23.award':
+            if self.section23_download_copy == 'signed':
+                if not hasattr(record, 'action_download_signed_award_file'):
+                    raise UserError(_('This record does not support signed downloads.'))
+                signed_action = record.action_download_signed_award_file(
+                    export_scope=scope,
+                    variant=variant,
+                    file_format=self.format,
+                )
+                return self._wrap_download_action_for_autoclose(signed_action)
             if not hasattr(record, 'action_download_cached_award_file'):
                 raise UserError(_('This record does not support cached downloads.'))
             # If requested file is missing in DB cache, auto-prepare both PDF+Excel first.

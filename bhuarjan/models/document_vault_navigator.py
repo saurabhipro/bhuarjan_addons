@@ -507,3 +507,8 @@ class DocumentVaultNavigatorLine(models.Model):
         self.navigator_id.selected_source_file_field = self.source_file_field if self.source_file_field else False
         self.navigator_id.selected_source_filename_field = self.source_filename_field if self.source_filename_field else False
         return self.navigator_id._action_open_self()
+
+    def get_formview_action(self, access_uid=None):
+        """Prevent x2many row click popup; keep selection in navigator only."""
+        self.ensure_one()
+        return self.action_select_document()

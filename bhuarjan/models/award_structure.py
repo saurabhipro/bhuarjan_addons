@@ -59,6 +59,7 @@ class AwardStructureDetails(models.Model):
     construction_type = fields.Selection([
         ('kaccha', 'Kaccha / कच्चा'),
         ('pukka', 'Pukka / पक्का'),
+        ('other', 'Other / अन्य'),
     ], string='Construction Type / निर्माण प्रकार')
     description = fields.Char(string='Description / विवरण')
 
@@ -160,15 +161,16 @@ class AwardStructureDetails(models.Model):
         for line in self:
             if line.structure_type == 'well' and not line.market_rate_per_sqm:
                 line.market_rate_per_sqm = 90000.0
-            if line.structure_type != 'other':
+            if line.structure_type != 'other' and line.construction_type != 'other':
                 line.description = False
 
-    @api.constrains('structure_type', 'description')
+    @api.constrains('structure_type', 'construction_type', 'description')
     def _check_other_requires_description(self):
         for line in self:
-            if line.structure_type == 'other' and not (line.description or '').strip():
+            needs_desc = line.structure_type == 'other' or line.construction_type == 'other'
+            if needs_desc and not (line.description or '').strip():
                 raise ValidationError(_(
-                    "Please enter Description when Structure Type is 'Others / अन्य'."
+                    "Please enter Description when Structure Type or Construction Type is 'Other / अन्य'."
                 ))
 
     def get_structure_type_label(self):

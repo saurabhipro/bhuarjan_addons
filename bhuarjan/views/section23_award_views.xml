@@ -105,16 +105,15 @@
                                 <div class="s23_meta_item">
                                     <div class="s23_meta_label">Village Type / ग्राम प्रकार</div>
                                     <div class="s23_meta_value">
-                                        <field name="village_type" readonly="1" widget="badge"
-                                               decoration-success="village_type == 'rural'"
-                                               decoration-info="village_type == 'urban'"/>
+                                        <field name="village_type"
+                                               readonly="not is_sdm and not is_admin"/>
                                     </div>
                                 </div>
                                 <div class="s23_meta_item" invisible="not is_urban">
                                     <div class="s23_meta_label">Urban Body Type / नगरीय निकाय प्रकार</div>
                                     <div class="s23_meta_value">
                                         <field name="urban_body_type"
-                                               readonly="1"
+                                               readonly="not is_sdm and not is_admin"
                                                placeholder="Select body type for slab calculation…"
                                                widget="selection"/>
                                     </div>
@@ -130,6 +129,22 @@
                                     <div class="s23_meta_label">BMR Rate / अन्य दर (₹/Ha) <span class="text-danger">*</span></div>
                                     <div class="s23_meta_value">
                                         <field name="rate_master_other_road_ha" readonly="state != 'draft'" required="1"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item" invisible="not is_urban">
+                                    <div class="s23_meta_label">MR Rate / मुख्यमार्ग दर (₹/sqm) <span class="text-danger">*</span></div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_main_road_sqm"
+                                               readonly="state != 'draft' or (not is_sdm and not is_admin)"
+                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    </div>
+                                </div>
+                                <div class="s23_meta_item" invisible="not is_urban">
+                                    <div class="s23_meta_label">BMR Rate / अन्य दर (₹/sqm) <span class="text-danger">*</span></div>
+                                    <div class="s23_meta_value">
+                                        <field name="rate_master_other_road_sqm"
+                                               readonly="state != 'draft' or (not is_sdm and not is_admin)"
                                                widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                     </div>
                                 </div>
@@ -261,6 +276,49 @@
                         </div>
                     </div>
 
+                    <details class="premium_card section-award-sign" id="s23_section_signed_awards">
+                        <summary class="section_banner sb_structure">
+                            <div class="sb_left">
+                                <span class="sb_icon"><i class="fa fa-pencil-square-o" title="Signed Awards"/></span>
+                                <span class="sb_title">Signed Award Upload / हस्ताक्षरित अवार्ड अपलोड</span>
+                            </div>
+                        </summary>
+                        <div class="card_body">
+                            <group col="2">
+                                <group string="Land Signed Award">
+                                    <field name="signed_land_award_document"
+                                           filename="signed_land_award_filename"
+                                           readonly="not is_sdm and not is_admin"
+                                           invisible="not land_generated"/>
+                                </group>
+                                <group string="Tree Signed Award">
+                                    <field name="signed_tree_award_document"
+                                           filename="signed_tree_award_filename"
+                                           readonly="not is_sdm and not is_admin"
+                                           invisible="not tree_generated"/>
+                                </group>
+                                <group string="Asset Signed Award">
+                                    <field name="signed_asset_award_document"
+                                           filename="signed_asset_award_filename"
+                                           readonly="not is_sdm and not is_admin"
+                                           invisible="not asset_generated"/>
+                                </group>
+                                <group string="Consolidated Signed Award">
+                                    <field name="signed_consolidated_award_document"
+                                           filename="signed_consolidated_award_filename"
+                                           readonly="not is_sdm and not is_admin"
+                                           invisible="not consolidated_generated"/>
+                                </group>
+                                <group string="R&amp;R Signed Award">
+                                    <field name="signed_rr_award_document"
+                                           filename="signed_rr_award_filename"
+                                           readonly="not is_sdm and not is_admin"
+                                           invisible="not rr_generated"/>
+                                </group>
+                            </group>
+                        </div>
+                    </details>
+
                     <details class="premium_card section-land" id="s23_section_land" open="open">
                         <summary class="section_banner sb_land">
                             <div class="sb_left">
@@ -329,20 +387,21 @@
                                 <button name="action_open_survey_for_land_edit" type="object"
                                         string="Edit" class="btn btn-sm s23_btn_brown"
                                         title="Edit: distance / road / irrigation / diverted"/>
-                                <field name="khasra_number" readonly="1" string="Khasra"/>
-                                <field name="village_name" readonly="1" string="Village"/>
-                                <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>
+                                <field name="khasra_number" readonly="1" string="Khasra" column_invisible="parent.is_urban"/>
+                                <field name="village_name" readonly="1" string="Village" column_invisible="parent.is_urban"/>
+                                <field name="distance_from_main_road" readonly="1" string="Distance (m)" column_invisible="parent.is_urban"/>
                                 <field name="road_type_display" readonly="1" string="Road"
+                                       column_invisible="parent.is_urban"
                                        decoration-success="road_type_display == 'MR'"
                                        decoration-warning="road_type_display == 'BMR'"/>
-                                <field name="irrigation_type" readonly="1" string="Irrigation"/>
-                                <field name="has_traded_land" readonly="1" string="Diverted"/>
-                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]"/>
-                                <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Land Award"/>
-                                <field name="solatium_display" readonly="1" string="Solatium (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Solatium"/>
-                                <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest"/>
+                                <field name="irrigation_type" readonly="1" string="Irrigation" column_invisible="parent.is_urban"/>
+                                <field name="has_traded_land" readonly="1" string="Diverted" column_invisible="parent.is_urban"/>
+                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]" column_invisible="parent.is_urban"/>
+                                <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
+                                <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
+                                <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Land Award" column_invisible="1"/>
+                                <field name="solatium_display" readonly="1" string="Solatium (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Solatium" column_invisible="1"/>
+                                <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest" column_invisible="1"/>
                             </list>
                         </field>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fdf4ec); border-left-color: #7a3b28;">
@@ -464,7 +523,7 @@
                                     confirm="Do you want to regenerate the Asset Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not asset_generated"/>
                         </div>
-                        <field name="award_structure_line_ids" nolabel="1" readonly="state != 'draft'">
+                        <field name="award_structure_line_ids" nolabel="1" readonly="0">
                             <list editable="bottom" create="1" delete="1">
                                 <field name="survey_id"
                                        domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('khasra_number', '!=', False), ('state', 'in', ['draft', 'submitted', 'approved', 'locked'])]"
@@ -476,8 +535,8 @@
                                 <field name="description"
                                        string="Description"
                                        placeholder="Enter description for Other"
-                                       required="structure_type == 'other'"
-                                       readonly="structure_type != 'other'"/>
+                                       required="structure_type == 'other' or construction_type == 'other'"
+                                       readonly="structure_type != 'other' and construction_type != 'other'"/>
                                 <field name="asset_count" string="Count"/>
                                 <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
                                 <field name="market_rate_per_sqm" string="Rate" widget="monetary" options="{'currency_field': 'parent.currency_id'}"/>

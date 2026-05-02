@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class S23TreeEditWizard(models.TransientModel):
@@ -42,6 +42,8 @@ class S23TreeEditWizard(models.TransientModel):
                 'development_stage': tline.development_stage,
                 'girth_cm': tline.girth_cm,
                 'quantity': tline.quantity,
+                'is_other_tree': bool(tline.is_other_tree),
+                'tree_description': tline.tree_description,
             }))
         res.update({
             'survey_line_id': line.id,
@@ -59,12 +61,22 @@ class S23TreeEditWizard(models.TransientModel):
             raise UserError(_('Tree quantity must be greater than zero for all rows.'))
 
         commands = [(5, 0, 0)]
+        fallback_other_tree = self.env['bhu.tree.master'].search([
+            ('name', 'ilike', 'other')
+        ], order='id asc', limit=1)
         for line in self.tree_line_ids:
+            tree_master = line.tree_master_id
+            if line.is_other_tree and not tree_master:
+                if not fallback_other_tree:
+                    raise UserError(_('Please configure an "Other" tree in Tree Rate Master first.'))
+                tree_master = fallback_other_tree
             commands.append((0, 0, {
-                'tree_master_id': line.tree_master_id.id,
+                'tree_master_id': tree_master.id,
                 'development_stage': line.development_stage,
                 'girth_cm': line.girth_cm or 0.0,
                 'quantity': int(line.quantity or 0),
+                'is_other_tree': bool(line.is_other_tree),
+                'tree_description': line.tree_description,
             }))
         survey.write({'tree_line_ids': commands})
 
@@ -94,8 +106,10 @@ class S23TreeEditWizardLine(models.TransientModel):
     tree_master_id = fields.Many2one(
         'bhu.tree.master',
         string='Tree / वृक्ष',
-        required=True,
+        required=False,
     )
+    is_other_tree = fields.Boolean(string='Other / अन्य', default=False)
+    tree_description = fields.Char(string='Description / विवरण')
     tree_type = fields.Selection(
         related='tree_master_id.tree_type',
         string='Tree Type',
@@ -108,3 +122,19 @@ class S23TreeEditWizardLine(models.TransientModel):
     ], string='Development Stage / विकास स्तर', default='undeveloped')
     girth_cm = fields.Float(string='Girth (cm) / छाती (से.मी.)', digits=(10, 2))
     quantity = fields.Integer(string='Quantity / मात्रा', required=True, default=1)
+
+    @api.onchange('is_other_tree')
+    def _onchange_is_other_tree(self):
+        for line in self:
+            if line.is_other_tree:
+                line.tree_master_id = False
+            else:
+                line.tree_description = False
+
+    @api.constrains('is_other_tree', 'tree_master_id', 'tree_description')
+    def _check_tree_other_requirements(self):
+        for line in self:
+            if line.is_other_tree and not (line.tree_description or '').strip():
+                raise ValidationError(_('Please enter description when Other is selected.'))
+            if not line.is_other_tree and not line.tree_master_id:
+                raise ValidationError(_('Please select Tree when Other is not selected.'))

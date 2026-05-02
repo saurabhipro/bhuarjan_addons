@@ -14,6 +14,11 @@
                     <field name="tree_line_ids" nolabel="1">
                         <list editable="bottom" create="1" delete="1">
                             <field name="tree_master_id"/>
+                            <field name="is_other_tree"/>
+                            <field name="tree_description"
+                                   placeholder="Enter tree details for Other"
+                                   required="is_other_tree"
+                                   readonly="not is_other_tree"/>
                             <field name="tree_type" readonly="1"/>
                             <field name="development_stage"/>
                             <field name="girth_cm"/>

@@ -1002,6 +1002,8 @@ class SurveyTreeLine(models.Model):
     survey_id = fields.Many2one('bhu.survey', string='Survey / सर्वे', required=True, ondelete='cascade')
     tree_master_id = fields.Many2one('bhu.tree.master', string='Tree / वृक्ष', required=True,
                                      help='Select tree from master')
+    is_other_tree = fields.Boolean(string='Other Tree / अन्य वृक्ष', default=False)
+    tree_description = fields.Char(string='Tree Description / वृक्ष विवरण')
     
     @api.onchange('tree_type')
     def _onchange_tree_type(self):
@@ -1017,6 +1019,9 @@ class SurveyTreeLine(models.Model):
             # Set default development_stage if not already set
             if not self.development_stage:
                 self.development_stage = self._context.get('default_development_stage', 'undeveloped')
+            if self.tree_master_id and 'other' not in (self.tree_master_id.name or '').lower():
+                self.is_other_tree = False
+                self.tree_description = False
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -1055,6 +1060,12 @@ class SurveyTreeLine(models.Model):
         for record in self:
             if not record.tree_master_id:
                 raise ValidationError(_('Tree must be selected'))
+
+    @api.constrains('is_other_tree', 'tree_description')
+    def _check_other_tree_description(self):
+        for record in self:
+            if record.is_other_tree and not (record.tree_description or '').strip():
+                raise ValidationError(_('Please enter tree description when Other Tree is selected.'))
     
     @api.constrains('girth_cm')
     def _check_girth_positive(self):

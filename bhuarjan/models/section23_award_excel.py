@@ -151,8 +151,26 @@ class Section23AwardExcel(models.Model):
                         if idx == 0 and line_count == 1:
                             land_sheet.write(row, 0, i, cell_center_fmt)
                             land_sheet.write(row, 1, details, cell_fmt)
-                        land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
-                        land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
+                        is_urban_slab = bool(land.get('is_urban_slab'))
+                        khasra_merge_show = bool(land.get('khasra_merge_show', True))
+                        khasra_merge_span = int(land.get('khasra_merge_rowspan', 1) or 1)
+                        if is_urban_slab:
+                            if khasra_merge_show:
+                                if khasra_merge_span > 1:
+                                    land_sheet.merge_range(
+                                        row, 2, row + khasra_merge_span - 1, 2,
+                                        land.get('khasra', ''), cell_center_fmt
+                                    )
+                                    land_sheet.merge_range(
+                                        row, 3, row + khasra_merge_span - 1, 3,
+                                        float(land.get('original_area', 0.0) or 0.0), number_fmt
+                                    )
+                                else:
+                                    land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
+                                    land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
+                        else:
+                            land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
+                            land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
                         land_sheet.write(row, 4, land.get('khasra', ''), cell_center_fmt)
                         land_sheet.write_number(row, 5, float(land.get('acquired_area', 0.0) or 0.0), number_fmt)
                         is_within_distance = bool(land.get('is_within_distance'))
@@ -160,24 +178,69 @@ class Section23AwardExcel(models.Model):
                         is_unirrigated = bool(land.get('unirrigated'))
                         is_diverted = bool(land.get('is_diverted'))
                         # Col 7 = "on main road": always हाँ (MR) / नहीं (BMR); never raw metres (avoids 51 m vs threshold confusion).
-                        land_sheet.write(
-                            row, 6,
-                            'हाँ' if is_within_distance else 'नहीं',
-                            _yes_no_format(is_within_distance),
-                        )
-                        if is_within_distance:
-                            land_sheet.write(row, 7, 'NA', cell_center_fmt)
-                            land_sheet.write(row, 8, 'NA', cell_center_fmt)
-                            land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                        if is_urban_slab:
+                            if khasra_merge_show:
+                                yes_no_text = 'हाँ' if is_within_distance else 'नहीं'
+                                yes_no_fmt = _yes_no_format(is_within_distance)
+                                if khasra_merge_span > 1:
+                                    land_sheet.merge_range(row, 6, row + khasra_merge_span - 1, 6, yes_no_text, yes_no_fmt)
+                                    if is_within_distance:
+                                        land_sheet.merge_range(row, 7, row + khasra_merge_span - 1, 7, 'NA', cell_center_fmt)
+                                        land_sheet.merge_range(row, 8, row + khasra_merge_span - 1, 8, 'NA', cell_center_fmt)
+                                        land_sheet.merge_range(row, 9, row + khasra_merge_span - 1, 9, 'NA', cell_center_fmt)
+                                    else:
+                                        land_sheet.merge_range(
+                                            row, 7, row + khasra_merge_span - 1, 7,
+                                            'हाँ' if is_irrigated else 'नहीं',
+                                            _yes_no_format(is_irrigated),
+                                        )
+                                        land_sheet.merge_range(
+                                            row, 8, row + khasra_merge_span - 1, 8,
+                                            'हाँ' if is_unirrigated else 'नहीं',
+                                            _yes_no_format(is_unirrigated),
+                                        )
+                                        land_sheet.merge_range(
+                                            row, 9, row + khasra_merge_span - 1, 9,
+                                            'हाँ' if is_diverted else 'नहीं',
+                                            _yes_no_format(is_diverted),
+                                        )
+                                else:
+                                    land_sheet.write(row, 6, yes_no_text, yes_no_fmt)
+                                    if is_within_distance:
+                                        land_sheet.write(row, 7, 'NA', cell_center_fmt)
+                                        land_sheet.write(row, 8, 'NA', cell_center_fmt)
+                                        land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                                    else:
+                                        land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
+                                        land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
+                                        land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
                         else:
-                            land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
-                            land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
-                            land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
+                            land_sheet.write(
+                                row, 6,
+                                'हाँ' if is_within_distance else 'नहीं',
+                                _yes_no_format(is_within_distance),
+                            )
+                            if is_within_distance:
+                                land_sheet.write(row, 7, 'NA', cell_center_fmt)
+                                land_sheet.write(row, 8, 'NA', cell_center_fmt)
+                                land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                            else:
+                                land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
+                                land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
+                                land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
                         land_sheet.write_number(row, 10, float(land.get('guide_line_rate', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 11, float(land.get('basic_value', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 12, float(land.get('market_value', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 13, float(land.get('solatium', 0.0) or 0.0), money_fmt)
-                        land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
+                        if land.get('is_urban_slab'):
+                            if land.get('khasra_merge_show', True):
+                                urban_span = int(land.get('khasra_merge_rowspan', 1) or 1)
+                                if urban_span > 1:
+                                    land_sheet.merge_range(row, 14, row + urban_span - 1, 14, 'NA', cell_center_fmt)
+                                else:
+                                    land_sheet.write(row, 14, 'NA', cell_center_fmt)
+                        else:
+                            land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 15, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
                         rehab_amount = float(land.get('rehab_policy_amount', 0.0) or 0.0)
                         if land.get('fallow'):
@@ -186,7 +249,15 @@ class Section23AwardExcel(models.Model):
                             land_type_hi = 'सिंचित भूमि'
                         else:
                             land_type_hi = 'असिंचित भूमि'
-                        land_sheet.write(row, 16, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
+                        if land.get('is_urban_slab'):
+                            if land.get('khasra_merge_show', True):
+                                urban_span = int(land.get('khasra_merge_rowspan', 1) or 1)
+                                if urban_span > 1:
+                                    land_sheet.merge_range(row, 16, row + urban_span - 1, 16, 'NA', cell_center_fmt)
+                                else:
+                                    land_sheet.write(row, 16, 'NA', cell_center_fmt)
+                        else:
+                            land_sheet.write(row, 16, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
                         land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1

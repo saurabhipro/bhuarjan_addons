@@ -1246,6 +1246,20 @@ class Section23Award(models.Model):
         if var not in ('standard', 'consolidated', 'rr'):
             var = 'standard'
 
+        # Guard: if row phase already reached 100%, reserve post-processing units
+        # so loader does not stay at 100% during PDF/Excel cache work.
+        cur = self.get_loader_progress_current() or {}
+        cur_done = int(cur.get('done') or 0)
+        cur_total = int(cur.get('total') or 0)
+        if cur_total <= cur_done:
+            self._s23_set_loader_progress(
+                done=cur_done,
+                total=cur_done + 8,
+                label=_('Starting document cache phase...'),
+                active=True,
+                flush=True,
+            )
+
         self._s23_increment_loader_progress(
             step=1, label=_('Rendering PDF report...'), flush=True, active=True
         )
@@ -1530,11 +1544,17 @@ class Section23Award(models.Model):
         self._s23_prepare_standard_scope_cache(export_scope=export_scope)
         t_cache = time.perf_counter() - t2
         # Base section change invalidates consolidated/R&R snapshots.
+        self._s23_increment_loader_progress(
+            step=1, label=_('Resetting dependent caches...'), flush=True, active=True
+        )
         removed_count = self._s23_clear_variant_cache(variants=('consolidated', 'rr'))
         self.write({
             'consolidated_generated': False,
             'rr_generated': False,
         })
+        self._s23_increment_loader_progress(
+            step=1, label=_('Updating generation status...'), flush=True, active=True
+        )
         self._mark_generated_scope(export_scope=export_scope)
         self._s23_set_loader_progress(
             label=_('Finalizing files...'),
@@ -1560,7 +1580,11 @@ class Section23Award(models.Model):
                 '%s Consolidated and R&R were reset and their cached files were deleted from DB (%s file(s)). '
                 'Please regenerate Consolidated and R&R.'
             ) % (message, removed_count)
+        current = self.get_loader_progress_current() or {}
+        final_total = int(current.get('total') or 0)
         self._s23_set_loader_progress(
+            done=final_total,
+            total=final_total,
             label=_('Completed'),
             active=False,
             flush=True,
@@ -2076,12 +2100,6 @@ class Section23Award(models.Model):
         if scope in ('all', 'land'):
             for row in land_rows:
                 khasra = row.get('khasra', '')
-                if log_khasra:
-                    _logger.warning(
-                        "[S23 GENERATE][LAND] award=%s id=%s khasra=%s owner=%s amount=%.2f",
-                        self.name, self.id, khasra, row.get('landowner_name', ''),
-                        _safe_amount(row.get('total_compensation', 0.0)),
-                    )
                 line_vals.append((0, 0, {
                     'line_type': 'land',
                     'landowner_name': row.get('landowner_name', ''),
@@ -2103,16 +2121,18 @@ class Section23Award(models.Model):
                     'remark': row.get('remark', '') or '',
                 }))
                 _bump_progress(_('Processing land rows...'))
+            if log_khasra:
+                _logger.warning(
+                    "[S23 GENERATE][LAND] award=%s id=%s rows=%s total_amount=%.2f",
+                    self.name,
+                    self.id,
+                    len(land_rows),
+                    sum(_safe_amount(r.get('total_compensation', 0.0)) for r in land_rows),
+                )
 
         if scope in ('all', 'tree'):
             for row in tree_rows:
                 khasra = row.get('khasra', '')
-                if log_khasra:
-                    _logger.warning(
-                        "[S23 GENERATE][TREE] award=%s id=%s khasra=%s owner=%s amount=%.2f",
-                        self.name, self.id, khasra, row.get('landowner_name', ''),
-                        _safe_amount(row.get('total', 0.0)),
-                    )
                 line_vals.append((0, 0, {
                     'line_type': 'tree',
                     'landowner_name': row.get('landowner_name', ''),
@@ -2121,16 +2141,18 @@ class Section23Award(models.Model):
                     'remark': row.get('tree_type', '') or '',
                 }))
                 _bump_progress(_('Processing tree rows...'))
+            if log_khasra:
+                _logger.warning(
+                    "[S23 GENERATE][TREE] award=%s id=%s rows=%s total_amount=%.2f",
+                    self.name,
+                    self.id,
+                    len(tree_rows),
+                    sum(_safe_amount(r.get('total', 0.0)) for r in tree_rows),
+                )
 
         if scope in ('all', 'asset'):
             for row in asset_rows:
                 khasra = row.get('asset_khasra', '')
-                if log_khasra:
-                    _logger.warning(
-                        "[S23 GENERATE][ASSET] award=%s id=%s khasra=%s owner=%s amount=%.2f",
-                        self.name, self.id, khasra, row.get('landowner_name', ''),
-                        _safe_amount(row.get('total', 0.0)),
-                    )
                 line_vals.append((0, 0, {
                     'line_type': 'structure',
                     'landowner_name': row.get('landowner_name', ''),
@@ -2143,6 +2165,14 @@ class Section23Award(models.Model):
                     'remark': row.get('asset_type', '') or '',
                 }))
                 _bump_progress(_('Processing asset rows...'))
+            if log_khasra:
+                _logger.warning(
+                    "[S23 GENERATE][ASSET] award=%s id=%s rows=%s total_amount=%.2f",
+                    self.name,
+                    self.id,
+                    len(asset_rows),
+                    sum(_safe_amount(r.get('total', 0.0)) for r in asset_rows),
+                )
 
         if line_vals:
             self.write({'award_line_item_ids': line_vals})

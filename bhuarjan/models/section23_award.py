@@ -935,9 +935,7 @@ class Section23Award(models.Model):
         headers = [
             'Khasra / खसरा', 'Village / ग्राम', 'Distance (m) / दूरी', 'Road / सड़क',
             'Irrigation / सिंचाई', 'Diverted / विचलित',
-            'Acquired (Ha) / अधि.', f'Base ({cur_sym}/sqm or Ha)',
-            f'Effective Rate', f'Land award ({cur_sym})',
-            f'Solatium ({cur_sym})', f'Interest ({cur_sym})', 'Slab / Remark',
+            'Acquired (Ha) / अधि.', 'Slab / Remark',
         ]
         parts = [
             '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
@@ -968,14 +966,6 @@ class Section23Award(models.Model):
             div_lbl = (r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"))
             parts.append(f'<td class="text-center text-nowrap">{escape(div_lbl)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("acquired_area"), 4)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("base_rate_hectare") or r.get("guide_line_rate") or 0, 0)}</td>')
-            eff = r.get("effective_rate_hectare")
-            if eff is None:
-                eff = r.get("guide_line_rate")
-            parts.append(f'<td class="text-end tabular-nums fw-semibold">{self._html_s23_num(eff, 0)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("basic_value"), 0)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
             parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape(slab_lbl)}</td>')
             parts.append('</tr>')
 

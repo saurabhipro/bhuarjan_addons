@@ -350,21 +350,16 @@
                         </summary>
                         <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
                             <field name="khasra_filter" nolabel="1"
-                                   placeholder="Search by khasra..."
-                                   style="max-width:200px;"/>
+                                   placeholder="Search by khasra to edit land details..."
+                                   style="max-width:220px;"/>
                             <button name="action_apply_khasra_search" type="object"
-                                    string="Search" icon="fa-search"
+                                    string="Search Land" icon="fa-search"
                                     class="btn btn-sm s23_btn_brown"
-                                    title="Exact khasra match"/>
-                            <button name="action_refresh_land_lines_debug" type="object"
-                                    string="Reload Surveys"
-                                    icon="fa-refresh"
-                                    class="btn btn-sm btn-outline-secondary"
-                                    title="Pull all surveys again for selected project and village"/>
+                                    title="Open popup to edit land details for matching khasra"/>
                             <button name="action_clear_khasra_filter" type="object"
                                     string="Show All" icon="fa-times"
                                     class="btn btn-sm btn-secondary"
-                                    title="Clear filter and show all khasras"
+                                    title="Clear filter"
                                     invisible="not khasra_filter"/>
                             <button name="action_generate_land_award" type="object"
                                     string="Generate Land Award"
@@ -385,28 +380,7 @@
                                     confirm="Do you want to regenerate the Land Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not land_generated"/>
                         </div>
-                        <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines" options="{'no_open': True, 'disable_open': True}">
-                            <list string="" create="0" delete="0" default_order="khasra_number" limit="20" editable="top" open_form_view="false">
-                                <field name="currency_id" column_invisible="1"/>
-                                <button name="action_open_survey_for_land_edit" type="object"
-                                        string="Edit" class="btn btn-sm s23_btn_brown"
-                                        title="Edit: distance / road / irrigation / diverted"/>
-                                <field name="khasra_number" readonly="1" string="Khasra"/>
-                                <field name="village_name" readonly="1" string="Village"/>
-                                <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>
-                                <field name="road_type_display" readonly="1" string="Road"
-                                       decoration-success="road_type_display == 'MR'"
-                                       decoration-warning="road_type_display == 'BMR'"/>
-                                <field name="irrigation_type" readonly="1" string="Irrigation"/>
-                                <field name="has_traded_land" readonly="1" string="Diverted"/>
-                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]"/>
-                                <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
-                                <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
-                                <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Land Award" column_invisible="1"/>
-                                <field name="solatium_display" readonly="1" string="Solatium (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Solatium" column_invisible="1"/>
-                                <field name="interest_display" readonly="1" string="Interest (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Interest" column_invisible="1"/>
-                            </list>
-                        </field>
+                        <field name="s23_land_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fdf4ec); border-left-color: #7a3b28;">
                             <span class="total_label_large">Land Subtotal</span>
                             <span class="total_value_large" style="color: #6a2d1d;">

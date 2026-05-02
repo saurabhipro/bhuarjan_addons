@@ -129,6 +129,11 @@ class Section23Award(models.Model):
     asset_generated = fields.Boolean(string='Asset Generated', default=False, tracking=True)
     consolidated_generated = fields.Boolean(string='Consolidated Generated', default=False, tracking=True)
     rr_generated = fields.Boolean(string='R&R Generated', default=False, tracking=True)
+    loader_progress_active = fields.Boolean(string='Loader Progress Active', default=False, tracking=False)
+    loader_progress_done = fields.Integer(string='Loader Progress Done', default=0, tracking=False)
+    loader_progress_total = fields.Integer(string='Loader Progress Total', default=0, tracking=False)
+    loader_progress_pct = fields.Float(string='Loader Progress %', digits=(6, 2), default=0.0, tracking=False)
+    loader_progress_label = fields.Char(string='Loader Progress Label', tracking=False)
     all_components_generated = fields.Boolean(
         string='All Components Generated',
         compute='_compute_all_components_generated',
@@ -1241,13 +1246,22 @@ class Section23Award(models.Model):
         if var not in ('standard', 'consolidated', 'rr'):
             var = 'standard'
 
+        self._s23_increment_loader_progress(
+            step=1, label=_('Rendering PDF report...'), flush=True, active=True
+        )
         pdf_bytes = self._s23_render_variant_pdf_bytes(variant=var, export_scope=scope)
         if pdf_bytes:
             self._s23_store_cached_attachment(
                 pdf_bytes, export_scope=scope, variant=var, file_format='pdf'
             )
+            self._s23_increment_loader_progress(
+                step=1, label=_('Uploading PDF to DB cache...'), flush=True, active=True
+            )
 
         excel_action = False
+        self._s23_increment_loader_progress(
+            step=1, label=_('Rendering Excel report...'), flush=True, active=True
+        )
         if var == 'standard':
             excel_action = self.action_download_excel_components(export_scope=scope)
         elif var == 'consolidated':
@@ -1263,8 +1277,14 @@ class Section23Award(models.Model):
                 self._s23_store_cached_attachment(
                     excel_bytes, export_scope=scope, variant=var, file_format='excel'
                 )
+                self._s23_increment_loader_progress(
+                    step=1, label=_('Uploading Excel to DB cache...'), flush=True, active=True
+                )
                 # Keep DB clean: remove temporary one created by exporter.
                 tmp_att.unlink()
+        self._s23_increment_loader_progress(
+            step=1, label=_('Cache ready. Updating status...'), flush=True, active=True
+        )
 
     def _s23_prepare_standard_scope_cache(self, export_scope='all'):
         """Generate and cache BOTH PDF and Excel for a standard scope."""
@@ -1360,6 +1380,110 @@ class Section23Award(models.Model):
         elif var == 'rr':
             self.write({'rr_generated': True})
 
+    def _s23_set_loader_progress(self, done=None, total=None, label=None, active=None, flush=False):
+        self.ensure_one()
+        key = 'bhuarjan.s23.loader.progress.%s' % self.id
+        user_key = 'bhuarjan.s23.loader.progress.user.%s' % self.env.uid
+        current = {}
+        raw = self.env['ir.config_parameter'].sudo().get_param(key, default='') or ''
+        if raw:
+            try:
+                current = json.loads(raw) if isinstance(raw, str) else {}
+                if not isinstance(current, dict):
+                    current = {}
+            except Exception:
+                current = {}
+        done_val = max(0, int(done if done is not None else current.get('done') or 0))
+        total_val = max(0, int(total if total is not None else current.get('total') or 0))
+        pct_val = (100.0 * done_val / total_val) if total_val > 0 else float(current.get('pct') or 0.0)
+        payload = {
+            'active': bool(active) if active is not None else bool(current.get('active', True)),
+            'done': done_val,
+            'total': total_val,
+            'pct': pct_val,
+            'label': label if label is not None else (current.get('label') or ''),
+            'project': self.project_id.name if self.project_id else '',
+            'village': self.village_id.name if self.village_id else '',
+        }
+        try:
+            if flush:
+                # Write progress in an isolated transaction to avoid concurrent
+                # updates on the same award row.
+                from odoo.modules.registry import Registry
+                with Registry(self.env.cr.dbname).cursor() as cr2:
+                    env2 = api.Environment(cr2, self.env.uid, dict(self.env.context))
+                    env2['ir.config_parameter'].sudo().set_param(key, json.dumps(payload))
+                    env2['ir.config_parameter'].sudo().set_param(user_key, json.dumps(payload))
+                    cr2.commit()
+            else:
+                self.env['ir.config_parameter'].sudo().set_param(key, json.dumps(payload))
+                self.env['ir.config_parameter'].sudo().set_param(user_key, json.dumps(payload))
+        except Exception:
+            _logger.exception("Failed loader progress write for award %s", self.id)
+
+    @api.model
+    def get_loader_progress(self, award_id):
+        rec = self.browse(int(award_id or 0))
+        if not rec or not rec.exists():
+            return {}
+        key = 'bhuarjan.s23.loader.progress.%s' % rec.id
+        raw = self.env['ir.config_parameter'].sudo().get_param(key, default='') or ''
+        if raw:
+            try:
+                payload = json.loads(raw)
+                if isinstance(payload, dict):
+                    payload.setdefault('project', rec.project_id.name if rec.project_id else '')
+                    payload.setdefault('village', rec.village_id.name if rec.village_id else '')
+                    return payload
+            except Exception:
+                pass
+        return {
+            'active': False,
+            'done': 0,
+            'total': 0,
+            'pct': 0.0,
+            'label': '',
+            'project': rec.project_id.name if rec.project_id else '',
+            'village': rec.village_id.name if rec.village_id else '',
+        }
+
+    @api.model
+    def get_loader_progress_current(self):
+        key = 'bhuarjan.s23.loader.progress.user.%s' % self.env.uid
+        raw = self.env['ir.config_parameter'].sudo().get_param(key, default='') or ''
+        if raw:
+            try:
+                payload = json.loads(raw)
+                if isinstance(payload, dict):
+                    return payload
+            except Exception:
+                pass
+        return {
+            'active': False,
+            'done': 0,
+            'total': 0,
+            'pct': 0.0,
+            'label': '',
+            'project': '',
+            'village': '',
+        }
+
+    def _s23_increment_loader_progress(self, step=1, label=None, flush=False, active=True):
+        self.ensure_one()
+        current = self.get_loader_progress_current() or {}
+        cur_done = int(current.get('done') or 0)
+        cur_total = int(current.get('total') or 0)
+        next_done = cur_done + max(0, int(step or 0))
+        if cur_total > 0 and next_done > cur_total:
+            next_done = cur_total
+        self._s23_set_loader_progress(
+            done=next_done,
+            total=cur_total,
+            label=label,
+            active=active,
+            flush=flush,
+        )
+
     def _ensure_all_components_generated(self):
         self.ensure_one()
         all_generated = bool(
@@ -1374,6 +1498,13 @@ class Section23Award(models.Model):
     def _generate_scope_without_download(self, export_scope='all', label=None, allow_regenerate=False):
         """Generate requested scope and update status without opening download UI."""
         self.ensure_one()
+        self._s23_set_loader_progress(
+            done=0,
+            total=0,
+            label=_('Preparing generation...'),
+            active=True,
+            flush=True,
+        )
         gen_t0 = time.perf_counter()
         _logger.warning(
             "[S23 GENERATE START] award=%s id=%s scope=%s project=%s village=%s",
@@ -1405,6 +1536,11 @@ class Section23Award(models.Model):
             'rr_generated': False,
         })
         self._mark_generated_scope(export_scope=export_scope)
+        self._s23_set_loader_progress(
+            label=_('Finalizing files...'),
+            active=True,
+            flush=True,
+        )
         total_sec = time.perf_counter() - gen_t0
         _logger.warning(
             "[S23 GENERATE] award=%s id=%s scope=%s timings: sync=%.3fs refresh=%.3fs cache=%.3fs total=%.3fs",
@@ -1424,6 +1560,11 @@ class Section23Award(models.Model):
                 '%s Consolidated and R&R were reset and their cached files were deleted from DB (%s file(s)). '
                 'Please regenerate Consolidated and R&R.'
             ) % (message, removed_count)
+        self._s23_set_loader_progress(
+            label=_('Completed'),
+            active=False,
+            flush=True,
+        )
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -1690,8 +1831,12 @@ class Section23Award(models.Model):
         # Ensure missing rate fields are auto-filled from village master first.
         # User-edited non-zero values are preserved (force=False).
         self._sync_rate_fields_from_master(force=False)
-        # Ensure O2M is flushed so we do not call _populate with a false "empty" after edits.
-        self.flush_recordset()
+        # Avoid flushing parent award row here (can cause concurrent update retries
+        # during regenerate). Flush only child line buffers if present.
+        if self.award_survey_line_ids:
+            self.award_survey_line_ids.flush_recordset()
+        if self.award_structure_line_ids:
+            self.award_structure_line_ids.flush_recordset()
         if (not allow_when_fully_generated) and self.land_generated and self.tree_generated and self.asset_generated:
             raise ValidationError(_(
                 'All section awards are already generated for this Project and Village. '
@@ -1900,8 +2045,36 @@ class Section23Award(models.Model):
                 return 0.0
 
         line_vals = []
+        land_rows = self.get_land_compensation_data() if scope in ('all', 'land') else []
+        tree_rows = self.get_tree_compensation_data() if scope in ('all', 'tree') else []
+        asset_rows = self.get_structure_compensation_data() if scope in ('all', 'asset') else []
+        total_rows = len(land_rows) + len(tree_rows) + len(asset_rows)
+        # Keep final progress room for cache/upload/status phases after rows are processed.
+        tail_steps = 6
+        total_units = (total_rows + tail_steps) if total_rows > 0 else tail_steps
+        processed_rows = 0
+        self._s23_set_loader_progress(
+            done=0,
+            total=total_units,
+            label=_('Processing award rows...'),
+            active=True,
+            flush=True,
+        )
+
+        def _bump_progress(label_text):
+            nonlocal processed_rows
+            processed_rows += 1
+            if processed_rows == total_rows or processed_rows % 5 == 0:
+                self._s23_set_loader_progress(
+                    done=processed_rows,
+                    total=total_units,
+                    label=label_text,
+                    active=True,
+                    flush=True,
+                )
+
         if scope in ('all', 'land'):
-            for row in self.get_land_compensation_data():
+            for row in land_rows:
                 khasra = row.get('khasra', '')
                 if log_khasra:
                     _logger.warning(
@@ -1929,9 +2102,10 @@ class Section23Award(models.Model):
                     'paid_compensation': row.get('paid_compensation', 0.0) or 0.0,
                     'remark': row.get('remark', '') or '',
                 }))
+                _bump_progress(_('Processing land rows...'))
 
         if scope in ('all', 'tree'):
-            for row in self.get_tree_compensation_data():
+            for row in tree_rows:
                 khasra = row.get('khasra', '')
                 if log_khasra:
                     _logger.warning(
@@ -1946,9 +2120,10 @@ class Section23Award(models.Model):
                     'total_compensation': row.get('total', 0.0) or 0.0,
                     'remark': row.get('tree_type', '') or '',
                 }))
+                _bump_progress(_('Processing tree rows...'))
 
         if scope in ('all', 'asset'):
-            for row in self.get_structure_compensation_data():
+            for row in asset_rows:
                 khasra = row.get('asset_khasra', '')
                 if log_khasra:
                     _logger.warning(
@@ -1967,9 +2142,17 @@ class Section23Award(models.Model):
                     'total_compensation': row.get('total', 0.0) or 0.0,
                     'remark': row.get('asset_type', '') or '',
                 }))
+                _bump_progress(_('Processing asset rows...'))
 
         if line_vals:
             self.write({'award_line_item_ids': line_vals})
+        self._s23_set_loader_progress(
+            done=total_rows,
+            total=total_units,
+            label=_('Rows processed. Preparing documents...'),
+            active=True,
+            flush=True,
+        )
     
     def action_submit_award(self):
         """Submit the award after document upload"""

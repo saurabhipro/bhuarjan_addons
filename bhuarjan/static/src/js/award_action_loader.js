@@ -138,6 +138,93 @@ const ACTION_ICONS = {
     action_generate_award: '✅',
 };
 
+let LOADER_PROGRESS_TIMER = null;
+
+function _extractSection23AwardId() {
+    const hash = window.location.hash || '';
+    const modelMatch = hash.match(/(?:^|[?#&])model=([^&]+)/);
+    const idMatch = hash.match(/(?:^|[?#&])id=(\d+)/);
+    const activeIdMatch = hash.match(/(?:^|[?#&])active_id=(\d+)/);
+    const model = modelMatch ? decodeURIComponent(modelMatch[1] || '') : '';
+    if (model === 'bhu.section23.award' && idMatch) {
+        return parseInt(idMatch[1], 10) || 0;
+    }
+    if (model === 'bhu.section23.award' && activeIdMatch) {
+        return parseInt(activeIdMatch[1], 10) || 0;
+    }
+    const form = document.querySelector('.o_form_view');
+    const fromDataset = parseInt(
+        (form && (form.dataset.resId || form.getAttribute('data-res-id'))) || '0',
+        10
+    ) || 0;
+    return fromDataset;
+}
+
+function _loaderEl(selector) {
+    const host = document.getElementById(LOADER_ID);
+    return host ? host.querySelector(selector) : null;
+}
+
+function _setLoaderText(selector, value, fallback = '-') {
+    const el = _loaderEl(selector);
+    if (el) el.textContent = value || fallback;
+}
+
+function _updateLoaderProgressUI(payload) {
+    if (!payload) return;
+    const total = Math.max(0, parseInt(payload.total || 0, 10));
+    const done = Math.max(0, parseInt(payload.done || 0, 10));
+    const pct = total > 0 ? Math.min(100, Math.max(0, (done * 100.0) / total)) : (parseFloat(payload.pct || 0) || 0);
+    const pctFixed = `${pct.toFixed(1)}%`;
+
+    _setLoaderText('.aal-project-name', payload.project || _fieldRawValue('project_id'));
+    _setLoaderText('.aal-village-name', payload.village || _fieldRawValue('village_id'));
+    _setLoaderText('.aal-progress-stat', total > 0 ? `${done} / ${total} rows` : 'Preparing rows...');
+    _setLoaderText('.aal-progress-pct', pctFixed, '0.0%');
+    _setLoaderText('.aal-progress-label', payload.label || 'Processing...');
+
+    const bar = _loaderEl('.aal-progress-fill');
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+}
+
+function _startLoaderProgressPolling() {
+    if (LOADER_PROGRESS_TIMER) {
+        clearInterval(LOADER_PROGRESS_TIMER);
+        LOADER_PROGRESS_TIMER = null;
+    }
+    _setLoaderText('.aal-project-name', _fieldRawValue('project_id'));
+    _setLoaderText('.aal-village-name', _fieldRawValue('village_id'));
+
+    const poll = () => {
+        if (!document.getElementById(LOADER_ID)) return;
+        fetch('/web/dataset/call_kw/bhu.section23.award/get_loader_progress_current', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: {
+                    model: 'bhu.section23.award',
+                    method: 'get_loader_progress_current',
+                    args: [],
+                    kwargs: {},
+                },
+                id: Date.now(),
+            }),
+        })
+            .then((r) => r.json())
+            .then((res) => {
+                const payload = res && res.result ? res.result : {};
+                _updateLoaderProgressUI(payload || {});
+            })
+            .catch(() => { /* keep loader alive even when polling fails */ });
+    };
+
+    poll();
+    LOADER_PROGRESS_TIMER = setInterval(poll, 350);
+}
+
 function _showLoader(label, actionName = '') {
     if (document.getElementById(LOADER_ID)) return;
     _setPopupButtonsDisabled(true);
@@ -192,6 +279,56 @@ function _showLoader(label, actionName = '') {
                 margin-top:6px;
                 color:rgba(255,255,255,0.88);
             }
+            #${LOADER_ID} .aal-meta {
+                width: min(620px, 90vw);
+                margin: 0 0 14px 0;
+                padding: 10px 14px;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.12);
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+                color: #fff;
+                font-size: 0.96rem;
+            }
+            #${LOADER_ID} .aal-meta-row {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 4px;
+            }
+            #${LOADER_ID} .aal-meta-row:last-child { margin-bottom: 0; }
+            #${LOADER_ID} .aal-progress-wrap {
+                width: min(620px, 90vw);
+                margin: 0 0 10px 0;
+            }
+            #${LOADER_ID} .aal-progress-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                color: rgba(255,255,255,0.95);
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+            #${LOADER_ID} .aal-progress-track {
+                width: 100%;
+                height: 10px;
+                border-radius: 999px;
+                background: rgba(255,255,255,0.18);
+                overflow: hidden;
+                box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
+            }
+            #${LOADER_ID} .aal-progress-fill {
+                width: 0%;
+                height: 100%;
+                border-radius: inherit;
+                transition: width 0.35s ease;
+                background: linear-gradient(90deg, #ffe49f, #ffd066);
+            }
+            #${LOADER_ID} .aal-progress-label {
+                color: rgba(255,255,255,0.9);
+                font-size: 0.9rem;
+                margin-top: 6px;
+                text-align: left;
+            }
             #${LOADER_ID} .aal-dots { display:flex; gap:9px; margin-bottom:30px; }
             #${LOADER_ID} .aal-dots span {
                 width:10px; height:10px; border-radius:50%;
@@ -216,14 +353,31 @@ function _showLoader(label, actionName = '') {
         <div class="aal-action-icon">${ACTION_ICONS[actionName] || '📄'}</div>
         <div class="aal-title">Please wait…</div>
         <div class="aal-sub">${label || 'Processing your request. This may take a few moments.'}</div>
+        <div class="aal-meta">
+            <div class="aal-meta-row"><span>Project</span><strong class="aal-project-name">-</strong></div>
+            <div class="aal-meta-row"><span>Village</span><strong class="aal-village-name">-</strong></div>
+        </div>
+        <div class="aal-progress-wrap">
+            <div class="aal-progress-head">
+                <span class="aal-progress-stat">Preparing rows...</span>
+                <strong class="aal-progress-pct">0.0%</strong>
+            </div>
+            <div class="aal-progress-track"><div class="aal-progress-fill"></div></div>
+            <div class="aal-progress-label">Initializing generation...</div>
+        </div>
         <div class="aal-dots"><span></span><span></span><span></span><span></span><span></span></div>
         <div class="aal-brand">Bhuarjan · Land Acquisition System</div>
     `;
     document.body.appendChild(el);
+    _startLoaderProgressPolling();
 }
 
 function _hideLoader() {
     const el = document.getElementById(LOADER_ID);
+    if (LOADER_PROGRESS_TIMER) {
+        clearInterval(LOADER_PROGRESS_TIMER);
+        LOADER_PROGRESS_TIMER = null;
+    }
     _setPopupButtonsDisabled(false);
     if (!el) return;
     el.style.transition = 'opacity 0.35s ease';

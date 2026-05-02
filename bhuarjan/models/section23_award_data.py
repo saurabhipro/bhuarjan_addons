@@ -114,13 +114,10 @@ class Section23AwardData(models.Model):
             ], limit=1)
 
             # Derive main-road status from measured distance.
-            # Rule: rural <= 50m is MR, urban <= 30m is MR; 0/blank counts as MR.
+            # Rule: rural <= 50m is MR, urban <= 20m is MR; 0/blank counts as MR.
             distance_from_main_road = (survey.distance_from_main_road or 0.0) if survey else 0.0
-            if survey:
-                threshold = 50.0 if survey.survey_type == 'rural' else 30.0
-                derived_is_within_distance = distance_from_main_road <= threshold
-            else:
-                derived_is_within_distance = False
+            threshold = self._s23_distance_threshold()
+            derived_is_within_distance = distance_from_main_road <= threshold
 
             # Effective guideline rate: master MR/BMR; BMR: ×1.25 if diverted, else irrigation 100%/80%.
             award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
@@ -188,17 +185,16 @@ class Section23AwardData(models.Model):
 
             # --- Urban area-based slab path ---
             # Trigger if: urban_body_type can be resolved AND
-            # either the village is marked urban OR the survey itself is urban.
+            # village master is marked urban.
             # Fall back to the village's urban_body_type when the award field is blank
             # (e.g. award was created before the village was marked Urban).
             _is_urban_village = (self.village_id and self.village_id.village_type == 'urban')
-            _is_urban_survey = (survey and survey.survey_type == 'urban')
             _body_type = self.urban_body_type or (
                 self.village_id.urban_body_type
                 if (_is_urban_village and self.village_id.urban_body_type)
                 else False
             )
-            if _body_type and (_is_urban_village or _is_urban_survey):
+            if _body_type and _is_urban_village:
                 slab_rows = self._generate_urban_slab_rows(
                     data, is_within_distance, guide_master, effective_rate, acre_per_hectare,
                     body_type=_body_type,
@@ -500,6 +496,25 @@ class Section23AwardData(models.Model):
             result.append(group)
         return result
 
+    def _s23_calculate_group_rehab_total(self, lines):
+        """Recompute group rehab total from acquired area and rehab rate."""
+        self.ensure_one()
+        acre_per_hectare = 2.471053814671653
+        total = 0.0
+        for line in (lines or []):
+            acquired_area_ha = float(line.get('acquired_area', 0.0) or 0.0)
+            if acquired_area_ha <= 0.0:
+                continue
+            rehab_rate = float(line.get('rehab_policy_rate_per_acre', 0.0) or 0.0)
+            if rehab_rate <= 0.0:
+                rehab_rate = self._get_min_rehab_rate_per_acre(
+                    bool(line.get('fallow')),
+                    bool(line.get('irrigated')),
+                    bool(line.get('unirrigated')),
+                )
+            total += acquired_area_ha * acre_per_hectare * rehab_rate
+        return total
+
     def format_indian_number(self, value, decimals=2):
         """Format number with Indian numbering system (commas for thousands)"""
         if value is None:
@@ -647,7 +662,6 @@ class Section23AwardData(models.Model):
             data['solatium'] = solatium
             data['interest'] = interest
             data['total'] = total
-
             result.append(data)
 
         # Sort by landowner name, then khasra, then tree type

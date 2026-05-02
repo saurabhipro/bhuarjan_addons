@@ -262,6 +262,12 @@ class Section23AwardExcel(models.Model):
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1
 
+                    group_basic_total = float(group.get('basic_value', 0.0) or 0.0)
+                    group_market_total = float(group.get('market_value', 0.0) or 0.0)
+                    group_solatium_total = float(group.get('solatium', 0.0) or 0.0)
+                    group_rehab_total = self._s23_calculate_group_rehab_total(lines)
+                    group_interest_total, _group_days = self._calculate_interest_on_basic(group_basic_total)
+                    group_total_comp = group_market_total + group_solatium_total + group_interest_total
                     land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
                     land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_number_fmt)
                     land_sheet.write_number(row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
@@ -271,20 +277,21 @@ class Section23AwardExcel(models.Model):
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
                     land_sheet.write_blank(row, 9, None, total_label_fmt)
                     land_sheet.write_blank(row, 10, None, total_label_fmt)
-                    land_sheet.write_number(row, 11, float(group.get('basic_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 12, float(group.get('market_value', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 13, float(group.get('solatium', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 14, float(group.get('interest', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 15, float(group.get('total_compensation', 0.0) or 0.0), total_money_fmt)
-                    land_sheet.write_number(row, 16, float(group.get('rehab_policy_amount', 0.0) or 0.0), total_money_fmt)
+                    land_sheet.write_number(row, 11, group_basic_total, total_money_fmt)
+                    land_sheet.write_number(row, 12, group_market_total, total_money_fmt)
+                    land_sheet.write_number(row, 13, group_solatium_total, total_money_fmt)
+                    # Col 15 (interest) in yellow row is always based on yellow Col 12 basic total.
+                    land_sheet.write_number(row, 14, group_interest_total, total_money_fmt)
+                    land_sheet.write_number(row, 15, group_total_comp, total_money_fmt)
+                    land_sheet.write_number(row, 16, group_rehab_total, total_money_fmt)
                     land_sheet.write_number(row, 17, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
                     land_sheet.write_blank(row, 18, None, total_label_fmt)
                     total_acq += float(group.get('acquired_area', 0.0) or 0.0)
-                    total_basic += float(group.get('basic_value', 0.0) or 0.0)
-                    total_market += float(group.get('market_value', 0.0) or 0.0)
-                    total_solatium += float(group.get('solatium', 0.0) or 0.0)
-                    total_interest += float(group.get('interest', 0.0) or 0.0)
-                    total_comp += float(group.get('total_compensation', 0.0) or 0.0)
+                    total_basic += group_basic_total
+                    total_market += group_market_total
+                    total_solatium += group_solatium_total
+                    total_interest += group_interest_total
+                    total_comp += group_total_comp
                     total_paid += float(group.get('paid_compensation', 0.0) or 0.0)
                     row += 1
 
@@ -301,7 +308,11 @@ class Section23AwardExcel(models.Model):
                 land_sheet.write_number(row, 13, total_solatium, total_money_fmt)
                 land_sheet.write_number(row, 14, total_interest, total_money_fmt)
                 land_sheet.write_number(row, 15, total_comp, total_money_fmt)
-                land_sheet.write_number(row, 16, sum(float(g.get('rehab_policy_amount', 0.0) or 0.0) for g in land_groups), total_money_fmt)
+                land_sheet.write_number(
+                    row, 16,
+                    sum(self._s23_calculate_group_rehab_total(g.get('lines')) for g in land_groups),
+                    total_money_fmt
+                )
                 land_sheet.write_number(row, 17, total_paid, total_money_fmt)
                 land_sheet.write_blank(row, 18, None, total_label_fmt)
 

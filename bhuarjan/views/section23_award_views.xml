@@ -114,7 +114,7 @@
                                     <div class="s23_meta_label">Urban Body Type / नगरीय निकाय प्रकार</div>
                                     <div class="s23_meta_value">
                                         <field name="urban_body_type"
-                                               readonly="state != 'draft'"
+                                               readonly="1"
                                                placeholder="Select body type for slab calculation…"
                                                widget="selection"/>
                                     </div>

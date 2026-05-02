@@ -12,7 +12,6 @@
                             type="object"
                             string="Open Survey for this Khasra / इस खसरे का सर्वे खोलें"
                             class="btn-link"/>
-                    <field name="survey_type" readonly="1"/>
                     <field name="distance_help" readonly="1"/>
                 </group>
                 <group string="Values saved on the survey / सर्वे पर सहेजे जाएंगे">

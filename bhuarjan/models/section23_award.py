@@ -94,7 +94,7 @@ class Section23Award(models.Model):
         string='Is Urban / नगरीय है',
         compute='_compute_is_urban',
         store=False,
-        help='True when any survey in this award has survey_type = urban.',
+        help='True when selected village is Urban in village master.',
     )
     
     # Award document
@@ -258,17 +258,11 @@ class Section23Award(models.Model):
             if not rec.urban_body_type:
                 rec.urban_body_type = rec.village_id.urban_body_type or False
 
-    @api.depends('village_id', 'village_id.village_type',
-                 'award_survey_line_ids', 'award_survey_line_ids.survey_id',
-                 'award_survey_line_ids.survey_id.survey_type')
+    @api.depends('village_id', 'village_id.village_type')
     def _compute_is_urban(self):
         for rec in self:
-            # Village-level type takes priority; fall back to survey_type check
-            if rec.village_id and rec.village_id.village_type == 'urban':
-                rec.is_urban = True
-            else:
-                surveys = rec.award_survey_line_ids.mapped('survey_id')
-                rec.is_urban = any(s.survey_type == 'urban' for s in surveys) if surveys else False
+            # Award urban/rural behavior is controlled strictly by village master.
+            rec.is_urban = bool(rec.village_id and rec.village_id.village_type == 'urban')
 
     def _get_active_rate_master_for_village(self):
         self.ensure_one()
@@ -278,6 +272,11 @@ class Section23Award(models.Model):
             ('village_id', '=', self.village_id.id),
             ('state', 'in', ['active', 'draft']),
         ], limit=1, order='state ASC, effective_from DESC')
+
+    def _s23_distance_threshold(self):
+        """MR/BMR threshold in meters from village master type."""
+        self.ensure_one()
+        return 20.0 if (self.village_id and self.village_id.village_type == 'urban') else 50.0
 
     def _sync_rate_fields_from_master(self, force=False):
         for rec in self:
@@ -483,7 +482,7 @@ class Section23Award(models.Model):
         commands = []
         for survey in surveys:
             distance = survey.distance_from_main_road or 0.0
-            threshold = 50.0 if survey.survey_type == 'rural' else 30.0
+            threshold = self._s23_distance_threshold()
             commands.append((0, 0, {
                 'survey_id': survey.id,
                 'land_type': survey.land_type_for_award or 'village',
@@ -643,7 +642,7 @@ class Section23Award(models.Model):
         commands = [(5, 0, 0)]
         for survey in surveys:
             distance = survey.distance_from_main_road or 0.0
-            threshold = 50.0 if survey.survey_type == 'rural' else 30.0
+            threshold = self._s23_distance_threshold()
             commands.append((0, 0, {
                 'survey_id': survey.id,
                 'land_type': survey.land_type_for_award or 'village',

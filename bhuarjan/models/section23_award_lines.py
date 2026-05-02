@@ -280,7 +280,7 @@ class Section23AwardSurveyLine(models.Model):
                 if not line.land_type and line.survey_id.land_type_for_award:
                     line.land_type = line.survey_id.land_type_for_award
                 distance = line.survey_id.distance_from_main_road or 0.0
-                threshold = 50.0 if line.survey_id.survey_type == 'rural' else 30.0
+                threshold = 20.0 if (line.award_id and line.award_id.village_id and line.award_id.village_id.village_type == 'urban') else 50.0
                 line.is_within_distance = distance <= threshold
 
     @api.model_create_multi
@@ -295,7 +295,8 @@ class Section23AwardSurveyLine(models.Model):
                         vals['land_type'] = survey.land_type_for_award
                     if 'is_within_distance' not in vals:
                         distance = survey.distance_from_main_road or 0.0
-                        threshold = 50.0 if survey.survey_type == 'rural' else 30.0
+                        award = self.env['bhu.section23.award'].browse(vals.get('award_id')) if vals.get('award_id') else False
+                        threshold = 20.0 if (award and award.village_id and award.village_id.village_type == 'urban') else 50.0
                         vals['is_within_distance'] = distance <= threshold
 
         lines = super().create(vals_list)

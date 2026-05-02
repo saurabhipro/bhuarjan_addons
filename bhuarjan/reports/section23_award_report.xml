@@ -881,6 +881,12 @@
                                         </tr>
                                     </t>
                                     <tr class="total-row">
+                                        <t t-set="group_basic_total" t-value="group.get('basic_value', 0.0) or 0.0"/>
+                                        <t t-set="group_market_total" t-value="group.get('market_value', 0.0) or 0.0"/>
+                                        <t t-set="group_solatium_total" t-value="group.get('solatium', 0.0) or 0.0"/>
+                                        <t t-set="group_rehab_total" t-value="o._s23_calculate_group_rehab_total(group_lines)"/>
+                                        <t t-set="group_interest_total" t-value="o._calculate_interest_on_basic(group_basic_total)[0]"/>
+                                        <t t-set="group_total_comp" t-value="group_market_total + group_solatium_total + group_interest_total"/>
                                         <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('original_area', 0.0), 4)"/>
@@ -891,12 +897,12 @@
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('basic_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('market_value', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('solatium', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('interest', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('total_compensation', 0.0), 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_basic_total, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_market_total, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_solatium_total, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_interest_total, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_total_comp, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_rehab_total, 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
                                         <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important; background-color: #ffd54f;">&#160;</td>
                                     </tr>

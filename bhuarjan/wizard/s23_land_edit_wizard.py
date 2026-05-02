@@ -14,11 +14,6 @@ class S23LandEditWizard(models.TransientModel):
         ondelete='cascade',
     )
     khasra_display = fields.Char(string='Khasra / खसरा', readonly=True)
-    survey_type = fields.Selection(
-        related='survey_line_id.survey_id.survey_type',
-        string='Survey type',
-        readonly=True,
-    )
     distance_help = fields.Char(
         string='MR/BMR threshold',
         compute='_compute_distance_help',
@@ -52,26 +47,29 @@ class S23LandEditWizard(models.TransientModel):
     )
 
     # ------------------------------------------------------------------ helpers
-    def _threshold(self):
-        st = (
-            self.survey_line_id.survey_id.survey_type
-            if self.survey_line_id and self.survey_line_id.survey_id
-            else 'rural'
-        )
-        return 50.0 if st == 'rural' else 30.0
+    def _village_type(self):
+        self.ensure_one()
+        line = self.survey_line_id
+        award = line.award_id if line else False
+        if award and award.village_id:
+            return award.village_id.village_type or 'rural'
+        survey = line.survey_id if line else False
+        if survey and survey.village_id:
+            return survey.village_id.village_type or 'rural'
+        return 'rural'
 
-    @api.depends('survey_line_id', 'survey_type')
+    def _threshold(self):
+        st = self._village_type()
+        return 50.0 if st == 'rural' else 20.0
+
+    @api.depends('survey_line_id')
     def _compute_distance_help(self):
         for wiz in self:
-            st = (
-                wiz.survey_line_id.survey_id.survey_type
-                if wiz.survey_line_id and wiz.survey_line_id.survey_id
-                else False
-            )
-            th   = 50.0 if st == 'rural' else 30.0 if st == 'urban' else 50.0
-            kind = 'Rural / ग्रामीण' if st == 'rural' else 'Urban / शहरी' if st == 'urban' else '—'
+            st = wiz._village_type() if wiz.survey_line_id else False
+            th   = 50.0 if st == 'rural' else 20.0 if st == 'urban' else 50.0
+            kind = 'Rural / ग्रामीण' if st == 'rural' else 'Urban / शहरी' if st == 'urban' else 'Rural / ग्रामीण'
             wiz.distance_help = _(
-                'MR if ≤ %(th)s m  |  BMR if > %(th)s m  (%(kind)s)'
+                'MR if ≤ %(th)s m  |  BMR if > %(th)s m  (Village type: %(kind)s)'
             ) % {'th': int(th), 'kind': kind}
 
     # ------------------------------------------------------------------ onchanges
@@ -102,7 +100,9 @@ class S23LandEditWizard(models.TransientModel):
             return res
         s   = line.survey_id
         d   = s.distance_from_main_road or 0.0
-        th  = 50.0 if s.survey_type == 'rural' else 30.0
+        award = line.award_id
+        village_type = award.village_id.village_type if (award and award.village_id) else (s.village_id.village_type if s.village_id else 'rural')
+        th  = 20.0 if village_type == 'urban' else 50.0
         res.update({
             'survey_line_id':          line.id,
             'khasra_display':          s.khasra_number or '',
@@ -151,7 +151,8 @@ class S23LandEditWizard(models.TransientModel):
         before_irrigation = survey.irrigation_type or ''
         before_diverted = survey.has_traded_land or ''
 
-        th = 50.0 if survey.survey_type == 'rural' else 30.0
+        village_type = line.award_id.village_id.village_type if (line and line.award_id and line.award_id.village_id) else (survey.village_id.village_type if survey.village_id else 'rural')
+        th = 20.0 if village_type == 'urban' else 50.0
         d  = self.distance_from_main_road or 0.0
         if self.road_type == 'mr':
             d = min(d, th)

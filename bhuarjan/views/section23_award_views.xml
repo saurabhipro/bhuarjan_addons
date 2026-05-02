@@ -385,8 +385,8 @@
                                     confirm="Do you want to regenerate the Land Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not land_generated"/>
                         </div>
-                        <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines">
-                            <list string="" create="0" delete="0" default_order="khasra_number" limit="20">
+                        <field name="award_survey_line_ids" nolabel="1" class="s23-land-edit-lines" options="{'no_open': True, 'disable_open': True}">
+                            <list string="" create="0" delete="0" default_order="khasra_number" limit="20" editable="top" open_form_view="false">
                                 <field name="currency_id" column_invisible="1"/>
                                 <button name="action_open_survey_for_land_edit" type="object"
                                         string="Edit" class="btn btn-sm s23_btn_brown"

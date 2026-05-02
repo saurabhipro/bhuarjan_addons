@@ -159,6 +159,10 @@ class Section23AwardSurveyLine(models.Model):
             'context': {'default_survey_line_id': self.id},
         }
 
+    def get_formview_action(self, access_uid=None):
+        """Disable default row-click popup in Land Award line list."""
+        return False
+
     def action_open_survey_for_tree_edit(self):
         """Open popup wizard to edit tree rows for this khasra's survey."""
         self.ensure_one()

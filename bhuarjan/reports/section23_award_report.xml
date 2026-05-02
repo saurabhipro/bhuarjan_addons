@@ -800,15 +800,25 @@
                                                 <span t-esc="group.get('landowner_name', '')"/><br/>
                                                 <t t-if="group.get('father_name')">पिता/पति: <span t-esc="group.get('father_name')"/></t>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;" t-esc="land.get('khasra', '')"/>
-                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('original_area', 0.0), 4)"/>
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: center; border: 1px solid #000 !important;"
+                                                t-esc="land.get('khasra', '')"/>
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: right; border: 1px solid #000 !important;"
+                                                t-esc="o.format_indian_number(land.get('original_area', 0.0), 4)"/>
                                             <td style="text-align: center; border: 1px solid #000 !important;" t-esc="land.get('khasra', '')"/>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 4)"/>
-                                            <td style="text-align: center; border: 1px solid #000 !important;">
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: center; border: 1px solid #000 !important;">
                                                 <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('is_within_distance') else 'color:#c62828;font-weight:700;'"
                                                       t-esc="'हाँ' if land.get('is_within_distance') else 'नहीं'"/>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;">
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
@@ -817,7 +827,9 @@
                                                           t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;">
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
@@ -826,7 +838,9 @@
                                                           t-esc="'हाँ' if land.get('unirrigated') else 'नहीं'"/>
                                                 </t>
                                             </td>
-                                            <td style="text-align: center; border: 1px solid #000 !important;">
+                                            <td t-if="land.get('khasra_merge_show', True)"
+                                                t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
+                                                style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>

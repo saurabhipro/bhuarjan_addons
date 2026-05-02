@@ -446,6 +446,7 @@ class Section23AwardData(models.Model):
                     'address': row.get('address', ''),
                     'lines': [],
                     'khasra_count': 0,
+                    '_seen_khasra_for_totals': set(),
                 }
                 for field_name in area_totals + amount_totals:
                     grouped[key][field_name] = 0.0
@@ -455,16 +456,47 @@ class Section23AwardData(models.Model):
             khasra = (row.get('khasra') or '').strip()
             area_present = bool((row.get('original_area', 0.0) or 0.0) or (row.get('acquired_area', 0.0) or 0.0))
             if khasra and area_present:
-                group['khasra_count'] += 1
-                for field_name in area_totals:
-                    group[field_name] += row.get(field_name, 0.0) or 0.0
+                # For urban slab-split rows, count khasra only once.
+                if khasra not in group['_seen_khasra_for_totals']:
+                    group['_seen_khasra_for_totals'].add(khasra)
+                    group['khasra_count'] += 1
+                    group['original_area'] += row.get('original_area', 0.0) or 0.0
+                # Acquired area is portion-wise and should sum across slab rows.
+                group['acquired_area'] += row.get('acquired_area', 0.0) or 0.0
             for field_name in amount_totals:
                 group[field_name] += row.get(field_name, 0.0) or 0.0
 
         result = []
         for key in ordered_keys:
             group = grouped[key]
-            group['lines'] = sorted(group.get('lines', []), key=_khasra_sort_key)
+            lines = sorted(group.get('lines', []), key=_khasra_sort_key)
+            # Add merge metadata for urban slab rows so repeating khasra cells
+            # render once with rowspan in report columns 3,4,7,8,9,10.
+            i = 0
+            while i < len(lines):
+                row = lines[i]
+                row['khasra_merge_show'] = True
+                row['khasra_merge_rowspan'] = 1
+                khasra = (row.get('khasra') or '').strip()
+                if row.get('is_urban_slab') and khasra:
+                    j = i + 1
+                    while (
+                        j < len(lines)
+                        and lines[j].get('is_urban_slab')
+                        and (lines[j].get('khasra') or '').strip() == khasra
+                    ):
+                        j += 1
+                    span = j - i
+                    if span > 1:
+                        row['khasra_merge_rowspan'] = span
+                        for k in range(i + 1, j):
+                            lines[k]['khasra_merge_show'] = False
+                            lines[k]['khasra_merge_rowspan'] = span
+                    i = j
+                    continue
+                i += 1
+            group['lines'] = lines
+            group.pop('_seen_khasra_for_totals', None)
             result.append(group)
         return result
 

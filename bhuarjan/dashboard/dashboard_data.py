@@ -100,14 +100,14 @@ class DashboardData(models.AbstractModel):
             project_id: Project ID to get villages for
             
         Returns:
-            list: List of village dictionaries with 'id' and 'name'
+            list: List of village dictionaries with id, name, village_type
         """
         project = self.env["bhu.project"].browse(project_id)
         if not project.exists():
             return []
         # Get villages from project's Many2many relationship
         villages = project.village_ids
-        return villages.read(["id", "name"])
+        return villages.read(["id", "name", "village_type"])
     @api.model
     def get_department_user_department(self):
         """Get the department for department user - first from user's department_id field, then from assigned projects"""

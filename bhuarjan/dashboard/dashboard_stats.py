@@ -1075,13 +1075,13 @@ class DashboardStats(models.AbstractModel):
             project_id: Project ID to get villages for
             
         Returns:
-            list: List of village dictionaries with 'id' and 'name'
+            list: List of village dictionaries with id, name, village_type
         """
         project = self.env["bhu.project"].browse(project_id)
         if not project.exists():
             return []
         villages = project.village_ids
-        return villages.read(["id", "name"])
+        return villages.read(["id", "name", "village_type"])
 
     @api.model
     def get_survey_trend_data(self, company_ids=None):

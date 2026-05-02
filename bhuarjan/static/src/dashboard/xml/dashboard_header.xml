@@ -70,7 +70,7 @@
                                     t-att-value="this.toString(village.id)"
                                     t-att-style="(village.survey_count || 0) > 0 ? 'background-color:#fff3e0; color:#7b3200; font-weight:700;' : 'background-color:#fff; color:#999;'"
                                 >
-                                    <t t-esc="`${village.name} (${village.survey_count || 0})`"/>
+                                    <t t-esc="`${village.name} (${village.survey_count || 0}) (${((village.village_type || '').toLowerCase() === 'urban') ? 'U' : 'R'})`"/>
                                 </option>
                             </t>
                         </select>

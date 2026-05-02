@@ -21,6 +21,7 @@ from . import settings_master
 from . import message_wizard
 from . import survey_bulk_approval_wizard
 from . import document_vault
+from . import document_vault_navigator
 from . import utils
 from . import sia_team
 from . import sia_team_member

@@ -371,6 +371,11 @@ class DashboardActions(models.AbstractModel):
                 'views': [(False, 'list'), (False, 'form')],
                 'target': 'current',
             }
+
+    @api.model
+    def action_open_document_vault_navigator(self):
+        """Open dashboard-style document navigator."""
+        return self.env['bhu.document.vault.navigator'].action_open_navigator()
     @api.model
     def action_open_section19(self):
         try:

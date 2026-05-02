@@ -72,6 +72,7 @@
         'views/survey_views.xml',
         'views/survey_bulk_approval_wizard_views.xml',
         'views/document_vault_views.xml',
+        'views/document_vault_navigator_views.xml',
         'views/sia_team_views.xml',
         'views/sia_team_member_views.xml',
         'wizard/sia_send_back_wizard.xml',
@@ -147,6 +148,7 @@
             # 'bhuarjan/static/src/css/rate_master_form.css',
             'bhuarjan/static/src/css/survey_status.css',
             'bhuarjan/static/src/css/section23_award_form_premium.css',
+            'bhuarjan/static/src/css/document_vault_navigator.css',
             'bhuarjan/static/src/css/search_view.css',
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders

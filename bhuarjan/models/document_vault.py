@@ -19,6 +19,13 @@ class DocumentVault(models.Model):
         ('sia_reports', 'SIA Reports / SIA रिपोर्ट'),
         ('sec15_objections', 'Section 15 Objections / धारा 15 आपत्तियां'),
         ('sec19_signed_notification', 'Section 19 Signed Notification / धारा 19 हस्ताक्षरित अधिसूचना'),
+        ('sec21_notification', 'Section 21 Notification / धारा 21 अधिसूचना'),
+        ('section23_land_award', 'Section 23 Land Award / धारा 23 भूमि अवार्ड'),
+        ('section23_tree_award', 'Section 23 Tree Award / धारा 23 वृक्ष अवार्ड'),
+        ('section23_asset_award', 'Section 23 Asset Award / धारा 23 परिसंपत्ति अवार्ड'),
+        ('section23_standard_award', 'Section 23 Standard Award / धारा 23 मानक अवार्ड'),
+        ('section23_consolidated_award', 'Section 23 Consolidated Award / धारा 23 समेकित अवार्ड'),
+        ('section23_rr_award', 'Section 23 R&R Award / धारा 23 पुनर्वास अवार्ड'),
         ('payment_signed_proof', 'Payment Signed Payment Proof / भुगतान हस्ताक्षरित प्रमाण'),
     ], string='Document Type / दस्तावेज़ प्रकार', required=True, tracking=True)
     signed_date = fields.Date(string='Final Signed Date / अंतिम हस्ताक्षर दिनांक', required=True, tracking=True, default=fields.Date.today)

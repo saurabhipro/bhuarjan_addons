@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_document_vault_navigator_form" model="ir.ui.view">
+        <field name="name">bhu.document.vault.navigator.form</field>
+        <field name="model">bhu.document.vault.navigator</field>
+        <field name="arch" type="xml">
+            <form string="Document Vault Navigator / दस्तावेज़ नेविगेटर" create="0" edit="1" delete="0">
+                <sheet class="o_docvault_navigator_form">
+                    <div class="o_docvault_selector_bar">
+                        <div class="o_docvault_selector_title">Doc Vault Viewer</div>
+                        <field name="department_id" class="o_docvault_selector_field" readonly="0" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="project_id" class="o_docvault_selector_field"
+                               readonly="0"
+                               domain="[('department_id', '=', department_id)]"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="village_id" class="o_docvault_selector_field"
+                               readonly="0"
+                               domain="[('project_ids', 'in', project_id)]"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                        <button name="action_refresh_sections" type="object" string="Refresh" class="btn btn-secondary o_docvault_refresh_btn" icon="fa-refresh"/>
+                    </div>
+                    <div class="o_docvault_split_area">
+                        <div class="o_docvault_left_panel">
+                            <div class="o_docvault_panel_title">Sections / अनुभाग</div>
+                            <field name="section_line_ids" nolabel="1" options="{'no_open': True}">
+                                <list create="0" delete="0" edit="0" open_form_view="0" decoration-success="is_available">
+                                    <button name="action_select_document" string="View" type="object" class="btn btn-sm btn-primary" icon="fa-eye"/>
+                                    <field name="availability_icon" string="Doc"/>
+                                    <field name="step_label" string="Step"/>
+                                    <field name="section_label"/>
+                                </list>
+                            </field>
+                        </div>
+                        <div class="o_docvault_right_panel">
+                            <div class="o_docvault_panel_title">PDF Preview / पीडीएफ पूर्वावलोकन</div>
+                            <field name="selected_document_hint" widget="html" readonly="1" invisible="selected_document_id or selected_attachment_id or selected_source_record_id"/>
+                            <field name="selected_document_file" filename="selected_document_filename" widget="pdf_viewer"
+                                   readonly="1" invisible="not selected_document_id and not selected_attachment_id and not selected_source_record_id"/>
+                        </div>
+                    </div>
+                    <field name="selected_document_id" invisible="1"/>
+                    <field name="selected_attachment_id" invisible="1"/>
+                    <field name="selected_source_model" invisible="1"/>
+                    <field name="selected_source_record_id" invisible="1"/>
+                    <field name="selected_source_file_field" invisible="1"/>
+                    <field name="selected_source_filename_field" invisible="1"/>
+                    <field name="user_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_document_vault_navigator_window" model="ir.actions.act_window">
+        <field name="name">Document Vault Navigator</field>
+        <field name="res_model">bhu.document.vault.navigator</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_document_vault_navigator_form"/>
+        <field name="target">current</field>
+        <field name="context">{'create': False, 'delete': False}</field>
+    </record>
+
+    <record id="action_document_vault_navigator" model="ir.actions.server">
+        <field name="name">Document Vault Navigator</field>
+        <field name="model_id" ref="model_bhu_document_vault_navigator"/>
+        <field name="state">code</field>
+        <field name="code">action = env['bhu.document.vault.navigator'].action_open_navigator()</field>
+    </record>
+</odoo>

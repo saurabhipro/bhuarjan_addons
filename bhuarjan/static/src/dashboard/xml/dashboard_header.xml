@@ -33,6 +33,11 @@
                     </h2>
                 </div>
                 <div class="o_dashboard_actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; width: auto; margin-left: auto;">
+                    <button class="btn btn-sm btn-primary"
+                            t-on-click.stop="() => this.openAction('action_open_document_vault_navigator')"
+                            style="white-space: nowrap; background: linear-gradient(135deg,#8B4513,#A0522D); border-color:#8B4513;">
+                        <i class="fa fa-folder-open-o me-1"/> Doc Vault Viewer
+                    </button>
                     <!-- Department Selector -->
                     <t t-if="this.config.showDepartmentFilter">
                         <select class="form-select o_department_selector" t-att-value="this.toString(state.selectedDepartment)" t-on-change="onDepartmentChange" style="background: white !important; color: #333; width: 200px !important; border: 3px solid #8B4513 !important; border-radius: 4px; text-align: left; padding-right: 30px; padding-left: 10px;line-height: normal;">

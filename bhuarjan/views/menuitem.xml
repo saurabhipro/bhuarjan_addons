@@ -152,7 +152,9 @@
     <menuitem id="menu_failed_payments" name="Failed Payments" action="action_failed_payment_lines" parent="menu_bhu_payment" sequence="7" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     
     <!-- Document Vault Menu - Moved to Process -->
-    <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault" parent="menu_bhu_process" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_document_vault_list" name="Document Vault" action="action_document_vault_navigator_window" parent="menu_bhu_process" sequence="14" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_document_vault_navigator_quick" name="Doc Vault Viewer" action="action_document_vault_navigator" parent="menu_document_vault_list" sequence="0" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
+    <menuitem id="menu_document_vault_repository" name="Document Repository" action="action_document_vault" parent="menu_document_vault_list" sequence="1" groups="bhuarjan.group_bhuarjan_admin,base.group_system"/>
     <record id="menu_document_vault_list" model="ir.ui.menu">
         <field name="groups_id" eval="[(6, 0, [ref('bhuarjan.group_bhuarjan_admin'), ref('base.group_system')])]"/>
     </record>   

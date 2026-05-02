@@ -20,19 +20,37 @@
                         <button name="action_refresh_sections" type="object" string="Refresh" class="btn btn-secondary o_docvault_refresh_btn" icon="fa-refresh"/>
                     </div>
                     <div class="o_docvault_split_area">
-                        <div class="o_docvault_left_panel">
-                            <div class="o_docvault_panel_title">Sections / अनुभाग</div>
-                            <field name="section_line_ids" nolabel="1" readonly="1" options="{'no_open': True, 'disable_open': True}">
-                                <list create="0" delete="0" edit="0" open_form_view="false" decoration-success="is_available">
+                        <field name="show_left_panel" invisible="1"/>
+                        <div class="o_docvault_left_panel" invisible="not show_left_panel">
+                            <div class="o_docvault_panel_title o_docvault_panel_title_row">
+                                <span>Sections / अनुभाग</span>
+                                <button type="object" name="action_toggle_left_panel"
+                                        string="Hide Sections"
+                                        class="btn btn-sm o_docvault_inline_toggle_btn"
+                                        icon="fa-dot-circle-o"
+                                        title="Hide sections panel"/>
+                            </div>
+                            <field name="section_line_ids" nolabel="1" options="{'no_open': True}">
+                                <list editable="top" create="0" delete="0" decoration-success="is_available" default_order="step_no asc">
                                     <button name="action_select_document" string="View" type="object" class="btn btn-sm btn-primary" icon="fa-eye"/>
-                                    <field name="availability_icon" string="Doc"/>
-                                    <field name="step_label" string="Step"/>
-                                    <field name="section_label"/>
+                                    <field name="availability_icon" string="Doc" readonly="1"/>
+                                    <field name="step_no" string="Step #" optional="hide" readonly="1"/>
+                                    <field name="step_label" string="Step" optional="hide" readonly="1"/>
+                                    <field name="section_label" string="Section" readonly="1"/>
+                                    <field name="is_available" string="Available" optional="hide" readonly="1"/>
                                 </list>
                             </field>
                         </div>
                         <div class="o_docvault_right_panel">
-                            <div class="o_docvault_panel_title">PDF Preview / पीडीएफ पूर्वावलोकन</div>
+                            <div class="o_docvault_panel_title o_docvault_panel_title_row">
+                                <span>PDF Preview / पीडीएफ पूर्वावलोकन</span>
+                                <button type="object" name="action_toggle_left_panel"
+                                        string="Show Sections"
+                                        class="btn btn-sm o_docvault_inline_toggle_btn"
+                                        icon="fa-dot-circle-o"
+                                        title="Show sections panel"
+                                        invisible="show_left_panel"/>
+                            </div>
                             <field name="selected_document_hint" widget="html" readonly="1" invisible="selected_document_id or selected_attachment_id or selected_source_record_id"/>
                             <field name="selected_document_file" filename="selected_document_filename" widget="pdf_viewer"
                                    readonly="1" invisible="not selected_document_id and not selected_attachment_id and not selected_source_record_id"/>

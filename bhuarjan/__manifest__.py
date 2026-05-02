@@ -149,6 +149,7 @@
             'bhuarjan/static/src/css/survey_status.css',
             'bhuarjan/static/src/css/section23_award_form_premium.css',
             'bhuarjan/static/src/css/document_vault_navigator.css',
+            'bhuarjan/static/src/js/docvault_navigator_row_click.js',
             'bhuarjan/static/src/css/search_view.css',
             'bhuarjan/static/src/css/dashboard.css',
             # Dashboard files - organized in separate folders

@@ -35,6 +35,12 @@ class DocumentVaultNavigator(models.Model):
         compute='_compute_selected_document_hint',
         sanitize=False,
     )
+    show_left_panel = fields.Boolean(string='Show Sections Panel', default=True)
+
+    def action_toggle_left_panel(self):
+        for rec in self:
+            rec.show_left_panel = not rec.show_left_panel
+        return self._action_open_self()
 
     @api.depends(
         'selected_document_id',
@@ -429,7 +435,7 @@ class DocumentVaultNavigatorLine(models.Model):
     document_count = fields.Integer(string='Count')
     is_available = fields.Boolean(string='Available')
     status_display = fields.Char(string='Status', compute='_compute_status_display')
-    availability_icon = fields.Char(string='Doc', compute='_compute_availability_icon')
+    availability_icon = fields.Char(string='Doc', compute='_compute_availability_icon', store=True)
     is_selected = fields.Boolean(string='Selected', compute='_compute_is_selected')
 
     @api.depends('document_id', 'attachment_id', 'source_model', 'source_record_id', 'source_file_field')

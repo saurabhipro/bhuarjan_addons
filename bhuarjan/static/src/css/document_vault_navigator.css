@@ -111,8 +111,48 @@
 
 .o_docvault_left_panel .o_list_view .o_data_row td {
     vertical-align: middle;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    cursor: pointer;
+}
+
+/* Section label takes full remaining width and wraps cleanly */
+.o_docvault_left_panel .o_list_view .o_data_row td[name="section_label"] {
+    white-space: normal !important;
+    word-break: break-word;
+    min-width: 0;
+    max-width: none;
+}
+
+/* Availability icon stays compact */
+.o_docvault_left_panel .o_list_view .o_data_row td[name="availability_icon"],
+.o_docvault_left_panel .o_list_view .o_data_row td[name="step_no"] {
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Hover effect on rows */
+.o_docvault_left_panel .o_list_view .o_data_row:hover td {
+    background: #f0f7ff !important;
+}
+
+/* Eye-icon trigger button — subtle, stays in row */
+.o_docvault_left_panel .o_list_view .o_data_row .o_docvault_row_view_btn {
+    background: transparent !important;
+    border: none !important;
+    color: #5a7fa8 !important;
+    padding: 0 4px !important;
+    box-shadow: none !important;
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.6;
+}
+.o_docvault_left_panel .o_list_view .o_data_row:hover .o_docvault_row_view_btn {
+    opacity: 1;
+    color: #2f6fb3 !important;
 }
 
 /* Rows with available documents are highlighted in green */
@@ -161,18 +201,6 @@
     color: #b2293a !important;
 }
 
-.o_docvault_left_panel .o_list_view .o_data_row .btn.btn-primary {
-    background: #7f4a2b;
-    border-color: #7f4a2b;
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 12px;
-}
-
-.o_docvault_left_panel .o_list_view .o_data_row .btn.btn-primary:hover {
-    background: #6d3f24;
-    border-color: #6d3f24;
-}
 
 .o_docvault_empty_hint {
     border: 1px dashed #d0b9a3;

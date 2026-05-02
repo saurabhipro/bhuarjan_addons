@@ -324,32 +324,18 @@ class DocumentVaultNavigator(models.Model):
         self.section_line_ids = [(5, 0, 0)]
         if not (self.project_id and self.village_id):
             return
-        workflow_steps = [
-            (1, _('Section 4'), 'bhu.section4.notification'),
-            (2, _('SIA Reports'), 'bhu.sia.team'),
-            (3, _('Section 11'), 'bhu.section11.preliminary.report'),
-            (4, _('Section 15'), 'bhu.section15.objection'),
-            (5, _('Section 19'), 'bhu.section19.notification'),
-            (6, _('Section 21'), 'bhu.section21.notification'),
-        ]
         commands = []
         first_document_id = False
         first_attachment_id = False
         first_source = False
 
-        step = 1
-        for _step_idx, sec_label, model_name in workflow_steps:
-            commands.append((0, 0, self._workflow_line_vals(step, sec_label, _('SDM PDF'), model_name, 'sdm_signed_file', 'sdm_signed_filename')))
-            step += 1
-            commands.append((0, 0, self._workflow_line_vals(step, sec_label, _('Collector PDF'), model_name, 'collector_signed_file', 'collector_signed_filename')))
-            step += 1
-
+        # --- Section 23 Award PDFs first (steps 1-5) ---
         s23_defs = [
-            {'step': step, 'doc_type': 'section23_land_award', 'label': _('Section 23 Land Award')},
-            {'step': step + 1, 'doc_type': 'section23_tree_award', 'label': _('Section 23 Tree Award')},
-            {'step': step + 2, 'doc_type': 'section23_asset_award', 'label': _('Section 23 Asset Award')},
-            {'step': step + 3, 'doc_type': 'section23_consolidated_award', 'label': _('Section 23 Consolidated Award')},
-            {'step': step + 4, 'doc_type': 'section23_rr_award', 'label': _('Section 23 R&R Award')},
+            {'step': 1, 'doc_type': 'section23_land_award', 'label': _('Section 23 Land Award')},
+            {'step': 2, 'doc_type': 'section23_tree_award', 'label': _('Section 23 Tree Award')},
+            {'step': 3, 'doc_type': 'section23_asset_award', 'label': _('Section 23 Asset Award')},
+            {'step': 4, 'doc_type': 'section23_consolidated_award', 'label': _('Section 23 Consolidated Award')},
+            {'step': 5, 'doc_type': 'section23_rr_award', 'label': _('Section 23 R&R Award')},
         ]
 
         for item in s23_defs:
@@ -384,6 +370,23 @@ class DocumentVaultNavigator(models.Model):
                 'source_file_field': False,
                 'source_filename_field': False,
             }))
+
+        # --- Workflow steps after S23 (steps 6+) ---
+        workflow_steps = [
+            (_('Section 4'), 'bhu.section4.notification'),
+            (_('SIA Reports'), 'bhu.sia.team'),
+            (_('Section 11'), 'bhu.section11.preliminary.report'),
+            (_('Section 15'), 'bhu.section15.objection'),
+            (_('Section 19'), 'bhu.section19.notification'),
+            (_('Section 21'), 'bhu.section21.notification'),
+        ]
+        step = 6
+        for sec_label, model_name in workflow_steps:
+            commands.append((0, 0, self._workflow_line_vals(step, sec_label, _('SDM PDF'), model_name, 'sdm_signed_file', 'sdm_signed_filename')))
+            step += 1
+            commands.append((0, 0, self._workflow_line_vals(step, sec_label, _('Collector PDF'), model_name, 'collector_signed_file', 'collector_signed_filename')))
+            step += 1
+
         self.section_line_ids = commands
         available_ids = self.section_line_ids.mapped('document_id').ids
         if self.selected_document_id and self.selected_document_id.id not in available_ids:

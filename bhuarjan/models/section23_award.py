@@ -998,7 +998,7 @@ class Section23Award(models.Model):
         except Exception:
             cur_sym = '₹'
         headers = [
-            'Owner', 'Khasra', 'Tree', 'Tree Type', 'Dev. Stage',
+            'Khasra', 'Owner', 'Tree', 'Tree Type', 'Dev. Stage',
             'Girth (cm)', 'Qty',
             f'Unit Rate ({cur_sym})', f'Value ({cur_sym})',
             f'Solatium ({cur_sym})', f'Interest ({cur_sym})', f'Total ({cur_sym})',
@@ -1013,8 +1013,8 @@ class Section23Award(models.Model):
         parts.append('</tr></thead><tbody>')
         for r in rows:
             parts.append('<tr>')
+            parts.append(f'<td class="text-nowrap fw-semibold">{escape(r.get("tree_khasra") or r.get("khasra") or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(r.get("landowner_name") or "")}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(r.get("tree_khasra") or r.get("khasra") or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(str(r.get("tree_type") or ""))}</td>')
             # Tree type code label
             tc = r.get("tree_type_code") or ""

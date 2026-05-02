@@ -63,13 +63,15 @@ class Section23Award(models.Model):
         tracking=True,
         help='Beyond Main Road rate per hectare from the active land rate master for this village.',
     )
-    rate_master_main_road_sqm = fields.Monetary(
-        string='MR Plot Rate (₹/sqm)', currency_field='currency_id',
+    rate_master_main_road_sqm = fields.Float(
+        string='MR Plot Rate (₹/sqm)',
+        digits=(16, 2),
         default=0.0,
         tracking=True,
     )
-    rate_master_other_road_sqm = fields.Monetary(
-        string='BMR Plot Rate (₹/sqm)', currency_field='currency_id',
+    rate_master_other_road_sqm = fields.Float(
+        string='BMR Plot Rate (₹/sqm)',
+        digits=(16, 2),
         default=0.0,
         tracking=True,
     )
@@ -316,11 +318,6 @@ class Section23Award(models.Model):
             bmr_rate = float(rm.other_road_rate_hectare or 0.0) if rm else 0.0
             mr_plot_rate = float(rm.main_road_rate_sqm or 0.0) if rm else 0.0
             bmr_plot_rate = float(rm.other_road_rate_sqm or 0.0) if rm else 0.0
-            # Fallback: when sq.m rates are not maintained in master, derive from hectare.
-            if mr_plot_rate <= 0.0 and mr_rate > 0.0:
-                mr_plot_rate = mr_rate / 10000.0
-            if bmr_plot_rate <= 0.0 and bmr_rate > 0.0:
-                bmr_plot_rate = bmr_rate / 10000.0
             if force or not rec.rate_master_main_road_ha:
                 rec.rate_master_main_road_ha = mr_rate
             if force or not rec.rate_master_other_road_ha:

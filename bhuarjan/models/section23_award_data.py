@@ -300,18 +300,10 @@ class Section23AwardData(models.Model):
             sqm_raw = float(self.rate_master_main_road_sqm or 0.0)
             if sqm_raw <= 0.0:
                 sqm_raw = (rm.main_road_rate_sqm or 0.0) if rm else 0.0
-            if sqm_raw <= 0.0:
-                sqm_raw = float(self.rate_master_main_road_ha or 0.0) / 10000.0
-            if sqm_raw <= 0.0 and rm:
-                sqm_raw = (rm.main_road_rate_hectare or 0.0) / 10000.0
         else:
             sqm_raw = float(self.rate_master_other_road_sqm or 0.0)
             if sqm_raw <= 0.0:
                 sqm_raw = (rm.other_road_rate_sqm or 0.0) if rm else 0.0
-            if sqm_raw <= 0.0:
-                sqm_raw = float(self.rate_master_other_road_ha or 0.0) / 10000.0
-            if sqm_raw <= 0.0 and rm:
-                sqm_raw = (rm.other_road_rate_hectare or 0.0) / 10000.0
 
         _urban_mult = self._s23_bmr_rate_multiplier(
             bool(is_within_distance),

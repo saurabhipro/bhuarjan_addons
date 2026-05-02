@@ -136,16 +136,20 @@
                                     <div class="s23_meta_label">MR Rate / मुख्यमार्ग दर (₹/sqm) <span class="text-danger">*</span></div>
                                     <div class="s23_meta_value">
                                         <field name="rate_master_main_road_sqm"
-                                               readonly="state != 'draft' or (not is_sdm and not is_admin)"
-                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                               force_save="1"
+                                               widget="float"
+                                               digits="[16,2]"
+                                               placeholder="0.00"/>
                                     </div>
                                 </div>
                                 <div class="s23_meta_item" invisible="not is_urban">
                                     <div class="s23_meta_label">BMR Rate / अन्य दर (₹/sqm) <span class="text-danger">*</span></div>
                                     <div class="s23_meta_value">
                                         <field name="rate_master_other_road_sqm"
-                                               readonly="state != 'draft' or (not is_sdm and not is_admin)"
-                                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                               force_save="1"
+                                               widget="float"
+                                               digits="[16,2]"
+                                               placeholder="0.00"/>
                                     </div>
                                 </div>
                             </div>
@@ -387,16 +391,15 @@
                                 <button name="action_open_survey_for_land_edit" type="object"
                                         string="Edit" class="btn btn-sm s23_btn_brown"
                                         title="Edit: distance / road / irrigation / diverted"/>
-                                <field name="khasra_number" readonly="1" string="Khasra" column_invisible="parent.is_urban"/>
-                                <field name="village_name" readonly="1" string="Village" column_invisible="parent.is_urban"/>
-                                <field name="distance_from_main_road" readonly="1" string="Distance (m)" column_invisible="parent.is_urban"/>
+                                <field name="khasra_number" readonly="1" string="Khasra"/>
+                                <field name="village_name" readonly="1" string="Village"/>
+                                <field name="distance_from_main_road" readonly="1" string="Distance (m)"/>
                                 <field name="road_type_display" readonly="1" string="Road"
-                                       column_invisible="parent.is_urban"
                                        decoration-success="road_type_display == 'MR'"
                                        decoration-warning="road_type_display == 'BMR'"/>
-                                <field name="irrigation_type" readonly="1" string="Irrigation" column_invisible="parent.is_urban"/>
-                                <field name="has_traded_land" readonly="1" string="Diverted" column_invisible="parent.is_urban"/>
-                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]" column_invisible="parent.is_urban"/>
+                                <field name="irrigation_type" readonly="1" string="Irrigation"/>
+                                <field name="has_traded_land" readonly="1" string="Diverted"/>
+                                <field name="acquired_area" readonly="1" string="Acquired (Ha)" widget="float" digits="[16,4]"/>
                                 <field name="base_rate_display" readonly="1" string="Base Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
                                 <field name="rate_per_hectare" readonly="1" string="Effective Rate (₹/Ha)" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="1"/>
                                 <field name="land_award_amount" readonly="1" string="Land Award (₹)" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Land Award" column_invisible="1"/>

@@ -104,6 +104,7 @@ class Survey(models.Model):
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
+        ('fallow', 'Fallow / पड़ती'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
     # Award-related fields (editable only from award section)
@@ -1153,6 +1154,7 @@ class SurveyLine(models.Model):
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
+        ('fallow', 'Fallow / पड़ती'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated')
     
     # Trees on Land / भूमि पर स्थित वृक्ष की संख्या

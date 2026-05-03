@@ -933,17 +933,29 @@ class Section23Award(models.Model):
                     color_idx += 1
 
         headers = [
-            'Khasra / खसरा', 'Village / ग्राम', 'Distance (m) / दूरी', 'Road / सड़क',
-            'Irrigation / सिंचाई', 'Diverted / विचलित',
-            'Acquired (Ha) / अधि.', 'Slab / Remark',
+            ('Owner / भूमि स्वामी', 'text'),
+            ('Khasra / खसरा', 'text'),
+            ('Village / ग्राम', 'text'),
+            ('Distance (m) / दूरी', 'num'),
+            ('Road / सड़क', 'text'),
+            ('Irrigation / सिंचाई', 'text'),
+            ('Diverted / विचलित', 'text'),
+            ('Acquired (Ha) / अधि.', 'num'),
+            ('Slab / Remark', 'text'),
         ]
         parts = [
             '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
             '<table class="table table-sm s23-sim-table s23-sim-table-land">',
             '<thead><tr>',
         ]
-        for col in headers:
-            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
+        for col_label, col_type in headers:
+            parts.append(
+                f'<th class="s23-sim-th s23-sortable-th" scope="col" '
+                f'data-sort-type="{escape(col_type)}" title="Click to sort">'
+                f'{escape(col_label)}'
+                f'<span class="s23-sort-indicator" aria-hidden="true"></span>'
+                f'</th>'
+            )
         parts.append('</tr></thead><tbody>')
 
         for r in rows:
@@ -957,14 +969,46 @@ class Section23Award(models.Model):
             slab_lbl = r.get('remark', '') or ''
 
             parts.append(f'<tr style="{row_style}">')
+            owner = (r.get("landowner_name") or "").strip()
+            parts.append(f'<td class="text-nowrap">{escape(owner)}</td>')
             parts.append(f'<td class="text-nowrap fw-semibold">{escape(r.get("khasra") or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(r.get("village_name") or "")}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("distance_from_main_road"), 2)}</td>')
             road = (r.get("road_type_label") or ("MR" if r.get("is_within_distance") else "BMR"))
-            parts.append(f'<td class="text-nowrap text-center"><span class="s23-sim-badge">{escape(road)}</span></td>')
-            parts.append(f'<td class="text-nowrap small">{escape(r.get("irrigation_label") or "")}</td>')
+            road_key = road.strip().upper()
+            road_style = (
+                'color:#1b8f4f;font-weight:700;'
+                if road_key == "MR" else
+                'color:#c0392b;font-weight:700;'
+            )
+            parts.append(
+                f'<td class="text-nowrap text-center"><span class="s23-sim-badge" style="{road_style}">{escape(road)}</span></td>'
+            )
+            irrigation_label = (r.get("irrigation_label") or "").strip()
+            irrigation_key = (r.get("irrigation_type") or "").strip().lower()
+            label_key = irrigation_label.lower()
+            irrigated_yes = irrigation_key == "irrigated" or (
+                "irrigated" in label_key and "unirrigated" not in label_key
+            )
+            irrigation_style = (
+                'color:#1b8f4f;font-weight:600;'
+                if irrigated_yes else
+                'color:#d66a6a;font-weight:600;'
+            )
+            parts.append(
+                f'<td class="text-nowrap small text-center" style="{irrigation_style}">{escape(irrigation_label)}</td>'
+            )
             div_lbl = (r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"))
-            parts.append(f'<td class="text-center text-nowrap">{escape(div_lbl)}</td>')
+            diverted_flag = r.get("is_diverted")
+            diverted_yes = bool(diverted_flag) if diverted_flag is not None else (
+                div_lbl.strip().lower() in {"yes", "y", "true", "1", "हाँ", "ha", "haan"}
+            )
+            diverted_style = (
+                'color:#1b8f4f;font-weight:700;'
+                if diverted_yes else
+                'color:#c0392b;font-weight:700;'
+            )
+            parts.append(f'<td class="text-center text-nowrap" style="{diverted_style}">{escape(div_lbl)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("acquired_area"), 4)}</td>')
             parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape(slab_lbl)}</td>')
             parts.append('</tr>')

@@ -483,6 +483,31 @@
 .bhu_s23_award_premium .s23-sim-table-land th.s23-sim-th {
     min-width: 3.2rem;
 }
+.bhu_s23_award_premium .s23-sim-table th.s23-sortable-th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 16px;
+}
+.bhu_s23_award_premium .s23-sim-table th.s23-sortable-th .s23-sort-indicator {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.62rem;
+    color: #9a6f5e;
+}
+.bhu_s23_award_premium .s23-sim-table th.s23-sortable-th .s23-sort-indicator::before {
+    content: "↕";
+}
+.bhu_s23_award_premium .s23-sim-table th.s23-sortable-th.s23-sort-asc .s23-sort-indicator::before {
+    content: "▲";
+    color: #7a3b28;
+}
+.bhu_s23_award_premium .s23-sim-table th.s23-sortable-th.s23-sort-desc .s23-sort-indicator::before {
+    content: "▼";
+    color: #7a3b28;
+}
 .bhu_s23_award_premium .s23-sim-badge {
     display: inline-block;
     font-weight: 700;

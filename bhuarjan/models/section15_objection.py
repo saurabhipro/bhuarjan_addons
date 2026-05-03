@@ -621,7 +621,11 @@ class Section15ObjectionKhasra(models.Model):
     has_shed = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Shed / शेड है')
     shed_area = fields.Float(string='Shed Area / शेड का क्षेत्रफल')
     has_pond = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Has Pond / तालाब है')
-    irrigation_type = fields.Selection([('irrigated', 'Irrigated / सिंचित'), ('unirrigated', 'Unirrigated / असिंचित')], string='Irrigation Type / सिंचाई का प्रकार')
+    irrigation_type = fields.Selection([
+        ('irrigated', 'Irrigated / सिंचित'),
+        ('unirrigated', 'Unirrigated / असिंचित'),
+        ('fallow', 'Fallow / पड़ती'),
+    ], string='Irrigation Type / सिंचाई का प्रकार')
     
     def unlink(self):
         """When a khasra line is deleted from the objection, mark the linked survey as rejected"""

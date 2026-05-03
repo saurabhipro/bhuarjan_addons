@@ -58,6 +58,11 @@ class BhuDepartment(models.Model):
     
     name = fields.Char(string='Department Name', required=True, tracking=True)
     active = fields.Boolean(default=True, tracking=True)
+    department_logo = fields.Image(
+        string='Department Logo',
+        max_width=512,
+        max_height=512,
+    )
     icon = fields.Char(string='Icon Class', help='Bootstrap icon class (e.g. fa-building)', tracking=True)
     district_id = fields.Many2one('bhu.district', string='District', tracking=True,
                                   default=lambda self: self._get_default_district(),

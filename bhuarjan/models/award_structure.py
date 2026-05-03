@@ -16,11 +16,6 @@ class AwardStructureDetails(models.Model):
         # Not required in DB: new O2M rows on an unsaved parent must be creatable; pick default in
         # default_get; generation/submit on award re-validates.
     )
-    simulator_id = fields.Many2one(
-        'bhu.award.simulator',
-        string='Award Simulator',
-        ondelete='set null'
-    )
     award_id = fields.Many2one(
         'bhu.section23.award',
         string='Section 23 Award',
@@ -121,11 +116,6 @@ class AwardStructureDetails(models.Model):
                 p, v = award.project_id, award.village_id
                 if p and v:
                     return p.id, v.id
-        sim_id = self.env.context.get('default_simulator_id')
-        if sim_id:
-            sim = self.env['bhu.award.simulator'].browse(sim_id)
-            if sim and sim.project_id and sim.village_id:
-                return sim.project_id.id, sim.village_id.id
         return False, False
 
     @api.depends('area_sqm', 'asset_count', 'market_rate_per_sqm')

@@ -35,6 +35,7 @@ class S23LandEditWizard(models.TransientModel):
         [
             ('irrigated',   'Irrigated / सिंचित'),
             ('unirrigated', 'Unirrigated / असिंचित'),
+            ('fallow',      'Fallow / पड़ती'),
         ],
         string='Irrigation / सिंचाई',
     )
@@ -150,6 +151,7 @@ class S23LandEditWizard(models.TransientModel):
         before_distance = survey.distance_from_main_road or 0.0
         before_irrigation = survey.irrigation_type or ''
         before_diverted = survey.has_traded_land or ''
+        before_within_distance = bool(line.is_within_distance) if line else False
 
         village_type = line.award_id.village_id.village_type if (line and line.award_id and line.award_id.village_id) else (survey.village_id.village_type if survey.village_id else 'rural')
         th = 20.0 if village_type == 'urban' else 50.0
@@ -165,6 +167,9 @@ class S23LandEditWizard(models.TransientModel):
             'irrigation_type':         self.irrigation_type,
             'has_traded_land':         self.has_traded_land,
         })
+        # Keep award-line MR/BMR lane in sync with popup selection so table badge updates immediately.
+        if line:
+            line.write({'is_within_distance': self.road_type == 'mr'})
         changed_parts = []
         if float(before_distance or 0.0) != float(d or 0.0):
             changed_parts.append(
@@ -185,6 +190,13 @@ class S23LandEditWizard(models.TransientModel):
                 _('Diverted land: %(old)s -> %(new)s') % {
                     'old': before_diverted or '-',
                     'new': self.has_traded_land or '-',
+                }
+            )
+        if before_within_distance != (self.road_type == 'mr'):
+            changed_parts.append(
+                _('Road band: %(old)s -> %(new)s') % {
+                    'old': 'MR' if before_within_distance else 'BMR',
+                    'new': 'MR' if self.road_type == 'mr' else 'BMR',
                 }
             )
         if changed_parts:

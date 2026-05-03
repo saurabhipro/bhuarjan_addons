@@ -104,7 +104,6 @@ class Survey(models.Model):
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
-        ('fallow', 'Fallow / पड़ती'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated', tracking=True)
     
     # Award-related fields (editable only from award section)
@@ -466,7 +465,8 @@ class Survey(models.Model):
     def _compute_irrigation_fields(self):
         for record in self:
             record.is_irrigated = record.irrigation_type == 'irrigated'
-            record.is_unirrigated = record.irrigation_type == 'unirrigated'
+            # Backward compatible for legacy values like "fallow".
+            record.is_unirrigated = record.irrigation_type in ('unirrigated', 'fallow')
     
     @api.depends('tree_line_ids', 'tree_line_ids.tree_type', 'tree_line_ids.development_stage', 'tree_line_ids.quantity')
     def _compute_tree_counts_by_stage(self):
@@ -1154,7 +1154,6 @@ class SurveyLine(models.Model):
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
-        ('fallow', 'Fallow / पड़ती'),
     ], string='Irrigation Type / सिंचाई का प्रकार', default='irrigated')
     
     # Trees on Land / भूमि पर स्थित वृक्ष की संख्या

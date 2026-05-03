@@ -33,7 +33,8 @@ class Section23AwardData(models.Model):
             # Get land type from survey
             irrigation_type = survey.irrigation_type or 'unirrigated'
             is_irrigated = irrigation_type == 'irrigated'
-            is_unirrigated = irrigation_type == 'unirrigated'
+            # Treat legacy "fallow" as unirrigated for backward compatibility.
+            is_unirrigated = irrigation_type in ('unirrigated', 'fallow')
             is_fallow = self._is_fallow_survey(survey)
             is_diverted = survey.has_traded_land == 'yes'
 
@@ -140,7 +141,7 @@ class Section23AwardData(models.Model):
             if survey:
                 _itype = survey.irrigation_type or 'unirrigated'
                 is_irrigated_rate = _itype == 'irrigated'
-                is_unirrigated_disp = _itype == 'unirrigated'
+                is_unirrigated_disp = _itype in ('unirrigated', 'fallow')
             else:
                 is_irrigated_rate = bool(data.get('irrigated'))
                 is_unirrigated_disp = bool(data.get('unirrigated'))
@@ -189,16 +190,18 @@ class Section23AwardData(models.Model):
             })
 
             # --- Urban area-based slab path ---
-            # Trigger if: urban_body_type can be resolved AND
-            # village master is marked urban.
-            # Fall back to the village's urban_body_type when the award field is blank
-            # (e.g. award was created before the village was marked Urban).
-            _is_urban_village = (self.village_id and self.village_id.village_type == 'urban')
-            _body_type = self.urban_body_type or (
-                self.village_id.urban_body_type
-                if (_is_urban_village and self.village_id.urban_body_type)
-                else False
+            # Trigger urban slab path from the award's effective village type
+            # (award override first, then village master fallback).
+            _effective_vtype = (
+                self.village_type
+                or (self.village_id.village_type if self.village_id else 'rural')
+                or 'rural'
             )
+            _is_urban_village = str(_effective_vtype).lower() == 'urban'
+            _body_type = (
+                self.urban_body_type
+                or (self.village_id.urban_body_type if self.village_id else False)
+            ) if _is_urban_village else False
             if _body_type and _is_urban_village:
                 slab_rows = self._generate_urban_slab_rows(
                     data, is_within_distance, guide_master, effective_rate, acre_per_hectare,

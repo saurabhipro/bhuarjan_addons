@@ -2621,8 +2621,8 @@ class Section23Award(models.Model):
         """
         if is_mr_lane:
             return 1.0
-        if is_diverted and is_irrigated:
-            return 1.25
+        if is_diverted:
+            return 1.25 if is_irrigated else 1.0
         return 1.0 if is_irrigated else 0.8
 
     def get_interest_period_note(self):

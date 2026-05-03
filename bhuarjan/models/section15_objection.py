@@ -624,7 +624,6 @@ class Section15ObjectionKhasra(models.Model):
     irrigation_type = fields.Selection([
         ('irrigated', 'Irrigated / सिंचित'),
         ('unirrigated', 'Unirrigated / असिंचित'),
-        ('fallow', 'Fallow / पड़ती'),
     ], string='Irrigation Type / सिंचाई का प्रकार')
     
     def unlink(self):

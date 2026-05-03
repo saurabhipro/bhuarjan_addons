@@ -35,7 +35,6 @@ class S23LandEditWizard(models.TransientModel):
         [
             ('irrigated',   'Irrigated / सिंचित'),
             ('unirrigated', 'Unirrigated / असिंचित'),
-            ('fallow',      'Fallow / पड़ती'),
         ],
         string='Irrigation / सिंचाई',
     )

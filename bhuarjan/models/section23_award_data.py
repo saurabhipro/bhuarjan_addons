@@ -157,9 +157,7 @@ class Section23AwardData(models.Model):
             # Always derive effective rate from master × survey-based factors (matches report columns).
             effective_rate = guide_master * _bmr_mult
 
-            if survey and self._is_fallow_survey(survey):
-                irrigation_label = 'Fallow / पड़ती'
-            elif survey and survey.irrigation_type == 'irrigated':
+            if survey and survey.irrigation_type == 'irrigated':
                 irrigation_label = 'Irrigated / सिंचित'
             else:
                 irrigation_label = 'Unirrigated / असिंचित'
@@ -323,6 +321,46 @@ class Section23AwardData(models.Model):
 
         total_area_ha = base_data['acquired_area']
         rows = []
+
+        # Policy rule: when acquired area crosses body threshold, no slab split applies.
+        # Entire acquired area is evaluated on hectare rate.
+        if total_area_ha > no_slab_threshold:
+            basic_value = total_area_ha * effective_rate_ha
+            market_value = basic_value * 2.0
+            solatium = market_value * 1.0
+            interest, _ = self._calculate_interest_on_basic(basic_value)
+            total_comp = market_value + solatium + interest
+
+            acquired_acre = total_area_ha * acre_per_hectare
+            rehab_rate = self._get_min_rehab_rate_per_acre(
+                base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
+            )
+            rehab_amt = acquired_acre * rehab_rate
+            paid = max(total_comp, rehab_amt)
+
+            row = dict(base_data)
+            row.update({
+                'acquired_area': total_area_ha,
+                'guide_line_rate': effective_rate_ha,
+                'guide_line_rate_unit': 'ha',
+                'base_rate_hectare': effective_rate_ha,
+                'basic_value': basic_value,
+                'market_value': market_value,
+                'solatium': solatium,
+                'interest': interest,
+                'total_compensation': total_comp,
+                'rehab_policy_rate_per_acre': rehab_rate,
+                'rehab_policy_amount': rehab_amt,
+                'paid_compensation': paid,
+                'remark': '',
+                'slab_label': f'No slab (>{no_slab_threshold} ha; full area at ₹/ha) / {_bt}',
+                'slab_pct': 1.0,
+                'is_urban_slab': True,
+                'effective_rate_hectare': effective_rate_ha,
+            })
+            rows.append(row)
+            return rows
+
         prev_limit = 0.0
 
         for slab_limit, pct, label, pct_label in slabs:
@@ -374,44 +412,6 @@ class Section23AwardData(models.Model):
             prev_limit = slab_limit
             if total_area_ha <= slab_limit:
                 break
-
-        if total_area_ha > no_slab_threshold:
-            remaining_ha = total_area_ha - no_slab_threshold
-            basic_value = remaining_ha * effective_rate_ha
-            market_value = basic_value * 2.0
-            solatium = market_value * 1.0
-            interest, _ = self._calculate_interest_on_basic(basic_value)
-            total_comp = market_value + solatium + interest
-
-            acquired_acre = remaining_ha * acre_per_hectare
-            rehab_rate = self._get_min_rehab_rate_per_acre(
-                base_data.get('fallow'), base_data.get('irrigated'), base_data.get('unirrigated')
-            )
-            rehab_amt = acquired_acre * rehab_rate
-            # Col 18 is payable amount: compare Col 16 and Col 17, take higher.
-            paid = max(total_comp, rehab_amt)
-
-            row = dict(base_data)
-            row.update({
-                'acquired_area': remaining_ha,
-                'guide_line_rate': effective_rate_ha,
-                'guide_line_rate_unit': 'ha',
-                'base_rate_hectare': sqm_raw,
-                'basic_value': basic_value,
-                'market_value': market_value,
-                'solatium': solatium,
-                'interest': interest,
-                'total_compensation': total_comp,
-                'rehab_policy_rate_per_acre': rehab_rate,
-                'rehab_policy_amount': rehab_amt,
-                'paid_compensation': paid,
-                'remark': '',
-                'slab_label': f'No slab (>{no_slab_threshold} ha, ₹/ha) / {_bt}',
-                'slab_pct': 1.0,
-                'is_urban_slab': True,
-                'effective_rate_hectare': effective_rate_ha,
-            })
-            rows.append(row)
 
         return rows
 

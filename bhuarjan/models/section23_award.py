@@ -224,6 +224,10 @@ class Section23Award(models.Model):
     s23_tree_preview_html = fields.Html(
         string='Tree preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
     )
+    s23_asset_preview_html = fields.Html(
+        string='Asset preview', compute='_compute_s23_section_previews', sanitize=False, store=False,
+    )
+    asset_khasra_filter = fields.Char(string='Search Asset Khasra', default='')
 
     _sql_constraints = [
         ('project_village_unique', 'unique(project_id, village_id)', 
@@ -392,12 +396,19 @@ class Section23Award(models.Model):
     @api.depends(
         'award_survey_line_ids', 'award_survey_line_ids.land_type', 'award_survey_line_ids.is_within_distance',
         'award_survey_line_ids.survey_id', 'award_survey_line_ids.rate_per_hectare',
+        'award_structure_line_ids', 'award_structure_line_ids.survey_id', 'award_structure_line_ids.khasra_number',
+        'award_structure_line_ids.structure_type', 'award_structure_line_ids.construction_type',
+        'award_structure_line_ids.description', 'award_structure_line_ids.asset_count',
+        'award_structure_line_ids.area_sqm', 'award_structure_line_ids.market_rate_per_sqm',
+        'award_structure_line_ids.asset_value',
+        'asset_khasra_filter',
         'village_id', 'project_id', 'award_date',
     )
     def _compute_s23_section_previews(self):
         for rec in self:
             rec.s23_land_preview_html = rec._html_s23_land_preview()
             rec.s23_tree_preview_html = rec._html_s23_tree_preview()
+            rec.s23_asset_preview_html = rec._html_s23_asset_preview()
 
     @api.depends('award_survey_line_ids')
     def _compute_s23_survey_count(self):
@@ -725,6 +736,215 @@ class Section23Award(models.Model):
             'res_id': self.id,
             'view_mode': 'form',
             'target': 'current',
+        }
+
+    def action_clear_asset_khasra_filter(self):
+        """Clear asset khasra filter and reload."""
+        self.ensure_one()
+        self.asset_khasra_filter = ''
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_open_asset_lines_popup(self):
+        """Open asset lines popup; if khasra typed, open add form for that khasra."""
+        self.ensure_one()
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
+        list_view = False
+        form_view = False
+        try:
+            list_view = self.env.ref('bhuarjan.view_bhu_award_structure_details_popup_list').id
+        except Exception:
+            list_view = False
+        try:
+            form_view = self.env.ref('bhuarjan.view_bhu_award_structure_details_popup_form').id
+        except Exception:
+            form_view = False
+        term = (self.asset_khasra_filter or '').strip()
+        if term:
+            if not self.award_survey_line_ids:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Add Asset',
+                        'message': 'No khasra lines found. Select project and village first.',
+                        'type': 'warning',
+                        'sticky': False,
+                    },
+                }
+            matches = self.award_survey_line_ids.filtered(
+                lambda l, t=term.lower(): t in (l.khasra_number or '').lower()
+            )
+            if not matches:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Add Asset',
+                        'message': f'No khasra matched "{term}".',
+                        'type': 'warning',
+                        'sticky': False,
+                    },
+                }
+            exact = matches.filtered(
+                lambda l, t=term.lower(): (l.khasra_number or '').strip().lower() == t
+            )
+            if not exact and len(matches) > 1:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Add Asset',
+                        'message': f'Multiple khasra matched "{term}". Please type full khasra number.',
+                        'type': 'warning',
+                        'sticky': False,
+                    },
+                }
+            target_line = (exact[:1] or matches[:1])
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Add Asset / परिसंपत्ति जोड़ें'),
+                'res_model': 'bhu.award.structure.details',
+                'view_mode': 'form',
+                'views': [(form_view, 'form')],
+                'target': 'new',
+                'context': {
+                    'default_award_id': self.id,
+                    'default_survey_id': target_line.survey_id.id if target_line and target_line.survey_id else False,
+                    'default_structure_type': 'makan',
+                },
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Asset Lines / परिसंपत्ति पंक्तियां'),
+            'res_model': 'bhu.award.structure.details',
+            'view_mode': 'list,form',
+            'views': [(list_view, 'list'), (form_view, 'form')],
+            'domain': [('award_id', '=', self.id)],
+            'target': 'new',
+            'context': {
+                'default_award_id': self.id,
+                'create': True,
+            },
+        }
+
+    def action_apply_asset_khasra_search(self):
+        """Search by khasra and open existing asset rows (or add form if none)."""
+        self.ensure_one()
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
+        term = (self.asset_khasra_filter or '').strip()
+        if not term:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': 'Enter a khasra value before searching asset lines.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+        if not self.award_survey_line_ids:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': 'No khasra lines found. Select project and village first.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+        survey_matches = self.award_survey_line_ids.filtered(
+            lambda l, t=term.lower(): t in (l.khasra_number or '').lower()
+        )
+        if not survey_matches:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': f'No khasra matched "{term}".',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+        exact = survey_matches.filtered(
+            lambda l, t=term.lower(): (l.khasra_number or '').strip().lower() == t
+        )
+        if not exact and len(survey_matches) > 1:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Search',
+                    'message': f'Multiple khasra matched "{term}". Please type full khasra number.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+        target_line = (exact[:1] or survey_matches[:1])
+        target_survey = target_line.survey_id if target_line else False
+        matches = self.award_structure_line_ids.filtered(
+            lambda l, sid=target_survey.id if target_survey else False: l.survey_id.id == sid
+        )
+        form_view = False
+        try:
+            form_view = self.env.ref('bhuarjan.view_bhu_award_structure_details_popup_form').id
+        except Exception:
+            form_view = False
+        if not matches:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Add Asset / परिसंपत्ति जोड़ें'),
+                'res_model': 'bhu.award.structure.details',
+                'view_mode': 'form',
+                'views': [(form_view, 'form')],
+                'target': 'new',
+                'context': {
+                    'default_award_id': self.id,
+                    'default_survey_id': target_survey.id if target_survey else False,
+                    'default_structure_type': 'makan',
+                },
+            }
+        if len(matches) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Asset Line / परिसंपत्ति पंक्ति'),
+                'res_model': 'bhu.award.structure.details',
+                'res_id': matches.id,
+                'view_mode': 'form',
+                'views': [(form_view, 'form')],
+                'target': 'new',
+            }
+        list_view = False
+        form_view = False
+        try:
+            list_view = self.env.ref('bhuarjan.view_bhu_award_structure_details_popup_list').id
+        except Exception:
+            list_view = False
+        try:
+            form_view = self.env.ref('bhuarjan.view_bhu_award_structure_details_popup_form').id
+        except Exception:
+            form_view = False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Asset Khasra Search: {term}',
+            'res_model': 'bhu.award.structure.details',
+            'view_mode': 'list,form',
+            'views': [(list_view, 'list'), (form_view, 'form')],
+            'domain': [('id', 'in', matches.ids)],
+            'target': 'new',
+            'context': {
+                'create': True,
+            },
         }
 
     def action_open_tree_add_popup(self):
@@ -1229,6 +1449,63 @@ class Section23Award(models.Model):
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(r.get("total"), 0)}</td>')
+            parts.append('</tr>')
+        parts.append('</tbody></table></div>')
+        return Markup(''.join(parts))
+
+    def _html_s23_asset_preview(self):
+        self.ensure_one()
+        rows = self.award_structure_line_ids
+        term = (self.asset_khasra_filter or '').strip().lower()
+        if term:
+            rows = rows.filtered(lambda l, t=term: t in (l.khasra_number or '').lower())
+        if not rows:
+            msg = (
+                'No asset lines found for this award.'
+                if not term else
+                f'No asset lines matched khasra "{escape(self.asset_khasra_filter)}".'
+            )
+            return Markup(
+                f'<p class="text-muted s23_note mb-0">{msg}</p>'
+            )
+
+        try:
+            _cur = self.currency_id or self.env.company.currency_id
+            cur_sym = _cur.symbol or '₹'
+        except Exception:
+            cur_sym = '₹'
+
+        headers = [
+            'Khasra',
+            'Structure Type',
+            'Construction Type',
+            'Description',
+            'Count',
+            'Area (Sq. Meter)',
+            f'Rate ({cur_sym})',
+            f'Asset Value ({cur_sym})',
+        ]
+        parts = [
+            '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
+            '<table class="table table-sm s23-sim-table s23-sim-table-land">',
+            '<thead><tr>',
+        ]
+        for col in headers:
+            parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
+        parts.append('</tr></thead><tbody>')
+
+        for line in rows.sorted(key=lambda r: ((r.khasra_number or ''), (r.id or 0))):
+            s_type = dict(line._fields['structure_type'].selection).get(line.structure_type, line.structure_type or '')
+            c_type = dict(line._fields['construction_type'].selection).get(line.construction_type, line.construction_type or '')
+            parts.append('<tr>')
+            parts.append(f'<td class="text-nowrap fw-semibold">{escape(line.khasra_number or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(s_type or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(c_type or "")}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(line.description or "")}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.asset_count, 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.area_sqm, 2)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.market_rate_per_sqm, 0)}</td>')
+            parts.append(f'<td class="text-end tabular-nums fw-bold">{self._html_s23_num(line.asset_value, 0)}</td>')
             parts.append('</tr>')
         parts.append('</tbody></table></div>')
         return Markup(''.join(parts))
@@ -2587,7 +2864,7 @@ class Section23Award(models.Model):
     def _is_fallow_survey(self, survey):
         """Return True when survey is fallow (पड़ती) land."""
         if not survey or not survey.crop_type_id:
-            return False
+            return False    
         crop_code = (survey.crop_type_id.code or '').upper()
         crop_name = (survey.crop_type_id.name or '')
         return crop_code == 'FALLOW' or 'पड़ती' in crop_name
@@ -2597,14 +2874,14 @@ class Section23Award(models.Model):
         """Minimum rehab policy rate per acre for Col 17 floor.
 
         Policy mapping used:
+        - Fallow (crop type): 6,00,000 per acre
         - Irrigated: 10,00,000 per acre
         - Unirrigated (default): 8,00,000 per acre
-        - Fallow: 6,00,000 per acre
         """
-        if is_irrigated:
-            return 1000000.0
         if is_fallow:
             return 600000.0
+        if is_irrigated:
+            return 1000000.0
         return 800000.0
 
     @api.model

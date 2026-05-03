@@ -481,6 +481,22 @@
                             </div>
                         </summary>
                         <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
+                            <field name="asset_khasra_filter" nolabel="1"
+                                   placeholder="Search by khasra to edit asset details..."
+                                   style="max-width:220px;"/>
+                            <button name="action_apply_asset_khasra_search" type="object"
+                                    string="Search Asset" icon="fa-search"
+                                    class="btn btn-sm s23_btn_brown"
+                                    title="Open popup to edit asset details for matching khasra"/>
+                            <button name="action_open_asset_lines_popup" type="object"
+                                    string="Add Asset" icon="fa-plus"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Open popup to add/edit asset rows"/>
+                            <button name="action_clear_asset_khasra_filter" type="object"
+                                    string="Show All" icon="fa-times"
+                                    class="btn btn-sm btn-secondary"
+                                    title="Clear asset search filter"
+                                    invisible="not asset_khasra_filter"/>
                             <button name="action_generate_asset_award" type="object"
                                     string="Generate Asset Award"
                                     icon="fa-cogs"
@@ -499,26 +515,7 @@
                                     confirm="Do you want to regenerate the Asset Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
                                     invisible="not asset_generated"/>
                         </div>
-                        <field name="award_structure_line_ids" nolabel="1" readonly="0">
-                            <list editable="bottom" create="1" delete="1">
-                                <field name="survey_id"
-                                       domain="[('project_id', '=', parent.project_id), ('village_id', '=', parent.village_id), ('khasra_number', '!=', False), ('state', 'in', ['draft', 'submitted', 'approved', 'locked'])]"
-                                       context="{'show_khasra': True}"
-                                       string="Khasra Number"
-                                       options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}"/>
-                                <field name="structure_type" string="Structure Type"/>
-                                <field name="construction_type" string="Construction Type"/>
-                                <field name="description"
-                                       string="Description"
-                                       placeholder="Enter description for Other"
-                                       required="structure_type == 'other' or construction_type == 'other'"
-                                       readonly="structure_type != 'other' and construction_type != 'other'"/>
-                                <field name="asset_count" string="Count"/>
-                                <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
-                                <field name="market_rate_per_sqm" string="Rate" widget="monetary" options="{'currency_field': 'parent.currency_id'}"/>
-                                <field name="asset_value" string="Asset Value" widget="monetary" options="{'currency_field': 'parent.currency_id'}" sum="Asset Value"/>
-                            </list>
-                        </field>
+                        <field name="s23_asset_preview_html" nolabel="1" readonly="1" widget="html" class="s23-embed-preview"/>
                         <div class="total_row" invisible="is_sdm" style="background: linear-gradient(to right, #fff, #fef6f2); border-left-color: #8a4b36;">
                             <span class="total_label_large">Structure Subtotal</span>
                             <span class="total_value_large" style="color: #8a4b36;">
@@ -651,6 +648,56 @@
                     </div><!-- close bhu_s23_content -->
                 </sheet>
                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Asset lines popup views used by Section 23 structure actions -->
+    <record id="view_bhu_award_structure_details_popup_list" model="ir.ui.view">
+        <field name="name">bhu.award.structure.details.popup.list</field>
+        <field name="model">bhu.award.structure.details</field>
+        <field name="arch" type="xml">
+            <list string="Asset Lines / परिसंपत्ति पंक्तियां" editable="bottom" create="1" delete="1">
+                <field name="survey_id"
+                       domain="[('project_id', '=', award_id.project_id), ('village_id', '=', award_id.village_id), ('khasra_number', '!=', False), ('state', 'in', ['draft', 'submitted', 'approved', 'locked'])]"
+                       context="{'show_khasra': True}"
+                       string="Khasra Number"
+                       options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}"/>
+                <field name="structure_type" string="Structure Type"/>
+                <field name="construction_type" string="Construction Type"/>
+                <field name="description" string="Description"/>
+                <field name="asset_count" string="Count"/>
+                <field name="area_sqm" string="Area (Sq. Meter)" readonly="structure_type == 'well'"/>
+                <field name="market_rate_per_sqm" string="Rate"/>
+                <field name="asset_value" string="Asset Value"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhu_award_structure_details_popup_form" model="ir.ui.view">
+        <field name="name">bhu.award.structure.details.popup.form</field>
+        <field name="model">bhu.award.structure.details</field>
+        <field name="arch" type="xml">
+            <form string="Asset Line / परिसंपत्ति पंक्ति">
+                <sheet>
+                    <group>
+                        <field name="award_id" invisible="1"/>
+                        <field name="survey_id"
+                               domain="[('project_id', '=', award_id.project_id), ('village_id', '=', award_id.village_id), ('khasra_number', '!=', False), ('state', 'in', ['draft', 'submitted', 'approved', 'locked'])]"
+                               context="{'show_khasra': True}"
+                               options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}"/>
+                        <field name="structure_type"/>
+                        <field name="construction_type"/>
+                        <field name="description"
+                               placeholder="Enter description for Other"
+                               required="structure_type == 'other' or construction_type == 'other'"
+                               readonly="structure_type != 'other' and construction_type != 'other'"/>
+                        <field name="asset_count"/>
+                        <field name="area_sqm" readonly="structure_type == 'well'"/>
+                        <field name="market_rate_per_sqm"/>
+                        <field name="asset_value" readonly="1"/>
+                    </group>
+                </sheet>
             </form>
         </field>
     </record>

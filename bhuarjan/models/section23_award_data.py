@@ -184,6 +184,7 @@ class Section23AwardData(models.Model):
                 'diverted_label': diverted_lbl,
                 'survey_id': survey.id if survey else False,
                 'guide_line_rate': effective_rate,
+                'guide_line_rate_unit': 'ha',
                 'is_urban_slab': False,
                 'slab_label': '',
                 'slab_pct': 1.0,
@@ -352,6 +353,7 @@ class Section23AwardData(models.Model):
             row.update({
                 'acquired_area': portion_ha,
                 'guide_line_rate': effective_sqm_rate,
+                'guide_line_rate_unit': 'sqm',
                 'base_rate_hectare': sqm_plot,
                 'basic_value': basic_value,
                 'market_value': market_value,
@@ -393,6 +395,7 @@ class Section23AwardData(models.Model):
             row.update({
                 'acquired_area': remaining_ha,
                 'guide_line_rate': effective_rate_ha,
+                'guide_line_rate_unit': 'ha',
                 'base_rate_hectare': sqm_raw,
                 'basic_value': basic_value,
                 'market_value': market_value,

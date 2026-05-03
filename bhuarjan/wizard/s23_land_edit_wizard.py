@@ -47,6 +47,17 @@ class S23LandEditWizard(models.TransientModel):
     )
 
     # ------------------------------------------------------------------ helpers
+    @api.model
+    def _normalize_irrigation_type(self, irrigation_type):
+        """Map legacy values to valid wizard options."""
+        val = (irrigation_type or '').strip().lower()
+        if val == 'irrigated':
+            return 'irrigated'
+        # Legacy records may still carry "fallow"; treat as unirrigated.
+        if val in ('unirrigated', 'fallow'):
+            return 'unirrigated'
+        return 'unirrigated'
+
     def _village_type(self):
         self.ensure_one()
         line = self.survey_line_id
@@ -108,7 +119,7 @@ class S23LandEditWizard(models.TransientModel):
             'khasra_display':          s.khasra_number or '',
             'distance_from_main_road': d,
             'road_type':               'mr' if d <= th else 'mbr',
-            'irrigation_type':         s.irrigation_type or 'unirrigated',
+            'irrigation_type':         self._normalize_irrigation_type(s.irrigation_type),
             'has_traded_land':         s.has_traded_land or 'no',
         })
         return res
@@ -163,7 +174,7 @@ class S23LandEditWizard(models.TransientModel):
 
         survey.write({
             'distance_from_main_road': d,
-            'irrigation_type':         self.irrigation_type,
+            'irrigation_type':         self._normalize_irrigation_type(self.irrigation_type),
             'has_traded_land':         self.has_traded_land,
         })
         # Keep award-line MR/BMR lane in sync with popup selection so table badge updates immediately.

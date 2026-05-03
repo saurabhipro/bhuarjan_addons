@@ -348,7 +348,7 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
                             <field name="khasra_filter" nolabel="1"
                                    placeholder="Search by khasra to edit land details..."
                                    style="max-width:220px;"/>
@@ -412,7 +412,7 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
                             <field name="tree_khasra_filter" nolabel="1"
                                    placeholder="Search by khasra to edit tree details..."
                                    style="max-width:220px;"/>
@@ -480,7 +480,7 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
                             <button name="action_generate_asset_award" type="object"
                                     string="Generate Asset Award"
                                     icon="fa-cogs"
@@ -549,7 +549,7 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
                             <button name="action_generate_consolidated_award" type="object"
                                     string="Generate Consolidated Award"
                                     icon="fa-cogs"
@@ -595,7 +595,7 @@
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
                             </div>
                         </summary>
-                        <div class="d-flex align-items-center gap-2 mb-2" style="overflow-x:auto;">
+                        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mb-2 s23_section_toolbar" style="overflow-x:auto;">
                             <button name="action_generate_rr_award" type="object"
                                     string="Generate R&amp;R Award"
                                     icon="fa-cogs"

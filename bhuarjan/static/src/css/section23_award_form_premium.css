@@ -422,6 +422,18 @@
 .bhu_s23_award_premium .s23_note { font-size: 0.85rem; line-height: 1.4; }
 .bhu_s23_award_premium .s23_o2m_toolbar { margin: 0 0 8px 0; }
 .bhu_s23_award_premium .s23_section_anchor { scroll-margin-top: 12px; }
+.bhu_s23_award_premium .s23_section_toolbar {
+    width: 100%;
+    justify-content: flex-end !important;
+    text-align: right;
+}
+.bhu_s23_award_premium .s23_section_toolbar .o_field_widget,
+.bhu_s23_award_premium .s23_section_toolbar .btn {
+    flex: 0 0 auto;
+}
+.bhu_s23_award_premium .s23_section_toolbar .o_field_widget {
+    min-width: 220px;
+}
 
 /* Configuration: hide embedded list record count / pager ("N records", "1-5 of 8") */
 .bhu_s23_award_premium [name="award_survey_line_ids"] .o_pager,
@@ -588,6 +600,14 @@
 }
 
 @media (max-width: 768px) {
+    .bhu_s23_award_premium .s23_section_toolbar {
+        justify-content: flex-start !important;
+        text-align: left;
+    }
+    .bhu_s23_award_premium .s23_section_toolbar .o_field_widget {
+        min-width: 0;
+        width: 100%;
+    }
     .bhu_s23_award_premium .s23_award_meta_grid {
         padding: 8px;
         gap: 0;

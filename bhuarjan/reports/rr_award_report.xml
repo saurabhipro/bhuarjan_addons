@@ -51,7 +51,8 @@
                                                 <div style="font-size:16px; font-weight:700; color:#000;">पुनर्वास अवार्ड पत्रक (R&amp;R Award Sheet)</div>
                                                 <div style="font-size:11px; color:#000; margin-top:3px; line-height:1.55;">
                                                     भू-अर्जन प्रकरण क्रमांक <span t-esc="o.case_number or ''"/> /
-                                                    ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>&#160;
+                                                    ग्राम-<span t-esc="o.village_id.name if o.village_id else ''"/>
+                                                    <t t-if="o.get_urban_body_label()"> (<span t-esc="o.get_urban_body_label()"/>)</t>&#160;
                                                     <span style="font-weight:800;">Project:</span>
                                                     <span t-esc="o.get_consolidated_report_project_name()"/>&#160;
                                                     तहसील-<span t-esc="o.village_id.tehsil_id.name if o.village_id and o.village_id.tehsil_id else ''"/>&#160;

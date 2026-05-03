@@ -152,9 +152,11 @@ class Section23AwardConsolidated(models.Model):
         district_full = f"{district_name} ({state_name})" if state_name else district_name
         date_str = self.award_date.strftime('%d-%m-%Y') if self.award_date else ''
         project_name = self.get_consolidated_report_project_name()
+        urban_body_label = self.get_urban_body_label()
+        urban_part = f" ({urban_body_label})" if urban_body_label else ''
         subtitle = (
             f"भू-अर्जन प्रकरण क्रमांक {self.case_number or ''} / "
-            f"ग्राम-{village_name}  "
+            f"ग्राम-{village_name}{urban_part}  "
             f"Project: {project_name}  "
             f"तहसील-{tehsil_name}  जिला-{district_full}  दिनांक: {date_str}"
         )

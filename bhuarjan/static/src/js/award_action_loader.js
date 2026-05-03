@@ -197,7 +197,8 @@ function _startLoaderProgressPolling() {
 
     const poll = () => {
         if (!document.getElementById(LOADER_ID)) return;
-        fetch('/web/dataset/call_kw/bhu.section23.award/get_loader_progress_current', {
+        const awardId = _extractSection23AwardId();
+        fetch('/web/dataset/call_kw/bhu.section23.award/get_loader_progress', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
@@ -206,8 +207,8 @@ function _startLoaderProgressPolling() {
                 method: 'call',
                 params: {
                     model: 'bhu.section23.award',
-                    method: 'get_loader_progress_current',
-                    args: [],
+                    method: 'get_loader_progress',
+                    args: [awardId],
                     kwargs: {},
                 },
                 id: Date.now(),

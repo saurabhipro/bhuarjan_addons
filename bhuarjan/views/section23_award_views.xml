@@ -114,6 +114,7 @@
                                     <div class="s23_meta_value">
                                         <field name="urban_body_type"
                                                readonly="not is_sdm and not is_admin"
+                                               required="is_urban"
                                                placeholder="Select body type for slab calculation…"
                                                widget="selection"/>
                                     </div>
@@ -340,7 +341,7 @@
                                 <span class="s23-stage-tick" invisible="not land_generated"><i class="fa fa-check" title="Generated"/></span>
                                 <button name="action_download_land_award" type="object"
                                         icon="fa-download"
-                                        title="Download Land Award"
+                                        title="Download"
                                         class="btn btn-sm s23_head_download_btn"
                                         confirm="Do you want to download the Land Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
@@ -368,13 +369,13 @@
                                     confirm="Do you want to create the Land Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
                                     invisible="land_generated"/>
                             <button name="action_download_land_award" type="object"
-                                    string="Download Land Award (PDF/Excel)"
+                                    string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
                                     confirm="Do you want to download the Land Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not land_generated"/>
                             <button name="action_regenerate_land_award" type="object"
-                                    string="Regenerate Land Award"
+                                    string="Regenerate"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
                                     confirm="Do you want to regenerate the Land Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
@@ -406,7 +407,7 @@
                                 <span class="s23-stage-tick" invisible="not tree_generated"><i class="fa fa-check" title="Generated"/></span>
                                 <button name="action_download_tree_award" type="object"
                                         icon="fa-download"
-                                        title="Download Tree Award"
+                                        title="Download"
                                         class="btn btn-sm s23_head_download_btn"
                                         confirm="Do you want to download the Tree Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
@@ -422,6 +423,10 @@
                                     string="Search Tree" icon="fa-search"
                                     class="btn btn-sm s23_btn_brown"
                                     title="Open popup to edit/add/remove trees for matching khasra"/>
+                            <button name="action_open_tree_add_popup" type="object"
+                                    string="Add Tree" icon="fa-plus"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Open popup to select khasra and add/edit tree rows"/>
                             <button name="action_clear_tree_khasra_filter" type="object"
                                     string="Show All" icon="fa-times"
                                     class="btn btn-sm btn-secondary"
@@ -434,13 +439,13 @@
                                     confirm="Do you want to create the Tree Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
                                     invisible="tree_generated"/>
                             <button name="action_download_tree_award" type="object"
-                                    string="Download Tree Award (PDF/Excel)"
+                                    string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
                                     confirm="Do you want to download the Tree Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not tree_generated"/>
                             <button name="action_regenerate_tree_award" type="object"
-                                    string="Regenerate Tree Award"
+                                    string="Regenerate"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
                                     confirm="Do you want to regenerate the Tree Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
@@ -472,7 +477,7 @@
                                 <span class="s23-stage-tick" invisible="not asset_generated"><i class="fa fa-check" title="Generated"/></span>
                                 <button name="action_download_asset_award" type="object"
                                         icon="fa-download"
-                                        title="Download Asset Award"
+                                        title="Download"
                                         class="btn btn-sm s23_head_download_btn"
                                         confirm="Do you want to download the Asset Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
@@ -488,13 +493,13 @@
                                     confirm="Do you want to create the Asset Award for this project and village? Please note: this generation will be treated as final and cannot be edited later."
                                     invisible="asset_generated"/>
                             <button name="action_download_asset_award" type="object"
-                                    string="Download Asset Award (PDF/Excel)"
+                                    string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
                                     confirm="Do you want to download the Asset Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not asset_generated"/>
                             <button name="action_regenerate_asset_award" type="object"
-                                    string="Regenerate Asset Award"
+                                    string="Regenerate"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
                                     confirm="Do you want to regenerate the Asset Award? This will also reset Consolidated and R&amp;R awards and delete their cached PDF/Excel files from DB. You must regenerate those two again."
@@ -543,7 +548,7 @@
                                 <span class="s23-stage-tick" invisible="not consolidated_generated"><i class="fa fa-check" title="Generated"/></span>
                                 <button name="action_download_consolidated_full_award" type="object"
                                         icon="fa-download"
-                                        title="Download Consolidated Award"
+                                        title="Download"
                                         class="btn btn-sm s23_head_download_btn"
                                         confirm="Do you want to download Consolidated Award now? Next popup will ask PDF or Excel."
                                         onclick="event.stopPropagation();"
@@ -559,13 +564,13 @@
                                     confirm="Do you want to generate Consolidated Award now? This will build and cache PDF and Excel in database."
                                     invisible="consolidated_generated"/>
                             <button name="action_download_consolidated_full_award" type="object"
-                                    string="Download Consolidated Award (PDF/Excel)"
+                                    string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
                                     confirm="Do you want to download Consolidated Award now? Next popup will ask PDF or Excel."
                                     invisible="not consolidated_generated"/>
                             <button name="action_generate_consolidated_award" type="object"
-                                    string="Regenerate Consolidated Award"
+                                    string="Regenerate"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
                                     confirm="Do you want to regenerate Consolidated Award? Existing cached files will be replaced."
@@ -591,7 +596,7 @@
                                 <span class="s23-stage-tick" invisible="not rr_generated"><i class="fa fa-check" title="Generated"/></span>
                                 <button name="action_download_rr_full_award" type="object"
                                         icon="fa-download"
-                                        title="Download R&amp;R Award"
+                                        title="Download"
                                         class="btn btn-sm s23_head_download_btn"
                                         confirm="Do you want to download R&amp;R Award now? Next popup will ask PDF or Excel."
                                         onclick="event.stopPropagation();"
@@ -607,13 +612,13 @@
                                     confirm="Do you want to generate R&amp;R Award now? This will build and cache PDF and Excel in database."
                                     invisible="rr_generated"/>
                             <button name="action_download_rr_full_award" type="object"
-                                    string="Download R&amp;R Award (PDF/Excel)"
+                                    string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
                                     confirm="Do you want to download R&amp;R Award now? Next popup will ask PDF or Excel."
                                     invisible="not rr_generated"/>
                             <button name="action_generate_rr_award" type="object"
-                                    string="Regenerate R&amp;R Award"
+                                    string="Regenerate"
                                     icon="fa-refresh"
                                     class="btn btn-sm btn-outline-secondary"
                                     confirm="Do you want to regenerate R&amp;R Award? Existing cached files will be replaced."

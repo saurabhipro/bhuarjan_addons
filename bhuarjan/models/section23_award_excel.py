@@ -78,14 +78,8 @@ class Section23AwardExcel(models.Model):
             return yes_fmt if flag else no_fmt
 
         rate_val = float(self.avg_three_year_sales_sort_rate or 0.0)
-        _urban_body_labels = {
-            'nagar_nigam':     'Nagar Nigam / नगर निगम',
-            'nagar_palika':    'Nagar Palika / नगर पालिका',
-            'nagar_panchayat': 'Nagar Panchayat / नगर पंचायत',
-        }
-        urban_part = ''
-        if self.urban_body_type:
-            urban_part = f" | Urban Body / नगरीय निकाय: {_urban_body_labels.get(self.urban_body_type, self.urban_body_type)}"
+        urban_body_label = self.get_urban_body_label()
+        urban_part = f" | Urban Body / नगरीय निकाय: {urban_body_label}" if urban_body_label else ''
         subtitle = (
             f"Village / ग्राम: {self.village_id.name or '-'} | "
             f"Project / परियोजना: {self.project_id.name or '-'} | "

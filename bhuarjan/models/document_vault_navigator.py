@@ -257,9 +257,20 @@ class DocumentVaultNavigator(models.Model):
         ], order='create_date desc')
         if not awards:
             return False
-        # Keep backward compatibility with existing naming scheme.
-        name_like = "S23_CACHE__%s__%s__pdf__" % ((variant or 'standard').lower(), (scope or 'all').lower())
-        return self._get_latest_cached_attachment('bhu.section23.award', awards.ids, name_like)
+        var = (variant or 'standard').lower()
+        scp = (scope or 'all').lower()
+        key_like = "s23_cache::%s::%s::pdf" % (var, scp)
+        att = self.env['ir.attachment'].search([
+            ('res_model', '=', 'bhu.section23.award'),
+            ('res_id', 'in', awards.ids),
+            ('description', 'ilike', key_like),
+            ('type', '=', 'binary'),
+        ], order='create_date desc, id desc', limit=1)
+        if att:
+            return att
+        # Backward compatibility for older technical names.
+        legacy_like = "S23_CACHE__%s__%s__pdf__" % (var, scp)
+        return self._get_latest_cached_attachment('bhu.section23.award', awards.ids, legacy_like)
 
     def _get_latest_payment_attachment(self):
         self.ensure_one()

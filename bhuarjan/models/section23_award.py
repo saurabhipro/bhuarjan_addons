@@ -727,6 +727,44 @@ class Section23Award(models.Model):
             'target': 'current',
         }
 
+    def action_open_tree_add_popup(self):
+        """Open popup list of khasras to add/edit tree rows."""
+        self.ensure_one()
+        if self.project_id and self.village_id and not self.award_survey_line_ids:
+            self._populate_award_survey_lines(reset_if_empty=False)
+        if not self.award_survey_line_ids:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Add Tree',
+                    'message': 'No khasra lines found. Select project and village first.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        tree_view = False
+        try:
+            tree_view = self.env.ref('bhuarjan.view_section23_award_survey_line_tree').id
+        except Exception:
+            tree_view = False
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Add/Edit Trees by Khasra',
+            'res_model': 'bhu.section23.award.survey.line',
+            'view_mode': 'list',
+            'views': [(tree_view, 'list')],
+            'domain': [('id', 'in', self.award_survey_line_ids.ids)],
+            'target': 'new',
+            'context': {
+                'default_award_id': self.id,
+                'create': False,
+                'edit': False,
+            },
+        }
+
     def action_refresh_land_lines_debug(self):
         """[DEBUG] Manually refresh land lines from surveys. Logs details to server console."""
         self.ensure_one()
@@ -1186,53 +1224,110 @@ class Section23Award(models.Model):
         scope = (export_scope or 'all').lower()
         var = (variant or 'standard').lower()
         fmt = 'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'excel'
-        ext = 'pdf' if fmt == 'pdf' else 'xlsx'
-        return f"S23_CACHE__{var}__{scope}__{fmt}__{self.id}.{ext}"
+        return f"s23_cache::{var}::{scope}::{fmt}"
+
+    def _s23_filename_token(self, value, fallback):
+        raw = (value or '').strip()
+        if not raw:
+            return fallback
+        token = re.sub(r'\s+', ' ', raw).strip()
+        # Keep Hindi/Unicode text readable; only remove filesystem-unsafe chars.
+        token = (token
+                 .replace('/', '-')
+                 .replace('\\', '-')
+                 .replace(':', '-')
+                 .replace('*', '')
+                 .replace('?', '')
+                 .replace('"', '')
+                 .replace('<', '')
+                 .replace('>', '')
+                 .replace('|', ''))
+        token = token.replace(' ', '_')
+        return token or fallback
+
+    def _s23_location_type_suffix(self):
+        """Return location type token with readable urban-body name."""
+        self.ensure_one()
+        village_type = (self.village_type or (self.village_id.village_type if self.village_id else '') or 'rural').lower()
+        if village_type != 'urban':
+            return 'R_Rural'
+        body_type = (self.urban_body_type or (self.village_id.urban_body_type if self.village_id else '') or '').lower()
+        body_map = {
+            'nagar_nigam': 'Nagar_Nigam_NN',
+            'nagar_palika': 'Nagar_Palika_NP',
+            'nagar_panchayat': 'Nagar_Panchayat_GP',
+        }
+        body_code = body_map.get(body_type, 'Urban')
+        return f"U_{body_code}"
+
+    def get_urban_body_label(self):
+        """Return urban body label only when award location is urban."""
+        self.ensure_one()
+        village_type = (self.village_type or (self.village_id.village_type if self.village_id else '') or 'rural').lower()
+        if village_type != 'urban':
+            return ''
+        body_type = (self.urban_body_type or (self.village_id.urban_body_type if self.village_id else '') or '').lower()
+        if not body_type:
+            return ''
+        body_map = {
+            'nagar_nigam': 'Nagar Nigam / नगर निगम',
+            'nagar_palika': 'Nagar Palika / नगर पालिका',
+            'nagar_panchayat': 'Nagar Panchayat / नगर पंचायत',
+        }
+        return body_map.get(body_type, body_type)
 
     def _s23_cache_filename_for_user(self, export_scope='all', variant='standard', file_format='pdf'):
         self.ensure_one()
-        scope_label = {
-            'all': 'All',
-            'land': 'Land',
-            'tree': 'Tree',
-            'asset': 'Asset',
-        }.get((export_scope or 'all').lower(), 'All')
-        var_label = {
-            'standard': 'Standard',
-            'consolidated': 'Consolidated',
-            'rr': 'RR',
-        }.get((variant or 'standard').lower(), 'Standard')
+        village_tok = self._s23_filename_token(
+            self.village_id.name if self.village_id else '',
+            f'village_{self.village_id.id if self.village_id else self.id}',
+        )
+        loc_tok = self._s23_location_type_suffix()
         ext = 'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'xlsx'
-        safe_name = (self.name or f"S23_{self.id}").replace(' ', '_')
-        return f"Section23_{var_label}_{scope_label}_{safe_name}.{ext}"
+        return f"Sec23_Award_{village_tok}_{loc_tok}.{ext}"
 
     def _s23_get_cached_attachment(self, export_scope='all', variant='standard', file_format='pdf'):
         self.ensure_one()
-        cache_name = self._s23_cache_attachment_name(export_scope, variant, file_format)
+        cache_key = self._s23_cache_attachment_name(export_scope, variant, file_format)
+        att = self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('description', 'ilike', cache_key),
+        ], order='create_date desc, id desc', limit=1)
+        if att:
+            return att
+        # Backward-compatibility with older cache naming.
+        legacy_name = "S23_CACHE__%s__%s__%s__%s.%s" % (
+            (variant or 'standard').lower(),
+            (export_scope or 'all').lower(),
+            'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'excel',
+            self.id,
+            'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'xlsx',
+        )
         return self.env['ir.attachment'].search([
             ('res_model', '=', self._name),
             ('res_id', '=', self.id),
-            ('name', '=', cache_name),
+            ('name', '=', legacy_name),
         ], limit=1)
 
     def _s23_store_cached_attachment(self, binary_data, export_scope='all', variant='standard', file_format='pdf'):
         self.ensure_one()
         if not binary_data:
             return False
-        cache_name = self._s23_cache_attachment_name(export_scope, variant, file_format)
+        cache_key = self._s23_cache_attachment_name(export_scope, variant, file_format)
         user_name = self._s23_cache_filename_for_user(export_scope, variant, file_format)
         mimetype = 'application/pdf' if (file_format or 'pdf') == 'pdf' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         old = self._s23_get_cached_attachment(export_scope, variant, file_format)
         if old:
             old.unlink()
         return self.env['ir.attachment'].create({
-            'name': cache_name,
+            'name': user_name,
             'type': 'binary',
             'datas': base64.b64encode(binary_data),
             'mimetype': mimetype,
             'res_model': self._name,
             'res_id': self.id,
-            'description': f'S23 cached export ({variant}/{export_scope}/{file_format})',
+            'description': f'S23 cached export ({variant}/{export_scope}/{file_format}) [{cache_key}]',
         })
 
     def _s23_clear_variant_cache(self, variants=None):
@@ -1245,10 +1340,13 @@ class Section23Award(models.Model):
         atts = self.env['ir.attachment'].search([
             ('res_model', '=', self._name),
             ('res_id', '=', self.id),
-            ('name', 'ilike', 'S23_CACHE__'),
         ])
         to_remove = atts.filtered(
-            lambda att: any(f"S23_CACHE__{var}__" in (att.name or '') for var in vars_clean)
+            lambda att: any(
+                (f"s23_cache::{var}::" in ((att.description or '').lower())) or
+                (f"S23_CACHE__{var}__" in (att.name or ''))
+                for var in vars_clean
+            )
         )
         count = len(to_remove)
         if to_remove:
@@ -1983,6 +2081,11 @@ class Section23Award(models.Model):
                 'अवार्ड जेनरेट करने से पहले MR Rate और BMR Rate दोनों दर्ज करें।'
             ))
         if self.is_urban:
+            if not (self.urban_body_type or '').strip():
+                raise ValidationError(_(
+                    'For Urban awards, please select Urban Body Type before generating the award.\n'
+                    'नगरीय अवार्ड के लिए जेनरेट करने से पहले Urban Body Type चुनना आवश्यक है।'
+                ))
             mr_sqm = float(self.rate_master_main_road_sqm or 0.0)
             bmr_sqm = float(self.rate_master_other_road_sqm or 0.0)
             if mr_sqm <= 0.0 or bmr_sqm <= 0.0:
@@ -2136,7 +2239,22 @@ class Section23Award(models.Model):
         land_rows = self.get_land_compensation_data() if scope in ('all', 'land') else []
         tree_rows = self.get_tree_compensation_data() if scope in ('all', 'tree') else []
         asset_rows = self.get_structure_compensation_data() if scope in ('all', 'asset') else []
-        total_rows = len(land_rows) + len(tree_rows) + len(asset_rows)
+        # Progress row count should reflect visible/logical rows for land (khasra-level),
+        # not internal owner-split calculation entries.
+        land_khasra_from_lines = set(
+            filter(None, (self.award_survey_line_ids.mapped('khasra_number') if self.award_survey_line_ids else []))
+        )
+        if land_khasra_from_lines:
+            land_progress_rows = len(land_khasra_from_lines)
+        else:
+            land_progress_rows = len({
+                (r.get('khasra') or '').strip()
+                for r in land_rows
+                if (r.get('khasra') or '').strip()
+            }) if land_rows else 0
+        tree_progress_rows = len(tree_rows)
+        asset_progress_rows = len(asset_rows)
+        total_rows = land_progress_rows + tree_progress_rows + asset_progress_rows
         # Keep final progress room for cache/upload/status phases after rows are processed.
         tail_steps = 6
         total_units = (total_rows + tail_steps) if total_rows > 0 else tail_steps
@@ -2162,6 +2280,7 @@ class Section23Award(models.Model):
                 )
 
         if scope in ('all', 'land'):
+            seen_land_khasra = set()
             for row in land_rows:
                 khasra = row.get('khasra', '')
                 line_vals.append((0, 0, {
@@ -2184,12 +2303,16 @@ class Section23Award(models.Model):
                     'paid_compensation': row.get('paid_compensation', 0.0) or 0.0,
                     'remark': row.get('remark', '') or '',
                 }))
-                _bump_progress(_('Processing land rows...'))
+                k_key = (khasra or '').strip()
+                if k_key and k_key not in seen_land_khasra:
+                    seen_land_khasra.add(k_key)
+                    _bump_progress(_('Processing land rows...'))
             if log_khasra:
                 _logger.warning(
-                    "[S23 GENERATE][LAND] award=%s id=%s rows=%s total_amount=%.2f",
+                    "[S23 GENERATE][LAND] award=%s id=%s rows=%s calc_entries=%s total_amount=%.2f",
                     self.name,
                     self.id,
+                    land_progress_rows,
                     len(land_rows),
                     sum(_safe_amount(r.get('total_compensation', 0.0)) for r in land_rows),
                 )

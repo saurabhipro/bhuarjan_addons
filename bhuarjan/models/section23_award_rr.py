@@ -138,16 +138,32 @@ class Section23AwardRR(models.Model):
         total_lbl_fmt = wb.add_format({'font_name': font, 'bold': True, 'border': 1, 'align': 'center', 'bg_color': '#E8E8E8'})
         total_num2_fmt = wb.add_format({'font_name': font, 'bold': True, 'border': 1, 'align': 'right', 'num_format': '#,##0.00', 'bg_color': '#E8E8E8'})
         total_num4_fmt = wb.add_format({'font_name': font, 'bold': True, 'border': 1, 'align': 'right', 'num_format': '0.0000', 'bg_color': '#E8E8E8'})
+        subtitle_fmt = wb.add_format({
+            'font_name': font, 'font_size': 10, 'border': 1, 'align': 'center',
+            'valign': 'vcenter', 'text_wrap': True,
+        })
 
         ws.merge_range(0, 0, 0, 8, 'R&R Award Sheet / पुनर्वास अवार्ड पत्रक', title_fmt)
+        village_name = self.village_id.name or '-'
+        tehsil_name = self.village_id.tehsil_id.name if self.village_id and self.village_id.tehsil_id else '-'
+        district_name = self.village_id.district_id.name if self.village_id and self.village_id.district_id else '-'
+        urban_body_label = self.get_urban_body_label()
+        urban_part = f" ({urban_body_label})" if urban_body_label else ''
+        subtitle = (
+            f"भू-अर्जन प्रकरण क्रमांक {self.case_number or ''} / "
+            f"ग्राम-{village_name}{urban_part}  "
+            f"Project: {self.project_id.name or ''}  "
+            f"तहसील-{tehsil_name}  जिला-{district_name}"
+        )
+        ws.merge_range(1, 0, 1, 8, subtitle, subtitle_fmt)
         for idx, h in enumerate(headers):
-            ws.write(2, idx, h, head_fmt)
+            ws.write(3, idx, h, head_fmt)
         number_row = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
         for idx, n in enumerate(number_row):
-            ws.write(3, idx, n, number_head_fmt)
+            ws.write(4, idx, n, number_head_fmt)
 
         total_area = total_land = total_asset = total_tree = total_det = total_final = 0.0
-        row_idx = 4
+        row_idx = 5
         for group in rr_rows:
             lines = group.get('lines', [])
             if not lines:

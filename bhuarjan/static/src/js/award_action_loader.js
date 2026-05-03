@@ -179,8 +179,8 @@ function _updateLoaderProgressUI(payload) {
 
     _setLoaderText('.aal-project-name', payload.project || _fieldRawValue('project_id'));
     _setLoaderText('.aal-village-name', payload.village || _fieldRawValue('village_id'));
-    _setLoaderText('.aal-village-type', payload.village_type || '-');
-    _setLoaderText('.aal-urban-body', payload.urban_body || '-');
+    _setLoaderText('.aal-village-type', payload.village_type || _fieldRawValue('village_type') || '-');
+    _setLoaderText('.aal-urban-body', payload.urban_body || _fieldRawValue('urban_body_type') || '-');
     _setLoaderText('.aal-progress-stat', total > 0 ? `${done} / ${total} rows` : 'Preparing rows...');
     _setLoaderText('.aal-progress-pct', pctFixed, '0.0%');
     _setLoaderText('.aal-progress-label', payload.label || 'Processing...');
@@ -196,8 +196,8 @@ function _startLoaderProgressPolling() {
     }
     _setLoaderText('.aal-project-name', _fieldRawValue('project_id'));
     _setLoaderText('.aal-village-name', _fieldRawValue('village_id'));
-    _setLoaderText('.aal-village-type', '-');
-    _setLoaderText('.aal-urban-body', '-');
+    _setLoaderText('.aal-village-type', _fieldRawValue('village_type') || '-');
+    _setLoaderText('.aal-urban-body', _fieldRawValue('urban_body_type') || '-');
 
     const poll = () => {
         if (!document.getElementById(LOADER_ID)) return;

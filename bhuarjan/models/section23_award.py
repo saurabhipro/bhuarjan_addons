@@ -1283,8 +1283,22 @@ class Section23Award(models.Model):
             f'village_{self.village_id.id if self.village_id else self.id}',
         )
         loc_tok = self._s23_location_type_suffix()
+        scope_key = (export_scope or 'all').lower()
+        variant_key = (variant or 'standard').lower()
+        if variant_key == 'consolidated':
+            award_type_tok = 'Consolidated'
+        elif variant_key == 'rr':
+            award_type_tok = 'RR'
+        else:
+            scope_map = {
+                'land': 'Land',
+                'tree': 'Tree',
+                'asset': 'Asset',
+                'all': 'All',
+            }
+            award_type_tok = scope_map.get(scope_key, 'All')
         ext = 'pdf' if (file_format or 'pdf').lower() == 'pdf' else 'xlsx'
-        return f"Sec23_Award_{village_tok}_{loc_tok}.{ext}"
+        return f"Sec23_Award_{award_type_tok}_{village_tok}_{loc_tok}.{ext}"
 
     def _s23_get_cached_attachment(self, export_scope='all', variant='standard', file_format='pdf'):
         self.ensure_one()

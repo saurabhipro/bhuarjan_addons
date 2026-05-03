@@ -119,7 +119,12 @@ class Section23AwardData(models.Model):
             threshold = self._s23_distance_threshold()
             derived_is_within_distance = distance_from_main_road <= threshold
 
-            # Effective guideline rate: master MR/BMR; BMR: ×1.25 if diverted, else irrigation 100%/80%.
+            # Effective guideline rate:
+            # - MR lane: ×1.0
+            # - BMR + diverted + irrigated: ×1.25
+            # - BMR + diverted + unirrigated: ×1.0
+            # - BMR + not-diverted + irrigated: ×1.0
+            # - BMR + not-diverted + unirrigated: ×0.8
             award_line = self.award_survey_line_ids.filtered(lambda l: l.survey_id.id == survey.id)
             has_award_line = bool(award_line)
             is_diverted = survey.has_traded_land == 'yes' if survey else False

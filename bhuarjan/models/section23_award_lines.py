@@ -242,7 +242,8 @@ class Section23AwardSurveyLine(models.Model):
         string='Rate per Hectare / हेक्टेयर दर',
         currency_field='currency_id',
         compute='_compute_rate_per_hectare', store=True,
-        help='Master guideline rate; on BMR lane: ×1.25 if diverted, else irrigated 100% / non-irrigated 80%.',
+        help='Master guideline rate; on BMR lane: diverted+irrigated ×1.25, diverted+unirrigated ×1.0, '
+        'not-diverted irrigated ×1.0, not-diverted unirrigated ×0.8.',
     )
 
     currency_id = fields.Many2one('res.currency', string='Currency',

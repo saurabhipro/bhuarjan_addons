@@ -728,7 +728,7 @@ class Section23Award(models.Model):
         }
 
     def action_open_tree_add_popup(self):
-        """Open popup list of khasras to add/edit tree rows."""
+        """Open tree edit wizard directly for typed khasra."""
         self.ensure_one()
         if self.project_id and self.village_id and not self.award_survey_line_ids:
             self._populate_award_survey_lines(reset_if_empty=False)
@@ -744,26 +744,51 @@ class Section23Award(models.Model):
                 },
             }
 
-        tree_view = False
-        try:
-            tree_view = self.env.ref('bhuarjan.view_section23_award_survey_line_tree').id
-        except Exception:
-            tree_view = False
+        term = (self.tree_khasra_filter or '').strip()
+        if not term:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Add Tree',
+                    'message': 'Please enter Khasra number first, then click Add Tree.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
 
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Add/Edit Trees by Khasra',
-            'res_model': 'bhu.section23.award.survey.line',
-            'view_mode': 'list',
-            'views': [(tree_view, 'list')],
-            'domain': [('id', 'in', self.award_survey_line_ids.ids)],
-            'target': 'new',
-            'context': {
-                'default_award_id': self.id,
-                'create': False,
-                'edit': False,
-            },
-        }
+        matches = self.award_survey_line_ids.filtered(
+            lambda l, t=term.lower(): t in (l.khasra_number or '').lower()
+        )
+        if not matches:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Add Tree',
+                    'message': f'No khasra matched "{term}".',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        exact = matches.filtered(
+            lambda l, t=term.lower(): (l.khasra_number or '').strip().lower() == t
+        )
+        if not exact and len(matches) > 1:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Add Tree',
+                    'message': f'Multiple khasra matched "{term}". Please type full khasra number.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+
+        target_line = (exact[:1] or matches[:1])
+        return target_line.action_open_survey_for_tree_edit()
 
     def action_refresh_land_lines_debug(self):
         """[DEBUG] Manually refresh land lines from surveys. Logs details to server console."""
@@ -1115,6 +1140,66 @@ class Section23Award(models.Model):
             f'Unit Rate ({cur_sym})', f'Value ({cur_sym})',
             f'Solatium ({cur_sym})', f'Interest ({cur_sym})', f'Total ({cur_sym})',
         ]
+        merged_by_khasra = {}
+
+        def _fnum(val):
+            try:
+                return float(val or 0.0)
+            except Exception:
+                return 0.0
+
+        for r in rows:
+            khasra = (r.get("tree_khasra") or r.get("khasra") or "").strip()
+            if not khasra:
+                continue
+            bucket = merged_by_khasra.setdefault(khasra, {
+                'khasra': khasra,
+                'owners': [],
+                'tree_names': [],
+                'tree_type_labels': [],
+                'dev_stage_labels': [],
+                'girth_labels': [],
+                'unit_rates': [],
+                'qty': 0.0,
+                'value': 0.0,
+                'solatium': 0.0,
+                'interest': 0.0,
+                'total': 0.0,
+            })
+
+            owner = (r.get("landowner_name") or "").strip()
+            if owner and owner not in bucket['owners']:
+                bucket['owners'].append(owner)
+
+            tree_name = str(r.get("tree_type") or "").strip()
+            if tree_name and tree_name not in bucket['tree_names']:
+                bucket['tree_names'].append(tree_name)
+
+            tc = r.get("tree_type_code") or ""
+            tc_label = "Fruit Bearing" if tc == "fruit_bearing" else ("Timber" if tc == "timber" else tc.replace("_", " ").title())
+            if tc_label and tc_label not in bucket['tree_type_labels']:
+                bucket['tree_type_labels'].append(tc_label)
+
+            _ds_map = {'undeveloped': 'Undeveloped', 'semi_developed': 'Semi-Developed', 'fully_developed': 'Fully Developed'}
+            ds_label = _ds_map.get(r.get('development_stage') or '', r.get('development_stage') or '—')
+            if ds_label and ds_label not in bucket['dev_stage_labels']:
+                bucket['dev_stage_labels'].append(ds_label)
+
+            girth_val = _fnum(r.get("girth_cm"))
+            girth_lbl = self._html_s23_num(girth_val, 1)
+            if girth_lbl and girth_lbl not in bucket['girth_labels']:
+                bucket['girth_labels'].append(girth_lbl)
+
+            unit_rate = _fnum(r.get("unit_rate") or r.get("rate") or 0.0)
+            if unit_rate > 0 and unit_rate not in bucket['unit_rates']:
+                bucket['unit_rates'].append(unit_rate)
+
+            bucket['qty'] += _fnum(r.get("tree_count"))
+            bucket['value'] += _fnum(r.get("value"))
+            bucket['solatium'] += _fnum(r.get("solatium"))
+            bucket['interest'] += _fnum(r.get("interest"))
+            bucket['total'] += _fnum(r.get("total"))
+
         parts = [
             '<div class="table-responsive s23-preview-wrap s23-land-sim-table-wrap">',
             '<table class="table table-sm s23-sim-table s23-sim-table-land">',
@@ -1123,22 +1208,23 @@ class Section23Award(models.Model):
         for col in headers:
             parts.append(f'<th class="s23-sim-th" scope="col">{escape(col)}</th>')
         parts.append('</tr></thead><tbody>')
-        for r in rows:
+        for khasra, r in merged_by_khasra.items():
             parts.append('<tr>')
-            parts.append(f'<td class="text-nowrap fw-semibold">{escape(r.get("tree_khasra") or r.get("khasra") or "")}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(r.get("landowner_name") or "")}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(str(r.get("tree_type") or ""))}</td>')
-            # Tree type code label
-            tc = r.get("tree_type_code") or ""
-            tc_label = "Fruit Bearing" if tc == "fruit_bearing" else ("Timber" if tc == "timber" else tc.replace("_", " ").title())
-            parts.append(f'<td class="text-nowrap small">{escape(tc_label)}</td>')
-            _ds_map = {'undeveloped': 'Undeveloped', 'semi_developed': 'Semi-Developed', 'fully_developed': 'Fully Developed'}
-            ds_label = _ds_map.get(r.get('development_stage') or '', r.get('development_stage') or '—')
-            parts.append(f'<td class="text-nowrap small">{escape(ds_label)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("girth_cm"), 1)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("tree_count"), 0)}</td>')
-            unit_rate = r.get("unit_rate") or r.get("rate") or 0
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(unit_rate, 0)}</td>')
+            parts.append(f'<td class="text-nowrap fw-semibold">{escape(khasra)}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(", ".join(r.get("owners") or []))}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(", ".join(r.get("tree_names") or []))}</td>')
+            parts.append(f'<td class="text-nowrap small">{escape(", ".join(r.get("tree_type_labels") or []))}</td>')
+            parts.append(f'<td class="text-nowrap small">{escape(", ".join(r.get("dev_stage_labels") or []))}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{escape(", ".join(r.get("girth_labels") or []))}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("qty"), 0)}</td>')
+            unit_rates = r.get("unit_rates") or []
+            if len(unit_rates) == 1:
+                unit_rate_display = self._html_s23_num(unit_rates[0], 0)
+            elif len(unit_rates) > 1:
+                unit_rate_display = "Mixed"
+            else:
+                unit_rate_display = self._html_s23_num(0, 0)
+            parts.append(f'<td class="text-end tabular-nums">{escape(unit_rate_display)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("value"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("solatium"), 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("interest"), 0)}</td>')
@@ -2508,10 +2594,15 @@ class Section23Award(models.Model):
 
     @api.model
     def _get_min_rehab_rate_per_acre(self, is_fallow, is_irrigated, is_unirrigated):
-        """Minimum rehab policy rate per acre (flat tiers: fallow vs other only).
+        """Minimum rehab policy rate per acre for Col 17 floor.
 
-        Irrigation / unirrigated no longer change the floor (caller still passes flags for API stability).
+        Policy mapping used:
+        - Irrigated: 10,00,000 per acre
+        - Unirrigated (default): 8,00,000 per acre
+        - Fallow: 6,00,000 per acre
         """
+        if is_irrigated:
+            return 1000000.0
         if is_fallow:
             return 600000.0
         return 800000.0
@@ -2523,12 +2614,14 @@ class Section23Award(models.Model):
         MR lane (``is_mr_lane``): multiplier **1.0**.
 
         BMR lane:
-        - **Diverted**: **×1.25** on the BMR master rate (no separate non-irrigation discount).
-        - **Not diverted**: irrigated **×1.0**, non-irrigated **×0.8**.
+        - **Diverted + irrigated**: **×1.25** on the BMR master rate.
+        - **Diverted + unirrigated**: **×1.0** on the BMR master rate.
+        - **Not diverted + irrigated**: **×1.0** on the BMR master rate.
+        - **Not diverted + unirrigated**: **×0.8** on the BMR master rate.
         """
         if is_mr_lane:
             return 1.0
-        if is_diverted:
+        if is_diverted and is_irrigated:
             return 1.25
         return 1.0 if is_irrigated else 0.8
 

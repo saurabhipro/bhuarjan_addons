@@ -933,6 +933,7 @@ class Section23Award(models.Model):
                     color_idx += 1
 
         headers = [
+            ('Sr. No. / क्र.', 'num'),
             ('Owner / भूमि स्वामी', 'text'),
             ('Khasra / खसरा', 'text'),
             ('Village / ग्राम', 'text'),
@@ -958,23 +959,52 @@ class Section23Award(models.Model):
             )
         parts.append('</tr></thead><tbody>')
 
-        for r in rows:
-            is_slab = r.get('is_urban_slab', False)
-            if is_slab:
-                k = (r.get('khasra') or '', r.get('landowner_name') or '')
-                bg = khasra_color.get(k, '#ffffff')
-                row_style = f'background:{bg};'
-            else:
-                row_style = ''
-            slab_lbl = r.get('remark', '') or ''
-
-            parts.append(f'<tr style="{row_style}">')
+        rows_sorted = sorted(
+            rows,
+            key=lambda x: (
+                x.get('khasra') or '',
+                x.get('landowner_name') or '',
+                float(x.get('distance_from_main_road') or 0.0),
+            ),
+        )
+        merged_by_khasra = {}
+        for r in rows_sorted:
+            khasra_val = (r.get("khasra") or "").strip()
+            if not khasra_val:
+                continue
+            if khasra_val not in merged_by_khasra:
+                merged_by_khasra[khasra_val] = {
+                    'khasra': khasra_val,
+                    'owners': [],
+                    'village_name': r.get("village_name") or "",
+                    'distance_from_main_road': r.get("distance_from_main_road") or 0.0,
+                    'road_type_label': r.get("road_type_label") or ("MR" if r.get("is_within_distance") else "BMR"),
+                    'irrigation_label': r.get("irrigation_label") or "",
+                    'irrigation_type': r.get("irrigation_type") or "",
+                    'is_diverted': r.get("is_diverted"),
+                    'diverted_label': r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"),
+                    'acquired_area': r.get("acquired_area") or 0.0,
+                    'remark': r.get("remark") or "",
+                }
+            bucket = merged_by_khasra[khasra_val]
             owner = (r.get("landowner_name") or "").strip()
-            parts.append(f'<td class="text-nowrap">{escape(owner)}</td>')
-            parts.append(f'<td class="text-nowrap fw-semibold">{escape(r.get("khasra") or "")}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(r.get("village_name") or "")}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("distance_from_main_road"), 2)}</td>')
-            road = (r.get("road_type_label") or ("MR" if r.get("is_within_distance") else "BMR"))
+            if owner and owner not in bucket['owners']:
+                bucket['owners'].append(owner)
+            # same khasra rows often duplicate acquired area per owner; keep logical single-khasra value
+            bucket['acquired_area'] = max(bucket['acquired_area'], r.get("acquired_area") or 0.0)
+            remark = (r.get("remark") or "").strip()
+            if remark and remark not in (bucket['remark'] or ""):
+                bucket['remark'] = (bucket['remark'] + ", " + remark).strip(", ")
+
+        for sr_no, row in enumerate(merged_by_khasra.values(), start=1):
+            parts.append('<tr>')
+            parts.append(f'<td class="text-center tabular-nums">{sr_no}</td>')
+            owner_display = ", ".join(row['owners'])
+            parts.append(f'<td class="text-nowrap">{escape(owner_display)}</td>')
+            parts.append(f'<td class="text-nowrap fw-semibold">{escape(row["khasra"])}</td>')
+            parts.append(f'<td class="text-nowrap">{escape(row.get("village_name") or "")}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(row.get("distance_from_main_road"), 2)}</td>')
+            road = row.get("road_type_label") or ("MR" if row.get("is_within_distance") else "BMR")
             road_key = road.strip().upper()
             road_style = (
                 'color:#1b8f4f;font-weight:700;'
@@ -984,8 +1014,8 @@ class Section23Award(models.Model):
             parts.append(
                 f'<td class="text-nowrap text-center"><span class="s23-sim-badge" style="{road_style}">{escape(road)}</span></td>'
             )
-            irrigation_label = (r.get("irrigation_label") or "").strip()
-            irrigation_key = (r.get("irrigation_type") or "").strip().lower()
+            irrigation_label = (row.get("irrigation_label") or "").strip()
+            irrigation_key = (row.get("irrigation_type") or "").strip().lower()
             label_key = irrigation_label.lower()
             irrigated_yes = irrigation_key == "irrigated" or (
                 "irrigated" in label_key and "unirrigated" not in label_key
@@ -998,8 +1028,8 @@ class Section23Award(models.Model):
             parts.append(
                 f'<td class="text-nowrap small text-center" style="{irrigation_style}">{escape(irrigation_label)}</td>'
             )
-            div_lbl = (r.get("diverted_label") or ("Yes" if r.get("is_diverted") else "No"))
-            diverted_flag = r.get("is_diverted")
+            div_lbl = (row.get("diverted_label") or ("Yes" if row.get("is_diverted") else "No"))
+            diverted_flag = row.get("is_diverted")
             diverted_yes = bool(diverted_flag) if diverted_flag is not None else (
                 div_lbl.strip().lower() in {"yes", "y", "true", "1", "हाँ", "ha", "haan"}
             )
@@ -1009,8 +1039,8 @@ class Section23Award(models.Model):
                 'color:#c0392b;font-weight:700;'
             )
             parts.append(f'<td class="text-center text-nowrap" style="{diverted_style}">{escape(div_lbl)}</td>')
-            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("acquired_area"), 4)}</td>')
-            parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape(slab_lbl)}</td>')
+            parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(row.get("acquired_area"), 4)}</td>')
+            parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape((row.get("remark") or ""))}</td>')
             parts.append('</tr>')
 
         parts.append(

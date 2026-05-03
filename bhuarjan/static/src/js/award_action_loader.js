@@ -179,6 +179,8 @@ function _updateLoaderProgressUI(payload) {
 
     _setLoaderText('.aal-project-name', payload.project || _fieldRawValue('project_id'));
     _setLoaderText('.aal-village-name', payload.village || _fieldRawValue('village_id'));
+    _setLoaderText('.aal-village-type', payload.village_type || '-');
+    _setLoaderText('.aal-urban-body', payload.urban_body || '-');
     _setLoaderText('.aal-progress-stat', total > 0 ? `${done} / ${total} rows` : 'Preparing rows...');
     _setLoaderText('.aal-progress-pct', pctFixed, '0.0%');
     _setLoaderText('.aal-progress-label', payload.label || 'Processing...');
@@ -194,6 +196,8 @@ function _startLoaderProgressPolling() {
     }
     _setLoaderText('.aal-project-name', _fieldRawValue('project_id'));
     _setLoaderText('.aal-village-name', _fieldRawValue('village_id'));
+    _setLoaderText('.aal-village-type', '-');
+    _setLoaderText('.aal-urban-body', '-');
 
     const poll = () => {
         if (!document.getElementById(LOADER_ID)) return;
@@ -357,6 +361,8 @@ function _showLoader(label, actionName = '') {
         <div class="aal-meta">
             <div class="aal-meta-row"><span>Project</span><strong class="aal-project-name">-</strong></div>
             <div class="aal-meta-row"><span>Village</span><strong class="aal-village-name">-</strong></div>
+            <div class="aal-meta-row"><span>Village Type</span><strong class="aal-village-type">-</strong></div>
+            <div class="aal-meta-row"><span>Urban Body Type</span><strong class="aal-urban-body">-</strong></div>
         </div>
         <div class="aal-progress-wrap">
             <div class="aal-progress-head">

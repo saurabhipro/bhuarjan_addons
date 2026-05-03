@@ -343,7 +343,6 @@
                                         icon="fa-download"
                                         title="Download"
                                         class="btn btn-sm s23_head_download_btn"
-                                        confirm="Do you want to download the Land Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
                                         invisible="not land_generated"/>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
@@ -372,7 +371,6 @@
                                     string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
-                                    confirm="Do you want to download the Land Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not land_generated"/>
                             <button name="action_regenerate_land_award" type="object"
                                     string="Regenerate"
@@ -409,7 +407,6 @@
                                         icon="fa-download"
                                         title="Download"
                                         class="btn btn-sm s23_head_download_btn"
-                                        confirm="Do you want to download the Tree Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
                                         invisible="not tree_generated"/>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
@@ -442,7 +439,6 @@
                                     string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
-                                    confirm="Do you want to download the Tree Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not tree_generated"/>
                             <button name="action_regenerate_tree_award" type="object"
                                     string="Regenerate"
@@ -479,7 +475,6 @@
                                         icon="fa-download"
                                         title="Download"
                                         class="btn btn-sm s23_head_download_btn"
-                                        confirm="Do you want to download the Asset Award now? Next popup will ask you to choose PDF or Excel."
                                         onclick="event.stopPropagation();"
                                         invisible="not asset_generated"/>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
@@ -496,7 +491,6 @@
                                     string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
-                                    confirm="Do you want to download the Asset Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not asset_generated"/>
                             <button name="action_regenerate_asset_award" type="object"
                                     string="Regenerate"
@@ -550,7 +544,6 @@
                                         icon="fa-download"
                                         title="Download"
                                         class="btn btn-sm s23_head_download_btn"
-                                        confirm="Do you want to download Consolidated Award now? Next popup will ask PDF or Excel."
                                         onclick="event.stopPropagation();"
                                         invisible="not consolidated_generated"/>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
@@ -567,7 +560,6 @@
                                     string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
-                                    confirm="Do you want to download Consolidated Award now? Next popup will ask PDF or Excel."
                                     invisible="not consolidated_generated"/>
                             <button name="action_generate_consolidated_award" type="object"
                                     string="Regenerate"
@@ -598,7 +590,6 @@
                                         icon="fa-download"
                                         title="Download"
                                         class="btn btn-sm s23_head_download_btn"
-                                        confirm="Do you want to download R&amp;R Award now? Next popup will ask PDF or Excel."
                                         onclick="event.stopPropagation();"
                                         invisible="not rr_generated"/>
                                 <span class="sb_chevron"><i class="fa fa-chevron-down" title="Toggle"/></span>
@@ -615,7 +606,6 @@
                                     string="Download"
                                     icon="fa-download"
                                     class="btn btn-sm s23_btn_teal"
-                                    confirm="Do you want to download R&amp;R Award now? Next popup will ask PDF or Excel."
                                     invisible="not rr_generated"/>
                             <button name="action_generate_rr_award" type="object"
                                     string="Regenerate"
@@ -643,7 +633,6 @@
                             <button name="action_download_standard_full_award" string="Download Standard (PDF/Excel)"
                                     type="object" class="btn s23_btn_teal"
                                     icon="fa-download"
-                                    confirm="Do you want to download the full Standard Award now? Next popup will ask you to choose PDF or Excel."
                                     invisible="not all_components_generated"/>
                         </div>
                         <p class="text-muted small s23_note mb-2" invisible="all_components_generated">

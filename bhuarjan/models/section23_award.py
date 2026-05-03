@@ -1253,9 +1253,9 @@ class Section23Award(models.Model):
             return 'R_Rural'
         body_type = (self.urban_body_type or (self.village_id.urban_body_type if self.village_id else '') or '').lower()
         body_map = {
-            'nagar_nigam': 'Nagar_Nigam_NN',
-            'nagar_palika': 'Nagar_Palika_NP',
-            'nagar_panchayat': 'Nagar_Panchayat_GP',
+            'nagar_nigam': 'Nagar_Nigam',
+            'nagar_palika': 'Nagar_Palika',
+            'nagar_panchayat': 'Nagar_Panchayat',
         }
         body_code = body_map.get(body_type, 'Urban')
         return f"U_{body_code}"
@@ -1560,6 +1560,9 @@ class Section23Award(models.Model):
         self.ensure_one()
         key = 'bhuarjan.s23.loader.progress.%s' % self.id
         user_key = 'bhuarjan.s23.loader.progress.user.%s' % self.env.uid
+        vtype_raw = (self.village_type or (self.village_id.village_type if self.village_id else '') or '').lower()
+        village_type_label = 'Urban / नगरीय' if vtype_raw == 'urban' else 'Rural / ग्रामीण'
+        urban_body_label = self.get_urban_body_label() or '-'
         current = {}
         raw = self.env['ir.config_parameter'].sudo().get_param(key, default='') or ''
         if raw:
@@ -1580,6 +1583,8 @@ class Section23Award(models.Model):
             'label': label if label is not None else (current.get('label') or ''),
             'project': self.project_id.name if self.project_id else '',
             'village': self.village_id.name if self.village_id else '',
+            'village_type': village_type_label,
+            'urban_body': urban_body_label,
         }
         try:
             if flush:
@@ -1610,9 +1615,13 @@ class Section23Award(models.Model):
                 if isinstance(payload, dict):
                     payload.setdefault('project', rec.project_id.name if rec.project_id else '')
                     payload.setdefault('village', rec.village_id.name if rec.village_id else '')
+                    vtype_raw = (rec.village_type or (rec.village_id.village_type if rec.village_id else '') or '').lower()
+                    payload.setdefault('village_type', 'Urban / नगरीय' if vtype_raw == 'urban' else 'Rural / ग्रामीण')
+                    payload.setdefault('urban_body', rec.get_urban_body_label() or '-')
                     return payload
             except Exception:
                 pass
+        vtype_raw = (rec.village_type or (rec.village_id.village_type if rec.village_id else '') or '').lower()
         return {
             'active': False,
             'done': 0,
@@ -1621,6 +1630,8 @@ class Section23Award(models.Model):
             'label': '',
             'project': rec.project_id.name if rec.project_id else '',
             'village': rec.village_id.name if rec.village_id else '',
+            'village_type': 'Urban / नगरीय' if vtype_raw == 'urban' else 'Rural / ग्रामीण',
+            'urban_body': rec.get_urban_body_label() or '-',
         }
 
     @api.model
@@ -1642,6 +1653,8 @@ class Section23Award(models.Model):
             'label': '',
             'project': '',
             'village': '',
+            'village_type': '',
+            'urban_body': '',
         }
 
     def _s23_increment_loader_progress(self, step=1, label=None, flush=False, active=True):

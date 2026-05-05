@@ -21,6 +21,10 @@ class BhuarjanWebsite(http.Controller):
     def acts(self, **kwargs):
         return request.render('bhuarjan_web.acts_page')
 
+    @http.route('/mobile-app', type='http', auth='public', website=True, sitemap=True)
+    def mobile_app(self, **kwargs):
+        return request.render('bhuarjan_web.mobile_app_page')
+
     @http.route('/contact/submit', type='http', auth='public', website=True, methods=['POST'], csrf=True)
     def contact_submit(self, **post):
         name = post.get('name', '')

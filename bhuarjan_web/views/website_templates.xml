@@ -697,6 +697,7 @@
             <ul class="bhu-nav-links">
                 <li><a href="/" t-attf-class="{{ 'active' if request.httprequest.path == '/' else '' }}">Home</a></li>
                 <li><a href="/features" t-attf-class="{{ 'active' if request.httprequest.path == '/features' else '' }}">Features</a></li>
+                <li><a href="/mobile-app" t-attf-class="{{ 'active' if request.httprequest.path == '/mobile-app' else '' }}">Mobile App</a></li>
                 <li><a href="/acts" t-attf-class="{{ 'active' if request.httprequest.path == '/acts' else '' }}">Acts</a></li>
                 <li><a href="/contact" t-attf-class="{{ 'active' if request.httprequest.path == '/contact' else '' }}">Contact us</a></li>
             </ul>

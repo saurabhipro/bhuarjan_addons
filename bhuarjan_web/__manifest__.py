@@ -11,6 +11,7 @@
         'views/website_templates.xml',
         'views/acts_templates.xml',
         'views/login_templates.xml',
+        'views/mobile_app_templates.xml',
         'views/website_menu.xml',
     ],
     'assets': {

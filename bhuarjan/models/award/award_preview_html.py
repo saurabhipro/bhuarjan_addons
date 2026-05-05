@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import html as html_lib
+
 from markupsafe import Markup, escape
 
 from odoo import models, api, _
@@ -119,7 +121,10 @@ class Section23Award(models.Model):
             parts.append('<tr>')
             parts.append(f'<td class="text-center tabular-nums">{sr_no}</td>')
             owner_display = ", ".join(row['owners'])
-            parts.append(f'<td class="text-nowrap">{escape(owner_display)}</td>')
+            parts.append(
+                f'<td class="s23-owner-cell" title="{html_lib.escape(owner_display, quote=True)}">'
+                f'{escape(owner_display)}</td>'
+            )
             parts.append(f'<td class="text-nowrap fw-semibold">{escape(row["khasra"])}</td>')
             parts.append(f'<td class="text-nowrap">{escape(row.get("village_name") or "")}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(row.get("distance_from_main_road"), 2)}</td>')
@@ -159,7 +164,11 @@ class Section23Award(models.Model):
             )
             parts.append(f'<td class="text-center text-nowrap" style="{diverted_style}">{escape(div_lbl)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(row.get("acquired_area"), 4)}</td>')
-            parts.append(f'<td class="text-nowrap small" style="font-style:italic;">{escape((row.get("remark") or ""))}</td>')
+            _remark = row.get("remark") or ""
+            parts.append(
+                f'<td class="s23-wrap-cell small" style="font-style:italic;" '
+                f'title="{html_lib.escape(_remark, quote=True)}">{escape(_remark)}</td>'
+            )
             parts.append('</tr>')
 
         parts.append(
@@ -267,10 +276,26 @@ class Section23Award(models.Model):
         for khasra, r in merged_by_khasra.items():
             parts.append('<tr>')
             parts.append(f'<td class="text-nowrap fw-semibold">{escape(khasra)}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(", ".join(r.get("owners") or []))}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(", ".join(r.get("tree_names") or []))}</td>')
-            parts.append(f'<td class="text-nowrap small">{escape(", ".join(r.get("tree_type_labels") or []))}</td>')
-            parts.append(f'<td class="text-nowrap small">{escape(", ".join(r.get("dev_stage_labels") or []))}</td>')
+            owners_joined = ", ".join(r.get("owners") or [])
+            parts.append(
+                f'<td class="s23-owner-cell" title="{html_lib.escape(owners_joined, quote=True)}">'
+                f'{escape(owners_joined)}</td>'
+            )
+            tree_joined = ", ".join(r.get("tree_names") or [])
+            parts.append(
+                f'<td class="s23-wrap-cell" title="{html_lib.escape(tree_joined, quote=True)}">'
+                f'{escape(tree_joined)}</td>'
+            )
+            ttl_joined = ", ".join(r.get("tree_type_labels") or [])
+            parts.append(
+                f'<td class="s23-wrap-cell small" title="{html_lib.escape(ttl_joined, quote=True)}">'
+                f'{escape(ttl_joined)}</td>'
+            )
+            dev_joined = ", ".join(r.get("dev_stage_labels") or [])
+            parts.append(
+                f'<td class="s23-wrap-cell small" title="{html_lib.escape(dev_joined, quote=True)}">'
+                f'{escape(dev_joined)}</td>'
+            )
             parts.append(f'<td class="text-end tabular-nums">{escape(", ".join(r.get("girth_labels") or []))}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(r.get("qty"), 0)}</td>')
             unit_rates = r.get("unit_rates") or []
@@ -337,7 +362,11 @@ class Section23Award(models.Model):
             parts.append(f'<td class="text-nowrap fw-semibold">{escape(line.khasra_number or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(s_type or "")}</td>')
             parts.append(f'<td class="text-nowrap">{escape(c_type or "")}</td>')
-            parts.append(f'<td class="text-nowrap">{escape(line.description or "")}</td>')
+            _desc = line.description or ""
+            parts.append(
+                f'<td class="s23-wrap-cell" title="{html_lib.escape(_desc, quote=True)}">'
+                f'{escape(_desc)}</td>'
+            )
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.asset_count, 0)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.area_sqm, 2)}</td>')
             parts.append(f'<td class="text-end tabular-nums">{self._html_s23_num(line.market_rate_per_sqm, 0)}</td>')

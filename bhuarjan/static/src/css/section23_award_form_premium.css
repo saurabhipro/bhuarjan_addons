@@ -492,6 +492,20 @@
     font-size: 0.7rem;
     white-space: nowrap;
 }
+/* Long owner / merged text: wrap in-cell + native tooltip on hover (title attr from Python) */
+.bhu_s23_award_premium .s23-sim-table-land td.s23-owner-cell,
+.bhu_s23_award_premium .s23-sim-table-land td.s23-wrap-cell {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+    max-width: 15rem;
+    line-height: 1.35;
+}
+.bhu_s23_award_premium .s23-sim-table-land td.s23-owner-cell[title],
+.bhu_s23_award_premium .s23-sim-table-land td.s23-wrap-cell[title] {
+    cursor: help;
+}
 .bhu_s23_award_premium .s23-sim-table-land th.s23-sim-th {
     min-width: 3.2rem;
 }

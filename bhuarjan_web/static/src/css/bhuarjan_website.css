@@ -2073,3 +2073,288 @@ button { font-family: inherit; }
     .bhu-act-stage p { font-size: .78rem; }
     .bhu-pdf-card img { aspect-ratio: 16/11; }
 }
+
+/* ============================================================
+   V4 VISUAL ENHANCEMENTS
+   Dark contrasting navbar · scroll-reveal · micro-animations
+   ============================================================ */
+
+/* ── 1. Dark contrasting navbar ──────────────────────────── */
+.bhu-navbar {
+    background: linear-gradient(120deg, #0c1929 0%, #172d4f 60%, #1e3660 100%) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.28) !important;
+    position: relative;
+}
+.bhu-navbar::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent  0%,
+        #8A4531     20%,
+        #FFB800     50%,
+        #8A4531     80%,
+        transparent 100%);
+    opacity: 0.55;
+    pointer-events: none;
+}
+.bhu-navbar.scrolled {
+    background: rgba(10, 18, 35, 0.96) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.38) !important;
+}
+
+/* Logo text on dark background */
+.bhu-logo-text .lt-1 { color: #ffffff !important; }
+.bhu-logo-text .lt-2 { color: rgba(255,255,255,0.48) !important; }
+
+/* Nav links */
+.bhu-nav-links a { color: rgba(255,255,255,0.75) !important; }
+.bhu-nav-links a:hover { color: #ffaa5a !important; }
+.bhu-nav-links a.active { color: #ffffff !important; }
+.bhu-nav-links a.active::after { background: #ff7a1a; opacity: 1; }
+
+/* Phone number */
+.bhu-nav-phone { color: rgba(255,255,255,0.7) !important; }
+.bhu-nav-phone i { color: #ff9a50 !important; }
+
+/* Login button ghost style for dark bg */
+.bhu-btn-nav.login {
+    background: rgba(255,255,255,0.07) !important;
+    border: 1.5px solid rgba(255,255,255,0.2) !important;
+    color: #fff !important;
+}
+.bhu-btn-nav.login:hover {
+    background: rgba(255,255,255,0.14) !important;
+    border-color: rgba(255,255,255,0.35) !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+/* ── 2. Hero: moving dot mesh background ─────────────────── */
+.bhu-hero {
+    position: relative;
+    overflow: hidden;
+}
+.bhu-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(138,69,49,0.22) 1.2px, transparent 1.2px);
+    background-size: 38px 38px;
+    pointer-events: none;
+    z-index: 0;
+    animation: heroDotDrift 22s linear infinite;
+    opacity: 0.6;
+}
+@keyframes heroDotDrift {
+    0%   { background-position: 0 0; }
+    100% { background-position: 38px 38px; }
+}
+.bhu-hero-inner { position: relative; z-index: 1; }
+
+/* Hero image — subtle float */
+.bhu-hero-img-main {
+    animation: heroFloat 7s ease-in-out infinite;
+    will-change: transform;
+}
+@keyframes heroFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33%       { transform: translateY(-9px) rotate(0.3deg); }
+    66%       { transform: translateY(-4px) rotate(-0.2deg); }
+}
+
+/* Hero pill dot — subtle pulse */
+.bhu-hero-pill .dot { animation: dotPulse 2.2s ease-in-out infinite; }
+@keyframes dotPulse {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* CTA primary button — ambient pulse ring */
+@keyframes btnRing {
+    0%   { box-shadow: 0 0 0 0   rgba(138,69,49,0.5); }
+    70%  { box-shadow: 0 0 0 14px rgba(138,69,49,0); }
+    100% { box-shadow: 0 0 0 0   rgba(138,69,49,0); }
+}
+.bhu-btn.primary { animation: btnRing 3s ease-out infinite; }
+.bhu-btn.primary:hover { animation: none; }
+
+/* ── 3. Trusted bar — edge fade ──────────────────────────── */
+.bhu-trusted { position: relative; overflow: hidden; }
+.bhu-trusted::before,
+.bhu-trusted::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 72px;
+    z-index: 2;
+    pointer-events: none;
+}
+.bhu-trusted::before { left:  0; background: linear-gradient(90deg,  var(--bg-soft), transparent); }
+.bhu-trusted::after  { right: 0; background: linear-gradient(270deg, var(--bg-soft), transparent); }
+
+/* ── 4. Value section — image halo ───────────────────────── */
+.bhu-values-img-wrap { position: relative; }
+.bhu-values-img-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, rgba(138,69,49,0.12), rgba(255,184,0,0.06));
+    z-index: -1;
+    animation: imgHalo 5s ease-in-out infinite;
+}
+@keyframes imgHalo {
+    0%, 100% { opacity: 0.5; transform: scale(1);    }
+    50%       { opacity: 1;   transform: scale(1.025); }
+}
+
+/* ── 5. Feature cards — glow + icon bounce ───────────────── */
+.bhu-feature {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+}
+.bhu-feature::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,122,26,0.07) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.bhu-feature:hover { transform: translateY(-5px); }
+.bhu-feature:hover::before { opacity: 1; }
+.bhu-feature .ico {
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.bhu-feature:hover .ico { transform: scale(1.14) rotate(-6deg); }
+
+/* ── 6. Why cards — tilt lift ────────────────────────────── */
+.bhu-why-card {
+    transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.32s ease;
+}
+.bhu-why-card:hover { transform: translateY(-8px) scale(1.01); }
+
+/* ── 7. Roadmap dots — pop on hover ──────────────────────── */
+.bhu-roadmap-step .dot {
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+}
+.bhu-roadmap-step:hover .dot {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(138,69,49,0.15);
+}
+
+/* ── 8. Insights section — top accent line ───────────────── */
+.bhu-insights { position: relative; }
+.bhu-insights::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--gold) 60%, transparent 100%);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ── 9. Features dark section tag — shimmer ─────────────── */
+.bhu-features.dark .bhu-sec-head .tag {
+    position: relative;
+    overflow: hidden;
+}
+.bhu-features.dark .bhu-sec-head .tag::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+    animation: tagShimmer 3.5s ease-in-out infinite;
+}
+@keyframes tagShimmer {
+    0%   { transform: translateX(-180%); }
+    100% { transform: translateX(180%);  }
+}
+
+/* ── 10. Scroll-reveal system ───────────────────────────── */
+.bhu-reveal {
+    opacity: 0;
+    transform: translateY(34px);
+    transition:
+        opacity  0.72s cubic-bezier(0.22,1,0.36,1),
+        transform 0.72s cubic-bezier(0.22,1,0.36,1);
+}
+.bhu-reveal-left {
+    opacity: 0;
+    transform: translateX(-36px);
+    transition:
+        opacity  0.75s cubic-bezier(0.22,1,0.36,1),
+        transform 0.75s cubic-bezier(0.22,1,0.36,1);
+}
+.bhu-reveal-right {
+    opacity: 0;
+    transform: translateX(36px);
+    transition:
+        opacity  0.75s cubic-bezier(0.22,1,0.36,1),
+        transform 0.75s cubic-bezier(0.22,1,0.36,1);
+}
+.bhu-reveal.bhu-visible,
+.bhu-reveal-left.bhu-visible,
+.bhu-reveal-right.bhu-visible {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+/* Stagger delay helpers applied by JS inline style */
+/* (transition-delay is set inline per child index) */
+
+/* ── 11. VP item icons — colour on hover ─────────────────── */
+.bhu-vp-item {
+    transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.bhu-vp-item:hover { transform: translateX(6px); }
+.bhu-vp-item .vp-ico {
+    transition: background 0.25s, color 0.25s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.bhu-vp-item:hover .vp-ico {
+    background: var(--accent) !important;
+    color: #fff !important;
+    transform: scale(1.1);
+}
+
+/* ── 12. Insights stat card float ────────────────────────── */
+.bhu-insights-stat-card {
+    animation: statFloat 5s ease-in-out infinite;
+}
+@keyframes statFloat {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-7px); }
+}
+
+/* ── 13. Footer links — underline slide-in ───────────────── */
+.bhu-footer-col ul a,
+.bhu-footer-brand a {
+    position: relative;
+    display: inline-block;
+}
+.bhu-footer-col ul a::after,
+.bhu-footer-brand a::after {
+    content: "";
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.25s ease;
+}
+.bhu-footer-col ul a:hover::after,
+.bhu-footer-brand a:hover::after { width: 100%; }
+
+/* ── 14. Social icon bounce ──────────────────────────────── */
+.bhu-social a {
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.2s, color 0.2s;
+}
+.bhu-social a:hover { transform: translateY(-4px) scale(1.1); }

@@ -810,7 +810,7 @@
                                                 style="text-align: right; border: 1px solid #000 !important;"
                                                 t-esc="o.format_indian_number(land.get('original_area', 0.0), 4)"/>
                                             <td style="text-align: center; border: 1px solid #000 !important;" t-esc="land.get('khasra', '')"/>
-                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('acquired_area', 0.0), 4)"/>
+                                            <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_land_sheet_col6_acquired_area(land)"/>
                                             <td t-if="land.get('khasra_merge_show', True)"
                                                 t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
                                                 style="text-align: center; border: 1px solid #000 !important;">
@@ -823,6 +823,9 @@
                                                 <t t-if="land.get('is_within_distance')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
+                                                <t t-elif="land.get('is_diverted') or (land.get('is_urban_slab') and (land.get('guide_line_rate_unit') or 'ha') == 'sqm')">
+                                                    <span style="font-weight:700;">NA</span>
+                                                </t>
                                                 <t t-else="">
                                                     <span t-att-style="'color:#1b8f3a;font-weight:700;' if land.get('irrigated') else 'color:#c62828;font-weight:700;'"
                                                           t-esc="'हाँ' if land.get('irrigated') else 'नहीं'"/>
@@ -832,6 +835,9 @@
                                                 t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
                                                 style="text-align: center; border: 1px solid #000 !important;">
                                                 <t t-if="land.get('is_within_distance')">
+                                                    <span style="font-weight:700;">NA</span>
+                                                </t>
+                                                <t t-elif="land.get('is_diverted') or (land.get('is_urban_slab') and (land.get('guide_line_rate_unit') or 'ha') == 'sqm')">
                                                     <span style="font-weight:700;">NA</span>
                                                 </t>
                                                 <t t-else="">
@@ -865,15 +871,14 @@
                                             <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('total_compensation', 0.0), 0)"/>
                                             <td t-if="land.get('is_urban_slab') and land.get('khasra_merge_show', True)"
                                                 t-att-rowspan="land.get('khasra_merge_rowspan', 1)"
-                                                style="text-align: center; border: 1px solid #000 !important; font-weight:700;">
-                                                NA
+                                                style="text-align: center; border: 1px solid #000 !important; font-weight:700; vertical-align:middle;">
+                                                <t t-if="land.get('fallow')">पड़ती भूमि</t><t t-elif="land.get('irrigated')">सिंचित भूमि</t><t t-else="">असिंचित भूमि</t>
+                                                <br/><span style="font-weight:600;" t-esc="o.format_indian_number(land.get('rehab_policy_amount_display', land.get('rehab_policy_amount', 0.0)), 2)"/>
                                             </td>
                                             <td t-elif="not land.get('is_urban_slab')"
-                                                style="text-align: right; border: 1px solid #000 !important;">
-                                                <span style="display:block; text-align:right;" t-esc="o.format_indian_number(land.get('rehab_policy_amount', 0.0), 0)"/>
-                                                <div style="display:block; width:100%; text-align:center !important; font-size:9px; line-height:1.2; color:#333; font-weight:700; margin-top:2px;">
-                                                    (<t t-if="land.get('fallow')">पड़ती भूमि</t><t t-elif="land.get('irrigated')">सिंचित भूमि</t><t t-else="">असिंचित भूमि</t>)
-                                                </div>
+                                                style="text-align: center; border: 1px solid #000 !important; font-weight:700; vertical-align:middle;">
+                                                <t t-if="land.get('fallow')">पड़ती भूमि</t><t t-elif="land.get('irrigated')">सिंचित भूमि</t><t t-else="">असिंचित भूमि</t>
+                                                <br/><span style="font-weight:600;" t-esc="o.format_indian_number(land.get('rehab_policy_amount_display', land.get('rehab_policy_amount', 0.0)), 2)"/>
                                             </td>
                                             <td style="text-align: right; border: 1px solid #000 !important;" t-esc="o.format_indian_number(land.get('paid_compensation', 0.0), 0)"/>
                                             <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important;">
@@ -885,14 +890,13 @@
                                         <t t-set="group_basic_total" t-value="group.get('basic_value', 0.0) or 0.0"/>
                                         <t t-set="group_market_total" t-value="group.get('market_value', 0.0) or 0.0"/>
                                         <t t-set="group_solatium_total" t-value="group.get('solatium', 0.0) or 0.0"/>
-                                        <t t-set="group_rehab_total" t-value="o._s23_calculate_group_rehab_total(group_lines)"/>
                                         <t t-set="group_interest_total" t-value="o._calculate_interest_on_basic(group_basic_total)[0]"/>
                                         <t t-set="group_total_comp" t-value="group_market_total + group_solatium_total + group_interest_total"/>
                                         <td colspan="2" style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">कुल</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('original_area', 0.0), 4)"/>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="group.get('khasra_count', 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('acquired_area', 0.0), 4)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_land_sheet_col6_acquired_area_group(group)"/>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
                                         <td style="text-align: center; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;">-</td>
@@ -903,7 +907,7 @@
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_solatium_total, 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_interest_total, 0)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_total_comp, 0)"/>
-                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group_rehab_total, 0)"/>
+                                        <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('rehab_policy_amount', 0.0), 2)"/>
                                         <td style="text-align: right; font-weight: bold; border: 1px solid #000 !important; background-color: #ffd54f;" t-esc="o.format_indian_number(group.get('paid_compensation', 0.0), 0)"/>
                                         <td class="section23-land-remark" style="vertical-align: top; border: 1px solid #000 !important; background-color: #ffd54f;">&#160;</td>
                                     </tr>

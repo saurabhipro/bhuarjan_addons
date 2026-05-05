@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
-from . import utils
+from .. import utils
 import uuid
 import json
 

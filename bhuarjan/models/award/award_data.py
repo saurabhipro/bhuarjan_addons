@@ -499,8 +499,16 @@ class Section23AwardData(models.Model):
                         for k in range(i + 1, j):
                             lines[k]['khasra_merge_show'] = False
                             lines[k]['khasra_merge_rowspan'] = span
+                    span_rehab = sum(
+                        float(lines[k].get('rehab_policy_amount', 0.0) or 0.0)
+                        for k in range(i, j)
+                    )
+                    row['rehab_policy_amount_display'] = span_rehab
                     i = j
                     continue
+                row['rehab_policy_amount_display'] = float(
+                    row.get('rehab_policy_amount', 0.0) or 0.0
+                )
                 i += 1
             group['lines'] = lines
             group.pop('_seen_khasra_for_totals', None)
@@ -540,6 +548,41 @@ class Section23AwardData(models.Model):
             formatted = f"{value:,.{decimals}f}"
 
         return formatted
+
+    def format_land_sheet_col6_acquired_area(self, land_line_dict):
+        """Column 6: acquired area — urban slab rows show हे. / व.मी. (sqm = ha × 10000)."""
+        ha = float((land_line_dict or {}).get('acquired_area', 0.0) or 0.0)
+        if (land_line_dict or {}).get('is_urban_slab'):
+            sqm = ha * 10000.0
+            return '%s / %s' % (
+                self.format_indian_number(ha, 4),
+                self.format_indian_number(sqm, 2),
+            )
+        return self.format_indian_number(ha, 4)
+
+    def format_land_sheet_col6_acquired_area_group(self, group):
+        """कुल row col 6: dual units if any urban slab line in the group."""
+        ha = float((group or {}).get('acquired_area', 0.0) or 0.0)
+        lines = (group or {}).get('lines') or []
+        if any(l.get('is_urban_slab') for l in lines):
+            sqm = ha * 10000.0
+            return '%s / %s' % (
+                self.format_indian_number(ha, 4),
+                self.format_indian_number(sqm, 2),
+            )
+        return self.format_indian_number(ha, 4)
+
+    def format_land_sheet_col6_acquired_area_mahayog(self, land_groups, total_ha):
+        """Grand total col 6: dual units if any urban slab exists in the sheet."""
+        ha = float(total_ha or 0.0)
+        for g in land_groups or []:
+            if any(l.get('is_urban_slab') for l in (g.get('lines') or [])):
+                sqm = ha * 10000.0
+                return '%s / %s' % (
+                    self.format_indian_number(ha, 4),
+                    self.format_indian_number(sqm, 2),
+                )
+        return self.format_indian_number(ha, 4)
 
     def get_tree_compensation_data(self):
         """Get tree compensation data grouped by landowner and khasra"""

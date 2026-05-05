@@ -477,8 +477,6 @@ export class UnifiedDashboard extends Component {
         });
 
         onMounted(() => {
-            console.log('🎯 DASHBOARD COMPONENT MOUNTED!');
-            console.log('this.el:', this.el);
             this._applySectionActivityHighlights();
         });
 
@@ -1180,12 +1178,10 @@ export class UnifiedDashboard extends Component {
             'bhu.section11.preliminary.report': 'Section 11 Preliminary Report',
             'bhu.section19.notification': 'Section 19 Notification',
             'bhu.section21.notification': 'Section 21 Notification',
-            'bhu.section23.award': 'Section 23 Award',
+            'bhu.section23.award': 'Award',
             'bhu.section20a.railways': 'Section 20 A (Railways)',
-            'bhu.section20d.railways': 'Section 20 D (Railways)',
             'bhu.section20e.railways': 'Section 20 E (Railways)',
             'bhu.section3a.nh': 'Section 3A (NH)',
-            'bhu.section3c.nh': 'Section 3C (NH)',
             'bhu.section3d.nh': 'Section 3D (NH)',
             'bhu.mutual.consent.policy': 'Mutual Consent Policy',
             'bhu.payment.file': 'Payment File',
@@ -1212,30 +1208,32 @@ export class UnifiedDashboard extends Component {
                 return;
             }
 
-            // Block if Section 4 is not approved for this project+village
-            const section4Records = await this.orm.searchRead(
-                "bhu.section4.notification",
-                [
-                    ["project_id", "=", projectId],
-                    ["village_id", "=", villageId],
-                ],
-                ["approved_date", "signed_date", "public_hearing_date"],
-                { limit: 10 }
-            );
-            const hasSection4Approval = section4Records.some(r =>
-                r.approved_date || r.signed_date || r.public_hearing_date
-            );
-            if (!hasSection4Approval) {
-                this.notification.add(
-                    _t(
-                        "Section 4 notification is not approved yet for this project and village.\n" +
-                        "Please get the Section 4 approved before creating the award.\n\n" +
-                        "इस प्रोजेक्ट और गाँव के लिए धारा 4 की अधिसूचना अभी स्वीकृत नहीं हुई है। " +
-                        "अवार्ड बनाने से पहले कृपया धारा 4 की स्वीकृति प्राप्त करें।"
-                    ),
-                    { type: "danger", sticky: true }
+            // LARR only: Section 4 approval required before award (not Railway, NHAI, or CGLRC).
+            if (this.requiresSection4BeforeAward()) {
+                const section4Records = await this.orm.searchRead(
+                    "bhu.section4.notification",
+                    [
+                        ["project_id", "=", projectId],
+                        ["village_id", "=", villageId],
+                    ],
+                    ["approved_date", "signed_date", "public_hearing_date"],
+                    { limit: 10 }
                 );
-                return;
+                const hasSection4Approval = section4Records.some(r =>
+                    r.approved_date || r.signed_date || r.public_hearing_date
+                );
+                if (!hasSection4Approval) {
+                    this.notification.add(
+                        _t(
+                            "Section 4 notification is not approved yet for this project and village.\n" +
+                            "Please get the Section 4 approved before creating the award.\n\n" +
+                            "इस प्रोजेक्ट और गाँव के लिए धारा 4 की अधिसूचना अभी स्वीकृत नहीं हुई है। " +
+                            "अवार्ड बनाने से पहले कृपया धारा 4 की स्वीकृति प्राप्त करें।"
+                        ),
+                        { type: "danger", sticky: true }
+                    );
+                    return;
+                }
             }
 
             const existing = await this.orm.searchRead(
@@ -1257,7 +1255,7 @@ export class UnifiedDashboard extends Component {
                 );
                 await this.action.doAction({
                     type: "ir.actions.act_window",
-                    name: _t("Section 23 Award"),
+                    name: _t("Award"),
                     res_model: "bhu.section23.award",
                     res_id: existing[0].id,
                     view_mode: "form",
@@ -1290,7 +1288,7 @@ export class UnifiedDashboard extends Component {
             }
             await this.action.doAction({
                 type: "ir.actions.act_window",
-                name: _t("Section 23 Award"),
+                name: _t("Award"),
                 res_model: "bhu.section23.award",
                 res_id: awardId,
                 view_mode: "form",
@@ -1497,12 +1495,10 @@ export class UnifiedDashboard extends Component {
             'bhu.sia.team': 'SIA Teams',
             'bhu.section18.rr.scheme': 'Section 18 R and R Scheme',
             'bhu.section21.notification': 'Section 21 Notifications',
-            'bhu.section23.award': 'Section 23 Awards',
+            'bhu.section23.award': 'Award',
             'bhu.section20a.railways': 'Section 20 A (Railways)',
-            'bhu.section20d.railways': 'Section 20 D (Railways)',
             'bhu.section20e.railways': 'Section 20 E (Railways)',
             'bhu.section3a.nh': 'Section 3A (NH)',
-            'bhu.section3c.nh': 'Section 3C (NH)',
             'bhu.section3d.nh': 'Section 3D (NH)',
             'bhu.mutual.consent.policy': 'Mutual Consent Policy',
             'bhu.payment.file': 'Payment File',
@@ -1524,13 +1520,12 @@ export class UnifiedDashboard extends Component {
             '(Sec 15) Objections': '(Sec 15) Objections',
             'Section 18 R and R Scheme': 'Section 18 R and R Scheme',
             '(Sec 19) Section 19 Notifications': '(Sec 19) Section 19 Notifications',
+            'Award': 'Section 23 Award',
             'Sec 21 notice': 'Sec 21 notice',
             'Section 23 Award': 'Section 23 Award',
             'Sec 20 A (Railways)': 'Sec 20 A (Railways)',
-            'Sec 20 D (Railways)': 'Sec 20 D (Objection) (Railways)',
             'Sec 20 E (Railways)': 'Sec 20 E (Railways)',
             'Sec 3A (NH)': 'Sec 3A (NH)',
-            'Sec 3C (NH)': 'Sec 3C (Objection) (NH)',
             'Sec 3D (NH)': 'Sec 3D (NH)',
             'Mutual Consent': 'आपसी सहमति की क्रय नीति (Only in रायगढ़ and पसौर)',
             'Payment File': 'Payment File',
@@ -1540,6 +1535,28 @@ export class UnifiedDashboard extends Component {
             'Award (247.3)': 'Award (247.3)',
         };
         return mapping[dashboardSectionName] || dashboardSectionName;
+    }
+
+    isRailwayLaw() {
+        const names = this.state.allowedSectionNames;
+        return !!(names && names.includes('Sec 20 A (Railways)'));
+    }
+
+    isNHLaw() {
+        const names = this.state.allowedSectionNames;
+        return !!(names && names.includes('Sec 3A (NH)'));
+    }
+
+    /** True only for LARR: Sec 4 must exist in the project workflow and this is not Railway, NHAI, or CGLRC. */
+    requiresSection4BeforeAward() {
+        const names = this.state.allowedSectionNames || [];
+        if (this.isRailwayLaw() || this.isNHLaw()) {
+            return false;
+        }
+        if (names.includes('Personal Notice generation (247.1)')) {
+            return false;
+        }
+        return names.includes('(Sec 4) Section 4 Notifications');
     }
 
     // Check if a section should be visible based on project's law
@@ -1554,7 +1571,7 @@ export class UnifiedDashboard extends Component {
             const steps = {
                 'Surveys': 'Step 1',
                 'Sec 20 A (Railways)': 'Step 2',
-                'Sec 20 D (Objection) (Railways)': 'Step 3',
+                'Section 23 Award': 'Step 3',
                 'Sec 20 E (Railways)': 'Step 4',
                 'Payment File': 'Step 5',
                 'Payment Reconciliation': 'Step 6'
@@ -1569,7 +1586,7 @@ export class UnifiedDashboard extends Component {
             const steps = {
                 'Surveys': 'Step 1',
                 'Sec 3A (NH)': 'Step 2',
-                'Sec 3C (Objection) (NH)': 'Step 3',
+                'Section 23 Award': 'Step 3',
                 'Sec 3D (NH)': 'Step 4',
                 'Payment File': 'Step 5',
                 'Payment Reconciliation': 'Step 6'
@@ -1602,12 +1619,8 @@ export class UnifiedDashboard extends Component {
             // Check both dashboard names and mapped names
             const railwayNhSections = [
                 'Sec 20 A (Railways)',
-                'Sec 20 D (Railways)',  // Dashboard name
-                'Sec 20 D (Objection) (Railways)',  // Mapped name
                 'Sec 20 E (Railways)',
                 'Sec 3A (NH)',
-                'Sec 3C (NH)',  // Dashboard name
-                'Sec 3C (Objection) (NH)',  // Mapped name
                 'Sec 3D (NH)'
             ];
 

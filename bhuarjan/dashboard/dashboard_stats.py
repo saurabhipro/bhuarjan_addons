@@ -590,8 +590,24 @@ class DashboardStats(models.AbstractModel):
                     is_displacement = project.is_displacement or False
                     # Get sections from project's law
                     if project.law_master_id and project.law_master_id.section_ids:
-                        allowed_section_names = project.law_master_id.section_ids.mapped('name')
+                        allowed_section_names = list(project.law_master_id.section_ids.mapped('name'))
                         _logger.info(f"Dashboard Stats - Project {project_id} has law '{project.law_master_id.name}' with sections: {allowed_section_names}")
+                        # Dashboard workflow: Railway drops Sec 20 D in favour of Award (Section 23).
+                        if 'Sec 20 A (Railways)' in allowed_section_names:
+                            allowed_section_names = [
+                                n for n in allowed_section_names
+                                if n != 'Sec 20 D (Objection) (Railways)'
+                            ]
+                            if 'Section 23 Award' not in allowed_section_names:
+                                allowed_section_names.append('Section 23 Award')
+                        # NH: drop Sec 3C Objection in favour of Award (Section 23).
+                        if 'Sec 3A (NH)' in allowed_section_names:
+                            allowed_section_names = [
+                                n for n in allowed_section_names
+                                if n != 'Sec 3C (Objection) (NH)'
+                            ]
+                            if 'Section 23 Award' not in allowed_section_names:
+                                allowed_section_names.append('Section 23 Award')
             
             # Get total villages for completion calculations
             total_villages = self._get_total_villages(domains['project_ids_from_domain'])

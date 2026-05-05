@@ -64,26 +64,26 @@
                 <!-- Build steps array based on act type -->
                 <t t-if="is_railways">
                     <t t-set="r2_active" t-value="stats &amp;&amp; (stats.section20a_railways_total || 0) > 0"/>
-                    <t t-set="r3_done"   t-value="stats &amp;&amp; stats.section20d_railways_info &amp;&amp; stats.section20d_railways_info.is_completed"/>
-                    <t t-set="r3_active" t-value="stats &amp;&amp; stats.section20d_railways_info &amp;&amp; (stats.section20d_railways_info.submitted_count || stats.section20d_railways_info.approved_count) &amp;&amp; !stats.section20d_railways_info.is_completed"/>
+                    <t t-set="r3_done"   t-value="stats &amp;&amp; stats.section23_award_info &amp;&amp; stats.section23_award_info.is_completed"/>
+                    <t t-set="r3_active" t-value="stats &amp;&amp; stats.section23_award_info &amp;&amp; (stats.section23_award_info.submitted_count || stats.section23_award_info.approved_count) &amp;&amp; !stats.section23_award_info.is_completed"/>
                     <t t-set="r4_active" t-value="stats &amp;&amp; (stats.section20e_railways_total || 0) > 0"/>
                     <t t-set="steps" t-value="[
                         {'num': '1', 'label': 'Survey',  'done': sur_done,  'active': sur_active},
                         {'num': '2', 'label': 'Sec 20A', 'done': false,     'active': r2_active},
-                        {'num': '3', 'label': 'Sec 20D', 'done': r3_done,   'active': r3_active},
+                        {'num': '3', 'label': 'Award', 'done': r3_done,   'active': r3_active},
                         {'num': '4', 'label': 'Sec 20E', 'done': false,     'active': r4_active},
                         {'num': '5', 'label': 'Payment', 'done': pay_done,  'active': pay_active}
                     ]"/>
                 </t>
                 <t t-elif="is_nh">
                     <t t-set="n2_active" t-value="stats &amp;&amp; (stats.section3a_nh_total || 0) > 0"/>
-                    <t t-set="n3_done"   t-value="stats &amp;&amp; stats.section3c_nh_info &amp;&amp; stats.section3c_nh_info.is_completed"/>
-                    <t t-set="n3_active" t-value="stats &amp;&amp; stats.section3c_nh_info &amp;&amp; (stats.section3c_nh_info.submitted_count || stats.section3c_nh_info.approved_count) &amp;&amp; !stats.section3c_nh_info.is_completed"/>
+                    <t t-set="n3_done"   t-value="stats &amp;&amp; stats.section23_award_info &amp;&amp; stats.section23_award_info.is_completed"/>
+                    <t t-set="n3_active" t-value="stats &amp;&amp; stats.section23_award_info &amp;&amp; (stats.section23_award_info.submitted_count || stats.section23_award_info.approved_count) &amp;&amp; !stats.section23_award_info.is_completed"/>
                     <t t-set="n4_active" t-value="stats &amp;&amp; (stats.section3d_nh_total || 0) > 0"/>
                     <t t-set="steps" t-value="[
                         {'num': '1', 'label': 'Survey',  'done': sur_done,  'active': sur_active},
                         {'num': '2', 'label': 'Sec 3A',  'done': false,     'active': n2_active},
-                        {'num': '3', 'label': 'Sec 3C',  'done': n3_done,   'active': n3_active},
+                        {'num': '3', 'label': 'Award',  'done': n3_done,   'active': n3_active},
                         {'num': '4', 'label': 'Sec 3D',  'done': false,     'active': n4_active},
                         {'num': '5', 'label': 'Payment', 'done': pay_done,  'active': pay_active}
                     ]"/>

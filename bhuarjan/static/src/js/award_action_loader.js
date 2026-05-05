@@ -202,6 +202,10 @@ function _startLoaderProgressPolling() {
     const poll = () => {
         if (!document.getElementById(LOADER_ID)) return;
         const awardId = _extractSection23AwardId();
+        // Avoid RPCs with no record id (e.g. transient "new" form while overlay is up).
+        if (!awardId || awardId <= 0) {
+            return;
+        }
         fetch('/web/dataset/call_kw/bhu.section23.award/get_loader_progress', {
             method: 'POST',
             credentials: 'same-origin',
@@ -220,7 +224,10 @@ function _startLoaderProgressPolling() {
         })
             .then((r) => r.json())
             .then((res) => {
-                const payload = res && res.result ? res.result : {};
+                if (!res || res.error) {
+                    return;
+                }
+                const payload = res.result || {};
                 _updateLoaderProgressUI(payload || {});
             })
             .catch(() => { /* keep loader alive even when polling fails */ });

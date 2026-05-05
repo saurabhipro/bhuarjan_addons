@@ -220,15 +220,15 @@
                         </div>
                         </t>
 
-                        <!-- Section 20 D (Railways) Card -->
-                        <t t-if="this.isSectionVisible('Sec 20 D (Objection) (Railways)')">
-                        <div class="o_stat_card o_card_section20d_railways">
+                        <!-- Award (Railways) — Section 23 model -->
+                        <t t-if="this.isSectionVisible('Section 23 Award') and this.isRailwayLaw()">
+                        <div class="o_stat_card o_card_section23_award">
                             <div class="o_stat_icon">
-                                <i class="fa fa-exclamation-triangle"/>
+                                <i class="fa fa-trophy"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Sec 20 D (Railways)</div>
-                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section20d_railways_total : 0"/></div>
+                                <div class="o_stat_label">Award</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section23_award_total : 0"/></div>
                             </div>
                         </div>
                         </t>
@@ -259,15 +259,15 @@
                         </div>
                         </t>
 
-                        <!-- Section 3C (NH) Card -->
-                        <t t-if="this.isSectionVisible('Sec 3C (Objection) (NH)')">
-                        <div class="o_stat_card o_card_section3c_nh">
+                        <!-- Award (NH) — Section 23 model -->
+                        <t t-if="this.isSectionVisible('Section 23 Award') and this.isNHLaw()">
+                        <div class="o_stat_card o_card_section23_award">
                             <div class="o_stat_icon">
-                                <i class="fa fa-exclamation-triangle"/>
+                                <i class="fa fa-trophy"/>
                             </div>
                             <div class="o_stat_content">
-                                <div class="o_stat_label">Sec 3C (NH)</div>
-                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section3c_nh_total : 0"/></div>
+                                <div class="o_stat_label">Award</div>
+                                <div class="o_stat_value"><t t-esc="state.stats ? state.stats.section23_award_total : 0"/></div>
                             </div>
                         </div>
                         </t>
@@ -825,8 +825,8 @@
                         </div>
                         </t>
 
-                        <!-- Section 23 Award -->
-                        <t t-if="this.isSectionVisible('Section 23 Award')">
+                        <!-- Section 23 Award (non-Railway / non-NH) -->
+                        <t t-if="this.isSectionVisible('Section 23 Award') and !this.isRailwayLaw() and !this.isNHLaw()">
                         <div class="o_section_list_item o_card_no_click">
                             <div class="o_section_list_step">
                                 <span class="o_step_number bg-primary">Step 10</span>
@@ -1003,18 +1003,21 @@
                         </div>
                         </t>
 
-                        <!-- Section 20 D (Railways) -->
-                        <t t-if="this.isSectionVisible('Sec 20 D (Objection) (Railways)')">
+                        <!-- Award (Railways) -->
+                        <t t-if="this.isSectionVisible('Section 23 Award') and this.isRailwayLaw()">
                         <div class="o_section_list_item o_card_no_click" t-att-style="this.isSectionVisible('Sec 20 A (Railways)') ? 'order: 20;' : ''">
                             <div class="o_section_list_step">
-                                <span class="o_step_number bg-primary">Step 12</span>
+                                <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Section 23 Award', 'Step 3')"/></span>
                             </div>
                             <div class="o_section_list_icon">
-                                <i class="fa fa-exclamation-triangle"/>
+                                <i class="fa fa-trophy"/>
                             </div>
                             <div class="o_section_list_content">
                                 <div class="o_section_list_title">
-                                    Sec 20 D (Railways)
+                                    Award
+                                    <t t-if="state.stats &amp;&amp; state.stats.section23_award_info &amp;&amp; state.stats.section23_award_info.is_completed">
+                                        <span class="o_completion_tick" title="Award completed"><i class="fa fa-check-circle"/></span>
+                                    </t>
                                     <t t-if="state.selectedProjectName or state.selectedVillageName">
                                         <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
                                             <t t-if="state.selectedProjectName">
@@ -1028,19 +1031,58 @@
                                     </t>
                                 </div>
                                 <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section20d_railways_completion_percent || 0) : 0"/>%</div>
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section23_award_completion_percent || 0) : 0"/>%</div>
                                     <div class="o_section_list_count">
-                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.draft_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.submitted_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.approved_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section20d_railways_info ? state.stats.section20d_railways_info.send_back_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.approved_count : 0) : 0"/></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.section20d.railways', state.stats &amp;&amp; state.stats.section20d_railways_info ? state.stats.section20d_railways_info : null)"
-                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section20d_railways_info &amp;&amp; state.stats.section20d_railways_info.total > 0)">
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
+                                    <i class="fa fa-eye"/> View/Edit
+                                </button>
+                            </div>
+                        </div>
+                        </t>
+
+                        <!-- Award (NH) -->
+                        <t t-if="this.isSectionVisible('Section 23 Award') and this.isNHLaw()">
+                        <div class="o_section_list_item o_card_no_click">
+                            <div class="o_section_list_step">
+                                <span class="o_step_number bg-primary"><t t-esc="this.getStepNumber('Section 23 Award', 'Step 3')"/></span>
+                            </div>
+                            <div class="o_section_list_icon">
+                                <i class="fa fa-trophy"/>
+                            </div>
+                            <div class="o_section_list_content">
+                                <div class="o_section_list_title">
+                                    Award
+                                    <t t-if="state.stats &amp;&amp; state.stats.section23_award_info &amp;&amp; state.stats.section23_award_info.is_completed">
+                                        <span class="o_completion_tick" title="Award completed"><i class="fa fa-check-circle"/></span>
+                                    </t>
+                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
+                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
+                                            <t t-if="state.selectedProjectName">
+                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
+                                            </t>
+                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
+                                            <t t-if="state.selectedVillageName">
+                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="o_completion_widget_list o_completion_single_line">
+                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section23_award_completion_percent || 0) : 0"/>%</div>
+                                    <div class="o_section_list_count">
+                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.draft_count : 0) : 0"/></span>
+                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section23_award_info ? state.stats.section23_award_info.approved_count : 0) : 0"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_section_list_actions">
+                                <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section23.award')">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>
@@ -1119,50 +1161,6 @@
                             </div>
                             <div class="o_section_list_actions">
                                 <button class="btn btn-sm btn-info" t-on-click.stop="() => this.openSectionList('bhu.section3a.nh')">
-                                    <i class="fa fa-eye"/> View/Edit
-                                </button>
-                            </div>
-                        </div>
-                        </t>
-
-                        <!-- Section 3C (NH) -->
-                        <t t-if="this.isSectionVisible('Sec 3C (Objection) (NH)')">
-                        <div class="o_section_list_item o_card_no_click">
-                            <div class="o_section_list_step">
-                                <span class="o_step_number bg-primary">Step 15</span>
-                            </div>
-                            <div class="o_section_list_icon">
-                                <i class="fa fa-exclamation-triangle"/>
-                            </div>
-                            <div class="o_section_list_content">
-                                <div class="o_section_list_title">
-                                    Sec 3C (NH)
-                                    <t t-if="state.selectedProjectName or state.selectedVillageName">
-                                        <div style="font-size: 11px; color: #666; margin-top: 4px; font-weight: normal;">
-                                            <t t-if="state.selectedProjectName">
-                                                <i class="fa fa-briefcase" style="margin-right: 4px;"/> <t t-esc="state.selectedProjectName"/>
-                                            </t>
-                                            <t t-if="state.selectedProjectName and state.selectedVillageName"> / </t>
-                                            <t t-if="state.selectedVillageName">
-                                                <i class="fa fa-home" style="margin-right: 4px;"/> <t t-esc="state.selectedVillageName"/>
-                                            </t>
-                                        </div>
-                                    </t>
-                                </div>
-                                <div class="o_completion_widget_list o_completion_single_line">
-                                    <div class="o_completion_percent_list"><t t-esc="state.stats ? (state.stats.section3c_nh_completion_percent || 0) : 0"/>%</div>
-                                    <div class="o_section_list_count">
-                                        <span class="o_count_badge o_count_draft"><i class="fa fa-file-o"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.draft_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_submitted"><i class="fa fa-paper-plane"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.submitted_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_approved"><i class="fa fa-check-circle"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.approved_count : 0) : 0"/></span>
-                                        <span class="o_count_badge o_count_rejected"><i class="fa fa-times-circle"/> <t t-esc="state.stats ? (state.stats.section3c_nh_info ? state.stats.section3c_nh_info.send_back_count : 0) : 0"/></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="o_section_list_actions">
-                                <button class="btn btn-sm btn-info" 
-                                        t-on-click.stop="() => this.openFirstDocument('bhu.section3c.nh', state.stats &amp;&amp; state.stats.section3c_nh_info ? state.stats.section3c_nh_info : null)"
-                                        t-att-disabled="!(state.stats &amp;&amp; state.stats.section3c_nh_info &amp;&amp; state.stats.section3c_nh_info.total > 0)">
                                     <i class="fa fa-eye"/> View/Edit
                                 </button>
                             </div>

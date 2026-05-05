@@ -1,18 +1,23 @@
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("Password toggle script loaded");
+  function isBhuarjanSvgToggle(el) {
+    return (
+      el &&
+      (el.tagName === "BUTTON" || el.classList.contains("bhu-password-toggle"))
+    );
+  }
 
   function setupToggle(passwordId, toggleId) {
     const passwordField = document.getElementById(passwordId);
     const toggleIcon = document.getElementById(toggleId);
 
     if (!passwordField || !toggleIcon) {
-      console.log(
-        `Elements not found: password=${passwordId}, toggle=${toggleId}`
-      );
       return;
     }
 
-    console.log(`Password toggle initialized: ${passwordId} with ${toggleId}`);
+    /* BHUARJAN /web/login: bhuarjan_web uses button + SVG + inline script; do not clobber. */
+    if (isBhuarjanSvgToggle(toggleIcon)) {
+      return;
+    }
 
     passwordField.type = "password";
     toggleIcon.className = "fa fa-eye-slash password-toggle";
@@ -20,23 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleIcon.onclick = function (e) {
       if (e) e.preventDefault();
 
-      console.log(
-        "Toggle clicked, current password field type:",
-        passwordField.type
-      );
-      console.log("Toggle current class:", this.className);
-
       if (passwordField.type === "password") {
         passwordField.type = "text";
         this.className = "fa fa-eye password-toggle";
-        console.log("Changed to: fa-eye, new class:", this.className);
       } else {
         passwordField.type = "password";
         this.className = "fa fa-eye-slash password-toggle";
-        console.log("Changed to: fa-eye-slash, new class:", this.className);
       }
 
-      console.log(`Toggled ${passwordId} to ${passwordField.type}`);
       return false;
     };
   }
@@ -48,27 +44,30 @@ document.addEventListener("DOMContentLoaded", function () {
     setupToggle("confirm_password", "password_toggle_confirm");
     setupToggle("password", "password_toggle_reset");
     setupToggle("confirm_password", "password_toggle_reset_confirm");
-
-    console.log("All password toggles initialized");
   }, 300);
 });
 
 if (typeof jQuery !== "undefined") {
   jQuery(document).ready(function () {
-    console.log("jQuery document ready - initializing toggles");
-
-    jQuery("#password_toggle_public").on("click", function (e) {
-      e.preventDefault();
-      var pwField = jQuery("#password");
-      if (pwField.attr("type") === "password") {
-        pwField.attr("type", "text");
-        jQuery(this).attr("class", "fa fa-eye password-toggle");
-      } else {
-        pwField.attr("type", "password");
-        jQuery(this).attr("class", "fa fa-eye-slash password-toggle");
-      }
-      return false;
-    });
+    var $pub = jQuery("#password_toggle_public");
+    if (
+      $pub.length &&
+      !$pub.is("button") &&
+      !$pub.hasClass("bhu-password-toggle")
+    ) {
+      $pub.on("click", function (e) {
+        e.preventDefault();
+        var pwField = jQuery("#password");
+        if (pwField.attr("type") === "password") {
+          pwField.attr("type", "text");
+          jQuery(this).attr("class", "fa fa-eye password-toggle");
+        } else {
+          pwField.attr("type", "password");
+          jQuery(this).attr("class", "fa fa-eye-slash password-toggle");
+        }
+        return false;
+      });
+    }
 
     jQuery("#password_toggle_signup, #password_toggle_reset").on(
       "click",

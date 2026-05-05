@@ -15,6 +15,15 @@
     --login-surface: #ffffff;
 }
 
+/* Narrow login column even before body.bhu-login-body runs — prevents password toggle anchoring to full viewport width */
+#bhu-login-root {
+    max-width: 420px !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
 /* ── Page canvas ── */
 body.bhu-login-body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
@@ -211,6 +220,22 @@ body.bhu-login-body form .form-label {
     margin-bottom: 7px !important;
 }
 
+body.bhu-login-body form .mb-3.field-login,
+body.bhu-login-body form .mb-3.field-password {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Same full-width shell for email and password rows */
+body.bhu-login-body #bhu-login-root .bhu-input-row {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+}
+
 body.bhu-login-body form .form-control,
 body.bhu-login-body form input.form-control {
     display: block !important;
@@ -220,6 +245,8 @@ body.bhu-login-body form input.form-control {
     padding: 10px 12px !important;
     font-size: 0.9rem !important;
     background: #f6f7fb !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
 }
 
 body.bhu-login-body form .form-control:focus {
@@ -313,4 +340,72 @@ body.bhu-login-body .o_login_redirect_back a:hover {
 
 body.bhu-login-body .o_skip_to_content {
     display: none !important;
+}
+
+/* Password visibility toggle (/web/login) — SVG icons (FontAwesome not loaded on this page).
+   Rules use #bhu-login-root so positioning works before body.bhu-login-body is set by JS. */
+#bhu-login-root .bhu-password-wrap {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    isolation: isolate;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-wrap .form-control,
+#bhu-login-root .bhu-password-wrap .form-control {
+    padding-right: 2.75rem !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle,
+#bhu-login-root .bhu-password-toggle {
+    position: absolute !important;
+    left: auto !important;
+    right: 6px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+    color: var(--login-muted, #687082) !important;
+    line-height: 0 !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle svg,
+#bhu-login-root .bhu-password-toggle svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle .bhu-toggle-icon-visible,
+#bhu-login-root .bhu-password-toggle .bhu-toggle-icon-visible {
+    display: none !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-hidden,
+#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-hidden {
+    display: none !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-visible,
+#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-visible {
+    display: block !important;
+}
+body.bhu-login-body #bhu-login-root .bhu-password-toggle:hover,
+body.bhu-login-body #bhu-login-root .bhu-password-toggle:focus,
+#bhu-login-root .bhu-password-toggle:hover,
+#bhu-login-root .bhu-password-toggle:focus {
+    color: var(--login-accent, #ff7a1a) !important;
+    outline: none !important;
+    background: rgba(255, 122, 26, 0.08) !important;
 }

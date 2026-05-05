@@ -42,9 +42,11 @@ class Section23AwardExcel(models.Model):
         header_fmt = workbook.add_format({'bold': True, 'bg_color': '#f2f2f2', 'align': 'center', 'valign': 'vcenter', 'border': 1, 'text_wrap': True})
         cell_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
         cell_center_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter'})
+        rehab_col_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'text_wrap': True})
         yes_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#2e7d32', 'color': 'white', 'bold': True})
         no_fmt = workbook.add_format({'border': 1, 'align': 'center', 'valign': 'vcenter', 'bg_color': '#c62828', 'color': 'white', 'bold': True})
         number_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0.0000'})
+        area_dual_fmt = workbook.add_format({'border': 1, 'align': 'right', 'valign': 'vcenter'})
         money_fmt = workbook.add_format({'border': 1, 'align': 'right', 'num_format': '#,##0'})
         asset_type_default_fmt = workbook.add_format({'border': 1, 'valign': 'top'})
         asset_type_cell_formats = {
@@ -89,7 +91,7 @@ class Section23AwardExcel(models.Model):
 
         if show_land:
             # LAND TAB
-            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 8, 11, 10]
+            land_col_widths = [4, 24, 10, 10, 10, 10, 8, 8, 8, 13, 10, 11, 11, 10, 10, 11, 14, 11, 10]
             _setup_sheet(land_sheet, land_col_widths, 8)
             row = 0
             land_sheet.merge_range(row, 0, row, 18, 'अर्जित भूमि का मुआवजा पत्रक', title_fmt)
@@ -125,7 +127,7 @@ class Section23AwardExcel(models.Model):
                 row += 1
             else:
                 total_basic = total_market = total_solatium = 0.0
-                total_interest = total_comp = total_paid = total_acq = 0.0
+                total_interest = total_comp = total_paid = total_acq = total_rehab = 0.0
                 for i, group in enumerate(land_groups, 1):
                     lines = group.get('lines', [])
                     details = group.get('landowner_name', '')
@@ -166,11 +168,26 @@ class Section23AwardExcel(models.Model):
                             land_sheet.write(row, 2, land.get('khasra', ''), cell_center_fmt)
                             land_sheet.write_number(row, 3, float(land.get('original_area', 0.0) or 0.0), number_fmt)
                         land_sheet.write(row, 4, land.get('khasra', ''), cell_center_fmt)
-                        land_sheet.write_number(row, 5, float(land.get('acquired_area', 0.0) or 0.0), number_fmt)
+                        if is_urban_slab:
+                            land_sheet.write(
+                                row, 5,
+                                self.format_land_sheet_col6_acquired_area(land),
+                                area_dual_fmt,
+                            )
+                        else:
+                            land_sheet.write_number(row, 5, float(land.get('acquired_area', 0.0) or 0.0), number_fmt)
                         is_within_distance = bool(land.get('is_within_distance'))
                         is_irrigated = bool(land.get('irrigated'))
                         is_unirrigated = bool(land.get('unirrigated'))
                         is_diverted = bool(land.get('is_diverted'))
+                        _guide_unit = (land.get('guide_line_rate_unit') or 'ha')
+                        # BMR: डायवर्टेड या नगरीय वर्गमीटर स्लैब → सिंचित/असिंचित कॉलम NA; विचलित कॉलम अलग से भरता है.
+                        irr_unirr_show_na = (
+                            (not is_within_distance) and (
+                                is_diverted
+                                or (is_urban_slab and _guide_unit == 'sqm')
+                            )
+                        )
                         # Col 7 = "on main road": always हाँ (MR) / नहीं (BMR); never raw metres (avoids 51 m vs threshold confusion).
                         if is_urban_slab:
                             if khasra_merge_show:
@@ -182,6 +199,14 @@ class Section23AwardExcel(models.Model):
                                         land_sheet.merge_range(row, 7, row + khasra_merge_span - 1, 7, 'NA', cell_center_fmt)
                                         land_sheet.merge_range(row, 8, row + khasra_merge_span - 1, 8, 'NA', cell_center_fmt)
                                         land_sheet.merge_range(row, 9, row + khasra_merge_span - 1, 9, 'NA', cell_center_fmt)
+                                    elif irr_unirr_show_na:
+                                        land_sheet.merge_range(row, 7, row + khasra_merge_span - 1, 7, 'NA', cell_center_fmt)
+                                        land_sheet.merge_range(row, 8, row + khasra_merge_span - 1, 8, 'NA', cell_center_fmt)
+                                        land_sheet.merge_range(
+                                            row, 9, row + khasra_merge_span - 1, 9,
+                                            'हाँ' if is_diverted else 'नहीं',
+                                            _yes_no_format(is_diverted),
+                                        )
                                     else:
                                         land_sheet.merge_range(
                                             row, 7, row + khasra_merge_span - 1, 7,
@@ -204,6 +229,10 @@ class Section23AwardExcel(models.Model):
                                         land_sheet.write(row, 7, 'NA', cell_center_fmt)
                                         land_sheet.write(row, 8, 'NA', cell_center_fmt)
                                         land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                                    elif irr_unirr_show_na:
+                                        land_sheet.write(row, 7, 'NA', cell_center_fmt)
+                                        land_sheet.write(row, 8, 'NA', cell_center_fmt)
+                                        land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
                                     else:
                                         land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
                                         land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
@@ -218,6 +247,10 @@ class Section23AwardExcel(models.Model):
                                 land_sheet.write(row, 7, 'NA', cell_center_fmt)
                                 land_sheet.write(row, 8, 'NA', cell_center_fmt)
                                 land_sheet.write(row, 9, 'NA', cell_center_fmt)
+                            elif irr_unirr_show_na:
+                                land_sheet.write(row, 7, 'NA', cell_center_fmt)
+                                land_sheet.write(row, 8, 'NA', cell_center_fmt)
+                                land_sheet.write(row, 9, 'हाँ' if is_diverted else 'नहीं', _yes_no_format(is_diverted))
                             else:
                                 land_sheet.write(row, 7, 'हाँ' if is_irrigated else 'नहीं', _yes_no_format(is_irrigated))
                                 land_sheet.write(row, 8, 'हाँ' if is_unirrigated else 'नहीं', _yes_no_format(is_unirrigated))
@@ -236,22 +269,31 @@ class Section23AwardExcel(models.Model):
                         else:
                             land_sheet.write_number(row, 14, float(land.get('interest', 0.0) or 0.0), money_fmt)
                         land_sheet.write_number(row, 15, float(land.get('total_compensation', 0.0) or 0.0), money_fmt)
-                        rehab_amount = float(land.get('rehab_policy_amount', 0.0) or 0.0)
                         if land.get('fallow'):
                             land_type_hi = 'पड़ती भूमि'
                         elif land.get('irrigated'):
                             land_type_hi = 'सिंचित भूमि'
                         else:
                             land_type_hi = 'असिंचित भूमि'
+                        rehab_show = float(
+                            land.get('rehab_policy_amount_display', land.get('rehab_policy_amount', 0.0)) or 0.0
+                        )
+                        col17_rehab_text = (
+                            f"{land_type_hi}\n{self.format_indian_number(rehab_show, 2)}"
+                        )
+                        # Col 17 (header "पुनर्वास नीति… न्यूनतम देय"): भूमि प्रकार + नीति राशि
                         if land.get('is_urban_slab'):
                             if land.get('khasra_merge_show', True):
                                 urban_span = int(land.get('khasra_merge_rowspan', 1) or 1)
                                 if urban_span > 1:
-                                    land_sheet.merge_range(row, 16, row + urban_span - 1, 16, 'NA', cell_center_fmt)
+                                    land_sheet.merge_range(
+                                        row, 16, row + urban_span - 1, 16,
+                                        col17_rehab_text, rehab_col_fmt,
+                                    )
                                 else:
-                                    land_sheet.write(row, 16, 'NA', cell_center_fmt)
+                                    land_sheet.write(row, 16, col17_rehab_text, rehab_col_fmt)
                         else:
-                            land_sheet.write(row, 16, f"{rehab_amount:,.2f}\n({land_type_hi})", cell_center_fmt)
+                            land_sheet.write(row, 16, col17_rehab_text, rehab_col_fmt)
                         land_sheet.write_number(row, 17, float(land.get('paid_compensation', 0.0) or 0.0), money_fmt)
                         land_sheet.write(row, 18, land.get('remark', ''), cell_fmt)
                         row += 1
@@ -259,13 +301,17 @@ class Section23AwardExcel(models.Model):
                     group_basic_total = float(group.get('basic_value', 0.0) or 0.0)
                     group_market_total = float(group.get('market_value', 0.0) or 0.0)
                     group_solatium_total = float(group.get('solatium', 0.0) or 0.0)
-                    group_rehab_total = self._s23_calculate_group_rehab_total(lines)
                     group_interest_total, _group_days = self._calculate_interest_on_basic(group_basic_total)
                     group_total_comp = group_market_total + group_solatium_total + group_interest_total
                     land_sheet.merge_range(row, 0, row, 1, 'कुल', total_label_fmt)
                     land_sheet.write_number(row, 3, float(group.get('original_area', 0.0) or 0.0), total_number_fmt)
                     land_sheet.write_number(row, 4, float(group.get('khasra_count', 0) or 0), total_money_fmt)
-                    land_sheet.write_number(row, 5, float(group.get('acquired_area', 0.0) or 0.0), total_number_fmt)
+                    _group_has_urban = any(l.get('is_urban_slab') for l in lines)
+                    land_sheet.write(
+                        row, 5,
+                        self.format_land_sheet_col6_acquired_area_group(group),
+                        area_dual_fmt if _group_has_urban else total_number_fmt,
+                    )
                     land_sheet.write_blank(row, 6, None, total_label_fmt)
                     land_sheet.write_blank(row, 7, None, total_label_fmt)
                     land_sheet.write_blank(row, 8, None, total_label_fmt)
@@ -277,7 +323,12 @@ class Section23AwardExcel(models.Model):
                     # Col 15 (interest) in yellow row is always based on yellow Col 12 basic total.
                     land_sheet.write_number(row, 14, group_interest_total, total_money_fmt)
                     land_sheet.write_number(row, 15, group_total_comp, total_money_fmt)
-                    land_sheet.write_number(row, 16, group_rehab_total, total_money_fmt)
+                    _g_rehab = float(group.get('rehab_policy_amount', 0.0) or 0.0)
+                    land_sheet.write(
+                        row, 16,
+                        self.format_indian_number(_g_rehab, 2),
+                        total_money_fmt,
+                    )
                     land_sheet.write_number(row, 17, float(group.get('paid_compensation', 0.0) or 0.0), total_money_fmt)
                     land_sheet.write_blank(row, 18, None, total_label_fmt)
                     total_acq += float(group.get('acquired_area', 0.0) or 0.0)
@@ -287,11 +338,20 @@ class Section23AwardExcel(models.Model):
                     total_interest += group_interest_total
                     total_comp += group_total_comp
                     total_paid += float(group.get('paid_compensation', 0.0) or 0.0)
+                    total_rehab += float(group.get('rehab_policy_amount', 0.0) or 0.0)
                     row += 1
 
                 land_sheet.merge_range(row, 0, row, 3, 'MAHAYOG (TOTAL) / महायोग', total_label_fmt)
                 land_sheet.write_blank(row, 4, None, total_label_fmt)
-                land_sheet.write_number(row, 5, total_acq, total_number_fmt)
+                _mah_urb = any(
+                    any(l.get('is_urban_slab') for l in (g.get('lines') or []))
+                    for g in land_groups
+                )
+                land_sheet.write(
+                    row, 5,
+                    self.format_land_sheet_col6_acquired_area_mahayog(land_groups, total_acq),
+                    area_dual_fmt if _mah_urb else total_number_fmt,
+                )
                 land_sheet.write_blank(row, 6, None, total_label_fmt)
                 land_sheet.write_blank(row, 7, None, total_label_fmt)
                 land_sheet.write_blank(row, 8, None, total_label_fmt)
@@ -302,10 +362,10 @@ class Section23AwardExcel(models.Model):
                 land_sheet.write_number(row, 13, total_solatium, total_money_fmt)
                 land_sheet.write_number(row, 14, total_interest, total_money_fmt)
                 land_sheet.write_number(row, 15, total_comp, total_money_fmt)
-                land_sheet.write_number(
+                land_sheet.write(
                     row, 16,
-                    sum(self._s23_calculate_group_rehab_total(g.get('lines')) for g in land_groups),
-                    total_money_fmt
+                    self.format_indian_number(total_rehab, 2),
+                    total_money_fmt,
                 )
                 land_sheet.write_number(row, 17, total_paid, total_money_fmt)
                 land_sheet.write_blank(row, 18, None, total_label_fmt)

@@ -8,8 +8,8 @@
 # - draft_award.py
 
 # Import all models from the new files
-from . import section4_notification
-from . import expert_committee_report
-from . import section11_preliminary_report
-from . import section19_notification
-from . import draft_award
+from ..sections import section4_notification
+from ..sections import expert_committee_report
+from ..sections import section11_preliminary_report
+from ..sections import section19_notification
+from ..process import draft_award

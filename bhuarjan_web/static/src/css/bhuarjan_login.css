@@ -1,411 +1,584 @@
 /* ============================================================
-   BHUARJAN — Simple professional login (/web/login)
-   Reference: centred white card on deep navy, minimal chrome.
+   BHUARJAN — Immersive split-screen login  (/web/login)
+   Left  : animated feature panel with auto-rotating slider
+   Right : clean, minimal login form
    ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+/* ── Design tokens ── */
 :root {
-    --login-bg-1: #ffedd8;
-    --login-bg-2: #ffd9b5;
-    --login-accent: #ff7a1a;
-    --login-accent-2: #ff9a3d;
-    --login-text: #1b1f28;
-    --login-muted: #687082;
-    --login-border: #eceff5;
-    --login-surface: #ffffff;
+    --lp-dark:     #160b06;
+    --lp-mid:      #4a1e0e;
+    --lp-med:      #7a3b28;
+    --lp-light:    #a05030;
+    --lp-accent:   #ff7a1a;
+    --lp-accent2:  #ffa857;
+    --rp-bg:       #ffffff;
+    --rp-text:     #1a1d24;
+    --rp-muted:    #6b7280;
+    --rp-border:   #e5e0da;
+    --rp-inp-bg:   #f7f4f1;
 }
 
-/* Narrow login column even before body.bhu-login-body runs — prevents password toggle anchoring to full viewport width */
-#bhu-login-root {
-    max-width: 420px !important;
-    width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    box-sizing: border-box !important;
-}
-
-/* ── Page canvas ── */
+/* ─────────────────────────────────────────────────
+   RESET ODOO WRAPPERS (card / container / main)
+   ───────────────────────────────────────────────── */
 body.bhu-login-body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0 !important; padding: 0 !important;
+    background: var(--lp-dark) !important;
+    overflow-x: hidden !important;
     min-height: 100vh !important;
-    background: radial-gradient(circle at 20% 10%, #ffffff99 0%, #ffffff00 40%),
-        linear-gradient(160deg, var(--login-bg-1) 0%, var(--login-bg-2) 100%) !important;
 }
-
 body.bhu-login-body #wrapwrap {
-    min-height: 100vh !important;
     background: transparent !important;
+    min-height: 100vh !important;
 }
-
-body.bhu-login-body #wrapwrap > header {
-    display: none !important;
-}
-
-body.bhu-login-body #wrapwrap > footer {
-    display: none !important;
-}
+body.bhu-login-body #wrapwrap > header,
+body.bhu-login-body #wrapwrap > footer { display: none !important; }
 
 body.bhu-login-body main {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: block !important;
+    padding: 0 !important; margin: 0 !important;
     min-height: 100vh !important;
-    padding: 32px 20px !important;
-    margin: 0 !important;
-}
-
-body.bhu-login-body main > .container,
-body.bhu-login-body .container.py-5 {
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-body.bhu-login-body .o_database_list,
-body.bhu-login-body .card {
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    border-radius: 14px !important;
-    background: var(--login-surface) !important;
-    box-shadow: 0 12px 38px rgba(16, 24, 40, 0.16) !important;
+    max-width: 100vw !important; width: 100% !important;
     overflow: hidden !important;
 }
-
+body.bhu-login-body main > .container,
+body.bhu-login-body .container.py-5 {
+    max-width: 100% !important; width: 100% !important;
+    padding: 0 !important; margin: 0 !important;
+    min-height: 100vh !important;
+}
+body.bhu-login-body .card,
+body.bhu-login-body .o_database_list {
+    max-width: 100% !important; width: 100% !important;
+    min-height: 100vh !important; height: auto !important;
+    border-radius: 0 !important; border: none !important;
+    box-shadow: none !important; background: transparent !important;
+    margin: 0 !important; overflow: visible !important;
+}
 body.bhu-login-body .card-body {
-    padding: 26px 24px 18px !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+}
+body.bhu-login-body .card-body > div.text-center.pb-3.border-bottom,
+body.bhu-login-body .card-body > div.border-top.small.mt-4 { display: none !important; }
+body.bhu-login-body .card-body > :not(#bhu-login-root)      { display: none !important; }
+body.bhu-login-body .o_skip_to_content                      { display: none !important; }
+body.bhu-login-body main form:not([role="form"])             { display: none !important; }
+body.bhu-login-body input[placeholder*="Search"],
+body.bhu-login-body .o_searchbar_form                        { display: none !important; }
+
+/* ─────────────────────────────────────────────────
+   ROOT — two-column grid
+   ───────────────────────────────────────────────── */
+#bhu-login-root {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    min-height: 100vh !important;
+    width: 100% !important; max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+@media (min-width: 900px) {
+    #bhu-login-root { grid-template-columns: 58% 42% !important; }
 }
 
-body.bhu-login-body .card-body > div.text-center.pb-3.border-bottom {
-    display: none !important;
+/* ═════════════════════════════════════════════════
+   LEFT PANEL
+   ═════════════════════════════════════════════════ */
+.bhu-lp-left {
+    position: relative;
+    background: linear-gradient(150deg,
+        var(--lp-dark)  0%,
+        #2e1208       25%,
+        var(--lp-mid)  55%,
+        var(--lp-light)100%);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 38px 44px 32px;
+    min-height: 100vh;
 }
 
-/* Keep only our standalone root in login card */
-body.bhu-login-body .card-body > :not(#bhu-login-root) {
-    display: none !important;
+/* Animated glow blobs */
+.bhu-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(72px);
+    pointer-events: none;
+    animation: blobDrift 10s ease-in-out infinite;
+}
+.bhu-blob-1 {
+    width: 420px; height: 420px;
+    top: -140px; left: -100px;
+    background: radial-gradient(circle, var(--lp-accent) 0%, transparent 70%);
+    opacity: 0.18;
+    animation-delay: 0s;
+}
+.bhu-blob-2 {
+    width: 320px; height: 320px;
+    bottom: 40px; right: -80px;
+    background: radial-gradient(circle, #ffcc66 0%, transparent 70%);
+    opacity: 0.14;
+    animation-delay: -4s;
+}
+.bhu-blob-3 {
+    width: 240px; height: 240px;
+    top: 45%; left: 40%;
+    background: radial-gradient(circle, var(--lp-accent2) 0%, transparent 70%);
+    opacity: 0.10;
+    animation-delay: -7s;
+}
+@keyframes blobDrift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(18px,-28px) scale(1.07); }
+    66%      { transform: translate(-12px, 16px) scale(0.95); }
 }
 
-body.bhu-login-body #bhu-login-root > :not(.bhu-login-head):not(.oe_login_form):not(.o_login_redirect_back):not(.bhu-login-visual):not(.bhu-login-logos) {
-    display: none !important;
+/* Subtle grid lines */
+.bhu-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
 }
 
-body.bhu-login-body #bhu-login-root > .bhu-login-logos {
-    display: flex !important;
+/* All real content above blobs */
+.bhu-lp-left > *:not(.bhu-blob):not(.bhu-grid-overlay) { position: relative; z-index: 1; }
+
+/* Brand row */
+.bhu-lp-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 42px;
+}
+.bhu-lp-logo {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.bhu-lp-brand-text { display: flex; flex-direction: column; }
+.bhu-lp-brand-name {
+    font-size: 0.96rem; font-weight: 800;
+    color: #fff; letter-spacing: 2px; line-height: 1;
+}
+.bhu-lp-brand-sub {
+    font-size: 0.63rem; font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.3px; margin-top: 4px;
 }
 
-body.bhu-login-body .bhu-login-logos {
+/* ── Slider ── */
+.bhu-slider-container {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.bhu-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    pointer-events: none;
+}
+.bhu-slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    position: relative;
+}
+
+.bhu-slide-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,122,26,0.18);
+    border: 1px solid rgba(255,122,26,0.4);
+    color: var(--lp-accent2);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+    width: fit-content;
+}
+.bhu-slide-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.22;
+    margin: 0 0 14px;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+    letter-spacing: -0.3px;
+}
+.bhu-slide-desc {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.65;
+    margin: 0 0 28px;
+    max-width: 400px;
+}
+
+/* Slide 1 – stat boxes */
+.bhu-slide-stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.bhu-slide-stat {
+    flex: 1 1 0;
+    min-width: 70px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 14px;
+    padding: 12px 14px;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s;
+}
+.bhu-slide-stat:hover { background: rgba(255,255,255,0.12); }
+.bhu-stat-num {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--lp-accent2);
+    line-height: 1;
+    margin-bottom: 5px;
+    font-variant-numeric: tabular-nums;
+}
+.bhu-stat-lbl {
+    display: block;
+    font-size: 0.66rem;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Slide 2 – workflow pills */
+.bhu-slide-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.bhu-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.88);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 13px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s, border-color 0.2s;
+}
+.bhu-pill:hover {
+    background: rgba(255,122,26,0.2);
+    border-color: rgba(255,122,26,0.45);
+}
+
+/* Slide 3 – impact rows */
+.bhu-slide-impacts { display: flex; flex-direction: column; gap: 14px; }
+.bhu-impact-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 12px 16px;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s;
+}
+.bhu-impact-row:hover { background: rgba(255,255,255,0.11); }
+.bhu-impact-ico {
+    font-size: 1.35rem;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(255,122,26,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.bhu-impact-val {
+    font-size: 0.92rem; font-weight: 700;
+    color: var(--lp-accent2); margin-bottom: 2px;
+}
+.bhu-impact-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+/* Slider dots */
+.bhu-slider-dots {
+    display: flex;
+    gap: 7px;
+    margin-top: 26px; margin-bottom: 22px;
+}
+.bhu-slider-dot {
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.28);
+    border: none; cursor: pointer; padding: 0;
+    transition: all 0.35s ease;
+}
+.bhu-slider-dot.active {
+    background: var(--lp-accent);
+    width: 26px;
+}
+.bhu-slider-dot:hover { background: rgba(255,255,255,0.55); }
+
+/* Trust badges */
+.bhu-lp-trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 6px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.bhu-lp-trust span {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+}
+
+/* ═════════════════════════════════════════════════
+   RIGHT PANEL
+   ═════════════════════════════════════════════════ */
+.bhu-lp-right {
+    background: var(--rp-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 28px;
+    min-height: 100vh;
+    position: relative;
+}
+/* Subtle warm tint top-right corner */
+.bhu-lp-right::before {
+    content: "";
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,170,80,0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.bhu-rp-inner {
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Logos */
+.bhu-login-logos {
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    padding: 2px 8px 14px;
+    padding-bottom: 22px;
 }
-
-body.bhu-login-body .bhu-login-logos img {
+.bhu-login-logos img {
     display: block;
     object-fit: cover;
     background: #fff;
     border-radius: 50%;
-    border: 2px solid rgba(15, 23, 42, 0.1);
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+    border: 2px solid rgba(15,23,42,0.09);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.12);
+    height: 66px; width: 66px;
+}
+.bhu-login-logos .bhu-logo-left { max-width: none; }
+.bhu-logo-divider { width: 1px; height: 38px; background: rgba(15,23,42,0.13); }
+
+/* Heading */
+.bhu-login-head { margin-bottom: 22px; }
+.bhu-login-head h1 {
+    margin: 0 0 5px;
+    color: var(--rp-text);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+.bhu-login-head p {
+    margin: 0;
+    color: var(--rp-muted);
+    font-size: 0.875rem;
 }
 
-body.bhu-login-body .bhu-login-logos .bhu-logo-left {
-    height: 78px;
-    width: 78px;
-    max-width: none;
-}
-
-body.bhu-login-body .bhu-login-logos .bhu-logo-right {
-    height: 78px;
-    width: 78px;
-}
-
-body.bhu-login-body .bhu-login-logos .bhu-logo-divider {
-    width: 1px;
-    height: 46px;
-    background: rgba(15, 23, 42, 0.15);
-}
-
-body.bhu-login-body .bhu-login-visual,
-body.bhu-login-body .bhu-login-visual-overlay {
-    display: none !important;
-}
-
-body.bhu-login-body .bhu-login-visual {
-    position: relative;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: -4px 0 14px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background: #132540;
-}
-
-body.bhu-login-body .bhu-login-visual img {
-    display: block;
-    width: 100%;
-    height: 130px;
-    object-fit: cover;
-    object-position: center;
-    filter: saturate(1.06) contrast(1.02);
-}
-
-body.bhu-login-body .bhu-login-visual-overlay {
-    position: absolute;
-    inset: auto 0 0 0;
-    background: linear-gradient(180deg, rgba(10, 20, 40, 0) 0%, rgba(10, 20, 40, 0.86) 82%);
-    padding: 28px 12px 10px;
-    color: #fff;
-}
-
-body.bhu-login-body .bhu-login-visual-overlay strong {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-body.bhu-login-body .bhu-login-visual-overlay span {
-    display: block;
-    font-size: 0.68rem;
-    opacity: 0.92;
-    margin-top: 3px;
-}
-
-body.bhu-login-body #bhu-login-root .oe_login_form ~ *:not(.o_login_redirect_back) {
-    display: none !important;
-}
-
-body.bhu-login-body .bhu-login-head {
-    margin-bottom: 14px !important;
-}
-
-body.bhu-login-body .bhu-login-head h1 {
-    margin: 0 0 6px !important;
-    color: var(--login-text) !important;
-    font-size: 1.5rem !important;
-    font-weight: 800 !important;
-}
-
-body.bhu-login-body .bhu-login-head p {
-    margin: 0 !important;
-    color: var(--login-muted) !important;
-    font-size: 0.9rem !important;
-}
-
-body.bhu-login-body form.oe_login_form,
-body.bhu-login-body form[role="form"] {
+/* Form resets */
+.bhu-lp-right form.oe_login_form,
+.bhu-lp-right form[role="form"] {
     background: transparent !important;
-    border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 8px 0 0 !important;
+    padding: 0 !important;
     width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
 }
+.bhu-lp-right form .mb-3 { margin-bottom: 14px !important; }
 
-body.bhu-login-body form .mb-3 {
-    margin-bottom: 12px !important;
-}
-
-body.bhu-login-body form label,
-body.bhu-login-body form .form-label {
-    font-size: 0.82rem !important;
+/* Labels */
+.bhu-lp-right form label,
+.bhu-lp-right form .form-label {
+    display: block !important;
+    font-size: 0.81rem !important;
     font-weight: 600 !important;
-    color: var(--login-text) !important;
+    color: var(--rp-text) !important;
     margin-bottom: 7px !important;
 }
 
-body.bhu-login-body form .mb-3.field-login,
-body.bhu-login-body form .mb-3.field-password {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+/* Input rows */
+.bhu-lp-right .bhu-input-row { display: block; width: 100%; box-sizing: border-box; }
+.bhu-lp-right form .mb-3.field-login,
+.bhu-lp-right form .mb-3.field-password {
+    width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;
 }
 
-/* Same full-width shell for email and password rows */
-body.bhu-login-body #bhu-login-root .bhu-input-row {
+/* Inputs */
+.bhu-lp-right form .form-control,
+.bhu-lp-right form input.form-control {
     display: block !important;
     width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-}
-
-body.bhu-login-body form .form-control,
-body.bhu-login-body form input.form-control {
-    display: block !important;
-    width: 100% !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--login-border) !important;
-    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    border: 1.5px solid var(--rp-border) !important;
+    padding: 10px 13px !important;
     font-size: 0.9rem !important;
-    background: #f6f7fb !important;
+    font-family: inherit !important;
+    background: var(--rp-inp-bg) !important;
+    color: var(--rp-text) !important;
     box-sizing: border-box !important;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s !important;
     min-width: 0 !important;
 }
-
-body.bhu-login-body form .form-control:focus {
-    border-color: var(--login-accent) !important;
-    box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.12) !important;
+.bhu-lp-right form .form-control:focus {
+    border-color: var(--lp-accent) !important;
+    box-shadow: 0 0 0 3px rgba(255,122,26,0.13) !important;
     background: #fff !important;
     outline: none !important;
 }
 
-body.bhu-login-body .btn-primary,
-body.bhu-login-body button[type="submit"].btn-primary {
+/* Submit button */
+.bhu-lp-right .btn-primary,
+.bhu-lp-right button[type="submit"].btn-primary {
     width: 100% !important;
-    padding: 10px 14px !important;
+    padding: 11px 16px !important;
     font-weight: 700 !important;
-    font-size: 0.88rem !important;
-    border-radius: 8px !important;
-    border: none !important;
-    background: linear-gradient(135deg, var(--login-accent) 0%, var(--login-accent-2) 100%) !important;
-    box-shadow: 0 8px 18px rgba(255, 122, 26, 0.32) !important;
-    margin-top: 2px !important;
-}
-
-body.bhu-login-body .btn-primary:hover,
-body.bhu-login-body button[type="submit"].btn-primary:hover {
-    filter: brightness(1.05) !important;
-    transform: translateY(-1px);
-}
-
-body.bhu-login-body .oe_login_buttons {
-    padding-top: 4px !important;
-}
-
-body.bhu-login-body .o_login_auth {
-    display: none !important;
-}
-
-/* Some third-party addons inject extra forms on /web/login; hide them */
-body.bhu-login-body main form:not([role="form"]) {
-    display: none !important;
-}
-
-/* Keep only the primary login form and back link visible */
-body.bhu-login-body input[placeholder*="Search"],
-body.bhu-login-body input[placeholder*="search"],
-body.bhu-login-body .o_searchbar_form,
-body.bhu-login-body .s_searchbar_input,
-body.bhu-login-body .o_wsale_products_searchbar_form,
-body.bhu-login-body .container.py-5 > .card:not(:first-child) {
-    display: none !important;
-}
-
-body.bhu-login-body form .btn-link {
-    font-size: 0.82rem !important;
-}
-
-body.bhu-login-body .alert {
+    font-size: 0.95rem !important;
+    font-family: inherit !important;
     border-radius: 10px !important;
-    font-size: 0.86rem !important;
+    border: none !important;
+    background: linear-gradient(135deg, var(--lp-accent) 0%, #ff9a3d 100%) !important;
+    box-shadow: 0 8px 22px rgba(255,122,26,0.38) !important;
+    color: #fff !important;
+    letter-spacing: 0.2px;
+    transition: filter 0.2s, transform 0.18s !important;
+}
+.bhu-lp-right .btn-primary:hover,
+.bhu-lp-right button[type="submit"].btn-primary:hover {
+    filter: brightness(1.08) !important;
+    transform: translateY(-1px) !important;
+}
+.bhu-lp-right .oe_login_buttons { padding-top: 6px !important; }
+.bhu-lp-right .o_login_auth     { display: none !important; }
+
+/* Alerts */
+.bhu-lp-right .alert { border-radius: 10px !important; font-size: 0.86rem !important; }
+
+/* Secure badge */
+.bhu-secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
 }
 
-body.bhu-login-body .card-body > div.border-top.small.mt-4 {
-    display: none !important;
+/* Back link */
+.bhu-lp-right .o_login_redirect_back { text-align: center; margin-top: 18px; }
+.bhu-lp-right .o_login_redirect_back a {
+    color: #8a4f20;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+.bhu-lp-right .o_login_redirect_back a:hover {
+    color: var(--lp-accent);
+    text-decoration: underline;
 }
 
-body.bhu-login-body .card-body > div.border-top.small.mt-4 a[href*="odoo.com"],
-body.bhu-login-body .card-body > div.border-top.small.mt-4 span {
-    display: none !important;
-}
-
-body.bhu-login-body .card-body > div.border-top.small.mt-4 a {
-    font-size: 0.78rem !important;
-    color: rgba(255, 255, 255, 0.55) !important;
-}
-
-body.bhu-login-body .o_login_redirect_back {
-    text-align: center !important;
-    margin-top: 22px !important;
-}
-
-body.bhu-login-body .o_login_redirect_back a {
-    color: #8a4f20 !important;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    text-decoration: none !important;
-}
-
-body.bhu-login-body .o_login_redirect_back a:hover {
-    color: #6e3f1a !important;
-    text-decoration: underline !important;
-}
-
-body.bhu-login-body .o_skip_to_content {
-    display: none !important;
-}
-
-/* Password visibility toggle (/web/login) — SVG icons (FontAwesome not loaded on this page).
-   Rules use #bhu-login-root so positioning works before body.bhu-login-body is set by JS. */
+/* ─────────────────────────────────────────────────
+   PASSWORD TOGGLE
+   ───────────────────────────────────────────────── */
 #bhu-login-root .bhu-password-wrap {
     position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100% !important; max-width: 100% !important;
     box-sizing: border-box !important;
     isolation: isolate;
 }
-body.bhu-login-body #bhu-login-root .bhu-password-wrap .form-control,
-#bhu-login-root .bhu-password-wrap .form-control {
-    padding-right: 2.75rem !important;
-}
-body.bhu-login-body #bhu-login-root .bhu-password-toggle,
+#bhu-login-root .bhu-password-wrap .form-control { padding-right: 2.75rem !important; }
+
 #bhu-login-root .bhu-password-toggle {
     position: absolute !important;
-    left: auto !important;
-    right: 6px !important;
-    top: 50% !important;
-    bottom: auto !important;
+    left: auto !important; right: 6px !important;
+    top: 50% !important; bottom: auto !important;
     transform: translateY(-50%) !important;
-    margin-top: 0 !important;
-    margin-right: 0 !important;
-    cursor: pointer !important;
+    margin: 0 !important; cursor: pointer !important;
     z-index: 2 !important;
-    color: var(--login-muted, #687082) !important;
+    color: var(--rp-muted) !important;
     line-height: 0 !important;
     padding: 4px !important;
-    margin: 0 !important;
-    user-select: none !important;
-    -webkit-tap-highlight-color: transparent;
-    background: transparent !important;
-    border: none !important;
+    background: transparent !important; border: none !important;
     display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 2.25rem !important;
-    height: 2.25rem !important;
-    border-radius: 6px !important;
-    box-sizing: border-box !important;
+    align-items: center !important; justify-content: center !important;
+    width: 2.25rem !important; height: 2.25rem !important;
+    border-radius: 6px !important; box-sizing: border-box !important;
+    -webkit-tap-highlight-color: transparent;
 }
-body.bhu-login-body #bhu-login-root .bhu-password-toggle svg,
-#bhu-login-root .bhu-password-toggle svg {
-    display: block !important;
-    width: 20px !important;
-    height: 20px !important;
-}
-body.bhu-login-body #bhu-login-root .bhu-password-toggle .bhu-toggle-icon-visible,
-#bhu-login-root .bhu-password-toggle .bhu-toggle-icon-visible {
-    display: none !important;
-}
-body.bhu-login-body #bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-hidden,
-#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-hidden {
-    display: none !important;
-}
-body.bhu-login-body #bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-visible,
-#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-visible {
-    display: block !important;
-}
-body.bhu-login-body #bhu-login-root .bhu-password-toggle:hover,
-body.bhu-login-body #bhu-login-root .bhu-password-toggle:focus,
+#bhu-login-root .bhu-password-toggle svg { display: block !important; width: 20px !important; height: 20px !important; }
+#bhu-login-root .bhu-password-toggle .bhu-toggle-icon-visible { display: none !important; }
+#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-hidden { display: none !important; }
+#bhu-login-root .bhu-password-toggle.bhu-password-showing .bhu-toggle-icon-visible { display: block !important; }
 #bhu-login-root .bhu-password-toggle:hover,
 #bhu-login-root .bhu-password-toggle:focus {
-    color: var(--login-accent, #ff7a1a) !important;
+    color: var(--lp-accent) !important;
     outline: none !important;
-    background: rgba(255, 122, 26, 0.08) !important;
+    background: rgba(255,122,26,0.09) !important;
+}
+
+/* ─────────────────────────────────────────────────
+   RESPONSIVE — mobile: hide left, warm card form
+   ───────────────────────────────────────────────── */
+@media (max-width: 899px) {
+    .bhu-lp-left { display: none; }
+    #bhu-login-root { grid-template-columns: 1fr !important; }
+    .bhu-lp-right {
+        background: linear-gradient(160deg, #ffedd8 0%, #ffd9b5 100%);
+        min-height: 100vh; padding: 40px 20px;
+    }
+    .bhu-rp-inner { max-width: 400px; margin: auto; }
 }

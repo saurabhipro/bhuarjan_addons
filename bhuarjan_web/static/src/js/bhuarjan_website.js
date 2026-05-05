@@ -55,4 +55,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Forcefully remove "Skip to Content" if it exists
     var skip = document.querySelector('.o_skip_to_content, a[href="#wrap"]');
     if (skip && skip.parentNode) skip.parentNode.removeChild(skip);
+
+    /* Cookie bar: Odoo's popup widget focuses the first focusable (often "Cookie Policy"),
+       which scrolls the viewport to the bottom. Keep the page at the top on first paint. */
+    var cookieBar = document.getElementById('website_cookies_bar');
+    if (cookieBar) {
+        var cookieModal = cookieBar.querySelector('.modal');
+        if (cookieModal) {
+            cookieModal.addEventListener('shown.bs.modal', function () {
+                if (window.scrollY < 48) {
+                    window.scrollTo(0, 0);
+                }
+                var ae = document.activeElement;
+                if (ae && cookieBar.contains(ae)) {
+                    ae.blur();
+                }
+            });
+        }
+    }
 });

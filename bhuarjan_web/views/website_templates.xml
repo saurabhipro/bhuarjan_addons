@@ -785,4 +785,12 @@
         </footer>
     </template>
 
+    <!-- Odoo injects the cookies bar on all website.layout pages, including /web/login.
+         Hide it on the login route only so the public site still shows consent. -->
+    <template id="bhuarjan_cookies_bar_skip_login" inherit_id="website.cookies_bar" name="BHUARJAN: no cookies bar on login">
+        <xpath expr="//div[@id='website_cookies_bar']" position="attributes">
+            <attribute name="t-if">website.cookies_bar and request.httprequest.path.rstrip('/') != '/web/login'</attribute>
+        </xpath>
+    </template>
+
 </odoo>
